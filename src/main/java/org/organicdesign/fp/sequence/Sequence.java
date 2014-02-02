@@ -14,21 +14,53 @@
 
 package org.organicdesign.fp.sequence;
 
-// hasNext() is not thread-safe.  Instead, use a USED_UP sentinel value that the client has to
-// check and provide only a next() method.  This does not have to ensure any ordering.  It may
-// for some collection types and not for others.
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.TreeSet;
+
+import org.organicdesign.fp.function.Function1;
+
+/**
+ A Sequence abstraction that lazy operations can be built from.  The idea is to create a lazy,
+ immutable, persistent (memoized/cached), type-safe, thread-safe storage for finite data sources
+ that fit in memory (because those that don't cannot be memoized/cached).
+ @param <T>
+ */
 public interface Sequence<T> {
     public static final Object USED_UP = new Object();
-    public static final Sequence<Object> EMPTY_SEQUENCE = new Sequence<Object>() {
+    public static final Sequence<Object> EMPTY_SEQUENCE = new SequenceAbstract<Object>() {
+        /**
+         @return the first item in the sequence or USED_UP
+         */
         @Override
         public Object first() {
             return USED_UP;
         }
+
+        /**
+         @return a sequence or EMPTY_SEQUENCE
+         */
         @Override
         public Sequence<Object> rest() {
             return this;
         }
     };
+
+    // ======================================= Base methods =======================================
     public T first();
     public Sequence<T> rest();
+
+    // ====================================== Helper methods ======================================
+    public ArrayList<T> toJavaArrayList();
+    /**
+     @param f1 Maps keys to values
+     @return A map with the keys from the given set, mapped to values using the given function.
+     */
+    public <U> HashMap<T,U> toJavaHashMap(Function1<T,U> f1);
+    public TreeSet<T> toJavaTreeSet(Comparator<? super T> comparator);
+    public TreeSet<T> toJavaTreeSet();
+    public HashSet<T> toJavaHashSet();
+
 }

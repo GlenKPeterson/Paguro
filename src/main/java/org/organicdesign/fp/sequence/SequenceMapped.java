@@ -16,7 +16,7 @@ package org.organicdesign.fp.sequence;
 
 import org.organicdesign.fp.function.Function1;
 
-public class SequenceMapped<T,U> implements Sequence<U> {
+public class SequenceMapped<T,U>  extends SequenceAbstract<U> {
     private final Sequence<T> seq;
     private final Function1<T,U> func;
 

@@ -16,7 +16,7 @@ package org.organicdesign.fp.sequence;
 
 import org.organicdesign.fp.function.Filter;
 
-public class SequenceFiltered<T> implements Sequence<T> {
+public class SequenceFiltered<T> extends SequenceAbstract<T> {
     private static final Object UNINITIALIZED = new Object();
 
     private Sequence<T> seq;

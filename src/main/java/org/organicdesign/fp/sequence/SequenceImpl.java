@@ -18,7 +18,7 @@ import org.organicdesign.fp.function.Filter;
 import org.organicdesign.fp.function.Function0;
 import org.organicdesign.fp.function.Function1;
 
-public class SequenceImpl<T> implements Sequence<T> {
+public class SequenceImpl<T> extends SequenceAbstract<T> {
 
     private static final Object UNINITIALIZED = new Object();
 

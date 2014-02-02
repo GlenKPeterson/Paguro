@@ -29,7 +29,7 @@ import org.organicdesign.fp.function.Function1;
  As long as you do not touch the iterator after passing it to the constructor of this object, this
  object will present and immutable, lazy, memoized, thread-safe view of the underlying iterator.
  */
-class SequenceFromIterator<T> implements Sequence<T> {
+class SequenceFromIterator<T> extends SequenceAbstract<T> {
 
     private static final Object UNINITIALIZED = new Object();
 
