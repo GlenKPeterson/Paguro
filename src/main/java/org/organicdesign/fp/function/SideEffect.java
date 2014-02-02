@@ -43,14 +43,15 @@ public abstract class SideEffect {
         }
     }
 
-    public Function0<?> asFunction0() {
+    @SuppressWarnings("unchecked")
+    public <T> Function0<T> asFunction0() {
         final SideEffect parent = this;
         return new Function0<T>() {
             @Override
-            public Object apply() throws Exception {
+            public T apply() throws Exception {
                 parent.apply();
-                return null;
+                return (T) null;
             }
-        }
+        };
     }
 }
