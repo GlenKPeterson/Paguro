@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.organicdesign.fp.sequence;
+package org.organicdesign.fp.permanent;
 
 import org.organicdesign.fp.function.Filter;
 
@@ -41,7 +41,7 @@ public class SequenceFiltered<T> extends SequenceAbstract<T> {
 
     private synchronized void init() {
         if (first == UNINITIALIZED) {
-            while (seq != Sequence.EMPTY_SEQUENCE) {
+            while (seq != EMPTY_SEQUENCE) {
                 T result = seq.first();
                 if (result == USED_UP) {
                     first = usedUp();
@@ -78,9 +78,9 @@ public class SequenceFiltered<T> extends SequenceAbstract<T> {
 
     @SuppressWarnings("unchecked")
     public static <T> SequenceFiltered<T> emptySequence() {
-        return (SequenceFiltered<T>) Sequence.EMPTY_SEQUENCE;
+        return (SequenceFiltered<T>) EMPTY_SEQUENCE;
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T usedUp() { return (T) Sequence.USED_UP; }
+    public static <T> T usedUp() { return (T) USED_UP; }
 }

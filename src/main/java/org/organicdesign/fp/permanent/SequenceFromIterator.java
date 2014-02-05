@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.organicdesign.fp.sequence;
+package org.organicdesign.fp.permanent;
 
 import java.util.Iterator;
 
@@ -44,14 +44,14 @@ class SequenceFromIterator<T> extends SequenceAbstract<T> {
 
     public static <T> Sequence<T> of(Iterator<T> i) {
         if (i == null) { return emptySequence(); }
-        return new SequenceFromIterator<T>(i);
+        return new SequenceFromIterator<>(i);
     }
 
     public static <T> Sequence<T> of(Iterable<T> i) {
         if (i == null) { return emptySequence(); }
         Iterator<T> iiter = i.iterator();
         if (iiter == null) { return emptySequence(); }
-        return new SequenceFromIterator<T>(iiter);
+        return new SequenceFromIterator<>(iiter);
     }
 
     private synchronized void init() {
@@ -89,7 +89,7 @@ class SequenceFromIterator<T> extends SequenceAbstract<T> {
 
     @SuppressWarnings("unchecked")
     public static <T> SequenceFromIterator<T> emptySequence() {
-        return (SequenceFromIterator<T>) Sequence.EMPTY_SEQUENCE;
+        return (SequenceFromIterator<T>) EMPTY_SEQUENCE;
     }
 
     @SuppressWarnings("unchecked")

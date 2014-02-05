@@ -12,15 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.organicdesign.fp.sequence;
+package org.organicdesign.fp.permanent;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.TreeSet;
-
-import org.organicdesign.fp.function.Function1;
+import org.organicdesign.fp.Realizable;
 
 /**
  A Sequence abstraction that lazy operations can be built from.  The idea is to create a lazy,
@@ -28,7 +22,7 @@ import org.organicdesign.fp.function.Function1;
  that fit in memory (because those that don't cannot be memoized/cached).
  @param <T>
  */
-public interface Sequence<T> {
+public interface Sequence<T> extends Realizable<T> {
     public static final Object USED_UP = new Object();
     public static final Sequence<Object> EMPTY_SEQUENCE = new SequenceAbstract<Object>() {
         /**
@@ -51,16 +45,4 @@ public interface Sequence<T> {
     // ======================================= Base methods =======================================
     public T first();
     public Sequence<T> rest();
-
-    // ====================================== Helper methods ======================================
-    public ArrayList<T> toJavaArrayList();
-    /**
-     @param f1 Maps keys to values
-     @return A map with the keys from the given set, mapped to values using the given function.
-     */
-    public <U> HashMap<T,U> toJavaHashMap(Function1<T,U> f1);
-    public TreeSet<T> toJavaTreeSet(Comparator<? super T> comparator);
-    public TreeSet<T> toJavaTreeSet();
-    public HashSet<T> toJavaHashSet();
-
 }

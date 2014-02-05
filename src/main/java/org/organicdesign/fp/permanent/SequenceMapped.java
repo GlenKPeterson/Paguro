@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.organicdesign.fp.sequence;
+package org.organicdesign.fp.permanent;
 
 import org.organicdesign.fp.function.Function1;
 
@@ -43,6 +43,6 @@ public class SequenceMapped<T,U>  extends SequenceAbstract<U> {
 
     @SuppressWarnings("unchecked")
     public static <T,U> SequenceMapped<T,U> emptySequence() {
-        return (SequenceMapped<T,U>) Sequence.EMPTY_SEQUENCE;
+        return (SequenceMapped<T,U>) EMPTY_SEQUENCE;
     }
 }

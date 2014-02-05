@@ -12,12 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.organicdesign.fp.sequence;
+package org.organicdesign.fp.permanent;
 
 import org.organicdesign.fp.function.Filter;
 import org.organicdesign.fp.function.Function0;
 import org.organicdesign.fp.function.Function1;
 
+/**
+ I think this makes no sense.  I'm modeling transformations and this tries to be a collection.
+ @param <T>
+ */
+@Deprecated
 public class SequenceImpl<T> extends SequenceAbstract<T> {
 
     private static final Object UNINITIALIZED = new Object();
@@ -58,8 +63,8 @@ public class SequenceImpl<T> extends SequenceAbstract<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> SequenceImpl<T> emptySequence() { return (SequenceImpl<T>) Sequence.EMPTY_SEQUENCE; }
+    public static <T> SequenceImpl<T> emptySequence() { return (SequenceImpl<T>) EMPTY_SEQUENCE; }
 
     @SuppressWarnings("unchecked")
-    public static <T> T usedUp() { return (T) Sequence.USED_UP; }
+    public static <T> T usedUp() { return (T) USED_UP; }
 }
