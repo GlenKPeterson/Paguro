@@ -22,6 +22,11 @@ import java.util.TreeSet;
 
 import org.organicdesign.fp.function.Function1;
 
+/**
+ Calling any of these methods forces eager evaluation of the entire underlying collection.
+ This is incomplete, but enough to run some simple experiments with.
+ @param <T>
+ */
 public interface Realizable<T> {
     public ArrayList<T> toJavaArrayList();
     /**
