@@ -6,18 +6,18 @@ The focus is on collection transformation, but general purpose functional tools 
 
 Typical usage might be (in Java 8):
 
-<pre><code>ViewFromArray.of(1, 2, 3, 4, 5).filter((i) -> { return i > 3; })
-                               .map(i) -> { return i + 1; })
+<pre><code>ViewFromArray.of(1, 2, 3, 4, 5).filter((i) -&gt; { return i &gt; 3; })
+                               .map(i) -&gt; { return i + 1; })
                                .toJavaUnmodArrayList();
 
-// Returns: List(5, 6)</code></pre>
+// Returns an unmodifiable List&lt;Integer&gt; containing the values 5 and 6</code></pre>
 
 Or verbosely in Java 7:
 
 <pre><code>ViewFromArray.of(1, 2, 3, 4, 5).filter(new Filter<Integer>() {
     @Override
     public boolean apply(Integer i) throws Exception {
-        return i > 3;
+        return i &gt; 3;
     }
 }).map(new Function1<Integer, Object>() {
     @Override
