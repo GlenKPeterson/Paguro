@@ -18,6 +18,10 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.organicdesign.fp.function.Function1;
@@ -38,4 +42,9 @@ public interface Realizable<T> {
     public TreeSet<T> toJavaTreeSet();
     public HashSet<T> toJavaHashSet();
 
+    public List<T> toJavaUnmodArrayList();
+    public <U> Map<T,U> toJavaUnmodHashMap(Function1<T,U> f1);
+    public SortedSet<T> toJavaUnmodTreeSet(Comparator<? super T> comparator);
+    public SortedSet<T> toJavaUnmodTreeSet();
+    public Set<T> toJavaUnmodHashSet();
 }

@@ -21,10 +21,11 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.organicdesign.fp.RealizableAbstract;
 import org.organicdesign.fp.function.Filter;
 import org.organicdesign.fp.function.Function1;
 
-public abstract class SequenceAbstract<T> implements Sequence<T> {
+public abstract class SequenceAbstract<T> extends RealizableAbstract<T> implements Sequence<T> {
 
     @Override
     public abstract T first();

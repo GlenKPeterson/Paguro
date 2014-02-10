@@ -21,10 +21,13 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.organicdesign.fp.RealizableAbstract;
+import org.organicdesign.fp.function.Consumer;
 import org.organicdesign.fp.function.Filter;
 import org.organicdesign.fp.function.Function1;
+import org.organicdesign.fp.function.Function2;
 
-public abstract class ViewAbstract<T> implements View<T> {
+public abstract class ViewAbstract<T> extends RealizableAbstract<T> implements View<T> {
 
     @Override
     public abstract T next();
@@ -39,23 +42,52 @@ public abstract class ViewAbstract<T> implements View<T> {
         return ViewFiltered.of(this, func);
     }
 
-    protected Set<T> asSet(Set<T> ts) {
+    @Override
+    public void forEach(Consumer<T> se) {
         T item = next();
         while (item != USED_UP) {
-            ts.add(item);
+            se.apply_(item);
             item = next();
         }
+    }
+
+    @Override
+    public <U> U reduce(Function2<T,U,U> fun, U u) {
+        T item = next();
+        while (item != USED_UP) {
+            u = fun.apply_(item, u);
+            item = next();
+        }
+        return u;
+    }
+
+    protected Set<T> asSet(final Set<T> ts) {
+        forEach(new Consumer<T>() {
+            @Override
+            public void apply(T t) throws Exception {
+                ts.add(t);
+            }
+        });
         return ts;
     }
 
     @Override
     public ArrayList<T> toJavaArrayList() {
-        ArrayList<T> ts = new ArrayList<>();
-        T item = next();
-        while (item != USED_UP) {
-            ts.add(item);
-            item = next();
-        }
+//        return reduce(new Function2<T, ArrayList<T>, ArrayList<T>>() {
+//            @Override
+//            public ArrayList<T> apply(T t, ArrayList<T> ts) throws Exception {
+//                ts.add(t);
+//                return ts;
+//            }
+//        }, new ArrayList<T>());
+
+        final ArrayList<T> ts = new ArrayList<>();
+        forEach(new Consumer<T>() {
+            @Override
+            public void apply(T t) throws Exception {
+                ts.add(t);
+            }
+        });
         return ts;
     }
     /**
