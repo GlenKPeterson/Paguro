@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.organicdesign.fp.function.Filter;
 import org.organicdesign.fp.function.Function1;
 
 public abstract class SequenceAbstract<T> implements Sequence<T> {
@@ -30,6 +31,17 @@ public abstract class SequenceAbstract<T> implements Sequence<T> {
 
     @Override
     public abstract Sequence<T> rest();
+
+    @Override
+    public <U> Sequence<U> map(Function1<T,U> func) {
+        return SequenceMapped.of(this, func);
+    }
+
+    @Override
+    public Sequence<T> filter(Filter<T> func) {
+        return SequenceFiltered.of(this, func);
+    }
+
 
     protected Set<T> asSet(Set<T> ts) {
         Sequence<T> seq = this;

@@ -16,9 +16,6 @@ package org.organicdesign.fp.permanent;
 
 import java.util.Iterator;
 
-import org.organicdesign.fp.function.Filter;
-import org.organicdesign.fp.function.Function1;
-
 /**
  If you use the source iterator after passing it to this class then the behavior of this class
  will be undefined.  This class is immutable and memoized so that calling it repeatedly returns
@@ -75,16 +72,6 @@ class SequenceFromIterator<T> extends SequenceAbstract<T> {
     public Sequence<T> rest() {
         init();
         return rest;
-    }
-
-    public <U> Sequence<U> map(Function1<T,U> func) {
-        return SequenceMapped.of(this, func);
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T> Sequence<T> filter(Filter<T> func) {
-        // TODO: Why do I have to cast this and suppress warnings on it when this is already a Sequence<T>
-        return SequenceFiltered.of((Sequence<T>) this, func);
     }
 
     @SuppressWarnings("unchecked")

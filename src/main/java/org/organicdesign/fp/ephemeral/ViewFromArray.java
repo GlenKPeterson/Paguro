@@ -1,4 +1,4 @@
-// Copyright 2014-01-08 PlanBase Inc. & Glen Peterson
+// Copyright 2014-02-09 PlanBase Inc. & Glen Peterson
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,35 +14,34 @@
 
 package org.organicdesign.fp.ephemeral;
 
-import java.util.Iterator;
+/** A single-pass incremental transformer backed by a Java array. */
+public class ViewFromArray<T> extends ViewAbstract<T> {
 
-/** A single-pass transformer backed by a Java Iterator. */
-public class ViewFromIterator<T> extends ViewAbstract<T> {
+    private final T[] items;
+    private int idx = 0;
 
-    private final Iterator<T> iter;
+    ViewFromArray(T[] i) { items = i; }
 
-    ViewFromIterator(Iterator<T> i) { iter = i; }
-
-    public static <T> View<T> of(Iterator<T> i) {
+    @SafeVarargs
+    public static <T> View<T> of(T... i) {
         if (i == null) { return emptyView(); }
-        return new ViewFromIterator<>(i);
-    }
-
-    public static <T> View<T> of(Iterable<T> i) {
-        if (i == null) { return emptyView(); }
-        Iterator<T> iiter = i.iterator();
-        if (iiter == null) { return emptyView(); }
-        return new ViewFromIterator<>(iiter);
+        return new ViewFromArray<>(i);
     }
 
     @Override
     public synchronized T next() {
-        return iter.hasNext() ? iter.next() : usedUp();
+        if (idx == items.length) {
+            return usedUp();
+        }
+//        T ret = items[idx];
+//        idx = idx + 1;
+//        return ret;
+        return items[idx++]; // return current idx then increment idx
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> ViewFromIterator<T> emptyView() {
-        return (ViewFromIterator<T>) EMPTY_VIEW;
+    public static <T> ViewFromArray<T> emptyView() {
+        return (ViewFromArray<T>) EMPTY_VIEW;
     }
 
     @SuppressWarnings("unchecked")

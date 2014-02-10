@@ -15,6 +15,8 @@
 package org.organicdesign.fp.ephemeral;
 
 import org.organicdesign.fp.Realizable;
+import org.organicdesign.fp.function.Filter;
+import org.organicdesign.fp.function.Function1;
 
 /**
  A lightweight, one-time view that lazy, thread-safe operations can be built from.  Because there
@@ -32,4 +34,8 @@ public interface View<T> extends Realizable<T> {
     };
 
     public T next();
+
+    public <U> View<U> map(Function1<T,U> func);
+
+    public View<T> filter(Filter<T> func);
 }

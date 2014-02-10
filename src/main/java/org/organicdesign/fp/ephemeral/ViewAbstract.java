@@ -21,12 +21,23 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.organicdesign.fp.function.Filter;
 import org.organicdesign.fp.function.Function1;
 
 public abstract class ViewAbstract<T> implements View<T> {
 
     @Override
     public abstract T next();
+
+    @Override
+    public <U> View<U> map(Function1<T,U> func) {
+        return ViewMapped.of(this, func);
+    }
+
+    @Override
+    public View<T> filter(Filter<T> func) {
+        return ViewFiltered.of(this, func);
+    }
 
     protected Set<T> asSet(Set<T> ts) {
         T item = next();
