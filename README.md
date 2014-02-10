@@ -6,9 +6,10 @@ The focus is on collection transformation, but general purpose functional tools 
 
 Typical usage might be (in Java 8):
 
-<pre><code>ViewFromArray.of(1, 2, 3, 4, 5).filter((i) -&gt; { return i &gt; 3; })
-                               .map(i) -&gt; { return i + 1; })
-                               .toJavaUnmodArrayList();
+<pre><code>ViewFromArray.of(1, 2, 3, 4, 5)
+        .filter((i) -&gt; { return i &gt; 3; })
+        .map((i) -&gt; { return i + 1; })
+        .toJavaUnmodArrayList();
 
 // Returns an unmodifiable List&lt;Integer&gt; containing the values 5 and 6</code></pre>
 
