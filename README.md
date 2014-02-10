@@ -1,27 +1,65 @@
 fp4java7
 ========
 
-Functional Programming tools for Java 7.  Specifically the focus will be on collections, but a lot of general purpose functional tools are necessary, such as "second-class" functions.  :-)
+These are functional programming tools for Java 7.
+The focus is on collection transformation, but general purpose functional tools are included to make that possible, such as "second-class" functions.  :-)
 
-The most interesting classes are in: src/main/java/org/organicdesign/fp/sequence.  The Sequence model implemented here is a lazy, immutable, persistent (memoized/cached), type-safe, thread-safe storage for finite data sources that fit in memory (because those that don't cannot be memoized/cached).  It's most similar to the Clojure sequence abstraction, but it's pure Java and type-safe.
+Typical usage might be (in Java 8):
 
-One usage starting point begins with a Java Iterator wrapped in a SequenceFromIterator.  The other is to start from SequenceImpl (Implementation).  Various operations return new objects that lazily carry those operations out.  map() produces a SequenceMapped.  filter() produces a SequenceFiltered().  In this way, multiple operations can be chained before actually evaluating anything.  Then evaluation can be done in the smallest possible increments.
+<pre><code>ViewFromArray.of(1, 2, 3, 4, 5).filter((i) -> { return i > 3; })
+                               .map(i) -> { return i + 1; })
+                               .toJavaUnmodArrayList();
 
-The end-points are currently a few methods that force full evaluation to a few popular Java collections (2014-02-02).  I'd eventually like this project to immutable collections that allow lightweight copies so that these libraries can compete with java.util.Collections even as the allow interop.  Thus toVector() might go to organicdesign.fp.immutable.Vector - an immutable shallow tree that supports lightweight copies, similar to the Clojre or Scala vector.  toJavaArrayList() would give full Java interop.
+// Returns: List(5, 6)</code></pre>
 
-Also worth checking out is src/main/java/org/organicdesign/fp/function/Filter.and().  It allows chaining of single argument functions that return a boolean.  Some attempt has been made to do something similar with Function1.compose(), but the greater variation of possible functions makes this more difficult.  Additional considerations are listed in the JavaDocs.
+Or verbosely in Java 7:
 
-This project involves some experimentation.  Theoretical purity (in the sense of atomic simplicity) is a goal, but the success of this project will be measured by practical application.  Of course, that's said partly tongue-in-cheek because the practical application of functional programming is somewhat limited by Java7.  But I expect the concepts behind this work to translate to something very useful in Java8 and/or Scala.
+<pre><code>ViewFromArray.of(1, 2, 3, 4, 5).filter(new Filter<Integer>() {
+    @Override
+    public boolean apply(Integer i) throws Exception {
+        return i > 3;
+    }
+}).map(new Function1<Integer, Object>() {
+    @Override
+    public Object apply(Integer i) throws Exception {
+        return i + 1;
+    }
+}).toJavaUnmodArrayList();</code></pre>
 
-An additional element of this, perhaps the most critical element is to look at a design for collections that handle many things the original Java collections did not (and most of the things that they did).
+The most interesting classes are probably (in src/main/java/):
+<ul>
+<li><code>org/organicdesign/fp/ephemeral/ViewAbstract</code> - allows various functional transformations to be lazily applied: filter, map, forEach, etc.</li>
+<li><code>org/organicdesign/fp/Realizable</code> - allows any transformations to be eagerly evaluated into either mutable or unmodifiable collections (Java collections have to fit in memory).</li>
+<li><code>org/organicdesign/fp/function/Filter.and()</code> - Smartly combines multiple filters.</li>
+</ul>
+
+The View model implemented here is for lightweight, lazy, immutable, type-safe, and thread-safe transformations.
+The Sequence model is also memoized/cached, so it is useful for repeated queries.
+Sequence is most similar to the Clojure sequence abstraction, but it's pure Java and type-safe.
+Both allow processing in the smallest possible (and therefore laziest) increments.
+
+To use, start with a Java Iterable or Array wrapped in a ViewFrom___ or SequenceFrom___ class.
+
+A lot has been said about lightweight copies of immutable collections, but I wonder how far
+mutable builders could go toward not having to copy immutable collections.
+
+Also worth checking out is src/main/java/org/organicdesign/fp/function/Filter.and().
+It allows chaining of single argument functions that return a boolean.
+Some attempt has been made to do something similar with Function1.compose(), but the greater variation of possible functions makes this more difficult.
+
+This project involves some experimentation.
+Simplicity is a goal, but the success of this project will be measured by practical application.
+Of course, that's said partly tongue-in-cheek because the practical application of functional programming is somewhat limited by Java7.
+But I expect the concepts behind this work to translate to something very useful in Java8 and/or Scala.
 
 Collection Variations:
  - Mutable vs. Immutable
  - Lazy vs. Eager
  - Persistent vs. Ephemeral
  - Finite vs. Infinite (finite sub-categories: fits in memory or not)
+ - Write-only Builder with read-only collection?
  - Permitting lightweight copies (goes well with Immutable)
- - Type-safe (with proper covariance and contravariance to the degree possible in Java)
+ - Type-safe
  - Thread-safe
 
 Interface Desires:
