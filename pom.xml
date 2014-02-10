@@ -3,12 +3,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.organicdesign.fp</groupId>
-  <artifactId>fp</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <artifactId>fp4java7</artifactId>
+  <version>0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>Functional Programming Tools for Java 7</name>
-<!--  <url>http://maven.apache.org</url> -->
+  <url>https://github.com/GlenKPeterson/fp4java7</url>
 
   <dependencies>
 <!--
