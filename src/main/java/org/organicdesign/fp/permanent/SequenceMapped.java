@@ -14,6 +14,7 @@
 
 package org.organicdesign.fp.permanent;
 
+import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.function.Function;
 
 public class SequenceMapped<T,U>  extends SequenceAbstract<U> {
@@ -26,7 +27,7 @@ public class SequenceMapped<T,U>  extends SequenceAbstract<U> {
     public static <T,U> Sequence<U> of(Sequence<T> s, Function<T,U> f) {
         // You can put nulls in, but you don't get nulls out.
         if (f == null) { return emptySequence(); }
-        if (f == Function.IDENTITY) { return (Sequence<U>) s; }
+        if (f == FunctionUtils.IDENTITY) { return (Sequence<U>) s; }
         if ( (s == null) || (s == EMPTY_SEQUENCE) ) { return emptySequence(); }
         return new SequenceMapped<>(s, f);
     }

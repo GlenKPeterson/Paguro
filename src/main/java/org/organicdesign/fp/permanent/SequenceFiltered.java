@@ -14,6 +14,7 @@
 
 package org.organicdesign.fp.permanent;
 
+import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.function.Predicate;
 
 public class SequenceFiltered<T> extends SequenceAbstract<T> {
@@ -33,8 +34,8 @@ public class SequenceFiltered<T> extends SequenceAbstract<T> {
 
     public static <T> Sequence<T> of(Sequence<T> s, Predicate<T> f) {
         // You can put nulls in, but you don't get nulls out.
-        if ( (f == null) || (f == Predicate.REJECT) ) { return emptySequence(); }
-        if (f == Predicate.ACCEPT) { return s; }
+        if ( (f == null) || (f == FunctionUtils.REJECT) ) { return emptySequence(); }
+        if (f == FunctionUtils.ACCEPT) { return s; }
         if ( (s == null) || (s == EMPTY_SEQUENCE) ) { return emptySequence(); }
         return new SequenceFiltered<>(s, f);
     }

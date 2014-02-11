@@ -14,6 +14,7 @@
 
 package org.organicdesign.fp.ephemeral;
 
+import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.function.Predicate;
 
 public class ViewFiltered<T> extends ViewAbstract<T> {
@@ -25,8 +26,8 @@ public class ViewFiltered<T> extends ViewAbstract<T> {
     ViewFiltered(View<T> v, Predicate<T> f) { view = v; predicate = f; }
 
     public static <T> View<T> of(View<T> v, Predicate<T> f) {
-        if ( (f == null) || (f == Predicate.REJECT) ) { return emptyView(); }
-        if (f == Predicate.ACCEPT) { return v; }
+        if ( (f == null) || (f == FunctionUtils.REJECT) ) { return emptyView(); }
+        if (f == FunctionUtils.ACCEPT) { return v; }
         if ( (v == null) || (v == EMPTY_VIEW) ) { return emptyView(); }
         return new ViewFiltered<>(v, f);
     }

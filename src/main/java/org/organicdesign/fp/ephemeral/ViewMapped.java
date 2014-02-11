@@ -14,6 +14,7 @@
 
 package org.organicdesign.fp.ephemeral;
 
+import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.function.Function;
 
 public class ViewMapped<T,U> extends ViewAbstract<U> {
@@ -26,7 +27,7 @@ public class ViewMapped<T,U> extends ViewAbstract<U> {
     public static <T,U> View<U> of(View<T> v, Function<T,U> f) {
         // You can put nulls in, but you don't get nulls out.
         if (f == null) { return emptyView(); }
-        if (f == Function.IDENTITY) { return (View<U>) v; }
+        if (f == FunctionUtils.IDENTITY) { return (View<U>) v; }
         if ( (v == null) || (v == EMPTY_VIEW) ) { return emptyView(); }
         return new ViewMapped<>(v, f);
     }

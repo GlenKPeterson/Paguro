@@ -22,7 +22,7 @@ import java.lang.Override;
  makes it clearer that you are doing something purely for side-effects.  It would be nice if
  Supplier could implement SideEffect so that they could be used more interchangeably, but
  Java inheritence prohibits overriding methods with the same arguments and different return types.
- So we have an asFunction0() convenience method built in.
+ So we have an asSupplier() convenience method built in.
  */
 public abstract class SideEffect {
 
@@ -42,7 +42,7 @@ public abstract class SideEffect {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> Supplier<T> asFunction0() {
+    public <T> Supplier<T> asSupplier() {
         final SideEffect parent = this;
         return new Supplier<T>() {
             @Override
