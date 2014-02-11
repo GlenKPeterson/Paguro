@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.organicdesign.fp.function.Function1;
+import org.organicdesign.fp.function.Function;
 
 /**
  Calling any of these methods forces eager evaluation of the entire underlying collection.
@@ -37,13 +37,13 @@ public interface Realizable<T> {
      @param f1 Maps keys to values
      @return A map with the keys from the given set, mapped to values using the given function.
      */
-    public <U> HashMap<T,U> toJavaHashMap(Function1<T,U> f1);
+    public <U> HashMap<T,U> toJavaHashMap(Function<T,U> f1);
     public TreeSet<T> toJavaTreeSet(Comparator<? super T> comparator);
     public TreeSet<T> toJavaTreeSet();
     public HashSet<T> toJavaHashSet();
 
     public List<T> toJavaUnmodArrayList();
-    public <U> Map<T,U> toJavaUnmodHashMap(Function1<T,U> f1);
+    public <U> Map<T,U> toJavaUnmodHashMap(Function<T,U> f1);
     public SortedSet<T> toJavaUnmodTreeSet(Comparator<? super T> comparator);
     public SortedSet<T> toJavaUnmodTreeSet();
     public Set<T> toJavaUnmodHashSet();

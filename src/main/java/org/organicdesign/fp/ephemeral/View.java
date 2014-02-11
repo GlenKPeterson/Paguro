@@ -16,9 +16,9 @@ package org.organicdesign.fp.ephemeral;
 
 import org.organicdesign.fp.Realizable;
 import org.organicdesign.fp.function.Consumer;
-import org.organicdesign.fp.function.Filter;
-import org.organicdesign.fp.function.Function1;
-import org.organicdesign.fp.function.Function2;
+import org.organicdesign.fp.function.Function;
+import org.organicdesign.fp.function.Predicate;
+import org.organicdesign.fp.function.BiFunction;
 
 /**
  A lightweight, one-time view that lazy, thread-safe operations can be built from.  Because there
@@ -44,7 +44,7 @@ public interface View<T> extends Realizable<T> {
      @return a lazy view of the same size as the input (may contain duplicates) containing the
      return values of the given function in the same order as the input values.
      */
-    public <U> View<U> map(Function1<T,U> func);
+    public <U> View<U> map(Function<T,U> func);
 
     /**
      Lazily applies the filter function to the underlying data source and returns a new view
@@ -52,7 +52,7 @@ public interface View<T> extends Realizable<T> {
      @param func a function that returns true for items to keep, false for items to drop
      @return a lazy view of only the filtered items.
      */
-    public View<T> filter(Filter<T> func);
+    public View<T> filter(Predicate<T> func);
 
     /**
      Eagerly processes the entire data source for side effects.
@@ -68,5 +68,5 @@ public interface View<T> extends Realizable<T> {
      @param u the starting value to be combined with the first member of the underlying data source
      @return
      */
-    public <U> U reduce(Function2<T,U,U> fun, U u);
+    public <U> U reduce(BiFunction<T,U,U> fun, U u);
 }

@@ -17,12 +17,10 @@ package org.organicdesign.fp.function;
 import java.lang.Exception;
 import java.lang.Override;
 
-import org.organicdesign.fp.function.Function0;
-
 /**
- Takes no arguments, has no return.  You could use a Function0 and ignore the return, but this
+ Takes no arguments, has no return.  You could use a Supplier and ignore the return, but this
  makes it clearer that you are doing something purely for side-effects.  It would be nice if
- Function0 could implement SideEffect so that they could be used more interchangeably, but
+ Supplier could implement SideEffect so that they could be used more interchangeably, but
  Java inheritence prohibits overriding methods with the same arguments and different return types.
  So we have an asFunction0() convenience method built in.
  */
@@ -44,11 +42,11 @@ public abstract class SideEffect {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> Function0<T> asFunction0() {
+    public <T> Supplier<T> asFunction0() {
         final SideEffect parent = this;
-        return new Function0<T>() {
+        return new Supplier<T>() {
             @Override
-            public T apply() throws Exception {
+            public T get() throws Exception {
                 parent.apply();
                 return (T) null;
             }

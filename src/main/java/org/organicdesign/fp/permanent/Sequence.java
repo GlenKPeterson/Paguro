@@ -15,8 +15,8 @@
 package org.organicdesign.fp.permanent;
 
 import org.organicdesign.fp.Realizable;
-import org.organicdesign.fp.function.Filter;
-import org.organicdesign.fp.function.Function1;
+import org.organicdesign.fp.function.Function;
+import org.organicdesign.fp.function.Predicate;
 
 /**
  A Sequence abstraction that lazy operations can be built from.  The idea is to create a lazy,
@@ -48,8 +48,8 @@ public interface Sequence<T> extends Realizable<T> {
     public T first();
     public Sequence<T> rest();
 
-    public <U> Sequence<U> map(Function1<T,U> func);
+    public <U> Sequence<U> map(Function<T,U> func);
 
-    public Sequence<T> filter(Filter<T> func);
+    public Sequence<T> filter(Predicate<T> func);
 
 }

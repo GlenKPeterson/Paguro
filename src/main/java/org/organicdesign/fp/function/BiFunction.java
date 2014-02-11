@@ -15,10 +15,11 @@
 package org.organicdesign.fp.function;
 
 /**
- This is like Java 8's java.util.function.Consumer, but retrofitted to turn checked exceptions
- into unchecked ones in Java 5, 6, and 7.
+ This is like Java 8's java.util.function.BiFunction, but retrofitted to turn checked exceptions
+ into unchecked ones in Java 5, 6, and 7.  I would call this Function2 because it takes 2 arguments
+ but I need to follow Java 8.
  */
-public abstract class Function2<T,U,V> {
+public abstract class BiFunction<T,U,V> {
     /** Implement this one method and you don't have to worry about checked exceptions. */
     public abstract V apply(T t, U u) throws Exception;
 

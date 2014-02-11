@@ -18,57 +18,60 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- This is a bit like Java 8's java.util.function.Function, but retrofitted to turn checked exceptions
- into unchecked ones in Java 5, 6, and 7.
+ This is a bit like Java 8's java.util.function.Predicate, but retrofitted to turn checked
+ exceptions into unchecked ones in Java 5, 6, and 7.  I originally called this Filter and used
+ apply() as the main method name to work more like the other functions, but Java 8 uses Predicate
+ and test().  Predicate is a fine name, but using a different method name from other
+ functions is just ugly.
  */
-public abstract class Filter<T> {
+public abstract class Predicate<T> {
     /** Implement this one method and you don't have to worry about checked exceptions. */
-    public abstract boolean apply(T t) throws Exception;
+    public abstract boolean test(T t) throws Exception;
 
     /**
      The class that takes a consumer as an argument uses this convenience method so that it
      doesn't have to worry about checked exceptions either.
      */
-    public boolean apply_(T t) {
+    public boolean test_(T t) {
         try {
-            return apply(t);
+            return test(t);
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
     }
 
     /** A filter that always returns true.  Use accept() for a type-safe version of this filter. */
-    public static final Filter<Object> ACCEPT = new Filter<Object>() {
+    public static final Predicate<Object> ACCEPT = new Predicate<Object>() {
         @Override
-        public boolean apply(Object t) throws Exception {
+        public boolean test(Object t) throws Exception {
             return true;
         }
     };
 
     /** A filter that always returns false. Use reject() for a type-safe version of this filter. */
-    public static final Filter<Object> REJECT = new Filter<Object>() {
+    public static final Predicate<Object> REJECT = new Predicate<Object>() {
         @Override
-        public boolean apply(Object t) throws Exception {
+        public boolean test(Object t) throws Exception {
             return false;
         }
     };
 
     /** Returns a type-safe version of the ACCEPT filter. */
     @SuppressWarnings("unchecked")
-    public static <T> Filter<T> accept() { return (Filter<T>) ACCEPT; }
+    public static <T> Predicate<T> accept() { return (Predicate<T>) ACCEPT; }
 
     /** Returns a type-safe version of the REJECT filter. */
     @SuppressWarnings("unchecked")
-    public static <T> Filter<T> reject() { return (Filter<T>) REJECT; }
+    public static <T> Predicate<T> reject() { return (Predicate<T>) REJECT; }
 
     /** Returns a filter that returns the boolean opposite of the given filter. */
-    public static <T> Filter<T> not(final Filter<T> f) {
+    public static <T> Predicate<T> not(final Predicate<T> f) {
         if (ACCEPT == f) { return reject(); }
         if (REJECT == f) { return accept(); }
-        return new Filter<T>() {
+        return new Predicate<T>() {
             @Override
-            public boolean apply(T t) throws Exception {
-                return !f.apply(t);
+            public boolean test(T t) throws Exception {
+                return !f.test(t);
             }
         };
     }
@@ -81,7 +84,7 @@ public abstract class Filter<T> {
      may or may not prove useful in practice.  Please use the accept()/ACCEPT and reject()/REJECT
      sentinel values in this abstract class since function comparison is done by reference.
 
-     @param in the filters to apply in order.  Nulls and ACCEPT filters are ignored.  Any REJECT
+     @param in the filters to test in order.  Nulls and ACCEPT filters are ignored.  Any REJECT
      filter will cause this entire method to return a single REJECT filter.  No filters means
      ACCEPT.
 
@@ -90,12 +93,12 @@ public abstract class Filter<T> {
      @return a filter which returns true if all the input filters return true, false otherwise.
      */
     @SafeVarargs
-    public static <T> Filter<T> and(Filter<T>... in) {
+    public static <T> Predicate<T> and(Predicate<T>... in) {
         if ( (in == null) || (in.length < 1) ) {
             return accept();
         }
-        final List<Filter<T>> out = new ArrayList<>();
-        for (Filter<T> f : in) {
+        final List<Predicate<T>> out = new ArrayList<>();
+        for (Predicate<T> f : in) {
             if ((f == null) || (f == ACCEPT)) {
                 continue;
             }
@@ -110,11 +113,11 @@ public abstract class Filter<T> {
         } else if (out.size() == 1) {
             return out.get(0);
         } else {
-            return new Filter<T>() {
+            return new Predicate<T>() {
                 @Override
-                public boolean apply(T t) throws Exception {
-                    for (Filter<T> f : out) {
-                        if (!f.apply(t)) {
+                public boolean test(T t) throws Exception {
+                    for (Predicate<T> f : out) {
+                        if (!f.test(t)) {
                             return false;
                         }
                     }

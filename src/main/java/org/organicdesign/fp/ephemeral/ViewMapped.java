@@ -14,19 +14,19 @@
 
 package org.organicdesign.fp.ephemeral;
 
-import org.organicdesign.fp.function.Function1;
+import org.organicdesign.fp.function.Function;
 
 public class ViewMapped<T,U> extends ViewAbstract<U> {
     private final View<T> view;
-    private final Function1<T,U> func;
+    private final Function<T,U> func;
 
-    ViewMapped(View<T> v, Function1<T,U> f) { view = v; func = f; }
+    ViewMapped(View<T> v, Function<T,U> f) { view = v; func = f; }
 
     @SuppressWarnings("unchecked")
-    public static <T,U> View<U> of(View<T> v, Function1<T,U> f) {
+    public static <T,U> View<U> of(View<T> v, Function<T,U> f) {
         // You can put nulls in, but you don't get nulls out.
         if (f == null) { return emptyView(); }
-        if (f == Function1.IDENTITY) { return (View<U>) v; }
+        if (f == Function.IDENTITY) { return (View<U>) v; }
         if ( (v == null) || (v == EMPTY_VIEW) ) { return emptyView(); }
         return new ViewMapped<>(v, f);
     }

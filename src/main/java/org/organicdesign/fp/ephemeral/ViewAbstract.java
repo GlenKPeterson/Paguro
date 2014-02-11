@@ -23,9 +23,9 @@ import java.util.TreeSet;
 
 import org.organicdesign.fp.RealizableAbstract;
 import org.organicdesign.fp.function.Consumer;
-import org.organicdesign.fp.function.Filter;
-import org.organicdesign.fp.function.Function1;
-import org.organicdesign.fp.function.Function2;
+import org.organicdesign.fp.function.Function;
+import org.organicdesign.fp.function.Predicate;
+import org.organicdesign.fp.function.BiFunction;
 
 public abstract class ViewAbstract<T> extends RealizableAbstract<T> implements View<T> {
 
@@ -33,12 +33,12 @@ public abstract class ViewAbstract<T> extends RealizableAbstract<T> implements V
     public abstract T next();
 
     @Override
-    public <U> View<U> map(Function1<T,U> func) {
+    public <U> View<U> map(Function<T,U> func) {
         return ViewMapped.of(this, func);
     }
 
     @Override
-    public View<T> filter(Filter<T> func) {
+    public View<T> filter(Predicate<T> func) {
         return ViewFiltered.of(this, func);
     }
 
@@ -46,13 +46,13 @@ public abstract class ViewAbstract<T> extends RealizableAbstract<T> implements V
     public void forEach(Consumer<T> se) {
         T item = next();
         while (item != USED_UP) {
-            se.apply_(item);
+            se.accept_(item);
             item = next();
         }
     }
 
     @Override
-    public <U> U reduce(Function2<T,U,U> fun, U u) {
+    public <U> U reduce(BiFunction<T,U,U> fun, U u) {
         T item = next();
         while (item != USED_UP) {
             u = fun.apply_(item, u);
@@ -64,7 +64,7 @@ public abstract class ViewAbstract<T> extends RealizableAbstract<T> implements V
     protected Set<T> asSet(final Set<T> ts) {
         forEach(new Consumer<T>() {
             @Override
-            public void apply(T t) throws Exception {
+            public void accept(T t) throws Exception {
                 ts.add(t);
             }
         });
@@ -73,7 +73,7 @@ public abstract class ViewAbstract<T> extends RealizableAbstract<T> implements V
 
     @Override
     public ArrayList<T> toJavaArrayList() {
-//        return reduce(new Function2<T, ArrayList<T>, ArrayList<T>>() {
+//        return reduce(new BiFunction<T, ArrayList<T>, ArrayList<T>>() {
 //            @Override
 //            public ArrayList<T> apply(T t, ArrayList<T> ts) throws Exception {
 //                ts.add(t);
@@ -84,7 +84,7 @@ public abstract class ViewAbstract<T> extends RealizableAbstract<T> implements V
         final ArrayList<T> ts = new ArrayList<>();
         forEach(new Consumer<T>() {
             @Override
-            public void apply(T t) throws Exception {
+            public void accept(T t) throws Exception {
                 ts.add(t);
             }
         });
@@ -95,7 +95,7 @@ public abstract class ViewAbstract<T> extends RealizableAbstract<T> implements V
      @return A map with the keys from the given set, mapped to values using the given function.
      */
     @Override
-    public <U> HashMap<T,U> toJavaHashMap(Function1<T,U> f1) {
+    public <U> HashMap<T,U> toJavaHashMap(Function<T,U> f1) {
         HashMap<T,U> ts = new HashMap<T, U>() {};
         T item = next();
         while (item != USED_UP) {

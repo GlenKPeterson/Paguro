@@ -14,19 +14,19 @@
 
 package org.organicdesign.fp.permanent;
 
-import org.organicdesign.fp.function.Function1;
+import org.organicdesign.fp.function.Function;
 
 public class SequenceMapped<T,U>  extends SequenceAbstract<U> {
     private final Sequence<T> seq;
-    private final Function1<T,U> func;
+    private final Function<T,U> func;
 
-    private SequenceMapped(Sequence<T> s, Function1<T,U> f) { seq = s; func = f; }
+    private SequenceMapped(Sequence<T> s, Function<T,U> f) { seq = s; func = f; }
 
     @SuppressWarnings("unchecked")
-    public static <T,U> Sequence<U> of(Sequence<T> s, Function1<T,U> f) {
+    public static <T,U> Sequence<U> of(Sequence<T> s, Function<T,U> f) {
         // You can put nulls in, but you don't get nulls out.
         if (f == null) { return emptySequence(); }
-        if (f == Function1.IDENTITY) { return (Sequence<U>) s; }
+        if (f == Function.IDENTITY) { return (Sequence<U>) s; }
         if ( (s == null) || (s == EMPTY_SEQUENCE) ) { return emptySequence(); }
         return new SequenceMapped<>(s, f);
     }

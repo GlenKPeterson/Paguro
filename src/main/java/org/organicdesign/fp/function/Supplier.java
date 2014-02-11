@@ -16,19 +16,21 @@ package org.organicdesign.fp.function;
 
 /**
  This is like Java 8's java.util.function.Function, but retrofitted to turn checked exceptions
- into unchecked ones in Java 5, 6, and 7.
+ into unchecked ones in Java 5, 6, and 7.  I originally called this Function0, meaning a zero-
+ argument function and called it's method apply() like all the other functions, but I renamed it
+ to match Java8.  Yucky.
  */
-public abstract class Function0<T> {
+public abstract class Supplier<T> {
     /** Implement this one method and you don't have to worry about checked exceptions. */
-    public abstract T apply() throws Exception;
+    public abstract T get() throws Exception;
 
     /**
      The class that takes a consumer as an argument uses this convenience method so that it
      doesn't have to worry about checked exceptions either.
      */
-    public T apply_() {
+    public T get_() {
         try {
-            return apply();
+            return get();
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }

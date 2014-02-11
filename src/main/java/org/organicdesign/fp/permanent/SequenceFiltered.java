@@ -14,14 +14,14 @@
 
 package org.organicdesign.fp.permanent;
 
-import org.organicdesign.fp.function.Filter;
+import org.organicdesign.fp.function.Predicate;
 
 public class SequenceFiltered<T> extends SequenceAbstract<T> {
     private static final Object UNINITIALIZED = new Object();
 
     private Sequence<T> seq;
 
-    private final Filter<T> filter;
+    private final Predicate<T> predicate;
 
     @SuppressWarnings("unchecked")
     private T first = (T) UNINITIALIZED;
@@ -29,12 +29,12 @@ public class SequenceFiltered<T> extends SequenceAbstract<T> {
 //    @SuppressWarnings("unchecked")
 //    private Sequence<T> rest = (Sequence<T>) UNINITIALIZED;
 
-    private SequenceFiltered(Sequence<T> s, Filter<T> f) { seq = s; filter = f; }
+    private SequenceFiltered(Sequence<T> s, Predicate<T> f) { seq = s; predicate = f; }
 
-    public static <T> Sequence<T> of(Sequence<T> s, Filter<T> f) {
+    public static <T> Sequence<T> of(Sequence<T> s, Predicate<T> f) {
         // You can put nulls in, but you don't get nulls out.
-        if ( (f == null) || (f == Filter.REJECT) ) { return emptySequence(); }
-        if (f == Filter.ACCEPT) { return s; }
+        if ( (f == null) || (f == Predicate.REJECT) ) { return emptySequence(); }
+        if (f == Predicate.ACCEPT) { return s; }
         if ( (s == null) || (s == EMPTY_SEQUENCE) ) { return emptySequence(); }
         return new SequenceFiltered<>(s, f);
     }
@@ -49,9 +49,9 @@ public class SequenceFiltered<T> extends SequenceAbstract<T> {
                     return;
                 }
 
-                if (filter.apply_(result)) {
+                if (predicate.test_(result)) {
                     first = result;
-                    seq = of(seq.rest(), filter);
+                    seq = of(seq.rest(), predicate);
                     return;
                 }
 

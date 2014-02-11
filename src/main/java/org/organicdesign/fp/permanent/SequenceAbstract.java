@@ -22,8 +22,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.organicdesign.fp.RealizableAbstract;
-import org.organicdesign.fp.function.Filter;
-import org.organicdesign.fp.function.Function1;
+import org.organicdesign.fp.function.Function;
+import org.organicdesign.fp.function.Predicate;
 
 public abstract class SequenceAbstract<T> extends RealizableAbstract<T> implements Sequence<T> {
 
@@ -34,12 +34,12 @@ public abstract class SequenceAbstract<T> extends RealizableAbstract<T> implemen
     public abstract Sequence<T> rest();
 
     @Override
-    public <U> Sequence<U> map(Function1<T,U> func) {
+    public <U> Sequence<U> map(Function<T,U> func) {
         return SequenceMapped.of(this, func);
     }
 
     @Override
-    public Sequence<T> filter(Filter<T> func) {
+    public Sequence<T> filter(Predicate<T> func) {
         return SequenceFiltered.of(this, func);
     }
 
@@ -68,7 +68,7 @@ public abstract class SequenceAbstract<T> extends RealizableAbstract<T> implemen
      @return A map with the keys from the given set, mapped to values using the given function.
      */
     @Override
-    public <U> HashMap<T,U> toJavaHashMap(Function1<T,U> f1) {
+    public <U> HashMap<T,U> toJavaHashMap(Function<T,U> f1) {
         HashMap<T,U> ts = new HashMap<T, U>() {};
         Sequence<T> seq = this;
         while (seq != EMPTY_SEQUENCE) {

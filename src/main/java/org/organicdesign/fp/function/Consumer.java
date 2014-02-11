@@ -16,19 +16,20 @@ package org.organicdesign.fp.function;
 
 /**
  This is like Java 8's java.util.function.Consumer, but retrofitted to turn checked exceptions
- into unchecked ones in Java 5, 6, and 7.
+ into unchecked ones in Java 5, 6, and 7.  I originally called the method apply() to be like all
+ the other functions, but Java 8 uses accept(), so I'm renaming it.
  */
 public abstract class Consumer<T> {
     /** Implement this one method and you don't have to worry about checked exceptions. */
-    public abstract void apply(T t) throws Exception;
+    public abstract void accept(T t) throws Exception;
 
     /**
      The class that takes a consumer as an argument uses this convenience method so that it
      doesn't have to worry about checked exceptions either.
      */
-    public void apply_(T t) {
+    public void accept_(T t) {
         try {
-            apply(t);
+            accept(t);
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }

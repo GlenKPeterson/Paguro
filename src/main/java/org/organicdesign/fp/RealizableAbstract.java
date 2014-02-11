@@ -25,7 +25,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.organicdesign.fp.function.Function1;
+import org.organicdesign.fp.function.Function;
 
 public abstract class RealizableAbstract<T> implements Realizable<T> {
     @Override
@@ -36,7 +36,7 @@ public abstract class RealizableAbstract<T> implements Realizable<T> {
      @return A map with the keys from the given set, mapped to values using the given function.
      */
     @Override
-    public abstract <U> HashMap<T,U> toJavaHashMap(Function1<T,U> f1);
+    public abstract <U> HashMap<T,U> toJavaHashMap(Function<T,U> f1);
 
     @Override
     public abstract TreeSet<T> toJavaTreeSet(Comparator<? super T> comparator);
@@ -53,7 +53,7 @@ public abstract class RealizableAbstract<T> implements Realizable<T> {
     }
 
     @Override
-    public <U> Map<T,U> toJavaUnmodHashMap(Function1<T,U> f1) {
+    public <U> Map<T,U> toJavaUnmodHashMap(Function<T,U> f1) {
         return Collections.unmodifiableMap(toJavaHashMap(f1));
     }
 
