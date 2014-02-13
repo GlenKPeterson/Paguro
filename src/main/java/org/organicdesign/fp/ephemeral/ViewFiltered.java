@@ -14,7 +14,10 @@
 
 package org.organicdesign.fp.ephemeral;
 
+import java.util.HashMap;
+
 import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.function.Function;
 import org.organicdesign.fp.function.Predicate;
 
 public class ViewFiltered<T> extends ViewAbstract<T> {

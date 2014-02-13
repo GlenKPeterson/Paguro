@@ -78,6 +78,25 @@ public abstract class SequenceAbstract<T> extends RealizableAbstract<T> implemen
         }
         return ts;
     }
+
+    /**
+     @param f1 Maps values to keys
+
+     @return A map with the values from the given set, mapped by keys supplied by the given
+     function.
+     */
+    @Override
+    public <U> HashMap<U, T> toReverseJavaHashMap(Function<T, U> f1) {
+        HashMap<U, T> ts = new HashMap<U, T>() {};
+        Sequence<T> seq = this;
+        while (seq != EMPTY_SEQUENCE) {
+            T first = seq.first();
+            ts.put(f1.apply_(first), first);
+            seq = seq.rest();
+        }
+        return ts;
+    }
+
     @Override
     public TreeSet<T> toJavaTreeSet(Comparator<? super T> comparator) {
         TreeSet<T> ts = new TreeSet<>(comparator);

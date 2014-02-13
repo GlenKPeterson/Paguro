@@ -31,6 +31,11 @@ public abstract class RealizableAbstract<T> implements Realizable<T> {
     @Override
     public abstract ArrayList<T> toJavaArrayList();
 
+    @Override
+    public List<T> toJavaUnmodList() {
+        return Collections.unmodifiableList(toJavaArrayList());
+    }
+
     /**
      @param f1 Maps keys to values
      @return A map with the keys from the given set, mapped to values using the given function.
@@ -39,36 +44,43 @@ public abstract class RealizableAbstract<T> implements Realizable<T> {
     public abstract <U> HashMap<T,U> toJavaHashMap(Function<T,U> f1);
 
     @Override
+    public <U> Map<T,U> toJavaUnmodMap(Function<T,U> f1) {
+        return Collections.unmodifiableMap(toJavaHashMap(f1));
+    }
+
+    /**
+     @param f1 Maps values to keys
+     @return A map with the values from the given set, mapped by keys supplied by the given function.
+     */
+    @Override
+    public abstract <U> HashMap<U,T> toReverseJavaHashMap(Function<T,U> f1);
+
+    @Override
+    public <U> Map<U,T> toReverseJavaUnmodMap(Function<T,U> f1) {
+        return Collections.unmodifiableMap(toReverseJavaHashMap(f1));
+    }
+
+    @Override
     public abstract TreeSet<T> toJavaTreeSet(Comparator<? super T> comparator);
+
+    @Override
+    public SortedSet<T> toJavaUnmodSortedSet(Comparator<? super T> comparator) {
+        return Collections.unmodifiableSortedSet(toJavaTreeSet(comparator));
+    }
 
     @Override
     public abstract TreeSet<T> toJavaTreeSet();
 
     @Override
-    public abstract HashSet<T> toJavaHashSet();
-
-    @Override
-    public List<T> toJavaUnmodArrayList() {
-        return Collections.unmodifiableList(toJavaArrayList());
-    }
-
-    @Override
-    public <U> Map<T,U> toJavaUnmodHashMap(Function<T,U> f1) {
-        return Collections.unmodifiableMap(toJavaHashMap(f1));
-    }
-
-    @Override
-    public SortedSet<T> toJavaUnmodTreeSet(Comparator<? super T> comparator) {
-        return Collections.unmodifiableSortedSet(toJavaTreeSet(comparator));
-    }
-
-    @Override
-    public SortedSet<T> toJavaUnmodTreeSet() {
+    public SortedSet<T> toJavaUnmodSortedSet() {
         return Collections.unmodifiableSortedSet(toJavaTreeSet());
     }
 
     @Override
-    public Set<T> toJavaUnmodHashSet() {
+    public abstract HashSet<T> toJavaHashSet();
+
+    @Override
+    public Set<T> toJavaUnmodSet() {
         return Collections.unmodifiableSet(toJavaHashSet());
     }
 }

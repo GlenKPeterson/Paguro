@@ -33,18 +33,24 @@ import org.organicdesign.fp.function.Function;
  */
 public interface Realizable<T> {
     public ArrayList<T> toJavaArrayList();
+    public List<T> toJavaUnmodList();
+
     /**
      @param f1 Maps keys to values
      @return A map with the keys from the given set, mapped to values using the given function.
      */
     public <U> HashMap<T,U> toJavaHashMap(Function<T,U> f1);
-    public TreeSet<T> toJavaTreeSet(Comparator<? super T> comparator);
-    public TreeSet<T> toJavaTreeSet();
-    public HashSet<T> toJavaHashSet();
+    public <U> Map<T,U> toJavaUnmodMap(Function<T,U> f1);
 
-    public List<T> toJavaUnmodArrayList();
-    public <U> Map<T,U> toJavaUnmodHashMap(Function<T,U> f1);
-    public SortedSet<T> toJavaUnmodTreeSet(Comparator<? super T> comparator);
-    public SortedSet<T> toJavaUnmodTreeSet();
-    public Set<T> toJavaUnmodHashSet();
+    public abstract <U> HashMap<U,T> toReverseJavaHashMap(Function<T,U> f1);
+    public <U> Map<U,T> toReverseJavaUnmodMap(Function<T,U> f1);
+
+    public TreeSet<T> toJavaTreeSet(Comparator<? super T> comparator);
+    public SortedSet<T> toJavaUnmodSortedSet(Comparator<? super T> comparator);
+
+    public TreeSet<T> toJavaTreeSet();
+    public SortedSet<T> toJavaUnmodSortedSet();
+
+    public HashSet<T> toJavaHashSet();
+    public Set<T> toJavaUnmodSet();
 }

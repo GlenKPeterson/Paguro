@@ -104,6 +104,24 @@ public abstract class ViewAbstract<T> extends RealizableAbstract<T> implements V
         }
         return ts;
     }
+
+    /**
+     @param f1 Maps values to keys
+
+     @return A map with the values from the given set, mapped by keys supplied by the given
+     function.
+     */
+    @Override
+    public <U> HashMap<U, T> toReverseJavaHashMap(Function<T, U> f1) {
+        HashMap<U, T> ts = new HashMap<U, T>() {};
+        T item = next();
+        while (item != USED_UP) {
+            ts.put(f1.apply_(item), item);
+            item = next();
+        }
+        return ts;
+    }
+
     @Override
     public TreeSet<T> toJavaTreeSet(Comparator<? super T> comparator) {
         TreeSet<T> ts = new TreeSet<>(comparator);
