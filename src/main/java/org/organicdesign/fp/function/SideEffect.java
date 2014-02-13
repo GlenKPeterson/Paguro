@@ -37,7 +37,7 @@ public abstract class SideEffect {
         try {
             apply();
         } catch (Exception e) {
-            throw new IllegalStateException(e);
+            throw (RuntimeException) e;
         }
     }
 

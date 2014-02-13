@@ -32,7 +32,7 @@ public abstract class Supplier<T> {
         try {
             return get();
         } catch (Exception e) {
-            throw new IllegalStateException(e);
+            throw (RuntimeException) e;
         }
     }
 }

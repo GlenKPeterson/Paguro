@@ -31,7 +31,7 @@ public abstract class Consumer<T> {
         try {
             accept(t);
         } catch (Exception e) {
-            throw new IllegalStateException(e);
+            throw (RuntimeException) e;
         }
     }
 }

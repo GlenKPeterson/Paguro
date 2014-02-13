@@ -37,7 +37,7 @@ public abstract class Predicate<T> {
         try {
             return test(t);
         } catch (Exception e) {
-            throw new IllegalStateException(e);
+            throw (RuntimeException) e;
         }
     }
 

@@ -34,7 +34,7 @@ public abstract class Function<T,R> {
         try {
             return apply(t);
         } catch (Exception e) {
-            throw new IllegalStateException(e);
+            throw (RuntimeException) e;
         }
     }
 

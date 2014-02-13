@@ -1,4 +1,4 @@
-// Copyright 2013-12-11 PlanBase Inc. & Glen Peterson
+// Copyright 2013-12-15 PlanBase Inc. & Glen Peterson
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,24 +14,20 @@
 
 package org.organicdesign.fp.function;
 
-/**
- This is like Java 8's java.util.function.BiFunction, but retrofitted to turn checked exceptions
- into unchecked ones in Java 5, 6, and 7.  I would call this Function2 because it takes 2 arguments
- but I need to follow Java 8.
- */
-public abstract class BiFunction<T,U,V> {
+public abstract class BiConsumer<T,U> {
     /** Implement this one method and you don't have to worry about checked exceptions. */
-    public abstract V apply(T t, U u) throws Exception;
+    public abstract void accept(T t, U u) throws Exception;
 
     /**
      The class that takes a consumer as an argument uses this convenience method so that it
      doesn't have to worry about checked exceptions either.
      */
-    public V apply_(T t, U u) {
+    public void accept_(T t, U u) {
         try {
-            return apply(t, u);
+            accept(t, u);
         } catch (Exception e) {
             throw (RuntimeException) e;
         }
     }
+
 }
