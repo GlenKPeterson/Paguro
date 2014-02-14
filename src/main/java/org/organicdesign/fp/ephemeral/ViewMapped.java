@@ -15,6 +15,7 @@
 package org.organicdesign.fp.ephemeral;
 
 import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.Sentinal;
 import org.organicdesign.fp.function.Function;
 
 public class ViewMapped<T,U> extends ViewAbstract<U> {
@@ -35,7 +36,7 @@ public class ViewMapped<T,U> extends ViewAbstract<U> {
     @Override
     public U next() {
         T item = view.next();
-        if (item == USED_UP) { return usedUp(); }
+        if (item == Sentinal.USED_UP) { return usedUp(); }
         return func.apply_(item);
     }
 
@@ -45,5 +46,5 @@ public class ViewMapped<T,U> extends ViewAbstract<U> {
     }
 
     @SuppressWarnings("unchecked")
-    public U usedUp() { return (U) USED_UP; }
+    public U usedUp() { return (U) Sentinal.USED_UP; }
 }

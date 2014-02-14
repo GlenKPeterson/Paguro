@@ -25,11 +25,23 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.organicdesign.fp.function.BiFunction;
 import org.organicdesign.fp.function.Function;
 
 public abstract class RealizableAbstract<T> implements Realizable<T> {
+
+    public abstract <U> U reduce(BiFunction<T,U,U> fun, U u);
+
     @Override
-    public abstract ArrayList<T> toJavaArrayList();
+    public ArrayList<T> toJavaArrayList() {
+        return reduce(new BiFunction<T, ArrayList<T>, ArrayList<T>>() {
+            @Override
+            public ArrayList<T> apply(T t, ArrayList<T> ts) throws Exception {
+                ts.add(t);
+                return ts;
+            }
+        }, new ArrayList<T>());
+    }
 
     @Override
     public List<T> toJavaUnmodList() {
@@ -41,7 +53,15 @@ public abstract class RealizableAbstract<T> implements Realizable<T> {
      @return A map with the keys from the given set, mapped to values using the given function.
      */
     @Override
-    public abstract <U> HashMap<T,U> toJavaHashMap(Function<T,U> f1);
+    public <U> HashMap<T,U> toJavaHashMap(final Function<T,U> f1) {
+        return reduce(new BiFunction<T, HashMap<T, U>, HashMap<T, U>>() {
+            @Override
+            public HashMap<T, U> apply(T t, HashMap<T, U> ts) throws Exception {
+                ts.put(t, f1.apply(t));
+                return ts;
+            }
+        }, new HashMap<T, U>());
+    }
 
     @Override
     public <U> Map<T,U> toJavaUnmodMap(Function<T,U> f1) {
@@ -53,7 +73,15 @@ public abstract class RealizableAbstract<T> implements Realizable<T> {
      @return A map with the values from the given set, mapped by keys supplied by the given function.
      */
     @Override
-    public abstract <U> HashMap<U,T> toReverseJavaHashMap(Function<T,U> f1);
+    public <U> HashMap<U,T> toReverseJavaHashMap(final Function<T, U> f1) {
+        return reduce(new BiFunction<T, HashMap<U, T>, HashMap<U, T>>() {
+            @Override
+            public HashMap<U, T> apply(T t, HashMap<U, T> ts) throws Exception {
+                ts.put(f1.apply_(t), t);
+                return ts;
+            }
+        }, new HashMap<U, T>());
+    }
 
     @Override
     public <U> Map<U,T> toReverseJavaUnmodMap(Function<T,U> f1) {
@@ -61,23 +89,38 @@ public abstract class RealizableAbstract<T> implements Realizable<T> {
     }
 
     @Override
-    public abstract TreeSet<T> toJavaTreeSet(Comparator<? super T> comparator);
+    public TreeSet<T> toJavaTreeSet(Comparator<? super T> comparator) {
+        return reduce(new BiFunction<T, TreeSet<T>, TreeSet<T>>() {
+            @Override
+            public TreeSet<T> apply(T t, TreeSet<T> ts) throws Exception {
+                ts.add(t);
+                return ts;
+            }
+        }, new TreeSet<T>(comparator));
+    }
+    @Override
+    public TreeSet<T> toJavaTreeSet() { return toJavaTreeSet(null); }
+
 
     @Override
     public SortedSet<T> toJavaUnmodSortedSet(Comparator<? super T> comparator) {
         return Collections.unmodifiableSortedSet(toJavaTreeSet(comparator));
     }
-
-    @Override
-    public abstract TreeSet<T> toJavaTreeSet();
-
     @Override
     public SortedSet<T> toJavaUnmodSortedSet() {
-        return Collections.unmodifiableSortedSet(toJavaTreeSet());
+        return toJavaUnmodSortedSet(null);
     }
 
     @Override
-    public abstract HashSet<T> toJavaHashSet();
+    public HashSet<T> toJavaHashSet() {
+        return reduce(new BiFunction<T, HashSet<T>, HashSet<T>>() {
+            @Override
+            public HashSet<T> apply(T t, HashSet<T> ts) throws Exception {
+                ts.add(t);
+                return ts;
+            }
+        }, new HashSet<T>());
+    }
 
     @Override
     public Set<T> toJavaUnmodSet() {

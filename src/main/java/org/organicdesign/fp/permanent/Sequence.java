@@ -15,8 +15,8 @@
 package org.organicdesign.fp.permanent;
 
 import org.organicdesign.fp.Realizable;
-import org.organicdesign.fp.function.Function;
-import org.organicdesign.fp.function.Predicate;
+import org.organicdesign.fp.Sentinal;
+import org.organicdesign.fp.Transformable;
 
 /**
  A Sequence abstraction that lazy operations can be built from.  The idea is to create a lazy,
@@ -24,15 +24,14 @@ import org.organicdesign.fp.function.Predicate;
  that fit in memory (because those that don't cannot be memoized/cached).
  @param <T>
  */
-public interface Sequence<T> extends Realizable<T> {
-    public static final Object USED_UP = new Object();
-    public static final Sequence<Object> EMPTY_SEQUENCE = new SequenceAbstract<Object>() {
+public interface Sequence<T> extends Realizable<T>, Transformable<T> {
+    public static final Sequence<?> EMPTY_SEQUENCE = new SequenceAbstract<Object>() {
         /**
          @return the first item in the sequence or USED_UP
          */
         @Override
         public Object first() {
-            return USED_UP;
+            return Sentinal.USED_UP;
         }
 
         /**
@@ -47,9 +46,4 @@ public interface Sequence<T> extends Realizable<T> {
     // ======================================= Base methods =======================================
     public T first();
     public Sequence<T> rest();
-
-    public <U> Sequence<U> map(Function<T,U> func);
-
-    public Sequence<T> filter(Predicate<T> func);
-
 }

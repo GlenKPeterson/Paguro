@@ -14,10 +14,8 @@
 
 package org.organicdesign.fp.ephemeral;
 
-import java.util.HashMap;
-
 import org.organicdesign.fp.FunctionUtils;
-import org.organicdesign.fp.function.Function;
+import org.organicdesign.fp.Sentinal;
 import org.organicdesign.fp.function.Predicate;
 
 public class ViewFiltered<T> extends ViewAbstract<T> {
@@ -38,7 +36,7 @@ public class ViewFiltered<T> extends ViewAbstract<T> {
     @Override
     public T next() {
         T item = view.next();
-        while (item != USED_UP) {
+        while (item != Sentinal.USED_UP) {
             if (predicate.test_(item)) { return item; }
             item = view.next();
         }
@@ -51,5 +49,5 @@ public class ViewFiltered<T> extends ViewAbstract<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public T usedUp() { return (T) USED_UP; }
+    public T usedUp() { return (T) Sentinal.USED_UP; }
 }

@@ -16,6 +16,8 @@ package org.organicdesign.fp.permanent;
 
 import java.util.Iterator;
 
+import org.organicdesign.fp.Sentinal;
+
 /**
  If you use the source iterator after passing it to this class then the behavior of this class
  will be undefined.  This class is immutable and memoized so that calling it repeatedly returns
@@ -80,5 +82,5 @@ class SequenceFromIterator<T> extends SequenceAbstract<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public T usedUp() { return (T) USED_UP; }
+    public T usedUp() { return (T) Sentinal.USED_UP; }
 }

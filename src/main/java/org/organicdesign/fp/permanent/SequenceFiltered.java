@@ -15,6 +15,7 @@
 package org.organicdesign.fp.permanent;
 
 import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.Sentinal;
 import org.organicdesign.fp.function.Predicate;
 
 public class SequenceFiltered<T> extends SequenceAbstract<T> {
@@ -44,7 +45,7 @@ public class SequenceFiltered<T> extends SequenceAbstract<T> {
         if (first == UNINITIALIZED) {
             while (seq != EMPTY_SEQUENCE) {
                 T result = seq.first();
-                if (result == USED_UP) {
+                if (result == Sentinal.USED_UP) {
                     first = usedUp();
                     seq = emptySequence();
                     return;
@@ -83,5 +84,5 @@ public class SequenceFiltered<T> extends SequenceAbstract<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T usedUp() { return (T) USED_UP; }
+    public static <T> T usedUp() { return (T) Sentinal.USED_UP; }
 }

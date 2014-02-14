@@ -14,14 +14,10 @@
 
 package org.organicdesign.fp.permanent;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.organicdesign.fp.RealizableAbstract;
+import org.organicdesign.fp.Sentinal;
+import org.organicdesign.fp.function.BiFunction;
+import org.organicdesign.fp.function.Consumer;
 import org.organicdesign.fp.function.Function;
 import org.organicdesign.fp.function.Predicate;
 
@@ -43,73 +39,41 @@ public abstract class SequenceAbstract<T> extends RealizableAbstract<T> implemen
         return SequenceFiltered.of(this, func);
     }
 
-
-    protected Set<T> asSet(Set<T> ts) {
+    @Override
+    public void forEach(Consumer<T> se) {
         Sequence<T> seq = this;
-        while (seq != EMPTY_SEQUENCE) {
-            ts.add(seq.first());
+        T item = seq.first();
+        while (item != Sentinal.USED_UP) {
+            se.accept_(item);
+            // repeat with next element
             seq = seq.rest();
+            item = seq.first();
         }
-        return ts;
     }
 
     @Override
-    public ArrayList<T> toJavaArrayList() {
-        ArrayList<T> ts = new ArrayList<>();
+    public T firstMatching(Predicate<T> pred) {
         Sequence<T> seq = this;
-        while (seq != EMPTY_SEQUENCE) {
-            ts.add(seq.first());
+        T item = seq.first();
+        while (item != Sentinal.USED_UP) {
+            if (pred.test_(item)) { return item; }
+            // repeat with next element
             seq = seq.rest();
+            item = seq.first();
         }
-        return ts;
+        return null;
     }
-    /**
-     @param f1 Maps keys to values
-     @return A map with the keys from the given set, mapped to values using the given function.
-     */
+
     @Override
-    public <U> HashMap<T,U> toJavaHashMap(Function<T,U> f1) {
-        HashMap<T,U> ts = new HashMap<T, U>() {};
+    public <U> U reduce(BiFunction<T,U,U> fun, U u) {
         Sequence<T> seq = this;
-        while (seq != EMPTY_SEQUENCE) {
-            T first = seq.first();
-            ts.put(first, f1.apply_(first));
+        T item = seq.first();
+        while (item != Sentinal.USED_UP) {
+            u = fun.apply_(item, u);
+            // repeat with next element
             seq = seq.rest();
+            item = seq.first();
         }
-        return ts;
-    }
-
-    /**
-     @param f1 Maps values to keys
-
-     @return A map with the values from the given set, mapped by keys supplied by the given
-     function.
-     */
-    @Override
-    public <U> HashMap<U, T> toReverseJavaHashMap(Function<T, U> f1) {
-        HashMap<U, T> ts = new HashMap<U, T>() {};
-        Sequence<T> seq = this;
-        while (seq != EMPTY_SEQUENCE) {
-            T first = seq.first();
-            ts.put(f1.apply_(first), first);
-            seq = seq.rest();
-        }
-        return ts;
-    }
-
-    @Override
-    public TreeSet<T> toJavaTreeSet(Comparator<? super T> comparator) {
-        TreeSet<T> ts = new TreeSet<>(comparator);
-        return (TreeSet<T>) asSet(ts);
-    }
-    @Override
-    public TreeSet<T> toJavaTreeSet() {
-        TreeSet<T> ts = new TreeSet<>();
-        return (TreeSet<T>) asSet(ts);
-    }
-    @Override
-    public HashSet<T> toJavaHashSet() {
-        HashSet<T> ts = new HashSet<>();
-        return (HashSet<T>) asSet(ts);
+        return u;
     }
 }

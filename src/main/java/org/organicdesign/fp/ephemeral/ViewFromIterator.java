@@ -16,6 +16,8 @@ package org.organicdesign.fp.ephemeral;
 
 import java.util.Iterator;
 
+import org.organicdesign.fp.Sentinal;
+
 /** A single-pass transformer backed by a Java Iterator. */
 public class ViewFromIterator<T> extends ViewAbstract<T> {
 
@@ -46,5 +48,5 @@ public class ViewFromIterator<T> extends ViewAbstract<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public T usedUp() { return (T) USED_UP; }
+    public T usedUp() { return (T) Sentinal.USED_UP; }
 }

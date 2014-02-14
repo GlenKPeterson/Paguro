@@ -24,8 +24,6 @@ Or verbosely in Java 7:
     }
 }).toJavaUnmodArrayList();</code></pre>
 
-The focus of this project is on collection transformation, but general purpose functional tools are included to make that possible, such as "second-class" functions.  :-)
-
 The classes in the function package allow you to use the Java 8 functional interfaces (more or less) in java7.
 When you switch to Java 8, you only need to change the import statement and remove the _ from the apply_() methods.
 The apply_() methods are there because that's the simplest way to deal with checked exceptions in lambdas in Java 7.
@@ -47,6 +45,15 @@ Sequence is most similar to the Clojure sequence abstraction, but it's pure Java
 Both allow processing in the smallest possible (and therefore laziest) increments.
 
 To use, start with a Java Iterable or Array wrapped in a ViewFrom____ or SequenceFrom____ class.
+
+The focus of this project is on collection transformation, but general purpose functional tools are included to make that possible, such as "second-class" functions.  :-)
+To that end, the ephemeral.View classes provide the lowest-common-denominator of transformation.
+That's good in the sense, that for a single-threaded application transforming a singly linked list, it could not perform any better.
+Having a simple, correct reference implementation provides a baseline for concurrent shortcuts to beat.
+
+Some collections, like Sets, are unordered and naturally partitioned, so that some processes (such as mapping one set to another) could be carried out in a highly concurrent manner.
+Other collections (like a linked list to an immutable linked list) and transformations (like reduce) usually have to be processed in order, so a simple View is as good as it gets for them.
+Other collections and transformations fall between these two extremes and provide a rich field for further study.
 
 A lot has been said about lightweight copies of immutable collections, but I wonder how far
 mutable builders could go toward not having to copy immutable collections?
