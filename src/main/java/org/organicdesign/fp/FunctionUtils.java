@@ -16,6 +16,7 @@ package org.organicdesign.fp;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.organicdesign.fp.function.Function;
 import org.organicdesign.fp.function.Predicate;
@@ -222,6 +223,88 @@ public class FunctionUtils {
             };
         }
     }
+
+    public static <T> String toString(Iterable<T> iterable) {
+        if (iterable == null) {
+            return "null";
+        }
+        StringBuilder sB = new StringBuilder();
+
+        sB.append(iterable.getClass().getSimpleName());
+        sB.append("(");
+
+        int i = 0;
+        for (T item : iterable) {
+            if (i > 4) {
+                sB.append("...");
+                break;
+            } else if (i > 0) {
+                sB.append(",");
+            }
+            sB.append(String.valueOf(item));
+            i++;
+        }
+
+        sB.append(")");
+        return sB.toString();
+    }
+
+    public static <A,B> String toString(Map<A,B> map) {
+        if (map == null) {
+            return "null";
+        }
+        StringBuilder sB = new StringBuilder();
+
+        sB.append(map.getClass().getSimpleName());
+        sB.append("(");
+
+        int i = 0;
+        for (Map.Entry<A,B> item : map.entrySet()) {
+            if (i > 4) {
+                sB.append("...");
+                break;
+            } else if (i > 0) {
+                sB.append(",");
+            }
+            sB.append("(").append(String.valueOf(item.getKey())).append(",");
+            sB.append(String.valueOf(item.getValue())).append(")");
+            i++;
+        }
+
+        sB.append(")");
+        return sB.toString();
+    }
+
+    public static <T> String toString(Object[] as) {
+        if (as == null) {
+            return "null";
+        }
+        StringBuilder sB = new StringBuilder();
+        sB.append("Array");
+
+        if ( (as.length > 0) && (as[0] != null) ) {
+            sB.append(" of ");
+            sB.append(as[0].getClass().getSimpleName());
+        }
+
+        sB.append("(");
+
+        int i = 0;
+        for (Object item : as) {
+            if (i > 4) {
+                sB.append("...");
+                break;
+            } else if (i > 0) {
+                sB.append(",");
+            }
+            sB.append(String.valueOf(item));
+            i++;
+        }
+
+        sB.append(")");
+        return sB.toString();
+    }
+
 
 //    /**
 //     Composes multiple functions into a single function to potentially minimize trips through
