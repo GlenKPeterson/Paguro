@@ -4,8 +4,8 @@ fp4java7
 Typical usage might be (in Java 8):
 
 <pre><code>ViewFromArray.of(1, 2, 3, 4, 5)
-        .filter((i) -&gt; { return i &gt; 3; })
-        .map((i) -&gt; { return i + 1; })
+        .filter(i -&gt;  i &gt; 3 )
+        .map(i -&gt; i + 1)
         .toJavaUnmodArrayList();
 
 // Returns an unmodifiable List&lt;Integer&gt; containing the values 5 and 6</code></pre>
@@ -23,6 +23,8 @@ Or verbosely in Java 7:
         return i + 1;
     }
 }).toJavaUnmodArrayList();</code></pre>
+
+IntelliJ IDEA and probably other IDE's can collapse the Java 7 code so that it looks more like the Java 8 code, so using it in Java 7 isn't nearly as bad as this exemple makes it look.
 
 The classes in the function package allow you to use the Java 8 functional interfaces (more or less) in java7.
 When you switch to Java 8, you only need to change the import statement and remove the _ from the apply_() methods.
@@ -43,8 +45,9 @@ The View model implemented here is for lightweight, lazy, immutable, type-safe, 
 The Sequence model is also memoized/cached, so it is useful for repeated queries.
 Sequence is most similar to the Clojure sequence abstraction, but it's pure Java and type-safe.
 Both allow processing in the smallest possible (and therefore laziest) increments.
+I find myself focusing on View more than Sequence because View seems to be adequite for most things I do.
 
-To use, start with a Java Iterable or Array wrapped in a ViewFrom____ or SequenceFrom____ class.
+To use, start with a ViewFromIterable or ViewFromArray class.
 
 The focus of this project is on collection transformation (using higher-order functions), but general purpose functional tools are included to make that possible, such as "second-class" functions.  :-)
 To that end, the ephemeral.View classes provide the lowest-common-denominator of transformation.
