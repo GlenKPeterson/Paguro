@@ -24,21 +24,19 @@ Or verbosely in Java 7:
     }
 }).toJavaUnmodArrayList();</code></pre>
 
-IntelliJ IDEA and probably other IDE's can collapse the Java 7 code so that it looks more like the Java 8 code, so using it in Java 7 isn't nearly as bad as this exemple makes it look.
-
-The classes in the function package allow you to use the Java 8 functional interfaces (more or less) in java7.
+Between auto-completion and code folding, the Java 7 code can be almost as easy to write and read as Java 8.  The classes in the function package allow you to use the Java 8 functional interfaces (more or less) in java7.
 When you switch to Java 8, you only need to change the import statement and remove the _ from the apply_() methods.
 The apply_() methods are there because that's the simplest way to deal with checked exceptions in lambdas in Java 7.
 
 Java 7 and earlier require that all variables declared outside a lambda be finial in order to use them inside the lambda.
-The Mutable.____Ref classes work around this limitation when required.
-These mutable reference classes will not be needed with Java 8.
+The Mutable.____Ref classes work around this limitation in Java 7, but will not be needed with Java 8.
 
 The most interesting classes are probably (in src/main/java/):
 <ul>
-<li><code>org/organicdesign/fp/ephemeral/ViewAbstract</code> - allows various functional transformations to be lazily applied: filter, map, forEach, etc.</li>
+<li><code>org/organicdesign/fp/Transformable</code> - allows various functional transformations to be lazily applied: filter, map, forEach, etc.</li>
 <li><code>org/organicdesign/fp/Realizable</code> - allows any transformations to be eagerly evaluated into either mutable or unmodifiable collections (Java collections have to fit in memory).</li>
-<li><code>org/organicdesign/fp/function/Predicate.and()</code> - Smartly combines multiple filters.</li>
+<li><code>org/organicdesign/fp/ephemeral/ViewAbstract</code> - a working implementation of most of these transformations</li>
+<li><code>org/organicdesign/fp/FunctionUtils</code> - Smartly combine/compose multiple filters and functions.</li>
 </ul>
 
 The View model implemented here is for lightweight, lazy, immutable, type-safe, and thread-safe transformations.
