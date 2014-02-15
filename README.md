@@ -46,7 +46,7 @@ Both allow processing in the smallest possible (and therefore laziest) increment
 
 To use, start with a Java Iterable or Array wrapped in a ViewFrom____ or SequenceFrom____ class.
 
-The focus of this project is on collection transformation, but general purpose functional tools are included to make that possible, such as "second-class" functions.  :-)
+The focus of this project is on collection transformation (using higher-order functions), but general purpose functional tools are included to make that possible, such as "second-class" functions.  :-)
 To that end, the ephemeral.View classes provide the lowest-common-denominator of transformation.
 That's good in the sense, that for a single-threaded application transforming a singly linked list, it could not perform any better.
 Having a simple, correct reference implementation provides a baseline for concurrent shortcuts to beat.
@@ -65,6 +65,9 @@ This project involves some experimentation.
 Simplicity is a goal, but the success of this project will be measured by practical application.
 Of course, that's said partly tongue-in-cheek because the practical application of functional programming is somewhat in Java7.
 The concepts behind this work are even more useful in Java 8.
+
+A Java 8 version of this project is working, but a few commits behind the Java 7 version.  If
+someone wants that, let me know and I'll post it.
 
 To Do:
 ======

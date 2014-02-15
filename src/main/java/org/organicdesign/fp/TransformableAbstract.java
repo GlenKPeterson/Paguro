@@ -28,19 +28,20 @@ import java.util.TreeSet;
 import org.organicdesign.fp.function.BiFunction;
 import org.organicdesign.fp.function.Function;
 
-public abstract class RealizableAbstract<T> implements Realizable<T> {
+public abstract class TransformableAbstract<T> implements Transformable<T> {
 
-    public abstract <U> U reduce(BiFunction<T,U,U> fun, U u);
+    @Override
+    public abstract <U> U foldLeft(U u, BiFunction<U, T, U> fun);
 
     @Override
     public ArrayList<T> toJavaArrayList() {
-        return reduce(new BiFunction<T, ArrayList<T>, ArrayList<T>>() {
+        return foldLeft(new ArrayList<T>(), new BiFunction<ArrayList<T>, T, ArrayList<T>>() {
             @Override
-            public ArrayList<T> apply(T t, ArrayList<T> ts) throws Exception {
+            public ArrayList<T> apply(ArrayList<T> ts, T t) throws Exception {
                 ts.add(t);
                 return ts;
             }
-        }, new ArrayList<T>());
+        });
     }
 
     @Override
@@ -54,13 +55,13 @@ public abstract class RealizableAbstract<T> implements Realizable<T> {
      */
     @Override
     public <U> HashMap<T,U> toJavaHashMap(final Function<T,U> f1) {
-        return reduce(new BiFunction<T, HashMap<T, U>, HashMap<T, U>>() {
+        return foldLeft(new HashMap<T, U>(), new BiFunction<HashMap<T, U>, T, HashMap<T, U>>() {
             @Override
-            public HashMap<T, U> apply(T t, HashMap<T, U> ts) throws Exception {
+            public HashMap<T, U> apply(HashMap<T, U> ts, T t) throws Exception {
                 ts.put(t, f1.apply(t));
                 return ts;
             }
-        }, new HashMap<T, U>());
+        });
     }
 
     @Override
@@ -74,13 +75,13 @@ public abstract class RealizableAbstract<T> implements Realizable<T> {
      */
     @Override
     public <U> HashMap<U,T> toReverseJavaHashMap(final Function<T, U> f1) {
-        return reduce(new BiFunction<T, HashMap<U, T>, HashMap<U, T>>() {
+        return foldLeft(new HashMap<U, T>(), new BiFunction<HashMap<U, T>, T, HashMap<U, T>>() {
             @Override
-            public HashMap<U, T> apply(T t, HashMap<U, T> ts) throws Exception {
+            public HashMap<U, T> apply(HashMap<U, T> ts, T t) throws Exception {
                 ts.put(f1.apply_(t), t);
                 return ts;
             }
-        }, new HashMap<U, T>());
+        });
     }
 
     @Override
@@ -90,13 +91,13 @@ public abstract class RealizableAbstract<T> implements Realizable<T> {
 
     @Override
     public TreeSet<T> toJavaTreeSet(Comparator<? super T> comparator) {
-        return reduce(new BiFunction<T, TreeSet<T>, TreeSet<T>>() {
+        return foldLeft(new TreeSet<T>(comparator), new BiFunction<TreeSet<T>, T, TreeSet<T>>() {
             @Override
-            public TreeSet<T> apply(T t, TreeSet<T> ts) throws Exception {
+            public TreeSet<T> apply(TreeSet<T> ts, T t) throws Exception {
                 ts.add(t);
                 return ts;
             }
-        }, new TreeSet<T>(comparator));
+        });
     }
     @Override
     public TreeSet<T> toJavaTreeSet() { return toJavaTreeSet(null); }
@@ -113,13 +114,13 @@ public abstract class RealizableAbstract<T> implements Realizable<T> {
 
     @Override
     public HashSet<T> toJavaHashSet() {
-        return reduce(new BiFunction<T, HashSet<T>, HashSet<T>>() {
+        return foldLeft(new HashSet<T>(), new BiFunction<HashSet<T>, T, HashSet<T>>() {
             @Override
-            public HashSet<T> apply(T t, HashSet<T> ts) throws Exception {
+            public HashSet<T> apply(HashSet<T> ts, T t) throws Exception {
                 ts.add(t);
                 return ts;
             }
-        }, new HashSet<T>());
+        });
     }
 
     @Override

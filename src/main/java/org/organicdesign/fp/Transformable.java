@@ -19,7 +19,7 @@ import org.organicdesign.fp.function.Consumer;
 import org.organicdesign.fp.function.Function;
 import org.organicdesign.fp.function.Predicate;
 
-public interface Transformable<T> {
+public interface Transformable<T> extends Realizable<T> {
     /**
      Lazily applies the given function to each item in the underlying data source, and returns
      a View with one item for each result.
@@ -50,13 +50,40 @@ public interface Transformable<T> {
      */
     public T firstMatching(Predicate<T> pred);
 
+    // TODO: You can always use foldLeft for this operation.  Does having reduceLeft add more clarity to the underlying code, or does it provide some useful additional functionality?
+//    /**
+//     Eagerly process entire data source.  This is an extremely powerful method, being the only one
+//     that currently can produce more output items than input items (flatMap would do that too
+//     if implemented).
+//     @return
+//     @param fun Starting with the first two elements of the list, combines each value in the list with the result so far.  The initial result is u.
+//     */
+//    public T reduceLeft(BiFunction<T, T, T> fun);
+
     /**
-     Eagerly process entire data source.  This is an extremely powerful method, being the only one
-     that currently can produce more output items than input items (flatMap would do that too
-     if implemented).
+     One of the two higher-order functions that can produce more output items than input items
+     (when u is a collection). FlatMap is the other, but foldLeft is eager while flatMap is lazy.
+
+     @return an eagerly evaluated result which could be a single value like a sum, or a collection.
+     @param u the accumulator and starting value.  This will be passed to the function on the
+     first iteration to be combined with the first member of the underlying data source.  For some
+     operations you'll need to pass an identity, e.g. for a sum, pass 0, for a product, pass 1 as
+     this parameter.
      @param fun combines each value in the list with the result so far.  The initial result is u.
-     @param u the starting value to be combined with the first member of the underlying data source
-     @return
      */
-    public <U> U reduce(BiFunction<T,U,U> fun, U u);
+    public <U> U foldLeft(U u, BiFunction<U, T, U> fun);
+
+
+    // Sub-classes cannot inherit from this because the function that you pass in has to know the actal return type.
+    // Have to implement this independently on sub-classes.
+//    /**
+//     One of the two higher-order functions that can produce more output items than input items.
+//     foldLeft is the other, but flatMap is lazy while foldLeft is eager.
+//     @return a lazily evaluated collection which is expected to be larger than the input
+//     collection.  For a collection that's the same size, map() is more efficient.  If the expected
+//     return is smaller, use filter followed by map if possible, or vice versa if not.
+//     @param fun yields a Transformable of 0 or more results for each input item.
+//     */
+//    public <U> Transformable<U> flatMap(Function<T,? extends Transformable<U>> func);
+
 }

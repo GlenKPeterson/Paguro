@@ -14,14 +14,14 @@
 
 package org.organicdesign.fp.permanent;
 
-import org.organicdesign.fp.RealizableAbstract;
 import org.organicdesign.fp.Sentinal;
+import org.organicdesign.fp.TransformableAbstract;
 import org.organicdesign.fp.function.BiFunction;
 import org.organicdesign.fp.function.Consumer;
 import org.organicdesign.fp.function.Function;
 import org.organicdesign.fp.function.Predicate;
 
-public abstract class SequenceAbstract<T> extends RealizableAbstract<T> implements Sequence<T> {
+public abstract class SequenceAbstract<T> extends TransformableAbstract<T> implements Sequence<T> {
 
     @Override
     public abstract T first();
@@ -65,15 +65,32 @@ public abstract class SequenceAbstract<T> extends RealizableAbstract<T> implemen
     }
 
     @Override
-    public <U> U reduce(BiFunction<T,U,U> fun, U u) {
+    public <U> U foldLeft(U u, BiFunction<U, T, U> fun) {
         Sequence<T> seq = this;
         T item = seq.first();
         while (item != Sentinal.USED_UP) {
-            u = fun.apply_(item, u);
+            u = fun.apply_(u, item);
             // repeat with next element
             seq = seq.rest();
             item = seq.first();
         }
         return u;
     }
+
+//    @Override
+//    public T reduceLeft(BiFunction<T, T, T> fun) {
+//        T item = next();
+//        T accum = item;
+//        while (item != Sentinal.USED_UP) {
+//            item = next();
+//            accum = fun.apply_(accum, item);
+//        }
+//        return accum;
+//    }
+
+//    @Override
+//    public <U> Sequence<U> flatMap(Function<T,Sequence<U>> func) {
+//        return SequenceFlatMapped.of(this, func);
+//    }
+
 }
