@@ -113,10 +113,8 @@ How hard is it to pass a 0 or 1 to foldLeft?
 It's easy enough to implement if there is a compelling use case where it's significantly better than foldLeft.
 Otherwise, fewer methods means a simpler interface to learn.
 
-I also implemented interpose, but took it out because I just didn't
-find it useful.  My only use case was to add commas to a list to
-display it in English and for that, you also need a conjunction, and
-often a continuation symbol:
+I also implemented interpose(), but took it out because my only use case was to add commas to a list to display
+it in English and for that, you also need a conjunction, and often a continuation symbol:
 
 a, b, c, or d.
 
