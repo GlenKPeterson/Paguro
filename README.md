@@ -26,12 +26,41 @@ Or verbosely in Java 7:
 
 FunctionUtils.toString(list); // Returns: "UnmodifiableRandomAccessList(5,6)"</code></pre>
 
-
 Between auto-completion and code folding, the Java 7 code can be almost as easy to write and read as Java 8.
 
-The classes in the function package allow you to use the Java 8 functional interfaces (more or less) in java7.
+Functions available in View (as of 2014-02-16):
+<pre><code>// Starting Points:
+View&lt;T&gt; ViewFromArray.of(T... i)
+View&lt;T&gt; ViewFromIterator.of(Iterator&lt;T&gt; i)
+View&lt;T&gt; ViewFromIterator.of(Iterable&lt;T&gt; i)
+
+// Transforms:
+View&lt;U&gt; map(Function&lt;T,U&gt; func)
+View&lt;T&gt; filter(Predicate&lt;T&gt; pred)
+void forEach(Consumer&lt;T&gt; se)
+T firstMatching(Predicate&lt;T&gt; pred)
+U foldLeft(U u, BiFunction&lt;U, T, U&gt; fun)
+View&lt;T&gt; take(long numItems)
+View&lt;T&gt; drop(long numItems)
+View&lt;U&gt; flatMap(Function&lt;T,View&lt;U&gt;&gt; func)
+
+// Endpoints
+ArrayList&lt;T&gt; toJavaArrayList()
+List&lt;T&gt; toJavaUnmodList()
+HashMap&lt;T,U&gt; toJavaHashMap(Function&lt;T,U&gt; f1)
+Map&lt;T,U&gt; toJavaUnmodMap(Function&lt;T,U&gt; f1)
+HashMap&lt;U,T&gt; toReverseJavaHashMap(Function&lt;T,U&gt; f1)
+Map&lt;U,T&gt; toReverseJavaUnmodMap(Function&lt;T,U&gt; f1)
+TreeSet&lt;T&gt; toJavaTreeSet(Comparator&lt;? super T&gt; comparator)
+SortedSet&lt;T&gt; toJavaUnmodSortedSet(Comparator&lt;? super T&gt; comparator)
+TreeSet&lt;T&gt; toJavaTreeSet()
+SortedSet&lt;T&gt; toJavaUnmodSortedSet()
+HashSet&lt;T&gt; toJavaHashSet()
+Set&lt;T&gt; toJavaUnmodSet()</code></pre>
+
+The classes in the <code>function</code> package allow you to use the Java 8 functional interfaces (more or less) as "second class" functions in Java 7.
 When you switch to Java 8, you only need to change the import statement and remove the _ from the apply_() methods.
-The apply_() methods are there because that's the simplest way to deal with checked exceptions in lambdas in Java 7.
+The apply_() methods are there to deal with checked exceptions in lambdas in Java 7.
 
 Java 7 and earlier require that all variables declared outside a lambda be finial in order to use them inside the lambda.
 If you need that functionality (and you usually won't), the Mutable.____Ref classes work around this limitation.
