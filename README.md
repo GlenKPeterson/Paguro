@@ -27,7 +27,9 @@ Or verbosely in Java 7:
 FunctionUtils.toString(list); // Returns: "UnmodifiableRandomAccessList(5,6)"</code></pre>
 
 
-Between auto-completion and code folding, the Java 7 code can be almost as easy to write and read as Java 8.  The classes in the function package allow you to use the Java 8 functional interfaces (more or less) in java7.
+Between auto-completion and code folding, the Java 7 code can be almost as easy to write and read as Java 8.
+
+The classes in the function package allow you to use the Java 8 functional interfaces (more or less) in java7.
 When you switch to Java 8, you only need to change the import statement and remove the _ from the apply_() methods.
 The apply_() methods are there because that's the simplest way to deal with checked exceptions in lambdas in Java 7.
 
