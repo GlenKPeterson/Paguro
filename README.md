@@ -58,6 +58,8 @@ SortedSet&lt;T&gt; toJavaUnmodSortedSet()
 HashSet&lt;T&gt; toJavaHashSet()
 Set&lt;T&gt; toJavaUnmodSet()</code></pre>
 
+None of these transformations change the underlying collections.  Ratherly they lazily build new collections by chaining together all the operations you specify, then applying them in a single pass through the unerlying data.
+
 The View model implemented here is for lightweight, lazy, immutable, type-safe, and thread-safe transformations.
 The Sequence model is also memoized/cached, so it is useful for repeated queries.
 Sequence is most similar to the Clojure sequence abstraction, but it's pure Java and type-safe.
