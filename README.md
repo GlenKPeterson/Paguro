@@ -58,6 +58,12 @@ SortedSet&lt;T&gt; toJavaUnmodSortedSet()
 HashSet&lt;T&gt; toJavaHashSet()
 Set&lt;T&gt; toJavaUnmodSet()</code></pre>
 
+The View model implemented here is for lightweight, lazy, immutable, type-safe, and thread-safe transformations.
+The Sequence model is also memoized/cached, so it is useful for repeated queries.
+Sequence is most similar to the Clojure sequence abstraction, but it's pure Java and type-safe.
+Both allow processing in the smallest possible (and therefore laziest) increments.
+I find myself focusing on View more than Sequence because View seems to be adequite for most things I do.
+
 The classes in the <code>function</code> package allow you to use the Java 8 functional interfaces (more or less) as "second class" functions in Java 7.
 When you switch to Java 8, you only need to change the import statement and remove the _ from the apply_() methods.
 The apply_() methods are there to deal with checked exceptions in lambdas in Java 7.
@@ -71,37 +77,6 @@ The most interesting classes are probably (in src/main/java/):
 <li><code><a href="https://github.com/GlenKPeterson/fp4java7/blob/master/src/main/java/org/organicdesign/fp/ephemeral/View.java">org/organicdesign/fp/ephemeral/View</a></code> - a working implementation of most of these transformations</li>
 <li><code><a href="https://github.com/GlenKPeterson/fp4java7/blob/master/src/main/java/org/organicdesign/fp/FunctionUtils.java">org/organicdesign/fp/FunctionUtils</a></code> - smartly combine/compose multiple filters and functions, convert collections to Strings, etc.</li>
 </ul>
-
-The View model implemented here is for lightweight, lazy, immutable, type-safe, and thread-safe transformations.
-The Sequence model is also memoized/cached, so it is useful for repeated queries.
-Sequence is most similar to the Clojure sequence abstraction, but it's pure Java and type-safe.
-Both allow processing in the smallest possible (and therefore laziest) increments.
-I find myself focusing on View more than Sequence because View seems to be adequite for most things I do.
-
-To use, start with a ViewFromIterable or ViewFromArray class.
-
-The focus of this project is on collection transformation (using higher-order functions), but general purpose functional tools are included to make that possible, such as "second-class" functions.  :-)
-To that end, the ephemeral.View classes provide the lowest-common-denominator of transformation.
-That's good in the sense, that for a single-threaded application transforming a singly linked list, it could not perform any better.
-Having a simple, correct reference implementation provides a baseline for concurrent shortcuts to beat.
-
-Some collections, like Sets, are unordered and naturally partitioned, so that some processes (such as mapping one set to another) could be carried out in a highly concurrent manner.
-Other collections (like a linked list to an immutable linked list) and transformations (like reduce) usually have to be processed in order, so a simple View is as good as it gets for them.
-Other collections and transformations fall between these two extremes and provide a rich field for further study.
-
-A lot has been said about lightweight copies of immutable collections, but I wonder how far
-mutable builders could go toward not having to copy immutable collections?
-
-Also worth checking out is src/main/java/org/organicdesign/fp/function/FunctionUtils.and().
-It allows chaining of single argument functions that return a boolean.
-
-This project involves some experimentation.
-Simplicity is a goal, but the success of this project will be measured by practical application.
-Of course, that's said partly tongue-in-cheek because the practical application of functional programming is somewhat in Java7.
-The concepts behind this work are even more useful in Java 8.
-
-A Java 8 version of this project is working, but a few commits behind the Java 7 version.  If
-someone wants that, let me know and I'll post it.
 
 To Do:
 ======
@@ -117,6 +92,16 @@ Collection Variations:
  - Thread-safe
 
 Update Sequence to have all the transforms that View does.
+
+Some collections, like Sets, are unordered and naturally partitioned, so that some processes (such as mapping one set to another) could be carried out in a highly concurrent manner.
+
+A Java 8 version of this project is working, but a few commits behind the Java 7 version.  If
+someone wants that, let me know and I'll post it.
+
+This would be an even smaller project in Scala than in Java 8 so that may be in the works as well, if people would find it useful.
+
+A lot has been said about lightweight copies of immutable collections, but I wonder how far
+mutable builders could go toward not having to copy immutable collections?
 
 Out of Scope
 ============
