@@ -3,25 +3,28 @@ fp4java7
 
 Typical usage in Java 8:
 
-<pre><code>List<Integer> list = ViewFromArray.of(1,2,3,4,5,6,7,8,9,10,11)
-        .filter(i -&gt;  i &gt; 3 )
-        .map(i -&gt; i + 1)
+```java
+List list = ViewFromArray.of(1,2,3,4,5,6,7,8,9,10,11)
+        .filter(i ->  i > 3 )
+        .map(i -> i + 1)
         .toJavaUnmodArrayList();
         
 FunctionUtils.toString(list);
-// Returns: "UnmodifiableRandomAccessList(5,6,7,8,9...)"</code></pre>
+// Returns: "UnmodifiableRandomAccessList(5,6,7,8,9...)"
+```
 
 None of these transformations change the underlying collections.  Ratherly they lazily build a new collection by chaining together all the operations you specify, then applying them in a single pass through the unerlying data.
 
 A good editor like Intellij IDEA has auto-completion and code folding features that make the Java 7 code look almost like the Java 8 code, but the above example completely expanded in Java 7 looks like this:
 
-<pre><code>List<Integer> list = ViewFromArray.of(1,2,3,4,5,6,7,8,9,10,11)
-        .filter(new Filter&lt;Integer&gt;() {
+```java
+List list = ViewFromArray.of(1,2,3,4,5,6,7,8,9,10,11)
+        .filter(new Filter<Integer>() {
             @Override
             public boolean apply(Integer i) {
-                return i &gt; 3;
+                return i > 3;
             }})
-        .map(new Function1&lt;Integer,Integer&gt;() {
+        .map(new Function1<Integer,Integer>() {
             @Override
             public Object apply(Integer i) {
                 return i + 1;
@@ -29,38 +32,40 @@ A good editor like Intellij IDEA has auto-completion and code folding features t
         .toJavaUnmodArrayList();
 
 FunctionUtils.toString(list);
-// Returns: "UnmodifiableRandomAccessList(5,6,7,8,9...)"</code></pre>
-
+// Returns: "UnmodifiableRandomAccessList(5,6,7,8,9...)"
+```
 
 Functions available in <code>View</code> (as of 2014-02-16):
-<pre><code>// Starting Points:
-View&lt;T&gt; ViewFromArray.of(T... i)
-View&lt;T&gt; ViewFromIterator.of(Iterator&lt;T&gt; i)
-View&lt;T&gt; ViewFromIterator.of(Iterable&lt;T&gt; i)
+```java
+// Starting Points:
+View<T> ViewFromArray.of(T... i)
+View<T> ViewFromIterator.of(Iterator<T> i)
+View<T> ViewFromIterator.of(Iterable<T> i)
 
 // Transforms:
-void forEach(Consumer&lt;T&gt; se)
-T firstMatching(Predicate&lt;T&gt; pred)
-U foldLeft(U u, BiFunction&lt;U, T, U&gt; fun)
-View&lt;T&gt; filter(Predicate&lt;T&gt; pred)
-View&lt;T&gt; take(long numItems)
-View&lt;T&gt; drop(long numItems)
-View&lt;U&gt; map(Function&lt;T,U&gt; func)
-View&lt;U&gt; flatMap(Function&lt;T,View&lt;U&gt;&gt; func)
+void forEach(Consumer<T> se)
+T firstMatching(Predicate<T> pred)
+U foldLeft(U u, BiFunction<U, T, U> fun)
+View<T> filter(Predicate<T> pred)
+View<T> take(long numItems)
+View<T> drop(long numItems)
+View<U> map(Function<T,U> func)
+View<U> flatMap(Function<T,View<U>> func)
 
 // Endpoints
-ArrayList&lt;T&gt; toJavaArrayList()
-List&lt;T&gt; toJavaUnmodList()
-HashMap&lt;T,U&gt; toJavaHashMap(Function&lt;T,U&gt; f1)
-Map&lt;T,U&gt; toJavaUnmodMap(Function&lt;T,U&gt; f1)
-HashMap&lt;U,T&gt; toReverseJavaHashMap(Function&lt;T,U&gt; f1)
-Map&lt;U,T&gt; toReverseJavaUnmodMap(Function&lt;T,U&gt; f1)
-TreeSet&lt;T&gt; toJavaTreeSet(Comparator&lt;? super T&gt; comparator)
-SortedSet&lt;T&gt; toJavaUnmodSortedSet(Comparator&lt;? super T&gt; comparator)
-TreeSet&lt;T&gt; toJavaTreeSet()
-SortedSet&lt;T&gt; toJavaUnmodSortedSet()
-HashSet&lt;T&gt; toJavaHashSet()
-Set&lt;T&gt; toJavaUnmodSet()</code></pre>
+ArrayList<T> toJavaArrayList()
+List<T> toJavaUnmodList()
+HashMap<T,U> toJavaHashMap(Function<T,U> f1)
+Map<T,U> toJavaUnmodMap(Function<T,U> f1)
+HashMap<U,T> toReverseJavaHashMap(Function<T,U> f1)
+Map<U,T> toReverseJavaUnmodMap(Function<T,U> f1)
+TreeSet<T> toJavaTreeSet(Comparator<? super T> comparator)
+SortedSet<T> toJavaUnmodSortedSet(Comparator<? super T> comparator)
+TreeSet<T> toJavaTreeSet()
+SortedSet<T> toJavaUnmodSortedSet()
+HashSet<T> toJavaHashSet()
+Set<T> toJavaUnmodSet()
+```
 
 The View model implemented here is for lightweight, lazy, immutable, type-safe, and thread-safe transformations.
 The Sequence model is also memoized/cached, so it is useful for repeated queries.
