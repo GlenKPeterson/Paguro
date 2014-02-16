@@ -28,7 +28,7 @@ FunctionUtils.toString(list); // Returns: "UnmodifiableRandomAccessList(5,6)"</c
 
 A good editor like Intellij IDEA has auto-completion and code folding features that make the Java 7 code easier to write and read than this example.
 
-Functions available in View (as of 2014-02-16):
+Functions available in <code>View</code> (as of 2014-02-16):
 <pre><code>// Starting Points:
 View&lt;T&gt; ViewFromArray.of(T... i)
 View&lt;T&gt; ViewFromIterator.of(Iterator&lt;T&gt; i)
