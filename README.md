@@ -12,23 +12,23 @@ FunctionUtils.toString(list); // Returns: "UnmodifiableRandomAccessList(5,6,7,8,
 
 None of these transformations change the underlying collections.  Ratherly they lazily build new collections by chaining together all the operations you specify, then applying them in a single pass through the unerlying data.
 
-Typical usage in Java 7:
+A good editor like Intellij IDEA has auto-completion and code folding features that make the Java 7 code easier to write and read, but this example completely expanded in Java 7 looks like this:
 
-<pre><code>List<Integer> list = ViewFromArray.of(1, 2, 3, 4, 5).filter(new Filter&lt;Integer&gt;() {
-    @Override
-    public boolean apply(Integer i) throws Exception {
-        return i &gt; 3;
-    }
-}).map(new Function1&lt;Integer, Object&gt;() {
-    @Override
-    public Object apply(Integer i) throws Exception {
-        return i + 1;
-    }
-}).toJavaUnmodArrayList();
+<pre><code>List<Integer> list = ViewFromArray.of(1,2,3,4,5,6,7,8,9,10,11)
+        .filter(new Filter&lt;Integer&gt;() {
+            @Override
+            public boolean apply(Integer i) {
+                return i &gt; 3;
+            }})
+        .map(new Function1&lt;Integer,Integer&gt;() {
+            @Override
+            public Object apply(Integer i) {
+                return i + 1;
+            }})
+        .toJavaUnmodArrayList();
 
-FunctionUtils.toString(list); // Returns: "UnmodifiableRandomAccessList(5,6)"</code></pre>
+FunctionUtils.toString(list); // Returns: "UnmodifiableRandomAccessList(5,6,7,8,9...)"</code></pre>
 
-A good editor like Intellij IDEA has auto-completion and code folding features that make the Java 7 code easier to write and read than this example.
 
 Functions available in <code>View</code> (as of 2014-02-16):
 <pre><code>// Starting Points:
