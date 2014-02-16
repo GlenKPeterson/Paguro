@@ -16,7 +16,10 @@ package org.organicdesign.fp.ephemeral;
 
 import org.organicdesign.fp.Sentinal;
 import org.organicdesign.fp.Transformable;
+import org.organicdesign.fp.function.BiFunction;
+import org.organicdesign.fp.function.Consumer;
 import org.organicdesign.fp.function.Function;
+import org.organicdesign.fp.function.Predicate;
 
 /**
  A lightweight, one-time view that lazy, thread-safe operations can be built from.  Because there
@@ -24,15 +27,65 @@ import org.organicdesign.fp.function.Function;
  @param <T>
  */
 
-public interface View<T> extends Transformable<T> {
-    public static final View<?> EMPTY_VIEW = new ViewAbstract<Object>() {
+public abstract class View<T> extends Transformable<T> {
+    public static final View<?> EMPTY_VIEW = new View<Object>() {
         @Override
         public Object next() {
             return Sentinal.USED_UP;
         }
     };
 
-    public T next();
+    public abstract T next();
+
+    @Override
+    public <U> View<U> map(Function<T,U> func) {
+        return ViewMapped.of(this, func);
+    }
+
+    @Override
+    public View<T> filter(Predicate<T> pred) {
+        return ViewFiltered.of(this, pred);
+    }
+
+    @Override
+    public void forEach(Consumer<T> se) {
+        T item = next();
+        while (item != Sentinal.USED_UP) {
+            se.accept_(item);
+            item = next();
+        }
+    }
+
+    @Override
+    public T firstMatching(Predicate<T> pred) {
+        T item = next();
+        while (item != Sentinal.USED_UP) {
+            if (pred.test_(item)) { return item; }
+            item = next();
+        }
+        return null;
+    }
+
+    @Override
+    public <U> U foldLeft(U u, BiFunction<U, T, U> fun) {
+        T item = next();
+        while (item != Sentinal.USED_UP) {
+            u = fun.apply_(u, item);
+            item = next();
+        }
+        return u;
+    }
+
+//    @Override
+//    public T reduceLeft(BiFunction<T, T, T> fun) {
+//        T item = next();
+//        T accum = item;
+//        while (item != Sentinal.USED_UP) {
+//            item = next();
+//            accum = fun.apply_(accum, item);
+//        }
+//        return accum;
+//    }
 
     // I don't see how I can legally declare this on Transformable!
     /**
@@ -43,5 +96,7 @@ public interface View<T> extends Transformable<T> {
      return is smaller, use filter followed by map if possible, or vice versa if not.
      @param fun yields a Transformable of 0 or more results for each input item.
      */
-    public <U> View<U> flatMap(Function<T,View<U>> func);
+    public <U> View<U> flatMap(Function<T,View<U>> func) {
+        return ViewFlatMapped.of(this, func);
+    }
 }

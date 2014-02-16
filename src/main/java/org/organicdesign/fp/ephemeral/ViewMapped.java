@@ -18,7 +18,7 @@ import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.Sentinal;
 import org.organicdesign.fp.function.Function;
 
-public class ViewMapped<T,U> extends ViewAbstract<U> {
+public class ViewMapped<T,U> extends View<U> {
     private final View<T> view;
     private final Function<T,U> func;
 

@@ -19,7 +19,7 @@ import java.util.Iterator;
 import org.organicdesign.fp.Sentinal;
 
 /** A single-pass transformer backed by a Java Iterator. */
-public class ViewFromIterator<T> extends ViewAbstract<T> {
+public class ViewFromIterator<T> extends View<T> {
 
     private final Iterator<T> iter;
 

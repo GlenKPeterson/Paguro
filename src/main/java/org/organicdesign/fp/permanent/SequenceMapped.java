@@ -17,7 +17,7 @@ package org.organicdesign.fp.permanent;
 import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.function.Function;
 
-public class SequenceMapped<T,U>  extends SequenceAbstract<U> {
+public class SequenceMapped<T,U>  extends Sequence<U> {
     private final Sequence<T> seq;
     private final Function<T,U> func;
 

@@ -17,7 +17,7 @@ package org.organicdesign.fp.ephemeral;
 import org.organicdesign.fp.Sentinal;
 import org.organicdesign.fp.function.Function;
 
-public class ViewFlatMapped<T,U> extends ViewAbstract<U> {
+public class ViewFlatMapped<T,U> extends View<U> {
     private final View<T> outerView;
 
     private View<U> innerView = emptyView();

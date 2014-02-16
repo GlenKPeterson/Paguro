@@ -18,7 +18,7 @@ import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.Sentinal;
 import org.organicdesign.fp.function.Predicate;
 
-public class ViewFiltered<T> extends ViewAbstract<T> {
+public class ViewFiltered<T> extends View<T> {
 
     private final View<T> view;
 

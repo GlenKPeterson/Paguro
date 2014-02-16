@@ -16,6 +16,10 @@ package org.organicdesign.fp.permanent;
 
 import org.organicdesign.fp.Sentinal;
 import org.organicdesign.fp.Transformable;
+import org.organicdesign.fp.function.BiFunction;
+import org.organicdesign.fp.function.Consumer;
+import org.organicdesign.fp.function.Function;
+import org.organicdesign.fp.function.Predicate;
 
 /**
  A Sequence abstraction that lazy operations can be built from.  The idea is to create a lazy,
@@ -23,30 +27,80 @@ import org.organicdesign.fp.Transformable;
  that fit in memory (because those that don't cannot be memoized/cached).
  @param <T>
  */
-public interface Sequence<T> extends Transformable<T> {
-    public static final Sequence<?> EMPTY_SEQUENCE = new SequenceAbstract<Object>() {
-        /**
-         @return the first item in the sequence or USED_UP
-         */
-        @Override
-        public Object first() {
-            return Sentinal.USED_UP;
-        }
+public abstract class Sequence<T> extends Transformable<T> {
+    public static final Sequence<?> EMPTY_SEQUENCE = new Sequence<Object>() {
+        /** @return USED_UP */
+        @Override public Object first() { return Sentinal.USED_UP; }
 
-        /**
-         @return a sequence or EMPTY_SEQUENCE
-         */
-        @Override
-        public Sequence<Object> rest() {
-            return this;
-        }
+        /** @return EMPTY_SEQUENCE (this) */
+        @Override public Sequence<Object> rest() { return this; }
     };
 
     // ======================================= Base methods =======================================
-    public T first();
-    public Sequence<T> rest();
+    public abstract T first();
+    public abstract Sequence<T> rest();
 
 //    // ======================================= Other methods ======================================
+
+    @Override
+    public <U> Sequence<U> map(Function<T,U> func) {
+        return SequenceMapped.of(this, func);
+    }
+
+    @Override
+    public Sequence<T> filter(Predicate<T> func) {
+        return SequenceFiltered.of(this, func);
+    }
+
+    @Override
+    public void forEach(Consumer<T> se) {
+        Sequence<T> seq = this;
+        T item = seq.first();
+        while (item != Sentinal.USED_UP) {
+            se.accept_(item);
+            // repeat with next element
+            seq = seq.rest();
+            item = seq.first();
+        }
+    }
+
+    @Override
+    public T firstMatching(Predicate<T> pred) {
+        Sequence<T> seq = this;
+        T item = seq.first();
+        while (item != Sentinal.USED_UP) {
+            if (pred.test_(item)) { return item; }
+            // repeat with next element
+            seq = seq.rest();
+            item = seq.first();
+        }
+        return null;
+    }
+
+    @Override
+    public <U> U foldLeft(U u, BiFunction<U, T, U> fun) {
+        Sequence<T> seq = this;
+        T item = seq.first();
+        while (item != Sentinal.USED_UP) {
+            u = fun.apply_(u, item);
+            // repeat with next element
+            seq = seq.rest();
+            item = seq.first();
+        }
+        return u;
+    }
+
+//    @Override
+//    public T reduceLeft(BiFunction<T, T, T> fun) {
+//        T item = next();
+//        T accum = item;
+//        while (item != Sentinal.USED_UP) {
+//            item = next();
+//            accum = fun.apply_(accum, item);
+//        }
+//        return accum;
+//    }
+
 //    // I don't see how I can legally declare this on Transformable!
       // When implementing, the innerSequence needs to call rest() on the parent sequence instead
       // of returning USED_UP.  Otherwise, it's a pretty clean copy of ViewFlatMapped.
@@ -58,5 +112,11 @@ public interface Sequence<T> extends Transformable<T> {
 //     return is smaller, use filter followed by map if possible, or vice versa if not.
 //     @param fun yields a Transformable of 0 or more results for each input item.
 //     */
-//    public <U> Sequence<U> flatMap(Function<T,Sequence<U>> func);
+//    public <U> Sequence<U> flatMap(Function<T,Sequence<U>> func) {
+//        return SequenceFlatMapped.of(this, func);
+//    }
+
+
+
+
 }

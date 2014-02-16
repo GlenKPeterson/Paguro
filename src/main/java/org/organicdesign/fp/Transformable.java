@@ -14,12 +14,23 @@
 
 package org.organicdesign.fp;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import org.organicdesign.fp.function.BiFunction;
 import org.organicdesign.fp.function.Consumer;
 import org.organicdesign.fp.function.Function;
 import org.organicdesign.fp.function.Predicate;
 
-public interface Transformable<T> extends Realizable<T> {
+public abstract class Transformable<T> implements Realizable<T> {
     /**
      Lazily applies the given function to each item in the underlying data source, and returns
      a View with one item for each result.
@@ -27,7 +38,7 @@ public interface Transformable<T> extends Realizable<T> {
      @return a lazy view of the same size as the input (may contain duplicates) containing the
      return values of the given function in the same order as the input values.
      */
-    public <U> Transformable<U> map(Function<T,U> func);
+    public abstract <U> Transformable<U> map(Function<T,U> func);
 
     /**
      Lazily applies the filter function to the underlying data source and returns a new view
@@ -35,20 +46,20 @@ public interface Transformable<T> extends Realizable<T> {
      @param func a function that returns true for items to keep, false for items to drop
      @return a lazy view of only the filtered items.
      */
-    public Transformable<T> filter(Predicate<T> func);
+    public abstract Transformable<T> filter(Predicate<T> func);
 
     /**
      Eagerly processes the entire data source for side effects.
      @param se the function to do the processing
      */
-    public void forEach(Consumer<T> se);
+    public abstract void forEach(Consumer<T> se);
 
     /**
      Eagerly returns the first item matching the given predicate.
      @param pred the test that the item needs to pass
      @return the first item that passes the test, or null if no such item is found
      */
-    public T firstMatching(Predicate<T> pred);
+    public abstract T firstMatching(Predicate<T> pred);
 
     // TODO: You can always use foldLeft for this operation.  Does having reduceLeft add more clarity to the underlying code, or does it provide some useful additional functionality?
 //    /**
@@ -71,7 +82,7 @@ public interface Transformable<T> extends Realizable<T> {
      this parameter.
      @param fun combines each value in the list with the result so far.  The initial result is u.
      */
-    public <U> U foldLeft(U u, BiFunction<U, T, U> fun);
+    public abstract <U> U foldLeft(U u, BiFunction<U, T, U> fun);
 
 
     // Sub-classes cannot inherit from this because the function that you pass in has to know the actal return type.
@@ -86,4 +97,99 @@ public interface Transformable<T> extends Realizable<T> {
 //     */
 //    public <U> Transformable<U> flatMap(Function<T,? extends Transformable<U>> func);
 
+
+    @Override
+    public ArrayList<T> toJavaArrayList() {
+        return foldLeft(new ArrayList<T>(), new BiFunction<ArrayList<T>, T, ArrayList<T>>() {
+            @Override
+            public ArrayList<T> apply(ArrayList<T> ts, T t) throws Exception {
+                ts.add(t);
+                return ts;
+            }
+        });
+    }
+
+    @Override
+    public List<T> toJavaUnmodList() {
+        return Collections.unmodifiableList(toJavaArrayList());
+    }
+
+    /**
+     @param f1 Maps keys to values
+     @return A map with the keys from the given set, mapped to values using the given function.
+     */
+    @Override
+    public <U> HashMap<T,U> toJavaHashMap(final Function<T,U> f1) {
+        return foldLeft(new HashMap<T, U>(), new BiFunction<HashMap<T, U>, T, HashMap<T, U>>() {
+            @Override
+            public HashMap<T, U> apply(HashMap<T, U> ts, T t) throws Exception {
+                ts.put(t, f1.apply(t));
+                return ts;
+            }
+        });
+    }
+
+    @Override
+    public <U> Map<T,U> toJavaUnmodMap(Function<T,U> f1) {
+        return Collections.unmodifiableMap(toJavaHashMap(f1));
+    }
+
+    /**
+     @param f1 Maps values to keys
+     @return A map with the values from the given set, mapped by keys supplied by the given function.
+     */
+    @Override
+    public <U> HashMap<U,T> toReverseJavaHashMap(final Function<T, U> f1) {
+        return foldLeft(new HashMap<U, T>(), new BiFunction<HashMap<U, T>, T, HashMap<U, T>>() {
+            @Override
+            public HashMap<U, T> apply(HashMap<U, T> ts, T t) throws Exception {
+                ts.put(f1.apply_(t), t);
+                return ts;
+            }
+        });
+    }
+
+    @Override
+    public <U> Map<U,T> toReverseJavaUnmodMap(Function<T,U> f1) {
+        return Collections.unmodifiableMap(toReverseJavaHashMap(f1));
+    }
+
+    @Override
+    public TreeSet<T> toJavaTreeSet(Comparator<? super T> comparator) {
+        return foldLeft(new TreeSet<T>(comparator), new BiFunction<TreeSet<T>, T, TreeSet<T>>() {
+            @Override
+            public TreeSet<T> apply(TreeSet<T> ts, T t) throws Exception {
+                ts.add(t);
+                return ts;
+            }
+        });
+    }
+    @Override
+    public TreeSet<T> toJavaTreeSet() { return toJavaTreeSet(null); }
+
+
+    @Override
+    public SortedSet<T> toJavaUnmodSortedSet(Comparator<? super T> comparator) {
+        return Collections.unmodifiableSortedSet(toJavaTreeSet(comparator));
+    }
+    @Override
+    public SortedSet<T> toJavaUnmodSortedSet() {
+        return toJavaUnmodSortedSet(null);
+    }
+
+    @Override
+    public HashSet<T> toJavaHashSet() {
+        return foldLeft(new HashSet<T>(), new BiFunction<HashSet<T>, T, HashSet<T>>() {
+            @Override
+            public HashSet<T> apply(HashSet<T> ts, T t) throws Exception {
+                ts.add(t);
+                return ts;
+            }
+        });
+    }
+
+    @Override
+    public Set<T> toJavaUnmodSet() {
+        return Collections.unmodifiableSet(toJavaHashSet());
+    }
 }
