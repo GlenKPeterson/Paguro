@@ -43,13 +43,21 @@ View<T> ViewFromIterator.of(Iterator<T> i)
 View<T> ViewFromIterator.of(Iterable<T> i)
 
 // Transforms:
+// Run a function against each item for side effects (e.g. writing output)
 void forEach(Consumer<T> se)
+// Return the first item for which the given test function returns true
 T firstMatching(Predicate<T> pred)
+// Apply the function to each item in the list, accumulating the result in u
 U foldLeft(U u, BiFunction<U, T, U> fun)
+// Return only the items for which the given function returns true
 View<T> filter(Predicate<T> pred)
+// Return only the first n items
 View<T> take(long numItems)
+// Ignore the first n items and return only those that come after
 View<T> drop(long numItems)
+// Transform each item into exactly one new item using the given function
 View<U> map(Function<T,U> func)
+// Transform each item into zero or more new items using the given function
 View<U> flatMap(Function<T,View<U>> func)
 
 // Endpoints
