@@ -37,6 +37,13 @@ import org.organicdesign.fp.function.Predicate;
  @param <T>
  */
 public abstract class Transformable<T> implements Realizable<T> {
+
+    /**
+     Please do not call this method directly because this abstract class may be turned into an
+     interface.
+     */
+    protected Transformable() {};
+
     /**
      Lazily applies the given function to each item in the underlying data source, and returns
      a View with one item for each result.

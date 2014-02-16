@@ -26,6 +26,9 @@ import org.organicdesign.fp.function.Predicate;
  */
 public class FunctionUtils {
 
+    // I don't want any instances of this class.
+    private FunctionUtils() {}
+
     /** A predicate that always returns true.  Use accept() for a type-safe version of this predicate. */
     public static final Predicate<Object> ACCEPT = new Predicate<Object>() {
         @Override

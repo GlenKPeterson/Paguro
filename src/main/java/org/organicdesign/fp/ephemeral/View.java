@@ -42,8 +42,12 @@ public abstract class View<T> extends Transformable<T> {
         return (View<U>) EMPTY_VIEW;
     }
 
-    /**
+    // default/package visibility is the most hidden we can make the default constructor and still
+    // inherit from this class.
+    View() {};
 
+    /**
+      This is the distinguishing method of the view interface.
      @return the next item in the view, or Sentinel.USED_UP
      */
     public abstract T next();

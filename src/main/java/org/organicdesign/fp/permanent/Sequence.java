@@ -36,6 +36,10 @@ public abstract class Sequence<T> extends Transformable<T> {
         @Override public Sequence<Object> rest() { return this; }
     };
 
+    // default/package visibility is the most hidden we can make the default constructor and still
+    // inherit from this class.
+    Sequence() {};
+
     // ======================================= Base methods =======================================
     public abstract T first();
     public abstract Sequence<T> rest();
