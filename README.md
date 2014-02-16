@@ -116,5 +116,27 @@ Collection Variations:
  - Type-safe
  - Thread-safe
 
-Interface Desires:
-Implement all expected operations: filter, map, reduce, forall, etc.
+Update Sequence to have all the transforms that View does.
+
+Out of Scope
+============
+
+reduceLeft() is like foldLeft without a "u" parameter.
+I implemented it, but deleted it because it seemed like a very special case of foldLeft that only operated on items of the same type as the original collection.
+I didn't think it improved readability or ease of use to have both methods.
+How hard is it to pass a 0 or 1 to foldLeft?
+It's easy enough to implement if there is a compelling use case where it's significantly better than foldLeft.
+Otherwise, fewer methods means a simpler interface to learn.
+
+I also implemented interpose, but took it out because I just didn't
+find it useful.  My only use case was to add commas to a list to
+display it in English and for that, you also need a conjunction, and
+often a continuation symbol:
+
+a, b, c, or d.
+
+a, b, c, and d.
+
+a,b,c...
+
+None of those are simple uses of interpose.
