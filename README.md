@@ -8,7 +8,8 @@ Typical usage in Java 8:
         .map(i -&gt; i + 1)
         .toJavaUnmodArrayList();
         
-FunctionUtils.toString(list); // Returns: "UnmodifiableRandomAccessList(5,6,7,8,9...)"</code></pre>
+FunctionUtils.toString(list);
+// Returns: "UnmodifiableRandomAccessList(5,6,7,8,9...)"</code></pre>
 
 None of these transformations change the underlying collections.  Ratherly they lazily build new collections by chaining together all the operations you specify, then applying them in a single pass through the unerlying data.
 
@@ -27,7 +28,8 @@ A good editor like Intellij IDEA has auto-completion and code folding features t
             }})
         .toJavaUnmodArrayList();
 
-FunctionUtils.toString(list); // Returns: "UnmodifiableRandomAccessList(5,6,7,8,9...)"</code></pre>
+FunctionUtils.toString(list);
+// Returns: "UnmodifiableRandomAccessList(5,6,7,8,9...)"</code></pre>
 
 
 Functions available in <code>View</code> (as of 2014-02-16):
