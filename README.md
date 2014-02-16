@@ -106,7 +106,7 @@ mutable builders could go toward not having to copy immutable collections?
 Out of Scope
 ============
 
-reduceLeft() is like foldLeft without a "u" parameter.
+reduceLeft() is like foldLeft without the "u" parameter.
 I implemented it, but deleted it because it seemed like a very special case of foldLeft that only operated on items of the same type as the original collection.
 I didn't think it improved readability or ease of use to have both methods.
 How hard is it to pass a 0 or 1 to foldLeft?
