@@ -1,7 +1,4 @@
-fp4java7
-========
-
-Typical usage in Java 8:
+Typical usage in Java 8 (prettier than Java 7):
 
 ```java
 List<Integer> list = ViewFromArray.of(1,2,3,4,5,6,7,8,9,10,11)
@@ -75,6 +72,19 @@ HashSet<T> toJavaHashSet()
 Set<T> toJavaUnmodSet()
 ```
 
+Why Not Loop?
+=============
+
+Using a loop says nothing about what you are trying to accomplish - is a given loop supposed to map something, filter it, accumulate a result, or all three?  Different kinds of collections require different looping constructs which can be error prone for the coder and confusing for the reader.  Using a loop generally requires setting up accumulators, then looping through all kinds of <code>if</code>, <code>break</code>, and <code>continue</code> statements, like some kind of mad obstacle race that involves as many state changes as possible.
+
+Higher order functions are not just less to write and less to read, they are less to *think* about.  They are useful abstractions that simplify your code and focus your attention on your goals rather than the details of how to accomplish them.  Function chaining: <code>xs.take(...).foldLeft(...).firstMatching(...)</code> defines what you are doing and how you are doing it in the simplest possible way.
+
+No data is changed when using these transformers.  They allow you to write nearly stateless programs where statements chain together and evaluate into a useful result.  Lisp works like this, except that lisp syntax makes this evaluation go inside out from the order you read the statements in (hence Clojure's two arrow operators).  With method chaining, the evaluation happens in the same order as the methods are written on the page, much like piping commands to one another in shell scripts.
+
+In some cases, writing a loop by hand may be faster, but in general, the overhead for using these transformations is very low, and well worth the clarity and safety they provide.
+
+Details
+=======
 The View model implemented here is for lightweight, lazy, immutable, type-safe, and thread-safe transformations.
 The Sequence model is also memoized/cached, so it is useful for repeated queries.
 Sequence is most similar to the Clojure sequence abstraction, but it's pure Java and type-safe.
