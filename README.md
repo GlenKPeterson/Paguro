@@ -38,10 +38,9 @@ If you need that functionality (and you usually won't), the Mutable.____Ref clas
 
 The most interesting classes are probably (in src/main/java/):
 <ul>
-<li><code>org/organicdesign/fp/Transformable</code> - allows various functional transformations to be lazily applied: filter, map, forEach, etc.</li>
-<li><code>org/organicdesign/fp/Realizable</code> - allows any transformations to be eagerly evaluated into either mutable or unmodifiable collections (Java collections have to fit in memory).</li>
-<li><code>org/organicdesign/fp/ephemeral/View</code> - a working implementation of most of these transformations</li>
-<li><code>org/organicdesign/fp/FunctionUtils</code> - Smartly combine/compose multiple filters and functions.</li>
+<li><code><a href="https://github.com/GlenKPeterson/fp4java7/blob/master/src/main/java/org/organicdesign/fp/Transformable.java">org/organicdesign/fp/Transformable</a></code> - allows various functional transformations to be lazily applied: filter, map, forEach, etc., and allows any transformations to be eagerly evaluated into either mutable or unmodifiable collections (Java collections have to fit in memory).</li>
+<li><code><a href="https://github.com/GlenKPeterson/fp4java7/blob/master/src/main/java/org/organicdesign/fp/ephemeral/View.java">org/organicdesign/fp/ephemeral/View</a></code> - a working implementation of most of these transformations</li>
+<li><code><a href="https://github.com/GlenKPeterson/fp4java7/blob/master/src/main/java/org/organicdesign/fp/FunctionUtils.java">org/organicdesign/fp/FunctionUtils</a></code> - smartly combine/compose multiple filters and functions, convert collections to Strings, etc.</li>
 </ul>
 
 The View model implemented here is for lightweight, lazy, immutable, type-safe, and thread-safe transformations.
