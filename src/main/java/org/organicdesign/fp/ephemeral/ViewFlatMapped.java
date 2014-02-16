@@ -17,7 +17,7 @@ package org.organicdesign.fp.ephemeral;
 import org.organicdesign.fp.Sentinal;
 import org.organicdesign.fp.function.Function;
 
-public class ViewFlatMapped<T,U> extends View<U> {
+class ViewFlatMapped<T,U> extends View<U> {
     private final View<T> outerView;
 
     private View<U> innerView = emptyView();
@@ -50,12 +50,4 @@ public class ViewFlatMapped<T,U> extends View<U> {
         }
         return innerNext;
     }
-
-    @SuppressWarnings("unchecked")
-    public static <T,U> View<U> emptyView() {
-        return (View<U>) EMPTY_VIEW;
-    }
-
-    @SuppressWarnings("unchecked")
-    public U usedUp() { return (U) Sentinal.USED_UP; }
 }

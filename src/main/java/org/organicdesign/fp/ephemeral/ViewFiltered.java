@@ -18,7 +18,7 @@ import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.Sentinal;
 import org.organicdesign.fp.function.Predicate;
 
-public class ViewFiltered<T> extends View<T> {
+class ViewFiltered<T> extends View<T> {
 
     private final View<T> view;
 
@@ -42,12 +42,4 @@ public class ViewFiltered<T> extends View<T> {
         }
         return usedUp();
     }
-
-    @SuppressWarnings("unchecked")
-    public static <T> ViewFiltered<T> emptyView() {
-        return (ViewFiltered<T>) EMPTY_VIEW;
-    }
-
-    @SuppressWarnings("unchecked")
-    public T usedUp() { return (T) Sentinal.USED_UP; }
 }

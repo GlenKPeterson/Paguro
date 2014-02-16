@@ -31,9 +31,17 @@ public abstract class View<T> extends Transformable<T> {
     public static final View<?> EMPTY_VIEW = new View<Object>() {
         @Override
         public Object next() {
-            return Sentinal.USED_UP;
+            return usedUp();
         }
     };
+    @SuppressWarnings("unchecked")
+    public T usedUp() { return (T) Sentinal.USED_UP; }
+
+    @SuppressWarnings("unchecked")
+    public static <U> View<U> emptyView() {
+        return (View<U>) EMPTY_VIEW;
+    }
+
 
     public abstract T next();
 
@@ -86,6 +94,28 @@ public abstract class View<T> extends Transformable<T> {
 //        }
 //        return accum;
 //    }
+
+    // TODO: Add these to Transformable and implement them in permanent.Sequence.
+
+    /**
+     Shorten this view to contain no more than the specified number of items.
+     @param numItems the maximum number of items in the returned view.
+     @return a lazy view containing no more than the specified number of items.
+     */
+    public View<T> take(long numItems) {
+        return ViewTaken.of(this, numItems);
+    }
+
+    /**
+     Note that all dropped items will be evaluated as they are dropped.  Any side effects
+     (including delays) caused by evaluating these items will be incurred.  For this reason,
+     you should always drop as early in your chain of functions as practical.
+     @param numItems the number of items at the beginning of this view to ignore
+     @return a lazy view with the specified number of items ignored.
+     */
+    public View<T> drop(long numItems) {
+        return ViewDropped.of(this, numItems);
+    }
 
     // I don't see how I can legally declare this on Transformable!
     /**

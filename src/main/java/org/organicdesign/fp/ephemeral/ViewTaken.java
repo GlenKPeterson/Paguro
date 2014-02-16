@@ -14,33 +14,23 @@
 
 package org.organicdesign.fp.ephemeral;
 
-public class ViewInterposed<T> extends View<T> {
+class ViewTaken<T> extends View<T> {
     private final View<T> outerView;
 
-    private final T item;
+    private long numItems;
 
-    private boolean showItem = false;
+    ViewTaken(View<T> v, long l) { outerView = v; numItems = l; }
 
-    ViewInterposed(View<T> v, T i) { outerView = v; item = i; }
-
-    @SuppressWarnings("unchecked")
-    public static <T> View<T> of(View<T> v, T i) {
+    public static <T> View<T> of(View<T> v, long l) {
+        if (l < 0) { throw new IllegalArgumentException("You can only take a non-negative number of items"); }
         if ( (v == null) || (v == EMPTY_VIEW) ) { return emptyView(); }
-        return new ViewInterposed<>(v, i);
+        return new ViewTaken<>(v, l);
     }
 
     @Override
     public synchronized T next() {
-        if (showItem) {
-            showItem = false;
-            return item;
-        }
-        showItem = true;
+        if (numItems < 1) { return usedUp(); }
+        numItems--;
         return outerView.next();
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T,U> View<U> emptyView() {
-        return (View<U>) EMPTY_VIEW;
     }
 }

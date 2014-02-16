@@ -14,8 +14,6 @@
 
 package org.organicdesign.fp.ephemeral;
 
-import org.organicdesign.fp.Sentinal;
-
 /** A single-pass incremental transformer backed by a Java array. */
 public class ViewFromArray<T> extends View<T> {
 
@@ -40,12 +38,4 @@ public class ViewFromArray<T> extends View<T> {
 //        return ret;
         return items[idx++]; // return current idx then increment idx
     }
-
-    @SuppressWarnings("unchecked")
-    public static <T> ViewFromArray<T> emptyView() {
-        return (ViewFromArray<T>) EMPTY_VIEW;
-    }
-
-    @SuppressWarnings("unchecked")
-    public T usedUp() { return (T) Sentinal.USED_UP; }
 }

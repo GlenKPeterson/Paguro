@@ -266,7 +266,7 @@ public class FunctionUtils {
             } else if (i > 0) {
                 sB.append(",");
             }
-            sB.append("(").append(String.valueOf(item.getKey())).append(",");
+            sB.append("Entry(").append(String.valueOf(item.getKey())).append(",");
             sB.append(String.valueOf(item.getValue())).append(")");
             i++;
         }

@@ -18,7 +18,7 @@ import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.Sentinal;
 import org.organicdesign.fp.function.Function;
 
-public class ViewMapped<T,U> extends View<U> {
+class ViewMapped<T,U> extends View<U> {
     private final View<T> view;
     private final Function<T,U> func;
 
@@ -39,12 +39,4 @@ public class ViewMapped<T,U> extends View<U> {
         if (item == Sentinal.USED_UP) { return usedUp(); }
         return func.apply_(item);
     }
-
-    @SuppressWarnings("unchecked")
-    public static <T,U> ViewMapped<T,U> emptyView() {
-        return (ViewMapped<T,U>) EMPTY_VIEW;
-    }
-
-    @SuppressWarnings("unchecked")
-    public U usedUp() { return (U) Sentinal.USED_UP; }
 }
