@@ -10,7 +10,9 @@ Typical usage (in Java 8):
         
 FunctionUtils.toString(list); // Returns: "UnmodifiableRandomAccessList(5,6,7,8,9...)"</code></pre>
 
-Or verbosely in Java 7:
+None of these transformations change the underlying collections.  Ratherly they lazily build new collections by chaining together all the operations you specify, then applying them in a single pass through the unerlying data.
+
+Typical usage (verbosely) in Java 7:
 
 <pre><code>List<Integer> list = ViewFromArray.of(1, 2, 3, 4, 5).filter(new Filter&lt;Integer&gt;() {
     @Override
@@ -57,8 +59,6 @@ TreeSet&lt;T&gt; toJavaTreeSet()
 SortedSet&lt;T&gt; toJavaUnmodSortedSet()
 HashSet&lt;T&gt; toJavaHashSet()
 Set&lt;T&gt; toJavaUnmodSet()</code></pre>
-
-None of these transformations change the underlying collections.  Ratherly they lazily build new collections by chaining together all the operations you specify, then applying them in a single pass through the unerlying data.
 
 The View model implemented here is for lightweight, lazy, immutable, type-safe, and thread-safe transformations.
 The Sequence model is also memoized/cached, so it is useful for repeated queries.
