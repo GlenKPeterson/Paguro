@@ -24,10 +24,7 @@ public abstract class Supplier<T> {
     /** Implement this one method and you don't have to worry about checked exceptions. */
     public abstract T get() throws Exception;
 
-    /**
-     The class that takes a consumer as an argument uses this convenience method so that it
-     doesn't have to worry about checked exceptions either.
-     */
+    /** The caller should use this convenience method to avoid checked exceptions. */
     public T get_() {
         try {
             return get();

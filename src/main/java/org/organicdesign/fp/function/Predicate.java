@@ -29,10 +29,7 @@ public abstract class Predicate<T> {
     /** Implement this one method and you don't have to worry about checked exceptions. */
     public abstract boolean test(T t) throws Exception;
 
-    /**
-     The class that takes a consumer as an argument uses this convenience method so that it
-     doesn't have to worry about checked exceptions either.
-     */
+    /** The caller should use this convenience method to avoid checked exceptions. */
     public boolean test_(T t) {
         try {
             return test(t);

@@ -15,7 +15,7 @@
 package org.organicdesign.fp.ephemeral;
 
 import org.organicdesign.fp.FunctionUtils;
-import org.organicdesign.fp.Sentinal;
+import org.organicdesign.fp.Sentinel;
 import org.organicdesign.fp.function.Function;
 
 class ViewMapped<T,U> extends View<U> {
@@ -36,7 +36,7 @@ class ViewMapped<T,U> extends View<U> {
     @Override
     public U next() {
         T item = view.next();
-        if (item == Sentinal.USED_UP) { return usedUp(); }
+        if (item == Sentinel.USED_UP) { return usedUp(); }
         return func.apply_(item);
     }
 }

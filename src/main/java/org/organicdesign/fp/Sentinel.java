@@ -17,6 +17,11 @@ package org.organicdesign.fp;
 /**
  Josh Bloch says that an enum is the best way to ensure a singleton.
  */
-public enum Sentinal {
+public enum Sentinel {
+    /**
+     Represents the end of a collection, filter, or view.  Having a sentinel value means that
+     such a collection can contain nulls or any value really besides the sentinel.  Because
+     this is an enum, you can use the blazingly fast compare-by-reference.
+     */
     USED_UP;
 }

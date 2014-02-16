@@ -26,10 +26,7 @@ public abstract class Function<T,R> {
     /** Implement this one method and you don't have to worry about checked exceptions. */
     public abstract R apply(T t) throws Exception;
 
-    /**
-     The class that takes a consumer as an argument uses this convenience method so that it
-     doesn't have to worry about checked exceptions either.
-     */
+    /** The caller should use this convenience method to avoid checked exceptions. */
     public R apply_(T t) {
         try {
             return apply(t);

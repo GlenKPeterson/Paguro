@@ -14,6 +14,11 @@
 
 package org.organicdesign.fp;
 
+/**
+ Java 7 and earlier require that any variables declared outside a lambda, but used inside a lambda
+ must be final.  Occasionally that is really inconvenient and the sub-classes in this class wrap
+ various classes to let you work around this limitation.
+ */
 public class Mutable {
 
     public static class BooleanRef {

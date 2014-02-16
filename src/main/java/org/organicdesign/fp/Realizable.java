@@ -40,9 +40,25 @@ public interface Realizable<T> {
      @return A map with the keys from the given set, mapped to values using the given function.
      */
     public <U> HashMap<T,U> toJavaHashMap(Function<T,U> f1);
+    /**
+     @param f1 Maps keys to values
+     @return An unmodifiable map with the keys from the given set, mapped to values using the given
+     function.
+     */
     public <U> Map<T,U> toJavaUnmodMap(Function<T,U> f1);
 
+    /**
+     @param f1 Maps values to keys
+     @return A map with the values from the given set, mapped by keys supplied by the given
+     function.
+     */
     public abstract <U> HashMap<U,T> toReverseJavaHashMap(Function<T,U> f1);
+
+    /**
+     @param f1 Maps values to keys
+     @return An unmodifiable map with the values from the given set, mapped by keys supplied by
+     the given function.
+     */
     public <U> Map<U,T> toReverseJavaUnmodMap(Function<T,U> f1);
 
     public TreeSet<T> toJavaTreeSet(Comparator<? super T> comparator);

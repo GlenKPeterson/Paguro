@@ -30,6 +30,12 @@ import org.organicdesign.fp.function.Consumer;
 import org.organicdesign.fp.function.Function;
 import org.organicdesign.fp.function.Predicate;
 
+/**
+ Represents transformations to be carried out on a collection.  This class also implements the
+ methods defined in Realizable so that sub-classes can just implement foldLeft and not have to
+ worry about any Realizable functions.
+ @param <T>
+ */
 public abstract class Transformable<T> implements Realizable<T> {
     /**
      Lazily applies the given function to each item in the underlying data source, and returns
@@ -113,10 +119,6 @@ public abstract class Transformable<T> implements Realizable<T> {
         return Collections.unmodifiableList(toJavaArrayList());
     }
 
-    /**
-     @param f1 Maps keys to values
-     @return A map with the keys from the given set, mapped to values using the given function.
-     */
     @Override
     public <U> HashMap<T,U> toJavaHashMap(final Function<T,U> f1) {
         return foldLeft(new HashMap<T, U>(), new BiFunction<HashMap<T, U>, T, HashMap<T, U>>() {
@@ -133,10 +135,6 @@ public abstract class Transformable<T> implements Realizable<T> {
         return Collections.unmodifiableMap(toJavaHashMap(f1));
     }
 
-    /**
-     @param f1 Maps values to keys
-     @return A map with the values from the given set, mapped by keys supplied by the given function.
-     */
     @Override
     public <U> HashMap<U,T> toReverseJavaHashMap(final Function<T, U> f1) {
         return foldLeft(new HashMap<U, T>(), new BiFunction<HashMap<U, T>, T, HashMap<U, T>>() {

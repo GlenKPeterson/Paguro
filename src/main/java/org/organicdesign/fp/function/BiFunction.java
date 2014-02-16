@@ -23,10 +23,7 @@ public abstract class BiFunction<T,U,V> {
     /** Implement this one method and you don't have to worry about checked exceptions. */
     public abstract V apply(T t, U u) throws Exception;
 
-    /**
-     The class that takes a consumer as an argument uses this convenience method so that it
-     doesn't have to worry about checked exceptions either.
-     */
+    /** The caller should use this convenience method to avoid checked exceptions. */
     public V apply_(T t, U u) {
         try {
             return apply(t, u);

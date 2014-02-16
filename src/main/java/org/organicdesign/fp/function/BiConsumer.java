@@ -14,14 +14,16 @@
 
 package org.organicdesign.fp.function;
 
+/**
+ This is like Java 8's java.util.function.BiConsumer, but retrofitted to turn checked exceptions
+ into unchecked ones in Java 5, 6, and 7.  I originally called the method apply() to be like all
+ the other functions, but Java 8 uses accept(), so I'm renaming it.
+ */
 public abstract class BiConsumer<T,U> {
     /** Implement this one method and you don't have to worry about checked exceptions. */
     public abstract void accept(T t, U u) throws Exception;
 
-    /**
-     The class that takes a consumer as an argument uses this convenience method so that it
-     doesn't have to worry about checked exceptions either.
-     */
+    /** The caller should use this convenience method to avoid checked exceptions. */
     public void accept_(T t, U u) {
         try {
             accept(t, u);

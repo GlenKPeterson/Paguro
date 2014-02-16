@@ -16,7 +16,7 @@ package org.organicdesign.fp.permanent;
 
 import java.util.Iterator;
 
-import org.organicdesign.fp.Sentinal;
+import org.organicdesign.fp.Sentinel;
 
 /**
  If you use the source iterator after passing it to this class then the behavior of this class
@@ -82,5 +82,5 @@ class SequenceFromIterator<T> extends Sequence<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public T usedUp() { return (T) Sentinal.USED_UP; }
+    public T usedUp() { return (T) Sentinel.USED_UP; }
 }

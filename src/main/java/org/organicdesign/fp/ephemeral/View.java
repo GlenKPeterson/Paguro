@@ -14,7 +14,7 @@
 
 package org.organicdesign.fp.ephemeral;
 
-import org.organicdesign.fp.Sentinal;
+import org.organicdesign.fp.Sentinel;
 import org.organicdesign.fp.Transformable;
 import org.organicdesign.fp.function.BiFunction;
 import org.organicdesign.fp.function.Consumer;
@@ -35,14 +35,17 @@ public abstract class View<T> extends Transformable<T> {
         }
     };
     @SuppressWarnings("unchecked")
-    public T usedUp() { return (T) Sentinal.USED_UP; }
+    public T usedUp() { return (T) Sentinel.USED_UP; }
 
     @SuppressWarnings("unchecked")
     public static <U> View<U> emptyView() {
         return (View<U>) EMPTY_VIEW;
     }
 
+    /**
 
+     @return the next item in the view, or Sentinel.USED_UP
+     */
     public abstract T next();
 
     @Override
@@ -58,7 +61,7 @@ public abstract class View<T> extends Transformable<T> {
     @Override
     public void forEach(Consumer<T> se) {
         T item = next();
-        while (item != Sentinal.USED_UP) {
+        while (item != Sentinel.USED_UP) {
             se.accept_(item);
             item = next();
         }
@@ -67,7 +70,7 @@ public abstract class View<T> extends Transformable<T> {
     @Override
     public T firstMatching(Predicate<T> pred) {
         T item = next();
-        while (item != Sentinal.USED_UP) {
+        while (item != Sentinel.USED_UP) {
             if (pred.test_(item)) { return item; }
             item = next();
         }
@@ -77,7 +80,7 @@ public abstract class View<T> extends Transformable<T> {
     @Override
     public <U> U foldLeft(U u, BiFunction<U, T, U> fun) {
         T item = next();
-        while (item != Sentinal.USED_UP) {
+        while (item != Sentinel.USED_UP) {
             u = fun.apply_(u, item);
             item = next();
         }
@@ -88,7 +91,7 @@ public abstract class View<T> extends Transformable<T> {
 //    public T reduceLeft(BiFunction<T, T, T> fun) {
 //        T item = next();
 //        T accum = item;
-//        while (item != Sentinal.USED_UP) {
+//        while (item != Sentinel.USED_UP) {
 //            item = next();
 //            accum = fun.apply_(accum, item);
 //        }
@@ -124,7 +127,7 @@ public abstract class View<T> extends Transformable<T> {
      @return a lazily evaluated collection which is expected to be larger than the input
      collection.  For a collection that's the same size, map() is more efficient.  If the expected
      return is smaller, use filter followed by map if possible, or vice versa if not.
-     @param fun yields a Transformable of 0 or more results for each input item.
+     @param func yields a Transformable of 0 or more results for each input item.
      */
     public <U> View<U> flatMap(Function<T,View<U>> func) {
         return ViewFlatMapped.of(this, func);

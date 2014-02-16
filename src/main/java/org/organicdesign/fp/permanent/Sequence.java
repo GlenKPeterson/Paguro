@@ -14,7 +14,7 @@
 
 package org.organicdesign.fp.permanent;
 
-import org.organicdesign.fp.Sentinal;
+import org.organicdesign.fp.Sentinel;
 import org.organicdesign.fp.Transformable;
 import org.organicdesign.fp.function.BiFunction;
 import org.organicdesign.fp.function.Consumer;
@@ -30,7 +30,7 @@ import org.organicdesign.fp.function.Predicate;
 public abstract class Sequence<T> extends Transformable<T> {
     public static final Sequence<?> EMPTY_SEQUENCE = new Sequence<Object>() {
         /** @return USED_UP */
-        @Override public Object first() { return Sentinal.USED_UP; }
+        @Override public Object first() { return Sentinel.USED_UP; }
 
         /** @return EMPTY_SEQUENCE (this) */
         @Override public Sequence<Object> rest() { return this; }
@@ -56,7 +56,7 @@ public abstract class Sequence<T> extends Transformable<T> {
     public void forEach(Consumer<T> se) {
         Sequence<T> seq = this;
         T item = seq.first();
-        while (item != Sentinal.USED_UP) {
+        while (item != Sentinel.USED_UP) {
             se.accept_(item);
             // repeat with next element
             seq = seq.rest();
@@ -68,7 +68,7 @@ public abstract class Sequence<T> extends Transformable<T> {
     public T firstMatching(Predicate<T> pred) {
         Sequence<T> seq = this;
         T item = seq.first();
-        while (item != Sentinal.USED_UP) {
+        while (item != Sentinel.USED_UP) {
             if (pred.test_(item)) { return item; }
             // repeat with next element
             seq = seq.rest();
@@ -81,7 +81,7 @@ public abstract class Sequence<T> extends Transformable<T> {
     public <U> U foldLeft(U u, BiFunction<U, T, U> fun) {
         Sequence<T> seq = this;
         T item = seq.first();
-        while (item != Sentinal.USED_UP) {
+        while (item != Sentinel.USED_UP) {
             u = fun.apply_(u, item);
             // repeat with next element
             seq = seq.rest();
@@ -94,7 +94,7 @@ public abstract class Sequence<T> extends Transformable<T> {
 //    public T reduceLeft(BiFunction<T, T, T> fun) {
 //        T item = next();
 //        T accum = item;
-//        while (item != Sentinal.USED_UP) {
+//        while (item != Sentinel.USED_UP) {
 //            item = next();
 //            accum = fun.apply_(accum, item);
 //        }

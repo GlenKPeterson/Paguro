@@ -15,7 +15,7 @@
 package org.organicdesign.fp.ephemeral;
 
 import org.organicdesign.fp.FunctionUtils;
-import org.organicdesign.fp.Sentinal;
+import org.organicdesign.fp.Sentinel;
 import org.organicdesign.fp.function.Predicate;
 
 class ViewFiltered<T> extends View<T> {
@@ -36,7 +36,7 @@ class ViewFiltered<T> extends View<T> {
     @Override
     public T next() {
         T item = view.next();
-        while (item != Sentinal.USED_UP) {
+        while (item != Sentinel.USED_UP) {
             if (predicate.test_(item)) { return item; }
             item = view.next();
         }
