@@ -63,7 +63,7 @@ When you switch to Java 8, you only need to change the import statement and remo
 The apply_() methods are there to deal with checked exceptions in lambdas in Java 7.
 
 Java 7 and earlier require that all variables declared outside a lambda be finial in order to use them inside the lambda.
-If you need that functionality (and you usually won't), the Mutable.____Ref classes work around this limitation.
+If you need that functionality in Java 7 or earlier, the Mutable.____Ref classes work around this limitation.
 
 The most interesting classes are probably (in src/main/java/):
 <ul>
