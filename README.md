@@ -1,7 +1,7 @@
 fp4java7
 ========
 
-Typical usage might be (in Java 8):
+Typical usage (in Java 8):
 
 <pre><code>List<Integer> list = ViewFromArray.of(1,2,3,4,5,6,7,8,9,10,11)
         .filter(i -&gt;  i &gt; 3 )
