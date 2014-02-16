@@ -97,7 +97,6 @@ public abstract class Transformable<T> implements Realizable<T> {
 //     */
 //    public <U> Transformable<U> flatMap(Function<T,? extends Transformable<U>> func);
 
-
     @Override
     public ArrayList<T> toJavaArrayList() {
         return foldLeft(new ArrayList<T>(), new BiFunction<ArrayList<T>, T, ArrayList<T>>() {
