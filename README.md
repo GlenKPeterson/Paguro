@@ -4,7 +4,7 @@ fp4java7
 Typical usage in Java 8:
 
 ```java
-List list = ViewFromArray.of(1,2,3,4,5,6,7,8,9,10,11)
+List<Integer> list = ViewFromArray.of(1,2,3,4,5,6,7,8,9,10,11)
         .filter(i ->  i > 3 )
         .map(i -> i + 1)
         .toJavaUnmodArrayList();
@@ -18,7 +18,7 @@ None of these transformations change the underlying collections.  Ratherly they 
 A good editor like Intellij IDEA has auto-completion and code folding features that make the Java 7 code look almost like the Java 8 code, but the above example completely expanded in Java 7 looks like this:
 
 ```java
-List list = ViewFromArray.of(1,2,3,4,5,6,7,8,9,10,11)
+List<Integer> list = ViewFromArray.of(1,2,3,4,5,6,7,8,9,10,11)
         .filter(new Filter<Integer>() {
             @Override
             public boolean apply(Integer i) {
