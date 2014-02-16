@@ -26,7 +26,7 @@ Or verbosely in Java 7:
 
 FunctionUtils.toString(list); // Returns: "UnmodifiableRandomAccessList(5,6)"</code></pre>
 
-Between auto-completion and code folding, the Java 7 code can be almost as easy to write and read as Java 8.
+A good editor like Intellij IDEA has auto-completion and code folding features that make the Java 7 code easier to write and read than this example.
 
 Functions available in View (as of 2014-02-16):
 <pre><code>// Starting Points:
