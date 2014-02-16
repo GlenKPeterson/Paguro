@@ -40,7 +40,7 @@ The most interesting classes are probably (in src/main/java/):
 <ul>
 <li><code>org/organicdesign/fp/Transformable</code> - allows various functional transformations to be lazily applied: filter, map, forEach, etc.</li>
 <li><code>org/organicdesign/fp/Realizable</code> - allows any transformations to be eagerly evaluated into either mutable or unmodifiable collections (Java collections have to fit in memory).</li>
-<li><code>org/organicdesign/fp/ephemeral/ViewAbstract</code> - a working implementation of most of these transformations</li>
+<li><code>org/organicdesign/fp/ephemeral/View</code> - a working implementation of most of these transformations</li>
 <li><code>org/organicdesign/fp/FunctionUtils</code> - Smartly combine/compose multiple filters and functions.</li>
 </ul>
 
