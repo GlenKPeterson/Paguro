@@ -13,7 +13,7 @@ FunctionUtils.toString(list);
 
 None of these transformations change the underlying collections.  Ratherly they lazily build a new collection by chaining together all the operations you specify, then applying them in a single pass through the unerlying data.
 
-A good editor like Intellij IDEA has auto-completion and code folding features that make the Java 7 code somewhat easier to write and read, but the above example completely expanded in Java 7 looks like this:
+A good editor like Intellij IDEA has auto-completion and code folding features that make the Java 7 code look almost like the Java 8 code, but the above example completely expanded in Java 7 looks like this:
 
 <pre><code>List<Integer> list = ViewFromArray.of(1,2,3,4,5,6,7,8,9,10,11)
         .filter(new Filter&lt;Integer&gt;() {
