@@ -35,13 +35,13 @@ View&lt;T&gt; ViewFromIterator.of(Iterator&lt;T&gt; i)
 View&lt;T&gt; ViewFromIterator.of(Iterable&lt;T&gt; i)
 
 // Transforms:
-View&lt;U&gt; map(Function&lt;T,U&gt; func)
-View&lt;T&gt; filter(Predicate&lt;T&gt; pred)
 void forEach(Consumer&lt;T&gt; se)
 T firstMatching(Predicate&lt;T&gt; pred)
 U foldLeft(U u, BiFunction&lt;U, T, U&gt; fun)
+View&lt;T&gt; filter(Predicate&lt;T&gt; pred)
 View&lt;T&gt; take(long numItems)
 View&lt;T&gt; drop(long numItems)
+View&lt;U&gt; map(Function&lt;T,U&gt; func)
 View&lt;U&gt; flatMap(Function&lt;T,View&lt;U&gt;&gt; func)
 
 // Endpoints
