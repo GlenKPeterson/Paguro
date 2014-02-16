@@ -5,8 +5,8 @@ Typical usage in Java 8:
 
 ```java
 List<Integer> list = ViewFromArray.of(1,2,3,4,5,6,7,8,9,10,11)
-        .filter(i ->  i > 3 )
-        .map(i -> i + 1)
+        .filter(i ->  i > 3)       // 4,5,6,7,8,9,10,11
+        .map(i -> i + 1)           // 5,6,7,8,9,10,11,12
         .toJavaUnmodArrayList();
         
 FunctionUtils.toString(list);
@@ -26,7 +26,7 @@ List<Integer> list = ViewFromArray.of(1,2,3,4,5,6,7,8,9,10,11)
             }})
         .map(new Function1<Integer,Integer>() {
             @Override
-            public Object apply(Integer i) {
+            public Integer apply(Integer i) {
                 return i + 1;
             }})
         .toJavaUnmodArrayList();
