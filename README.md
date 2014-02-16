@@ -3,16 +3,16 @@ fp4java7
 
 Typical usage might be (in Java 8):
 
-<pre><code>ViewFromArray.of(1, 2, 3, 4, 5)
+<pre><code>List<Integer> list = ViewFromArray.of(1,2,3,4,5,6,7,8,9,10,11)
         .filter(i -&gt;  i &gt; 3 )
         .map(i -&gt; i + 1)
         .toJavaUnmodArrayList();
-
-// Returns an unmodifiable List&lt;Integer&gt; containing the values 5 and 6</code></pre>
+        
+FunctionUtils.toString(list); // Returns: "UnmodifiableRandomAccessList(5,6,7,8,9...)"</code></pre>
 
 Or verbosely in Java 7:
 
-<pre><code>ViewFromArray.of(1, 2, 3, 4, 5).filter(new Filter&lt;Integer&gt;() {
+<pre><code>List<Integer> list = ViewFromArray.of(1, 2, 3, 4, 5).filter(new Filter&lt;Integer&gt;() {
     @Override
     public boolean apply(Integer i) throws Exception {
         return i &gt; 3;
@@ -22,7 +22,10 @@ Or verbosely in Java 7:
     public Object apply(Integer i) throws Exception {
         return i + 1;
     }
-}).toJavaUnmodArrayList();</code></pre>
+}).toJavaUnmodArrayList();
+
+FunctionUtils.toString(list); // Returns: "UnmodifiableRandomAccessList(5,6)"</code></pre>
+
 
 Between auto-completion and code folding, the Java 7 code can be almost as easy to write and read as Java 8.  The classes in the function package allow you to use the Java 8 functional interfaces (more or less) in java7.
 When you switch to Java 8, you only need to change the import statement and remove the _ from the apply_() methods.
