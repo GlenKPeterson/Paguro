@@ -36,24 +36,25 @@ FunctionUtils.toString(list);
 
 #Motivations
 
-Using a loop says nothing about what you are trying to accomplish.  Is a given loop supposed to map something, filter it, accumulate a result, or all three?  Different kinds of collections require different looping constructs which can be error prone for the coder and confusing for the reader.  Using a loop generally requires setting up accumulators, then looping through all kinds of <code>if</code>, <code>break</code>, and <code>continue</code> statements, like some kind of mad obstacle race that involves as many state changes as possible.
+Using a loop says nothing about what you are trying to accomplish.  Is a given loop supposed to map something, filter it, accumulate a result, or all three?  Different kinds of collections require different looping constructs which can be error prone for the coder and confusing for the reader.  Loops generally require setting up accumulators, then looping through all kinds of <code>if</code>, <code>break</code>, and <code>continue</code> statements, like some kind of mad obstacle race that involves as many state changes as possible.
 
-Higher order functions are not just less to write and less to read, they are less to *think* about.  They are useful abstractions that simplify your code and focus your attention on your goals rather than the details of how to accomplish them.  Function chaining: <code>xs.take(...).foldLeft(...).firstMatching(...)</code> defines what you are doing and how you are doing it in the simplest possible way.
+Higher order functions are not just briefer to write and read, they are less to *think* about.  They are useful abstractions that simplify your code and focus your attention on your goals rather than the details of how to accomplish them.  Function chaining: <code>xs.take(...).foldLeft(...).firstMatching(...)</code> defines what you are doing and how you are doing it in the simplest possible way.
 
-No data is changed when using these transformers.  They allow you to write nearly stateless programs where statements chain together and evaluate into a useful result.  Lisp works like this, except that lisp syntax makes this evaluation go inside out from the order you read the statements in (hence Clojure's two arrow operators).  With method chaining, the evaluation happens in the same order as the methods are written on the page, much like piping commands to one another in shell scripts.
+No data is changed when using these transformations.  They allow you to write nearly stateless programs whose statements chain together and evaluate into a useful result.  Lisp works like this, only the syntax makes the evaluation go inside out from the order you read the statements in (hence Clojure's two arrow operators).  With method chaining, the evaluation happens in the same order as the methods are written on the page, much like piping commands to one another in shell scripts.
 
-In some cases, writing a loop by hand may be faster, but in general, the overhead for using these transformations is very low, and well worth the clarity and safety they provide.
+In some cases, a well hand-written loop may be faster, but in general, the overhead for using these transformations is very low, and well worth the clarity and safety they provide.
 
 #API
 
 Functions available in <code>View</code> (as of 2014-02-16):
+###Starting Points:
 ```java
-// Starting Points:
 View<T> ViewFromArray.of(T... i)
 View<T> ViewFromIterator.of(Iterator<T> i)
 View<T> ViewFromIterator.of(Iterable<T> i)
-
-// Transforms:
+```
+###Transformations:
+```java
 // Run a function against each item for side effects (e.g. writing output)
 void forEach(Consumer<T> se)
 // Return the first item for which the given test function returns true
@@ -70,8 +71,9 @@ View<T> drop(long numItems)
 View<U> map(Function<T,U> func)
 // Transform each item into zero or more new items using the given function
 View<U> flatMap(Function<T,View<U>> func)
-
-// Endpoints
+```
+###Endpoints
+```java
 ArrayList<T> toJavaArrayList()
 List<T> toJavaUnmodList()
 HashMap<T,U> toJavaHashMap(Function<T,U> f1)
@@ -86,8 +88,7 @@ HashSet<T> toJavaHashSet()
 Set<T> toJavaUnmodSet()
 ```
 
-Details
-=======
+#Details
 The View model implemented here is for lightweight, lazy, immutable, type-safe, and thread-safe transformations.
 The Sequence model is also memoized/cached, so it is useful for repeated queries.
 Sequence is most similar to the Clojure sequence abstraction, but it's pure Java and type-safe.
@@ -108,8 +109,7 @@ The most interesting classes are probably (in src/main/java/):
 <li><code><a href="https://github.com/GlenKPeterson/fp4java7/blob/master/src/main/java/org/organicdesign/fp/FunctionUtils.java">org/organicdesign/fp/FunctionUtils</a></code> - smartly combine/compose multiple predicates, convert collections to Strings, etc.</li>
 </ul>
 
-To Do:
-======
+#To Do
 
 Collection Variations:
  - Mutable vs. Immutable
@@ -133,9 +133,9 @@ This would be an even smaller project in Scala than in Java 8 so that may be in 
 A lot has been said about lightweight copies of immutable collections, but I wonder how far
 mutable builders could go toward not having to copy immutable collections?
 
-Out of Scope
-============
+#Out of Scope
 
+###T reduceLeft(BiFunction<T, T, T> fun)
 reduceLeft() is like foldLeft without the "u" parameter.
 I implemented it, but deleted it because it seemed like a very special case of foldLeft that only operated on items of the same type as the original collection.
 I didn't think it improved readability or ease of use to have both methods.
@@ -143,6 +143,7 @@ How hard is it to pass a 0 or 1 to foldLeft?
 It's easy enough to implement if there is a compelling use case where it's significantly better than foldLeft.
 Otherwise, fewer methods means a simpler interface to learn.
 
+###View<T> interpose(T item)
 I also implemented interpose(), but took it out because my only use case was to add commas to a list to display
 it in English and for that, you also need a conjunction, and often a continuation symbol:
 
