@@ -46,7 +46,7 @@ class ViewFlatMapped<T,U> extends View<U> {
         U innerNext = innerView.next();
         if (innerNext == Sentinel.USED_UP) {
             innerView = emptyView();
-            next();
+            return next();
         }
         return innerNext;
     }

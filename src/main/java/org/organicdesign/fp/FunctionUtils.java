@@ -139,7 +139,7 @@ public class FunctionUtils {
      A function that returns its input unchanged.
      Use identity() for a type-safe version of this function.
      */
-    public static final Function<Object,Object> IDENTITY = new Function<Object,Object>() {
+    public static final Function<?,?> IDENTITY = new Function<Object,Object>() {
 
         @Override
         public Object apply(Object t) throws Exception {
@@ -163,7 +163,7 @@ public class FunctionUtils {
 
     /** Returns a type-safe version of the IDENTITY function. */
     @SuppressWarnings("unchecked")
-    public static <T,R> Function<T,R> identity() { return (Function<T,R>) IDENTITY; }
+    public static <T> Function<T,T> identity() { return (Function<T,T>) IDENTITY; }
 
     /** Returns a String showing the type and first few elements of a Collection */
     public static <T> String toString(Iterable<T> iterable) {

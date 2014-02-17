@@ -1,5 +1,7 @@
 name := "fp4java7"
 
+version := "0.2-SNAPSHOT"
+
 //val licenseFile: File = file("LICENSE.txt")
 
 //`package` ++= (licenseFile, "LICENSE.txt")
