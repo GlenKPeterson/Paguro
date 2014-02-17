@@ -36,7 +36,7 @@ FunctionUtils.toString(list);
 
 #Motivations
 
-Using a loop says nothing about what you are trying to accomplish - is a given loop supposed to map something, filter it, accumulate a result, or all three?  Different kinds of collections require different looping constructs which can be error prone for the coder and confusing for the reader.  Using a loop generally requires setting up accumulators, then looping through all kinds of <code>if</code>, <code>break</code>, and <code>continue</code> statements, like some kind of mad obstacle race that involves as many state changes as possible.
+Using a loop says nothing about what you are trying to accomplish.  Is a given loop supposed to map something, filter it, accumulate a result, or all three?  Different kinds of collections require different looping constructs which can be error prone for the coder and confusing for the reader.  Using a loop generally requires setting up accumulators, then looping through all kinds of <code>if</code>, <code>break</code>, and <code>continue</code> statements, like some kind of mad obstacle race that involves as many state changes as possible.
 
 Higher order functions are not just less to write and less to read, they are less to *think* about.  They are useful abstractions that simplify your code and focus your attention on your goals rather than the details of how to accomplish them.  Function chaining: <code>xs.take(...).foldLeft(...).firstMatching(...)</code> defines what you are doing and how you are doing it in the simplest possible way.
 
