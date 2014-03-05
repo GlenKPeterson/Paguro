@@ -14,9 +14,10 @@
 
 package org.organicdesign.fp.ephemeral;
 
+import java.util.function.Predicate;
+
 import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.Sentinel;
-import org.organicdesign.fp.function.Predicate;
 
 class ViewFiltered<T> extends View<T> {
 
@@ -37,7 +38,7 @@ class ViewFiltered<T> extends View<T> {
     public T next() {
         T item = view.next();
         while (item != Sentinel.USED_UP) {
-            if (predicate.test_(item)) { return item; }
+            if (predicate.test(item)) { return item; }
             item = view.next();
         }
         return usedUp();

@@ -14,9 +14,10 @@
 
 package org.organicdesign.fp.permanent;
 
+import java.util.function.Predicate;
+
 import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.Sentinel;
-import org.organicdesign.fp.function.Predicate;
 
 public class SequenceFiltered<T> extends Sequence<T> {
     private static final Object UNINITIALIZED = new Object();
@@ -51,7 +52,7 @@ public class SequenceFiltered<T> extends Sequence<T> {
                     return;
                 }
 
-                if (predicate.test_(result)) {
+                if (predicate.test(result)) {
                     first = result;
                     seq = of(seq.rest(), predicate);
                     return;

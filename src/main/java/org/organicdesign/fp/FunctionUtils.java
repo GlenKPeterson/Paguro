@@ -18,8 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.organicdesign.fp.function.Function;
-import org.organicdesign.fp.function.Predicate;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  Utilities that functional programmers would want, but aren't supplied in Java 7 (or 8)
@@ -32,7 +32,7 @@ public class FunctionUtils {
     /** A predicate that always returns true.  Use accept() for a type-safe version of this predicate. */
     public static final Predicate<Object> ACCEPT = new Predicate<Object>() {
         @Override
-        public boolean test(Object t) throws Exception {
+        public boolean test(Object t) {
             return true;
         }
 
@@ -56,7 +56,7 @@ public class FunctionUtils {
     /** A predicate that always returns false. Use reject() for a type-safe version of this predicate. */
     public static final Predicate<Object> REJECT = new Predicate<Object>() {
         @Override
-        public boolean test(Object t) throws Exception {
+        public boolean test(Object t) {
             return false;
         }
 
@@ -121,16 +121,13 @@ public class FunctionUtils {
         } else if (out.size() == 1) {
             return out.get(0);
         } else {
-            return new Predicate<T>() {
-                @Override
-                public boolean test(T t) throws Exception {
-                    for (Predicate<T> f : out) {
-                        if (!f.test(t)) {
-                            return false;
-                        }
+            return t -> {
+                for (Predicate<T> f : out) {
+                    if (!f.test(t)) {
+                        return false;
                     }
-                    return true;
                 }
+                return true;
             };
         }
     }
@@ -142,13 +139,13 @@ public class FunctionUtils {
     public static final Function<?,?> IDENTITY = new Function<Object,Object>() {
 
         @Override
-        public Object apply(Object t) throws Exception {
+        public Object apply(Object t) {
             return t;
         }
 
         @Override
         @SuppressWarnings("unchecked")
-        public <V> Function<V, Object> compose(Function<? super V,Object> before) {
+        public <V> Function<V, Object> compose(Function<? super V, ?> before) {
             // Composing any function with the identity function has no effect on the original
             // function (by definition of identity) - just return it.
             return (Function<V, Object>) before;
@@ -156,7 +153,7 @@ public class FunctionUtils {
 
         @Override
         @SuppressWarnings("unchecked")
-        public <V> Function<Object, V> andThen(Function<? super Object, V> after) {
+        public <V> Function<Object, V> andThen(Function<? super Object, ? extends V> after) {
             return (Function<Object, V>) after;
         }
     };

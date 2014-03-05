@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.organicdesign.fp.function.Function;
+import java.util.function.Function;
 
 /**
  Calling any of these methods forces eager evaluation of the entire underlying collection.
@@ -52,7 +52,7 @@ public interface Realizable<T> {
      @return A map with the values from the given set, mapped by keys supplied by the given
      function.
      */
-    public abstract <U> HashMap<U,T> toReverseJavaHashMap(Function<T,U> f1);
+    public <U> HashMap<U,T> toReverseJavaHashMap(Function<T,U> f1);
 
     /**
      @param f1 Maps values to keys

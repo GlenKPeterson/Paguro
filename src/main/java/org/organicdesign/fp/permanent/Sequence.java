@@ -14,12 +14,13 @@
 
 package org.organicdesign.fp.permanent;
 
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+
 import org.organicdesign.fp.Sentinel;
 import org.organicdesign.fp.Transformable;
-import org.organicdesign.fp.function.BiFunction;
-import org.organicdesign.fp.function.Consumer;
-import org.organicdesign.fp.function.Function;
-import org.organicdesign.fp.function.Predicate;
 
 /**
  A Sequence abstraction that lazy operations can be built from.  The idea is to create a lazy,
@@ -61,7 +62,7 @@ public abstract class Sequence<T> extends Transformable<T> {
         Sequence<T> seq = this;
         T item = seq.first();
         while (item != Sentinel.USED_UP) {
-            se.accept_(item);
+            se.accept(item);
             // repeat with next element
             seq = seq.rest();
             item = seq.first();
@@ -73,7 +74,7 @@ public abstract class Sequence<T> extends Transformable<T> {
         Sequence<T> seq = this;
         T item = seq.first();
         while (item != Sentinel.USED_UP) {
-            if (pred.test_(item)) { return item; }
+            if (pred.test(item)) { return item; }
             // repeat with next element
             seq = seq.rest();
             item = seq.first();
@@ -86,7 +87,7 @@ public abstract class Sequence<T> extends Transformable<T> {
         Sequence<T> seq = this;
         T item = seq.first();
         while (item != Sentinel.USED_UP) {
-            u = fun.apply_(u, item);
+            u = fun.apply(u, item);
             // repeat with next element
             seq = seq.rest();
             item = seq.first();

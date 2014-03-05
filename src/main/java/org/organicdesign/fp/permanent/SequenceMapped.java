@@ -14,8 +14,9 @@
 
 package org.organicdesign.fp.permanent;
 
+import java.util.function.Function;
+
 import org.organicdesign.fp.FunctionUtils;
-import org.organicdesign.fp.function.Function;
 
 public class SequenceMapped<T,U>  extends Sequence<U> {
     private final Sequence<T> seq;
@@ -34,7 +35,7 @@ public class SequenceMapped<T,U>  extends Sequence<U> {
 
     @Override
     public U first() {
-        return func.apply_(seq.first());
+        return func.apply(seq.first());
     }
 
     @Override

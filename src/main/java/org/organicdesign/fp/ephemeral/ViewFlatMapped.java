@@ -14,8 +14,9 @@
 
 package org.organicdesign.fp.ephemeral;
 
+import java.util.function.Function;
+
 import org.organicdesign.fp.Sentinel;
-import org.organicdesign.fp.function.Function;
 
 class ViewFlatMapped<T,U> extends View<U> {
     private final View<T> outerView;
@@ -41,7 +42,7 @@ class ViewFlatMapped<T,U> extends View<U> {
         if (innerView == EMPTY_VIEW) {
             T item = outerView.next();
             if (item == Sentinel.USED_UP) { return usedUp(); }
-            innerView = func.apply_(item);
+            innerView = func.apply(item);
         }
         U innerNext = innerView.next();
         if (innerNext == Sentinel.USED_UP) {

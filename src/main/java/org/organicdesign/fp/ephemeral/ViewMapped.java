@@ -14,9 +14,10 @@
 
 package org.organicdesign.fp.ephemeral;
 
+import java.util.function.Function;
+
 import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.Sentinel;
-import org.organicdesign.fp.function.Function;
 
 class ViewMapped<T,U> extends View<U> {
     private final View<T> view;
@@ -37,6 +38,6 @@ class ViewMapped<T,U> extends View<U> {
     public U next() {
         T item = view.next();
         if (item == Sentinel.USED_UP) { return usedUp(); }
-        return func.apply_(item);
+        return func.apply(item);
     }
 }

@@ -14,12 +14,13 @@
 
 package org.organicdesign.fp.ephemeral;
 
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+
 import org.organicdesign.fp.Sentinel;
 import org.organicdesign.fp.Transformable;
-import org.organicdesign.fp.function.BiFunction;
-import org.organicdesign.fp.function.Consumer;
-import org.organicdesign.fp.function.Function;
-import org.organicdesign.fp.function.Predicate;
 
 /**
  A lightweight, one-time view that lazy, thread-safe operations can be built from.  Because there
@@ -66,7 +67,7 @@ public abstract class View<T> extends Transformable<T> {
     public void forEach(Consumer<T> se) {
         T item = next();
         while (item != Sentinel.USED_UP) {
-            se.accept_(item);
+            se.accept(item);
             item = next();
         }
     }
@@ -75,7 +76,7 @@ public abstract class View<T> extends Transformable<T> {
     public T firstMatching(Predicate<T> pred) {
         T item = next();
         while (item != Sentinel.USED_UP) {
-            if (pred.test_(item)) { return item; }
+            if (pred.test(item)) { return item; }
             item = next();
         }
         return null;
@@ -85,7 +86,7 @@ public abstract class View<T> extends Transformable<T> {
     public <U> U foldLeft(U u, BiFunction<U, T, U> fun) {
         T item = next();
         while (item != Sentinel.USED_UP) {
-            u = fun.apply_(u, item);
+            u = fun.apply(u, item);
             item = next();
         }
         return u;
