@@ -18,8 +18,9 @@ import java.util.function.Predicate;
 
 import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.Sentinel;
+import org.organicdesign.fp.Transformable;
 
-class ViewFiltered<T> extends View<T> {
+class ViewFiltered<T> implements View<T> {
 
     private final View<T> view;
 
@@ -28,9 +29,9 @@ class ViewFiltered<T> extends View<T> {
     ViewFiltered(View<T> v, Predicate<T> f) { view = v; predicate = f; }
 
     public static <T> View<T> of(View<T> v, Predicate<T> f) {
-        if ( (f == null) || (f == FunctionUtils.REJECT) ) { return emptyView(); }
+        if ( (f == null) || (f == FunctionUtils.REJECT) ) { return View.emptyView(); }
         if (f == FunctionUtils.ACCEPT) { return v; }
-        if ( (v == null) || (v == EMPTY_VIEW) ) { return emptyView(); }
+        if ( (v == null) || (v == EMPTY_VIEW) ) { return View.emptyView(); }
         return new ViewFiltered<>(v, f);
     }
 
@@ -41,6 +42,6 @@ class ViewFiltered<T> extends View<T> {
             if (predicate.test(item)) { return item; }
             item = view.next();
         }
-        return usedUp();
+        return Transformable.usedUp();
     }
 }

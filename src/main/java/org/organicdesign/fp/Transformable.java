@@ -36,14 +36,10 @@ import java.util.function.Predicate;
  worry about any Realizable functions.
  @param <T>
  */
-public abstract class Transformable<T> implements Realizable<T> {
+public interface Transformable<T> extends Realizable<T> {
 
-    /**
-     Please do not call this method directly because this abstract class may be turned into an
-     interface.
-     */
-    protected Transformable() {};
-
+    @SuppressWarnings("unchecked")
+    public static <T> T usedUp() { return (T) Sentinel.USED_UP; }
     /**
      Lazily applies the given function to each item in the underlying data source, and returns
      a View with one item for each result.
@@ -51,7 +47,7 @@ public abstract class Transformable<T> implements Realizable<T> {
      @return a lazy view of the same size as the input (may contain duplicates) containing the
      return values of the given function in the same order as the input values.
      */
-    public abstract <U> Transformable<U> map(Function<T,U> func);
+    <U> Transformable<U> map(Function<T,U> func);
 
     /**
      Lazily applies the filter function to the underlying data source and returns a new view
@@ -59,20 +55,20 @@ public abstract class Transformable<T> implements Realizable<T> {
      @param func a function that returns true for items to keep, false for items to drop
      @return a lazy view of only the filtered items.
      */
-    public abstract Transformable<T> filter(Predicate<T> func);
+    Transformable<T> filter(Predicate<T> func);
 
     /**
      Eagerly processes the entire data source for side effects.
      @param se the function to do the processing
      */
-    public abstract void forEach(Consumer<T> se);
+    void forEach(Consumer<T> se);
 
     /**
      Eagerly returns the first item matching the given predicate.
      @param pred the test that the item needs to pass
      @return the first item that passes the test, or null if no such item is found
      */
-    public abstract T firstMatching(Predicate<T> pred);
+    T firstMatching(Predicate<T> pred);
 
     // TODO: You can always use foldLeft for this operation.  Does having reduceLeft add more clarity to the underlying code, or does it provide some useful additional functionality?
 //    /**
@@ -82,7 +78,7 @@ public abstract class Transformable<T> implements Realizable<T> {
 //     @return
 //     @param fun Starting with the first two elements of the list, combines each value in the list with the result so far.  The initial result is u.
 //     */
-//    public T reduceLeft(BiFunction<T, T, T> fun);
+//    T reduceLeft(BiFunction<T, T, T> fun);
 
     /**
      One of the two higher-order functions that can produce more output items than input items
@@ -95,7 +91,7 @@ public abstract class Transformable<T> implements Realizable<T> {
      this parameter.
      @param fun combines each value in the list with the result so far.  The initial result is u.
      */
-    public abstract <U> U foldLeft(U u, BiFunction<U, T, U> fun);
+    <U> U foldLeft(U u, BiFunction<U, T, U> fun);
 
 
     // Sub-classes cannot inherit from this because the function that you pass in has to know the actal return type.
@@ -108,10 +104,10 @@ public abstract class Transformable<T> implements Realizable<T> {
 //     return is smaller, use filter followed by map if possible, or vice versa if not.
 //     @param fun yields a Transformable of 0 or more results for each input item.
 //     */
-//    public <U> Transformable<U> flatMap(Function<T,? extends Transformable<U>> func);
+//    <U> Transformable<U> flatMap(Function<T,? extends Transformable<U>> func);
 
     @Override
-    public ArrayList<T> toJavaArrayList() {
+    default ArrayList<T> toJavaArrayList() {
         return foldLeft(new ArrayList<T>(), (ts, t) -> {
             ts.add(t);
             return ts;
@@ -119,12 +115,12 @@ public abstract class Transformable<T> implements Realizable<T> {
     }
 
     @Override
-    public List<T> toJavaUnmodList() {
+    default List<T> toJavaUnmodList() {
         return Collections.unmodifiableList(toJavaArrayList());
     }
 
     @Override
-    public <U> HashMap<T,U> toJavaHashMap(final Function<T,U> f1) {
+    default <U> HashMap<T,U> toJavaHashMap(final Function<T,U> f1) {
         return foldLeft(new HashMap<T, U>(), (ts, t) -> {
             ts.put(t, f1.apply(t));
             return ts;
@@ -132,12 +128,12 @@ public abstract class Transformable<T> implements Realizable<T> {
     }
 
     @Override
-    public <U> Map<T,U> toJavaUnmodMap(Function<T,U> f1) {
+    default <U> Map<T,U> toJavaUnmodMap(Function<T,U> f1) {
         return Collections.unmodifiableMap(toJavaHashMap(f1));
     }
 
     @Override
-    public <U> HashMap<U,T> toReverseJavaHashMap(final Function<T, U> f1) {
+    default <U> HashMap<U,T> toReverseJavaHashMap(final Function<T, U> f1) {
         return foldLeft(new HashMap<U, T>(), (ts, t) -> {
             ts.put(f1.apply(t), t);
             return ts;
@@ -145,32 +141,32 @@ public abstract class Transformable<T> implements Realizable<T> {
     }
 
     @Override
-    public <U> Map<U,T> toReverseJavaUnmodMap(Function<T,U> f1) {
+    default <U> Map<U,T> toReverseJavaUnmodMap(Function<T,U> f1) {
         return Collections.unmodifiableMap(toReverseJavaHashMap(f1));
     }
 
     @Override
-    public TreeSet<T> toJavaTreeSet(Comparator<? super T> comparator) {
+    default TreeSet<T> toJavaTreeSet(Comparator<? super T> comparator) {
         return foldLeft(new TreeSet<T>(comparator), (ts, t) -> {
             ts.add(t);
             return ts;
         });
     }
     @Override
-    public TreeSet<T> toJavaTreeSet() { return toJavaTreeSet(null); }
+    default TreeSet<T> toJavaTreeSet() { return toJavaTreeSet(null); }
 
 
     @Override
-    public SortedSet<T> toJavaUnmodSortedSet(Comparator<? super T> comparator) {
+    default SortedSet<T> toJavaUnmodSortedSet(Comparator<? super T> comparator) {
         return Collections.unmodifiableSortedSet(toJavaTreeSet(comparator));
     }
     @Override
-    public SortedSet<T> toJavaUnmodSortedSet() {
+    default SortedSet<T> toJavaUnmodSortedSet() {
         return toJavaUnmodSortedSet(null);
     }
 
     @Override
-    public HashSet<T> toJavaHashSet() {
+    default HashSet<T> toJavaHashSet() {
         return foldLeft(new HashSet<T>(), (ts, t) -> {
             ts.add(t);
             return ts;
@@ -178,7 +174,7 @@ public abstract class Transformable<T> implements Realizable<T> {
     }
 
     @Override
-    public Set<T> toJavaUnmodSet() {
+    default Set<T> toJavaUnmodSet() {
         return Collections.unmodifiableSet(toJavaHashSet());
     }
 }

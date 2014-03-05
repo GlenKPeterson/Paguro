@@ -18,8 +18,9 @@ import java.util.function.Predicate;
 
 import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.Sentinel;
+import org.organicdesign.fp.Transformable;
 
-public class SequenceFiltered<T> extends Sequence<T> {
+public class SequenceFiltered<T> implements Sequence<T> {
     private static final Object UNINITIALIZED = new Object();
 
     private Sequence<T> seq;
@@ -36,9 +37,9 @@ public class SequenceFiltered<T> extends Sequence<T> {
 
     public static <T> Sequence<T> of(Sequence<T> s, Predicate<T> f) {
         // You can put nulls in, but you don't get nulls out.
-        if ( (f == null) || (f == FunctionUtils.REJECT) ) { return emptySequence(); }
+        if ( (f == null) || (f == FunctionUtils.REJECT) ) { return Sequence.emptySequence(); }
         if (f == FunctionUtils.ACCEPT) { return s; }
-        if ( (s == null) || (s == EMPTY_SEQUENCE) ) { return emptySequence(); }
+        if ( (s == null) || (s == EMPTY_SEQUENCE) ) { return Sequence.emptySequence(); }
         return new SequenceFiltered<>(s, f);
     }
 
@@ -47,8 +48,8 @@ public class SequenceFiltered<T> extends Sequence<T> {
             while (seq != EMPTY_SEQUENCE) {
                 T result = seq.first();
                 if (result == Sentinel.USED_UP) {
-                    first = usedUp();
-                    seq = emptySequence();
+                    first = Transformable.usedUp();
+                    seq = Sequence.emptySequence();
                     return;
                 }
 
@@ -77,13 +78,4 @@ public class SequenceFiltered<T> extends Sequence<T> {
         // if initialized, seq has been replaced with the appropriate filtered sequence.
         return seq;
     }
-
-
-    @SuppressWarnings("unchecked")
-    public static <T> SequenceFiltered<T> emptySequence() {
-        return (SequenceFiltered<T>) EMPTY_SEQUENCE;
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> T usedUp() { return (T) Sentinel.USED_UP; }
 }

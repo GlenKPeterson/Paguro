@@ -28,7 +28,7 @@ import org.organicdesign.fp.Transformable;
  that fit in memory (because those that don't cannot be memoized/cached).
  @param <T>
  */
-public abstract class Sequence<T> extends Transformable<T> {
+public interface Sequence<T> extends Transformable<T> {
     public static final Sequence<?> EMPTY_SEQUENCE = new Sequence<Object>() {
         /** @return USED_UP */
         @Override public Object first() { return Sentinel.USED_UP; }
@@ -36,29 +36,29 @@ public abstract class Sequence<T> extends Transformable<T> {
         /** @return EMPTY_SEQUENCE (this) */
         @Override public Sequence<Object> rest() { return this; }
     };
-
-    // default/package visibility is the most hidden we can make the default constructor and still
-    // inherit from this class.
-    Sequence() {};
+    @SuppressWarnings("unchecked")
+    public static <T> Sequence<T> emptySequence() {
+        return (Sequence<T>) EMPTY_SEQUENCE;
+    }
 
     // ======================================= Base methods =======================================
-    public abstract T first();
-    public abstract Sequence<T> rest();
+    T first();
+    Sequence<T> rest();
 
 //    // ======================================= Other methods ======================================
 
     @Override
-    public <U> Sequence<U> map(Function<T,U> func) {
+    default <U> Sequence<U> map(Function<T,U> func) {
         return SequenceMapped.of(this, func);
     }
 
     @Override
-    public Sequence<T> filter(Predicate<T> func) {
+    default Sequence<T> filter(Predicate<T> func) {
         return SequenceFiltered.of(this, func);
     }
 
     @Override
-    public void forEach(Consumer<T> se) {
+    default void forEach(Consumer<T> se) {
         Sequence<T> seq = this;
         T item = seq.first();
         while (item != Sentinel.USED_UP) {
@@ -70,7 +70,7 @@ public abstract class Sequence<T> extends Transformable<T> {
     }
 
     @Override
-    public T firstMatching(Predicate<T> pred) {
+    default T firstMatching(Predicate<T> pred) {
         Sequence<T> seq = this;
         T item = seq.first();
         while (item != Sentinel.USED_UP) {
@@ -83,7 +83,7 @@ public abstract class Sequence<T> extends Transformable<T> {
     }
 
     @Override
-    public <U> U foldLeft(U u, BiFunction<U, T, U> fun) {
+    default <U> U foldLeft(U u, BiFunction<U, T, U> fun) {
         Sequence<T> seq = this;
         T item = seq.first();
         while (item != Sentinel.USED_UP) {
@@ -96,7 +96,7 @@ public abstract class Sequence<T> extends Transformable<T> {
     }
 
 //    @Override
-//    public T reduceLeft(BiFunction<T, T, T> fun) {
+//    T reduceLeft(BiFunction<T, T, T> fun) {
 //        T item = next();
 //        T accum = item;
 //        while (item != Sentinel.USED_UP) {
@@ -117,11 +117,7 @@ public abstract class Sequence<T> extends Transformable<T> {
 //     return is smaller, use filter followed by map if possible, or vice versa if not.
 //     @param fun yields a Transformable of 0 or more results for each input item.
 //     */
-//    public <U> Sequence<U> flatMap(Function<T,Sequence<U>> func) {
+//    <U> Sequence<U> flatMap(Function<T,Sequence<U>> func) {
 //        return SequenceFlatMapped.of(this, func);
 //    }
-
-
-
-
 }

@@ -32,41 +32,41 @@ import java.util.function.Function;
  @param <T>
  */
 public interface Realizable<T> {
-    public ArrayList<T> toJavaArrayList();
-    public List<T> toJavaUnmodList();
+    ArrayList<T> toJavaArrayList();
+    List<T> toJavaUnmodList();
 
     /**
      @param f1 Maps keys to values
      @return A map with the keys from the given set, mapped to values using the given function.
      */
-    public <U> HashMap<T,U> toJavaHashMap(Function<T,U> f1);
+    <U> HashMap<T,U> toJavaHashMap(Function<T,U> f1);
     /**
      @param f1 Maps keys to values
      @return An unmodifiable map with the keys from the given set, mapped to values using the given
      function.
      */
-    public <U> Map<T,U> toJavaUnmodMap(Function<T,U> f1);
+    <U> Map<T,U> toJavaUnmodMap(Function<T,U> f1);
 
     /**
      @param f1 Maps values to keys
      @return A map with the values from the given set, mapped by keys supplied by the given
      function.
      */
-    public <U> HashMap<U,T> toReverseJavaHashMap(Function<T,U> f1);
+    <U> HashMap<U,T> toReverseJavaHashMap(Function<T,U> f1);
 
     /**
      @param f1 Maps values to keys
      @return An unmodifiable map with the values from the given set, mapped by keys supplied by
      the given function.
      */
-    public <U> Map<U,T> toReverseJavaUnmodMap(Function<T,U> f1);
+    <U> Map<U,T> toReverseJavaUnmodMap(Function<T,U> f1);
 
-    public TreeSet<T> toJavaTreeSet(Comparator<? super T> comparator);
-    public SortedSet<T> toJavaUnmodSortedSet(Comparator<? super T> comparator);
+    TreeSet<T> toJavaTreeSet(Comparator<? super T> comparator);
+    SortedSet<T> toJavaUnmodSortedSet(Comparator<? super T> comparator);
 
-    public TreeSet<T> toJavaTreeSet();
-    public SortedSet<T> toJavaUnmodSortedSet();
+    TreeSet<T> toJavaTreeSet();
+    SortedSet<T> toJavaUnmodSortedSet();
 
-    public HashSet<T> toJavaHashSet();
-    public Set<T> toJavaUnmodSet();
+    HashSet<T> toJavaHashSet();
+    Set<T> toJavaUnmodSet();
 }

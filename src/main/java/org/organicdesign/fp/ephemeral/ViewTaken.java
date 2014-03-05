@@ -14,7 +14,9 @@
 
 package org.organicdesign.fp.ephemeral;
 
-class ViewTaken<T> extends View<T> {
+import org.organicdesign.fp.Transformable;
+
+class ViewTaken<T> implements View<T> {
     private final View<T> outerView;
 
     private long numItems;
@@ -23,13 +25,13 @@ class ViewTaken<T> extends View<T> {
 
     public static <T> View<T> of(View<T> v, long l) {
         if (l < 0) { throw new IllegalArgumentException("You can only take a non-negative number of items"); }
-        if ( (v == null) || (v == EMPTY_VIEW) ) { return emptyView(); }
+        if ( (v == null) || (v == EMPTY_VIEW) ) { return View.emptyView(); }
         return new ViewTaken<>(v, l);
     }
 
     @Override
     public synchronized T next() {
-        if (numItems < 1) { return usedUp(); }
+        if (numItems < 1) { return Transformable.usedUp(); }
         numItems--;
         return outerView.next();
     }

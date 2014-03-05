@@ -18,7 +18,7 @@ import java.util.function.Function;
 
 import org.organicdesign.fp.FunctionUtils;
 
-public class SequenceMapped<T,U>  extends Sequence<U> {
+public class SequenceMapped<T,U>  implements Sequence<U> {
     private final Sequence<T> seq;
     private final Function<T,U> func;
 
@@ -27,9 +27,9 @@ public class SequenceMapped<T,U>  extends Sequence<U> {
     @SuppressWarnings("unchecked")
     public static <T,U> Sequence<U> of(Sequence<T> s, Function<T,U> f) {
         // You can put nulls in, but you don't get nulls out.
-        if (f == null) { return emptySequence(); }
+        if (f == null) { return Sequence.emptySequence(); }
         if (f == FunctionUtils.IDENTITY) { return (Sequence<U>) s; }
-        if ( (s == null) || (s == EMPTY_SEQUENCE) ) { return emptySequence(); }
+        if ( (s == null) || (s == EMPTY_SEQUENCE) ) { return Sequence.emptySequence(); }
         return new SequenceMapped<>(s, f);
     }
 
@@ -41,10 +41,5 @@ public class SequenceMapped<T,U>  extends Sequence<U> {
     @Override
     public Sequence<U> rest() {
         return of(seq.rest(), func);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T,U> SequenceMapped<T,U> emptySequence() {
-        return (SequenceMapped<T,U>) EMPTY_SEQUENCE;
     }
 }

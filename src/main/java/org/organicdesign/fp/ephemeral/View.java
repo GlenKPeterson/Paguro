@@ -28,43 +28,36 @@ import org.organicdesign.fp.Transformable;
  @param <T>
  */
 
-public abstract class View<T> extends Transformable<T> {
+public interface View<T> extends Transformable<T> {
     public static final View<?> EMPTY_VIEW = new View<Object>() {
         @Override
         public Object next() {
-            return usedUp();
+            return Transformable.usedUp();
         }
     };
-    @SuppressWarnings("unchecked")
-    public T usedUp() { return (T) Sentinel.USED_UP; }
-
     @SuppressWarnings("unchecked")
     public static <U> View<U> emptyView() {
         return (View<U>) EMPTY_VIEW;
     }
 
-    // default/package visibility is the most hidden we can make the default constructor and still
-    // inherit from this class.
-    View() {};
-
     /**
       This is the distinguishing method of the view interface.
      @return the next item in the view, or Sentinel.USED_UP
      */
-    public abstract T next();
+    T next();
 
     @Override
-    public <U> View<U> map(Function<T,U> func) {
+    default <U> View<U> map(Function<T,U> func) {
         return ViewMapped.of(this, func);
     }
 
     @Override
-    public View<T> filter(Predicate<T> pred) {
+    default View<T> filter(Predicate<T> pred) {
         return ViewFiltered.of(this, pred);
     }
 
     @Override
-    public void forEach(Consumer<T> se) {
+    default void forEach(Consumer<T> se) {
         T item = next();
         while (item != Sentinel.USED_UP) {
             se.accept(item);
@@ -73,7 +66,7 @@ public abstract class View<T> extends Transformable<T> {
     }
 
     @Override
-    public T firstMatching(Predicate<T> pred) {
+    default T firstMatching(Predicate<T> pred) {
         T item = next();
         while (item != Sentinel.USED_UP) {
             if (pred.test(item)) { return item; }
@@ -83,7 +76,7 @@ public abstract class View<T> extends Transformable<T> {
     }
 
     @Override
-    public <U> U foldLeft(U u, BiFunction<U, T, U> fun) {
+    default <U> U foldLeft(U u, BiFunction<U, T, U> fun) {
         T item = next();
         while (item != Sentinel.USED_UP) {
             u = fun.apply(u, item);
@@ -110,7 +103,7 @@ public abstract class View<T> extends Transformable<T> {
      @param numItems the maximum number of items in the returned view.
      @return a lazy view containing no more than the specified number of items.
      */
-    public View<T> take(long numItems) {
+    default View<T> take(long numItems) {
         return ViewTaken.of(this, numItems);
     }
 
@@ -121,7 +114,7 @@ public abstract class View<T> extends Transformable<T> {
      @param numItems the number of items at the beginning of this view to ignore
      @return a lazy view with the specified number of items ignored.
      */
-    public View<T> drop(long numItems) {
+    default View<T> drop(long numItems) {
         return ViewDropped.of(this, numItems);
     }
 
@@ -134,7 +127,7 @@ public abstract class View<T> extends Transformable<T> {
      return is smaller, use filter followed by map if possible, or vice versa if not.
      @param func yields a Transformable of 0 or more results for each input item.
      */
-    public <U> View<U> flatMap(Function<T,View<U>> func) {
+    default <U> View<U> flatMap(Function<T,View<U>> func) {
         return ViewFlatMapped.of(this, func);
     }
 }

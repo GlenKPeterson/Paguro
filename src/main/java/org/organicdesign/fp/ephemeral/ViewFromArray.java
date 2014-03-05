@@ -14,8 +14,10 @@
 
 package org.organicdesign.fp.ephemeral;
 
+import org.organicdesign.fp.Transformable;
+
 /** A single-pass incremental transformer backed by a Java array. */
-public class ViewFromArray<T> extends View<T> {
+public class ViewFromArray<T> implements View<T> {
 
     private final T[] items;
     private int idx = 0;
@@ -24,14 +26,14 @@ public class ViewFromArray<T> extends View<T> {
 
     @SafeVarargs
     public static <T> View<T> of(T... i) {
-        if (i == null) { return emptyView(); }
+        if (i == null) { return View.emptyView(); }
         return new ViewFromArray<>(i);
     }
 
     @Override
     public synchronized T next() {
         if (idx == items.length) {
-            return usedUp();
+            return Transformable.usedUp();
         }
 //        T ret = items[idx];
 //        idx = idx + 1;
