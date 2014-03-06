@@ -1,5 +1,5 @@
-If you're using Java 8, you need to get the Java 8 branch - "Now with unit tests!"
-https://github.com/GlenKPeterson/fp4java7/tree/2014-03-02_java8
+If you're using Java 7, you need to get the Java 7 branch from here:
+https://github.com/GlenKPeterson/fp4java7/
 
 #Usage
 
