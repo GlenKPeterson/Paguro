@@ -16,26 +16,41 @@ package org.organicdesign.fp.ephemeral
 
 import org.scalatest._
 import java.util
-import org.organicdesign.fp.FunctionUtils
-import java.util.function
+import org.organicdesign.fp.{JavaFunction1, FunctionUtils}
 
 class TestViewMapped extends FlatSpec with Matchers {
   "A View" should "map items in one batch" in {
     assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).map(FunctionUtils.identity()).toJavaArrayList() ===
            util.Arrays.asList(1,2,3,4,5,6,7,8,9))
 
-    val plusOne = new java.util.function.Function[Int,Int]{
-      override def apply(t:Int):Int = t + 1
-
-      override def andThen[V](after:function.Function[_ >: Int, _ <: V]):
-        function.Function[Int, V] = ???
-
-      override def compose[V](before:function.Function[_ >: V, _ <: Int]):
-        function.Function[V, Int] = ???
-    }
+    val plusOne = JavaFunction1((x:Int) => x + 1)
+    val minusOne = JavaFunction1((x:Int) => x - 1)
 
     assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).map(plusOne).toJavaArrayList() ===
            util.Arrays.asList(2,3,4,5,6,7,8,9,10))
+    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).map(minusOne).toJavaArrayList() ===
+           util.Arrays.asList(0,1,2,3,4,5,6,7,8))
+
+    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).map(plusOne).map(minusOne).toJavaArrayList() ===
+           util.Arrays.asList(1,2,3,4,5,6,7,8,9))
+
+    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).map(minusOne).map(plusOne).toJavaArrayList() ===
+           util.Arrays.asList(1,2,3,4,5,6,7,8,9))
+
+    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).map(plusOne).map(plusOne).toJavaArrayList() ===
+           util.Arrays.asList(3,4,5,6,7,8,9,10,11))
+
+    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9)
+               .map(plusOne).map(plusOne).map(plusOne).map(plusOne).map(plusOne)
+               .map(plusOne).map(plusOne).map(plusOne).map(plusOne).map(plusOne)
+               .toJavaArrayList() ===
+           util.Arrays.asList(11,12,13,14,15,16,17,18,19))
+
+    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9)
+               .map(minusOne).map(minusOne).map(minusOne).map(minusOne).map(minusOne)
+               .map(minusOne).map(minusOne).map(minusOne).map(minusOne).map(minusOne)
+               .toJavaArrayList() ===
+           util.Arrays.asList(-9,-8,-7,-6,-5,-4,-3,-2,-1))
 
   }
 }
