@@ -1,3 +1,6 @@
+If you're using Java 8, you need to get the Java 8 branch from here (now includes unit tests):
+https://github.com/GlenKPeterson/fp4java7/tree/2014-03-02_java8
+
 #Usage
 
 Typical usage in Java 8 (prettier than Java 7):
