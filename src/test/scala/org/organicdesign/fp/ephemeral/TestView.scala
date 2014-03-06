@@ -14,21 +14,21 @@
 
 package org.organicdesign.fp.ephemeral
 import org.scalatest._
-import java.util
+import java.util.Arrays
 
 class TestView extends FlatSpec with Matchers {
   "A View" should "take and drop" in {
-    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).drop(0).take(8888).toJavaArrayList() ===
-           util.Arrays.asList(1,2,3,4,5,6,7,8,9))
-    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).drop(1).take(1).toJavaArrayList() ===
-           util.Arrays.asList(2))
-    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).drop(2).take(2).toJavaArrayList() ===
-           util.Arrays.asList(3,4))
-    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).drop(3).take(3).toJavaArrayList() ===
-           util.Arrays.asList(4,5,6))
-    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).drop(9999).take(3).toJavaArrayList() ===
-           util.Arrays.asList())
-    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).drop(3).take(0).toJavaArrayList() ===
-           util.Arrays.asList())
+    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).drop(0).take(8888).toJavaArrayList ===
+           Arrays.asList(1,2,3,4,5,6,7,8,9))
+    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).drop(1).take(1).toJavaArrayList ===
+           Arrays.asList(2))
+    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).drop(2).take(2).toJavaArrayList ===
+           Arrays.asList(3,4))
+    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).drop(3).take(3).toJavaArrayList ===
+           Arrays.asList(4,5,6))
+    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).drop(9999).take(3).toJavaArrayList ===
+           Arrays.asList())
+    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).drop(3).take(0).toJavaArrayList ===
+           Arrays.asList())
   }
 }

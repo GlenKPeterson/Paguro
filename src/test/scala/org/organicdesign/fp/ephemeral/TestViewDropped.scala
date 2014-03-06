@@ -15,26 +15,26 @@
 package org.organicdesign.fp.ephemeral
 
 import org.scalatest._
-import java.util
+import java.util.Arrays
 
 class TestViewDropped extends FlatSpec with Matchers {
   "A View" should "drop items in a single drop" in {
-    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).drop(0).toJavaArrayList() ===
-           util.Arrays.asList(1,2,3,4,5,6,7,8,9))
-    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).drop(1).toJavaArrayList() ===
-           util.Arrays.asList(2,3,4,5,6,7,8,9))
-    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).drop(2).toJavaArrayList() ===
-           util.Arrays.asList(3,4,5,6,7,8,9))
-    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).drop(3).toJavaArrayList() ===
-           util.Arrays.asList(4,5,6,7,8,9))
-    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).drop(8).toJavaArrayList() ===
-           util.Arrays.asList(9))
-    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).drop(9).toJavaArrayList() ===
-           util.Arrays.asList())
-    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).drop(10).toJavaArrayList() ===
-           util.Arrays.asList())
-    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).drop(10000).toJavaArrayList() ===
-           util.Arrays.asList())
+    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).drop(0).toJavaArrayList ===
+           Arrays.asList(1,2,3,4,5,6,7,8,9))
+    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).drop(1).toJavaArrayList ===
+           Arrays.asList(2,3,4,5,6,7,8,9))
+    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).drop(2).toJavaArrayList ===
+           Arrays.asList(3,4,5,6,7,8,9))
+    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).drop(3).toJavaArrayList ===
+           Arrays.asList(4,5,6,7,8,9))
+    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).drop(8).toJavaArrayList ===
+           Arrays.asList(9))
+    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).drop(9).toJavaArrayList ===
+           Arrays.asList())
+    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).drop(10).toJavaArrayList ===
+           Arrays.asList())
+    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).drop(10000).toJavaArrayList ===
+           Arrays.asList())
   }
 
   it should "throw an IllegalArgumentException if a negative number of drops are specified" in {
@@ -47,33 +47,33 @@ class TestViewDropped extends FlatSpec with Matchers {
   }
 
   it should "drop items in multiple drops" in {
-    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).drop(1).drop(1).toJavaArrayList() ===
-           util.Arrays.asList(3,4,5,6,7,8,9))
-    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).drop(1).drop(1).drop(1).toJavaArrayList() ===
-           util.Arrays.asList(4,5,6,7,8,9))
+    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).drop(1).drop(1).toJavaArrayList ===
+           Arrays.asList(3,4,5,6,7,8,9))
+    assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9).drop(1).drop(1).drop(1).toJavaArrayList ===
+           Arrays.asList(4,5,6,7,8,9))
     assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9)
                .drop(1).drop(1).drop(1).drop(1).drop(1)
-               .drop(1).drop(1).drop(1).toJavaArrayList() ===
-           util.Arrays.asList(9))
+               .drop(1).drop(1).drop(1).toJavaArrayList ===
+           Arrays.asList(9))
     assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9)
                .drop(1).drop(1).drop(1).drop(1).drop(1)
-               .drop(1).drop(1).drop(1).drop(1).toJavaArrayList() ===
-           util.Arrays.asList())
+               .drop(1).drop(1).drop(1).drop(1).toJavaArrayList ===
+           Arrays.asList())
     assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9)
                .drop(1).drop(1).drop(1).drop(1).drop(1)
-               .drop(1).drop(1).drop(1).drop(1).drop(1).toJavaArrayList() ===
-           util.Arrays.asList())
+               .drop(1).drop(1).drop(1).drop(1).drop(1).toJavaArrayList ===
+           Arrays.asList())
     assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9)
                .drop(1).drop(1).drop(1).drop(1).drop(1)
                .drop(1).drop(1).drop(1).drop(1).drop(1)
-               .drop(1).drop(1).drop(1).drop(1).drop(1).toJavaArrayList() ===
-           util.Arrays.asList())
+               .drop(1).drop(1).drop(1).drop(1).drop(1).toJavaArrayList ===
+           Arrays.asList())
 
     assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9)
-               .drop(0).drop(1).drop(2).drop(3).toJavaArrayList() ===
-           util.Arrays.asList(7,8,9))
+               .drop(0).drop(1).drop(2).drop(3).toJavaArrayList ===
+           Arrays.asList(7,8,9))
     assert(ViewFromArray.of(1,2,3,4,5,6,7,8,9)
-               .drop(3).drop(2).drop(1).drop(0).toJavaArrayList() ===
-           util.Arrays.asList(7,8,9))
+               .drop(3).drop(2).drop(1).drop(0).toJavaArrayList ===
+           Arrays.asList(7,8,9))
   }
 }
