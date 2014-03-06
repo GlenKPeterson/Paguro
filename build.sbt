@@ -20,6 +20,6 @@ someFileTask := {
 
 // unmanagedJars in Compile += new File("/home/gpeterso/tools/apache-tomcat-7.0.28/lib/servlet-api.jar")
 
-// libraryDependencies += "org.scalatest" % "scalatest_2.10" % "1.9.1"
-                        
+libraryDependencies += "org.scalatest" % "scalatest_2.10" % "2.1.0" % "test"
+
 // libraryDependencies += "junit" % "junit" % "4.10"

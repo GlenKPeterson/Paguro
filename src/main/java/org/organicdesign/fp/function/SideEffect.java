@@ -14,8 +14,7 @@
 
 package org.organicdesign.fp.function;
 
-import java.lang.Exception;
-import java.lang.Override;
+import java.util.function.Supplier;
 
 /**
  Takes no arguments, has no return.  You could use a Supplier and ignore the return, but this
@@ -24,13 +23,14 @@ import java.lang.Override;
  Java inheritence prohibits overriding methods with the same arguments and different return types.
  So we have an asSupplier() convenience method built in.
  */
-public abstract class SideEffect {
+@FunctionalInterface
+public interface SideEffect {
 
     /** Implement this one method and you don't have to worry about checked exceptions. */
-    public abstract void apply() throws Exception;
+    void apply() throws Exception;
 
     /** The caller should use this convenience method to avoid checked exceptions. */
-    public void apply_() {
+    default void apply_() {
         try {
             apply();
         } catch (Exception e) {
@@ -39,14 +39,11 @@ public abstract class SideEffect {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> Supplier<T> asSupplier() {
+    default <T> Supplier<T> asSupplier() {
         final SideEffect parent = this;
-        return new Supplier<T>() {
-            @Override
-            public T get() throws Exception {
-                parent.apply();
-                return (T) null;
-            }
+        return () -> {
+            parent.apply_();
+            return (T) null;
         };
     }
 }
