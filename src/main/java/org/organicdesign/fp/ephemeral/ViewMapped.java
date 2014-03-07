@@ -14,11 +14,13 @@
 
 package org.organicdesign.fp.ephemeral;
 
+import java.util.function.Function;
+
 import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.Sentinel;
-import org.organicdesign.fp.function.Function;
+import org.organicdesign.fp.Transformable;
 
-class ViewMapped<T,U> extends View<U> {
+class ViewMapped<T,U> implements View<U> {
     private final View<T> view;
     private final Function<T,U> func;
 
@@ -27,16 +29,16 @@ class ViewMapped<T,U> extends View<U> {
     @SuppressWarnings("unchecked")
     public static <T,U> View<U> of(View<T> v, Function<T,U> f) {
         // You can put nulls in, but you don't get nulls out.
-        if (f == null) { return emptyView(); }
+        if (f == null) { return View.emptyView(); }
         if (f == FunctionUtils.IDENTITY) { return (View<U>) v; }
-        if ( (v == null) || (v == EMPTY_VIEW) ) { return emptyView(); }
+        if ( (v == null) || (v == EMPTY_VIEW) ) { return View.emptyView(); }
         return new ViewMapped<>(v, f);
     }
 
     @Override
     public U next() {
         T item = view.next();
-        if (item == Sentinel.USED_UP) { return usedUp(); }
-        return func.apply_(item);
+        if (item == Sentinel.USED_UP) { return Transformable.usedUp(); }
+        return func.apply(item);
     }
 }

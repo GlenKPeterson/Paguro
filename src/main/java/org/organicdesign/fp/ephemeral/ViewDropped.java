@@ -15,8 +15,9 @@
 package org.organicdesign.fp.ephemeral;
 
 import org.organicdesign.fp.Sentinel;
+import org.organicdesign.fp.Transformable;
 
-class ViewDropped<T> extends View<T> {
+class ViewDropped<T> implements View<T> {
     private final View<T> outerView;
 
     private long numItems;
@@ -25,7 +26,7 @@ class ViewDropped<T> extends View<T> {
 
     public static <T> View<T> of(View<T> v, long l) {
         if (l < 0) { throw new IllegalArgumentException("You can only drop a non-negative number of items"); }
-        if ( (v == null) || (v == EMPTY_VIEW) ) { return emptyView(); }
+        if ( (v == null) || (v == EMPTY_VIEW) ) { return View.emptyView(); }
         return new ViewDropped<>(v, l);
     }
 
@@ -35,7 +36,7 @@ class ViewDropped<T> extends View<T> {
             numItems--;
             if (outerView.next() == Sentinel.USED_UP) {
                 numItems = 0;
-                return usedUp();
+                return Transformable.usedUp();
             }
         }
         return outerView.next();

@@ -18,8 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.organicdesign.fp.function.Function;
-import org.organicdesign.fp.function.Predicate;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  Utilities that functional programmers would want, but aren't supplied in Java 7 (or 8)
@@ -32,7 +32,7 @@ public class FunctionUtils {
     /** A predicate that always returns true.  Use accept() for a type-safe version of this predicate. */
     public static final Predicate<Object> ACCEPT = new Predicate<Object>() {
         @Override
-        public boolean test(Object t) throws Exception {
+        public boolean test(Object t) {
             return true;
         }
 
@@ -56,7 +56,7 @@ public class FunctionUtils {
     /** A predicate that always returns false. Use reject() for a type-safe version of this predicate. */
     public static final Predicate<Object> REJECT = new Predicate<Object>() {
         @Override
-        public boolean test(Object t) throws Exception {
+        public boolean test(Object t) {
             return false;
         }
 
@@ -121,16 +121,61 @@ public class FunctionUtils {
         } else if (out.size() == 1) {
             return out.get(0);
         } else {
-            return new Predicate<T>() {
-                @Override
-                public boolean test(T t) throws Exception {
-                    for (Predicate<T> f : out) {
-                        if (!f.test(t)) {
-                            return false;
-                        }
+            return t -> {
+                for (Predicate<T> f : out) {
+                    if (!f.test(t)) {
+                        return false;
                     }
-                    return true;
                 }
+                return true;
+            };
+        }
+    }
+
+    /**
+     Composes multiple predicates into a single predicate to potentially minimize trips through
+     the source data.  The resultant predicate will loop through the predicates for each item in
+     the source, but for few predicates and many source items, that takes less memory.  Considers
+     no predicate to mean "reject all."  Use only accept()/ACCEPT and reject()/REJECT since
+     function comparison is done by reference.
+
+     @param in the predicates to test in order.  Nulls and REJECT predicates are ignored.  Any
+     ACCEPT predicate will cause this entire method to return the ACCEPT predicate.
+     No predicates means REJECT.
+
+     @param <T> the type of object to predicate on.
+
+     @return a predicate which returns true if any of the input predicates return true,
+     false otherwise.
+     */
+    @SafeVarargs
+    public static <T> Predicate<T> or(Predicate<T>... in) {
+        if ( (in == null) || (in.length < 1) ) {
+            return reject();
+        }
+        final List<Predicate<T>> out = new ArrayList<>();
+        for (Predicate<T> f : in) {
+            if ( (f == null) || (f == REJECT)) {
+                continue;
+            }
+            if (f == ACCEPT) {
+                // One reject in an or-list means to always accept.
+                return accept();
+            }
+            out.add(f);
+        }
+        if (out.size() < 1) {
+            return reject(); // No predicates means to reject all.
+        } else if (out.size() == 1) {
+            return out.get(0);
+        } else {
+            return t -> {
+                for (Predicate<T> f : out) {
+                    if (f.test(t)) {
+                        return true;
+                    }
+                }
+                return false;
             };
         }
     }
@@ -142,13 +187,13 @@ public class FunctionUtils {
     public static final Function<?,?> IDENTITY = new Function<Object,Object>() {
 
         @Override
-        public Object apply(Object t) throws Exception {
+        public Object apply(Object t) {
             return t;
         }
 
         @Override
         @SuppressWarnings("unchecked")
-        public <V> Function<V, Object> compose(Function<? super V,Object> before) {
+        public <V> Function<V, Object> compose(Function<? super V, ?> before) {
             // Composing any function with the identity function has no effect on the original
             // function (by definition of identity) - just return it.
             return (Function<V, Object>) before;
@@ -156,7 +201,7 @@ public class FunctionUtils {
 
         @Override
         @SuppressWarnings("unchecked")
-        public <V> Function<Object, V> andThen(Function<? super Object, V> after) {
+        public <V> Function<Object, V> andThen(Function<? super Object, ? extends V> after) {
             return (Function<Object, V>) after;
         }
     };

@@ -1,9 +1,9 @@
-If you're using Java 8, you need to get the Java 8 branch from here (now includes unit tests):
-https://github.com/GlenKPeterson/fp4java7/tree/2014-03-02_java8
+You are on the Java 8 branch of this project.  If you're using Java 7 or earlier, you need to get the Java 7 branch from here:
+https://github.com/GlenKPeterson/fp4java7/tree/java7
 
 #Usage
 
-Typical usage in Java 8 (prettier than Java 7):
+Typical usage:
 
 ```java
 List<Integer> list = ViewFromArray.of(1,2,3,4,5,6,7,8,9,10,11)
@@ -17,26 +17,6 @@ FunctionUtils.toString(list);
 
 None of these transformations change the underlying collections.  Ratherly they lazily build a new collection by chaining together all the operations you specify, then applying them in a single pass through the unerlying data.
 
-A good editor like Intellij IDEA has auto-completion and code folding features that make the Java 7 code look almost like the Java 8 code, but the above example completely expanded in Java 7 looks like this:
-
-```java
-List<Integer> list = ViewFromArray.of(1,2,3,4,5,6,7,8,9,10,11)
-        .filter(new Filter<Integer>() {
-            @Override
-            public boolean apply(Integer i) {
-                return i > 3;
-            }})
-        .map(new Function1<Integer,Integer>() {
-            @Override
-            public Integer apply(Integer i) {
-                return i + 1;
-            }})
-        .toJavaUnmodArrayList();
-
-FunctionUtils.toString(list);
-// Returns: "UnmodifiableRandomAccessList(5,6,7,8,9...)"
-```
-
 #Motivations
 
 Using a loop says nothing about what you are trying to accomplish.  Is a given loop supposed to map something, filter it, accumulate a result, or all three?  Different kinds of collections require different looping constructs which can be error prone for the coder and confusing for the reader.  Loops generally require setting up accumulators, then looping through all kinds of <code>if</code>, <code>break</code>, and <code>continue</code> statements, like some kind of mad obstacle race that involves as many state changes as possible.
@@ -49,7 +29,7 @@ In some cases, a well hand-written loop may be faster, but in general, the overh
 
 #API
 
-Functions available in <code>View</code> (as of 2014-02-16):
+Functions available in <code>View</code> (as of 2014-03-07):
 ###Starting Points:
 ```java
 View<T> ViewFromArray.of(T... i)

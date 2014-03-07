@@ -16,27 +16,29 @@ package org.organicdesign.fp.ephemeral;
 
 import java.util.Iterator;
 
+import org.organicdesign.fp.Transformable;
+
 /** A single-pass transformer backed by a Java Iterator. */
-public class ViewFromIterator<T> extends View<T> {
+public class ViewFromIterator<T> implements View<T> {
 
     private final Iterator<T> iter;
 
     ViewFromIterator(Iterator<T> i) { iter = i; }
 
     public static <T> View<T> of(Iterator<T> i) {
-        if (i == null) { return emptyView(); }
+        if (i == null) { return View.emptyView(); }
         return new ViewFromIterator<>(i);
     }
 
     public static <T> View<T> of(Iterable<T> i) {
-        if (i == null) { return emptyView(); }
+        if (i == null) { return View.emptyView(); }
         Iterator<T> iiter = i.iterator();
-        if (iiter == null) { return emptyView(); }
+        if (iiter == null) { return View.emptyView(); }
         return new ViewFromIterator<>(iiter);
     }
 
     @Override
     public synchronized T next() {
-        return iter.hasNext() ? iter.next() : usedUp();
+        return iter.hasNext() ? iter.next() : Transformable.usedUp();
     }
 }

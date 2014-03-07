@@ -14,13 +14,15 @@
 
 package org.organicdesign.fp.ephemeral;
 
-import org.organicdesign.fp.Sentinel;
-import org.organicdesign.fp.function.Function;
+import java.util.function.Function;
 
-class ViewFlatMapped<T,U> extends View<U> {
+import org.organicdesign.fp.Sentinel;
+import org.organicdesign.fp.Transformable;
+
+class ViewFlatMapped<T,U> implements View<U> {
     private final View<T> outerView;
 
-    private View<U> innerView = emptyView();
+    private View<U> innerView = View.emptyView();
 
     private final Function<T,View<U>> func;
 
@@ -29,10 +31,10 @@ class ViewFlatMapped<T,U> extends View<U> {
     @SuppressWarnings("unchecked")
     public static <T,U> View<U> of(View<T> v, Function<T,View<U>> f) {
         // You can put nulls in, but you don't get nulls out.
-        if (f == null) { return emptyView(); }
+        if (f == null) { return View.emptyView(); }
         // TODO: Is this comparison possible?
 //        if (f == FunctionUtils.IDENTITY) { return (View<U>) v; }
-        if ( (v == null) || (v == EMPTY_VIEW) ) { return emptyView(); }
+        if ( (v == null) || (v == EMPTY_VIEW) ) { return View.emptyView(); }
         return new ViewFlatMapped<>(v, f);
     }
 
@@ -40,12 +42,12 @@ class ViewFlatMapped<T,U> extends View<U> {
     public U next() {
         if (innerView == EMPTY_VIEW) {
             T item = outerView.next();
-            if (item == Sentinel.USED_UP) { return usedUp(); }
-            innerView = func.apply_(item);
+            if (item == Sentinel.USED_UP) { return Transformable.usedUp(); }
+            innerView = func.apply(item);
         }
         U innerNext = innerView.next();
         if (innerNext == Sentinel.USED_UP) {
-            innerView = emptyView();
+            innerView = View.emptyView();
             return next();
         }
         return innerNext;

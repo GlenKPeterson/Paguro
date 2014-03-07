@@ -16,7 +16,7 @@ package org.organicdesign.fp.permanent;
 
 import java.util.Iterator;
 
-import org.organicdesign.fp.Sentinel;
+import org.organicdesign.fp.Transformable;
 
 /**
  If you use the source iterator after passing it to this class then the behavior of this class
@@ -28,7 +28,7 @@ import org.organicdesign.fp.Sentinel;
  As long as you do not touch the iterator after passing it to the constructor of this object, this
  object will present and immutable, lazy, memoized, thread-safe view of the underlying iterator.
  */
-class SequenceFromIterator<T> extends Sequence<T> {
+class SequenceFromIterator<T> implements Sequence<T> {
 
     private static final Object UNINITIALIZED = new Object();
 
@@ -42,14 +42,14 @@ class SequenceFromIterator<T> extends Sequence<T> {
     SequenceFromIterator(Iterator<T> i) { iter = i; }
 
     public static <T> Sequence<T> of(Iterator<T> i) {
-        if (i == null) { return emptySequence(); }
+        if (i == null) { return Sequence.emptySequence(); }
         return new SequenceFromIterator<>(i);
     }
 
     public static <T> Sequence<T> of(Iterable<T> i) {
-        if (i == null) { return emptySequence(); }
+        if (i == null) { return Sequence.emptySequence(); }
         Iterator<T> iiter = i.iterator();
-        if (iiter == null) { return emptySequence(); }
+        if (iiter == null) { return Sequence.emptySequence(); }
         return new SequenceFromIterator<>(iiter);
     }
 
@@ -59,8 +59,8 @@ class SequenceFromIterator<T> extends Sequence<T> {
                 first = iter.next();
                 rest = of(iter);
             } else {
-                first = usedUp();
-                rest = emptySequence();
+                first = Transformable.usedUp();
+                rest = Sequence.emptySequence();
             }
         }
     }
@@ -75,12 +75,4 @@ class SequenceFromIterator<T> extends Sequence<T> {
         init();
         return rest;
     }
-
-    @SuppressWarnings("unchecked")
-    public static <T> SequenceFromIterator<T> emptySequence() {
-        return (SequenceFromIterator<T>) EMPTY_SEQUENCE;
-    }
-
-    @SuppressWarnings("unchecked")
-    public T usedUp() { return (T) Sentinel.USED_UP; }
 }
