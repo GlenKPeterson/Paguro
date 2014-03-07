@@ -133,6 +133,54 @@ public class FunctionUtils {
     }
 
     /**
+     Composes multiple predicates into a single predicate to potentially minimize trips through
+     the source data.  The resultant predicate will loop through the predicates for each item in
+     the source, but for few predicates and many source items, that takes less memory.  Considers
+     no predicate to mean "reject all."  Use only accept()/ACCEPT and reject()/REJECT since
+     function comparison is done by reference.
+
+     @param in the predicates to test in order.  Nulls and REJECT predicates are ignored.  Any
+     ACCEPT predicate will cause this entire method to return the ACCEPT predicate.
+     No predicates means REJECT.
+
+     @param <T> the type of object to predicate on.
+
+     @return a predicate which returns true if any of the input predicates return true,
+     false otherwise.
+     */
+    @SafeVarargs
+    public static <T> Predicate<T> or(Predicate<T>... in) {
+        if ( (in == null) || (in.length < 1) ) {
+            return reject();
+        }
+        final List<Predicate<T>> out = new ArrayList<>();
+        for (Predicate<T> f : in) {
+            if ( (f == null) || (f == REJECT)) {
+                continue;
+            }
+            if (f == ACCEPT) {
+                // One reject in an or-list means to always accept.
+                return accept();
+            }
+            out.add(f);
+        }
+        if (out.size() < 1) {
+            return reject(); // No predicates means to reject all.
+        } else if (out.size() == 1) {
+            return out.get(0);
+        } else {
+            return t -> {
+                for (Predicate<T> f : out) {
+                    if (f.test(t)) {
+                        return true;
+                    }
+                }
+                return false;
+            };
+        }
+    }
+
+    /**
      A function that returns its input unchanged.
      Use identity() for a type-safe version of this function.
      */

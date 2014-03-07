@@ -12,17 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Special thanks to Alexey Romanov http://programmers.stackexchange.com/users/33636/alexey-romanov
+// for his suggestions here:
+// http://programmers.stackexchange.com/questions/231420/passing-a-scala-function-to-a-java-8-method
+
 package org.organicdesign.fp
 
 import java.util.function.Function
 
 // Note: Function1 is Scala's functional interface,
 // Function (without the 1) is Java 8's.
-case class JavaFunction1[U,V](f:Function1[U,V]) extends Function[U,V] {
+//
+// case class JavaFunction1[U,V](f:Function1[U,V]) extends Function[U,V] {
+case class JavaFunction1[U,V](f:(U) => V) extends Function[U,V] {
   override def apply(t: U): V = f(t)
   override def compose[T](before:Function[_ >: T, _ <: U]):
-    Function[T, V] = ???
+    Function[T, V] = JavaFunction1(f.compose(x => before.apply(x))) // thanks to Alexey Romanov
   override def andThen[W](after:Function[_ >: V, _ <: W]):
-    Function[U, W] = ???
+    Function[U, W] = JavaFunction1(f.andThen(x => after.apply(x))) // thanks to Alexey Romanov
 }
 
