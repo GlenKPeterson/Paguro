@@ -3,20 +3,16 @@ https://github.com/GlenKPeterson/fp4java7/tree/java7
 
 #Usage
 
-Typical usage (from <a href="https://github.com/GlenKPeterson/fp4java7/blob/master/src/test/java/org/organicdesign/fp/ephemeral/ViewTest.java">ViewTest.java</a>):
+Typical usage (based on this unit test: <a href="https://github.com/GlenKPeterson/fp4java7/blob/master/src/test/java/org/organicdesign/fp/ephemeral/ViewTest.java">ViewTest.java</a>):
 
 ```java
-List<Integer> list = View.ofArray(5) //         5
-        .prepend(View.ofArray(4))    //       4,5
-        .append(View.ofArray(6))     //       4,5,6
-        .prepend(View.ofArray(2,3))  //   2,3,4,5,6
-        .append(View.ofArray(7,8))   //   2,3,4,5,6,7,8
-        .prepend(View.ofArray(1))    // 1,2,3,4,5,6,7,8
-        .append(View.ofArray(9))     // 1,2,3,4,5,6,7,8,9
-        .filter(i -> i > 3)          //       4,5,6,7,8,9
-        .map(i -> i - 2)             //   2,3,4,5,6,7
-        .take(5)                     //   2,3,4,5,6
-        .drop(2)                     //       4,5,6
+List<Integer> list = View.ofArray(5)    //         5
+        .prepend(View.ofArray(1,2,3,4)) // 1,2,3,4,5
+        .append(View.ofArray(6,7,8,9))  // 1,2,3,4,5,6,7,8,9
+        .filter(i -> i > 3)             //       4,5,6,7,8,9
+        .map(i -> i - 2)                //   2,3,4,5,6,7
+        .take(5)                        //   2,3,4,5,6
+        .drop(2)                        //       4,5,6
         .toJavaArrayList();
 
 FunctionUtils.toString(list);
