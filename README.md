@@ -1,3 +1,6 @@
+If you're using Java 7, you need to get the Java 7 branch from here:
+https://github.com/GlenKPeterson/fp4java7/
+
 #Usage
 
 Typical usage in Java 8 (prettier than Java 7):
