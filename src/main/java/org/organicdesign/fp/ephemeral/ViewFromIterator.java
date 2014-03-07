@@ -23,7 +23,7 @@ public class ViewFromIterator<T> implements View<T> {
 
     private final Iterator<T> iter;
 
-    ViewFromIterator(Iterator<T> i) { iter = i; }
+    private ViewFromIterator(Iterator<T> i) { iter = i; }
 
     public static <T> View<T> of(Iterator<T> i) {
         if (i == null) { return View.emptyView(); }

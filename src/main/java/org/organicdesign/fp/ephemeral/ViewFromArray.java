@@ -22,11 +22,11 @@ public class ViewFromArray<T> implements View<T> {
     private final T[] items;
     private int idx = 0;
 
-    ViewFromArray(T[] i) { items = i; }
+    private ViewFromArray(T[] i) { items = i; }
 
     @SafeVarargs
-    public static <T> View<T> of(T... i) {
-        if (i == null) { return View.emptyView(); }
+    static <T> View<T> of(T... i) {
+        if ((i == null) || (i.length < 1)) { return View.emptyView(); }
         return new ViewFromArray<>(i);
     }
 

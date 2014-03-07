@@ -14,6 +14,7 @@
 
 package org.organicdesign.fp.ephemeral;
 
+import java.util.Iterator;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -38,6 +39,19 @@ public interface View<T> extends Transformable<T> {
     @SuppressWarnings("unchecked")
     public static <U> View<U> emptyView() {
         return (View<U>) EMPTY_VIEW;
+    }
+
+    public static <T> View<T> of(Iterator<T> i) {
+        return ViewFromIterator.of(i);
+    }
+
+    public static <T> View<T> of(Iterable<T> i) {
+        return ViewFromIterator.of(i);
+    }
+
+    @SafeVarargs
+    public static <T> View<T> ofArray(T... i) {
+        return ViewFromArray.of(i);
     }
 
     /**
@@ -129,5 +143,13 @@ public interface View<T> extends Transformable<T> {
      */
     default <U> View<U> flatMap(Function<T,View<U>> func) {
         return ViewFlatMapped.of(this, func);
+    }
+
+    default View<T> append(View<T> pv) {
+        return ViewPrepended.of(pv, this);
+    }
+
+    default View<T> prepend(View<T> pv) {
+        return ViewPrepended.of(this, pv);
     }
 }

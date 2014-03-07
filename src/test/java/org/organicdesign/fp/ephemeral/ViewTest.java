@@ -23,23 +23,41 @@ import static org.junit.Assert.assertArrayEquals;
 public class ViewTest {
     @Test
     public void takeAndDrop() {
-        assertArrayEquals(ViewFromArray.of(1,2,3,4,5,6,7,8,9)
+        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
                                   .drop(0).take(8888).toJavaArrayList().toArray(),
                           new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 });
-        assertArrayEquals(ViewFromArray.of(1,2,3,4,5,6,7,8,9)
+        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
                                   .drop(1).take(1).toJavaArrayList().toArray(),
                    new Integer[] { 2 });
-        assertArrayEquals(ViewFromArray.of(1,2,3,4,5,6,7,8,9)
+        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
                                   .drop(2).take(2).toJavaArrayList().toArray(),
                    new Integer[] { 3,4 });
-        assertArrayEquals(ViewFromArray.of(1,2,3,4,5,6,7,8,9)
+        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
                                   .drop(3).take(3).toJavaArrayList().toArray(),
                    new Integer[] { 4,5,6 });
-        assertArrayEquals(ViewFromArray.of(1,2,3,4,5,6,7,8,9)
+        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
                                   .drop(9999).take(3).toJavaArrayList().toArray(),
                    new Integer[] { });
-        assertArrayEquals(ViewFromArray.of(1,2,3,4,5,6,7,8,9)
+        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
                                   .drop(3).take(0).toJavaArrayList().toArray(),
                    new Integer[] { });
     }
+
+    @Test
+    public void chain1() {
+        assertArrayEquals(View.ofArray(5)                     //         5
+                                  .prepend(View.ofArray(4))   //       4,5
+                                  .append(View.ofArray(6))    //       4,5,6
+                                  .prepend(View.ofArray(2,3)) //   2,3,4,5,6
+                                  .append(View.ofArray(7,8))  //   2,3,4,5,6,7,8
+                                  .prepend(View.ofArray(1))   // 1,2,3,4,5,6,7,8
+                                  .append(View.ofArray(9))    // 1,2,3,4,5,6,7,8,9
+                                  .filter(i -> i > 3)         //       4,5,6,7,8,9
+                                  .map(i -> i - 2)            //   2,3,4,5,6,7
+                                  .take(5)                    //   2,3,4,5,6
+                                  .drop(2)                    //       4,5,6
+                                  .toJavaArrayList().toArray(),
+                          new Integer[] { 4, 5, 6 });
+    }
+
 }

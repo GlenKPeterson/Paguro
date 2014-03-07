@@ -17,9 +17,10 @@ package org.organicdesign.fp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import java.util.function.Function;
 import java.util.function.Predicate;
+
+import org.organicdesign.fp.ephemeral.View;
 
 /**
  Utilities that functional programmers would want, but aren't supplied in Java 7 (or 8)
@@ -85,6 +86,9 @@ public class FunctionUtils {
     @SuppressWarnings("unchecked")
     public static <T> Predicate<T> reject() { return (Predicate<T>) REJECT; }
 
+    // For forced exit from a forEach.
+    private static class EndException extends RuntimeException {}
+
     /**
      Composes multiple predicates into a single predicate to potentially minimize trips through
      the source data.  The resultant predicate will loop through the predicates for each item in
@@ -100,21 +104,24 @@ public class FunctionUtils {
 
      @return a predicate which returns true if all the input predicates return true, false otherwise.
      */
-    @SafeVarargs
-    public static <T> Predicate<T> and(Predicate<T>... in) {
-        if ( (in == null) || (in.length < 1) ) {
+    public static <T> Predicate<T> and(View<Predicate<T>> in) {
+        if ( (in == null) || (in == View.EMPTY_VIEW) ) {
             return accept();
         }
         final List<Predicate<T>> out = new ArrayList<>();
-        for (Predicate<T> f : in) {
-            if ((f == null) || (f == ACCEPT)) {
-                continue;
-            }
-            if (f == REJECT) {
-                // One reject in an and-list means to always reject.
-                return reject();
-            }
-            out.add(f);
+        // I can't seem to iterate through a View here, so I'm using an exception to terminate
+        // the loop.
+        try {
+            in.filter(f -> (f != null) && (f != ACCEPT))
+                    .forEach(f -> {
+                        // One reject in an and-list means to always reject.
+                        if (f == REJECT) {
+                            throw new EndException();
+                        }
+                        out.add(f);
+                    });
+        } catch (EndException ee) {
+            return reject();
         }
         if (out.size() < 1) {
             return accept(); // No predicates means to accept all.
@@ -130,6 +137,12 @@ public class FunctionUtils {
                 return true;
             };
         }
+    }
+
+    /** A convenience wrapper for and().  This may be a bad idea.  Not sure yet. */
+    @SafeVarargs // Not really sure how safe these varargs are...
+    public static <T> Predicate<T> andArray(Predicate<T>... in) {
+        return and(View.ofArray(in));
     }
 
     /**
@@ -148,21 +161,22 @@ public class FunctionUtils {
      @return a predicate which returns true if any of the input predicates return true,
      false otherwise.
      */
-    @SafeVarargs
-    public static <T> Predicate<T> or(Predicate<T>... in) {
-        if ( (in == null) || (in.length < 1) ) {
+    public static <T> Predicate<T> or(View<Predicate<T>> in) {
+        if ( (in == null) || (in == View.EMPTY_VIEW) ) {
             return reject();
         }
         final List<Predicate<T>> out = new ArrayList<>();
-        for (Predicate<T> f : in) {
-            if ( (f == null) || (f == REJECT)) {
-                continue;
-            }
-            if (f == ACCEPT) {
-                // One reject in an or-list means to always accept.
-                return accept();
-            }
-            out.add(f);
+        try {
+            in.filter(f -> (f != null) && (f != REJECT))
+                    .forEach(f -> {
+                        // One accept in an or-list means to always accept.
+                        if (f == ACCEPT) {
+                            throw new EndException();
+                        }
+                        out.add(f);
+                    });
+        } catch (EndException ee) {
+            return accept();
         }
         if (out.size() < 1) {
             return reject(); // No predicates means to reject all.
@@ -178,6 +192,12 @@ public class FunctionUtils {
                 return false;
             };
         }
+    }
+
+    /** A convenience wrapper for of().  This may be a bad idea.  Not sure yet. */
+    @SafeVarargs
+    public static <T> Predicate<T> orArray(Predicate<T>... in) {
+        return or(View.ofArray(in));
     }
 
     /**

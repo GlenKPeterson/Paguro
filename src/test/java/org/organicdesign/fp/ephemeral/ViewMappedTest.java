@@ -30,26 +30,26 @@ public class ViewMappedTest {
 
     @Test
     public void mapInOneBatch() {
-        assertArrayEquals(ViewFromArray.of(1,2,3,4,5,6,7,8,9)
+        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
                                   .map(FunctionUtils.identity()).toJavaArrayList().toArray(),
                           new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 });
 
-        assertArrayEquals(ViewFromArray.of(1,2,3,4,5,6,7,8,9)
+        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
                                   .map(plusOne).toJavaArrayList().toArray(),
                           new Integer[] { 2,3,4,5,6,7,8,9,10 });
-        assertArrayEquals(ViewFromArray.of(1,2,3,4,5,6,7,8,9)
+        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
                                   .map(minusOne).toJavaArrayList().toArray(),
                           new Integer[] { 0,1,2,3,4,5,6,7,8 });
 
-        assertArrayEquals(ViewFromArray.of(1,2,3,4,5,6,7,8,9)
+        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
                                   .map(plusOne).map(minusOne).toJavaArrayList().toArray(),
                           new Integer[] { 1,2,3,4,5,6,7,8,9 });
 
-        assertArrayEquals(ViewFromArray.of(1,2,3,4,5,6,7,8,9)
+        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
                                   .map(minusOne).map(plusOne).toJavaArrayList().toArray(),
                           new Integer[] { 1,2,3,4,5,6,7,8,9 });
 
-        assertArrayEquals(ViewFromArray.of(1,2,3,4,5,6,7,8,9)
+        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
                                   .map(plusOne).map(plusOne).toJavaArrayList().toArray(),
                           new Integer[] { 3,4,5,6,7,8,9,10,11 });
 
@@ -57,13 +57,13 @@ public class ViewMappedTest {
     @Test
     public void mapInMultipleBatches() {
 
-        assertArrayEquals(ViewFromArray.of(1,2,3,4,5,6,7,8,9)
+        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
                                   .map(plusOne).map(plusOne).map(plusOne).map(plusOne).map(plusOne)
                                   .map(plusOne).map(plusOne).map(plusOne).map(plusOne).map(plusOne)
                                   .toJavaArrayList().toArray(),
                           new Integer[] { 11,12,13,14,15,16,17,18,19 });
 
-        assertArrayEquals(ViewFromArray.of(1,2,3,4,5,6,7,8,9)
+        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
                                   .map(minusOne).map(minusOne).map(minusOne).map(minusOne)
                                   .map(minusOne).map(minusOne).map(minusOne).map(minusOne)
                                   .map(minusOne).map(minusOne)
