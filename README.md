@@ -3,19 +3,27 @@ https://github.com/GlenKPeterson/fp4java7/tree/java7
 
 #Usage
 
-Typical usage:
+Typical usage (from <a href="https://github.com/GlenKPeterson/fp4java7/blob/master/src/test/java/org/organicdesign/fp/ephemeral/ViewTest.java">ViewTest.java</a>):
 
 ```java
-List<Integer> list = ViewFromArray.of(1,2,3,4,5,6,7,8,9,10,11)
-        .filter(i ->  i > 3)       // 4,5,6,7,8,9,10,11
-        .map(i -> i + 1)           // 5,6,7,8,9,10,11,12
-        .toJavaUnmodArrayList();
-        
+List<Integer> list = View.ofArray(5) //         5
+        .prepend(View.ofArray(4))    //       4,5
+        .append(View.ofArray(6))     //       4,5,6
+        .prepend(View.ofArray(2,3))  //   2,3,4,5,6
+        .append(View.ofArray(7,8))   //   2,3,4,5,6,7,8
+        .prepend(View.ofArray(1))    // 1,2,3,4,5,6,7,8
+        .append(View.ofArray(9))     // 1,2,3,4,5,6,7,8,9
+        .filter(i -> i > 3)          //       4,5,6,7,8,9
+        .map(i -> i - 2)             //   2,3,4,5,6,7
+        .take(5)                     //   2,3,4,5,6
+        .drop(2)                     //       4,5,6
+        .toJavaArrayList();
+
 FunctionUtils.toString(list);
-// Returns: "UnmodifiableRandomAccessList(5,6,7,8,9...)"
+// Returns: "UnmodifiableRandomAccessList(4,5,6)"
 ```
 
-None of these transformations change the underlying collections.  Ratherly they lazily build a new collection by chaining together all the operations you specify, then applying them in a single pass through the unerlying data.
+Unlike Java 8 streams, these transformations do not change the underlying data.  They build a new collection by chaining together all the operations you specify, then lazily applying them in a single pass through the unerlying data.  The laziness is implemented as an incremental pull, so that if your last operation is take(1), then the absolute minimum number of items will be evaluated through all the functions you specified.
 
 #Motivations
 
@@ -25,33 +33,46 @@ Higher order functions are not just briefer to write and read, they are less to 
 
 No data is changed when using these transformations.  They allow you to write nearly stateless programs whose statements chain together and evaluate into a useful result.  Lisp works like this, only the syntax makes the evaluation go inside out from the order you read the statements in (hence Clojure's two arrow operators).  With method chaining, the evaluation happens in the same order as the methods are written on the page, much like piping commands to one another in shell scripts.
 
-In some cases, a well hand-written loop may be faster, but in general, the overhead for using these transformations is very low, and well worth the clarity and safety they provide.
+In some cases, a well hand-written loop may be faster, but in general, the overhead for using these transformations is minimal and, I believe, well worth the clarity and safety they provide.
 
 #API
 
 Functions available in <code>View</code> (as of 2014-03-07):
 ###Starting Points:
 ```java
-View<T> ViewFromArray.of(T... i)
-View<T> ViewFromIterator.of(Iterator<T> i)
-View<T> ViewFromIterator.of(Iterable<T> i)
+View<T> View.ofArray(T... i)
+View<T> View.of(Iterator<T> i)
+View<T> View.of(Iterable<T> i)
 ```
 ###Transformations:
 ```java
 // Run a function against each item for side effects (e.g. writing output)
 void forEach(Consumer<T> se)
+
 // Return the first item for which the given test function returns true
 T firstMatching(Predicate<T> pred)
+
 // Apply the function to each item in the list, accumulating the result in u
 U foldLeft(U u, BiFunction<U, T, U> fun)
+
 // Return only the items for which the given function returns true
 View<T> filter(Predicate<T> pred)
+
 // Return only the first n items
 View<T> take(long numItems)
+
 // Ignore the first n items and return only those that come after
 View<T> drop(long numItems)
+
 // Transform each item into exactly one new item using the given function
 View<U> map(Function<T,U> func)
+
+// Add more items at the end of this view
+View<T> append(View<T> pv)
+
+// Add more items at the beginning of this view
+View<T> prepend(View<T> pv)
+
 // Transform each item into zero or more new items using the given function
 View<U> flatMap(Function<T,View<U>> func)
 ```
