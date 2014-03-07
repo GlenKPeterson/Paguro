@@ -1,4 +1,4 @@
-You are on the Java 8 branch of this project.  If you're using Java 7 or earlier, you need to get the Java 7 branch from here:
+You are on the Java 8 branch of this project.  If you're using Java 7 or earlier, get the Java 7 legacy support branch from here:
 https://github.com/GlenKPeterson/fp4java7/tree/java7
 
 #Usage
