@@ -17,7 +17,7 @@ import org.scalatest._
 import java.util.Arrays
 
 class TestFunctionUtils extends FlatSpec with Matchers {
-  "A View" should "take and drop" in {
+  "FunctionUtils" should "compose predicates with and and or" in {
     assert(FunctionUtils.and() eq FunctionUtils.accept())
     assert(FunctionUtils.and(FunctionUtils.accept()) eq FunctionUtils.accept())
     assert(FunctionUtils.and(FunctionUtils.accept(),
