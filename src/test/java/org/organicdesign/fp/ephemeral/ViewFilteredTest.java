@@ -31,9 +31,9 @@ public class ViewFilteredTest {
     }
 
     @Test
-    public void singleFilterWorks() {
+    public void singleFilter() {
         assertArrayEquals(View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).filter(accept()).toArray(),
-                          new Integer[] {1,2,3,4,5,6,7,8,9});
+                          new Integer[] {1, 2, 3, 4, 5, 6, 7, 8, 9});
 
         assertArrayEquals(View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).filter(reject()).toArray(),
                           new Integer[] {});
@@ -58,5 +58,37 @@ public class ViewFilteredTest {
 
     }
 
-    // TODO: Add tests for chained filters.
+    @Test
+    public void chainedFilters() {
+        assertArrayEquals(View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                                  .filter(accept()).filter(accept()).filter(accept())
+                                  .filter(accept()).filter(accept()).filter(accept())
+                                  .filter(accept()).filter(accept()).toArray(),
+                          new Integer[] {1, 2, 3, 4, 5, 6, 7, 8, 9});
+
+        assertArrayEquals(View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                                  .filter(reject()).filter(accept()).filter(accept())
+                                  .filter(accept()).filter(accept()).filter(accept())
+                                  .filter(accept()).filter(accept()).toArray(),
+                          new Integer[] {});
+
+        assertArrayEquals(View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                                  .filter(accept()).filter(accept()).filter(accept())
+                                  .filter(accept()).filter(reject()).filter(accept())
+                                  .filter(accept()).filter(accept()).toArray(),
+                          new Integer[] {});
+
+        assertArrayEquals(View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                                  .filter(accept()).filter(accept()).filter(accept())
+                                  .filter(accept()).filter(accept()).filter(accept())
+                                  .filter(accept()).filter(reject()).toArray(),
+                          new Integer[] {});
+
+        assertArrayEquals(View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                                  .filter(i -> i > 2)
+                                  .filter(i -> i < 7)
+                                  .filter(i -> i != 5).toArray(),
+                          new Integer[] {3, 4, 6});
+
+    }
 }
