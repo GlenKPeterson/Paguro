@@ -177,4 +177,12 @@ public interface Transformable<T> extends Realizable<T> {
     default Set<T> toJavaUnmodSet() {
         return Collections.unmodifiableSet(toJavaHashSet());
     }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    default T[] toArray() {
+        ArrayList<T> al = toJavaArrayList();
+        return al.toArray((T[]) new Object[al.size()]);
+    }
+
 }

@@ -29,7 +29,8 @@ class ViewFiltered<T> implements View<T> {
     ViewFiltered(View<T> v, Predicate<T> f) { view = v; predicate = f; }
 
     public static <T> View<T> of(View<T> v, Predicate<T> f) {
-        if ( (f == null) || (f == FunctionUtils.REJECT) ) { return View.emptyView(); }
+        if (f == null) { throw new IllegalArgumentException("Must provide a predicate"); }
+        if (f == FunctionUtils.REJECT) { return View.emptyView(); }
         if (f == FunctionUtils.ACCEPT) { return v; }
         if ( (v == null) || (v == EMPTY_VIEW) ) { return View.emptyView(); }
         return new ViewFiltered<>(v, f);

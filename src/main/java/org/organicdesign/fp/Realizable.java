@@ -69,4 +69,6 @@ public interface Realizable<T> {
 
     HashSet<T> toJavaHashSet();
     Set<T> toJavaUnmodSet();
+
+    T[] toArray();
 }
