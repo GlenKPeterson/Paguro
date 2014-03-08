@@ -86,6 +86,7 @@ TreeSet<T> toJavaTreeSet()
 SortedSet<T> toJavaUnmodSortedSet()
 HashSet<T> toJavaHashSet()
 Set<T> toJavaUnmodSet()
+T[] toArray()
 ```
 
 #Details
@@ -99,8 +100,8 @@ The classes in the <code>function</code> package allow you to use the Java 8 fun
 When you switch to Java 8, you only need to change the import statement and remove the _ from the apply_() methods.
 The apply_() methods are there to deal with checked exceptions in lambdas in Java 7.
 
-Java 7 and earlier require that all variables declared outside a lambda be finial in order to use them inside the lambda.
-If you need that functionality in Java 7 or earlier, the Mutable.____Ref classes work around this limitation.
+Some variables declared outside a lambda and used within one must be finial.
+The Mutable.____Ref classes work around this limitation.
 
 The most interesting classes are probably (in src/main/java/):
 <ul>
@@ -108,6 +109,16 @@ The most interesting classes are probably (in src/main/java/):
 <li><code><a href="https://github.com/GlenKPeterson/fp4java7/blob/master/src/main/java/org/organicdesign/fp/ephemeral/View.java">org/organicdesign/fp/ephemeral/View</a></code> - a working implementation of most of these transformations</li>
 <li><code><a href="https://github.com/GlenKPeterson/fp4java7/blob/master/src/main/java/org/organicdesign/fp/FunctionUtils.java">org/organicdesign/fp/FunctionUtils</a></code> - smartly combine/compose multiple predicates, convert collections to Strings, etc.</li>
 </ul>
+
+#Dependencies
+- Java 8 (tested with 64-bit Linux build 1.8.0-b129)
+ 
+#Build Dependencies
+- Maven (tested version: 3.11.0-18-generic 64-bit Linux build)
+
+#Test Dependencies
+- Maven will download jUnit for you
+- As of 2014-03-08, all major areas of functionality are covered by unit tests.
 
 #To Do
 
