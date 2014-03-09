@@ -29,13 +29,14 @@ public class ConcurrentXform {
 
     public Long[] toArray() {
         Long[] ret = new Long[range.size().toPrimitiveInt()];
-        List<IntRange> ranges = range.getSubRanges(1);
+        List<IntRange> ranges = range.getSubRanges(maxThreads);
         List<Thread> threads = new ArrayList<>();
+
         for (IntRange r : ranges) {
-            final Mutable.IntRef idx = Mutable.IntRef.of(0);
             Thread t = new Thread() {
                 @Override
                 public void run() {
+                    final Mutable.IntRef idx = Mutable.IntRef.of(r.start().toPrimitiveInt() - range.start().toPrimitiveInt());
                     ViewFromIntRange.of(r).forEach(i -> {
                         ret[idx.value()] = ((Int) i).toLongObj();
                         idx.increment();
@@ -61,7 +62,7 @@ public class ConcurrentXform {
     private Object[] fields() {
         // So long as your class does not have any internal arrays,
         // simply list your fields here.
-        return new Object[] { maxThreads };
+        return new Object[] { range, maxThreads };
     }
 
     @Override
