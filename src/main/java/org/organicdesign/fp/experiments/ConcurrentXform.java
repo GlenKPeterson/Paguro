@@ -27,18 +27,25 @@ public class ConcurrentXform {
 
     public static ConcurrentXform of(int t, IntRange r) { return new ConcurrentXform(t, r); }
 
-    public Long[] toArray() {
-        Long[] ret = new Long[range.size().toPrimitiveInt()];
+    public Int[] toArray() {
+        Int[] ret = new Int[range.size().toPrimitiveInt()];
         List<IntRange> ranges = range.getSubRanges(maxThreads);
+
+        List<IntRange> idxRanges = IntRange.of(Int.ZERO, range.size().minus(Int.ONE)).getSubRanges(maxThreads);
+
         List<Thread> threads = new ArrayList<>();
 
-        for (IntRange r : ranges) {
+        for (int i = 0; i < ranges.size(); i++) {
+            System.out.println("Starting thread: " + i);
+            IntRange r = ranges.get(i);
+            IntRange rIdx = idxRanges.get(i);
             Thread t = new Thread() {
                 @Override
                 public void run() {
-                    final Mutable.IntRef idx = Mutable.IntRef.of(r.start().toPrimitiveInt() - range.start().toPrimitiveInt());
+                    final Mutable.IntRef idx = Mutable.IntRef.of(rIdx.start().toPrimitiveInt());
                     ViewFromIntRange.of(r).forEach(i -> {
-                        ret[idx.value()] = ((Int) i).toLongObj();
+//                        System.out.println("\tidx: " + idx.value() + " value: " + (Int) i);
+                        ret[idx.value()] = (Int) i;
                         idx.increment();
                     });
                 }
@@ -48,6 +55,7 @@ public class ConcurrentXform {
         }
         // Wait for 'em all to finish
         for (Thread t : threads) {
+            System.out.println("Joining thread...");
             try {
                 t.join();
             } catch (InterruptedException tie) {

@@ -17,14 +17,32 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import static org.junit.Assert.assertArrayEquals;
+
 @RunWith(JUnit4.class)
 public class ConcurrentXformTest {
+
+    @Test
+    public void basics() {
+        Int[] is = new Int[] { Int.of(1), Int.of(2), Int.of(3), Int.of(4), Int.of(5),
+                               Int.of(6), Int.of(7), Int.of(8), Int.of(9), };
+        IntRange range = IntRange.of(1, 9);
+        assertArrayEquals(ConcurrentXform.of(1, range).toArray(), is);
+
+        assertArrayEquals(ConcurrentXform.of(2, range).toArray(), is);
+        assertArrayEquals(ConcurrentXform.of(3, range).toArray(), is);
+        assertArrayEquals(ConcurrentXform.of(4, range).toArray(), is);
+        assertArrayEquals(ConcurrentXform.of(5, range).toArray(), is);
+    }
+
     @Test
     public void tryStuff() {
-        IntRange range = IntRange.of(-1000000, 1000000);
+        System.out.println();
+        IntRange range = IntRange.of(-10000000, 10000000);
         ConcurrentXform cx = ConcurrentXform.of(1, range);
         long startTime = System.currentTimeMillis();
         cx.toArray();
         System.out.println("Time: " + (System.currentTimeMillis() - startTime));
     }
+
 }

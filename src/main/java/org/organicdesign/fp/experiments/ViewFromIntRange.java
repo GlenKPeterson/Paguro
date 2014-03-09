@@ -29,7 +29,7 @@ public class ViewFromIntRange implements View<Object> {
     }
 
     @Override
-    public synchronized Object next() {
+    public Object next() {
         if (idx.lt(range.size())) {
             Int ret = range.get(idx);
             idx = idx.plus(Int.ONE);
