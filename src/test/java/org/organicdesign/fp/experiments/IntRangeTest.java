@@ -97,6 +97,6 @@ public class IntRangeTest {
         assertEquals(l.size(), 3);
         assertEquals(l.get(0), IntRange.of(Int.ONE, Int.of(34)));
         assertEquals(l.get(1), IntRange.of(Int.of(35), Int.of(67)));
-        assertEquals(l.get(2), IntRange.of(Int.of(68), Int.of(99)));
+        assertEquals(l.get(2), IntRange.of(Int.of(68), Int.of(100)));
     }
 }
