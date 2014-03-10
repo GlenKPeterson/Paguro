@@ -13,7 +13,7 @@
 
 package org.organicdesign.fp.experiments;
 
-import org.organicdesign.fp.Transformable;
+import org.organicdesign.fp.Option;
 import org.organicdesign.fp.ephemeral.View;
 
 public class ViewFromIntRange implements View<Object> {
@@ -29,12 +29,12 @@ public class ViewFromIntRange implements View<Object> {
     }
 
     @Override
-    public Object next() {
+    public Option<Object> next() {
         if (idx.lt(range.size())) {
             Int ret = range.get(idx);
             idx = idx.plus(Int.ONE);
-            return ret;
+            return Option.of(ret);
         }
-        return Transformable.usedUp();
+        return Option.none();
     }
 }

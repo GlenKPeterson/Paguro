@@ -20,7 +20,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import org.organicdesign.fp.Sentinel;
+import org.organicdesign.fp.Option;
 import org.organicdesign.fp.Transformable;
 
 /**
@@ -30,12 +30,8 @@ import org.organicdesign.fp.Transformable;
  */
 
 public interface View<T> extends Transformable<T> {
-    public static final View<?> EMPTY_VIEW = new View<Object>() {
-        @Override
-        public Object next() {
-            return Transformable.usedUp();
-        }
-    };
+    public static final View<?> EMPTY_VIEW = Option::none;
+
     @SuppressWarnings("unchecked")
     public static <U> View<U> emptyView() {
         return (View<U>) EMPTY_VIEW;
@@ -58,7 +54,7 @@ public interface View<T> extends Transformable<T> {
       This is the distinguishing method of the view interface.
      @return the next item in the view, or Sentinel.USED_UP
      */
-    T next();
+    Option<T> next();
 
     @Override
     default <U> View<U> map(Function<T,U> func) {
@@ -72,18 +68,19 @@ public interface View<T> extends Transformable<T> {
 
     @Override
     default void forEach(Consumer<T> se) {
-        T item = next();
-        while (item != Sentinel.USED_UP) {
-            se.accept(item);
+        Option<T> item = next();
+        while (item.isSome()) {
+            se.accept(item.get());
             item = next();
         }
     }
 
     @Override
     default T firstMatching(Predicate<T> pred) {
-        T item = next();
-        while (item != Sentinel.USED_UP) {
-            if (pred.test(item)) { return item; }
+        Option<T> item = next();
+        while (item.isSome()) {
+            T t = item.get();
+            if (pred.test(t)) { return t; }
             item = next();
         }
         return null;
@@ -91,9 +88,9 @@ public interface View<T> extends Transformable<T> {
 
     @Override
     default <U> U foldLeft(U u, BiFunction<U, T, U> fun) {
-        T item = next();
-        while (item != Sentinel.USED_UP) {
-            u = fun.apply(u, item);
+        Option<T> item = next();
+        while (item.isSome()) {
+            u = fun.apply(u, item.get());
             item = next();
         }
         return u;

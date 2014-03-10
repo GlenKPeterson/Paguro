@@ -13,7 +13,7 @@
 
 package org.organicdesign.fp.ephemeral;
 
-import org.organicdesign.fp.Sentinel;
+import org.organicdesign.fp.Option;
 
 class ViewPrepended<T> implements View<T> {
     private final View<T> originalView;
@@ -37,12 +37,12 @@ class ViewPrepended<T> implements View<T> {
     }
 
     @Override
-    public T next() {
+    public Option<T> next() {
         if (prependedView == EMPTY_VIEW) {
             return originalView.next();
         }
-        T innerNext = prependedView.next();
-        if (innerNext == Sentinel.USED_UP) {
+        Option<T> innerNext = prependedView.next();
+        if (!innerNext.isSome()) {
             prependedView = View.emptyView();
             return originalView.next();
         }

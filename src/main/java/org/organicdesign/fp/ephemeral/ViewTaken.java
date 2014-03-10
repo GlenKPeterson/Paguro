@@ -14,7 +14,7 @@
 
 package org.organicdesign.fp.ephemeral;
 
-import org.organicdesign.fp.Transformable;
+import org.organicdesign.fp.Option;
 
 class ViewTaken<T> implements View<T> {
     private final View<T> outerView;
@@ -30,8 +30,8 @@ class ViewTaken<T> implements View<T> {
     }
 
     @Override
-    public synchronized T next() {
-        if (numItems < 1) { return Transformable.usedUp(); }
+    public synchronized Option<T> next() {
+        if (numItems < 1) { return Option.none(); }
         numItems--;
         return outerView.next();
     }
