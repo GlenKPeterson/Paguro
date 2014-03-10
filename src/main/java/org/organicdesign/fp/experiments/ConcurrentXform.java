@@ -27,11 +27,14 @@ public class ConcurrentXform {
 
     public static ConcurrentXform of(int t, IntRange r) { return new ConcurrentXform(t, r); }
 
-    public Int[] toArray() {
-        Int[] ret = new Int[range.size().toPrimitiveInt()];
+    public Long[] toArray() {
+        if (range.size() > (long) Integer.MAX_VALUE) {
+            throw new IllegalStateException("size of range is too big for a Java array.");
+        }
+        Long[] ret = new Long[(int) range.size()];
         List<IntRange> ranges = range.getSubRanges(maxThreads);
 
-        List<IntRange> idxRanges = IntRange.of(Int.ZERO, range.size().minus(Int.ONE)).getSubRanges(maxThreads);
+        List<IntRange> idxRanges = IntRange.of(0, range.size() - 1).getSubRanges(maxThreads);
 
         List<Thread> threads = new ArrayList<>();
 
@@ -42,10 +45,10 @@ public class ConcurrentXform {
             Thread t = new Thread() {
                 @Override
                 public void run() {
-                    final Mutable.IntRef idx = Mutable.IntRef.of(rIdx.start().toPrimitiveInt());
+                    final Mutable.LongRef idx = Mutable.LongRef.of(rIdx.start());
                     ViewFromIntRange.of(r).forEach(i -> {
 //                        System.out.println("\tidx: " + idx.value() + " value: " + (Int) i);
-                        ret[idx.value()] = (Int) i;
+                        ret[(int) idx.value()] = i;
                         idx.increment();
                     });
                 }

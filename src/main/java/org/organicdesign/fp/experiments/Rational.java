@@ -52,7 +52,7 @@ public class Rational {
         }
         return new Rational(n, d);
     }
-    public static Rational of(Int i) { return Rational.of(i.toPrimitiveLong(),1); }
+    public static Rational of(long i) { return Rational.of(i, 1); }
 
     public Rational negate(Rational r) { return Rational.of(-r.numerator, r.denominator); }
 
@@ -66,28 +66,29 @@ public class Rational {
                            (denominator * r.denominator));
     }
     public Rational minus(Rational r) { return plus(negate(r)); }
+    public Rational minus(int i) { return plus(negate(Rational.of(i, 1))); }
 
     public boolean lt(Rational r) { return this.minus(r).numerator < 0; }
     public boolean lte(Rational r) { return this.minus(r).numerator <= 0; }
-    public boolean lte(Int i) { return this.minus(Rational.of(i)).numerator <= 0; }
+    public boolean lte(long i) { return this.minus(Rational.of(i, 1)).numerator <= 0; }
     public boolean eq(Rational r) { return this.equals(r); }
 
     // Always less than or equal to the quotient, even for negative numbers.
     // NOT closest to zero.
-    public Int floor() {
-        Int ret = Int.of(numerator / denominator);
+    public long floor() {
+        long ret = numerator / denominator;
         if ((numerator < 0) && ((numerator % denominator) != 0)) {
-            return ret.minus(Int.ONE);
+            return ret - 1;
         }
         return ret;
     }
 
     // Always greater than or equal to the quotient, even for negative numbers.
     // NOT closest to zero.
-    public Int ceiling() {
-        Int ret = Int.of(numerator / denominator);
+    public long ceiling() {
+        long ret = numerator / denominator;
         if ((numerator > 0) && ((numerator % denominator) != 0)) {
-            return ret.plus(Int.ONE);
+            return ret + 1;
         }
         return ret;
     }

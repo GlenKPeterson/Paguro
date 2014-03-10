@@ -67,27 +67,27 @@ public class RationalTest {
 
     @Test
     public void floor() {
-        assertEquals(Rational.of(24, 24).floor(), Int.ONE);
-        assertEquals(Rational.of(25, 24).floor(), Int.ONE);
-        assertEquals(Rational.of(29, 24).floor(), Int.ONE);
-        assertEquals(Rational.of(47, 24).floor(), Int.ONE);
+        assertEquals(Rational.of(24, 24).floor(), 1);
+        assertEquals(Rational.of(25, 24).floor(), 1);
+        assertEquals(Rational.of(29, 24).floor(), 1);
+        assertEquals(Rational.of(47, 24).floor(), 1);
 
-        assertEquals(Rational.of(1, -24).floor(), Int.NEG_ONE);
-        assertEquals(Rational.of(-17, 24).floor(), Int.NEG_ONE);
-        assertEquals(Rational.of(23, -24).floor(), Int.NEG_ONE);
-        assertEquals(Rational.of(-24, 24).floor(), Int.NEG_ONE);
+        assertEquals(Rational.of(1, -24).floor(), -1);
+        assertEquals(Rational.of(-17, 24).floor(), -1);
+        assertEquals(Rational.of(23, -24).floor(), -1);
+        assertEquals(Rational.of(-24, 24).floor(), -1);
     }
 
     @Test
     public void ceiling() {
-        assertEquals(Rational.of(1, 24).ceiling(), Int.ONE);
-        assertEquals(Rational.of(17, 24).ceiling(), Int.ONE);
-        assertEquals(Rational.of(23, 24).ceiling(), Int.ONE);
-        assertEquals(Rational.of(24, 24).ceiling(), Int.ONE);
+        assertEquals(Rational.of(1, 24).ceiling(), 1);
+        assertEquals(Rational.of(17, 24).ceiling(), 1);
+        assertEquals(Rational.of(23, 24).ceiling(), 1);
+        assertEquals(Rational.of(24, 24).ceiling(), 1);
 
-        assertEquals(Rational.of(-24, 24).ceiling(), Int.NEG_ONE);
-        assertEquals(Rational.of(25, -24).ceiling(), Int.NEG_ONE);
-        assertEquals(Rational.of(-29, 24).ceiling(), Int.NEG_ONE);
-        assertEquals(Rational.of(47, -24).ceiling(), Int.NEG_ONE);
+        assertEquals(Rational.of(-24, 24).ceiling(), -1);
+        assertEquals(Rational.of(25, -24).ceiling(), -1);
+        assertEquals(Rational.of(-29, 24).ceiling(), -1);
+        assertEquals(Rational.of(47, -24).ceiling(), -1);
     }
 }

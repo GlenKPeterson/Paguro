@@ -24,8 +24,7 @@ public class ConcurrentXformTest {
 
     @Test
     public void basics() {
-        Int[] is = new Int[] { Int.of(1), Int.of(2), Int.of(3), Int.of(4), Int.of(5),
-                               Int.of(6), Int.of(7), Int.of(8), Int.of(9), };
+        Long[] is = new Long[] { 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L };
         IntRange range = IntRange.of(1, 9);
         assertArrayEquals(ConcurrentXform.of(1, range).toArray(), is);
 
@@ -39,7 +38,7 @@ public class ConcurrentXformTest {
     public void tryStuff() {
         System.out.println();
         IntRange range = IntRange.of(-10000000, 10000000);
-        ConcurrentXform cx = ConcurrentXform.of(2, range);
+        ConcurrentXform cx = ConcurrentXform.of(1, range);
         long startTime = System.currentTimeMillis();
         cx.toArray();
         System.out.println("Time: " + (System.currentTimeMillis() - startTime));

@@ -40,6 +40,15 @@ public class Mutable {
         public IntRef set(int x) { i = x; return this; }
     }
 
+    public static class LongRef {
+        private long i;
+        private LongRef(long in) { i = in; }
+        public static LongRef of(long in) { return new LongRef(in); }
+        public long value() { return i; }
+        public LongRef increment() { i++; return this; }
+        public LongRef set(long x) { i = x; return this; }
+    }
+
     public static class ObjectRef<T> {
         private T t;
         private ObjectRef(T in) { t = in; }
