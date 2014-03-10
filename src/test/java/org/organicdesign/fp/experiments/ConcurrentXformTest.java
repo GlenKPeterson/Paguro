@@ -13,6 +13,7 @@
 
 package org.organicdesign.fp.experiments;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -23,7 +24,7 @@ import static org.junit.Assert.assertArrayEquals;
 public class ConcurrentXformTest {
 
     @Test
-    public void basics() {
+    public void arrayCorrectness() {
         Long[] is = new Long[] { 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L };
         IntRange range = IntRange.of(1, 9);
         assertArrayEquals(ConcurrentXform.of(1, range).toArray(), is);
@@ -35,7 +36,20 @@ public class ConcurrentXformTest {
     }
 
     @Test
-    public void tryStuff() {
+    public void linkedListCorrectness() {
+        Long[] is = new Long[] { 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L };
+        IntRange range = IntRange.of(1, 9);
+        assertArrayEquals(ConcurrentXform.of(1, range).toLinkedList().toArray(), is);
+
+        assertArrayEquals(ConcurrentXform.of(2, range).toLinkedList().toArray(), is);
+        assertArrayEquals(ConcurrentXform.of(3, range).toLinkedList().toArray(), is);
+        assertArrayEquals(ConcurrentXform.of(4, range).toLinkedList().toArray(), is);
+        assertArrayEquals(ConcurrentXform.of(5, range).toLinkedList().toArray(), is);
+    }
+
+    @Test
+    @Ignore
+    public void arraySpeed() {
         System.out.println();
         IntRange range = IntRange.of(-10000000, 10000000);
         ConcurrentXform cx = ConcurrentXform.of(1, range);
@@ -44,4 +58,14 @@ public class ConcurrentXformTest {
         System.out.println("Time: " + (System.currentTimeMillis() - startTime));
     }
 
+    @Test
+    // @Ignore
+    public void linkedListSpeed() {
+        System.out.println();
+        IntRange range = IntRange.of(-3000000, 3000000);
+        ConcurrentXform cx = ConcurrentXform.of(1, range);
+        long startTime = System.currentTimeMillis();
+        cx.toLinkedList();
+        System.out.println("Time: " + (System.currentTimeMillis() - startTime));
+    }
 }
