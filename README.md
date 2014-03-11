@@ -45,13 +45,20 @@ View<T> View.of(Iterable<T> i)
 // Run a function against each item for side effects (e.g. writing output)
 void forEach(Consumer<T> se)
 
-// Return the first item for which the given test function returns true
+// Return the first item for which the given predicate returns true
+// Hmm...  
+// You can call filter(...).take(1) to achieve the same result
+// (because Views are incrementally evaluated) so this may not be strictly
+// necessary (I might remove it in a future release).
 T firstMatching(Predicate<T> pred)
 
 // Apply the function to each item in the list, accumulating the result in u
+// You could perform many of the other functions with just this one, but
+// it is clearer to use the most specific function that meets your needs.
+// Still, sometimes you need the flexibility foldLeft provides.
 U foldLeft(U u, BiFunction<U, T, U> fun)
 
-// Return only the items for which the given function returns true
+// Return only the items for which the given predicate returns true
 View<T> filter(Predicate<T> pred)
 
 // Return only the first n items
@@ -63,10 +70,10 @@ View<T> drop(long numItems)
 // Transform each item into exactly one new item using the given function
 View<U> map(Function<T,U> func)
 
-// Add more items at the end of this view
+// Add items to the end of this view
 View<T> append(View<T> pv)
 
-// Add more items at the beginning of this view
+// Add items to the beginning of this view
 View<T> prepend(View<T> pv)
 
 // Transform each item into zero or more new items using the given function
