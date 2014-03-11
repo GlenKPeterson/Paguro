@@ -62,7 +62,7 @@ public class ConcurrentXformTest {
     // @Ignore
     public void linkedListSpeed() {
         System.out.println();
-        IntRange range = IntRange.of(-3000000, 3000000);
+        IntRange range = IntRange.of(-10000000, 10000000);
         ConcurrentXform cx = ConcurrentXform.of(1, range);
         long startTime = System.currentTimeMillis();
         cx.toLinkedList();

@@ -68,7 +68,7 @@ public class ConcurrentXform {
         }
         // Wait for 'em all to finish
         for (Thread t : threads) {
-            System.out.println("Joining thread...");
+            // System.out.println("Joining thread...");
             try {
                 t.join();
             } catch (InterruptedException tie) {
@@ -92,7 +92,7 @@ public class ConcurrentXform {
                 last = c;
                 size = 1;
             } else {
-                last.setNext(c);
+                last.next = c;
                 last = c;
                 size++;
             }
@@ -105,7 +105,7 @@ public class ConcurrentXform {
                 last = ll.last;
                 size = ll.size;
             } else {
-                last.setNext(ll.first);
+                last.next = ll.first;
                 last = ll.last;
                 size += ll.size;
             }
@@ -121,7 +121,7 @@ public class ConcurrentXform {
             Cell<T> c = first;
             int i = 0;
             while (c != null) {
-                ret[i] = c.val;
+                ret[i] = c.value;
                 c = c.next;
                 i++;
             }
@@ -129,14 +129,9 @@ public class ConcurrentXform {
         }
 
         private class Cell<T> {
-            private T val;
+            private final T value;
             private Cell<T> next = null;
-
-            private Cell(T t) { val = t; }
-
-            public void setNext(Cell<T> n) { next = n; }
-            public Cell<T> next() { return next; }
-            public T val() { return val; }
+            private Cell(T t) { value = t; }
         }
     }
 
@@ -171,7 +166,7 @@ public class ConcurrentXform {
         }
         // Wait for 'em all to finish
         for (Thread t : threads) {
-            System.out.println("Joining thread...");
+            // System.out.println("Joining thread...");
             try {
                 t.join();
             } catch (InterruptedException tie) {
