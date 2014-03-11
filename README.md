@@ -23,13 +23,15 @@ Unlike Java 8 streams, these transformations do not change the underlying data. 
 
 #Motivations
 
-Higher order functions are not just briefer to write and read, they are less to *think* about.  They are useful abstractions that simplify your code and focus your attention on your goals rather than the details of how to accomplish them.  Function chaining: <code>xs.take(...).foldLeft(...).firstMatching(...)</code> defines what you are doing and how you are doing it in the simplest possible way.
+Higher order functions are not just briefer to write and read, they are less to *think* about.  They are useful abstractions that simplify your code and focus your attention on your goals rather than the details of how to accomplish them.  Function chaining: <code>xs.map(x -> x + 1).filter(x -> x > 7).take(1)</code> defines what you are doing and how you are doing it in the simplest possible way, hiding all details about how to iterate through the underlying collection.
 
-Using a loop says nothing about what you are trying to accomplish.  Is a given loop supposed to map something, filter it, accumulate a result, or all three?  Different kinds of collections require different looping constructs which can be error prone for the coder and confusing for the reader.  Loops generally require setting up accumulators, then looping through all kinds of <code>if</code>, <code>break</code>, and <code>continue</code> statements, like some kind of mad obstacle race that involves as many state changes as possible.  You don't have to write that kind of code any more.
+The alternative - loops - are bundles of unnecessary complexity.  Loops generally require setting up accumulators, then running a gamut of <code>if</code>, <code>break</code>, and <code>continue</code> statements, like some kind of mad obstacle race that involves as many state changes as possible.  Different kinds of collections require different looping constructs which adds unnecessary variety to looping boilerplate.  Looping code is vulnerable "off-by-one" boundary overflow/underflow, improper initialization, accidental exit, infinite loops, forgetting to update a counter, updating the wrong counter...  The list goes on!  None of that has anything to do with why the loop was created in the first place which is to transform the underlying data.
+
+You don't have to write that kind of code any more.  If you want to map one set of values according to a given function, say so with xs.map().  Filter?  xs.filter().  It's clearer, simpler, and like type safety, it eliminates whole classes of errors.
 
 No data is changed when using the transformers in this project.  They allow you to write nearly stateless programs whose statements chain together and evaluate into a useful result.  Lisp works like this, only the syntax makes the evaluation go inside out from the order you read the statements in (hence Clojure's two arrow operators).  With method chaining, the evaluation happens in the same order as the methods are written on the page, much like piping commands to one another in shell scripts.
 
-In some cases, a well hand-written loop may be faster, but in general, the overhead for using these transformations is minimal and, I believe, well worth the clarity and safety they provide.
+Incremental evaluation ensures that no extra items are considered to produce the results you need which is sometimes more efficient than traditional whole-collection transforms.  There may be cases where a well hand-written loop will be faster, but in general, the overhead for using these transformations is minimal and, I believe, well worth the clarity, safety, and productivity benefits they provide.
 
 #API
 
