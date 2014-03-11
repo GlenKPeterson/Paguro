@@ -47,16 +47,10 @@ View<T> View.of(Iterable<T> i)
 // Run a function against each item for side effects (e.g. writing output)
 void forEach(Consumer<T> se)
 
-// Return the first item for which the given predicate returns true.
-// You can call filter(...).take(1) to achieve the same result
-// (because Views are incrementally evaluated) so this may not be strictly
-// necessary (I might remove it in a future release).
-T firstMatching(Predicate<T> pred)
-
-// Apply the function to each item in the list, accumulating the result in u
-// You could perform many of the other functions with just this one, but
-// it is clearer to use the most specific function that meets your needs.
-// Still, sometimes you need the flexibility foldLeft provides.
+// Apply the function to each item in the list, accumulating the result in u.
+// You could perform many other transformations with just this one function, but
+// it is clearer to use the most specific transformations that meets your needs.
+// Still, sometimes you need the flexibility foldLeft provides, so here it is:
 U foldLeft(U u, BiFunction<U, T, U> fun)
 
 // Return only the items for which the given predicate returns true
@@ -129,6 +123,15 @@ The most interesting classes are probably (in src/main/java/):
 - As of 2014-03-08, all major areas of functionality are covered by unit tests.
 
 #To Do
+
+Remove firstMatching
+```java
+// Return the first item for which the given predicate returns true.
+// You can call filter(...).take(1) to achieve the same result
+// (because Views are incrementally evaluated) so this may not be strictly
+// necessary (I might remove it in a future release).
+T firstMatching(Predicate<T> pred)
+```
 
 Collection Variations:
  - Mutable vs. Immutable
