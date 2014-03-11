@@ -47,7 +47,7 @@ View<T> View.of(Iterable<T> i)
 // Run a function against each item for side effects (e.g. writing output)
 void forEach(Consumer<T> se)
 
-// Return the first item for which the given predicate returns true
+// Return the first item for which the given predicate returns true.
 // You can call filter(...).take(1) to achieve the same result
 // (because Views are incrementally evaluated) so this may not be strictly
 // necessary (I might remove it in a future release).
