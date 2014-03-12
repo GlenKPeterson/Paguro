@@ -52,18 +52,18 @@ public class ConcurrentXformTest {
     public void arraySpeed() {
         System.out.println();
         IntRange range = IntRange.of(-10000000, 10000000);
-        ConcurrentXform cx = ConcurrentXform.of(1, range);
+        ConcurrentXform cx = ConcurrentXform.of(2, range);
         long startTime = System.currentTimeMillis();
         cx.toArray();
         System.out.println("Time: " + (System.currentTimeMillis() - startTime));
     }
 
     @Test
-    // @Ignore
+    @Ignore
     public void linkedListSpeed() {
         System.out.println();
         IntRange range = IntRange.of(-10000000, 10000000);
-        ConcurrentXform cx = ConcurrentXform.of(1, range);
+        ConcurrentXform cx = ConcurrentXform.of(2, range);
         long startTime = System.currentTimeMillis();
         cx.toLinkedList();
         System.out.println("Time: " + (System.currentTimeMillis() - startTime));

@@ -82,20 +82,31 @@ public class ConcurrentXform {
         private Cell<T> first = null;
         private Cell<T> last = first;
         private long size = 0;
+        private int cellSize = 1;
 
         private MutableLinkedList() { }
 
         public MutableLinkedList<T> append(T item) {
-            Cell<T> c = new Cell<>(item);
             if (first == null) {
+                Cell<T> c = new Cell<>(item, cellSize);
                 first = c;
                 last = c;
-                size = 1;
-            } else {
-                last.next = c;
+            } else if (last.numValues >= last.values.length) {
+                // 512 is about 12 seconds
+                // 256 is about 11.5 seconds
+                // 128 10.5 seconds
+                // 64  12 seconds
+                if (cellSize < 128) {
+                    cellSize = cellSize << 1;
+                }
+                Cell<T> c = new Cell<>(item, cellSize);
+                last.nextCell = c;
                 last = c;
-                size++;
+            } else {
+                last.values[last.numValues] = item;
+                last.numValues++;
             }
+            size++;
             return this;
         }
 
@@ -105,7 +116,7 @@ public class ConcurrentXform {
                 last = ll.last;
                 size = ll.size;
             } else {
-                last.next = ll.first;
+                last.nextCell = ll.first;
                 last = ll.last;
                 size += ll.size;
             }
@@ -121,17 +132,24 @@ public class ConcurrentXform {
             Cell<T> c = first;
             int i = 0;
             while (c != null) {
-                ret[i] = c.value;
-                c = c.next;
-                i++;
+                for (int j = 0; j < c.numValues; j++) {
+                    ret[i] = c.values[j];
+                    i++;
+                }
+                c = c.nextCell;
             }
             return ret;
         }
 
         private class Cell<T> {
-            private final T value;
-            private Cell<T> next = null;
-            private Cell(T t) { value = t; }
+            private final T[] values;
+            private int numValues = 1;
+            private Cell<T> nextCell = null;
+            @SuppressWarnings("unchecked")
+            private Cell(T t, int size) {
+                values = (T[]) new Object[size];
+                values[0] = t;
+            }
         }
     }
 
