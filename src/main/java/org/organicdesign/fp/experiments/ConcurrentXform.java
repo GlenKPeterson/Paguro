@@ -13,11 +13,11 @@
 
 package org.organicdesign.fp.experiments;
 
+import org.organicdesign.fp.Mutable;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import org.organicdesign.fp.Mutable;
 
 public class ConcurrentXform {
     private final int maxThreads;
@@ -36,7 +36,7 @@ public class ConcurrentXform {
         List<Thread> threads = new ArrayList<>();
 
         for (int i = 0; i < ranges.size(); i++) {
-            System.out.println("Starting thread: " + i);
+            // System.out.println("Starting thread: " + i);
             IntRange r = ranges.get(i);
             IntRange rIdx = idxRanges.get(i);
             Thread t = new Thread() {
@@ -55,7 +55,7 @@ public class ConcurrentXform {
         }
         // Wait for 'em all to finish
         for (Thread t : threads) {
-            System.out.println("Joining thread...");
+            // System.out.println("Joining thread...");
             try {
                 t.join();
             } catch (InterruptedException tie) {

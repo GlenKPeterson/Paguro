@@ -13,6 +13,7 @@
 
 package org.organicdesign.fp.experiments;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -36,6 +37,7 @@ public class ConcurrentXformTest {
     }
 
     @Test
+    @Ignore
     public void tryStuff() {
         System.out.println();
         IntRange range = IntRange.of(-10000000, 10000000);

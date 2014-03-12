@@ -64,10 +64,12 @@ public interface Transformable<T> extends Realizable<T> {
     void forEach(Consumer<T> se);
 
     /**
+     Deprecated: use filter(...).take(1) instead.
      Eagerly returns the first item matching the given predicate.
      @param pred the test that the item needs to pass
      @return the first item that passes the test, or null if no such item is found
      */
+    @Deprecated
     T firstMatching(Predicate<T> pred);
 
     // TODO: You can always use foldLeft for this operation.  Does having reduceLeft add more clarity to the underlying code, or does it provide some useful additional functionality?

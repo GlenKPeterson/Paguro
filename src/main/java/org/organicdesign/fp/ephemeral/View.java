@@ -14,14 +14,14 @@
 
 package org.organicdesign.fp.ephemeral;
 
+import org.organicdesign.fp.Sentinel;
+import org.organicdesign.fp.Transformable;
+
 import java.util.Iterator;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
-
-import org.organicdesign.fp.Sentinel;
-import org.organicdesign.fp.Transformable;
 
 /**
  A lightweight, one-time view that lazy, thread-safe operations can be built from.  Because there
@@ -79,7 +79,11 @@ public interface View<T> extends Transformable<T> {
         }
     }
 
+    /**
+     Deprecated: use filter(...).take(1) instead.
+     */
     @Override
+    @Deprecated
     default T firstMatching(Predicate<T> pred) {
         T item = next();
         while (item != Sentinel.USED_UP) {
