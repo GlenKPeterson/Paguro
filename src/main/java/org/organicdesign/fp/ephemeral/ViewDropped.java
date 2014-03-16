@@ -14,8 +14,7 @@
 
 package org.organicdesign.fp.ephemeral;
 
-import org.organicdesign.fp.Sentinel;
-import org.organicdesign.fp.Transformable;
+import org.organicdesign.fp.Option;
 
 class ViewDropped<T> implements View<T> {
     private final View<T> outerView;
@@ -31,12 +30,12 @@ class ViewDropped<T> implements View<T> {
     }
 
     @Override
-    public synchronized T next() {
+    public synchronized Option<T> next() {
         while (numItems > 0) {
             numItems--;
-            if (outerView.next() == Sentinel.USED_UP) {
+            if (!outerView.next().isSome()) {
                 numItems = 0;
-                return Transformable.usedUp();
+                return Option.none();
             }
         }
         return outerView.next();

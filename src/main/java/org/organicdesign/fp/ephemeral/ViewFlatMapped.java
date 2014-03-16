@@ -16,8 +16,7 @@ package org.organicdesign.fp.ephemeral;
 
 import java.util.function.Function;
 
-import org.organicdesign.fp.Sentinel;
-import org.organicdesign.fp.Transformable;
+import org.organicdesign.fp.Option;
 
 class ViewFlatMapped<T,U> implements View<U> {
     private final View<T> outerView;
@@ -39,14 +38,14 @@ class ViewFlatMapped<T,U> implements View<U> {
     }
 
     @Override
-    public U next() {
+    public Option<U> next() {
         if (innerView == EMPTY_VIEW) {
-            T item = outerView.next();
-            if (item == Sentinel.USED_UP) { return Transformable.usedUp(); }
-            innerView = func.apply(item);
+            Option<T> item = outerView.next();
+            if (!item.isSome()) { return Option.none(); }
+            innerView = func.apply(item.get());
         }
-        U innerNext = innerView.next();
-        if (innerNext == Sentinel.USED_UP) {
+        Option<U> innerNext = innerView.next();
+        if (!innerNext.isSome()) {
             innerView = View.emptyView();
             return next();
         }

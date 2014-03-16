@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.organicdesign.fp.experiments.collection.mutable.MutableLinkedList;
+
 public class ConcurrentXform {
     private final int maxThreads;
     private final IntRange range;
@@ -27,31 +29,44 @@ public class ConcurrentXform {
 
     public static ConcurrentXform of(int t, IntRange r) { return new ConcurrentXform(t, r); }
 
-    public Int[] toArray() {
-        Int[] ret = new Int[range.size().toPrimitiveInt()];
+    public Long[] toArray() {
+        if (range.size() > (long) Integer.MAX_VALUE) {
+            throw new IllegalStateException("size of range is too big for a Java array.");
+        }
+        Long[] ret = new Long[(int) range.size()];
         List<IntRange> ranges = range.getSubRanges(maxThreads);
 
-        List<IntRange> idxRanges = IntRange.of(Int.ZERO, range.size().minus(Int.ONE)).getSubRanges(maxThreads);
+        List<IntRange> idxRanges = IntRange.of(0, range.size() - 1).getSubRanges(maxThreads);
 
         List<Thread> threads = new ArrayList<>();
 
         for (int i = 0; i < ranges.size(); i++) {
-            // System.out.println("Starting thread: " + i);
             IntRange r = ranges.get(i);
             IntRange rIdx = idxRanges.get(i);
-            Thread t = new Thread() {
-                @Override
-                public void run() {
-                    final Mutable.IntRef idx = Mutable.IntRef.of(rIdx.start().toPrimitiveInt());
-                    ViewFromIntRange.of(r).forEach(i -> {
-//                        System.out.println("\tidx: " + idx.value() + " value: " + (Int) i);
-                        ret[idx.value()] = (Int) i;
-                        idx.increment();
-                    });
-                }
-            };
-            threads.add(t);
-            t.start();
+            if (i == (ranges.size() - 1)) {
+                System.out.println("Running in current thread...");
+                final Mutable.IntRef idx = Mutable.IntRef.of((int) rIdx.start());
+                ViewFromIntRange.of(r).forEach(item -> {
+                    // System.out.println("\tidx: " + idx.value() + " value: " + (Int) i);
+                    ret[idx.value()] = item;
+                    idx.increment();
+                });
+            } else {
+                System.out.println("Starting thread: " + i);
+                Thread t = new Thread() {
+                    @Override
+                    public void run() {
+                        final Mutable.IntRef idx = Mutable.IntRef.of((int) rIdx.start());
+                        ViewFromIntRange.of(r).forEach(item -> {
+    //                        System.out.println("\tidx: " + idx.value() + " value: " + (Int) i);
+                            ret[idx.value()] = item;
+                            idx.increment();
+                        });
+                    }
+                };
+                threads.add(t);
+                t.start();
+            }
         }
         // Wait for 'em all to finish
         for (Thread t : threads) {
@@ -64,6 +79,56 @@ public class ConcurrentXform {
         }
         return ret;
     }
+
+    public MutableLinkedList<Long> toLinkedList() {
+        if (range.size() > (long) Integer.MAX_VALUE) {
+            throw new IllegalStateException("size of range is too big for a Java array.");
+        }
+        List<MutableLinkedList<Long>> results = new ArrayList<>();
+
+        List<IntRange> ranges = range.getSubRanges(maxThreads);
+
+        List<Thread> threads = new ArrayList<>();
+
+        for (int i = 0; i < ranges.size(); i++) {
+            IntRange r = ranges.get(i);
+            MutableLinkedList<Long> ll = new MutableLinkedList<>();
+            results.add(ll);
+            if (i == (ranges.size() - 1)) {
+                System.out.println("Running in current thread...");
+                ViewFromIntRange.of(r).forEach(ll::append);
+            } else {
+                System.out.println("Starting thread: " + i);
+                Thread t = new Thread() {
+                    @Override
+                    public void run() {
+                        ViewFromIntRange.of(r).forEach(ll::append);
+                    }
+                };
+                threads.add(t);
+                t.start();
+            }
+        }
+        // Wait for 'em all to finish
+        for (Thread t : threads) {
+            // System.out.println("Joining thread...");
+            try {
+                t.join();
+            } catch (InterruptedException tie) {
+                ; // ignore.
+            }
+        }
+        // Java LinkedList sucks!  Concatenate should return instantly, not take as long as
+        // rebuilding it from scratch.
+        System.out.println("Concatenating results...");
+        MutableLinkedList<Long> ret = new MutableLinkedList<>();
+        for (int i = 0; i < results.size(); i++) {
+            ret.append(results.get(i));
+        }
+
+        return ret;
+    }
+
 
 
     // Keep this method private because it provides access to private fields!

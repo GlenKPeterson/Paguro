@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.organicdesign.fp.experiments.math.Rational;
+
 /**
  This is an idea, which is why I put it in the test folder.  It would be super nice if
  Integer implemented something beyond Comparable that would give a sense of what the *next* integer
@@ -25,33 +27,37 @@ import java.util.List;
  Does NOT handle an infinite range (yet).
  */
 public class IntRange {
-    private final Int start;
-    private final Int end;
-    private final Int size;
+    private final long start;
+    private final long end;
+    private final long size;
 
-    private IntRange(Int s, Int e) { start = s; end = e; size = end.minus(start).plus(Int.ONE); }
+    private IntRange(long s, long e) { start = s; end = e; size = (end - start) + 1; }
 
-    public static IntRange of(Int s, Int e) {
-        if ((s == null) || (e == null)) {
-            throw new IllegalArgumentException("Nulls not allowed");
-        }
-        if (e.lt(s)) {
+    public static IntRange of(long s, long e) {
+        if (e < s) {
             throw new IllegalArgumentException("end of range must be >= start of range");
         }
         return new IntRange(s, e);
     }
 
-    public static IntRange of(int s, int e) { return of(Int.of(s), Int.of(e)); }
+    public static IntRange of(Long s, Long e) {
+        if ((s == null) || (e == null)) {
+            throw new IllegalArgumentException("Nulls not allowed");
+        }
+        return new IntRange(s.longValue(), e.longValue());
+    }
 
-    public Int start() { return start; }
-    public Int end() { return end; }
+    public static IntRange of(int s, int e) { return of((long) s, (long) e); }
 
-    public Int size() { return size; }
+    public long start() { return start; }
+    public long end() { return end; }
 
-    public boolean contains(Int i) { return i.gte(start) && i.lte(end); }
+    public long size() { return size; }
 
-    public Int get(Int idx) {
-        if (idx.lt(size)) { return start.plus(idx); }
+    public boolean contains(long i) { return (i >= start) && (i <= end); }
+
+    public long get(long idx) {
+        if (idx < size) { return start + idx; }
         throw new IllegalArgumentException("Index " + idx + " was outside the size of this range: " + start + " to " + end);
     }
 
@@ -67,9 +73,9 @@ public class IntRange {
         if (n < 1) {
             throw new IllegalArgumentException("Must specify a positive number of ranges");
         }
-        Int numParts = Int.of(n);
+        long numParts = (long) n;
         List<IntRange> ranges = new ArrayList<>();
-        if (numParts.eq(Int.ONE)) {
+        if (numParts == 1) {
             ranges.add(this);
         } else {
             // TODO: Handle case where range is too small and also handle rounding error
@@ -78,18 +84,18 @@ public class IntRange {
 //            System.out.println("\tNum ranges: " + numParts);
 //            System.out.println("\tsize: " + size());
 
-            Rational viewSize = size().div(numParts);
+            Rational viewSize = Rational.of(size(), numParts);
 //            System.out.println("\tviewSize: " + viewSize);
 
             Rational partitionEnd = viewSize; // exact partition size - no rounding error.
-            Int startIdx = Int.ZERO;
-            for (Int i = Int.ZERO; partitionEnd.lte(size()); i.plus(Int.ONE)) {
+            long startIdx = 0;
+            for (long i = 0; partitionEnd.lte(size()); i++) {
 //                System.out.println();
-                Int endIdx = partitionEnd.ceiling().minus(Int.ONE);
+                long endIdx = partitionEnd.ceiling() - 1;
 //                System.out.println("\t\tstartIdx: " + startIdx);
 //                System.out.println("\t\tendIdx: " + endIdx);
                 ranges.add(IntRange.of(get(startIdx), get(endIdx)));
-                startIdx = endIdx.plus(Int.ONE);
+                startIdx = endIdx + 1;
 //                System.out.println("\t\tnext startIdx: " + startIdx);
                 partitionEnd = partitionEnd.plus(viewSize); // no rounding error
 //                System.out.println("\t\tpartitionEnd: " + partitionEnd);

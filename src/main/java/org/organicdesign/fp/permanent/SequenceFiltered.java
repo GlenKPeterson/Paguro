@@ -17,8 +17,7 @@ package org.organicdesign.fp.permanent;
 import java.util.function.Predicate;
 
 import org.organicdesign.fp.FunctionUtils;
-import org.organicdesign.fp.Sentinel;
-import org.organicdesign.fp.Transformable;
+import org.organicdesign.fp.Option;
 
 public class SequenceFiltered<T> implements Sequence<T> {
     private static final Object UNINITIALIZED = new Object();
@@ -28,7 +27,7 @@ public class SequenceFiltered<T> implements Sequence<T> {
     private final Predicate<T> predicate;
 
     @SuppressWarnings("unchecked")
-    private T first = (T) UNINITIALIZED;
+    private Option<T> first = (Option<T>) UNINITIALIZED;
 
 //    @SuppressWarnings("unchecked")
 //    private Sequence<T> rest = (Sequence<T>) UNINITIALIZED;
@@ -46,15 +45,15 @@ public class SequenceFiltered<T> implements Sequence<T> {
     private synchronized void init() {
         if (first == UNINITIALIZED) {
             while (seq != EMPTY_SEQUENCE) {
-                T result = seq.first();
-                if (result == Sentinel.USED_UP) {
-                    first = Transformable.usedUp();
+                Option<T> item = seq.first();
+                if (!item.isSome()) {
+                    first = Option.none();
                     seq = Sequence.emptySequence();
                     return;
                 }
 
-                if (predicate.test(result)) {
-                    first = result;
+                if (predicate.test(item.get())) {
+                    first = item;
                     seq = of(seq.rest(), predicate);
                     return;
                 }
@@ -67,7 +66,7 @@ public class SequenceFiltered<T> implements Sequence<T> {
 
 
     @Override
-    public T first() {
+    public Option<T> first() {
         init();
         return first;
     }

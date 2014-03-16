@@ -17,6 +17,7 @@ package org.organicdesign.fp.permanent;
 import java.util.function.Function;
 
 import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.Option;
 
 public class SequenceMapped<T,U>  implements Sequence<U> {
     private final Sequence<T> seq;
@@ -34,8 +35,10 @@ public class SequenceMapped<T,U>  implements Sequence<U> {
     }
 
     @Override
-    public U first() {
-        return func.apply(seq.first());
+    public Option<U> first() {
+        Option<T> item = seq.first();
+        if (!item.isSome()) { return Option.none(); }
+        return Option.of(func.apply(item.get()));
     }
 
     @Override

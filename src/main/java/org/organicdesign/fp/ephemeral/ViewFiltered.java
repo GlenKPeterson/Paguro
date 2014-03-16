@@ -17,8 +17,7 @@ package org.organicdesign.fp.ephemeral;
 import java.util.function.Predicate;
 
 import org.organicdesign.fp.FunctionUtils;
-import org.organicdesign.fp.Sentinel;
-import org.organicdesign.fp.Transformable;
+import org.organicdesign.fp.Option;
 
 class ViewFiltered<T> implements View<T> {
 
@@ -37,12 +36,12 @@ class ViewFiltered<T> implements View<T> {
     }
 
     @Override
-    public T next() {
-        T item = view.next();
-        while (item != Sentinel.USED_UP) {
-            if (predicate.test(item)) { return item; }
+    public Option<T> next() {
+        Option<T> item = view.next();
+        while (item.isSome()) {
+            if (predicate.test(item.get())) { return item; }
             item = view.next();
         }
-        return Transformable.usedUp();
+        return Option.none();
     }
 }

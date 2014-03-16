@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.organicdesign.fp.experiments;
+package org.organicdesign.fp.experiments.math;
 
 public class Int {
     public static final Int NEG_ONE = new Int(-1);
@@ -47,6 +47,9 @@ public class Int {
     public int toPrimitiveInt() { return (int) value; }
     public long toPrimitiveLong() { return value; }
     public Long toLongObj() { return Long.valueOf(value); }
+
+    public Int next() { return Int.of(value + 1); }
+    public Int previous() { return Int.of(value - 1); }
 
     @Override
     public String toString() { return String.valueOf(value); }

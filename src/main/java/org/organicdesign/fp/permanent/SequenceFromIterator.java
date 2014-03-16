@@ -16,7 +16,7 @@ package org.organicdesign.fp.permanent;
 
 import java.util.Iterator;
 
-import org.organicdesign.fp.Transformable;
+import org.organicdesign.fp.Option;
 
 /**
  If you use the source iterator after passing it to this class then the behavior of this class
@@ -35,7 +35,7 @@ class SequenceFromIterator<T> implements Sequence<T> {
     private final Iterator<T> iter;
 
     @SuppressWarnings("unchecked")
-    private T first = (T) UNINITIALIZED;
+    private Option<T> first = (Option<T>) UNINITIALIZED;
 
     private Sequence<T> rest;
 
@@ -56,17 +56,17 @@ class SequenceFromIterator<T> implements Sequence<T> {
     private synchronized void init() {
         if (first == UNINITIALIZED) {
             if (iter.hasNext()) {
-                first = iter.next();
+                first = Option.of(iter.next());
                 rest = of(iter);
             } else {
-                first = Transformable.usedUp();
+                first = Option.none();
                 rest = Sequence.emptySequence();
             }
         }
     }
 
     @Override
-    public T first() {
+    public Option<T> first() {
         init();
         return first;
     }

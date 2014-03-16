@@ -16,6 +16,7 @@ package org.organicdesign.fp.experiments;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.organicdesign.fp.experiments.math.Int;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;

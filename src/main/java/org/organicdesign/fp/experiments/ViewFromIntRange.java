@@ -13,28 +13,28 @@
 
 package org.organicdesign.fp.experiments;
 
-import org.organicdesign.fp.Transformable;
+import org.organicdesign.fp.Option;
 import org.organicdesign.fp.ephemeral.View;
 
-public class ViewFromIntRange implements View<Object> {
+public class ViewFromIntRange implements View<Long> {
 
     private final IntRange range;
-    private Int idx = Int.ZERO;
+    private long idx = 0;
 
     ViewFromIntRange(IntRange r) { range = r; }
 
-    static View<Object> of(IntRange r) {
-        if ((r == null) || (r.size().lt(Int.ONE))) { return View.emptyView(); }
+    static View<Long> of(IntRange r) {
+        if ((r == null) || (r.size() < 1)) { return View.emptyView(); }
         return new ViewFromIntRange(r);
     }
 
     @Override
-    public Object next() {
-        if (idx.lt(range.size())) {
-            Int ret = range.get(idx);
-            idx = idx.plus(Int.ONE);
-            return ret;
+    public Option<Long> next() {
+        if (idx < range.size()) {
+            Long ret = range.get(idx);
+            idx++;
+            return Option.of(ret);
         }
-        return Transformable.usedUp();
+        return Option.none();
     }
 }

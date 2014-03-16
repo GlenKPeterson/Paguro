@@ -19,7 +19,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import org.organicdesign.fp.Sentinel;
+import org.organicdesign.fp.Option;
 import org.organicdesign.fp.Transformable;
 
 /**
@@ -31,7 +31,7 @@ import org.organicdesign.fp.Transformable;
 public interface Sequence<T> extends Transformable<T> {
     public static final Sequence<?> EMPTY_SEQUENCE = new Sequence<Object>() {
         /** @return USED_UP */
-        @Override public Object first() { return Sentinel.USED_UP; }
+        @Override public Option<Object> first() { return Option.none(); }
 
         /** @return EMPTY_SEQUENCE (this) */
         @Override public Sequence<Object> rest() { return this; }
@@ -42,7 +42,7 @@ public interface Sequence<T> extends Transformable<T> {
     }
 
     // ======================================= Base methods =======================================
-    T first();
+    Option<T> first();
     Sequence<T> rest();
 
 //    // ======================================= Other methods ======================================
@@ -60,9 +60,9 @@ public interface Sequence<T> extends Transformable<T> {
     @Override
     default void forEach(Consumer<T> se) {
         Sequence<T> seq = this;
-        T item = seq.first();
-        while (item != Sentinel.USED_UP) {
-            se.accept(item);
+        Option<T> item = seq.first();
+        while (!item.isSome()) {
+            se.accept(item.get());
             // repeat with next element
             seq = seq.rest();
             item = seq.first();
@@ -70,11 +70,11 @@ public interface Sequence<T> extends Transformable<T> {
     }
 
     @Override
-    default T firstMatching(Predicate<T> pred) {
+    default Option<T> firstMatching(Predicate<T> pred) {
         Sequence<T> seq = this;
-        T item = seq.first();
-        while (item != Sentinel.USED_UP) {
-            if (pred.test(item)) { return item; }
+        Option<T> item = seq.first();
+        while (!item.isSome()) {
+            if (pred.test(item.get())) { return item; }
             // repeat with next element
             seq = seq.rest();
             item = seq.first();
@@ -85,9 +85,9 @@ public interface Sequence<T> extends Transformable<T> {
     @Override
     default <U> U foldLeft(U u, BiFunction<U, T, U> fun) {
         Sequence<T> seq = this;
-        T item = seq.first();
-        while (item != Sentinel.USED_UP) {
-            u = fun.apply(u, item);
+        Option<T> item =seq.first();
+        while (!item.isSome()) {
+            u = fun.apply(u, item.get());
             // repeat with next element
             seq = seq.rest();
             item = seq.first();
@@ -97,9 +97,9 @@ public interface Sequence<T> extends Transformable<T> {
 
 //    @Override
 //    T reduceLeft(BiFunction<T, T, T> fun) {
-//        T item = next();
+//        Option<T> item =next();
 //        T accum = item;
-//        while (item != Sentinel.USED_UP) {
+//        while (!item.isSome()) {
 //            item = next();
 //            accum = fun.apply_(accum, item);
 //        }
