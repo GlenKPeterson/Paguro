@@ -48,6 +48,9 @@ public class Int {
     public long toPrimitiveLong() { return value; }
     public Long toLongObj() { return Long.valueOf(value); }
 
+    public Int next() { return Int.of(value + 1); }
+    public Int previous() { return Int.of(value - 1); }
+
     @Override
     public String toString() { return String.valueOf(value); }
 
