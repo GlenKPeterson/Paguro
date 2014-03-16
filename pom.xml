@@ -8,6 +8,9 @@
   <packaging>jar</packaging>
 
   <name>Functional Programming Tools for Java 7</name>
+  <description>Non-destructive (mutation-free), lazy, (higher order) functional data transformations for Java 8.
+	  Allows loop-free functional programming.
+	  Additional general purpose functional tools are provided.</description>
   <url>https://github.com/GlenKPeterson/fp4java7</url>
 
   <dependencies>
