@@ -45,5 +45,24 @@ public class ViewFlatMappedTest {
                           new String[] { "1","2", "2","3", "3","4"});
 
     }
-    // TODO: Test flatmap chaining
+
+    @Test
+    public void flatMapChain() {
+        assertEquals(View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                             .flatMap(null).flatMap(null).flatMap(null),
+                     View.EMPTY_VIEW);
+
+        assertEquals(View.EMPTY_VIEW.flatMap(null).flatMap(null).flatMap(null),
+                     View.EMPTY_VIEW);
+
+        assertArrayEquals(View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                                  .flatMap(null).flatMap(null).flatMap(null).toArray(),
+                          new Integer[] {});
+
+        assertArrayEquals(View.ofArray(1, 10)
+                                  .flatMap(i -> View.ofArray(i, i * 2, i * 3))
+                                  .flatMap(i -> View.ofArray(i, i + 1))
+                                  .toArray(),
+                          new Integer[] { 1,2, 2,3, 3,4, 10,11, 20,21, 30,31});
+    }
 }
