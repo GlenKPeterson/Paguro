@@ -52,7 +52,7 @@ public interface View<T> extends Transformable<T> {
 
     /**
       This is the distinguishing method of the view interface.
-     @return the next item in the view, or Sentinel.USED_UP
+     @return the next item in the view, or None()
      */
     Option<T> next();
 
@@ -100,7 +100,7 @@ public interface View<T> extends Transformable<T> {
 //    public T reduceLeft(BiFunction<T, T, T> fun) {
 //        T item = next();
 //        T accum = item;
-//        while (item != Sentinel.USED_UP) {
+//        while (item != None()) {
 //            item = next();
 //            accum = fun.apply_(accum, item);
 //        }

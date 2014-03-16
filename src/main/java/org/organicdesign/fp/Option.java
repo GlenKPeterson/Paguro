@@ -15,7 +15,7 @@ package org.organicdesign.fp;
 
 /**
  This is NOT a type-safe null.  Null is a valid value for a Some.  It's more to indicate
- the presence or absence of a value.
+ the presence or absence of a value, or indicate end-of-stream.
  @param <T>
  */
 public interface Option<T> {

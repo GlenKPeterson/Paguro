@@ -37,9 +37,6 @@ import java.util.function.Predicate;
  @param <T>
  */
 public interface Transformable<T> extends Realizable<T> {
-
-    @SuppressWarnings("unchecked")
-    public static <T> T usedUp() { return (T) Sentinel.USED_UP; }
     /**
      Lazily applies the given function to each item in the underlying data source, and returns
      a View with one item for each result.
