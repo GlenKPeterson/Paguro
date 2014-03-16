@@ -13,7 +13,7 @@ List<Integer> list = View.ofArray(5)    //         5
         .map(i -> i - 2)                //   2,3,4,5,6,7
         .take(5)                        //   2,3,4,5,6
         .drop(2)                        //       4,5,6
-        .toJavaArrayList();
+        .toJavaUnmodList();
 
 FunctionUtils.toString(list);
 // Returns: "UnmodifiableRandomAccessList(4,5,6)"
