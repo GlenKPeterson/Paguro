@@ -16,6 +16,7 @@ package org.organicdesign.fp.experiments;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.organicdesign.fp.experiments.math.Rational;
 
 import static org.junit.Assert.assertEquals;
 

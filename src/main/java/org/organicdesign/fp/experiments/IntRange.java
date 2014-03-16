@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.organicdesign.fp.experiments.math.Rational;
+
 /**
  This is an idea, which is why I put it in the test folder.  It would be super nice if
  Integer implemented something beyond Comparable that would give a sense of what the *next* integer

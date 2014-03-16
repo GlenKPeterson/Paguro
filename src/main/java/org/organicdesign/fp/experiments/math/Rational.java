@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.organicdesign.fp.experiments;
+package org.organicdesign.fp.experiments.math;
 
 public class Rational {
     public static final Rational NEG_ONE = new Rational(-1,1);
