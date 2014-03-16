@@ -61,6 +61,24 @@ public class ConcurrentXformTest {
     @Test
     @Ignore
     public void linkedListSpeed() {
+        // Test results (in seconds:
+        // Threads:    1      2   With Option<T> return type
+        //          11.1   11.3
+        //          11.0   11.4
+        //          10.0   11.4
+        // With null return type
+        //          12.3   12.1
+        //          12.0   12.2
+        //          12.3   12.3
+        // Back with option again
+        //          10.2   12.0
+        //          11.5   11.7
+        //          11.3   12.0
+        //
+        // Conclusions: Option is not slowing anything down.
+        // Question: Why is it that even with one thread, I can *see* two threads at over 95%
+        // on my system monitor for the entire duration of the test???  I've only got two
+        // processors, so it would be interesting to run on bigger hardware.
         System.out.println();
         IntRange range = IntRange.of(-10000000, 10000000);
         ConcurrentXform cx = ConcurrentXform.of(2, range);
