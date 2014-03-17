@@ -21,6 +21,10 @@ FunctionUtils.toString(list);
 
 Unlike Java 8 streams, these transformations do not change the underlying data.  They build a new collection by chaining together all the operations you specify, then lazily applying them in a single pass through the unerlying data.  The laziness is implemented as an incremental pull, so that if your last operation is take(1), then the absolute minimum number of items will be evaluated through all the functions you specified.
 
+#Learn
+
+There is now a problem-set for learning this tool-kit: https://github.com/GlenKPeterson/LearnFpJava
+
 #Motivations
 
 Higher order functions are not just briefer to write and read, they are less to *think* about.  They are useful abstractions that simplify your code and focus your attention on your goals rather than the details of how to accomplish them.  Function chaining: <code>xs.map(x -> x + 1).filter(x -> x > 7).take(1)</code> defines what you are doing and how you are doing it in the simplest possible way, hiding all details about how to iterate through the underlying collection.
