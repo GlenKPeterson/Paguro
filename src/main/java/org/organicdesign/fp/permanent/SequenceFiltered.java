@@ -20,36 +20,26 @@ import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.Option;
 
 public class SequenceFiltered<T> implements Sequence<T> {
-    private static final Object UNINITIALIZED = new Object();
-
     private Sequence<T> seq;
-
     private final Predicate<T> predicate;
-
-    @SuppressWarnings("unchecked")
-    private Option<T> first = (Option<T>) UNINITIALIZED;
-
-//    @SuppressWarnings("unchecked")
-//    private Sequence<T> rest = (Sequence<T>) UNINITIALIZED;
+    private Option<T> first = null;
 
     private SequenceFiltered(Sequence<T> s, Predicate<T> f) { seq = s; predicate = f; }
 
     public static <T> Sequence<T> of(Sequence<T> s, Predicate<T> f) {
-        // You can put nulls in, but you don't get nulls out.
-        if ( (f == null) || (f == FunctionUtils.REJECT) ) { return Sequence.emptySequence(); }
+        if (f == null) { throw new IllegalArgumentException("Must provide a predicate"); }
+        if (f == FunctionUtils.REJECT) { return Sequence.emptySequence(); }
         if (f == FunctionUtils.ACCEPT) { return s; }
         if ( (s == null) || (s == EMPTY_SEQUENCE) ) { return Sequence.emptySequence(); }
         return new SequenceFiltered<>(s, f);
     }
 
     private synchronized void init() {
-        if (first == UNINITIALIZED) {
+        if (first == null) {
             while (seq != EMPTY_SEQUENCE) {
                 Option<T> item = seq.first();
                 if (!item.isSome()) {
-                    first = Option.none();
-                    seq = Sequence.emptySequence();
-                    return;
+                    break;
                 }
 
                 if (predicate.test(item.get())) {
@@ -61,9 +51,10 @@ public class SequenceFiltered<T> implements Sequence<T> {
                 // If we didn't find one, repeat with next element
                 seq = seq.rest();
             }
+            first = Option.none();
+            seq = Sequence.emptySequence();
         }
     }
-
 
     @Override
     public Option<T> first() {

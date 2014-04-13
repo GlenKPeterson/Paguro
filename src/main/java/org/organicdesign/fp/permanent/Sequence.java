@@ -14,6 +14,7 @@
 
 package org.organicdesign.fp.permanent;
 
+import java.util.Iterator;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -40,6 +41,17 @@ public interface Sequence<T> extends Transformable<T> {
     public static <T> Sequence<T> emptySequence() {
         return (Sequence<T>) EMPTY_SEQUENCE;
     }
+
+    public static <T> Sequence<T> of(Iterator<T> i) {
+        return SequenceFromIterator.of(i);
+    }
+
+    public static <T> Sequence<T> of(Iterable<T> i) {
+        return SequenceFromIterator.of(i);
+    }
+
+    @SafeVarargs
+    public static <T> Sequence<T> ofArray(T... i) { return SequenceFromArray.of(i); }
 
     // ======================================= Base methods =======================================
     Option<T> first();
@@ -85,8 +97,10 @@ public interface Sequence<T> extends Transformable<T> {
     @Override
     default <U> U foldLeft(U u, BiFunction<U, T, U> fun) {
         Sequence<T> seq = this;
-        Option<T> item =seq.first();
-        while (!item.isSome()) {
+        // System.out.println("seq: " + seq);
+        Option<T> item = seq.first();
+        // System.out.println("===>item: " + item);
+        while (item.isSome()) {
             u = fun.apply(u, item.get());
             // repeat with next element
             seq = seq.rest();

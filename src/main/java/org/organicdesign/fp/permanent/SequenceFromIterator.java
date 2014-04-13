@@ -30,16 +30,11 @@ import org.organicdesign.fp.Option;
  */
 class SequenceFromIterator<T> implements Sequence<T> {
 
-    private static final Object UNINITIALIZED = new Object();
-
     private final Iterator<T> iter;
-
-    @SuppressWarnings("unchecked")
-    private Option<T> first = (Option<T>) UNINITIALIZED;
-
+    private Option<T> first = null;
     private Sequence<T> rest;
 
-    SequenceFromIterator(Iterator<T> i) { iter = i; }
+    private SequenceFromIterator(Iterator<T> i) { iter = i; }
 
     public static <T> Sequence<T> of(Iterator<T> i) {
         if (i == null) { return Sequence.emptySequence(); }
@@ -54,7 +49,7 @@ class SequenceFromIterator<T> implements Sequence<T> {
     }
 
     private synchronized void init() {
-        if (first == UNINITIALIZED) {
+        if (first == null) {
             if (iter.hasNext()) {
                 first = Option.of(iter.next());
                 rest = of(iter);

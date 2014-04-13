@@ -13,6 +13,8 @@
 
 package org.organicdesign.fp.ephemeral;
 
+import java.util.Arrays;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -21,6 +23,15 @@ import static org.junit.Assert.assertArrayEquals;
 
 @RunWith(JUnit4.class)
 public class ViewTest {
+    @Test
+    public void construction() {
+        Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        assertArrayEquals(View.ofArray(ints).toJavaArrayList().toArray(), ints);
+        assertArrayEquals(View.of(Arrays.asList(ints)).toJavaArrayList().toArray(), ints);
+        assertArrayEquals(View.of(Arrays.asList(ints).iterator()).toJavaArrayList().toArray(),
+                          ints);
+    }
+
     @Test
     public void takeAndDrop() {
         assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
