@@ -26,31 +26,31 @@ public class ViewTest {
     @Test
     public void construction() {
         Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-        assertArrayEquals(View.ofArray(ints).toJavaArrayList().toArray(), ints);
-        assertArrayEquals(View.of(Arrays.asList(ints)).toJavaArrayList().toArray(), ints);
-        assertArrayEquals(View.of(Arrays.asList(ints).iterator()).toJavaArrayList().toArray(),
+        assertArrayEquals(View.ofArray(ints).toArray(), ints);
+        assertArrayEquals(View.of(Arrays.asList(ints)).toArray(), ints);
+        assertArrayEquals(View.of(Arrays.asList(ints).iterator()).toArray(),
                           ints);
     }
 
     @Test
     public void takeAndDrop() {
         assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
-                                  .drop(0).take(8888).toJavaArrayList().toArray(),
+                                  .drop(0).take(8888).toArray(),
                           new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 });
         assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
-                                  .drop(1).take(1).toJavaArrayList().toArray(),
+                                  .drop(1).take(1).toArray(),
                    new Integer[] { 2 });
         assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
-                                  .drop(2).take(2).toJavaArrayList().toArray(),
+                                  .drop(2).take(2).toArray(),
                    new Integer[] { 3,4 });
         assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
-                                  .drop(3).take(3).toJavaArrayList().toArray(),
+                                  .drop(3).take(3).toArray(),
                    new Integer[] { 4,5,6 });
         assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
-                                  .drop(9999).take(3).toJavaArrayList().toArray(),
+                                  .drop(9999).take(3).toArray(),
                    new Integer[] { });
         assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
-                                  .drop(3).take(0).toJavaArrayList().toArray(),
+                                  .drop(3).take(0).toArray(),
                    new Integer[] { });
     }
 
@@ -67,7 +67,7 @@ public class ViewTest {
                                   .map(i -> i - 2)            //   2,3,4,5,6,7
                                   .take(5)                    //   2,3,4,5,6
                                   .drop(2)                    //       4,5,6
-                                  .toJavaArrayList().toArray(),
+                                  .toArray(),
                           new Integer[] { 4, 5, 6 });
     }
 

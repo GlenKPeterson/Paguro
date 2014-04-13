@@ -11,9 +11,9 @@ public class SequenceTest {
     @Test
     public void construction() {
         Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-        assertArrayEquals(Sequence.ofArray(ints).toJavaArrayList().toArray(), ints);
-        assertArrayEquals(Sequence.of(Arrays.asList(ints)).toJavaArrayList().toArray(), ints);
-        assertArrayEquals(Sequence.of(Arrays.asList(ints).iterator()).toJavaArrayList().toArray(),
+        assertArrayEquals(Sequence.ofArray(ints).toArray(), ints);
+        assertArrayEquals(Sequence.of(Arrays.asList(ints)).toArray(), ints);
+        assertArrayEquals(Sequence.of(Arrays.asList(ints).iterator()).toArray(),
                           ints);
     }
 }
