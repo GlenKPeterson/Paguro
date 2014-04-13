@@ -73,7 +73,7 @@ public interface Sequence<T> extends Transformable<T> {
     default void forEach(Consumer<T> se) {
         Sequence<T> seq = this;
         Option<T> item = seq.first();
-        while (!item.isSome()) {
+        while (item.isSome()) {
             se.accept(item.get());
             // repeat with next element
             seq = seq.rest();
@@ -85,7 +85,7 @@ public interface Sequence<T> extends Transformable<T> {
     default Option<T> firstMatching(Predicate<T> pred) {
         Sequence<T> seq = this;
         Option<T> item = seq.first();
-        while (!item.isSome()) {
+        while (item.isSome()) {
             if (pred.test(item.get())) { return item; }
             // repeat with next element
             seq = seq.rest();
