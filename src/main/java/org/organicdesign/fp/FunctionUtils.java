@@ -108,6 +108,7 @@ public class FunctionUtils {
         if ( (in == null) || (in == View.EMPTY_VIEW) ) {
             return accept();
         }
+
         final List<Predicate<T>> out = new ArrayList<>();
         // I can't seem to iterate through a View here, so I'm using an exception to terminate
         // the loop.
@@ -123,6 +124,23 @@ public class FunctionUtils {
         } catch (EndException ee) {
             return reject();
         }
+
+// Didn't work.  With a View, the first REJECT is consumed by the takeWhile, so it's gone when we
+// call filtered.next().  With a Sequence, I don't immediately see how to get the next item after
+// what's used up.
+//
+//        View<Predicate<T>> filtered = in.filter(f -> (f != null) && (f != ACCEPT));
+//        final List<Predicate<T>> out = filtered
+//                .takeWhile(f -> f != REJECT)
+//                .foldLeft(new ArrayList<Predicate<T>>(), (accum, p) -> {
+//                    accum.add(p);
+//                    return accum;
+//                });
+//
+//        if (filtered.next() == REJECT) {
+//            return reject();
+//        }
+
         if (out.size() < 1) {
             return accept(); // No predicates means to accept all.
         } else if (out.size() == 1) {

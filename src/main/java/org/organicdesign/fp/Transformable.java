@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -68,6 +67,16 @@ public interface Transformable<T> extends Realizable<T> {
      */
     @Deprecated
     Option<T> firstMatching(Predicate<T> pred);
+
+    /**
+     Shorten this transformable to contain all items from the beginning so long as they satisfy the
+     predicate.
+     @param p the test.
+     @return a lazy transformable containing the longest un-interrupted run of items, from the
+     beginning of the transformable, that satisfy the given predicate.  This could be 0 items to
+     the entire transformable.
+     */
+    Transformable<T> takeWhile(Predicate<T> p);
 
     // TODO: You can always use foldLeft for this operation.  Does having reduceLeft add more clarity to the underlying code, or does it provide some useful additional functionality?
 //    /**

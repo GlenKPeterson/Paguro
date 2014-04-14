@@ -121,6 +121,11 @@ public interface View<T> extends Transformable<T> {
         return ViewTaken.of(this, numItems);
     }
 
+    @Override
+    default View<T> takeWhile(Predicate<T> p) {
+        return ViewTakenWhile.of(this, p);
+    }
+
     /**
      Note that all dropped items will be evaluated as they are dropped.  Any side effects
      (including delays) caused by evaluating these items will be incurred.  For this reason,

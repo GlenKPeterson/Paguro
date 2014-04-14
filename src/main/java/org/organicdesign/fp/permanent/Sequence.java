@@ -109,6 +109,11 @@ public interface Sequence<T> extends Transformable<T> {
         return u;
     }
 
+    @Override
+    default Sequence<T> takeWhile(Predicate<T> p) {
+        return SequenceTakenWhile.of(this, p);
+    }
+
 //    @Override
 //    T reduceLeft(BiFunction<T, T, T> fun) {
 //        Option<T> item =next();
