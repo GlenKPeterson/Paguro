@@ -60,6 +60,9 @@ U foldLeft(U u, BiFunction<U, T, U> fun)
 // Return only the items for which the given predicate returns true
 View<T> filter(Predicate<T> pred)
 
+// Return only the first n items for which the given predicate returns true
+View<T> takeWhile(Predicate<T> p)
+
 // Return only the first n items
 View<T> take(long numItems)
 
@@ -93,6 +96,7 @@ SortedSet<T> toJavaUnmodSortedSet()
 HashSet<T> toJavaHashSet()
 Set<T> toJavaUnmodSet()
 T[] toArray()
+Iterator<T> toIterator()
 ```
 
 #Details
