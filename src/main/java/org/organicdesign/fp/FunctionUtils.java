@@ -109,6 +109,7 @@ public class FunctionUtils {
             return accept();
         }
 
+        // First attempt:
 //        final List<Predicate<T>> out = new ArrayList<>();
 //        // I can't seem to iterate through a View here, so I'm using an exception to terminate
 //        // the loop.
@@ -124,41 +125,64 @@ public class FunctionUtils {
 //        } catch (EndException ee) {
 //            return reject();
 //        }
+//
+//        if (out.size() < 1) {
+//            return accept(); // No predicates means to accept all.
+//        } else if (out.size() == 1) {
+//            return out.get(0);
+//        } else {
+//            return t -> {
+//                for (Predicate<T> f : out) {
+//                    if (!f.test(t)) {
+//                        return false;
+//                    }
+//                }
+//                return true;
+//            };
+//        }
 
-        Mutable.BooleanRef foundReject = Mutable.BooleanRef.of(false);
+        // Second attempt:
+//        Mutable.BooleanRef foundReject = Mutable.BooleanRef.of(false);
+//
+//        final List<Predicate<T>> out = in
+//                .filter(f -> (f != null) && (f != ACCEPT))
+//                .takeWhile(f -> {
+//                    if (f == REJECT) {
+//                        foundReject.set(true);
+//                        return false;
+//                    }
+//                    return true;
+//                })
+//                .foldLeft(new ArrayList<Predicate<T>>(), (accum, p) -> {
+//                    accum.add(p);
+//                    return accum;
+//                });
+//
+//        if (foundReject.isTrue()) {
+//            return reject();
+//        }
+//
+//        if (out.size() < 1) {
+//            return accept(); // No predicates means to accept all.
+//        } else if (out.size() == 1) {
+//            return out.get(0);
+//        } else {
+//            return t -> {
+//                for (Predicate<T> f : out) {
+//                    if (!f.test(t)) {
+//                        return false;
+//                    }
+//                }
+//                return true;
+//            };
+//        }
 
-        final List<Predicate<T>> out = in
-                .filter(f -> (f != null) && (f != ACCEPT))
-                .takeWhile(f -> {
-                    if (f == REJECT) {
-                        foundReject.set(true);
-                        return false;
-                    }
-                    return true;
-                })
-                .foldLeft(new ArrayList<Predicate<T>>(), (accum, p) -> {
-                    accum.add(p);
-                    return accum;
-                });
-
-        if (foundReject.isTrue()) {
-            return reject();
-        }
-
-        if (out.size() < 1) {
-            return accept(); // No predicates means to accept all.
-        } else if (out.size() == 1) {
-            return out.get(0);
-        } else {
-            return t -> {
-                for (Predicate<T> f : out) {
-                    if (!f.test(t)) {
-                        return false;
-                    }
-                }
-                return true;
-            };
-        }
+        // Third attempt:
+        return in
+                .filter(p -> (p != null) && (p != ACCEPT))
+                .foldLeft(accept(),
+                          (accum, p) -> ((accum == REJECT) || (p == REJECT)) ? reject()
+                                                                             : accum.and(p));
     }
 
     /** A convenience wrapper for and().  This may be a bad idea.  Not sure yet. */

@@ -68,6 +68,7 @@ public class FunctionUtilsTest {
     public void composePredicatesWithAnd() {
         assertTrue(FunctionUtils.andArray() == FunctionUtils.accept());
         assertTrue(FunctionUtils.and(null) == FunctionUtils.accept());
+        assertTrue(FunctionUtils.and(View.emptyView()) == FunctionUtils.accept());
 
         assertTrue(FunctionUtils.andArray(FunctionUtils.accept()) == FunctionUtils.accept());
         assertTrue(FunctionUtils.and(View.ofArray(FunctionUtils.accept())) ==
