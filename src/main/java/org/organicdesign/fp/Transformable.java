@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -193,4 +194,9 @@ public interface Transformable<T> extends Realizable<T> {
         return al.toArray((T[]) new Object[al.size()]);
     }
 
+    @Override
+    default Iterator<T> toIterator() {
+        // Maybe not so performant, but gives a chance to see if this is even a useful method.
+        return toJavaArrayList().iterator();
+    }
 }
