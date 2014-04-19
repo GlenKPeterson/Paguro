@@ -99,6 +99,31 @@ public interface View<T> extends Transformable<T> {
         return u;
     }
 
+    default <U> U foldLeft(U u, BiFunction<U, T, U> fun, Predicate<U> terminateWith) {
+        Option<T> item = next();
+        while (item.isSome()) {
+            u = fun.apply(u, item.get());
+            if (terminateWith.test(u)) {
+                return u;
+            }
+            item = next();
+        }
+        return u;
+    }
+
+//    default <U> U foldLeft(Tuple2<U,Boolean> u,
+//                           BiFunction<U, T, Tuple2<U,Boolean>> fun) {
+//        Option<T> item = next();
+//        while (item.isSome()) {
+//            u = fun.apply(u._1(), item.get());
+//            if (u._2()) {
+//                return u._1();
+//            }
+//            item = next();
+//        }
+//        return u._1();
+//    }
+
 //    @Override
 //    public T reduceLeft(BiFunction<T, T, T> fun) {
 //        T item = next();
@@ -117,14 +142,12 @@ public interface View<T> extends Transformable<T> {
      @param numItems the maximum number of items in the returned view.
      @return a lazy view containing no more than the specified number of items.
      */
-    default View<T> take(long numItems) {
-        return ViewTaken.of(this, numItems);
-    }
+    default View<T> take(long numItems) { return ViewTaken.of(this, numItems); }
 
     @Override
-    default View<T> takeWhile(Predicate<T> p) {
-        return ViewTakenWhile.of(this, p);
-    }
+    default View<T> takeWhile(Predicate<T> p) { return ViewTakenWhile.of(this, p); }
+
+    // default View<T> takeUntilInclusive(Predicate<T> p) { return ViewTakenUntilIncl.of(this, p); }
 
     /**
      Note that all dropped items will be evaluated as they are dropped.  Any side effects

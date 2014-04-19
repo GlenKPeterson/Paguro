@@ -14,8 +14,6 @@
 
 package org.organicdesign.fp;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -86,9 +84,6 @@ public class FunctionUtils {
     @SuppressWarnings("unchecked")
     public static <T> Predicate<T> reject() { return (Predicate<T>) REJECT; }
 
-    // For forced exit from a forEach.
-    private static class EndException extends RuntimeException {}
-
     /**
      Composes multiple predicates into a single predicate to potentially minimize trips through
      the source data.  The resultant predicate will loop through the predicates for each item in
@@ -105,84 +100,15 @@ public class FunctionUtils {
      @return a predicate which returns true if all the input predicates return true, false otherwise.
      */
     public static <T> Predicate<T> and(View<Predicate<T>> in) {
-        if ( (in == null) || (in == View.EMPTY_VIEW) ) {
-            return accept();
-        }
+        if (in == null) { return accept(); }
 
-        // First attempt:
-//        final List<Predicate<T>> out = new ArrayList<>();
-//        // I can't seem to iterate through a View here, so I'm using an exception to terminate
-//        // the loop.
-//        try {
-//            in.filter(f -> (f != null) && (f != ACCEPT))
-//                    .forEach(f -> {
-//                        // One reject in an and-list means to always reject.
-//                        if (f == REJECT) {
-//                            throw new EndException();
-//                        }
-//                        out.add(f);
-//                    });
-//        } catch (EndException ee) {
-//            return reject();
-//        }
-//
-//        if (out.size() < 1) {
-//            return accept(); // No predicates means to accept all.
-//        } else if (out.size() == 1) {
-//            return out.get(0);
-//        } else {
-//            return t -> {
-//                for (Predicate<T> f : out) {
-//                    if (!f.test(t)) {
-//                        return false;
-//                    }
-//                }
-//                return true;
-//            };
-//        }
-
-        // Second attempt:
-//        Mutable.BooleanRef foundReject = Mutable.BooleanRef.of(false);
-//
-//        final List<Predicate<T>> out = in
-//                .filter(f -> (f != null) && (f != ACCEPT))
-//                .takeWhile(f -> {
-//                    if (f == REJECT) {
-//                        foundReject.set(true);
-//                        return false;
-//                    }
-//                    return true;
-//                })
-//                .foldLeft(new ArrayList<Predicate<T>>(), (accum, p) -> {
-//                    accum.add(p);
-//                    return accum;
-//                });
-//
-//        if (foundReject.isTrue()) {
-//            return reject();
-//        }
-//
-//        if (out.size() < 1) {
-//            return accept(); // No predicates means to accept all.
-//        } else if (out.size() == 1) {
-//            return out.get(0);
-//        } else {
-//            return t -> {
-//                for (Predicate<T> f : out) {
-//                    if (!f.test(t)) {
-//                        return false;
-//                    }
-//                }
-//                return true;
-//            };
-//        }
-
-        // Third attempt:
         return in
                 .filter(p -> (p != null) && (p != ACCEPT))
                 .foldLeft(accept(),
-                          (accum, p) -> ((accum == REJECT) || (p == REJECT)) ? reject()
-                                                                             : accum.and(p));
+                          (accum, p) -> (p == REJECT) ? p
+                                                      : accum.and(p),
+                          accum -> accum == REJECT);
+
     }
 
     /** A convenience wrapper for and().  This may be a bad idea.  Not sure yet. */
@@ -208,36 +134,14 @@ public class FunctionUtils {
      false otherwise.
      */
     public static <T> Predicate<T> or(View<Predicate<T>> in) {
-        if ( (in == null) || (in == View.EMPTY_VIEW) ) {
-            return reject();
-        }
-        final List<Predicate<T>> out = new ArrayList<>();
-        try {
-            in.filter(f -> (f != null) && (f != REJECT))
-                    .forEach(f -> {
-                        // One accept in an or-list means to always accept.
-                        if (f == ACCEPT) {
-                            throw new EndException();
-                        }
-                        out.add(f);
-                    });
-        } catch (EndException ee) {
-            return accept();
-        }
-        if (out.size() < 1) {
-            return reject(); // No predicates means to reject all.
-        } else if (out.size() == 1) {
-            return out.get(0);
-        } else {
-            return t -> {
-                for (Predicate<T> f : out) {
-                    if (f.test(t)) {
-                        return true;
-                    }
-                }
-                return false;
-            };
-        }
+        if (in == null) { return reject(); }
+
+        return in
+                .filter(p -> (p != null) && (p != REJECT))
+                .foldLeft(reject(),
+                          (accum, p) -> (p == ACCEPT) ? p
+                                                      : accum.or(p),
+                          accum -> accum == ACCEPT);
     }
 
     /** A convenience wrapper for of().  This may be a bad idea.  Not sure yet. */
