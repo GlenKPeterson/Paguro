@@ -99,6 +99,7 @@ public interface View<T> extends Transformable<T> {
         return u;
     }
 
+    @Override
     default <U> U foldLeft(U u, BiFunction<U, T, U> fun, Predicate<U> terminateWith) {
         Option<T> item = next();
         while (item.isSome()) {

@@ -92,6 +92,7 @@ public interface Transformable<T> extends Realizable<T> {
     /**
      One of the two higher-order functions that can produce more output items than input items
      (when u is a collection). FlatMap is the other, but foldLeft is eager while flatMap is lazy.
+     FoldLeft can also produce a single (scalar) value.  In that form, it is often called reduce().
 
      @return an eagerly evaluated result which could be a single value like a sum, or a collection.
      @param u the accumulator and starting value.  This will be passed to the function on the
@@ -101,6 +102,23 @@ public interface Transformable<T> extends Realizable<T> {
      @param fun combines each value in the list with the result so far.  The initial result is u.
      */
     <U> U foldLeft(U u, BiFunction<U, T, U> fun);
+
+    /**
+     A form of foldLeft() that handles early termination.  If foldLeft replaces a loop, and return
+     is a more general form of break, then this can do anything a loop can do.  If you want to
+     terminate based on an input T value rather than an output U, make U = Tuple2(T,V) and have
+     terminateWith(Tuple2(T,V) tv) { if tv._1()... }
+
+     @return an eagerly evaluated result which could be a single value like a sum, or a collection.
+     @param u the accumulator and starting value.  This will be passed to the function on the
+     first iteration to be combined with the first member of the underlying data source.  For some
+     operations you'll need to pass an identity, e.g. for a sum, pass 0, for a product, pass 1 as
+     this parameter.
+     @param fun combines each value in the list with the result so far.  The initial result is u.
+     @param terminateWith returns true when the termination condition is reached and will stop
+     processing the input at that time, returning the latest u.
+     */
+    <U> U foldLeft(U u, BiFunction<U, T, U> fun, Predicate<U> terminateWith);
 
 
     // Sub-classes cannot inherit from this because the function that you pass in has to know the actal return type.

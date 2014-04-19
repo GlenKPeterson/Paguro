@@ -110,6 +110,24 @@ public interface Sequence<T> extends Transformable<T> {
     }
 
     @Override
+    default <U> U foldLeft(U u, BiFunction<U, T, U> fun, Predicate<U> terminateWith) {
+        Sequence<T> seq = this;
+        // System.out.println("seq: " + seq);
+        Option<T> item = seq.first();
+        // System.out.println("===>item: " + item);
+        while (item.isSome()) {
+            u = fun.apply(u, item.get());
+            if (terminateWith.test(u)) {
+                return u;
+            }
+            // repeat with next element
+            seq = seq.rest();
+            item = seq.first();
+        }
+        return u;
+    }
+
+    @Override
     default Sequence<T> takeWhile(Predicate<T> p) {
         return SequenceTakenWhile.of(this, p);
     }
