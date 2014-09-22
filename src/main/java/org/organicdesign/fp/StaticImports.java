@@ -23,9 +23,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class StaticIncludes {
+public class StaticImports {
     // Prevent instantiation
-    private StaticIncludes() { throw new UnsupportedOperationException("No instantiation"); }
+    private StaticImports() { throw new UnsupportedOperationException("No instantiation"); }
 
     public static <K,V> Map<K,V> uMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5,
                                       K k6, V v6, K k7, V v7, K k8, V v8, K k9, V v9) {
