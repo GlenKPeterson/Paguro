@@ -13,6 +13,10 @@
 
 package org.organicdesign.fp;
 
+import java.lang.Deprecated;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
 /**
  This is NOT a type-safe null.  Null is a valid value for a Some.  It's more to indicate
  the presence or absence of a value, or indicate end-of-stream.
@@ -32,9 +36,17 @@ public interface Option<T> {
         return new Some<>(t);
     }
 
+    public static <T> Option<T> someOrNullNoneOf(T t) {
+        if ( (t == null) || NONE.equals(t) ) {
+            return none();
+        }
+        return new Some<>(t);
+    }
+
     T get();
     T getOrElse(T t);
     boolean isSome();
+    <U> U patMat(Function<T,U> has, Supplier<U> hasNot);
 
     static class None<T> implements Option<T> {
         //private None();
@@ -49,8 +61,17 @@ public interface Option<T> {
         public boolean isSome() { return false; }
 
         @Override
+        public <U> U patMat(Function<T,U> has, Supplier<U> hasNot) {
+            return hasNot.get();
+        }
+
+        /** Valid, but deprecated because it's usually an error to call this in client code. */
+        @Deprecated // Has no effect.  Darn!
+        @Override
         public int hashCode() { return 0; }
 
+        /** Valid, but deprecated because it's usually an error to call this in client code. */
+        @Deprecated // Has no effect.  Darn!
         @Override
         public boolean equals(Object other) {
             if (this == other) { return true; }
@@ -74,10 +95,19 @@ public interface Option<T> {
         public boolean isSome() { return true; }
 
         @Override
+        public <U> U patMat(Function<T,U> has, Supplier<U> hasNot) {
+            return has.apply(item);
+        }
+
+        /** Valid, but deprecated because it's usually an error to call this in client code. */
+        @Deprecated // Has no effect.  Darn!
+        @Override
         public int hashCode() {
             return item.hashCode();
         }
 
+        /** Valid, but deprecated because it's usually an error to call this in client code. */
+        @Deprecated // Has no effect.  Darn!
         @Override
         public boolean equals(Object other) {
             // Cheapest operation first...
