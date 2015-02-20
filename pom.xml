@@ -4,7 +4,7 @@
 
 	<groupId>org.organicdesign.fp</groupId>
 	<artifactId>fp4java7</artifactId>
-	<version>0.7.1-SNAPSHOT</version>
+	<version>0.7.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>Functional Programming Tools for Java 8</name>
