@@ -130,6 +130,13 @@ The most interesting classes are probably (in src/main/java/):
 - Maven will download jUnit for you
 - As of 2014-03-08, all major areas of functionality are covered by unit tests.
 
+#Change Log
+0.7.3:
+ - Added back exception-safe Function0 (Producer)
+ - Added LazyRef class to take a Function0 and lazily initialize a value (and free the initialization resources) on the
+ first call to get().  Subsequent calls to get() cheaply return the previously initialized value.  This class is thread
+ safe if the producer and the values it produces are free from outside influences.
+
 #To Do
 
 Remove firstMatching
