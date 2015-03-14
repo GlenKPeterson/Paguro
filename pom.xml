@@ -3,15 +3,16 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.organicdesign.fp</groupId>
-	<artifactId>fp4java7</artifactId>
+	<artifactId>Java-cicle</artifactId>
 	<version>0.7.4-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>Functional Programming Tools for Java 8</name>
-	<description>Non-destructive (mutation-free), lazy, (higher order) functional data transformations for Java 8.
-		Allows loop-free functional programming.
+	<name>Java-cicle</name>
+	<description>Functional Programming Tools for Java (formerly fp4java7).
+		Non-destructive (mutation-free), lazy, (higher order) functional data
+		transformations for Java 8.  Allows loop-free functional programming.
 		Additional general purpose functional tools are provided.</description>
-	<url>https://github.com/GlenKPeterson/fp4java7</url>
+	<url>https://github.com/GlenKPeterson/Java-cicle</url>
 
 	<licenses>
 		<license>
