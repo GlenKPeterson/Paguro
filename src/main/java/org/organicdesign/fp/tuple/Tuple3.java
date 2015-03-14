@@ -14,25 +14,30 @@
 
 package org.organicdesign.fp.tuple;
 
+/**
+ Use tuples as immutable, type-safe, data structures instead of defining your own classes (when appropriate).
+ Defining your own class is better for building models, but tuples can be more convenient, especially for adapter code.
+ */
 public class Tuple3<T,U,V> {
     private final T _1;
     private final U _2;
     private final V _3;
     private Tuple3(T t, U u, V v) { _1 = t; _2 = u; _3 = v; }
-    public static <T,U,V> Tuple3<T,U,V> of(T first, U second, V third) {
-        return new Tuple3<>(first, second, third);
-    }
+
+    /** Public static factory method */
+    public static <T,U,V> Tuple3<T,U,V> of(T first, U second, V third) { return new Tuple3<>(first, second, third); }
+
+    /** Returns the first field of the tuple */
     public T _1() { return _1; }
+
+    /** Returns the second field of the tuple */
     public U _2() { return _2; }
+
+    /** Returns the third field of the tuple */
     public V _3() { return _3; }
 
     @Override
-    public String toString() {
-        return new StringBuilder("(")
-                .append(_1).append(",")
-                .append(_2).append(",")
-                .append(_3).append(")").toString();
-    }
+    public String toString() { return "(" + _1 + "," + _2 + "," + _3 + ")"; }
 
     @Override
     public boolean equals(Object other) {

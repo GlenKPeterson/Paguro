@@ -90,9 +90,9 @@ public interface Function1<T,U> {
      is to chain two functions with an intermediate type into a single composite function:
 
      <pre><code>
-     public static &lt;A,B,C> Function1&lt;A,C> chain2(final Function1&lt;A,B> f1, final Function1&lt;B,C> f2) {
-         return new Function1&lt;A,C>() {
-             @Override
+     public static &lt;A,B,C&gt; Function1&lt;A,C&gt; chain2(final Function1&lt;A,B&gt; f1, final Function1&lt;B,C&gt; f2) {
+         return new Function1&lt;A,C&gt;() {
+             &#64;Override
              public C apply(A a) throws Exception {
                  return f2.apply(f1.apply(a));
              }

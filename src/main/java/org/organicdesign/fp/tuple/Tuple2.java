@@ -16,14 +16,30 @@ package org.organicdesign.fp.tuple;
 
 import java.util.Map.Entry;
 
+/**
+ Use tuples as immutable, type-safe, data structures instead of defining your own classes (when appropriate).
+ Defining your own class is better for building models, but tuples can be more convenient, especially for adapter code.
+ */
 public class Tuple2<T,U> implements Entry<T,U> {
     private final T _1;
     private final U _2;
     private Tuple2(T t, U u) { _1 = t; _2 = u; }
+
+    /** Public static factory method */
     public static <T,U> Tuple2<T,U> of(T first, U second) {
         return new Tuple2<>(first, second);
     }
+
+    /**
+     Returns the first field of the tuple (the Key if this is a Key/Value pair).  This field naming scheme is compatible
+     with other (larger) tuples.
+     */
     public T _1() { return _1; }
+
+    /**
+     Returns the second field of the tuple (the Value if this is a Key/Value pair)  This field naming scheme is
+     compatible with other (larger) tuples.
+     */
     public U _2() { return _2; }
 
     @Override
@@ -65,7 +81,10 @@ public class Tuple2<T,U> implements Entry<T,U> {
     }
 
     // Inherited from Map.Entry
+    /** Returns the first field of the tuple.  This field naming scheme is to implement Map.Entry. */
     @Override public T getKey() { return _1; }
+    /** Returns the second field of the tuple.  This field naming scheme is to implement Map.Entry. */
     @Override public U getValue() { return _2; }
+    /** This method is required to implement Map.Entry, but calling it only issues an exception */
     @Override @Deprecated public U setValue(U value) { throw new UnsupportedOperationException("Tuple2 is immutable"); }
 }
