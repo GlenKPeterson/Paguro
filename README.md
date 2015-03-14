@@ -1,4 +1,4 @@
-This project was formerly called fp4java7.  Java-cicle (like Java-icicle) is the new name because limiting mutation is like freezing parts of your code (so they are easier to reason about and debug).  Java-cicle is intended *for use with* Java, it is *not part of* Java&trade;.  Java is a registered trademark of Oracle Corporation.
+Formerly called fp4java7, J-cicle (pronounced "Jay-sick-ul" like Java-icicle) is about limiting mutation and replacing loops with lazy transformations.
 
 You are on the Java 8 branch of this project.  If you're using Java 7 or earlier, get the Java 7 legacy support branch from here:
 https://github.com/GlenKPeterson/fp4java7/tree/java7
@@ -23,6 +23,28 @@ FunctionUtils.toString(list);
 ```
 
 These transformations do not change the underlying data.  They build a new collection by chaining together all the operations you specify, then lazily applying them in a single pass through the unerlying data.  The laziness is implemented as an incremental pull, so that if your last operation is take(1), then the absolute minimum number of items will be evaluated through all the functions you specified.
+
+How hard is it to create an immutable, type safe map in Java?
+```java
+import static org.organicdesign.fp.StaticImports.uMap;
+
+Map<String,Integer> sToI = uMap(
+        "One", 1,
+        "Two", 2,
+        "Three", 3);
+```
+
+What if you want to add items conditionally?  The following will create an UnmodifiableMap of 0, 1, 2, or 3 items (no nulls) depending on the values of showFirst, showSecond, and showThird:
+```java
+import static org.organicdesign.fp.StaticImports.uMapSkipNull;
+
+Map<String,Integer> sToI = uMapSkipNull(
+        showFirst ? Tuple2.of("One", 1) : null,
+        showSecond ? Tuple2.of("Two", 2) : null,
+        showThird ? Tuple2.of("Three", 3) : null);
+```
+
+Similar methods are available for producing unmodifiable Sets and Lists of any length (uMaps currently go up to 20 type-safe parameters).
 
 #Learn
 
