@@ -35,10 +35,6 @@ public class SequenceTest {
         Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         Sequence<Integer> seq = Sequence.ofArray(ints);
 
-        assertEquals(Option.of(1), seq.firstMatching(i -> i == 1));
-        assertEquals(Option.of(3), seq.firstMatching(i -> i > 2));
-        assertEquals(null, seq.firstMatching(i -> i > 10));
-
         assertEquals(Option.of(1), seq.filter(i -> i == 1).first());
         assertEquals(Option.of(3), seq.filter(i -> i > 2).first());
         assertEquals(Option.none(), seq.filter(i -> i > 10).first());

@@ -52,7 +52,7 @@ There is now a problem-set for learning this tool-kit: https://github.com/GlenKP
 
 #Motivations
 
-Higher order functions are not just briefer to write and read, they are less to *think* about.  They are useful abstractions that simplify your code and focus your attention on your goals rather than the details of how to accomplish them.  Function chaining: <code>xs.map(x -> x + 1).filter(x -> x > 7).take(1)</code> defines what you are doing and how you are doing it in the simplest possible way, hiding all details about how to iterate through the underlying collection.
+Higher order functions are not just briefer to write and read, they are less to *think* about.  They are useful abstractions that simplify your code and focus your attention on your goals rather than the details of how to accomplish them.  Function chaining: <code>xs.map(x -> x + 1).filter(x -> x > 7).first()</code> defines what you are doing and how you are doing it in the simplest possible way, hiding all details about how to iterate through the underlying collection.
 
 The alternative - loops - are bundles of unnecessary complexity.  Loops generally require setting up accumulators, then running a gamut of <code>if</code>, <code>break</code>, and <code>continue</code> statements, like some kind of mad obstacle race that involves as many state changes as possible.  Different kinds of collections require different looping constructs - more complexity.  Looping code is vulnerable to "off-by-one" boundary overflow/underflow, improper initialization, accidental exit, infinite loops, forgetting to update a counter, updating the wrong counter...  The list goes on!  None of that has anything to do with why the loop was created in the first place which is to transform the underlying data.
 
@@ -156,6 +156,9 @@ The most interesting classes are probably (in src/main/java/):
 - As of 2014-03-08, all major areas of functionality are covered by unit tests.
 
 #Change Log
+2015-03-14 version 0.8.0: Removed firstMatching - in your code, replace firstMatching(...) with filter(...).first().
+Implemented filter() on Sequence.
+
 0.7.4:
 Added uMapSkipNull and other skipNull versions of the StaticImports methods.  This allows little one-liner add-if items
 to still go efficiently into an immutable map.  Next step is to probably implement an immutable map that you can
@@ -170,14 +173,7 @@ Added unit tests for the above.
 
 #To Do
 
-Remove firstMatching
-```java
-// Return the first item for which the given predicate returns true.
-// You can call filter(...).take(1) to achieve the same result
-// (because Views are incrementally evaluated) so this may not be strictly
-// necessary (I might remove it in a future release).
-T firstMatching(Predicate<T> pred)
-```
+Use LazyRef to re-implement Sequence classes much more simply.
 
 Collection Variations:
  - Mutable vs. Immutable

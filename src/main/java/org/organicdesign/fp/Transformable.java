@@ -60,14 +60,21 @@ public interface Transformable<T> extends Realizable<T> {
      */
     void forEach(Consumer<T> se);
 
+//    /**
+//     Deprecated: use filter(...).first() instead.
+//     Eagerly returns the first item matching the given predicate.
+//     @param pred the test that the item needs to pass
+//     @return the first item that passes the test, or null if no such item is found
+//     */
+//    @Deprecated
+//    Option<T> firstMatching(Predicate<T> pred);
+
     /**
-     Deprecated: use filter(...).take(1) instead.
-     Eagerly returns the first item matching the given predicate.
-     @param pred the test that the item needs to pass
-     @return the first item that passes the test, or null if no such item is found
+     Shorten this Transformable to contain no more than the specified number of items.
+     @param numItems the maximum number of items in the returned view.
+     @return a lazy view containing no more than the specified number of items.
      */
-    @Deprecated
-    Option<T> firstMatching(Predicate<T> pred);
+    Transformable<T> take(long numItems);
 
     /**
      Shorten this transformable to contain all items from the beginning so long as they satisfy the

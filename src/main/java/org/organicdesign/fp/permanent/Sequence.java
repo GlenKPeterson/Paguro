@@ -14,14 +14,14 @@
 
 package org.organicdesign.fp.permanent;
 
+import org.organicdesign.fp.Option;
+import org.organicdesign.fp.Transformable;
+
 import java.util.Iterator;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
-
-import org.organicdesign.fp.Option;
-import org.organicdesign.fp.Transformable;
 
 /**
  A Sequence abstraction that lazy operations can be built from.  The idea is to create a lazy,
@@ -81,18 +81,20 @@ public interface Sequence<T> extends Transformable<T> {
         }
     }
 
-    @Override
-    default Option<T> firstMatching(Predicate<T> pred) {
-        Sequence<T> seq = this;
-        Option<T> item = seq.first();
-        while (item.isSome()) {
-            if (pred.test(item.get())) { return item; }
-            // repeat with next element
-            seq = seq.rest();
-            item = seq.first();
-        }
-        return null;
-    }
+
+    // Use filter(...).first() instead!
+//    @Override
+//    default Option<T> firstMatching(Predicate<T> pred) {
+//        Sequence<T> seq = this;
+//        Option<T> item = seq.first();
+//        while (item.isSome()) {
+//            if (pred.test(item.get())) { return item; }
+//            // repeat with next element
+//            seq = seq.rest();
+//            item = seq.first();
+//        }
+//        return null;
+//    }
 
     @Override
     default <U> U foldLeft(U u, BiFunction<U, T, U> fun) {
@@ -127,10 +129,16 @@ public interface Sequence<T> extends Transformable<T> {
         return u;
     }
 
+    /**
+     Shorten this Transformable to contain no more than the specified number of items.
+     @param numItems the maximum number of items in the returned view.
+     @return a lazy view containing no more than the specified number of items.
+     */
     @Override
-    default Sequence<T> takeWhile(Predicate<T> p) {
-        return SequenceTakenWhile.of(this, p);
-    }
+    default Transformable<T> take(long numItems) { return SequenceTaken.of(this, numItems); }
+
+    @Override
+    default Sequence<T> takeWhile(Predicate<T> p) { return SequenceTakenWhile.of(this, p); }
 
 //    @Override
 //    T reduceLeft(BiFunction<T, T, T> fun) {
