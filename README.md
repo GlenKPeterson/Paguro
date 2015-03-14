@@ -131,6 +131,12 @@ The most interesting classes are probably (in src/main/java/):
 - As of 2014-03-08, all major areas of functionality are covered by unit tests.
 
 #Change Log
+0.7.4:
+Added uMapSkipNull and other skipNull versions of the StaticImports methods.  This allows little one-liner add-if items
+to still go efficiently into an immutable map.  Next step is to probably implement an immutable map that you can
+"add things to" (returning a new immutable map, leaving the original unchanged).  Made Tuple2 implement Map.Entry.
+Added unit tests for the above.
+
 0.7.3:
  - Added back exception-safe Function0 (Producer)
  - Added LazyRef class to take a Function0 and lazily initialize a value (and free the initialization resources) on the

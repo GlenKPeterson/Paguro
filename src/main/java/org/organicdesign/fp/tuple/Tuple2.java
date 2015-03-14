@@ -14,7 +14,9 @@
 
 package org.organicdesign.fp.tuple;
 
-public class Tuple2<T,U> {
+import java.util.Map.Entry;
+
+public class Tuple2<T,U> implements Entry<T,U> {
     private final T _1;
     private final U _2;
     private Tuple2(T t, U u) { _1 = t; _2 = u; }
@@ -25,9 +27,7 @@ public class Tuple2<T,U> {
     public U _2() { return _2; }
 
     @Override
-    public String toString() {
-        return new StringBuilder("(").append(_1).append(",").append(_2).append(")").toString();
-    }
+    public String toString() { return "(" + _1 + "," + _2 + ")"; }
 
     @Override
     public boolean equals(Object other) {
@@ -63,4 +63,9 @@ public class Tuple2<T,U> {
         // If it's uninitialized, it's equal to every other uninitialized instance.
         return ret;
     }
+
+    // Inherited from Map.Entry
+    @Override public T getKey() { return _1; }
+    @Override public U getValue() { return _2; }
+    @Override @Deprecated public U setValue(U value) { throw new UnsupportedOperationException("Tuple2 is immutable"); }
 }
