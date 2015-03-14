@@ -22,7 +22,7 @@ FunctionUtils.toString(list);
 // Returns: "UnmodifiableRandomAccessList(4,5,6)"
 ```
 
-Unlike Java 8 streams, these transformations do not change the underlying data.  They build a new collection by chaining together all the operations you specify, then lazily applying them in a single pass through the unerlying data.  The laziness is implemented as an incremental pull, so that if your last operation is take(1), then the absolute minimum number of items will be evaluated through all the functions you specified.
+These transformations do not change the underlying data.  They build a new collection by chaining together all the operations you specify, then lazily applying them in a single pass through the unerlying data.  The laziness is implemented as an incremental pull, so that if your last operation is take(1), then the absolute minimum number of items will be evaluated through all the functions you specified.
 
 #Learn
 
