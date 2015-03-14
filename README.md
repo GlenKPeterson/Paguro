@@ -1,4 +1,4 @@
-This project was formerly called fp4java7.  Java-cicle is the new name because limiting mutation is like freezing parts of your code (so they are easier to reason about and debug), making a Java-icicle.  Java-cicle is intended *for use with* Java, it is *not part* of Java&trade;.  Java is a registered trademark of Oracle Corporation.
+This project was formerly called fp4java7.  Java-cicle (like Java-icicle) is the new name because limiting mutation is like freezing parts of your code (so they are easier to reason about and debug).  Java-cicle is intended *for use with* Java, it is *not part* of Java&trade;.  Java is a registered trademark of Oracle Corporation.
 
 You are on the Java 8 branch of this project.  If you're using Java 7 or earlier, get the Java 7 legacy support branch from here:
 https://github.com/GlenKPeterson/fp4java7/tree/java7
