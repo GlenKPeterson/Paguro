@@ -15,8 +15,8 @@
 package org.organicdesign.fp.function;
 
 /**
- This is like Java 8's java.util.function.Producer, but retrofitted to turn checked exceptions
- into unchecked ones.  It's also called a thunk and is used to delay evaluation.
+ This is like Java 8's java.util.function.Supplier, but retrofitted to turn checked exceptions
+ into unchecked ones.  It's also called a thunk when used to delay evaluation.
  */
 public interface Function0<U> {
     /** Implement this one method and you don't have to worry about checked exceptions. */
@@ -40,4 +40,8 @@ public interface Function0<U> {
             return null;
         }
     };
+// Don't think this is necessary.  Is it?
+//    default Supplier<U> asSupplier() {
+//        return () -> apply_();
+//    }
 }

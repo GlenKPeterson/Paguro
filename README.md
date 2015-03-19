@@ -5,25 +5,6 @@ https://github.com/GlenKPeterson/fp4java7/tree/java7
 
 
 #Usage
-
-Typical usage (based on this unit test: <a href="https://github.com/GlenKPeterson/fp4java7/blob/master/src/test/java/org/organicdesign/fp/ephemeral/ViewTest.java">ViewTest.java</a>):
-
-```java
-List<Integer> list = View.ofArray(5)    //         5
-        .prepend(View.ofArray(1,2,3,4)) // 1,2,3,4,5
-        .append(View.ofArray(6,7,8,9))  // 1,2,3,4,5,6,7,8,9
-        .filter(i -> i > 3)             //       4,5,6,7,8,9
-        .map(i -> i - 2)                //   2,3,4,5,6,7
-        .take(5)                        //   2,3,4,5,6
-        .drop(2)                        //       4,5,6
-        .toJavaUnmodList();
-
-FunctionUtils.toString(list);
-// Returns: "UnmodifiableRandomAccessList(4,5,6)"
-```
-
-These transformations do not change the underlying data.  They build a new collection by chaining together all the operations you specify, then lazily applying them in a single pass through the unerlying data.  The laziness is implemented as an incremental pull, so that if your last operation is take(1), then the absolute minimum number of items will be evaluated through all the functions you specified.
-
 How hard is it to create an immutable, type safe map in Java?
 ```java
 import static org.organicdesign.fp.StaticImports.uMap;
@@ -45,6 +26,26 @@ Map<String,Integer> sToI = uMapSkipNull(
 ```
 
 Similar methods are available for producing unmodifiable Sets and Lists of any length (uMaps currently go up to 20 type-safe parameters).
+
+
+
+Typical usage (based on this unit test: <a href="https://github.com/GlenKPeterson/fp4java7/blob/master/src/test/java/org/organicdesign/fp/ephemeral/ViewTest.java">ViewTest.java</a>):
+
+```java
+List<Integer> list = View.ofArray(5)    //         5
+        .prepend(View.ofArray(1,2,3,4)) // 1,2,3,4,5
+        .append(View.ofArray(6,7,8,9))  // 1,2,3,4,5,6,7,8,9
+        .filter(i -> i > 3)             //       4,5,6,7,8,9
+        .map(i -> i - 2)                //   2,3,4,5,6,7
+        .take(5)                        //   2,3,4,5,6
+        .drop(2)                        //       4,5,6
+        .toJavaUnmodList();
+
+FunctionUtils.toString(list);
+// Returns: "UnmodifiableRandomAccessList(4,5,6)"
+```
+
+These transformations do not change the underlying data.  They build a new collection by chaining together all the operations you specify, then lazily applying them in a single pass through the unerlying data.  The laziness is implemented as an incremental pull, so that if your last operation is take(1), then the absolute minimum number of items will be evaluated through all the functions you specified.
 
 #Learn
 

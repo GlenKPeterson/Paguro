@@ -166,4 +166,8 @@ public interface Function1<T,U> {
 //        };
 //    }
 
+// Don't think this is necessary.  Is it?
+//    default Function<T,U> asFunction() {
+//        return (T t) -> apply_(t);
+//    }
 }
