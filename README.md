@@ -5,47 +5,51 @@ https://github.com/GlenKPeterson/fp4java7/tree/java7
 
 
 #Usage
-How hard is it to create an immutable, type safe map in Java?
-```java
-import static org.organicdesign.fp.StaticImports.uMap;
+How hard is it to create an immutable, type safe map in Java?  Are you tired of writing code like this:
+http://glenpeterson.blogspot.com/2013/07/immutable-java-with-lists-and-other.html
 
+Like Guava, J-cicle cuts through the boilerplate:
+```java
 Map<String,Integer> sToI = uMap(
         "One", 1,
         "Two", 2,
         "Three", 3);
 ```
 
-What if you want to add items conditionally?  The following will create an UnmodifiableMap of 0, 1, 2, or 3 items (no nulls) depending on the values of showFirst, showSecond, and showThird:
+What if you want to add items conditionally?  Would you create a temporary, mutable map, test each item, adding some to
+the mutable map, then call Collections.unmodifiableMap(tempMap) on it?  Ouch!  The following will create an
+UnmodifiableMap of 0, 1, 2, or 3 items (no nulls) depending on the values of showFirst, showSecond, and showThird:
 ```java
-import static org.organicdesign.fp.StaticImports.uMapSkipNull;
-
 Map<String,Integer> sToI = uMapSkipNull(
         showFirst ? Tuple2.of("One", 1) : null,
         showSecond ? Tuple2.of("Two", 2) : null,
         showThird ? Tuple2.of("Three", 3) : null);
 ```
 
-Similar methods are available for producing unmodifiable Sets and Lists of any length (uMaps currently go up to 20 type-safe parameters).
+Similar type-safe methods are available for producing unmodifiable Sets and Lists of any length (uMaps currently go
+from 0 to 20 type-safe parameters).
 
-
-
+What about transforming your unmodifiable data into other unmodifiable data?  Lazily, without any extra processing?
 Typical usage (based on this unit test: <a href="https://github.com/GlenKPeterson/fp4java7/blob/master/src/test/java/org/organicdesign/fp/ephemeral/ViewTest.java">ViewTest.java</a>):
 
 ```java
-List<Integer> list = View.ofArray(5)    //         5
-        .prepend(View.ofArray(1,2,3,4)) // 1,2,3,4,5
-        .append(View.ofArray(6,7,8,9))  // 1,2,3,4,5,6,7,8,9
-        .filter(i -> i > 3)             //       4,5,6,7,8,9
-        .map(i -> i - 2)                //   2,3,4,5,6,7
-        .take(5)                        //   2,3,4,5,6
-        .drop(2)                        //       4,5,6
+List<Integer> list = View.ofArray(4,5) //       4,5
+        .prepend(View.ofArray(1,2,3))  // 1,2,3,4,5
+        .append(View.ofArray(6,7,8,9)) // 1,2,3,4,5,6,7,8,9
+        .filter(i -> i > 4)            //         5,6,7,8,9
+        .map(i -> i - 2)               //     3,4,5,6,7
+        .take(5)                       //     3,4,5,6
+        .drop(2)                       //         5,6
         .toJavaUnmodList();
 
 FunctionUtils.toString(list);
 // Returns: "UnmodifiableRandomAccessList(4,5,6)"
 ```
-
-These transformations do not change the underlying data.  They build a new collection by chaining together all the operations you specify, then lazily applying them in a single pass through the unerlying data.  The laziness is implemented as an incremental pull, so that if your last operation is take(1), then the absolute minimum number of items will be evaluated through all the functions you specified.
+These transformations do not change the underlying data.  They build a new collection by chaining together all the
+operations you specify, then lazily applying them in a single pass through the unerlying data.  The laziness is
+implemented as an incremental pull, so that if your last operation is take(1), then the absolute minimum number of
+items will be evaluated through all the functions you specified.  In the example above, items 7, 8, and 9 are never
+processed.
 
 #Learn
 
