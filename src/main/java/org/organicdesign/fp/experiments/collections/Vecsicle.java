@@ -25,13 +25,14 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author Rich Hickey (Primary author)
  * @author Glen Peterson (Java-centric editor)
  */
-public class ImVector<E> {
+public class Vecsicle<E> {
 
     // There's bit shifting going on here because it's a very fast operation.
     // Shifting right by 5 is aeons faster than dividing by 32.
-    private static final int FIVE_LOWEST_BITS = 0x01f;
-    private static final int SINGLE_NODE_ADDRESS_BIT_WIDTH = 5;
-    private static final int MAX_NODE_LENGTH = 1 << SINGLE_NODE_ADDRESS_BIT_WIDTH; // 32.
+    private static final int NODE_LENGTH_POW_2 = 5;
+    private static final int MAX_NODE_LENGTH = 1 << NODE_LENGTH_POW_2; // 32.
+    private static final int HIGH_BITS = -MAX_NODE_LENGTH;   // 0b11111111111111111111111111100000
+    private static final int LOW_BITS = MAX_NODE_LENGTH - 1; // 0b0000000000000000000000000011111 = 0x1f;
 
     // Java shift operator review:
     // The signed left shift operator "<<" shifts a bit pattern to the left, and
@@ -73,11 +74,11 @@ public class ImVector<E> {
 
     private final static Node EMPTY_NODE = new Node(NOEDIT, new Object[MAX_NODE_LENGTH]);
 
-    private final static ImVector<?> EMPTY = new ImVector<>(0, SINGLE_NODE_ADDRESS_BIT_WIDTH, EMPTY_NODE,
+    private final static Vecsicle<?> EMPTY = new Vecsicle<>(0, NODE_LENGTH_POW_2, EMPTY_NODE,
             new Object[]{});
 
     @SuppressWarnings("unchecked")
-    public static final <T> ImVector<T> empty() { return (ImVector<T>) EMPTY; }
+    public static final <T> Vecsicle<T> empty() { return (Vecsicle<T>) EMPTY; }
 
     @SuppressWarnings("unchecked")
     public static final <T> TransientVector<T> emptyTransientVector() {
@@ -91,7 +92,7 @@ public class ImVector<E> {
     public final E[] tail;
 
     /** Constructor */
-    private ImVector(int z, int shift, Node root, E[] tail) {
+    private Vecsicle(int z, int shift, Node root, E[] tail) {
         size = z;
         this.shift = shift;
         this.root = root;
@@ -99,7 +100,7 @@ public class ImVector<E> {
     }
 
     /** Public static factory method. */
-    static public <T> ImVector<T> of(List<T> items) {
+    static public <T> Vecsicle<T> of(List<T> items) {
         TransientVector<T> ret = emptyTransientVector();
         for (T item : items) {
             ret = ret.append(item);
@@ -109,7 +110,7 @@ public class ImVector<E> {
 
     /** Public static factory method. */
     @SafeVarargs
-    static public <T> ImVector<T> of(T... items) {
+    static public <T> Vecsicle<T> of(T... items) {
         TransientVector<T> ret = emptyTransientVector();
         for (T item : items) {
             ret = ret.append(item);
@@ -124,10 +125,16 @@ public class ImVector<E> {
         return new TransientVector<>(this);
     }
 
-    final int tailoff() {
-        if (size < MAX_NODE_LENGTH)
-            return 0;
-        return ((size - 1) >>> SINGLE_NODE_ADDRESS_BIT_WIDTH) << SINGLE_NODE_ADDRESS_BIT_WIDTH;
+    // Returns the high (gt 5) bits of the index of the last item.
+    // I think this is the index of the start of the last array in the tree.
+    final private int tailoff() {
+        // ((size - 1) / 32) * 32
+        // (Size - 1) is an index into an array because size starts counting from 1 and array indicies start from 0.
+        // /32 *32 zeroes out the low 5 bits.
+        return (size < MAX_NODE_LENGTH)
+                ? 0
+                : ((size - 1) >>> NODE_LENGTH_POW_2) << NODE_LENGTH_POW_2;
+        // Last line can be replaced with (size -1) & HIGH_BITS
     }
 
     @SuppressWarnings("unchecked")
@@ -136,8 +143,8 @@ public class ImVector<E> {
             if (i >= tailoff())
                 return tail;
             Node node = root;
-            for (int level = shift; level > 0; level -= SINGLE_NODE_ADDRESS_BIT_WIDTH)
-                node = (Node) node.array[(i >>> level) & FIVE_LOWEST_BITS];
+            for (int level = shift; level > 0; level -= NODE_LENGTH_POW_2)
+                node = (Node) node.array[(i >>> level) & LOW_BITS];
             return (E[]) node.array;
         }
         throw new IndexOutOfBoundsException();
@@ -145,7 +152,7 @@ public class ImVector<E> {
 
     public E nth(int i) {
         E[] node = arrayFor(i);
-        return node[i & FIVE_LOWEST_BITS];
+        return node[i & LOW_BITS];
     }
 
     public E nth(int i, E notFound) {
@@ -155,17 +162,17 @@ public class ImVector<E> {
     }
 
     @SuppressWarnings("unchecked")
-    public ImVector<E> assocN(int i, E val) {
+    public Vecsicle<E> assocN(int i, E val) {
         if (i >= 0 && i < size) {
             if (i >= tailoff()) {
                 Object[] newTail = new Object[tail.length];
                 System.arraycopy(tail, 0, newTail, 0, tail.length);
-                newTail[i & FIVE_LOWEST_BITS] = val;
+                newTail[i & LOW_BITS] = val;
 
-                return new ImVector<>(size, shift, root, (E[]) newTail);
+                return new Vecsicle<>(size, shift, root, (E[]) newTail);
             }
 
-            return new ImVector<>(size, shift, doAssoc(shift, root, i, val), tail);
+            return new Vecsicle<>(size, shift, doAssoc(shift, root, i, val), tail);
         }
         if (i == size) {
             return cons(val);
@@ -176,28 +183,28 @@ public class ImVector<E> {
     public int size() { return size; }
 
     @SuppressWarnings("unchecked")
-    public ImVector<E> cons(E val) {
+    public Vecsicle<E> cons(E val) {
         //room in tail?
         //	if(tail.length < MAX_NODE_LENGTH)
         if (size - tailoff() < MAX_NODE_LENGTH) {
             Object[] newTail = new Object[tail.length + 1];
             System.arraycopy(tail, 0, newTail, 0, tail.length);
             newTail[tail.length] = val;
-            return new ImVector<>(size + 1, shift, root, (E[]) newTail);
+            return new Vecsicle<>(size + 1, shift, root, (E[]) newTail);
         }
         //full tail, push into tree
         Node newroot;
         Node tailnode = new Node(root.edit, tail);
         int newshift = shift;
         //overflow root?
-        if ((size >>> SINGLE_NODE_ADDRESS_BIT_WIDTH) > (1 << shift)) {
+        if ((size >>> NODE_LENGTH_POW_2) > (1 << shift)) {
             newroot = new Node(root.edit);
             newroot.array[0] = root;
             newroot.array[1] = newPath(root.edit, shift, tailnode);
-            newshift += SINGLE_NODE_ADDRESS_BIT_WIDTH;
+            newshift += NODE_LENGTH_POW_2;
         } else
             newroot = pushTail(shift, root, tailnode);
-        return new ImVector<>(size + 1, newshift, newroot, (E[]) new Object[]{val});
+        return new Vecsicle<>(size + 1, newshift, newroot, (E[]) new Object[]{val});
     }
 
     private Node pushTail(int level, Node parent, Node tailnode) {
@@ -205,16 +212,16 @@ public class ImVector<E> {
         // else does it map to an existing child? -> nodeToInsert = pushNode one more level
         // else alloc new path
         //return  nodeToInsert placed in copy of parent
-        int subidx = ((size - 1) >>> level) & FIVE_LOWEST_BITS;
+        int subidx = ((size - 1) >>> level) & LOW_BITS;
         Node ret = new Node(parent.edit, parent.array.clone());
         Node nodeToInsert;
-        if (level == SINGLE_NODE_ADDRESS_BIT_WIDTH) {
+        if (level == NODE_LENGTH_POW_2) {
             nodeToInsert = tailnode;
         } else {
             Node child = (Node) parent.array[subidx];
             nodeToInsert = (child != null) ?
-                    pushTail(level - SINGLE_NODE_ADDRESS_BIT_WIDTH, child, tailnode)
-                    : newPath(root.edit, level - SINGLE_NODE_ADDRESS_BIT_WIDTH, tailnode);
+                    pushTail(level - NODE_LENGTH_POW_2, child, tailnode)
+                    : newPath(root.edit, level - NODE_LENGTH_POW_2, tailnode);
         }
         ret.array[subidx] = nodeToInsert;
         return ret;
@@ -237,7 +244,7 @@ public class ImVector<E> {
                     array = arrayFor(i);
                     base += MAX_NODE_LENGTH;
                 }
-                return array[i++ & FIVE_LOWEST_BITS];
+                return array[i++ & LOW_BITS];
             }
 
             @Override
@@ -274,7 +281,7 @@ public class ImVector<E> {
 //    }
 
     @SuppressWarnings("unchecked")
-    public ImVector<E> pop() {
+    public Vecsicle<E> pop() {
         if (size == 0)
             throw new IllegalStateException("Can't pop empty vector");
         if (size == 1)
@@ -283,7 +290,7 @@ public class ImVector<E> {
         if (size - tailoff() > 1) {
             E[] newTail = (E[]) new Object[tail.length - 1];
             System.arraycopy(tail, 0, newTail, 0, newTail.length);
-            return new ImVector<>(size - 1, shift, root, newTail);
+            return new Vecsicle<>(size - 1, shift, root, newTail);
         }
         E[] newtail = arrayFor(size - 2);
 
@@ -292,17 +299,17 @@ public class ImVector<E> {
         if (newroot == null) {
             newroot = EMPTY_NODE;
         }
-        if (shift > SINGLE_NODE_ADDRESS_BIT_WIDTH && newroot.array[1] == null) {
+        if (shift > NODE_LENGTH_POW_2 && newroot.array[1] == null) {
             newroot = (Node) newroot.array[0];
-            newshift -= SINGLE_NODE_ADDRESS_BIT_WIDTH;
+            newshift -= NODE_LENGTH_POW_2;
         }
-        return new ImVector<>(size - 1, newshift, newroot, newtail);
+        return new Vecsicle<>(size - 1, newshift, newroot, newtail);
     }
 
     private Node popTail(int level, Node node) {
-        int subidx = ((size - 2) >>> level) & FIVE_LOWEST_BITS;
-        if (level > SINGLE_NODE_ADDRESS_BIT_WIDTH) {
-            Node newchild = popTail(level - SINGLE_NODE_ADDRESS_BIT_WIDTH, (Node) node.array[subidx]);
+        int subidx = ((size - 2) >>> level) & LOW_BITS;
+        if (level > NODE_LENGTH_POW_2) {
+            Node newchild = popTail(level - NODE_LENGTH_POW_2, (Node) node.array[subidx]);
             if (newchild == null && subidx == 0)
                 return null;
             else {
@@ -322,19 +329,20 @@ public class ImVector<E> {
     private static Node doAssoc(int level, Node node, int i, Object val) {
         Node ret = new Node(node.edit, node.array.clone());
         if (level == 0) {
-            ret.array[i & FIVE_LOWEST_BITS] = val;
+            ret.array[i & LOW_BITS] = val;
         } else {
-            int subidx = (i >>> level) & FIVE_LOWEST_BITS;
-            ret.array[subidx] = doAssoc(level - SINGLE_NODE_ADDRESS_BIT_WIDTH, (Node) node.array[subidx], i, val);
+            int subidx = (i >>> level) & LOW_BITS;
+            ret.array[subidx] = doAssoc(level - NODE_LENGTH_POW_2, (Node) node.array[subidx], i, val);
         }
         return ret;
     }
 
     private static Node newPath(AtomicReference<Thread> edit, int level, Node node) {
-        if (level == 0)
+        if (level == 0) {
             return node;
+        }
         Node ret = new Node(edit);
-        ret.array[0] = newPath(edit, level - SINGLE_NODE_ADDRESS_BIT_WIDTH, node);
+        ret.array[0] = newPath(edit, level - NODE_LENGTH_POW_2, node);
         return ret;
     }
 
@@ -363,7 +371,7 @@ public class ImVector<E> {
 
         private TransientVector(int c, int s, Node r, F[] t) { size = c; shift = s; root = r; tail = t; }
 
-        private TransientVector(ImVector<F> v) { this(v.size, v.shift, editableRoot(v.root), editableTail(v.tail)); }
+        private TransientVector(Vecsicle<F> v) { this(v.size, v.shift, editableRoot(v.root), editableTail(v.tail)); }
 
         private Node ensureEditable(Node node) {
             if (node.edit == root.edit)
@@ -385,7 +393,7 @@ public class ImVector<E> {
         }
 
         @SuppressWarnings("unchecked")
-        public ImVector<F> persistent() {
+        public Vecsicle<F> persistent() {
             ensureEditable();
             //		Thread owner = root.edit.get();
             //		if(owner != null && owner != Thread.currentThread())
@@ -395,7 +403,7 @@ public class ImVector<E> {
             root.edit.set(null);
             F[] trimmedTail = (F[]) new Object[size - tailoff()];
             System.arraycopy(tail, 0, trimmedTail, 0, trimmedTail.length);
-            return new ImVector<>(size, shift, root, trimmedTail);
+            return new Vecsicle<>(size, shift, root, trimmedTail);
         }
 
         @SuppressWarnings("unchecked")
@@ -404,7 +412,7 @@ public class ImVector<E> {
             int i = size;
             //room in tail?
             if (i - tailoff() < MAX_NODE_LENGTH) {
-                tail[i & FIVE_LOWEST_BITS] = val;
+                tail[i & LOW_BITS] = val;
                 ++size;
                 return this;
             }
@@ -415,11 +423,11 @@ public class ImVector<E> {
             tail[0] = val;
             int newshift = shift;
             //overflow root?
-            if ((size >>> SINGLE_NODE_ADDRESS_BIT_WIDTH) > (1 << shift)) {
+            if ((size >>> NODE_LENGTH_POW_2) > (1 << shift)) {
                 newroot = new Node(root.edit);
                 newroot.array[0] = root;
                 newroot.array[1] = newPath(root.edit, shift, tailnode);
-                newshift += SINGLE_NODE_ADDRESS_BIT_WIDTH;
+                newshift += NODE_LENGTH_POW_2;
             } else
                 newroot = pushTail(shift, root, tailnode);
             root = newroot;
@@ -436,29 +444,31 @@ public class ImVector<E> {
             // else alloc new path
             //return  nodeToInsert placed in parent
             parent = ensureEditable(parent);
-            int subidx = ((size - 1) >>> level) & FIVE_LOWEST_BITS;
+            int subidx = ((size - 1) >>> level) & LOW_BITS;
             Node ret = parent;
             Node nodeToInsert;
-            if (level == SINGLE_NODE_ADDRESS_BIT_WIDTH) {
+            if (level == NODE_LENGTH_POW_2) {
                 nodeToInsert = tailnode;
             } else {
                 Node child = (Node) parent.array[subidx];
                 nodeToInsert = (child != null) ?
-                        pushTail(level - SINGLE_NODE_ADDRESS_BIT_WIDTH, child, tailnode)
-                        : newPath(root.edit, level - SINGLE_NODE_ADDRESS_BIT_WIDTH, tailnode);
+                        pushTail(level - NODE_LENGTH_POW_2, child, tailnode)
+                        : newPath(root.edit, level - NODE_LENGTH_POW_2, tailnode);
             }
             ret.array[subidx] = nodeToInsert;
             return ret;
         }
 
-        // Sort-of almost returns the high (above 5) bits of the size.  I don't fully understand this.
+        // Returns the high (gt 5) bits of the index of the last item.
+        // I think this is the index of the start of the last array in the tree.
         final private int tailoff() {
             // ((size - 1) / 32) * 32
-            // This does something like zeroing the low 5 bits, but not quite.
-            // I'm not sure what the -1 is for.  Is this like some kind of division by a non-base-2 number?
+            // (Size - 1) is an index into an array because size starts counting from 1 and array indicies start from 0.
+            // /32 *32 zeroes out the low 5 bits.
             return (size < MAX_NODE_LENGTH)
                     ? 0
-                    : ((size - 1) >>> SINGLE_NODE_ADDRESS_BIT_WIDTH) << SINGLE_NODE_ADDRESS_BIT_WIDTH;
+                    : ((size - 1) >>> NODE_LENGTH_POW_2) << NODE_LENGTH_POW_2;
+            // Last line can be replaced with (size -1) & HIGH_BITS
         }
 
         @SuppressWarnings("unchecked")
@@ -468,8 +478,8 @@ public class ImVector<E> {
                     return tail;
                 }
                 Node node = root;
-                for (int level = shift; level > 0; level -= SINGLE_NODE_ADDRESS_BIT_WIDTH) {
-                    node = (Node) node.array[(i >>> level) & FIVE_LOWEST_BITS];
+                for (int level = shift; level > 0; level -= NODE_LENGTH_POW_2) {
+                    node = (Node) node.array[(i >>> level) & LOW_BITS];
                 }
                 return (F[]) node.array;
             }
@@ -482,8 +492,8 @@ public class ImVector<E> {
                 if (i >= tailoff())
                     return tail;
                 Node node = root;
-                for (int level = shift; level > 0; level -= SINGLE_NODE_ADDRESS_BIT_WIDTH)
-                    node = ensureEditable((Node) node.array[(i >>> level) & FIVE_LOWEST_BITS]);
+                for (int level = shift; level > 0; level -= NODE_LENGTH_POW_2)
+                    node = ensureEditable((Node) node.array[(i >>> level) & LOW_BITS]);
                 return (F[]) node.array;
             }
             throw new IndexOutOfBoundsException();
@@ -492,7 +502,7 @@ public class ImVector<E> {
         public F nth(int i) {
             ensureEditable();
             F[] node = arrayFor(i);
-            return node[i & FIVE_LOWEST_BITS];
+            return node[i & LOW_BITS];
         }
 
         public F nth(int i, F notFound) {
@@ -511,7 +521,7 @@ public class ImVector<E> {
             ensureEditable();
             if (i >= 0 && i < size) {
                 if (i >= tailoff()) {
-                    tail[i & FIVE_LOWEST_BITS] = val;
+                    tail[i & LOW_BITS] = val;
                     return this;
                 }
 
@@ -537,10 +547,10 @@ public class ImVector<E> {
             node = ensureEditable(node);
             Node ret = node;
             if (level == 0) {
-                ret.array[i & FIVE_LOWEST_BITS] = val;
+                ret.array[i & LOW_BITS] = val;
             } else {
-                int subidx = (i >>> level) & FIVE_LOWEST_BITS;
-                ret.array[subidx] = doAssoc(level - SINGLE_NODE_ADDRESS_BIT_WIDTH, (Node) node.array[subidx], i, val);
+                int subidx = (i >>> level) & LOW_BITS;
+                ret.array[subidx] = doAssoc(level - NODE_LENGTH_POW_2, (Node) node.array[subidx], i, val);
             }
             return ret;
         }
@@ -556,7 +566,7 @@ public class ImVector<E> {
             }
             int i = size - 1;
             //pop in tail?
-            if ((i & FIVE_LOWEST_BITS) > 0) {
+            if ((i & LOW_BITS) > 0) {
                 --size;
                 return this;
             }
@@ -568,9 +578,9 @@ public class ImVector<E> {
             if (newroot == null) {
                 newroot = new Node(root.edit);
             }
-            if (shift > SINGLE_NODE_ADDRESS_BIT_WIDTH && newroot.array[1] == null) {
+            if (shift > NODE_LENGTH_POW_2 && newroot.array[1] == null) {
                 newroot = ensureEditable((Node) newroot.array[0]);
-                newshift -= SINGLE_NODE_ADDRESS_BIT_WIDTH;
+                newshift -= NODE_LENGTH_POW_2;
             }
             root = newroot;
             shift = newshift;
@@ -582,9 +592,9 @@ public class ImVector<E> {
         @SuppressWarnings("unchecked")
         private Node popTail(int level, Node node) {
             node = ensureEditable(node);
-            int subidx = ((size - 2) >>> level) & FIVE_LOWEST_BITS;
-            if (level > SINGLE_NODE_ADDRESS_BIT_WIDTH) {
-                Node newchild = popTail(level - SINGLE_NODE_ADDRESS_BIT_WIDTH, (Node) node.array[subidx]);
+            int subidx = ((size - 2) >>> level) & LOW_BITS;
+            if (level > NODE_LENGTH_POW_2) {
+                Node newchild = popTail(level - NODE_LENGTH_POW_2, (Node) node.array[subidx]);
                 if (newchild == null && subidx == 0)
                     return null;
                 else {

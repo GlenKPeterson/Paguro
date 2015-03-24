@@ -3,16 +3,16 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.organicdesign.fp</groupId>
-	<artifactId>J-cicle</artifactId>
+	<artifactId>J-sicle</artifactId>
 	<version>0.8.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>J-cicle</name>
+	<name>J-sicle</name>
 	<description>Functional Programming Tools for Java (formerly fp4java7).
 		Non-destructive (mutation-free), lazy, (higher order) functional data
 		transformations for Java 8.  Allows loop-free functional programming.
 		Additional general purpose functional tools are provided.</description>
-	<url>https://github.com/GlenKPeterson/J-cicle</url>
+	<url>https://github.com/GlenKPeterson/J-sicle</url>
 
 	<licenses>
 		<license>

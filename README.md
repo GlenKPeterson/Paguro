@@ -1,4 +1,4 @@
-Formerly called fp4java7, J-cicle (pronounced "Jay-sick-ul" like Java-icicle) is about limiting mutation and replacing loops with lazy transformations.
+Formerly called fp4java7, J-sicle (pronounced "Jay-sick-ul" like Java-popsicle) is about limiting mutation and replacing loops with lazy transformations.
 
 You are on the Java 8 branch of this project.  If you're using Java 7 or earlier, get the Java 7 legacy support branch from here:
 https://github.com/GlenKPeterson/fp4java7/tree/java7
@@ -8,7 +8,7 @@ https://github.com/GlenKPeterson/fp4java7/tree/java7
 How hard is it to create an immutable, type safe map in Java?  Are you tired of writing code like this:
 http://glenpeterson.blogspot.com/2013/07/immutable-java-with-lists-and-other.html
 
-Like Guava, J-cicle cuts through the boilerplate:
+Like Guava, J-sicle cuts through the boilerplate:
 ```java
 Map<String,Integer> sToI = uMap(
         "One", 1,
