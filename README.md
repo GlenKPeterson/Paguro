@@ -1,4 +1,4 @@
-Formerly called fp4java7, J-sicle (pronounced "Jay-sick-ul" like Java-popsicle) is about limiting mutation and replacing loops with lazy transformations.
+Formerly called fp4java7, J-sicle (pronounced "Jay-sick-ul" like a frozen/immutable Java-popsicle) is about limiting mutation and replacing loops with lazy transformations.
 
 You are on the Java 8 branch of this project.  If you're using Java 7 or earlier, get the Java 7 legacy support branch from here:
 https://github.com/GlenKPeterson/fp4java7/tree/java7
@@ -225,9 +225,13 @@ a,b,c...
 None of those are simple uses of interpose.
 
 #Licenses
-Most of this work is licensed under the Apache 2.0 license.  However, the persistent collections (in the expiraments/collections folder as of 2015-03-24) are originally copied from, and still based on, the Clojure source code by Rich Hickey which is released under the Eclipse Distribution License (as of fall 2014).  These versions of that code are derivative works and must remain under that license.
+Java&trade; is a registered trademark of the Oracle Corporation in the US and other countries.  J-sicle is not part of Java.  Oracle in no way affiliated with the J-sicle project.
 
-I am not a lawyer and this is not legal advice.  The EPL and Apache licenses have a similar intent.  Each project lists the other license as being compatible.  If I am somehow disrespectful of other people's contributions or their licenses, I trust you will let me know.
+This work is licensed under both the Apache 2.0 license and the Eclipse Public License.  You must comply with the rules of both licenses (you don't get to choose).  New contributions should be made under the Apache 2.0 license whenever practical.
+
+Most of this work is licensed under the Apache 2.0 license.  However, the persistent collections (Vecsicle, Mapsicle, Setsicle, etc. in the expiraments/collections folder as of 2015-03-24) are originally copied from, and still based on, the Clojure source code by Rich Hickey which is released under the Eclipse Public License (as of fall 2014).  Those files will always be derivative works and must remain under the EPL license unless the original authors chooses a new license.
+
+I am not a lawyer and this is not legal advice.  Both the EPL and Apache projects list each other's license as being compatible.  I am not aware of a clear difference between them, or a reason why works written under the two licenses cannot be combined.
 
 As of 2015-03-24, the following statements made me think the Apache and EPL licenses were compatible.
 
@@ -236,9 +240,13 @@ As of 2015-03-24, the following statements made me think the Apache and EPL lice
 > are considered to be similar in terms to the Apache License 2.0?
 >
 > Works under the following licenses may be included within Apache products:
+>
 > ...
+>
 > Eclipse Distribution License 1.0
+>
 > ...
+>
 > Many of these licenses have specific attribution terms that need to be
 > adhered to, for example CC-A, often by adding them to the NOTICE file. Ensure
 > you are doing this when including these works. Note, this list is
@@ -260,8 +268,11 @@ Source (as of 2015-03-24): https://www.apache.org/legal/resolved
 >
 > The current list of licenses approved for use by third-party code
 > redistributed by Eclipse projects is:
+>
 > Apache Software License 1.1
+>
 > Apache Software License 2.0
+>
 > ...
 
 Source (as of 2015-03-24): https://eclipse.org/legal/eplfaq.php#3RDPARTY
