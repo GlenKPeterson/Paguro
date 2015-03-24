@@ -225,11 +225,11 @@ a,b,c...
 None of those are simple uses of interpose.
 
 #Licenses
-Java&trade; is a registered trademark of the Oracle Corporation in the US and other countries.  J-sicle is not part of Java.  Oracle in no way affiliated with the J-sicle project.
+Java&trade; is a registered trademark of the Oracle Corporation in the US and other countries.  J-sicle is not part of Java.  Oracle is in no way affiliated with the J-sicle project.
 
 This work is licensed under both the Apache 2.0 license and the Eclipse Public License.  You must comply with the rules of both licenses (you don't get to choose).  New contributions should be made under the Apache 2.0 license whenever practical.
 
-Most of this work is licensed under the Apache 2.0 license.  However, the persistent collections (Vecsicle, Mapsicle, Setsicle, etc. in the expiraments/collections folder as of 2015-03-24) are originally copied from, and still based on, the Clojure source code by Rich Hickey which is released under the Eclipse Public License (as of fall 2014).  Those files will always be derivative works and must remain under the EPL license unless the original authors chooses a new license.
+Most of this work is licensed under the Apache 2.0 license.  However, the persistent collections (Vec-sicle, Mapsicle, Setsicle, etc. in the expiraments/collections folder as of 2015-03-24) are originally copied from, and still based on, the Clojure source code by Rich Hickey which is released under the Eclipse Public License (as of fall 2014).  Those files are derivative works and must remain under the EPL license unless the original authors chooses a new license.
 
 I am not a lawyer and this is not legal advice.  Both the EPL and Apache projects list each other's license as being compatible.  I am not aware of a clear difference between them, or a reason why works written under the two licenses cannot be combined.
 
