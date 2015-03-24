@@ -23,11 +23,11 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
-        <module name="J-cicle" />
+        <module name="J-sicle" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="J-cicle" target="1.8" />
+      <module name="J-sicle" target="1.8" />
     </bytecodeTargetLevel>
   </component>
   <component name="CopyrightManager" default="" />
@@ -143,7 +143,7 @@
   </component>
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/J-cicle.iml" filepath="$PROJECT_DIR$/J-cicle.iml" />
+      <module fileurl="file://$PROJECT_DIR$/J-sicle.iml" filepath="$PROJECT_DIR$/J-sicle.iml" />
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
