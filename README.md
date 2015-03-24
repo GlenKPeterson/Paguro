@@ -183,14 +183,14 @@ Use LazyRef to re-implement Sequence classes much more simply.
 I think what I'm calling foldLeft actually processes items in order like foldRight.  I should either fix it to process items in reverse order, or rename it.  You can see this if you pass it the cons() function.
 
 Collection Variations:
- - Mutable vs. Immutable
- - Lazy vs. Eager
- - Persistent vs. Ephemeral
+ - Immutable vs. Mutable (Persistent vs. Ephemeral) and Permitting lightweight copies
  - Finite vs. Infinite (finite sub-categories: fits in memory or not)
+ - Heterogenious vs. Homogenious
  - Write-only Builder with read-only collection?
- - Permitting lightweight copies (goes well with Immutable)
- - Type-safe
- - Thread-safe
+ - Thread-safe vs. unsafe
+
+Transform Variations:
+ - Lazy vs. Eager
 
 Update Sequence to have all the transforms that View does.
 
