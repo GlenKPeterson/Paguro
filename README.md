@@ -180,6 +180,8 @@ Added unit tests for the above.
 
 Use LazyRef to re-implement Sequence classes much more simply.
 
+I think what I'm calling foldLeft actually processes items in order like foldRight.  I should either fix it to process items in reverse order, or rename it.  You can see this if you pass it the cons() function.
+
 Collection Variations:
  - Mutable vs. Immutable
  - Lazy vs. Eager
