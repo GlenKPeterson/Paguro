@@ -223,3 +223,45 @@ a, b, c, and d.
 a,b,c...
 
 None of those are simple uses of interpose.
+
+#Licenses
+Most of this work is licensed under the Apache 2.0 license.  However, the persistent collections (in the expiraments/collections folder as of 2015-03-24) are originally copied from, and still based on, the Clojure source code by Rich Hickey which is released under the Eclipse Distribution License (as of fall 2014).  These versions of that code are derivative works and must remain under that license.
+
+I am not a lawyer and this is not legal advice.  The EPL and Apache licenses have a similar intent.  Each project lists the other license as being compatible.  If I am somehow disrespectful of other people's contributions or their licenses, I trust you will let me know.
+
+As of 2015-03-24, the following statements made me think the Apache and EPL licenses were compatible.
+
+###From Apache
+> For the purposes of being a dependency to an Apache product, which licenses
+> are considered to be similar in terms to the Apache License 2.0?
+>
+> Works under the following licenses may be included within Apache products:
+> ...
+> Eclipse Distribution License 1.0
+> ...
+> Many of these licenses have specific attribution terms that need to be
+> adhered to, for example CC-A, often by adding them to the NOTICE file. Ensure
+> you are doing this when including these works. Note, this list is
+> colloquially known as the Category A list.
+
+Source (as of 2015-03-24): https://www.apache.org/legal/resolved
+
+###From Eclipse
+> What licenses are acceptable for third-party code redistributed by Eclipse
+> projects?
+>
+> Eclipse views license compatibility through the lens of enabling successful
+> commercial adoption of Eclipse technology in software products and services.
+> We wish to create a commercial ecosystem based on the redistribution of
+> Eclipse software technologies in commercially licensed software products.
+> Determining whether a license for third-party code is acceptable often
+> requires the input and advice of Eclipse’s legal advisors. If you have any
+> questions, please contact license@eclipse.org.
+>
+> The current list of licenses approved for use by third-party code
+> redistributed by Eclipse projects is:
+> Apache Software License 1.1
+> Apache Software License 2.0
+> ...
+
+Source (as of 2015-03-24): https://eclipse.org/legal/eplfaq.php#3RDPARTY
