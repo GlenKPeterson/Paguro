@@ -8,16 +8,16 @@
 	ImmutableJava is not allowed because Java is a registered trademark of Oracle and specifically prohibited from
 	the names of Java-related products.
 	-->
-	<artifactId>J-sicle</artifactId>
+	<artifactId>J-cicle</artifactId>
 	<version>0.8.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>J-sicle</name>
+	<name>J-cicle</name>
 	<description>Functional Programming Tools for Java (formerly fp4java7).
 		Non-destructive (mutation-free), lazy, (higher order) functional data
 		transformations for Java 8.  Allows loop-free functional programming.
 		Additional general purpose functional tools are provided.</description>
-	<url>https://github.com/GlenKPeterson/J-sicle</url>
+	<url>https://github.com/GlenKPeterson/J-cicle</url>
 
 	<licenses>
 		<license>

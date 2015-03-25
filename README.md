@@ -1,4 +1,4 @@
-Formerly called fp4java7, J-sicle (pronounced "Jay-sick-ul" like a frozen/immutable Java-popsicle) is about limiting mutation and replacing loops with lazy transformations.
+Formerly called fp4java7, J-cicle (pronounced "Jay-sick-ul" like a frozen/immutable Java-icicle) is about limiting mutation and replacing loops with lazy transformations.
 
 You are on the Java 8 branch of this project.  If you're using Java 7 or earlier, get the Java 7 legacy support branch from here:
 https://github.com/GlenKPeterson/fp4java7/tree/java7
@@ -8,7 +8,7 @@ https://github.com/GlenKPeterson/fp4java7/tree/java7
 How hard is it to create an immutable, type safe map in Java?  Are you tired of writing code like this:
 http://glenpeterson.blogspot.com/2013/07/immutable-java-with-lists-and-other.html
 
-Like Guava, J-sicle cuts through the boilerplate:
+Like Guava, J-cicle cuts through the boilerplate:
 ```java
 Map<String,Integer> sToI = uMap(
         "One", 1,
@@ -227,7 +227,7 @@ a,b,c...
 None of those are simple uses of interpose.
 
 #Licenses
-Java&trade; is a registered trademark of the Oracle Corporation in the US and other countries.  J-sicle is not part of Java.  Oracle is in no way affiliated with the J-sicle project.
+Java&trade; is a registered trademark of the Oracle Corporation in the US and other countries.  J-cicle is not part of Java.  Oracle is in no way affiliated with the J-cicle project.
 
 This work is licensed under both the Apache 2.0 license and the Eclipse Public License.  You must comply with the rules of both licenses (you don't get to choose).  New contributions should be made under the Apache 2.0 license whenever practical.
 
