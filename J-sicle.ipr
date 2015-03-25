@@ -31,95 +31,87 @@
     </bytecodeTargetLevel>
   </component>
   <component name="CopyrightManager" default="" />
-  <component name="DaemonCodeAnalyzer">
-    <disable_hints />
-  </component>
-  <component name="DependencyValidationManager">
-    <option name="SKIP_IMPORT_STATEMENTS" value="false" />
-  </component>
-  <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false">
+  <component name="Encoding">
     <file url="file://$PROJECT_DIR$" charset="UTF-8" />
   </component>
   <component name="EntryPointsManager">
     <entry_points version="2.0" />
   </component>
   <component name="InspectionProjectProfileManager">
-    <profiles>
-      <profile version="1.0" is_locked="false">
-        <option name="myName" value="Project Default" />
-        <option name="myLocal" value="false" />
-        <inspection_tool class="ConditionalExpressionWithIdenticalBranches" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="EqualsBetweenInconvertibleTypes" enabled="true" level="INFO" enabled_by_default="true" />
-        <inspection_tool class="FinalPrivateMethod" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="FinalStaticMethod" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="ForCanBeForeach" enabled="true" level="INFO" enabled_by_default="true">
-          <option name="REPORT_INDEXED_LOOP" value="true" />
-          <option name="ignoreUntypedCollections" value="false" />
-        </inspection_tool>
-        <inspection_tool class="HtmlPresentationalElement" enabled="true" level="INFO" enabled_by_default="true" />
-        <inspection_tool class="JavaDoc" enabled="true" level="INFO" enabled_by_default="true">
-          <option name="TOP_LEVEL_CLASS_OPTIONS">
-            <value>
-              <option name="ACCESS_JAVADOC_REQUIRED_FOR" value="none" />
-              <option name="REQUIRED_TAGS" value="" />
-            </value>
-          </option>
-          <option name="INNER_CLASS_OPTIONS">
-            <value>
-              <option name="ACCESS_JAVADOC_REQUIRED_FOR" value="none" />
-              <option name="REQUIRED_TAGS" value="" />
-            </value>
-          </option>
-          <option name="METHOD_OPTIONS">
-            <value>
-              <option name="ACCESS_JAVADOC_REQUIRED_FOR" value="none" />
-              <option name="REQUIRED_TAGS" value="@return@param@throws or @exception" />
-            </value>
-          </option>
-          <option name="FIELD_OPTIONS">
-            <value>
-              <option name="ACCESS_JAVADOC_REQUIRED_FOR" value="none" />
-              <option name="REQUIRED_TAGS" value="" />
-            </value>
-          </option>
-          <option name="IGNORE_DEPRECATED" value="false" />
-          <option name="IGNORE_JAVADOC_PERIOD" value="true" />
-          <option name="IGNORE_DUPLICATED_THROWS" value="false" />
-          <option name="IGNORE_POINT_TO_ITSELF" value="false" />
-          <option name="myAdditionalJavadocTags" value="" />
-        </inspection_tool>
-        <inspection_tool class="JavadocReference" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="MissingOverrideAnnotation" enabled="true" level="WARNING" enabled_by_default="true">
-          <option name="ignoreObjectMethods" value="true" />
-          <option name="ignoreAnonymousClassMethods" value="false" />
-        </inspection_tool>
-        <inspection_tool class="QuirksModeInspectionTool" enabled="true" level="WARNING" enabled_by_default="true">
-          <option name="IE50" value="false" />
-          <option name="IE55" value="false" />
-          <option name="IE6" value="true" />
-          <option name="IE7" value="true" />
-          <option name="IE_MAC" value="false" />
-          <option name="MOZILLA" value="true" />
-          <option name="OPERA7" value="false" />
-          <option name="OPERA8" value="false" />
-          <option name="OPERA85" value="true" />
-          <option name="OPERA9" value="true" />
-          <option name="SAFARI" value="true" />
-        </inspection_tool>
-        <inspection_tool class="RedundantFieldInitialization" enabled="false" level="INFO" enabled_by_default="false" />
-        <inspection_tool class="SimplifiableConditionalExpression" enabled="false" level="INFO" enabled_by_default="false" />
-        <inspection_tool class="SimplifiableIfStatement" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="UnnecessaryBoxing" enabled="true" level="INFO" enabled_by_default="true" />
-        <inspection_tool class="UnnecessarySemicolon" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="UnnecessaryUnboxing" enabled="true" level="INFO" enabled_by_default="true" />
-        <inspection_tool class="UnusedAssignment" enabled="true" level="WARNING" enabled_by_default="true">
-          <option name="REPORT_PREFIX_EXPRESSIONS" value="false" />
-          <option name="REPORT_POSTFIX_EXPRESSIONS" value="true" />
-          <option name="REPORT_REDUNDANT_INITIALIZER" value="false" />
-        </inspection_tool>
-        <inspection_tool class="WhileCanBeForeach" enabled="true" level="INFO" enabled_by_default="true" />
-      </profile>
-    </profiles>
+    <profile version="1.0">
+      <option name="myName" value="Project Default" />
+      <option name="myLocal" value="true" />
+      <inspection_tool class="ConditionalExpressionWithIdenticalBranches" enabled="true" level="WARNING" enabled_by_default="true" />
+      <inspection_tool class="EqualsBetweenInconvertibleTypes" enabled="true" level="INFO" enabled_by_default="true" />
+      <inspection_tool class="FinalPrivateMethod" enabled="false" level="WARNING" enabled_by_default="false" />
+      <inspection_tool class="FinalStaticMethod" enabled="false" level="WARNING" enabled_by_default="false" />
+      <inspection_tool class="ForCanBeForeach" enabled="true" level="INFO" enabled_by_default="true">
+        <option name="REPORT_INDEXED_LOOP" value="true" />
+        <option name="ignoreUntypedCollections" value="false" />
+      </inspection_tool>
+      <inspection_tool class="HtmlPresentationalElement" enabled="true" level="INFO" enabled_by_default="true" />
+      <inspection_tool class="JavaDoc" enabled="true" level="INFO" enabled_by_default="true">
+        <option name="TOP_LEVEL_CLASS_OPTIONS">
+          <value>
+            <option name="ACCESS_JAVADOC_REQUIRED_FOR" value="none" />
+            <option name="REQUIRED_TAGS" value="" />
+          </value>
+        </option>
+        <option name="INNER_CLASS_OPTIONS">
+          <value>
+            <option name="ACCESS_JAVADOC_REQUIRED_FOR" value="none" />
+            <option name="REQUIRED_TAGS" value="" />
+          </value>
+        </option>
+        <option name="METHOD_OPTIONS">
+          <value>
+            <option name="ACCESS_JAVADOC_REQUIRED_FOR" value="none" />
+            <option name="REQUIRED_TAGS" value="@return@param@throws or @exception" />
+          </value>
+        </option>
+        <option name="FIELD_OPTIONS">
+          <value>
+            <option name="ACCESS_JAVADOC_REQUIRED_FOR" value="none" />
+            <option name="REQUIRED_TAGS" value="" />
+          </value>
+        </option>
+        <option name="IGNORE_DEPRECATED" value="false" />
+        <option name="IGNORE_JAVADOC_PERIOD" value="true" />
+        <option name="IGNORE_DUPLICATED_THROWS" value="false" />
+        <option name="IGNORE_POINT_TO_ITSELF" value="false" />
+        <option name="myAdditionalJavadocTags" value="" />
+      </inspection_tool>
+      <inspection_tool class="JavadocReference" enabled="true" level="WARNING" enabled_by_default="true" />
+      <inspection_tool class="MissingOverrideAnnotation" enabled="true" level="WARNING" enabled_by_default="true">
+        <option name="ignoreObjectMethods" value="true" />
+        <option name="ignoreAnonymousClassMethods" value="false" />
+      </inspection_tool>
+      <inspection_tool class="QuirksModeInspectionTool" enabled="true" level="WARNING" enabled_by_default="true">
+        <option name="IE50" value="false" />
+        <option name="IE55" value="false" />
+        <option name="IE6" value="true" />
+        <option name="IE7" value="true" />
+        <option name="IE_MAC" value="false" />
+        <option name="MOZILLA" value="true" />
+        <option name="OPERA7" value="false" />
+        <option name="OPERA8" value="false" />
+        <option name="OPERA85" value="true" />
+        <option name="OPERA9" value="true" />
+        <option name="SAFARI" value="true" />
+      </inspection_tool>
+      <inspection_tool class="RedundantFieldInitialization" enabled="false" level="INFO" enabled_by_default="false" />
+      <inspection_tool class="SimplifiableConditionalExpression" enabled="false" level="INFO" enabled_by_default="false" />
+      <inspection_tool class="SimplifiableIfStatement" enabled="false" level="WARNING" enabled_by_default="false" />
+      <inspection_tool class="UnnecessaryBoxing" enabled="true" level="INFO" enabled_by_default="true" />
+      <inspection_tool class="UnnecessarySemicolon" enabled="false" level="WARNING" enabled_by_default="false" />
+      <inspection_tool class="UnnecessaryUnboxing" enabled="true" level="INFO" enabled_by_default="true" />
+      <inspection_tool class="UnusedAssignment" enabled="true" level="WARNING" enabled_by_default="true">
+        <option name="REPORT_PREFIX_EXPRESSIONS" value="false" />
+        <option name="REPORT_POSTFIX_EXPRESSIONS" value="true" />
+        <option name="REPORT_REDUNDANT_INITIALIZER" value="false" />
+      </inspection_tool>
+      <inspection_tool class="WhileCanBeForeach" enabled="true" level="INFO" enabled_by_default="true" />
+    </profile>
     <option name="PROJECT_PROFILE" value="Project Default" />
     <option name="USE_PROJECT_PROFILE" value="true" />
     <version value="1.0" />
@@ -148,83 +140,6 @@
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
-  </component>
-  <component name="PropertiesComponent">
-    <property name="GoToClass.includeLibraries" value="false" />
-    <property name="GoToClass.toSaveIncludeLibraries" value="false" />
-    <property name="GoToFile.includeJavaFiles" value="false" />
-    <property name="MemberChooser.sorted" value="false" />
-    <property name="MemberChooser.showClasses" value="true" />
-    <property name="MemberChooser.copyJavadoc" value="false" />
-  </component>
-  <component name="RunManager">
-    <configuration default="true" type="JUnit" factoryName="JUnit">
-      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
-      <module name="" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="METHOD_NAME" />
-      <option name="TEST_OBJECT" value="class" />
-      <option name="VM_PARAMETERS" value="-ea" />
-      <option name="PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="singleModule" />
-      </option>
-      <envs />
-      <patterns />
-      <method />
-    </configuration>
-    <configuration default="true" type="Remote" factoryName="Remote">
-      <option name="USE_SOCKET_TRANSPORT" value="true" />
-      <option name="SERVER_MODE" value="false" />
-      <option name="SHMEM_ADDRESS" value="javadebug" />
-      <option name="HOST" value="localhost" />
-      <option name="PORT" value="5005" />
-      <method />
-    </configuration>
-    <configuration default="true" type="Applet" factoryName="Applet">
-      <module name="" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="HTML_FILE_NAME" />
-      <option name="HTML_USED" value="false" />
-      <option name="WIDTH" value="400" />
-      <option name="HEIGHT" value="300" />
-      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
-      <option name="VM_PARAMETERS" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <method />
-    </configuration>
-    <configuration default="true" type="Application" factoryName="Application">
-      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="VM_PARAMETERS" />
-      <option name="PROGRAM_PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="ENABLE_SWING_INSPECTOR" value="false" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <module name="" />
-      <envs />
-      <method />
-    </configuration>
-    <list size="0" />
-    <configuration name="&lt;template&gt;" type="TestNG" default="true" selected="false">
-      <option name="MAIN_CLASS_NAME" />
-      <option name="VM_PARAMETERS" value="-ea" />
-      <option name="PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-    </configuration>
-    <configuration name="&lt;template&gt;" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" default="true" selected="false">
-      <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m -ea" />
-    </configuration>
   </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />

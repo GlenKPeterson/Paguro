@@ -108,6 +108,7 @@ public interface Transformable<T> extends Realizable<T> {
      this parameter.
      @param fun combines each value in the list with the result so far.  The initial result is u.
      */
+    // TODO: Rename to foldRight!
     <U> U foldLeft(U u, BiFunction<U, T, U> fun);
 
     /**
@@ -125,6 +126,7 @@ public interface Transformable<T> extends Realizable<T> {
      @param terminateWith returns true when the termination condition is reached and will stop
      processing the input at that time, returning the latest u.
      */
+    // TODO: Rename to foldRight!
     <U> U foldLeft(U u, BiFunction<U, T, U> fun, Predicate<U> terminateWith);
 
 

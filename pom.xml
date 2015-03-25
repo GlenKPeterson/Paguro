@@ -3,6 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.organicdesign.fp</groupId>
+	<!--
+	TODO: Rename to BlochItem15 or MinimizeMutability
+	ImmutableJava is not allowed because Java is a registered trademark of Oracle and specifically prohibited from
+	the names of Java-related products.
+	-->
 	<artifactId>J-sicle</artifactId>
 	<version>0.8.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
@@ -18,6 +23,15 @@
 		<license>
 			<name>The Apache License, Version 2.0</name>
 			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<comments>The license for most of the files in this
+				project.</comments>
+		</license>
+		<license>
+			<name>Eclipse Public License - v 1.0</name>
+			<url>http://www.eclipse.org/legal/epl-v10.html</url>
+			<comments>For the persistent collections in the
+				experiments/collections folder. These files are derivative
+				works based on the Clojure source code.</comments>
 		</license>
 	</licenses>
 	<developers>

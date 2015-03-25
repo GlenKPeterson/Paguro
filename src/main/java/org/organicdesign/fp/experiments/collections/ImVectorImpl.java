@@ -25,14 +25,14 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author Rich Hickey (Primary author)
  * @author Glen Peterson (Java-centric editor)
  */
-public class Vecsicle<E> {
+public class ImVectorImpl<E> { // TODO: implements UnList<E> {
 
     // There's bit shifting going on here because it's a very fast operation.
     // Shifting right by 5 is aeons faster than dividing by 32.
     private static final int NODE_LENGTH_POW_2 = 5;
-    private static final int MAX_NODE_LENGTH = 1 << NODE_LENGTH_POW_2; // 32.
-    private static final int HIGH_BITS = -MAX_NODE_LENGTH;   // 0b11111111111111111111111111100000
-    private static final int LOW_BITS = MAX_NODE_LENGTH - 1; // 0b0000000000000000000000000011111 = 0x1f;
+    private static final int MAX_NODE_LENGTH = 1 << NODE_LENGTH_POW_2;// 0b00000000000000000000000000100000 = 0x20 = 32
+    private static final int HIGH_BITS = -MAX_NODE_LENGTH;            // 0b11111111111111111111111111100000
+    private static final int LOW_BITS = MAX_NODE_LENGTH - 1;          // 0b00000000000000000000000000011111 = 0x1f
 
     // Java shift operator review:
     // The signed left shift operator "<<" shifts a bit pattern to the left, and
@@ -74,15 +74,15 @@ public class Vecsicle<E> {
 
     private final static Node EMPTY_NODE = new Node(NOEDIT, new Object[MAX_NODE_LENGTH]);
 
-    private final static Vecsicle<?> EMPTY = new Vecsicle<>(0, NODE_LENGTH_POW_2, EMPTY_NODE,
+    private final static ImVectorImpl<?> EMPTY = new ImVectorImpl<>(0, NODE_LENGTH_POW_2, EMPTY_NODE,
             new Object[]{});
 
     @SuppressWarnings("unchecked")
-    public static final <T> Vecsicle<T> empty() { return (Vecsicle<T>) EMPTY; }
+    public static final <T> ImVectorImpl<T> empty() { return (ImVectorImpl<T>) EMPTY; }
 
     @SuppressWarnings("unchecked")
-    public static final <T> TransientVector<T> emptyTransientVector() {
-        return (TransientVector<T>) EMPTY.asTransient();
+    public static final <T> MutableVector<T> emptyTransientVector() {
+        return (MutableVector<T>) EMPTY.asTransient();
     }
 
     // The number of items in this Vector.
@@ -92,7 +92,7 @@ public class Vecsicle<E> {
     public final E[] tail;
 
     /** Constructor */
-    private Vecsicle(int z, int shift, Node root, E[] tail) {
+    private ImVectorImpl(int z, int shift, Node root, E[] tail) {
         size = z;
         this.shift = shift;
         this.root = root;
@@ -100,8 +100,8 @@ public class Vecsicle<E> {
     }
 
     /** Public static factory method. */
-    static public <T> Vecsicle<T> of(List<T> items) {
-        TransientVector<T> ret = emptyTransientVector();
+    static public <T> ImVectorImpl<T> of(List<T> items) {
+        MutableVector<T> ret = emptyTransientVector();
         for (T item : items) {
             ret = ret.append(item);
         }
@@ -110,8 +110,8 @@ public class Vecsicle<E> {
 
     /** Public static factory method. */
     @SafeVarargs
-    static public <T> Vecsicle<T> of(T... items) {
-        TransientVector<T> ret = emptyTransientVector();
+    static public <T> ImVectorImpl<T> of(T... items) {
+        MutableVector<T> ret = emptyTransientVector();
         for (T item : items) {
             ret = ret.append(item);
         }
@@ -121,8 +121,8 @@ public class Vecsicle<E> {
     // IEditableCollection has this return ITransientCollection<E>,
     // not TransientVector<E> as this originally returned.
 //    @Override
-    public TransientVector<E> asTransient() {
-        return new TransientVector<>(this);
+    public MutableVector<E> asTransient() {
+        return new MutableVector<>(this);
     }
 
     // Returns the high (gt 5) bits of the index of the last item.
@@ -150,47 +150,78 @@ public class Vecsicle<E> {
         throw new IndexOutOfBoundsException();
     }
 
-    public E nth(int i) {
+    /**
+     * Returns the item at this index.
+     * @param i the zero-based index to get from the vector.
+     * @return the value at that index.
+     */
+    public E get(int i) {
         E[] node = arrayFor(i);
         return node[i & LOW_BITS];
     }
 
-    public E nth(int i, E notFound) {
+    /**
+     * Returns the item at this index.
+     * @param n the zero-based index to get from the vector.
+     * @return the value at that index.
+     */
+    public E get(Number n) { return get(n.intValue()); }
+
+    /**
+     * Returns the item at this index.
+     * @param i the zero-based index to get from the vector.
+     * @param notFound the value to return if the index is out of bounds.
+     * @return the value at that index, or the notFound value.
+     */
+    public E get(int i, E notFound) {
         if (i >= 0 && i < size)
-            return nth(i);
+            return get(i);
         return notFound;
     }
 
+    /**
+     * Inserts a new item at the specified index.
+     * @param i the zero-based index to insert at (pushes current item and all subsequent items up)
+     * @param val the value to insert
+     * @return a new Vecsicle with the additional item.
+     */
     @SuppressWarnings("unchecked")
-    public Vecsicle<E> assocN(int i, E val) {
+    public ImVectorImpl<E> insert(int i, E val) {
         if (i >= 0 && i < size) {
             if (i >= tailoff()) {
                 Object[] newTail = new Object[tail.length];
                 System.arraycopy(tail, 0, newTail, 0, tail.length);
                 newTail[i & LOW_BITS] = val;
 
-                return new Vecsicle<>(size, shift, root, (E[]) newTail);
+                return new ImVectorImpl<>(size, shift, root, (E[]) newTail);
             }
 
-            return new Vecsicle<>(size, shift, doAssoc(shift, root, i, val), tail);
+            return new ImVectorImpl<>(size, shift, doAssoc(shift, root, i, val), tail);
         }
         if (i == size) {
-            return cons(val);
+            return append(val);
         }
         throw new IndexOutOfBoundsException();
     }
 
     public int size() { return size; }
 
+// TODO: add prepend() that takes an array
+// TODO: Make this take an array
+    /**
+     * Inserts a new item at the end of the Vecsicle.
+     * @param val the value to insert
+     * @return a new Vecsicle with the additional item.
+     */
     @SuppressWarnings("unchecked")
-    public Vecsicle<E> cons(E val) {
+    public ImVectorImpl<E> append(E val) {
         //room in tail?
         //	if(tail.length < MAX_NODE_LENGTH)
         if (size - tailoff() < MAX_NODE_LENGTH) {
             Object[] newTail = new Object[tail.length + 1];
             System.arraycopy(tail, 0, newTail, 0, tail.length);
             newTail[tail.length] = val;
-            return new Vecsicle<>(size + 1, shift, root, (E[]) newTail);
+            return new ImVectorImpl<>(size + 1, shift, root, (E[]) newTail);
         }
         //full tail, push into tree
         Node newroot;
@@ -202,9 +233,10 @@ public class Vecsicle<E> {
             newroot.array[0] = root;
             newroot.array[1] = newPath(root.edit, shift, tailnode);
             newshift += NODE_LENGTH_POW_2;
-        } else
+        } else {
             newroot = pushTail(shift, root, tailnode);
-        return new Vecsicle<>(size + 1, newshift, newroot, (E[]) new Object[]{val});
+        }
+        return new ImVectorImpl<>(size + 1, newshift, newroot, (E[]) new Object[]{val});
     }
 
     private Node pushTail(int level, Node parent, Node tailnode) {
@@ -219,9 +251,9 @@ public class Vecsicle<E> {
             nodeToInsert = tailnode;
         } else {
             Node child = (Node) parent.array[subidx];
-            nodeToInsert = (child != null) ?
-                    pushTail(level - NODE_LENGTH_POW_2, child, tailnode)
-                    : newPath(root.edit, level - NODE_LENGTH_POW_2, tailnode);
+            nodeToInsert = (child == null)
+                    ? newPath(root.edit, level - NODE_LENGTH_POW_2, tailnode)
+                    : pushTail(level - NODE_LENGTH_POW_2, child, tailnode);
         }
         ret.array[subidx] = nodeToInsert;
         return ret;
@@ -281,7 +313,7 @@ public class Vecsicle<E> {
 //    }
 
     @SuppressWarnings("unchecked")
-    public Vecsicle<E> pop() {
+    public ImVectorImpl<E> pop() {
         if (size == 0)
             throw new IllegalStateException("Can't pop empty vector");
         if (size == 1)
@@ -290,7 +322,7 @@ public class Vecsicle<E> {
         if (size - tailoff() > 1) {
             E[] newTail = (E[]) new Object[tail.length - 1];
             System.arraycopy(tail, 0, newTail, 0, newTail.length);
-            return new Vecsicle<>(size - 1, shift, root, newTail);
+            return new ImVectorImpl<>(size - 1, shift, root, newTail);
         }
         E[] newtail = arrayFor(size - 2);
 
@@ -303,7 +335,7 @@ public class Vecsicle<E> {
             newroot = (Node) newroot.array[0];
             newshift -= NODE_LENGTH_POW_2;
         }
-        return new Vecsicle<>(size - 1, newshift, newroot, newtail);
+        return new ImVectorImpl<>(size - 1, newshift, newroot, newtail);
     }
 
     private Node popTail(int level, Node node) {
@@ -358,7 +390,7 @@ public class Vecsicle<E> {
     public static <A> Reduced<A> done(A a) { return new Reduced<>(a); }
 
     // Implements Counted through ITransientVector<E> -> Indexed<E> -> Counted.
-    private static final class TransientVector<F> {
+    private static final class MutableVector<F> {
         // The number of items in this Vector.
         int size;
 
@@ -369,9 +401,9 @@ public class Vecsicle<E> {
 
         F[] tail;
 
-        private TransientVector(int c, int s, Node r, F[] t) { size = c; shift = s; root = r; tail = t; }
+        private MutableVector(int c, int s, Node r, F[] t) { size = c; shift = s; root = r; tail = t; }
 
-        private TransientVector(Vecsicle<F> v) { this(v.size, v.shift, editableRoot(v.root), editableTail(v.tail)); }
+        private MutableVector(ImVectorImpl<F> v) { this(v.size, v.shift, editableRoot(v.root), editableTail(v.tail)); }
 
         private Node ensureEditable(Node node) {
             if (node.edit == root.edit)
@@ -380,9 +412,9 @@ public class Vecsicle<E> {
         }
 
         private void ensureEditable() {
-            if (root.edit.get() == null)
+            if (root.edit.get() == null) {
                 throw new IllegalAccessError("Transient used after persistent! call");
-
+            }
             //		root = editableRoot(root);
             //		tail = editableTail(tail);
         }
@@ -393,7 +425,7 @@ public class Vecsicle<E> {
         }
 
         @SuppressWarnings("unchecked")
-        public Vecsicle<F> persistent() {
+        public ImVectorImpl<F> persistent() {
             ensureEditable();
             //		Thread owner = root.edit.get();
             //		if(owner != null && owner != Thread.currentThread())
@@ -403,11 +435,11 @@ public class Vecsicle<E> {
             root.edit.set(null);
             F[] trimmedTail = (F[]) new Object[size - tailoff()];
             System.arraycopy(tail, 0, trimmedTail, 0, trimmedTail.length);
-            return new Vecsicle<>(size, shift, root, trimmedTail);
+            return new ImVectorImpl<>(size, shift, root, trimmedTail);
         }
 
         @SuppressWarnings("unchecked")
-        public TransientVector<F> append(F val) {
+        public MutableVector<F> append(F val) {
             ensureEditable();
             int i = size;
             //room in tail?
@@ -517,7 +549,7 @@ public class Vecsicle<E> {
         /** Convenience method for using any class that implements Number as a key. */
         public F nth(Number key, F notFound) { return nth(key.intValue(), notFound); }
 
-        public TransientVector<F> assocN(int i, F val) {
+        public MutableVector<F> insertAt(int i, F val) {
             ensureEditable();
             if (i >= 0 && i < size) {
                 if (i >= tailoff()) {
@@ -527,19 +559,19 @@ public class Vecsicle<E> {
 
                 root = doAssoc(shift, root, i, val);
                 return this;
-            }
-            if (i == size)
+            } else if (i == size) {
                 return append(val);
+            }
             throw new IndexOutOfBoundsException();
         }
 
-        public TransientVector<F> assoc(int key, F val) {
-            //note - relies on ensureEditable in assocN
-            return assocN(key, val);
+        public MutableVector<F> assoc(int key, F val) {
+            //note - relies on ensureEditable in insertAt
+            return insertAt(key, val);
         }
 
-        public TransientVector<F> assoc(Number key, F val) {
-            return assocN(key.intValue(), val);
+        public MutableVector<F> assoc(Number key, F val) {
+            return insertAt(key.intValue(), val);
         }
 
         @SuppressWarnings("unchecked")
@@ -556,7 +588,7 @@ public class Vecsicle<E> {
         }
 
         @SuppressWarnings("unchecked")
-        public TransientVector<F> pop() {
+        public MutableVector<F> pop() {
             ensureEditable();
             if (size == 0)
                 throw new IllegalStateException("Can't pop empty vector");

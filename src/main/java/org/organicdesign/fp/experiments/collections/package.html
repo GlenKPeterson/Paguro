@@ -1,0 +1,50 @@
+<html>
+<body>
+
+<h3>Definitions</h3>
+<dl>
+    <dt>Mutable</dt>
+    <dd>This is a reasonable term for the java.util collections.&#160;
+        Really, they are built on an assumption that you will modify them in-place, never making any copies.&#160;
+        This was sensible when they were created in the 1990's when memory was expensive, the
+        garbage collector was in it's infancy, and multi-processor systems were rare.&#160;
+        But today, memory is cheap, the garbage collector is one of the wonders of the modern world, and even your phone has several processors.&#160;
+        We have to extend these interfaces for compatibility, but the sub-interfaces both throw UnsupportedOperationException and deprecate the modification
+        methods so that your IDE and the compiler give you warnings when you try to use the wrong method.</dd>
+
+    <dt>Unmodifiable</dt>
+    <dd>This is what the Collections.unmodifiableXxxx() methods return.&#160;
+        They implement the Mutable interfaces, but throw an UnsupportedOperationException when a mutation method is called.&#160;
+        It is a shame that the java.util mutable collection interfaces are not extended from Unmodifiable
+        interfaces having the same "get" methods (readers), but without any "set" methods (modifiers).&#160;
+        It would be useful for a function to accept Unmodifiable interfaces in order to say,
+        "I'm not going to modify this" and return Unmodifiable interfaces to say, "You can't modify this."&#160;
+        Since that's not possible, this package provides the next-best thing which is "Un" interfaces which extend the java.util mutable collections.</dd>
+
+    <dt>Immutable</dt>
+    <dd>This is what the Clojure collections provide.&#160;
+        The collection itself cannot be changed, yet it has "modification" methods that return a new immutable collection reflecting the change
+        while still sharing as much data as possible with the original collection so that these methods are relatively fast and lightweight.&#160;
+        For this to work, each "set" method needs to return a new collection.&#160;
+        Unfortunately, the java.util mutable collections "set" methods all return something else, like a boolean indicating success,
+        or the item you just inserted.&#160;
+        This package works around that limitation.</dd>
+</dl>
+
+<h3>Description</h3>
+<p>In a perfect world, all the Java APIs and existing code would be magically rewritten to use Immutable collections.&#160;
+    Next best would be if java.util would have unmodifiable collections interfaces (Collection, List, Set, Map..) at the top of the interface hierarchy.&#160;
+    Those interfaces would have only "get" methods (no "set" methods).&#160;
+    Each of those interfaces would have a sub-interface that added the "set" methods.&#160;
+    Each of those set methods would return a new collection so that they could be implemented in a non-destructive manner.&#160;
+    There are currently no plans for that either.</p>
+
+<p>We can't have the perfect hierarchy, but we still want to make it as easy as possible to work with existing code.&#160;
+    This package contains Unmodifiable "Un" interfaces which override, deprecate, and implement each of the "set" methods in the java.util collections interfaces.&#160;
+    Each of the "Un" collection interfaces is then extended with an "Im" interface which represents an "Immutable" collection.&#160;
+    The Immutable interfaces further override and deprecate all of the "set" methods which don't return a
+    collection and provide new alternative "set" methods which do, as well as some convenience methods.&#160;
+    Finally, there are various implementations of the Immutable interfaces.</p>
+
+</body>
+</html>

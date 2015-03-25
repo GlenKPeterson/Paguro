@@ -2,9 +2,15 @@ package org.organicdesign.fp.experiments.collections;
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.function.Predicate;
 
-public interface UnSet<E> extends UnCollection<E>, Set<E> {
+public interface UnSet<E> extends Set<E> {
     // Query Operations
+
+    /** Not allowed - this is supposed to be unmodifiable */
+    @Override @Deprecated default boolean removeIf(Predicate<? super E> filter) {
+        throw new UnsupportedOperationException("Modification attempted");
+    }
 
     /** {@inheritDoc} */
     @Override UnIterator<E> iterator();
