@@ -60,6 +60,25 @@ public interface ImList<E> extends UnList<E> {
     }
 
     /**
+     * Returns the item at this index, but takes any Number as an argument.
+     * @param n the zero-based index to get from the vector.
+     * @return the value at that index.
+     */
+    default E get(Number n) { return get(n.intValue()); }
+
+    /**
+     * Returns the item at this index.
+     * @param i the zero-based index to get from the vector.
+     * @param notFound the value to return if the index is out of bounds.
+     * @return the value at that index, or the notFound value.
+     */
+    default E get(int i, E notFound) {
+        if (i >= 0 && i < size())
+            return get(i);
+        return notFound;
+    }
+
+    /**
      * Inserts items at the beginning of the ImList.
      * @param es the values to insert
      * @return a new ImList beginning with the additional items.

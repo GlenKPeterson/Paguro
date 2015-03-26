@@ -11,10 +11,7 @@
 /* rich Jul 5, 2007 */
 package org.organicdesign.fp.experiments.collections;
 
-import org.organicdesign.fp.function.Function2;
-
 import java.io.Serializable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -25,13 +22,13 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author Rich Hickey (Primary author)
  * @author Glen Peterson (Java-centric editor)
  */
-public class ImVectorImpl<E> { // TODO: implements UnList<E> {
+public class ImVectorImpl<E> implements ImList<E> {
 
     // There's bit shifting going on here because it's a very fast operation.
     // Shifting right by 5 is aeons faster than dividing by 32.
     private static final int NODE_LENGTH_POW_2 = 5;
     private static final int MAX_NODE_LENGTH = 1 << NODE_LENGTH_POW_2;// 0b00000000000000000000000000100000 = 0x20 = 32
-    private static final int HIGH_BITS = -MAX_NODE_LENGTH;            // 0b11111111111111111111111111100000
+//    private static final int HIGH_BITS = -MAX_NODE_LENGTH;            // 0b11111111111111111111111111100000
     private static final int LOW_BITS = MAX_NODE_LENGTH - 1;          // 0b00000000000000000000000000011111 = 0x1f
 
     // Java shift operator review:
@@ -77,8 +74,8 @@ public class ImVectorImpl<E> { // TODO: implements UnList<E> {
     private final static ImVectorImpl<?> EMPTY = new ImVectorImpl<>(0, NODE_LENGTH_POW_2, EMPTY_NODE,
             new Object[]{});
 
-    @SuppressWarnings("unchecked")
-    public static final <T> ImVectorImpl<T> empty() { return (ImVectorImpl<T>) EMPTY; }
+//    @SuppressWarnings("unchecked")
+//    public static final <T> ImVectorImpl<T> empty() { return (ImVectorImpl<T>) EMPTY; }
 
     @SuppressWarnings("unchecked")
     public static final <T> MutableVector<T> emptyTransientVector() {
@@ -137,56 +134,36 @@ public class ImVectorImpl<E> { // TODO: implements UnList<E> {
         // Last line can be replaced with (size -1) & HIGH_BITS
     }
 
+    /** Returns the array (of type E) from the leaf node indicated by the given index. */
     @SuppressWarnings("unchecked")
-    public E[] arrayFor(int i) {
+    E[] leafNodeArrayFor(int i) {
+        // i is the index into this vector.  Each 5 bits represent an index into an array.
+        // The highest 5 bits (that are less than the shift value) are the index into the top-level array.
+        // The lowest 5 bits index the the leaf.  The guts of this method indexes into the array at each level,
+        // finally indexing into the leaf node.
+
         if (i >= 0 && i < size) {
-            if (i >= tailoff())
+            if (i >= tailoff()) {
                 return tail;
+            }
             Node node = root;
-            for (int level = shift; level > 0; level -= NODE_LENGTH_POW_2)
+            for (int level = shift; level > 0; level -= NODE_LENGTH_POW_2) {
                 node = (Node) node.array[(i >>> level) & LOW_BITS];
+            }
             return (E[]) node.array;
         }
         throw new IndexOutOfBoundsException();
     }
 
-    /**
-     * Returns the item at this index.
-     * @param i the zero-based index to get from the vector.
-     * @return the value at that index.
-     */
-    public E get(int i) {
-        E[] node = arrayFor(i);
+    /** {@inheritDoc} */
+    @Override public E get(int i) {
+        E[] node = leafNodeArrayFor(i);
         return node[i & LOW_BITS];
     }
 
-    /**
-     * Returns the item at this index.
-     * @param n the zero-based index to get from the vector.
-     * @return the value at that index.
-     */
-    public E get(Number n) { return get(n.intValue()); }
-
-    /**
-     * Returns the item at this index.
-     * @param i the zero-based index to get from the vector.
-     * @param notFound the value to return if the index is out of bounds.
-     * @return the value at that index, or the notFound value.
-     */
-    public E get(int i, E notFound) {
-        if (i >= 0 && i < size)
-            return get(i);
-        return notFound;
-    }
-
-    /**
-     * Inserts a new item at the specified index.
-     * @param i the zero-based index to insert at (pushes current item and all subsequent items up)
-     * @param val the value to insert
-     * @return a new Vecsicle with the additional item.
-     */
+    /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
-    public ImVectorImpl<E> insert(int i, E val) {
+    @Override public ImVectorImpl<E> insert(int i, E val) {
         if (i >= 0 && i < size) {
             if (i >= tailoff()) {
                 Object[] newTail = new Object[tail.length];
@@ -204,10 +181,8 @@ public class ImVectorImpl<E> { // TODO: implements UnList<E> {
         throw new IndexOutOfBoundsException();
     }
 
-    public int size() { return size; }
+    @Override public int size() { return size; }
 
-// TODO: add prepend() that takes an array
-// TODO: Make this take an array
     /**
      * Inserts a new item at the end of the Vecsicle.
      * @param val the value to insert
@@ -259,104 +234,140 @@ public class ImVectorImpl<E> { // TODO: implements UnList<E> {
         return ret;
     }
 
-    Iterator<E> rangedIterator(final int start, final int end) {
-        return new Iterator<E>() {
-            int i = start;
-            int base = i - (i % MAX_NODE_LENGTH);
-            E[] array = (start < size()) ? arrayFor(i) : null;
+    /** {@inheritDoc} */
+    @Override public UnListIterator<E> listIterator(int index) {
+        return new UnListIterator<E>() {
+            private int i = index;
+            private int base = i - (i % MAX_NODE_LENGTH);
+            private E[] array = (index < size()) ? leafNodeArrayFor(i) : null;
 
-            @Override
-            public boolean hasNext() {
-                return i < end;
-            }
+            /** {@inheritDoc} */
+            @Override public boolean hasNext() { return i < size(); }
+            /** {@inheritDoc} */
+            @Override public boolean hasPrevious() { return i > 0; }
 
-            @Override
-            public E next() {
+            /** {@inheritDoc} */
+            @Override public E next() {
                 if (i - base == MAX_NODE_LENGTH) {
-                    array = arrayFor(i);
+                    array = leafNodeArrayFor(i);
                     base += MAX_NODE_LENGTH;
                 }
                 return array[i++ & LOW_BITS];
             }
 
-            @Override
-            public void remove() {
-                throw new UnsupportedOperationException();
+            /** {@inheritDoc} */
+            @Override public int nextIndex() { return i + 1; }
+            /** {@inheritDoc} */
+            @Override public E previous() {
+                if (i - base == 0) {
+                    array = leafNodeArrayFor(i);
+                    base += MAX_NODE_LENGTH;
+                }
+                return array[i-- & LOW_BITS]; // TODO: Should we have decremented i sooner?
             }
+            /** {@inheritDoc} */
+            @Override public int previousIndex() { return i - 1; }
         };
     }
 
-    public Iterator<E> iterator() {
-        return rangedIterator(0, size());
-    }
+//    Iterator<E> rangedIterator(final int start, final int end) {
+//        return new Iterator<E>() {
+//            int i = start;
+//            int base = i - (i % MAX_NODE_LENGTH);
+//            E[] array = (start < size()) ? leafNodeArrayFor(i) : null;
+//
+//            @Override
+//            public boolean hasNext() {
+//                return i < end;
+//            }
+//
+//            @Override
+//            public E next() {
+//                if (i - base == MAX_NODE_LENGTH) {
+//                    array = leafNodeArrayFor(i);
+//                    base += MAX_NODE_LENGTH;
+//                }
+//                return array[i++ & LOW_BITS];
+//            }
+//
+//            @Override
+//            public void remove() {
+//                throw new UnsupportedOperationException();
+//            }
+//        };
+//    }
 
-    @SuppressWarnings("unchecked")
-    public <U> U reduce(Function2<U, E, U> f, U init) {
-        int step = 0;
-        for (int i = 0; i < size; i += step) {
-            E[] array = arrayFor(i);
-            for (int j = 0; j < array.length; ++j) {
-                init = f.apply_(init, array[j]);
+//    public UnIterator<E> iterator() {
+//        return rangedIterator(0, size());
+//    }
 
-                if ( (init != null) && (init instanceof Reduced) ) {
-                    return ((Reduced<U>) init).val;
-                }
-            }
-            step = array.length;
-        }
-        return init;
-    }
+//    @SuppressWarnings("unchecked")
+//    public <U> U reduce(Function2<U, E, U> f, U init) {
+//        int step = 0;
+//        for (int i = 0; i < size; i += step) {
+//            E[] array = leafNodeArrayFor(i);
+//            for (int j = 0; j < array.length; ++j) {
+//                init = f.apply_(init, array[j]);
+//
+//                if ( (init != null) && (init instanceof Reduced) ) {
+//                    return ((Reduced<U>) init).val;
+//                }
+//            }
+//            step = array.length;
+//        }
+//        return init;
+//    }
 
 
 //    @Override public IPersistentCollection<E> empty(){
 //    	return emptyPersistentCollection(meta());
 //    }
 
-    @SuppressWarnings("unchecked")
-    public ImVectorImpl<E> pop() {
-        if (size == 0)
-            throw new IllegalStateException("Can't pop empty vector");
-        if (size == 1)
-            return empty();
-        //if(tail.length > 1)
-        if (size - tailoff() > 1) {
-            E[] newTail = (E[]) new Object[tail.length - 1];
-            System.arraycopy(tail, 0, newTail, 0, newTail.length);
-            return new ImVectorImpl<>(size - 1, shift, root, newTail);
-        }
-        E[] newtail = arrayFor(size - 2);
+//    @SuppressWarnings("unchecked")
+//    public ImVectorImpl<E> pop() {
+//        if (size == 0)
+//            throw new IllegalStateException("Can't pop empty vector");
+//        if (size == 1)
+//            return empty();
+//        //if(tail.length > 1)
+//        if (size - tailoff() > 1) {
+//            E[] newTail = (E[]) new Object[tail.length - 1];
+//            System.arraycopy(tail, 0, newTail, 0, newTail.length);
+//            return new ImVectorImpl<>(size - 1, shift, root, newTail);
+//        }
+//        E[] newtail = leafNodeArrayFor(size - 2);
+//
+//        Node newroot = popTail(shift, root);
+//        int newshift = shift;
+//        if (newroot == null) {
+//            newroot = EMPTY_NODE;
+//        }
+//        if (shift > NODE_LENGTH_POW_2 && newroot.array[1] == null) {
+//            newroot = (Node) newroot.array[0];
+//            newshift -= NODE_LENGTH_POW_2;
+//        }
+//        return new ImVectorImpl<>(size - 1, newshift, newroot, newtail);
+//    }
 
-        Node newroot = popTail(shift, root);
-        int newshift = shift;
-        if (newroot == null) {
-            newroot = EMPTY_NODE;
-        }
-        if (shift > NODE_LENGTH_POW_2 && newroot.array[1] == null) {
-            newroot = (Node) newroot.array[0];
-            newshift -= NODE_LENGTH_POW_2;
-        }
-        return new ImVectorImpl<>(size - 1, newshift, newroot, newtail);
-    }
-
-    private Node popTail(int level, Node node) {
-        int subidx = ((size - 2) >>> level) & LOW_BITS;
-        if (level > NODE_LENGTH_POW_2) {
-            Node newchild = popTail(level - NODE_LENGTH_POW_2, (Node) node.array[subidx]);
-            if (newchild == null && subidx == 0)
-                return null;
-            else {
-                Node ret = new Node(root.edit, node.array.clone());
-                ret.array[subidx] = newchild;
-                return ret;
-            }
-        } else if (subidx == 0)
-            return null;
-        else {
-            Node ret = new Node(root.edit, node.array.clone());
-            ret.array[subidx] = null;
-            return ret;
-        }
-    }
+//    private Node popTail(int level, Node node) {
+//        int subidx = ((size - 2) >>> level) & LOW_BITS;
+//        if (level > NODE_LENGTH_POW_2) {
+//            Node newchild = popTail(level - NODE_LENGTH_POW_2, (Node) node.array[subidx]);
+//            if (newchild == null && subidx == 0)
+//                return null;
+//            else {
+//                Node ret = new Node(root.edit, node.array.clone());
+//                ret.array[subidx] = newchild;
+//                return ret;
+//            }
+//        } else if (subidx == 0)
+//            return null;
+//        else {
+//            Node ret = new Node(root.edit, node.array.clone());
+//            ret.array[subidx] = null;
+//            return ret;
+//        }
+//    }
 
     private static Node doAssoc(int level, Node node, int i, Object val) {
         Node ret = new Node(node.edit, node.array.clone());
@@ -378,28 +389,28 @@ public class ImVectorImpl<E> { // TODO: implements UnList<E> {
         return ret;
     }
 
-    public static class Reduced<A> {
-        public final A val;
-        private Reduced(A a) { val = a; }
-    }
-
-    /**
-     * This is an early exit indicator for reduce operations.  Return one of these when you want the reduction to end.
-     * It uses types, but not in a "traditional" way.
-     */
-    public static <A> Reduced<A> done(A a) { return new Reduced<>(a); }
+//    public static class Reduced<A> {
+//        public final A val;
+//        private Reduced(A a) { val = a; }
+//    }
+//
+//    /**
+//     * This is an early exit indicator for reduce operations.  Return one of these when you want the reduction to end.
+//     * It uses types, but not in a "traditional" way.
+//     */
+//    public static <A> Reduced<A> done(A a) { return new Reduced<>(a); }
 
     // Implements Counted through ITransientVector<E> -> Indexed<E> -> Counted.
     private static final class MutableVector<F> {
         // The number of items in this Vector.
-        int size;
+        private int size;
 
-        int shift;
+        private int shift;
 
         // The root node of the data tree inside this vector.
-        Node root;
+        private Node root;
 
-        F[] tail;
+        private F[] tail;
 
         private MutableVector(int c, int s, Node r, F[] t) { size = c; shift = s; root = r; tail = t; }
 
@@ -503,143 +514,143 @@ public class ImVectorImpl<E> { // TODO: implements UnList<E> {
             // Last line can be replaced with (size -1) & HIGH_BITS
         }
 
-        @SuppressWarnings("unchecked")
-        private F[] arrayFor(int i) {
-            if (i >= 0 && i < size) {
-                if (i >= tailoff()) {
-                    return tail;
-                }
-                Node node = root;
-                for (int level = shift; level > 0; level -= NODE_LENGTH_POW_2) {
-                    node = (Node) node.array[(i >>> level) & LOW_BITS];
-                }
-                return (F[]) node.array;
-            }
-            throw new IndexOutOfBoundsException();
-        }
+//        @SuppressWarnings("unchecked")
+//        private F[] leafNodeArrayFor(int i) {
+//            if (i >= 0 && i < size) {
+//                if (i >= tailoff()) {
+//                    return tail;
+//                }
+//                Node node = root;
+//                for (int level = shift; level > 0; level -= NODE_LENGTH_POW_2) {
+//                    node = (Node) node.array[(i >>> level) & LOW_BITS];
+//                }
+//                return (F[]) node.array;
+//            }
+//            throw new IndexOutOfBoundsException();
+//        }
 
-        @SuppressWarnings("unchecked")
-        private F[] editableArrayFor(int i) {
-            if (i >= 0 && i < size) {
-                if (i >= tailoff())
-                    return tail;
-                Node node = root;
-                for (int level = shift; level > 0; level -= NODE_LENGTH_POW_2)
-                    node = ensureEditable((Node) node.array[(i >>> level) & LOW_BITS]);
-                return (F[]) node.array;
-            }
-            throw new IndexOutOfBoundsException();
-        }
+//        @SuppressWarnings("unchecked")
+//        private F[] editableArrayFor(int i) {
+//            if (i >= 0 && i < size) {
+//                if (i >= tailoff())
+//                    return tail;
+//                Node node = root;
+//                for (int level = shift; level > 0; level -= NODE_LENGTH_POW_2)
+//                    node = ensureEditable((Node) node.array[(i >>> level) & LOW_BITS]);
+//                return (F[]) node.array;
+//            }
+//            throw new IndexOutOfBoundsException();
+//        }
 
-        public F nth(int i) {
-            ensureEditable();
-            F[] node = arrayFor(i);
-            return node[i & LOW_BITS];
-        }
+//        public F nth(int i) {
+//            ensureEditable();
+//            F[] node = arrayFor(i);
+//            return node[i & LOW_BITS];
+//        }
+//
+//        public F nth(int i, F notFound) {
+//            if (i >= 0 && i < size())
+//                return nth(i);
+//            return notFound;
+//        }
+//
+//        /** Convenience method for using any class that implements Number as a key. */
+//        public F nth(Number key) { return nth(key.intValue(), null); }
+//
+//        /** Convenience method for using any class that implements Number as a key. */
+//        public F nth(Number key, F notFound) { return nth(key.intValue(), notFound); }
 
-        public F nth(int i, F notFound) {
-            if (i >= 0 && i < size())
-                return nth(i);
-            return notFound;
-        }
+//        public MutableVector<F> insertAt(int i, F val) {
+//            ensureEditable();
+//            if (i >= 0 && i < size) {
+//                if (i >= tailoff()) {
+//                    tail[i & LOW_BITS] = val;
+//                    return this;
+//                }
+//
+//                root = doAssoc(shift, root, i, val);
+//                return this;
+//            } else if (i == size) {
+//                return append(val);
+//            }
+//            throw new IndexOutOfBoundsException();
+//        }
 
-        /** Convenience method for using any class that implements Number as a key. */
-        public F nth(Number key) { return nth(key.intValue(), null); }
+//        public MutableVector<F> assoc(int key, F val) {
+//            //note - relies on ensureEditable in insertAt
+//            return insertAt(key, val);
+//        }
+//
+//        public MutableVector<F> assoc(Number key, F val) {
+//            return insertAt(key.intValue(), val);
+//        }
 
-        /** Convenience method for using any class that implements Number as a key. */
-        public F nth(Number key, F notFound) { return nth(key.intValue(), notFound); }
+//        @SuppressWarnings("unchecked")
+//        private Node doAssoc(int level, Node node, int i, Object val) {
+//            node = ensureEditable(node);
+//            Node ret = node;
+//            if (level == 0) {
+//                ret.array[i & LOW_BITS] = val;
+//            } else {
+//                int subidx = (i >>> level) & LOW_BITS;
+//                ret.array[subidx] = doAssoc(level - NODE_LENGTH_POW_2, (Node) node.array[subidx], i, val);
+//            }
+//            return ret;
+//        }
 
-        public MutableVector<F> insertAt(int i, F val) {
-            ensureEditable();
-            if (i >= 0 && i < size) {
-                if (i >= tailoff()) {
-                    tail[i & LOW_BITS] = val;
-                    return this;
-                }
+//        @SuppressWarnings("unchecked")
+//        public MutableVector<F> pop() {
+//            ensureEditable();
+//            if (size == 0)
+//                throw new IllegalStateException("Can't pop empty vector");
+//            if (size == 1) {
+//                size = 0;
+//                return this;
+//            }
+//            int i = size - 1;
+//            //pop in tail?
+//            if ((i & LOW_BITS) > 0) {
+//                --size;
+//                return this;
+//            }
+//
+//            F[] newtail = editableArrayFor(size - 2);
+//
+//            Node newroot = popTail(shift, root);
+//            int newshift = shift;
+//            if (newroot == null) {
+//                newroot = new Node(root.edit);
+//            }
+//            if (shift > NODE_LENGTH_POW_2 && newroot.array[1] == null) {
+//                newroot = ensureEditable((Node) newroot.array[0]);
+//                newshift -= NODE_LENGTH_POW_2;
+//            }
+//            root = newroot;
+//            shift = newshift;
+//            --size;
+//            tail = newtail;
+//            return this;
+//        }
 
-                root = doAssoc(shift, root, i, val);
-                return this;
-            } else if (i == size) {
-                return append(val);
-            }
-            throw new IndexOutOfBoundsException();
-        }
-
-        public MutableVector<F> assoc(int key, F val) {
-            //note - relies on ensureEditable in insertAt
-            return insertAt(key, val);
-        }
-
-        public MutableVector<F> assoc(Number key, F val) {
-            return insertAt(key.intValue(), val);
-        }
-
-        @SuppressWarnings("unchecked")
-        private Node doAssoc(int level, Node node, int i, Object val) {
-            node = ensureEditable(node);
-            Node ret = node;
-            if (level == 0) {
-                ret.array[i & LOW_BITS] = val;
-            } else {
-                int subidx = (i >>> level) & LOW_BITS;
-                ret.array[subidx] = doAssoc(level - NODE_LENGTH_POW_2, (Node) node.array[subidx], i, val);
-            }
-            return ret;
-        }
-
-        @SuppressWarnings("unchecked")
-        public MutableVector<F> pop() {
-            ensureEditable();
-            if (size == 0)
-                throw new IllegalStateException("Can't pop empty vector");
-            if (size == 1) {
-                size = 0;
-                return this;
-            }
-            int i = size - 1;
-            //pop in tail?
-            if ((i & LOW_BITS) > 0) {
-                --size;
-                return this;
-            }
-
-            F[] newtail = editableArrayFor(size - 2);
-
-            Node newroot = popTail(shift, root);
-            int newshift = shift;
-            if (newroot == null) {
-                newroot = new Node(root.edit);
-            }
-            if (shift > NODE_LENGTH_POW_2 && newroot.array[1] == null) {
-                newroot = ensureEditable((Node) newroot.array[0]);
-                newshift -= NODE_LENGTH_POW_2;
-            }
-            root = newroot;
-            shift = newshift;
-            --size;
-            tail = newtail;
-            return this;
-        }
-
-        @SuppressWarnings("unchecked")
-        private Node popTail(int level, Node node) {
-            node = ensureEditable(node);
-            int subidx = ((size - 2) >>> level) & LOW_BITS;
-            if (level > NODE_LENGTH_POW_2) {
-                Node newchild = popTail(level - NODE_LENGTH_POW_2, (Node) node.array[subidx]);
-                if (newchild == null && subidx == 0)
-                    return null;
-                else {
-                    node.array[subidx] = newchild;
-                    return node;
-                }
-            } else if (subidx == 0)
-                return null;
-            else {
-                node.array[subidx] = null;
-                return node;
-            }
-        }
+//        @SuppressWarnings("unchecked")
+//        private Node popTail(int level, Node node) {
+//            node = ensureEditable(node);
+//            int subidx = ((size - 2) >>> level) & LOW_BITS;
+//            if (level > NODE_LENGTH_POW_2) {
+//                Node newchild = popTail(level - NODE_LENGTH_POW_2, (Node) node.array[subidx]);
+//                if (newchild == null && subidx == 0)
+//                    return null;
+//                else {
+//                    node.array[subidx] = newchild;
+//                    return node;
+//                }
+//            } else if (subidx == 0)
+//                return null;
+//            else {
+//                node.array[subidx] = null;
+//                return node;
+//            }
+//        }
 
         static Node editableRoot(Node node) {
             return new Node(new AtomicReference<>(Thread.currentThread()), node.array.clone());
