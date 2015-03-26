@@ -2,7 +2,6 @@ package org.organicdesign.fp.experiments.collections;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -198,7 +197,10 @@ public interface UnList<E> extends List<E>, UnCollection<E> {
      */
     @SuppressWarnings("unchecked")
     @Override default <T> T[] toArray(T[] as) {
-        if ( (as == null) || (as.length < size()) ) {
+        if (as == null) {
+            throw new IllegalArgumentException("You can't pass null to this method.");
+        }
+        if ( (as.length < size()) ) {
             as = (T[]) new Object[size()];
         }
         UnIterator<E> iter = iterator();
@@ -225,10 +227,5 @@ public interface UnList<E> extends List<E>, UnCollection<E> {
 //forEach
 
     // ================================================ STATIC METHODS ================================================
-    static final UnList<Object> EMPTY_LIST = (UnList<Object>) Collections.unmodifiableList(Collections.emptyList());
-
-    @SuppressWarnings("unchecked")
-    static <T> UnList<T> empty() {
-        return (UnList<T>) EMPTY_LIST;
-    }
+    static <T> UnList<T> empty() { return ImVectorImpl.empty(); }
 }

@@ -107,4 +107,7 @@ public interface ImList<E> extends UnList<E> {
         }
         return l;
     }
+
+    // ================================================ STATIC METHODS ================================================
+    static <T> ImList<T> empty() { return ImVectorImpl.empty(); }
 }

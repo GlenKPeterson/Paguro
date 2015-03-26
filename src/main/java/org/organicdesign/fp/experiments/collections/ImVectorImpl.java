@@ -74,8 +74,8 @@ public class ImVectorImpl<E> implements ImList<E> {
     private final static ImVectorImpl<?> EMPTY = new ImVectorImpl<>(0, NODE_LENGTH_POW_2, EMPTY_NODE,
             new Object[]{});
 
-//    @SuppressWarnings("unchecked")
-//    public static final <T> ImVectorImpl<T> empty() { return (ImVectorImpl<T>) EMPTY; }
+    @SuppressWarnings("unchecked")
+    public static final <T> ImList<T> empty() { return (ImVectorImpl<T>) EMPTY; }
 
     @SuppressWarnings("unchecked")
     public static final <T> MutableVector<T> emptyTransientVector() {
