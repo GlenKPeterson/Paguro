@@ -4,6 +4,21 @@
 
 	<groupId>org.organicdesign.fp</groupId>
 	<!--
+To build javadoc:
+javadoc:javadoc
+
+To see updated versions available: http://mojo.codehaus.org/versions-maven-plugin/
+versions:display-dependency-updates
+
+To see third-party licenses: http://mojo.codehaus.org/license-maven-plugin/
+license:add-third-party
+
+pmd:cpd reports on cut and pasted code in your project.
+
+Show the dependency tree:
+http://maven.apache.org/plugins/maven-dependency-plugin/examples/resolving-conflicts-using-the-dependency-tree.html
+dependency:tree
+
 	TODO: Rename to BlochItem15 or MinimizeMutability
 	ImmutableJava is not allowed because Java is a registered trademark of Oracle and specifically prohibited from
 	the names of Java-related products.
