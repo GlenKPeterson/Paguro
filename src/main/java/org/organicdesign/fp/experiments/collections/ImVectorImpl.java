@@ -74,19 +74,21 @@ public class ImVectorImpl<E> implements ImList<E> {
     private final static ImVectorImpl<?> EMPTY = new ImVectorImpl<>(0, NODE_LENGTH_POW_2, EMPTY_NODE,
             new Object[]{});
 
+    /** Returns the empty ImList (there only needs to be one) */
     @SuppressWarnings("unchecked")
     public static final <T> ImList<T> empty() { return (ImVectorImpl<T>) EMPTY; }
 
+    // We could make this public someday.
     @SuppressWarnings("unchecked")
-    public static final <T> MutableVector<T> emptyTransientVector() {
+    private static final <T> MutableVector<T> emptyTransientVector() {
         return (MutableVector<T>) EMPTY.asTransient();
     }
 
     // The number of items in this Vector.
-    final int size;
-    public final int shift;
-    public final Node root;
-    public final E[] tail;
+    private final int size;
+    private final int shift;
+    private final Node root;
+    private final E[] tail;
 
     /** Constructor */
     private ImVectorImpl(int z, int shift, Node root, E[] tail) {
@@ -118,9 +120,8 @@ public class ImVectorImpl<E> implements ImList<E> {
     // IEditableCollection has this return ITransientCollection<E>,
     // not TransientVector<E> as this originally returned.
 //    @Override
-    public MutableVector<E> asTransient() {
-        return new MutableVector<>(this);
-    }
+    // We could make this public some day, maybe.
+    private MutableVector<E> asTransient() { return new MutableVector<>(this); }
 
     // Returns the high (gt 5) bits of the index of the last item.
     // I think this is the index of the start of the last array in the tree.
@@ -181,6 +182,7 @@ public class ImVectorImpl<E> implements ImList<E> {
         throw new IndexOutOfBoundsException();
     }
 
+    /** {@inheritDoc} */
     @Override public int size() { return size; }
 
     /**

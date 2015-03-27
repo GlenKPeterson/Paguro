@@ -1,6 +1,6 @@
 <html>
 <body>
-
+<p>Makes immutable collections (like/from Clojure) work with the existing java.util collections.</p>
 <h3>Definitions</h3>
 <dl>
     <dt>Mutable</dt>
@@ -33,18 +33,16 @@
 
 <h3>Description</h3>
 <p>In a perfect world, all the Java APIs and existing code would be magically rewritten to use Immutable collections.&#160;
-    Next best would be if java.util would have unmodifiable collections interfaces (Collection, List, Set, Map..) at the top of the interface hierarchy.&#160;
+    Next best would be if java.util would have unmodifiable collections interfaces (UnCollection, UnList, UnSet, UnMap..) at the top of the interface hierarchy.&#160;
     Those interfaces would have only "get" methods (no "set" methods).&#160;
-    Each of those interfaces would have a sub-interface that added the "set" methods.&#160;
-    Each of those set methods would return a new collection so that they could be implemented in a non-destructive manner.&#160;
-    There are currently no plans for that either.</p>
+    Each of the current java.util collection interfaces would extend the "Un" interfaces to add the "set" methods which could remain unchanged for backwards compatibility.&#160;
+    Immutable "Im" interfaces could then extend the "Un" interfaces without any deprecations or UnsupportedOperationExceptions.</p>
 
-<p>We can't have the perfect hierarchy, but we still want to make it as easy as possible to work with existing code.&#160;
+<p>We don't have the perfect hierarchy, but we still want to make it as easy as possible to work with existing Java code.&#160;
     This package contains Unmodifiable "Un" interfaces which override, deprecate, and implement each of the "set" methods in the java.util collections interfaces.&#160;
-    Each of the "Un" collection interfaces is then extended with an "Im" interface which represents an "Immutable" collection.&#160;
-    The Immutable interfaces further override and deprecate all of the "set" methods which don't return a
-    collection and provide new alternative "set" methods which do, as well as some convenience methods.&#160;
-    Finally, there are various implementations of the Immutable interfaces.</p>
+    Each of the "Un" collection interfaces is then extended by an "Im" interface which represents an "Immutable" collection.&#160;
+    The Immutable interfaces further provide new alternative "set" methods which return the "altered" collection, as well as some convenience methods.&#160;
+    Finally, there are various implementations of the Immutable interfaces (currently, they are all copied from Clojure).</p>
 
 </body>
 </html>

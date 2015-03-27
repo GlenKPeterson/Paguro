@@ -29,8 +29,10 @@ public interface Function0<U> {
     default U apply_() {
         try {
             return apply();
+        } catch (RuntimeException re) {
+            throw re;
         } catch (Exception e) {
-            throw new IllegalStateException(e);
+            throw new RuntimeException(e);
         }
     }
 

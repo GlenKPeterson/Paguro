@@ -31,7 +31,7 @@ public interface UnCollection<E> extends Collection<E> {
     }
 
     /**
-     * The default implementation of this method has O(this.size()) performance.
+     * This is quick for sets and maps, but it's slow for Lists.
      *
      * {@inheritDoc}
      */
@@ -46,7 +46,7 @@ public interface UnCollection<E> extends Collection<E> {
     }
 
     /**
-     * The default implementation of this method has O(this.size() * that.size()) performance
+     * This is quick for sets and maps, but it's slow for Lists.
      *
      * {@inheritDoc}
      * */
@@ -95,14 +95,13 @@ public interface UnCollection<E> extends Collection<E> {
 //default Stream<E>	stream()
 
     /**
-     * Grudgingly provided for backward compatibility, but deprecated because a type-safe version of this method is
-     * available (this method isn't going away).
-     * If you're going to go against Josh Bloch's Item 25: "Prefer Lists to Arrays", at least use the type-safe version
-     * of this method.
+     * This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for backwards
+     * compatibility in some performance-critical situations.  If you really need an array, consider using the somewhat
+     * type-safe version of this method instead, but read the caveats first.
      *
      * {@inheritDoc}
      */
-    @Deprecated @Override default Object[] toArray() {
+    @Override default Object[] toArray() {
         Object[] os = new Object[size()];
         UnIterator iter = iterator();
         for (int i = 0; i < size(); i++) {
@@ -113,10 +112,14 @@ public interface UnCollection<E> extends Collection<E> {
 
     /**
      * This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for backwards
-     * compatibility.  Unlike the collections method this overrides, you can pass it null, though you'll want to cast
-     * it to the appropriate type as in
+     * compatibility in some performance-critical situations.  If you need to create an array (you almost always do)
+     * then the best way to use this method is:
      *
-     * <code>String[] ss = c.toArray((String[]) null);</code>
+     * <code>MyThing[] things = col.toArray(new MyThing[coll.size()]);</code>
+     *
+     * Calling this method any other way causes unnecessary work to be done - an extra memory allocation and potential
+     * garbage collection if the passed array is too small, extra effort to fill the end of the array with nulls if it
+     * is too large.
      *
      * {@inheritDoc}
      */

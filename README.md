@@ -57,13 +57,26 @@ There is now a problem-set for learning this tool-kit: https://github.com/GlenKP
 
 #Motivations
 
+The goals of this project are to make it easy to use Java:
+
+ - Immutably (Josh Bloch Item 15)
+ - Type safely (Josh Bloch Item 23)
+ - Functionally (using first-class functions more easily)
+ - Minimizing the use of primitives and arrays (except for varargs, Suggested by Josh Bloch Items 23, 25, 26, 27, 28, 29)
+ - Briefly
+ - Returning empty collections instead of <code>null</code> (Josh Bloch Item 43)
+ - "Throw exceptions at people, not at code" (Bill Venners quote, but also Josh Bloch Item 59)
+ - Concurrency friendly (Josh Bloch Item 66, 67)
+ - Context-sensitive equality: prefer Comparators to <code>equals()</code>, <code>hashcode()</code> and <code>compareTo()</code> (Daniel Spiewak, Viktor Klang, Rúnar Óli Bjarnason, Hughes Chabot, java.util.TreeSet, java.util.TreeMap)
+ - Compatibly with existing/legacy Java code
+
 Higher order functions are not just briefer to write and read, they are less to *think* about.  They are useful abstractions that simplify your code and focus your attention on your goals rather than the details of how to accomplish them.  Function chaining: <code>xs.map(x -> x + 1).filter(x -> x > 7).first()</code> defines what you are doing and how you are doing it in the simplest possible way, hiding all details about how to iterate through the underlying collection.
 
 The alternative - loops - are bundles of unnecessary complexity.  Loops generally require setting up accumulators, then running a gamut of <code>if</code>, <code>break</code>, and <code>continue</code> statements, like some kind of mad obstacle race that involves as many state changes as possible.  Different kinds of collections require different looping constructs - more complexity.  Looping code is vulnerable to "off-by-one" boundary overflow/underflow, improper initialization, accidental exit, infinite loops, forgetting to update a counter, updating the wrong counter...  The list goes on!  None of that has anything to do with why the loop was created in the first place which is to transform the underlying data.
 
 You don't have to write that kind of code any more.  If you want to map one set of values according to a given function, say so with xs.map().  Filter?  xs.filter().  It's clearer, simpler, and like type safety, it eliminates whole classes of errors.
 
-No data is changed when using the transformers in this project.  They allow you to write nearly stateless programs whose statements chain together and evaluate into a useful result.  Lisp works like this, only the syntax makes the evaluation go inside out from the order you read the statements in (hence Clojure's two arrow operators).  With method chaining, the evaluation happens in the same order as the methods are written on the page, much like piping commands to one another in shell scripts.
+No data is changed when using the transformers in this project.  They allow you to write nearly stateless programs whose statements chain together and evaluate into a useful result.  Clojure works like this, only the syntax makes the evaluation go inside out from the order you read the statements in (hence Clojure's two arrow operators).  With method chaining, the evaluation happens in the same order as the methods are written on the page, much like piping commands to one another in shell scripts.
 
 Incremental evaluation prevents some items from being evaluated to produce the results you need which is sometimes more efficient than traditional whole-collection transforms.  There may be cases where a well hand-written loop will be faster, but in general, the overhead for using these transformations is minimal and, I believe, well worth the clarity, safety, and productivity benefits they provide.  If you find a better/faster implementation, please submit your improvements!
 
@@ -161,6 +174,12 @@ The most interesting classes are probably (in src/main/java/):
 - As of 2014-03-08, all major areas of functionality are covered by unit tests.
 
 #Change Log
+2015-03-27 version 0.8.1: Renamed LazyRef to Lazy.Ref so that I could add Lazy.Int for computing hashcodes.
+Made FunctionX.apply_() methods rethrow RuntimeExceptions unchanged, but (still) wrap checked Exceptions in RuntimeExceptions.
+They were previously wrapped in IllegalStateExceptions, except for SideEffect which tried to cast the exception which never worked.
+SideEffect has been deprecated because it may not have been used anywhere.
+Added some tests, improved some documentation, and made a bunch of things private or deleted them in experiments.collections.ImVectorImpl.
+
 2015-03-14 version 0.8.0: Removed firstMatching - in your code, replace firstMatching(...) with filter(...).first().
 Implemented filter() on Sequence.
 

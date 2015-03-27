@@ -15,8 +15,10 @@ public interface Function2<A,B,R> {
     default R apply_(A a, B b) {
         try {
             return apply(a, b);
+        } catch (RuntimeException re) {
+            throw re;
         } catch (Exception e) {
-            throw new IllegalStateException(e);
+            throw new RuntimeException(e);
         }
     }
 

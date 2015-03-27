@@ -9,6 +9,12 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
+/**
+ * An unmodifiable version of {@link java.util.List} which formalizes the return type of
+ * Collections.unmodifiableList()
+ *
+ * {@inheritDoc}
+ */
 public interface UnList<E> extends List<E>, UnCollection<E> {
 
     /** Not allowed - this is supposed to be unmodifiable */
@@ -55,7 +61,7 @@ public interface UnList<E> extends List<E>, UnCollection<E> {
     }
 
     /**
-     * The default implementation of this method has O(this.size() * that.size()) performance
+     * The default implementation of this method has O(this.size() * that.size()) performance.
      *
      * {@inheritDoc}
      * */
@@ -169,15 +175,8 @@ public interface UnList<E> extends List<E>, UnCollection<E> {
         return (UnList<E>) ls.subList(fromIndex, toIndex);
     }
 
-    /**
-     * Grudgingly provided for backward compatibility, but deprecated because a type-safe version of this method is
-     * available (this method isn't going away).
-     * If you're going to go against Josh Bloch's Item 25: "Prefer Lists to Arrays", at least use the type-safe version
-     * of this method.
-     *
-     * {@inheritDoc}
-     */
-    @Deprecated @Override default Object[] toArray() {
+    /** {@inheritDoc} */
+    @Override default Object[] toArray() {
         Object[] os = new Object[size()];
         UnIterator iter = iterator();
         for (int i = 0; i < size(); i++) {
@@ -186,15 +185,7 @@ public interface UnList<E> extends List<E>, UnCollection<E> {
         return os;
     }
 
-    /**
-     * This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for backwards
-     * compatibility.  Unlike the collections method this overrides, you can pass it null, though you'll want to cast
-     * it to the appropriate type as in
-     *
-     * <code>String[] ss = c.toArray((String[]) null);</code>
-     *
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     @Override default <T> T[] toArray(T[] as) {
         if (as == null) {

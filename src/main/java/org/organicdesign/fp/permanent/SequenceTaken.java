@@ -1,14 +1,14 @@
 package org.organicdesign.fp.permanent;
 
-import org.organicdesign.fp.LazyRef;
+import org.organicdesign.fp.Lazy;
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.tuple.Tuple2;
 
 public class SequenceTaken<T> implements Sequence<T> {
-    private final LazyRef<Tuple2<Option<T>,Sequence<T>>> laz;
+    private final Lazy.Ref<Tuple2<Option<T>,Sequence<T>>> laz;
 
     SequenceTaken(Sequence<T> v, long n) {
-        laz = LazyRef.of(() -> {
+        laz = Lazy.Ref.of(() -> {
             Option<T> first = v.first();
             return Tuple2.of(
                     first,

@@ -620,4 +620,46 @@ public class StaticImports {
         }
         return (s.size() > 0) ? (UnList<T>) Collections.unmodifiableList(s) : UnList.empty();
     }
+
+//    /**
+//     * Returns an int which is a unique and correct hash code for the objects passed.  This hashcode is recomputed on
+//     * every call, so that if any of these objects change their hashCodes, this will always return the latest value.
+//     * Of course, if you add something to a collection that uses a hashCode, then that hashCode changes, you're going
+//     * to have problems!
+//     */
+//    public static int hashCoder(Object... ts) {
+//        if (ts == null) {
+//            return 0;
+//        }
+//        int ret = 0;
+//        for (Object t : ts) {
+//            if (t != null) {
+//                ret = ret ^ t.hashCode();
+//            }
+//        }
+//        return ret;
+//    }
+//
+//    /**
+//     * Use this only if you can guarantee to pass it immutable objects only!  Returns a LazyInt that will compute a
+//     * unique and correct hash code on the first time it is called, then return that primitive int very quickly for all
+//     * future calls.  If any of the hashCodes for the objects passed in change after that time, it will not affect the
+//     * output of this function.  Of course, if you add something to a collection that uses a hashCode and then change
+//     * its hashCode, the behavior is undefined, so changing things after that time is a bad idea anyway.  Still,
+//     * correct is more important than fast, so make good decisions about when to use this.
+//     */
+//    public static Lazy.Int lazyHashCoder(Object... ts) {
+//        if ( (ts == null) || (ts.length < 1) ) {
+//            return Lazy.Int.ZERO;
+//        }
+//        return Lazy.Int.of(() -> {
+//            int ret = 0;
+//            for (Object t : ts) {
+//                if (t != null) {
+//                    ret = ret ^ t.hashCode();
+//                }
+//            }
+//            return ret;
+//        });
+//    }
 }

@@ -417,4 +417,19 @@ public class StaticImportsTest {
         int max = 0;
         helper(a, max);
     }
+
+//    @Test public void testLazyHashcoder() {
+//        int a = 0b1;
+//        int b = 0b10;
+//        int c = 0b100;
+//        int d = 0b1000;
+//        int e = 0b10000;
+//        Lazy.Int hc = lazyHashCoder(a, b, c, d, e);
+//        assertEquals(0b11111, hc.get());
+//        a = 999;
+//        assertEquals(0b11111, hc.get());
+//        a = 0b1;
+//        assertEquals(0b10001, lazyHashCoder(a, null, null, null, e).get());
+//        assertEquals(0b01110, lazyHashCoder(null, b, c, d, null).get());
+//    }
 }

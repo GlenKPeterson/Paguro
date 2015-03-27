@@ -25,15 +25,14 @@ public interface Function1<T,U> {
     /** Implement this one method and you don't have to worry about checked exceptions. */
     U apply(T t) throws Exception;
 
-    /**
-     The class that takes a consumer as an argument uses this convenience method so that it
-     doesn't have to worry about checked exceptions either.
-     */
+    /** Call this convenience method so that you don't have to worry about checked exceptions. */
     default U apply_(T t) {
         try {
             return apply(t);
+        } catch (RuntimeException re) {
+            throw re;
         } catch (Exception e) {
-            throw new IllegalStateException(e);
+            throw new RuntimeException(e);
         }
     }
 

@@ -22,7 +22,9 @@ import java.util.function.Supplier;
  Supplier could implement SideEffect so that they could be used more interchangeably, but
  Java inheritence prohibits overriding methods with the same arguments and different return types.
  So we have an asSupplier() convenience method built in.
+ This is deprecated because it just doesn't seem like a good idea.  You can return null from a Function0.
  */
+@Deprecated
 @FunctionalInterface
 public interface SideEffect {
 
@@ -33,8 +35,10 @@ public interface SideEffect {
     default void apply_() {
         try {
             apply();
+        } catch (RuntimeException re) {
+            throw re;
         } catch (Exception e) {
-            throw (RuntimeException) e;
+            throw new RuntimeException(e);
         }
     }
 
