@@ -37,7 +37,7 @@ class ViewFiltered<T> implements View<T> {
     public Option<T> next() {
         Option<T> item = view.next();
         while (item.isSome()) {
-            if (predicate.apply_(item.get())) { return item; }
+            if (predicate.apply(item.get())) { return item; }
             item = view.next();
         }
         return Option.none();

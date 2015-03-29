@@ -39,7 +39,7 @@ public class ViewTakenWhile<T> implements View<T> {
         Option<T> item = innerView.next();
 
         if ( !item.isSome() ||
-             !pred.apply_(item.get()) ) {
+             !pred.apply(item.get()) ) {
 
             done = true;
             return Option.none();

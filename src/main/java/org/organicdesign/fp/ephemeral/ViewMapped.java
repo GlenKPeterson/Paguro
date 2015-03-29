@@ -36,6 +36,6 @@ class ViewMapped<T,U> implements View<U> {
     public Option<U> next() {
         Option<T> item = view.next();
         if (!item.isSome()) { return Option.none(); }
-        return Option.of(func.apply_(item.get()));
+        return Option.of(func.apply(item.get()));
     }
 }

@@ -155,7 +155,7 @@ processing the input at that time, returning the latest u.
     @Override
     default <U> HashMap<T,U> toJavaHashMap(final Function1<T,U> f1) {
         return foldLeft(new HashMap<T, U>(), (ts, t) -> {
-            ts.put(t, f1.apply(t));
+            ts.put(t, f1.applyEx(t));
             return ts;
         });
     }
@@ -166,7 +166,7 @@ processing the input at that time, returning the latest u.
     @Override
     default <U> HashMap<U,T> toReverseJavaHashMap(final Function1<T,U> f1) {
         return foldLeft(new HashMap<U, T>(), (ts, t) -> {
-            ts.put(f1.apply(t), t);
+            ts.put(f1.applyEx(t), t);
             return ts;
         });
     }

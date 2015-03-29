@@ -26,14 +26,14 @@ public class LazyTest {
     public void testLazyRef() {
         Mutable.IntRef intRef = Mutable.IntRef.of(3);
         Function0<Integer> f = () -> intRef.increment().value();
-        assertEquals(f.apply_(), new Integer(4));
-        assertEquals(f.apply_(), new Integer(5));
-        assertEquals(f.apply_(), new Integer(6));
+        assertEquals(f.apply(), new Integer(4));
+        assertEquals(f.apply(), new Integer(5));
+        assertEquals(f.apply(), new Integer(6));
 
         Lazy.Ref<Integer> lr = Lazy.Ref.of(f);
         assertEquals(lr.get(), new Integer(7));
 
-        assertEquals(f.apply_(), new Integer(8));
+        assertEquals(f.apply(), new Integer(8));
         intRef.set(-1);
 
         assertEquals(lr.get(), new Integer(7));
@@ -45,14 +45,14 @@ public class LazyTest {
     public void testLazyInt() {
         Mutable.IntRef intRef = Mutable.IntRef.of(3);
         Function0<Integer> f = () -> intRef.increment().value();
-        assertEquals(f.apply_(), new Integer(4));
-        assertEquals(f.apply_(), new Integer(5));
-        assertEquals(f.apply_(), new Integer(6));
+        assertEquals(f.apply(), new Integer(4));
+        assertEquals(f.apply(), new Integer(5));
+        assertEquals(f.apply(), new Integer(6));
 
         Lazy.Int lr = Lazy.Int.of(f);
         assertEquals(lr.get(), 7);
 
-        assertEquals(f.apply_(), new Integer(8));
+        assertEquals(f.apply(), new Integer(8));
         intRef.set(-1);
 
         assertEquals(lr.get(), 7);

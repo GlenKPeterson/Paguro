@@ -41,7 +41,7 @@ class ViewFlatMapped<T,U> implements View<U> {
         if (innerView == EMPTY_VIEW) {
             Option<T> item = outerView.next();
             if (!item.isSome()) { return Option.none(); }
-            innerView = func.apply_(item.get());
+            innerView = func.apply(item.get());
         }
         Option<U> innerNext = innerView.next();
         if (!innerNext.isSome()) {

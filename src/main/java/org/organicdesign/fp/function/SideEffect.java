@@ -29,12 +29,12 @@ import java.util.function.Supplier;
 public interface SideEffect {
 
     /** Implement this one method and you don't have to worry about checked exceptions. */
-    void apply() throws Exception;
+    void applyEx() throws Exception;
 
     /** The caller should use this convenience method to avoid checked exceptions. */
-    default void apply_() {
+    default void apply() {
         try {
-            apply();
+            applyEx();
         } catch (RuntimeException re) {
             throw re;
         } catch (Exception e) {
@@ -46,7 +46,7 @@ public interface SideEffect {
     default <T> Supplier<T> asSupplier() {
         final SideEffect parent = this;
         return () -> {
-            parent.apply_();
+            parent.apply();
             return (T) null;
         };
     }

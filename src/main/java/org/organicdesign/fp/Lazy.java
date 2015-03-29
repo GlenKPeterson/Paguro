@@ -42,7 +42,7 @@ public class Lazy {
                     // Checking again inside the sync block ensures only one thread can produce the value.
                     if (producer != null) {
                         // Here, a single thread has earned the right to produce our value.
-                        value = producer.apply_();
+                        value = producer.apply();
                         // Delete the producer to 1. mark the work done and 2. free resources.
                         producer = null;
                     }
@@ -95,7 +95,7 @@ public class Lazy {
                     // Checking again inside the sync block ensures only one thread can produce the value.
                     if (producer != null) {
                         // Here, a single thread has earned the right to produce our value.
-                        value = producer.apply_();
+                        value = producer.apply();
                         // Delete the producer to 1. mark the work done and 2. free resources.
                         producer = null;
                     }

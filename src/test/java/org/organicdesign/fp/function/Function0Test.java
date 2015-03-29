@@ -11,18 +11,18 @@ public class Function0Test {
     @Test(expected = RuntimeException.class)
     public void applyIOException() {
         new Function0<Integer>() {
-            @Override public Integer apply() throws Exception {
+            @Override public Integer applyEx() throws Exception {
                 throw new IOException("test exception");
             }
-        }.apply_();
+        }.apply();
     }
 
     @Test(expected = IllegalStateException.class)
     public void applyIllegalStateException() {
         new Function0<Integer>() {
-            @Override public Integer apply() throws Exception {
+            @Override public Integer applyEx() throws Exception {
                 throw new IllegalStateException("test exception");
             }
-        }.apply_();
+        }.apply();
     }
 }

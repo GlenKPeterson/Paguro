@@ -23,7 +23,7 @@ public class SequenceTakenWhile<T> implements Sequence<T> {
         if (first == null) {
             first = innerSequence.first();
             if ( first.isSome() &&
-                 pred.apply_(first.get()) ) {
+                 pred.apply(first.get()) ) {
                 innerSequence = SequenceTakenWhile.of(innerSequence.rest(), pred);
             } else {
                 first = Option.none();

@@ -11,18 +11,18 @@ public class SideEffectTest {
     @Test(expected = RuntimeException.class)
     public void applyIOException() {
         new SideEffect() {
-            @Override public void apply() throws Exception {
+            @Override public void applyEx() throws Exception {
                 throw new IOException("test exception");
             }
-        }.apply_();
+        }.apply();
     }
 
     @Test(expected = IllegalStateException.class)
     public void applyIllegalStateException() {
         new SideEffect() {
-            @Override public void apply() throws Exception {
+            @Override public void applyEx() throws Exception {
                 throw new IllegalStateException("test exception");
             }
-        }.apply_();
+        }.apply();
     }
 }

@@ -309,7 +309,7 @@ public class ImVectorImpl<E> implements ImList<E> {
 //        for (int i = 0; i < size; i += step) {
 //            E[] array = leafNodeArrayFor(i);
 //            for (int j = 0; j < array.length; ++j) {
-//                init = f.apply_(init, array[j]);
+//                init = f.apply(init, array[j]);
 //
 //                if ( (init != null) && (init instanceof Reduced) ) {
 //                    return ((Reduced<U>) init).val;

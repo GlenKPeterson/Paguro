@@ -72,7 +72,7 @@ public interface Sequence<T> extends Transformable<T> {
         Sequence<T> seq = this;
         Option<T> item = seq.first();
         while (item.isSome()) {
-            consumer.apply_(item.get());
+            consumer.apply(item.get());
             // repeat with next element
             seq = seq.rest();
             item = seq.first();
@@ -101,7 +101,7 @@ public interface Sequence<T> extends Transformable<T> {
         Option<T> item = seq.first();
         // System.out.println("===>item: " + item);
         while (item.isSome()) {
-            u = fun.apply_(u, item.get());
+            u = fun.apply(u, item.get());
             // repeat with next element
             seq = seq.rest();
             item = seq.first();
@@ -116,8 +116,8 @@ public interface Sequence<T> extends Transformable<T> {
         Option<T> item = seq.first();
         // System.out.println("===>item: " + item);
         while (item.isSome()) {
-            u = fun.apply_(u, item.get());
-            if (terminateWith.apply_(u)) {
+            u = fun.apply(u, item.get());
+            if (terminateWith.apply(u)) {
                 return u;
             }
             // repeat with next element
@@ -144,7 +144,7 @@ public interface Sequence<T> extends Transformable<T> {
 //        T accum = item;
 //        while (!item.isSome()) {
 //            item = next();
-//            accum = fun.apply_(accum, item);
+//            accum = fun.apply(accum, item);
 //        }
 //        return accum;
 //    }

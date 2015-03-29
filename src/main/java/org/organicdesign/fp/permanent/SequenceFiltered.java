@@ -40,7 +40,7 @@ public class SequenceFiltered<T> implements Sequence<T> {
                     break;
                 }
 
-                if (predicate.apply_(item.get())) {
+                if (predicate.apply(item.get())) {
                     first = item;
                     seq = of(seq.rest(), predicate);
                     return;

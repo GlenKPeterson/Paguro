@@ -55,7 +55,7 @@ public interface View<T> extends Transformable<T> {
     default void forEach(Function1<T,?> consumer) {
         Option<T> item = next();
         while (item.isSome()) {
-            consumer.apply_(item.get());
+            consumer.apply(item.get());
             item = next();
         }
     }
@@ -78,7 +78,7 @@ public interface View<T> extends Transformable<T> {
     default <U> U foldLeft(U u, Function2<U,T,U> fun) {
         Option<T> item = next();
         while (item.isSome()) {
-            u = fun.apply_(u, item.get());
+            u = fun.apply(u, item.get());
             item = next();
         }
         return u;
@@ -88,8 +88,8 @@ public interface View<T> extends Transformable<T> {
     default <U> U foldLeft(U u, Function2<U,T,U> fun, Function1<U,Boolean> terminateWith) {
         Option<T> item = next();
         while (item.isSome()) {
-            u = fun.apply_(u, item.get());
-            if (terminateWith.apply_(u)) {
+            u = fun.apply(u, item.get());
+            if (terminateWith.apply(u)) {
                 return u;
             }
             item = next();
@@ -101,7 +101,7 @@ public interface View<T> extends Transformable<T> {
 //                           BiFunction<U, T, Tuple2<U,Boolean>> fun) {
 //        Option<T> item = next();
 //        while (item.isSome()) {
-//            u = fun.apply(u._1(), item.get());
+//            u = fun.applyEx(u._1(), item.get());
 //            if (u._2()) {
 //                return u._1();
 //            }
@@ -116,7 +116,7 @@ public interface View<T> extends Transformable<T> {
 //        T accum = item;
 //        while (item != None()) {
 //            item = next();
-//            accum = fun.apply_(accum, item);
+//            accum = fun.apply(accum, item);
 //        }
 //        return accum;
 //    }

@@ -36,7 +36,7 @@ public class SequenceMapped<T,U>  implements Sequence<U> {
     public Option<U> first() {
         Option<T> item = seq.first();
         if (!item.isSome()) { return Option.none(); }
-        return Option.of(func.apply_(item.get()));
+        return Option.of(func.apply(item.get()));
     }
 
     @Override

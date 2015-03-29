@@ -3,7 +3,6 @@ package org.organicdesign.fp.function;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.ephemeral.View;
 
 import java.io.IOException;
@@ -16,25 +15,25 @@ public class Function1Test {
     @Test(expected = RuntimeException.class)
     public void applyIOException() {
         new Function1<Integer,Integer>() {
-            @Override public Integer apply(Integer o) throws Exception {
+            @Override public Integer applyEx(Integer o) throws Exception {
                 if (o < 10) {
                     throw new IOException("test exception");
                 }
                 return o;
             }
-        }.apply_(3);
+        }.apply(3);
     }
 
     @Test(expected = IllegalStateException.class)
     public void applyIllegalStateException() {
         new Function1<Integer,Integer>() {
-            @Override public Integer apply(Integer o) throws Exception {
+            @Override public Integer applyEx(Integer o) throws Exception {
                 if (o < 10) {
                     throw new IllegalStateException("test exception");
                 }
                 return o;
             }
-        }.apply_(3);
+        }.apply(3);
     }
 
     @Test

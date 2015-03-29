@@ -18,19 +18,20 @@ import org.organicdesign.fp.ephemeral.View;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  This is like Java 8's java.util.function.Function, but retrofitted to turn checked exceptions
  into unchecked ones.
  */
-public interface Function1<T,U> {
+public interface Function1<T,U> extends Function<T,U> {
     /** Implement this one method and you don't have to worry about checked exceptions. */
-    U apply(T t) throws Exception;
+    U applyEx(T t) throws Exception;
 
     /** Call this convenience method so that you don't have to worry about checked exceptions. */
-    default U apply_(T t) {
+    @Override default U apply(T t) {
         try {
-            return apply(t);
+            return applyEx(t);
         } catch (RuntimeException re) {
             throw re;
         } catch (Exception e) {
@@ -50,8 +51,8 @@ public interface Function1<T,U> {
         final Function1<T,U> parent = this;
         return new Function1<S, U>() {
             @Override
-            public U apply(S s) throws Exception {
-                return parent.apply(f.apply(s));
+            public U applyEx(S s) throws Exception {
+                return parent.applyEx(f.applyEx(s));
             }
         };
     }
@@ -59,7 +60,7 @@ public interface Function1<T,U> {
     public static final Function1<Object,Object> IDENTITY = new Function1<Object,Object>() {
 
         @Override
-        public Object apply(Object t) throws Exception {
+        public Object applyEx(Object t) throws Exception {
             return t;
         }
 
@@ -94,8 +95,8 @@ public interface Function1<T,U> {
      public static &lt;A,B,C&gt; Function1&lt;A,C&gt; chain2(final Function1&lt;A,B&gt; f1, final Function1&lt;B,C&gt; f2) {
          return new Function1&lt;A,C&gt;() {
              &#64;Override
-             public C apply(A a) throws Exception {
-                 return f2.apply(f1.apply(a));
+             public C applyEx(A a) throws Exception {
+                 return f2.applyEx(f1.applyEx(a));
              }
          };
      }</code></pre>
@@ -106,7 +107,7 @@ public interface Function1<T,U> {
      roll your own type safe versions as you need them.  Only the simplest case seems worth
      providing, along the lines of the and() helper function in Filter()
 
-     @param in the functions to apply in order.  Nulls and IDENTITY functions are ignored.
+     @param in the functions to applyEx in order.  Nulls and IDENTITY functions are ignored.
      No functions means IDENTITY.
 
      @param <V> the type of object to chain functions on
@@ -132,10 +133,10 @@ public interface Function1<T,U> {
         } else {
             return new Function1<V,V>() {
                 @Override
-                public V apply(V v) throws Exception {
+                public V applyEx(V v) throws Exception {
                     V ret = v;
                     for (Function1<V,V> f : out) {
-                        ret = f.apply(ret);
+                        ret = f.applyEx(ret);
                     }
                     return ret;
                 }
@@ -151,7 +152,7 @@ public interface Function1<T,U> {
 //     may or may not prove useful in practice.  Please use the identity()/IDENTITY
 //     sentinel value in this abstract class since function comparison is done by reference.
 //
-//     @param in the functions to apply in order.  Nulls and IDENTITY functions are ignored.
+//     @param in the functions to applyEx in order.  Nulls and IDENTITY functions are ignored.
 //     No functions means IDENTITY.
 //
 //     @param <V> the type of object to chain functions on
@@ -161,15 +162,15 @@ public interface Function1<T,U> {
 //    public static <A,B,C> Function1<A,C> chain2(final Function1<A,B> f1, final Function1<B,C> f2) {
 //        return new Function1<A,C>() {
 //            @Override
-//            public C apply(A a) throws Exception {
-//                return f2.apply(f1.apply(a));
+//            public C applyEx(A a) throws Exception {
+//                return f2.applyEx(f1.applyEx(a));
 //            }
 //        };
 //    }
 
 // Don't think this is necessary.  Is it?
 //    default Function<T,U> asFunction() {
-//        return (T t) -> apply_(t);
+//        return (T t) -> apply(t);
 //    }
 
     static <S> Function1<S,Boolean> or(Function1<S,Boolean> a, Function1<S,Boolean> b) {
@@ -177,7 +178,7 @@ public interface Function1<T,U> {
                 a == REJECT ? b : // return whatever b is.
                 b == ACCEPT ? b : // If any are true, all are true.
                 b == REJECT ? a : // Just amounts to if a else false, no composition necessary.
-                (S s) -> (a.apply_(s) == Boolean.TRUE) || (b.apply_(s) == Boolean.TRUE); // compose new function.
+                (S s) -> (a.apply(s) == Boolean.TRUE) || (b.apply(s) == Boolean.TRUE); // compose new function.
     }
 
     static <S> Function1<S,Boolean> and(Function1<S,Boolean> a, Function1<S,Boolean> b) {
@@ -185,23 +186,23 @@ public interface Function1<T,U> {
                 a == REJECT ? a : // if any are false, all are false.  No composition necessary.
                 b == ACCEPT ? a : // Just amounts to if a else false, no composition necessary.
                 b == REJECT ? b : // If any are false, all are false.
-                (S s) -> (a.apply_(s) == Boolean.TRUE) && (b.apply_(s) == Boolean.TRUE); // compose new fn
+                (S s) -> (a.apply(s) == Boolean.TRUE) && (b.apply(s) == Boolean.TRUE); // compose new fn
     }
 
     static <S> Function1<S,Boolean> negate(Function1<? super S,Boolean> a) {
         return  a == ACCEPT ? reject() :
                 a == REJECT ? accept() :
-                        (S s) -> (a.apply_(s) == Boolean.TRUE) ? Boolean.FALSE : Boolean.TRUE;
+                        (S s) -> (a.apply(s) == Boolean.TRUE) ? Boolean.FALSE : Boolean.TRUE;
     }
 
     /** A predicate that always returns true.  Use accept() for a type-safe version of this predicate. */
     public static final Function1<Object,Boolean> ACCEPT = new Function1<Object,Boolean>() {
-        @Override public Boolean apply(Object t) { return Boolean.TRUE; }
+        @Override public Boolean applyEx(Object t) { return Boolean.TRUE; }
     };
 
     /** A predicate that always returns false. Use reject() for a type-safe version of this predicate. */
     public static final Function1<Object,Boolean> REJECT = new Function1<Object,Boolean>() {
-        @Override public Boolean apply(Object t) { return Boolean.FALSE; }
+        @Override public Boolean applyEx(Object t) { return Boolean.FALSE; }
     };
 
     /** Returns a type-safe version of the ACCEPT predicate. */
