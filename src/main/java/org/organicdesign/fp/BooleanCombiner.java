@@ -13,35 +13,34 @@
 
 package org.organicdesign.fp;
 
-import java.util.function.Predicate;
-
 import org.organicdesign.fp.ephemeral.View;
+import org.organicdesign.fp.function.Function1;
 
 public enum BooleanCombiner {
     AND {
         @Override
-        public <T> Predicate<T> combine(View<Predicate<T>> in) {
-            return FunctionUtils.and(in);
+        public <T> Function1<T,Boolean> combine(View<Function1<T,Boolean>> in) {
+            return Function1.and(in);
         }
         @Override
         @SafeVarargs
-        public final <T> Predicate<T> combineArray(Predicate<T>... in) {
-            return FunctionUtils.andArray(in);
+        public final <T> Function1<T,Boolean> combineArray(Function1<T,Boolean>... in) {
+            return Function1.andArray(in);
         }
     },
     OR {
         @Override
-        public <T> Predicate<T> combine(View<Predicate<T>> in) {
-            return FunctionUtils.or(in);
+        public <T> Function1<T,Boolean> combine(View<Function1<T,Boolean>> in) {
+            return Function1.or(in);
         }
         @Override
         @SafeVarargs
-        public final <T> Predicate<T> combineArray(Predicate<T>... in) {
-            return FunctionUtils.orArray(in);
+        public final <T> Function1<T,Boolean> combineArray(Function1<T,Boolean>... in) {
+            return Function1.orArray(in);
         }
     };
-    public abstract <T> Predicate<T> combine(View<Predicate<T>> in);
+    public abstract <T> Function1<T,Boolean> combine(View<Function1<T,Boolean>> in);
 
     @SuppressWarnings("unchecked")
-    public abstract <T> Predicate<T> combineArray(Predicate<T>... in);
+    public abstract <T> Function1<T,Boolean> combineArray(Function1<T,Boolean>... in);
 }

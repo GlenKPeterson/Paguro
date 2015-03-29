@@ -599,16 +599,16 @@ public class StaticImports {
     /** Returns an unmodifiable List containing all passed items (including null items). */
     @SuppressWarnings("unchecked")
     @SafeVarargs
-    public static <T> UnList<T> uList(T... ts) {
+    public static <T> List<T> uList(T... ts) {
         return ( (ts == null) || (ts.length < 1) )
                 ? UnList.empty()
-                : (UnList<T>) Collections.unmodifiableList(new ArrayList<>(Arrays.asList(ts)));
+                : Collections.unmodifiableList(new ArrayList<>(Arrays.asList(ts)));
     }
 
     /** Returns an unmodifiable List containing any non-null passed items. */
     @SuppressWarnings("unchecked")
     @SafeVarargs
-    public static <T> UnList<T> uListSkipNull(T... ts) {
+    public static <T> List<T> uListSkipNull(T... ts) {
         if ( (ts == null) || (ts.length < 1) ) {
             return UnList.empty();
         }
@@ -618,7 +618,7 @@ public class StaticImports {
                 s.add(t);
             }
         }
-        return (s.size() > 0) ? (UnList<T>) Collections.unmodifiableList(s) : UnList.empty();
+        return (s.size() > 0) ? Collections.unmodifiableList(s) : UnList.empty();
     }
 
 //    /**

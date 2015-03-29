@@ -1,23 +1,21 @@
 package org.organicdesign.fp.permanent;
 
-import java.util.function.Predicate;
-
-import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.Option;
+import org.organicdesign.fp.function.Function1;
 
 public class SequenceTakenWhile<T> implements Sequence<T> {
     private Sequence<T> innerSequence;
-    private final Predicate<T> pred;
+    private final Function1<T,Boolean> pred;
     private Option<T> first = null;
 
-    SequenceTakenWhile(Sequence<T> v, Predicate<T> p) { innerSequence = v; pred = p; }
+    SequenceTakenWhile(Sequence<T> v, Function1<T,Boolean> p) { innerSequence = v; pred = p; }
 
-    public static <T> Sequence<T> of(Sequence<T> v, Predicate<T> p) {
+    public static <T> Sequence<T> of(Sequence<T> v, Function1<T,Boolean> p) {
         if (p == null) { throw new IllegalArgumentException("Must provide a predicate"); }
-        if ( (p == FunctionUtils.REJECT) ||
+        if ( (p == Function1.REJECT) ||
              (v == null) ||
              (v == EMPTY_SEQUENCE) ) { return Sequence.emptySequence(); }
-        if (p == FunctionUtils.ACCEPT) { return v; }
+        if (p == Function1.ACCEPT) { return v; }
         return new SequenceTakenWhile<>(v, p);
     }
 
@@ -25,7 +23,7 @@ public class SequenceTakenWhile<T> implements Sequence<T> {
         if (first == null) {
             first = innerSequence.first();
             if ( first.isSome() &&
-                 pred.test(first.get()) ) {
+                 pred.apply_(first.get()) ) {
                 innerSequence = SequenceTakenWhile.of(innerSequence.rest(), pred);
             } else {
                 first = Option.none();

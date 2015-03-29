@@ -74,8 +74,6 @@ public class Lazy {
          * Use this function to produce a value on the first call to get().  Delete the pointer to this function when that
          * first call completes, but remember the value to return with all subsequent calls to get().
          * @param producer will produce the desired value when called.
-         * @param <T>
-         * @return
          */
         public static Int of(Function0<Integer> producer) {
             if (producer == null) {

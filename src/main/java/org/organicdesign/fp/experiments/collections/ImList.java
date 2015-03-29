@@ -34,30 +34,16 @@ public interface ImList<E> extends UnList<E> {
      * @param es the values to insert
      * @return a new ImList with the additional items at the end.
      */
-    default ImList<E> append(E... es) {
-        if ( (es == null) || (es.length < 1) ) { return this; }
-        ImList<E> l = this;
-        for (E e : es) {
-            l = l.insert(l.size() - 1, e);
-        }
-        return l;
-    }
+    @SuppressWarnings("unchecked")
+    default ImList<E> append(E... es) { return append(this, es); }
 
     /**
      * Adds items to the end of the ImList.
      * @param es the values to insert
      * @return a new ImList with the additional items at the end.
      */
-    default ImList<E> appendSkipNull(E... es) {
-        if ( (es == null) || (es.length < 1) ) { return this; }
-        ImList<E> l = this;
-        for (E e : es) {
-            if (e != null) {
-                l = l.insert(l.size() - 1, e);
-            }
-        }
-        return l;
-    }
+    @SuppressWarnings("unchecked")
+    default ImList<E> appendSkipNull(E... es) { return appendSkipNull(this, es); }
 
     /**
      * Returns the item at this index, but takes any Number as an argument.
@@ -83,9 +69,60 @@ public interface ImList<E> extends UnList<E> {
      * @param es the values to insert
      * @return a new ImList beginning with the additional items.
      */
-    default ImList<E> prepend(E... es) {
-        if ( (es == null) || (es.length < 1) ) { return this; }
-        ImList<E> l = this;
+    @SuppressWarnings("unchecked")
+    default ImList<E> prepend(E... es) { return prepend(this, es); }
+
+    /**
+     * Inserts items at the beginning of the ImList.
+     * @param es the values to insert
+     * @return a new ImList beginning with the additional items.
+     */
+    @SuppressWarnings("unchecked")
+    default ImList<E> prependSkipNull(E... es) { return prependSkipNull(this, es); }
+
+    // ================================================ STATIC METHODS ================================================
+    static <T> ImList<T> empty() { return ImVectorImpl.empty(); }
+
+    /**
+     * Adds items to the end of the ImList.
+     * @param es the values to insert
+     * @return a new ImList with the additional items at the end.
+     */
+    @SafeVarargs
+    static <E> ImList<E> append(ImList<E> l, E... es) {
+        if ((es == null) || (es.length < 1)) {
+            return l;
+        }
+        for (E e : es) {
+            l = l.insert(l.size() - 1, e);
+        }
+        return l;
+    }
+
+    /**
+     * Adds items to the end of the ImList.
+     * @param es the values to insert
+     * @return a new ImList with the additional items at the end.
+     */
+    @SafeVarargs
+    static <E> ImList<E> appendSkipNull(ImList<E> l, E... es) {
+        if ( (es == null) || (es.length < 1) ) { return l; }
+        for (E e : es) {
+            if (e != null) {
+                l = l.insert(l.size() - 1, e);
+            }
+        }
+        return l;
+    }
+
+    /**
+     * Inserts items at the beginning of the ImList.
+     * @param es the values to insert
+     * @return a new ImList beginning with the additional items.
+     */
+    @SafeVarargs
+    static <E> ImList<E> prepend(ImList<E> l, E... es) {
+        if ( (es == null) || (es.length < 1) ) { return l; }
         for (E e : es) {
             l = l.insert(0, e);
         }
@@ -97,9 +134,9 @@ public interface ImList<E> extends UnList<E> {
      * @param es the values to insert
      * @return a new ImList beginning with the additional items.
      */
-    default ImList<E> prependSkipNull(E... es) {
-        if ( (es == null) || (es.length < 1) ) { return this; }
-        ImList<E> l = this;
+    @SafeVarargs
+    static <E> ImList<E> prependSkipNull(ImList<E> l, E... es) {
+        if ( (es == null) || (es.length < 1) ) { return l; }
         for (E e : es) {
             if (e != null) {
                 l = l.insert(0, e);
@@ -108,6 +145,5 @@ public interface ImList<E> extends UnList<E> {
         return l;
     }
 
-    // ================================================ STATIC METHODS ================================================
-    static <T> ImList<T> empty() { return ImVectorImpl.empty(); }
+
 }

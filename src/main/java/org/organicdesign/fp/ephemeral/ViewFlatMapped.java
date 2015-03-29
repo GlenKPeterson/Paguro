@@ -14,21 +14,20 @@
 
 package org.organicdesign.fp.ephemeral;
 
-import java.util.function.Function;
-
 import org.organicdesign.fp.Option;
+import org.organicdesign.fp.function.Function1;
 
 class ViewFlatMapped<T,U> implements View<U> {
     private final View<T> outerView;
 
     private View<U> innerView = View.emptyView();
 
-    private final Function<T,View<U>> func;
+    private final Function1<T,View<U>> func;
 
-    ViewFlatMapped(View<T> v, Function<T,View<U>> f) { outerView = v; func = f; }
+    ViewFlatMapped(View<T> v, Function1<T,View<U>> f) { outerView = v; func = f; }
 
     @SuppressWarnings("unchecked")
-    public static <T,U> View<U> of(View<T> v, Function<T,View<U>> f) {
+    public static <T,U> View<U> of(View<T> v, Function1<T,View<U>> f) {
         // You can put nulls in, but you don't get nulls out.
         if (f == null) { return View.emptyView(); }
         // TODO: Is this comparison possible?
@@ -42,7 +41,7 @@ class ViewFlatMapped<T,U> implements View<U> {
         if (innerView == EMPTY_VIEW) {
             Option<T> item = outerView.next();
             if (!item.isSome()) { return Option.none(); }
-            innerView = func.apply(item.get());
+            innerView = func.apply_(item.get());
         }
         Option<U> innerNext = innerView.next();
         if (!innerNext.isSome()) {

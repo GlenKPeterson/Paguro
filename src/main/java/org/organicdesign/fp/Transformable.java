@@ -14,6 +14,9 @@
 
 package org.organicdesign.fp;
 
+import org.organicdesign.fp.function.Function1;
+import org.organicdesign.fp.function.Function2;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -25,10 +28,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 /**
  Represents transformations to be carried out on a collection.  This class also implements the
@@ -40,25 +39,25 @@ public interface Transformable<T> extends Realizable<T> {
     /**
      Lazily applies the given function to each item in the underlying data source, and returns
      a View with one item for each result.
-     @param func a function that returns a new value for any value in the input
      @return a lazy view of the same size as the input (may contain duplicates) containing the
      return values of the given function in the same order as the input values.
+      * @param func a function that returns a new value for any value in the input
      */
-    <U> Transformable<U> map(Function<T,U> func);
+    <U> Transformable<U> map(Function1<T,U> func);
 
     /**
      Lazily applies the filter function to the underlying data source and returns a new view
      containing only the items for which the filter returned true
-     @param func a function that returns true for items to keep, false for items to drop
      @return a lazy view of only the filtered items.
+      * @param predicate a function that returns true for items to keep, false for items to drop
      */
-    Transformable<T> filter(Predicate<T> func);
+    Transformable<T> filter(Function1<T,Boolean> predicate);
 
     /**
      Eagerly processes the entire data source for side effects.
-     @param se the function to do the processing
+     * @param consumer the function to do the processing
      */
-    void forEach(Consumer<T> se);
+    void forEach(Function1<T,?> consumer);
 
 //    /**
 //     Deprecated: use filter(...).first() instead.
@@ -79,12 +78,12 @@ public interface Transformable<T> extends Realizable<T> {
     /**
      Shorten this transformable to contain all items from the beginning so long as they satisfy the
      predicate.
-     @param p the test.
      @return a lazy transformable containing the longest un-interrupted run of items, from the
      beginning of the transformable, that satisfy the given predicate.  This could be 0 items to
      the entire transformable.
+      * @param predicate the test.
      */
-    Transformable<T> takeWhile(Predicate<T> p);
+    Transformable<T> takeWhile(Function1<T,Boolean> predicate);
 
     // TODO: You can always use foldLeft for this operation.  Does having reduceLeft add more clarity to the underlying code, or does it provide some useful additional functionality?
 //    /**
@@ -102,14 +101,14 @@ public interface Transformable<T> extends Realizable<T> {
      FoldLeft can also produce a single (scalar) value.  In that form, it is often called reduce().
 
      @return an eagerly evaluated result which could be a single value like a sum, or a collection.
-     @param u the accumulator and starting value.  This will be passed to the function on the
-     first iteration to be combined with the first member of the underlying data source.  For some
-     operations you'll need to pass an identity, e.g. for a sum, pass 0, for a product, pass 1 as
-     this parameter.
-     @param fun combines each value in the list with the result so far.  The initial result is u.
+      * @param u the accumulator and starting value.  This will be passed to the function on the
+      first iteration to be combined with the first member of the underlying data source.  For some
+      operations you'll need to pass an identity, e.g. for a sum, pass 0, for a product, pass 1 as
+      this parameter.
+     * @param fun combines each value in the list with the result so far.  The initial result is u.
      */
     // TODO: Rename to foldRight!
-    <U> U foldLeft(U u, BiFunction<U, T, U> fun);
+    <U> U foldLeft(U u, Function2<U,T,U> fun);
 
     /**
      A form of foldLeft() that handles early termination.  If foldLeft replaces a loop, and return
@@ -118,16 +117,16 @@ public interface Transformable<T> extends Realizable<T> {
      terminateWith(Tuple2(T,V) tv) { if tv._1()... }
 
      @return an eagerly evaluated result which could be a single value like a sum, or a collection.
-     @param u the accumulator and starting value.  This will be passed to the function on the
-     first iteration to be combined with the first member of the underlying data source.  For some
-     operations you'll need to pass an identity, e.g. for a sum, pass 0, for a product, pass 1 as
-     this parameter.
-     @param fun combines each value in the list with the result so far.  The initial result is u.
-     @param terminateWith returns true when the termination condition is reached and will stop
-     processing the input at that time, returning the latest u.
+      * @param u the accumulator and starting value.  This will be passed to the function on the
+      first iteration to be combined with the first member of the underlying data source.  For some
+      operations you'll need to pass an identity, e.g. for a sum, pass 0, for a product, pass 1 as
+      this parameter.
+     * @param fun combines each value in the list with the result so far.  The initial result is u.
+     * @param terminateWith returns true when the termination condition is reached and will stop
+processing the input at that time, returning the latest u.
      */
     // TODO: Rename to foldRight!
-    <U> U foldLeft(U u, BiFunction<U, T, U> fun, Predicate<U> terminateWith);
+    <U> U foldLeft(U u, Function2<U,T,U> fun, Function1<U,Boolean> terminateWith);
 
 
     // Sub-classes cannot inherit from this because the function that you pass in has to know the actal return type.
@@ -151,12 +150,10 @@ public interface Transformable<T> extends Realizable<T> {
     }
 
     @Override
-    default List<T> toJavaUnmodList() {
-        return Collections.unmodifiableList(toJavaArrayList());
-    }
+    default List<T> toJavaUnmodList() { return Collections.unmodifiableList(toJavaArrayList()); }
 
     @Override
-    default <U> HashMap<T,U> toJavaHashMap(final Function<T,U> f1) {
+    default <U> HashMap<T,U> toJavaHashMap(final Function1<T,U> f1) {
         return foldLeft(new HashMap<T, U>(), (ts, t) -> {
             ts.put(t, f1.apply(t));
             return ts;
@@ -164,12 +161,10 @@ public interface Transformable<T> extends Realizable<T> {
     }
 
     @Override
-    default <U> Map<T,U> toJavaUnmodMap(Function<T,U> f1) {
-        return Collections.unmodifiableMap(toJavaHashMap(f1));
-    }
+    default <U> Map<T,U> toJavaUnmodMap(Function1<T,U> f1) { return Collections.unmodifiableMap(toJavaHashMap(f1)); }
 
     @Override
-    default <U> HashMap<U,T> toReverseJavaHashMap(final Function<T, U> f1) {
+    default <U> HashMap<U,T> toReverseJavaHashMap(final Function1<T,U> f1) {
         return foldLeft(new HashMap<U, T>(), (ts, t) -> {
             ts.put(f1.apply(t), t);
             return ts;
@@ -177,7 +172,7 @@ public interface Transformable<T> extends Realizable<T> {
     }
 
     @Override
-    default <U> Map<U,T> toReverseJavaUnmodMap(Function<T,U> f1) {
+    default <U> Map<U,T> toReverseJavaUnmodMap(Function1<T,U> f1) {
         return Collections.unmodifiableMap(toReverseJavaHashMap(f1));
     }
 
@@ -197,9 +192,7 @@ public interface Transformable<T> extends Realizable<T> {
         return Collections.unmodifiableSortedSet(toJavaTreeSet(comparator));
     }
     @Override
-    default SortedSet<T> toJavaUnmodSortedSet() {
-        return toJavaUnmodSortedSet(null);
-    }
+    default SortedSet<T> toJavaUnmodSortedSet() { return toJavaUnmodSortedSet(null); }
 
     @Override
     default HashSet<T> toJavaHashSet() {
@@ -210,9 +203,7 @@ public interface Transformable<T> extends Realizable<T> {
     }
 
     @Override
-    default Set<T> toJavaUnmodSet() {
-        return Collections.unmodifiableSet(toJavaHashSet());
-    }
+    default Set<T> toJavaUnmodSet() { return Collections.unmodifiableSet(toJavaHashSet()); }
 
     @Override
     @SuppressWarnings("unchecked")

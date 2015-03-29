@@ -14,11 +14,11 @@
 
 package org.organicdesign.fp.experiments;
 
-import java.util.function.Predicate;
-
-import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.ephemeral.View;
+import org.organicdesign.fp.function.Function1;
+
+import java.util.function.Predicate;
 
 public class ViewTakenUntilIncl<T> implements View<T> {
     private final View<T> innerView;
@@ -29,10 +29,10 @@ public class ViewTakenUntilIncl<T> implements View<T> {
 
     public static <T> View<T> of(View<T> v, Predicate<T> p) {
         if (p == null) { throw new IllegalArgumentException("Must provide a predicate"); }
-        if ( (p == FunctionUtils.REJECT) ||
+        if ( (p == Function1.REJECT) ||
              (v == null) ||
              (v == EMPTY_VIEW) ) { return View.emptyView(); }
-        if (p == FunctionUtils.ACCEPT) { return v; }
+        if (p == Function1.ACCEPT) { return v; }
         return new ViewTakenUntilIncl<>(v, p);
     }
 

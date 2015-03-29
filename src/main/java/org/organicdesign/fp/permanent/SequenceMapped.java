@@ -14,22 +14,20 @@
 
 package org.organicdesign.fp.permanent;
 
-import java.util.function.Function;
-
-import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.Option;
+import org.organicdesign.fp.function.Function1;
 
 public class SequenceMapped<T,U>  implements Sequence<U> {
     private final Sequence<T> seq;
-    private final Function<T,U> func;
+    private final Function1<T,U> func;
 
-    private SequenceMapped(Sequence<T> s, Function<T,U> f) { seq = s; func = f; }
+    private SequenceMapped(Sequence<T> s, Function1<T,U> f) { seq = s; func = f; }
 
     @SuppressWarnings("unchecked")
-    public static <T,U> Sequence<U> of(Sequence<T> s, Function<T,U> f) {
+    public static <T,U> Sequence<U> of(Sequence<T> s, Function1<T,U> f) {
         // You can put nulls in, but you don't get nulls out.
         if (f == null) { return Sequence.emptySequence(); }
-        if (f == FunctionUtils.IDENTITY) { return (Sequence<U>) s; }
+        if (f == Function1.IDENTITY) { return (Sequence<U>) s; }
         if ( (s == null) || (s == EMPTY_SEQUENCE) ) { return Sequence.emptySequence(); }
         return new SequenceMapped<>(s, f);
     }
@@ -38,11 +36,9 @@ public class SequenceMapped<T,U>  implements Sequence<U> {
     public Option<U> first() {
         Option<T> item = seq.first();
         if (!item.isSome()) { return Option.none(); }
-        return Option.of(func.apply(item.get()));
+        return Option.of(func.apply_(item.get()));
     }
 
     @Override
-    public Sequence<U> rest() {
-        return of(seq.rest(), func);
-    }
+    public Sequence<U> rest() { return of(seq.rest(), func); }
 }

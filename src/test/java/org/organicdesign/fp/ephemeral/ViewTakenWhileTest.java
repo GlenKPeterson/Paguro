@@ -16,7 +16,7 @@ package org.organicdesign.fp.ephemeral;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.function.Function1;
 
 import static org.junit.Assert.assertArrayEquals;
 
@@ -26,7 +26,7 @@ public class ViewTakenWhileTest {
     @Test
     public void takeItemsInOneBatch() {
         assertArrayEquals(View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
-                                  .takeWhile(FunctionUtils.accept()).toArray(),
+                                  .takeWhile(Function1.accept()).toArray(),
                           new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 });
         assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i < 10).toArray(),
                           new Integer[] { 1,2,3,4,5,6,7,8,9 });
@@ -42,7 +42,7 @@ public class ViewTakenWhileTest {
                           new Integer[] { 1,2 });
         assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i <= 1).toArray(),
                           new Integer[] { 1 });
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(FunctionUtils.reject())
+        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(Function1.reject())
                                   .toArray(),
                           new Integer[] {  });
         assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i > 10).toArray(),
@@ -50,7 +50,5 @@ public class ViewTakenWhileTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void exception1() {
-        View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(null);
-    }
+    public void exception1() { View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(null); }
 }

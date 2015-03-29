@@ -18,8 +18,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import static org.junit.Assert.assertArrayEquals;
-import static org.organicdesign.fp.FunctionUtils.accept;
-import static org.organicdesign.fp.FunctionUtils.reject;
+import static org.organicdesign.fp.function.Function1.accept;
+import static org.organicdesign.fp.function.Function1.reject;
 
 @RunWith(JUnit4.class)
 public class ViewFilteredTest {

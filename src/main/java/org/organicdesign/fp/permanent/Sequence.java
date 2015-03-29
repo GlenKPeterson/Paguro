@@ -16,12 +16,10 @@ package org.organicdesign.fp.permanent;
 
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.Transformable;
+import org.organicdesign.fp.function.Function1;
+import org.organicdesign.fp.function.Function2;
 
 import java.util.Iterator;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 /**
  A Sequence abstraction that lazy operations can be built from.  The idea is to create a lazy,
@@ -60,21 +58,21 @@ public interface Sequence<T> extends Transformable<T> {
 //    // ======================================= Other methods ======================================
 
     @Override
-    default <U> Sequence<U> map(Function<T,U> func) {
+    default <U> Sequence<U> map(Function1<T,U> func) {
         return SequenceMapped.of(this, func);
     }
 
     @Override
-    default Sequence<T> filter(Predicate<T> func) {
-        return SequenceFiltered.of(this, func);
+    default Sequence<T> filter(Function1<T,Boolean> predicate) {
+        return SequenceFiltered.of(this, predicate);
     }
 
     @Override
-    default void forEach(Consumer<T> se) {
+    default void forEach(Function1<T,?> consumer) {
         Sequence<T> seq = this;
         Option<T> item = seq.first();
         while (item.isSome()) {
-            se.accept(item.get());
+            consumer.apply_(item.get());
             // repeat with next element
             seq = seq.rest();
             item = seq.first();
@@ -97,13 +95,13 @@ public interface Sequence<T> extends Transformable<T> {
 //    }
 
     @Override
-    default <U> U foldLeft(U u, BiFunction<U, T, U> fun) {
+    default <U> U foldLeft(U u, Function2<U,T,U> fun) {
         Sequence<T> seq = this;
         // System.out.println("seq: " + seq);
         Option<T> item = seq.first();
         // System.out.println("===>item: " + item);
         while (item.isSome()) {
-            u = fun.apply(u, item.get());
+            u = fun.apply_(u, item.get());
             // repeat with next element
             seq = seq.rest();
             item = seq.first();
@@ -112,14 +110,14 @@ public interface Sequence<T> extends Transformable<T> {
     }
 
     @Override
-    default <U> U foldLeft(U u, BiFunction<U, T, U> fun, Predicate<U> terminateWith) {
+    default <U> U foldLeft(U u, Function2<U,T,U> fun, Function1<U,Boolean> terminateWith) {
         Sequence<T> seq = this;
         // System.out.println("seq: " + seq);
         Option<T> item = seq.first();
         // System.out.println("===>item: " + item);
         while (item.isSome()) {
-            u = fun.apply(u, item.get());
-            if (terminateWith.test(u)) {
+            u = fun.apply_(u, item.get());
+            if (terminateWith.apply_(u)) {
                 return u;
             }
             // repeat with next element
@@ -138,7 +136,7 @@ public interface Sequence<T> extends Transformable<T> {
     default Transformable<T> take(long numItems) { return SequenceTaken.of(this, numItems); }
 
     @Override
-    default Sequence<T> takeWhile(Predicate<T> p) { return SequenceTakenWhile.of(this, p); }
+    default Sequence<T> takeWhile(Function1<T,Boolean> predicate) { return SequenceTakenWhile.of(this, predicate); }
 
 //    @Override
 //    T reduceLeft(BiFunction<T, T, T> fun) {

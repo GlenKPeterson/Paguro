@@ -14,22 +14,20 @@
 
 package org.organicdesign.fp.permanent;
 
-import java.util.function.Predicate;
-
-import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.Option;
+import org.organicdesign.fp.function.Function1;
 
 public class SequenceFiltered<T> implements Sequence<T> {
     private Sequence<T> seq;
-    private final Predicate<T> predicate;
+    private final Function1<T,Boolean> predicate;
     private Option<T> first = null;
 
-    private SequenceFiltered(Sequence<T> s, Predicate<T> f) { seq = s; predicate = f; }
+    private SequenceFiltered(Sequence<T> s, Function1<T,Boolean> f) { seq = s; predicate = f; }
 
-    public static <T> Sequence<T> of(Sequence<T> s, Predicate<T> f) {
+    public static <T> Sequence<T> of(Sequence<T> s, Function1<T,Boolean> f) {
         if (f == null) { throw new IllegalArgumentException("Must provide a predicate"); }
-        if (f == FunctionUtils.REJECT) { return Sequence.emptySequence(); }
-        if (f == FunctionUtils.ACCEPT) { return s; }
+        if (f == Function1.REJECT) { return Sequence.emptySequence(); }
+        if (f == Function1.ACCEPT) { return s; }
         if ( (s == null) || (s == EMPTY_SEQUENCE) ) { return Sequence.emptySequence(); }
         return new SequenceFiltered<>(s, f);
     }
@@ -42,7 +40,7 @@ public class SequenceFiltered<T> implements Sequence<T> {
                     break;
                 }
 
-                if (predicate.test(item.get())) {
+                if (predicate.apply_(item.get())) {
                     first = item;
                     seq = of(seq.rest(), predicate);
                     return;

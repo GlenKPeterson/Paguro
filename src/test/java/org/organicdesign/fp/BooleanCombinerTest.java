@@ -19,7 +19,7 @@ import org.junit.runners.JUnit4;
 import org.organicdesign.fp.ephemeral.View;
 
 import static junit.framework.TestCase.assertTrue;
-import static org.organicdesign.fp.FunctionUtils.*;
+import static org.organicdesign.fp.function.Function1.*;
 
 @RunWith(JUnit4.class)
 public class BooleanCombinerTest {

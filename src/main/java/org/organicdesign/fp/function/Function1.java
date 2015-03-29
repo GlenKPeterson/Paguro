@@ -14,6 +14,8 @@
 
 package org.organicdesign.fp.function;
 
+import org.organicdesign.fp.ephemeral.View;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -169,4 +171,111 @@ public interface Function1<T,U> {
 //    default Function<T,U> asFunction() {
 //        return (T t) -> apply_(t);
 //    }
+
+    static <S> Function1<S,Boolean> or(Function1<S,Boolean> a, Function1<S,Boolean> b) {
+        return  a == ACCEPT ? a : // If any are true, all are true.  Accept is always true, so no composition necessary.
+                a == REJECT ? b : // return whatever b is.
+                b == ACCEPT ? b : // If any are true, all are true.
+                b == REJECT ? a : // Just amounts to if a else false, no composition necessary.
+                (S s) -> (a.apply_(s) == Boolean.TRUE) || (b.apply_(s) == Boolean.TRUE); // compose new function.
+    }
+
+    static <S> Function1<S,Boolean> and(Function1<S,Boolean> a, Function1<S,Boolean> b) {
+        return  a == ACCEPT ? b : // return whatever b is.
+                a == REJECT ? a : // if any are false, all are false.  No composition necessary.
+                b == ACCEPT ? a : // Just amounts to if a else false, no composition necessary.
+                b == REJECT ? b : // If any are false, all are false.
+                (S s) -> (a.apply_(s) == Boolean.TRUE) && (b.apply_(s) == Boolean.TRUE); // compose new fn
+    }
+
+    static <S> Function1<S,Boolean> negate(Function1<? super S,Boolean> a) {
+        return  a == ACCEPT ? reject() :
+                a == REJECT ? accept() :
+                        (S s) -> (a.apply_(s) == Boolean.TRUE) ? Boolean.FALSE : Boolean.TRUE;
+    }
+
+    /** A predicate that always returns true.  Use accept() for a type-safe version of this predicate. */
+    public static final Function1<Object,Boolean> ACCEPT = new Function1<Object,Boolean>() {
+        @Override public Boolean apply(Object t) { return Boolean.TRUE; }
+    };
+
+    /** A predicate that always returns false. Use reject() for a type-safe version of this predicate. */
+    public static final Function1<Object,Boolean> REJECT = new Function1<Object,Boolean>() {
+        @Override public Boolean apply(Object t) { return Boolean.FALSE; }
+    };
+
+    /** Returns a type-safe version of the ACCEPT predicate. */
+    @SuppressWarnings("unchecked")
+    public static <T> Function1<T,Boolean> accept() { return (Function1<T,Boolean>) ACCEPT; }
+
+    /** Returns a type-safe version of the REJECT predicate. */
+    @SuppressWarnings("unchecked")
+    public static <T> Function1<T,Boolean> reject() { return (Function1<T,Boolean>) REJECT; }
+
+    /**
+     Composes multiple predicates into a single predicate to potentially minimize trips through
+     the source data.  The resultant predicate will loop through the predicates for each item in
+     the source, but for few predicates and many source items, that takes less memory.  Considers
+     no predicate to mean "accept all."  Use only accept()/ACCEPT and reject()/REJECT since
+     function comparison is done by reference.
+
+     @param in the predicates to test in order.  Nulls and ACCEPT predicates are ignored.  Any
+     REJECT predicate will cause this entire method to return a single REJECT predicate.  No
+     predicates means ACCEPT.
+
+     @param <T> the type of object to predicate on.
+
+     @return a predicate which returns true if all the input predicates return true, false otherwise.
+     */
+    public static <T> Function1<T,Boolean> and(View<Function1<T,Boolean>> in) {
+        if (in == null) { return accept(); }
+
+        return in
+                .filter(p -> (p != null) && (p != ACCEPT))
+                .foldLeft(accept(),
+                          (accum, p) -> (p == REJECT) ? p
+                                                      : and(accum, p),
+                          accum -> accum == REJECT);
+
+    }
+
+    /** A convenience wrapper for and().  This may be a bad idea.  Not sure yet. */
+    @SafeVarargs // Not really sure how safe these varargs are...
+    public static <T> Function1<T,Boolean> andArray(Function1<T,Boolean>... in) {
+        return and(View.ofArray(in));
+    }
+
+    /**
+     Composes multiple predicates into a single predicate to potentially minimize trips through
+     the source data.  The resultant predicate will loop through the predicates for each item in
+     the source, but for few predicates and many source items, that takes less memory.  Considers
+     no predicate to mean "reject all."  Use only accept()/ACCEPT and reject()/REJECT since
+     function comparison is done by reference.
+
+     @param in the predicates to test in order.  Nulls and REJECT predicates are ignored.  Any
+     ACCEPT predicate will cause this entire method to return the ACCEPT predicate.
+     No predicates means REJECT.
+
+     @param <T> the type of object to predicate on.
+
+     @return a predicate which returns true if any of the input predicates return true,
+     false otherwise.
+     */
+    public static <T> Function1<T,Boolean> or(View<Function1<T,Boolean>> in) {
+        if (in == null) { return reject(); }
+
+        return in
+                .filter(p -> (p != null) && (p != REJECT))
+                .foldLeft(reject(),
+                          (accum, p) -> (p == ACCEPT) ? p
+                                                      : or(accum, p),
+                          accum -> accum == ACCEPT);
+    }
+
+    /** A convenience wrapper for of().  This may be a bad idea.  Not sure yet. */
+    @SafeVarargs
+    public static <T> Function1<T,Boolean> orArray(Function1<T,Boolean>... in) {
+        return or(View.ofArray(in));
+    }
+
 }

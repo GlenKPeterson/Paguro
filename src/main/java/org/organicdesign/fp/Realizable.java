@@ -14,6 +14,8 @@
 
 package org.organicdesign.fp;
 
+import org.organicdesign.fp.function.Function1;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -24,7 +26,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.function.Function;
 
 /**
  Calling any of these methods forces eager evaluation of the entire underlying collection.
@@ -36,30 +37,30 @@ public interface Realizable<T> {
     List<T> toJavaUnmodList();
 
     /**
-     @param f1 Maps keys to values
      @return A map with the keys from the given set, mapped to values using the given function.
+      * @param f1 Maps keys to values
      */
-    <U> HashMap<T,U> toJavaHashMap(Function<T,U> f1);
+    <U> HashMap<T,U> toJavaHashMap(Function1<T,U> f1);
     /**
-     @param f1 Maps keys to values
      @return An unmodifiable map with the keys from the given set, mapped to values using the given
      function.
+      * @param f1 Maps keys to values
      */
-    <U> Map<T,U> toJavaUnmodMap(Function<T,U> f1);
+    <U> Map<T,U> toJavaUnmodMap(Function1<T,U> f1);
 
     /**
-     @param f1 Maps values to keys
      @return A map with the values from the given set, mapped by keys supplied by the given
      function.
+      * @param f1 Maps values to keys
      */
-    <U> HashMap<U,T> toReverseJavaHashMap(Function<T,U> f1);
+    <U> HashMap<U,T> toReverseJavaHashMap(Function1<T,U> f1);
 
     /**
-     @param f1 Maps values to keys
      @return An unmodifiable map with the values from the given set, mapped by keys supplied by
      the given function.
+      * @param f1 Maps values to keys
      */
-    <U> Map<U,T> toReverseJavaUnmodMap(Function<T,U> f1);
+    <U> Map<U,T> toReverseJavaUnmodMap(Function1<T,U> f1);
 
     TreeSet<T> toJavaTreeSet(Comparator<? super T> comparator);
     SortedSet<T> toJavaUnmodSortedSet(Comparator<? super T> comparator);
