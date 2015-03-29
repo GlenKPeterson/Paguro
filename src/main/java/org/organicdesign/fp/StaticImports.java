@@ -15,6 +15,7 @@
 package org.organicdesign.fp;
 
 import org.organicdesign.fp.experiments.collections.UnList;
+import org.organicdesign.fp.experiments.collections.UnListIterator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -599,16 +601,16 @@ public class StaticImports {
     /** Returns an unmodifiable List containing all passed items (including null items). */
     @SuppressWarnings("unchecked")
     @SafeVarargs
-    public static <T> List<T> uList(T... ts) {
+    public static <T> UnList<T> uList(T... ts) {
         return ( (ts == null) || (ts.length < 1) )
                 ? UnList.empty()
-                : Collections.unmodifiableList(new ArrayList<>(Arrays.asList(ts)));
+                : un(Arrays.asList(ts));
     }
 
     /** Returns an unmodifiable List containing any non-null passed items. */
     @SuppressWarnings("unchecked")
     @SafeVarargs
-    public static <T> List<T> uListSkipNull(T... ts) {
+    public static <T> UnList<T> uListSkipNull(T... ts) {
         if ( (ts == null) || (ts.length < 1) ) {
             return UnList.empty();
         }
@@ -618,7 +620,33 @@ public class StaticImports {
                 s.add(t);
             }
         }
-        return (s.size() > 0) ? Collections.unmodifiableList(s) : UnList.empty();
+        return (s.size() > 0) ? un(s) : UnList.empty();
+    }
+
+    /** Returns an unmodifiable version of the given listiterator. */
+    public static <T> UnListIterator<T> un(ListIterator<T> li) {
+        return (li == null) ? UnListIterator.empty() :
+                (li instanceof UnListIterator) ? (UnListIterator<T>) li :
+                        new UnListIterator<T>() {
+                            @Override public boolean hasNext() { return li.hasNext(); }
+                            @Override public T next() { return li.next(); }
+                            @Override public boolean hasPrevious() { return li.hasPrevious(); }
+                            @Override public T previous() { return li.previous(); }
+                            @Override public int nextIndex() { return li.nextIndex(); }
+                            @Override public int previousIndex() { return li.previousIndex(); }
+                        };
+    }
+
+    /** Returns an unmodifiable version of the given list. */
+    public static <T> UnList<T> un(List<T> ls) {
+        return (ls == null) ? UnList.empty() :
+                (ls instanceof UnList) ? (UnList<T>) ls :
+                        new UnList<T>() {
+                            @Override
+                            public UnListIterator<T> listIterator(int index) { return un(ls.listIterator(index)); }
+                            @Override public int size() { return ls.size(); }
+                            @Override public T get(int index) { return ls.get(index); }
+                        };
     }
 
 //    /**

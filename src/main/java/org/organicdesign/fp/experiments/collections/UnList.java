@@ -217,6 +217,13 @@ public interface UnList<E> extends List<E>, UnCollection<E> {
 //Methods inherited from interface java.lang.Iterable
 //forEach
 
-    // ================================================ STATIC METHODS ================================================
-    static <T> UnList<T> empty() { return ImVectorImpl.empty(); }
+    // ==================================================== STATIC ====================================================
+    UnList<Object> EMPTY = new UnList<Object>() {
+        @Override public UnListIterator<Object> listIterator(int index) { return UnListIterator.empty(); }
+        @Override public int size() { return 0; }
+        @Override public Object get(int index) { throw new IndexOutOfBoundsException(); }
+    };
+
+    @SuppressWarnings("unchecked")
+    static <T> UnList<T> empty() { return (UnList<T>) EMPTY; }
 }

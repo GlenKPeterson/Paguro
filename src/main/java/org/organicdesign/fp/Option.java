@@ -13,42 +13,42 @@
 
 package org.organicdesign.fp;
 
-import java.lang.Deprecated;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import org.organicdesign.fp.function.Function0;
+import org.organicdesign.fp.function.Function1;
 
 /**
- This is NOT a type-safe null.  Null is a valid value for a Some.  It's more to indicate
- the presence or absence of a value, or indicate end-of-stream.
+ Indicates presence or absence of a value (null is a valid, present value) or end-of-stream.
+ This is NOT a type-safe null.
  @param <T>
  */
 public interface Option<T> {
 
-    public static final Option NONE = new None();
+    T get();
+    T getOrElse(T t);
+    boolean isSome();
+    <U> U patMat(Function1<T,U> has, Function0<U> hasNot);
+
+    // ==================================================== Static ====================================================
+    Option NONE = new None();
 
     @SuppressWarnings("unchecked")
-    public static <T> Option<T> none() { return NONE; }
+    static <T> Option<T> none() { return NONE; }
 
-    public static <T> Option<T> of(T t) {
+    static <T> Option<T> of(T t) {
         if (NONE.equals(t)) {
             return none();
         }
         return new Some<>(t);
     }
 
-    public static <T> Option<T> someOrNullNoneOf(T t) {
+    static <T> Option<T> someOrNullNoneOf(T t) {
         if ( (t == null) || NONE.equals(t) ) {
             return none();
         }
         return new Some<>(t);
     }
 
-    T get();
-    T getOrElse(T t);
-    boolean isSome();
-    <U> U patMat(Function<T,U> has, Supplier<U> hasNot);
-
-    static class None<T> implements Option<T> {
+    class None<T> implements Option<T> {
         //private None();
 
         @Override
@@ -61,7 +61,7 @@ public interface Option<T> {
         public boolean isSome() { return false; }
 
         @Override
-        public <U> U patMat(Function<T,U> has, Supplier<U> hasNot) {
+        public <U> U patMat(Function1<T,U> has, Function0<U> hasNot) {
             return hasNot.get();
         }
 
@@ -79,7 +79,7 @@ public interface Option<T> {
         }
     }
 
-    public static class Some<T> implements Option<T> {
+    class Some<T> implements Option<T> {
         private final T item;
         private Some(T t) { item = t; }
 
@@ -95,7 +95,7 @@ public interface Option<T> {
         public boolean isSome() { return true; }
 
         @Override
-        public <U> U patMat(Function<T,U> has, Supplier<U> hasNot) {
+        public <U> U patMat(Function1<T,U> has, Function0<U> hasNot) {
             return has.apply(item);
         }
 

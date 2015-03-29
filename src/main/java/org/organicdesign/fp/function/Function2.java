@@ -6,6 +6,7 @@ import java.util.function.BiFunction;
  This is like Java 8's java.util.function.BiFunction, but retrofitted to turn checked exceptions
  into unchecked ones.
  */
+@FunctionalInterface
 public interface Function2<A,B,R> extends BiFunction<A,B,R> {
     /** Implement this one method and you don't have to worry about checked exceptions. */
     R applyEx(A a, B b) throws Exception;

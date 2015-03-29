@@ -8,6 +8,7 @@ import java.io.IOException;
 
 @RunWith(JUnit4.class)
 public class SideEffectTest {
+    @SuppressWarnings("deprecation")
     @Test(expected = RuntimeException.class)
     public void applyIOException() {
         new SideEffect() {
@@ -17,6 +18,7 @@ public class SideEffectTest {
         }.apply();
     }
 
+    @SuppressWarnings("deprecation")
     @Test(expected = IllegalStateException.class)
     public void applyIllegalStateException() {
         new SideEffect() {

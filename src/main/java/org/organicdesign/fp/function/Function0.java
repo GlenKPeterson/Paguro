@@ -20,6 +20,7 @@ import java.util.function.Supplier;
  This is like Java 8's java.util.function.Supplier, but retrofitted to turn checked exceptions
  into unchecked ones.  It's also called a thunk when used to delay evaluation.
  */
+@FunctionalInterface
 public interface Function0<U> extends Supplier<U> {
     /** Implement this one method and you don't have to worry about checked exceptions. */
     U applyEx() throws Exception;
@@ -41,6 +42,7 @@ public interface Function0<U> extends Supplier<U> {
     /** {@inheritDoc} */
     @Override default U get() { return apply(); }
 
+    // ==================================================== Static ====================================================
     public static final Function0<Object> NULL = new Function0<Object>() {
         @Override
         public Object applyEx() throws Exception {

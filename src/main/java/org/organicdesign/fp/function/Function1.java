@@ -24,6 +24,7 @@ import java.util.function.Function;
  This is like Java 8's java.util.function.Function, but retrofitted to turn checked exceptions
  into unchecked ones.
  */
+@FunctionalInterface
 public interface Function1<T,U> extends Function<T,U> {
     /** Implement this one method and you don't have to worry about checked exceptions. */
     U applyEx(T t) throws Exception;

@@ -42,7 +42,7 @@ public interface SideEffect {
         }
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "deprecation"})
     default <T> Supplier<T> asSupplier() {
         final SideEffect parent = this;
         return () -> {
