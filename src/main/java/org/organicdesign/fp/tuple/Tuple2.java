@@ -14,13 +14,15 @@
 
 package org.organicdesign.fp.tuple;
 
+import org.organicdesign.fp.experiments.collections.UnMap;
+
 import java.util.Map.Entry;
 
 /**
  Use tuples as immutable, type-safe, data structures instead of defining your own classes (when appropriate).
  Defining your own class is better for building models, but tuples can be more convenient, especially for adapter code.
  */
-public class Tuple2<T,U> implements Entry<T,U> {
+public class Tuple2<T,U> implements Entry<T,U>, UnMap.UnEntry<T,U> {
     private final T _1;
     private final U _2;
     private Tuple2(T t, U u) { _1 = t; _2 = u; }
@@ -86,5 +88,6 @@ public class Tuple2<T,U> implements Entry<T,U> {
     /** Returns the second field of the tuple.  This field naming scheme is to implement Map.Entry. */
     @Override public U getValue() { return _2; }
     /** This method is required to implement Map.Entry, but calling it only issues an exception */
+    @SuppressWarnings("deprecation")
     @Override @Deprecated public U setValue(U value) { throw new UnsupportedOperationException("Tuple2 is immutable"); }
 }

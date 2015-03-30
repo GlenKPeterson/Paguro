@@ -3,7 +3,6 @@ package org.organicdesign.fp.experiments.collections;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -64,16 +63,8 @@ public interface UnList<E> extends List<E>, UnCollection<E> {
      * The default implementation of this method has O(this.size() * that.size()) performance.
      *
      * {@inheritDoc}
-     * */
-    @Override default boolean containsAll(Collection<?> c) {
-        Iterator iter = c.iterator();
-        while (iter.hasNext()) {
-            if (!contains(iter.next())) {
-                return false;
-            }
-        }
-        return true;
-    }
+     */
+    @Override default boolean containsAll(Collection<?> c) { return UnCollection.containsAll(this, c); }
 
 //boolean	equals(Object o)
 //E	get(int index)
@@ -175,35 +166,28 @@ public interface UnList<E> extends List<E>, UnCollection<E> {
         return (UnList<E>) ls.subList(fromIndex, toIndex);
     }
 
-    /** {@inheritDoc} */
-    @Override default Object[] toArray() {
-        Object[] os = new Object[size()];
-        UnIterator iter = iterator();
-        for (int i = 0; i < size(); i++) {
-            os[i] = iter.next();
-        }
-        return os;
-    }
+    /**
+     * This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for backwards
+     * compatibility in some performance-critical situations.  If you really need an array, consider using the somewhat
+     * type-safe version of this method instead, but read the caveats first.
+     * {@inheritDoc}
+     */
+    @Override default Object[] toArray() { return UnCollection.toArray(this); }
 
-    /** {@inheritDoc} */
-    @SuppressWarnings("unchecked")
-    @Override default <T> T[] toArray(T[] as) {
-        if (as == null) {
-            throw new IllegalArgumentException("You can't pass null to this method.");
-        }
-        if ( (as.length < size()) ) {
-            as = (T[]) new Object[size()];
-        }
-        UnIterator<E> iter = iterator();
-        int i = 0;
-        for (; i < size(); i++) {
-            as[i] = (T) iter.next();
-        }
-        for (; i < size(); i++) {
-            as[i] = null;
-        }
-        return as;
-    }
+    /**
+     * This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for backwards
+     * compatibility in some performance-critical situations.  If you need to create an array (you almost always do)
+     * then the best way to use this method is:
+     *
+     * <code>MyThing[] things = col.toArray(new MyThing[coll.size()]);</code>
+     *
+     * Calling this method any other way causes unnecessary work to be done - an extra memory allocation and potential
+     * garbage collection if the passed array is too small, extra effort to fill the end of the array with nulls if it
+     * is too large.
+     *
+     * {@inheritDoc}
+     */
+    @Override default <T> T[] toArray(T[] as) { return UnCollection.toArray(this, as); }
 
 //Methods inherited from interface java.util.Collection
 //parallelStream, removeIf, stream
@@ -217,7 +201,7 @@ public interface UnList<E> extends List<E>, UnCollection<E> {
 //Methods inherited from interface java.lang.Iterable
 //forEach
 
-    // ==================================================== STATIC ====================================================
+    // ==================================================== Static ====================================================
     UnList<Object> EMPTY = new UnList<Object>() {
         @Override public UnListIterator<Object> listIterator(int index) { return UnListIterator.empty(); }
         @Override public int size() { return 0; }
