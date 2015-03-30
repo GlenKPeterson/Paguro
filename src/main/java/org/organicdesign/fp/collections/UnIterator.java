@@ -3,6 +3,7 @@ package org.organicdesign.fp.collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+/** An unmodifiable iterator */
 public interface UnIterator<E> extends Iterator<E> {
 //default void forEachRemaining(Consumer<? super E> action)
 //boolean hasNext()

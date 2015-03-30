@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.function.Predicate;
 
+/** An unmodifiable set */
 public interface UnSet<E> extends UnCollection<E>, Set<E> {
 
     /** Not allowed - this is supposed to be unmodifiable */

@@ -4,6 +4,7 @@ import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 
+/** An unmodifiable ListIterator */
 public interface UnListIterator<E> extends ListIterator<E>, UnIterator<E> {
 
     /** Not allowed - this is supposed to be unmodifiable */

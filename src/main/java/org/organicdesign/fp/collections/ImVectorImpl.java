@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * This started out as Rich Hickey's PersistentVector class from Clojure in late 2014.  Glen added types, and tried
+ * This started out as Rich Hickey's PersistentVector class from Clojure in late 2014.  Glen added generic types, tried
  * to make it a little more pure-Java friendly, and removed dependencies on other Clojure stuff.
  *
  * @author Rich Hickey (Primary author)

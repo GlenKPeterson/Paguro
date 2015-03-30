@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+/** An unmodifiable map */
 public interface UnMap<K,V> extends Map<K,V> {
     // Modification Operations
 
