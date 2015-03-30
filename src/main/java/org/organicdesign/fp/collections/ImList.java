@@ -1,4 +1,4 @@
-package org.organicdesign.fp.experiments.collections;
+package org.organicdesign.fp.collections;
 
 /**
  * Holds Immutable "modification" methods that return a new ImList (for safety) reflecting the modification while

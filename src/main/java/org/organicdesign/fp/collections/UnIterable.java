@@ -1,4 +1,4 @@
-package org.organicdesign.fp.experiments.collections;
+package org.organicdesign.fp.collections;
 
 public interface UnIterable<T> extends Iterable<T> {
     /** {@inheritDoc} */

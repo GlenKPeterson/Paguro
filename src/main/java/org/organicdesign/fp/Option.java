@@ -48,6 +48,7 @@ public interface Option<T> {
         return new Some<>(t);
     }
 
+    /** Represents the absence of a value */
     class None<T> implements Option<T> {
         //private None();
 
@@ -79,6 +80,7 @@ public interface Option<T> {
         }
     }
 
+    /** Represents the presence of a value, even if that value is null. */
     class Some<T> implements Option<T> {
         private final T item;
         private Some(T t) { item = t; }

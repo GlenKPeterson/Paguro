@@ -2,7 +2,14 @@ package org.organicdesign.fp;
 
 import org.organicdesign.fp.function.Function0;
 
+/**
+ Lazily initialize a value (and free the initialization resources) on the first call to get().
+ Subsequent calls to get() cheaply return the previously initialized value.  This class is thread-safe if the producer
+ function and the value it produces are pure and free from side effects.
+ */
 public class Lazy {
+    // Prevent instantiation
+    private Lazy() { throw new UnsupportedOperationException("No instantiation"); }
 
     /**
      Take a Function0 and lazily initialize a value (and frees the initialization resources) on the first call to get().

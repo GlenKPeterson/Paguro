@@ -15,12 +15,16 @@
 package org.organicdesign.fp;
 
 /**
- Java 7 and earlier require that any variables declared outside a lambda, but used inside a lambda
- must be final.  Occasionally that is really inconvenient and the sub-classes in this class wrap
- various classes to let you work around this limitation.
+ Java 8 requires that variables declared outside a lambda, but used inside a lambda must be <i>effectively</i> final
+ and this class makes that possible for variables that are not (effectively) final.
+ Java 7 and earlier require that they all be final.  Because these are often used where performance is critical,
+ some primitive versions are available.
  */
 public class Mutable {
+    // Prevent instantiation
+    private Mutable() { throw new UnsupportedOperationException("No instantiation"); }
 
+    /** Wraps a primitive boolean to make it appear final when used inside a lambda. */
     public static class BooleanRef {
         private boolean b;
         private BooleanRef(boolean boo) { b = boo; }
@@ -31,6 +35,7 @@ public class Mutable {
         public void set(boolean boo) { b = boo; }
     }
 
+    /** Wraps a primitive int to make it appear final when used inside a lambda. */
     public static class IntRef {
         private int i;
         private IntRef(int in) { i = in; }
@@ -40,6 +45,7 @@ public class Mutable {
         public IntRef set(int x) { i = x; return this; }
     }
 
+    /** Wraps a primitive long to make it appear final when used inside a lambda. */
     public static class LongRef {
         private long i;
         private LongRef(long in) { i = in; }
@@ -49,6 +55,7 @@ public class Mutable {
         public LongRef set(long x) { i = x; return this; }
     }
 
+    /** Wraps any object to make it appear final when used inside a lambda. */
     public static class ObjectRef<T> {
         private T t;
         private ObjectRef(T in) { t = in; }

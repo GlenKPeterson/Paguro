@@ -280,4 +280,32 @@ public interface Function1<T,U> extends Function<T,U> {
         return or(View.ofArray(in));
     }
 
+    enum BooleanCombiner {
+        AND {
+            @Override
+            public <T> Function1<T,Boolean> combine(View<Function1<T,Boolean>> in) {
+                return and(in);
+            }
+            @Override
+            @SafeVarargs
+            public final <T> Function1<T,Boolean> combineArray(Function1<T,Boolean>... in) {
+                return andArray(in);
+            }
+        },
+        OR {
+            @Override
+            public <T> Function1<T,Boolean> combine(View<Function1<T,Boolean>> in) {
+                return or(in);
+            }
+            @Override
+            @SafeVarargs
+            public final <T> Function1<T,Boolean> combineArray(Function1<T,Boolean>... in) {
+                return orArray(in);
+            }
+        };
+        public abstract <T> Function1<T,Boolean> combine(View<Function1<T,Boolean>> in);
+
+        @SuppressWarnings("unchecked")
+        public abstract <T> Function1<T,Boolean> combineArray(Function1<T,Boolean>... in);
+    }
 }

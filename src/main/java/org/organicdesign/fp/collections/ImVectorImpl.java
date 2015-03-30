@@ -9,7 +9,7 @@
  */
 
 /* rich Jul 5, 2007 */
-package org.organicdesign.fp.experiments.collections;
+package org.organicdesign.fp.collections;
 
 import java.io.Serializable;
 import java.util.List;

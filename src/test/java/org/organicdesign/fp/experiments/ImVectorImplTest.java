@@ -3,8 +3,8 @@ package org.organicdesign.fp.experiments;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.organicdesign.fp.experiments.collections.ImList;
-import org.organicdesign.fp.experiments.collections.ImVectorImpl;
+import org.organicdesign.fp.collections.ImList;
+import org.organicdesign.fp.collections.ImVectorImpl;
 
 import static org.junit.Assert.assertArrayEquals;
 

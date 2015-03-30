@@ -1,9 +1,9 @@
 package org.organicdesign.fp;
 
 import org.junit.Test;
-import org.organicdesign.fp.experiments.collections.UnList;
-import org.organicdesign.fp.experiments.collections.UnMap;
-import org.organicdesign.fp.experiments.collections.UnSet;
+import org.organicdesign.fp.collections.UnList;
+import org.organicdesign.fp.collections.UnMap;
+import org.organicdesign.fp.collections.UnSet;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import java.util.ArrayList;
@@ -446,7 +446,6 @@ public class StaticImportsTest {
 
     @Test public void testUnSet3() {
         UnSet<Integer> a = unSet(1, 2, 3);
-        int max = 3;
         assertEquals(3, a.size());
 
         Set<Integer> b = new HashSet<>();
@@ -468,7 +467,6 @@ public class StaticImportsTest {
 
     @Test public void testUnList3() {
         UnList<Integer> a = unList(1, 2, 3);
-        int max = 3;
         assertEquals(3, a.size());
 
         List<Integer> b = new ArrayList<>();

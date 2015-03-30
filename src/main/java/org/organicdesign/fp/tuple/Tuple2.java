@@ -14,7 +14,7 @@
 
 package org.organicdesign.fp.tuple;
 
-import org.organicdesign.fp.experiments.collections.UnMap;
+import org.organicdesign.fp.collections.UnMap;
 
 import java.util.Map.Entry;
 

@@ -17,6 +17,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.organicdesign.fp.ephemeral.View;
+import org.organicdesign.fp.function.Function1;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.organicdesign.fp.function.Function1.*;
@@ -27,26 +28,26 @@ public class BooleanCombinerTest {
     @Test
     @SuppressWarnings("unchecked")
     public void combineAnd() {
-        assertTrue(BooleanCombiner.AND.combineArray() == ACCEPT);
-        assertTrue(BooleanCombiner.AND.combine(null) == ACCEPT);
+        assertTrue(Function1.BooleanCombiner.AND.combineArray() == ACCEPT);
+        assertTrue(Function1.BooleanCombiner.AND.combine(null) == ACCEPT);
 
-        assertTrue(BooleanCombiner.AND.combineArray(accept()) == ACCEPT);
-        assertTrue(BooleanCombiner.AND.combine(View.ofArray(accept())) == ACCEPT);
+        assertTrue(Function1.BooleanCombiner.AND.combineArray(accept()) == ACCEPT);
+        assertTrue(Function1.BooleanCombiner.AND.combine(View.ofArray(accept())) == ACCEPT);
 
-        assertTrue(BooleanCombiner.AND.combineArray(reject()) == REJECT);
-        assertTrue(BooleanCombiner.AND.combine(View.ofArray(reject())) == REJECT);
+        assertTrue(Function1.BooleanCombiner.AND.combineArray(reject()) == REJECT);
+        assertTrue(Function1.BooleanCombiner.AND.combine(View.ofArray(reject())) == REJECT);
     }
 
     @Test
     @SuppressWarnings("unchecked")
     public void combineOr() {
-        assertTrue(BooleanCombiner.OR.combineArray() == REJECT);
-        assertTrue(BooleanCombiner.OR.combine(null) == REJECT);
+        assertTrue(Function1.BooleanCombiner.OR.combineArray() == REJECT);
+        assertTrue(Function1.BooleanCombiner.OR.combine(null) == REJECT);
 
-        assertTrue(BooleanCombiner.OR.combineArray(accept()) == ACCEPT);
-        assertTrue(BooleanCombiner.OR.combine(View.ofArray(accept())) == ACCEPT);
+        assertTrue(Function1.BooleanCombiner.OR.combineArray(accept()) == ACCEPT);
+        assertTrue(Function1.BooleanCombiner.OR.combine(View.ofArray(accept())) == ACCEPT);
 
-        assertTrue(BooleanCombiner.OR.combineArray(reject()) == REJECT);
-        assertTrue(BooleanCombiner.OR.combine(View.ofArray(reject())) == REJECT);
+        assertTrue(Function1.BooleanCombiner.OR.combineArray(reject()) == REJECT);
+        assertTrue(Function1.BooleanCombiner.OR.combine(View.ofArray(reject())) == REJECT);
     }
 }

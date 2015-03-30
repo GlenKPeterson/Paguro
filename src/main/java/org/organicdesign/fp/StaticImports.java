@@ -14,13 +14,13 @@
 
 package org.organicdesign.fp;
 
-import org.organicdesign.fp.experiments.collections.UnCollection;
-import org.organicdesign.fp.experiments.collections.UnIterator;
-import org.organicdesign.fp.experiments.collections.UnList;
-import org.organicdesign.fp.experiments.collections.UnListIterator;
-import org.organicdesign.fp.experiments.collections.UnMap;
-import org.organicdesign.fp.experiments.collections.UnMap.UnEntry;
-import org.organicdesign.fp.experiments.collections.UnSet;
+import org.organicdesign.fp.collections.UnCollection;
+import org.organicdesign.fp.collections.UnIterator;
+import org.organicdesign.fp.collections.UnList;
+import org.organicdesign.fp.collections.UnListIterator;
+import org.organicdesign.fp.collections.UnMap;
+import org.organicdesign.fp.collections.UnMap.UnEntry;
+import org.organicdesign.fp.collections.UnSet;
 
 import java.util.ArrayList;
 import java.util.Arrays;
