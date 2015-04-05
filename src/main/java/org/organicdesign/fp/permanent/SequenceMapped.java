@@ -14,14 +14,22 @@
 
 package org.organicdesign.fp.permanent;
 
+import org.organicdesign.fp.Lazy;
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.function.Function1;
+import org.organicdesign.fp.tuple.Tuple2;
 
 public class SequenceMapped<T,U>  implements Sequence<U> {
-    private final Sequence<T> seq;
-    private final Function1<T,U> func;
+    private final Lazy.Ref<Tuple2<Option<U>,Sequence<U>>> laz;
 
-    private SequenceMapped(Sequence<T> s, Function1<T,U> f) { seq = s; func = f; }
+    SequenceMapped(Sequence<T> seq, Function1<T,U> func) {
+        laz = Lazy.Ref.of(() -> {
+            Option<T> first = seq.first();
+            return first.isSome()
+                    ? Tuple2.of(Option.of(func.apply(first.get())), new SequenceMapped<>(seq.rest(), func))
+                    : Sequence.emptySeqTuple();
+        });
+    }
 
     @SuppressWarnings("unchecked")
     public static <T,U> Sequence<U> of(Sequence<T> s, Function1<T,U> f) {
@@ -32,13 +40,7 @@ public class SequenceMapped<T,U>  implements Sequence<U> {
         return new SequenceMapped<>(s, f);
     }
 
-    @Override
-    public Option<U> first() {
-        Option<T> item = seq.first();
-        if (!item.isSome()) { return Option.none(); }
-        return Option.of(func.apply(item.get()));
-    }
+    @Override public Option<U> first() { return laz.get()._1(); }
 
-    @Override
-    public Sequence<U> rest() { return of(seq.rest(), func); }
+    @Override public Sequence<U> rest() { return laz.get()._2(); }
 }

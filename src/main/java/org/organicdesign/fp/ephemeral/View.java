@@ -134,16 +134,8 @@ public interface View<T> extends Transformable<T> {
 
     // default View<T> takeUntilInclusive(Predicate<T> p) { return ViewTakenUntilIncl.of(this, p); }
 
-    /**
-     Note that all dropped items will be evaluated as they are dropped.  Any side effects
-     (including delays) caused by evaluating these items will be incurred.  For this reason,
-     you should always drop as early in your chain of functions as practical.
-     @param numItems the number of items at the beginning of this view to ignore
-     @return a lazy view with the specified number of items ignored.
-     */
-    default View<T> drop(long numItems) {
-        return ViewDropped.of(this, numItems);
-    }
+    /** {@inheritDoc} */
+    @Override default View<T> drop(long numItems) { return ViewDropped.of(this, numItems); }
 
     // I don't see how I can legally declare this on Transformable!
     /**

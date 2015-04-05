@@ -85,6 +85,15 @@ public interface Transformable<T> extends Realizable<T> {
      */
     Transformable<T> takeWhile(Function1<T,Boolean> predicate);
 
+    /**
+     Note that all dropped items will be evaluated as they are dropped.  Any side effects
+     (including delays) caused by evaluating these items will be incurred.  For this reason,
+     you should always drop as early in your chain of functions as practical.
+     @param numItems the number of items at the beginning of this view to ignore
+     @return a lazy view with the specified number of items ignored.
+     */
+    Transformable<T> drop(long numItems);
+
     // TODO: You can always use foldLeft for this operation.  Does having reduceLeft add more clarity to the underlying code, or does it provide some useful additional functionality?
 //    /**
 //     Eagerly process entire data source.  This is an extremely powerful method, being the only one

@@ -13,11 +13,12 @@
 
 package org.organicdesign.fp.experiments;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import org.organicdesign.fp.collections.UnIterable;
+import org.organicdesign.fp.collections.UnIterator;
 import org.organicdesign.fp.experiments.math.Rational;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  This is an idea, which is why I put it in the test folder.  It would be super nice if
@@ -26,7 +27,7 @@ import org.organicdesign.fp.experiments.math.Rational;
 
  Does NOT handle an infinite range (yet).
  */
-public class IntRange {
+public class IntRange implements UnIterable<Long> {
     private final long start;
     private final long end;
     private final long size;
@@ -59,13 +60,6 @@ public class IntRange {
     public long get(long idx) {
         if (idx < size) { return start + idx; }
         throw new IllegalArgumentException("Index " + idx + " was outside the size of this range: " + start + " to " + end);
-    }
-
-    // Keep this method private because it provides access to private fields!
-    private Object[] fields() {
-        // So Integer as your class does not have any internal arrays,
-        // simply list your fields here.
-        return new Object[] { start, end };
     }
 
     // You can ask for a given number of views, but what you get could be that number of fewer.
@@ -105,7 +99,7 @@ public class IntRange {
     }
 
     @Override
-    public int hashCode() { return Arrays.hashCode(fields()); }
+    public int hashCode() { return (int) (start + end); }
 
     @Override
     public boolean equals(Object other) {
@@ -120,7 +114,19 @@ public class IntRange {
         // Details...
         final IntRange that = (IntRange) other;
         // If this is not a database object, compare "significant" fields here.
-        return Arrays.equals(fields(), that.fields());
+        return (this.start == that.start) &&
+                (this.end == that.end);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public UnIterator<Long> iterator() {
+        return new UnIterator<Long>() {
+            long s = start;
+            @Override public boolean hasNext() { return s < end; }
+            @Override public Long next() { s = s + 1; return s; }
+        };
+    }
 }

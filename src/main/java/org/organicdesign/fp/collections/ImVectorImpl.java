@@ -371,6 +371,19 @@ public class ImVectorImpl<E> implements ImList<E> {
 //        }
 //    }
 
+    /** This is correct, but O(n). */
+    // Does this need to be compatible with java.util.AbstractList?
+    @Override public int hashCode() { return (size() == 0) ? 0 : UnIterable.hashCode(this); }
+
+    /** This is correct, but definitely O(n), same as java.util.ArrayList. */
+    // Does this need to be compatible with java.util.AbstractList?
+    @Override
+    public boolean equals(Object other) {
+        return (other instanceof UnList) &&
+                (this.size() == ((UnList) other).size()) &&
+                UnIterable.equals(this, (UnList) other);
+    }
+
     private static Node doAssoc(int level, Node node, int i, Object val) {
         Node ret = new Node(node.edit, node.array.clone());
         if (level == 0) {

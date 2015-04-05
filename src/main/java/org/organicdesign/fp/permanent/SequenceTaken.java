@@ -24,9 +24,7 @@ public class SequenceTaken<T> implements Sequence<T> {
         return new SequenceTaken<>(v, numItems);
     }
 
-    @Override
-    public Option<T> first() { return laz.get()._1(); }
+    @Override public Option<T> first() { return laz.get()._1(); }
 
-    @Override
-    public Sequence<T> rest() { return laz.get()._2(); }
+    @Override public Sequence<T> rest() { return laz.get()._2(); }
 }

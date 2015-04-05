@@ -14,9 +14,11 @@
 
 package org.organicdesign.fp.permanent;
 
-import java.util.Iterator;
-
+import org.organicdesign.fp.Lazy;
 import org.organicdesign.fp.Option;
+import org.organicdesign.fp.tuple.Tuple2;
+
+import java.util.Iterator;
 
 /**
  If you use the source iterator after passing it to this class then the behavior of this class
@@ -29,12 +31,13 @@ import org.organicdesign.fp.Option;
  object will present and immutable, lazy, memoized, thread-safe view of the underlying iterator.
  */
 class SequenceFromIterator<T> implements Sequence<T> {
+    private final Lazy.Ref<Tuple2<Option<T>,Sequence<T>>> laz;
 
-    private final Iterator<T> iter;
-    private Option<T> first = null;
-    private Sequence<T> rest;
-
-    private SequenceFromIterator(Iterator<T> i) { iter = i; }
+    SequenceFromIterator(Iterator<T> iter) {
+        laz = Lazy.Ref.of(() -> iter.hasNext()
+                ? Tuple2.of(Option.of(iter.next()), new SequenceFromIterator<>(iter))
+                : Sequence.emptySeqTuple());
+    }
 
     public static <T> Sequence<T> of(Iterator<T> i) {
         if (i == null) { return Sequence.emptySequence(); }
@@ -48,26 +51,7 @@ class SequenceFromIterator<T> implements Sequence<T> {
         return new SequenceFromIterator<>(iiter);
     }
 
-    private synchronized void init() {
-        if (first == null) {
-            if (iter.hasNext()) {
-                first = Option.of(iter.next());
-                rest = of(iter);
-            } else {
-                first = Option.none();
-                rest = Sequence.emptySequence();
-            }
-        }
-    }
+    @Override public Option<T> first() { return laz.get()._1(); }
 
-    @Override
-    public Option<T> first() {
-        init();
-        return first;
-    }
-    @Override
-    public Sequence<T> rest() {
-        init();
-        return rest;
-    }
+    @Override public Sequence<T> rest() { return laz.get()._2(); }
 }

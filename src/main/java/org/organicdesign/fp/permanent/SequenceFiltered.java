@@ -14,15 +14,34 @@
 
 package org.organicdesign.fp.permanent;
 
+import org.organicdesign.fp.Lazy;
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.function.Function1;
+import org.organicdesign.fp.tuple.Tuple2;
 
 public class SequenceFiltered<T> implements Sequence<T> {
-    private Sequence<T> seq;
-    private final Function1<T,Boolean> predicate;
-    private Option<T> first = null;
+    private final Lazy.Ref<Tuple2<Option<T>,Sequence<T>>> laz;
 
-    private SequenceFiltered(Sequence<T> s, Function1<T,Boolean> f) { seq = s; predicate = f; }
+    SequenceFiltered(Sequence<T> s, Function1<T,Boolean> predicate) {
+
+        laz = Lazy.Ref.of(() -> {
+            Sequence<T> seq = s;
+            while (seq != EMPTY_SEQUENCE) {
+                Option<T> item = seq.first();
+                if (!item.isSome()) {
+                    break;
+                }
+
+                if (predicate.apply(item.get())) {
+                    return Tuple2.of(item, of(seq.rest(), predicate));
+                }
+
+                // If we didn't find one, repeat with next element
+                seq = seq.rest();
+            }
+            return Tuple2.of(Option.none(), Sequence.emptySequence());
+        });
+    }
 
     public static <T> Sequence<T> of(Sequence<T> s, Function1<T,Boolean> f) {
         if (f == null) { throw new IllegalArgumentException("Must provide a predicate"); }
@@ -32,38 +51,9 @@ public class SequenceFiltered<T> implements Sequence<T> {
         return new SequenceFiltered<>(s, f);
     }
 
-    private synchronized void init() {
-        if (first == null) {
-            while (seq != EMPTY_SEQUENCE) {
-                Option<T> item = seq.first();
-                if (!item.isSome()) {
-                    break;
-                }
-
-                if (predicate.apply(item.get())) {
-                    first = item;
-                    seq = of(seq.rest(), predicate);
-                    return;
-                }
-
-                // If we didn't find one, repeat with next element
-                seq = seq.rest();
-            }
-            first = Option.none();
-            seq = Sequence.emptySequence();
-        }
-    }
+    @Override
+    public Option<T> first() { return laz.get()._1(); }
 
     @Override
-    public Option<T> first() {
-        init();
-        return first;
-    }
-
-    @Override
-    public Sequence<T> rest() {
-        init();
-        // if initialized, seq has been replaced with the appropriate filtered sequence.
-        return seq;
-    }
+    public Sequence<T> rest() { return laz.get()._2(); }
 }

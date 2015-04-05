@@ -18,6 +18,7 @@ import org.organicdesign.fp.Option;
 import org.organicdesign.fp.Transformable;
 import org.organicdesign.fp.function.Function1;
 import org.organicdesign.fp.function.Function2;
+import org.organicdesign.fp.tuple.Tuple2;
 
 import java.util.Iterator;
 
@@ -35,9 +36,14 @@ public interface Sequence<T> extends Transformable<T> {
         /** @return EMPTY_SEQUENCE (this) */
         @Override public Sequence<Object> rest() { return this; }
     };
+
     @SuppressWarnings("unchecked")
     public static <T> Sequence<T> emptySequence() {
         return (Sequence<T>) EMPTY_SEQUENCE;
+    }
+
+    static <U> Tuple2<Option<U>,Sequence<U>> emptySeqTuple() {
+        return Tuple2.of(Option.none(), Sequence.emptySequence());
     }
 
     public static <T> Sequence<T> of(Iterator<T> i) {
@@ -137,6 +143,11 @@ public interface Sequence<T> extends Transformable<T> {
 
     @Override
     default Sequence<T> takeWhile(Function1<T,Boolean> predicate) { return SequenceTakenWhile.of(this, predicate); }
+
+    /** {@inheritDoc} */
+    @Override default Sequence<T> drop(long numItems) {
+        return SequenceDropped.of(this, numItems);
+    }
 
 //    @Override
 //    T reduceLeft(BiFunction<T, T, T> fun) {

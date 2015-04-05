@@ -11,7 +11,7 @@ import java.util.function.Predicate;
  *
  * {@inheritDoc}
  */
-public interface UnCollection<E> extends Collection<E> {
+public interface UnCollection<E> extends Collection<E>, UnIterable<E> {
 
     // Methods are listed in the same order as the javadocs.
 
