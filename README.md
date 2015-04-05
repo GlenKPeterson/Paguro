@@ -147,7 +147,8 @@ The View model implemented here is for lightweight, lazy, immutable, type-safe, 
 The Sequence model is also memoized/cached, so it is useful for repeated queries.
 Sequence is most similar to the Clojure sequence abstraction, but it's pure Java and type-safe.
 Both allow processing in the smallest possible (and therefore laziest) increments.
-I find myself focusing on View more than Sequence because View seems to be adequite for most things I do.
+I fond myself focusing on View more than Sequence at first because View was adequate for most things I do.
+Sequence is catching up though.
 
 The classes in the <code>function</code> package allow you to use the Java 8 functional interfaces (more or less) as "second class" functions in Java 7.
 When you switch to Java 8, you only need to change the import statement and remove the _ from the apply_() methods.
@@ -163,20 +164,28 @@ The most interesting classes are probably (in src/main/java/):
 <li><code><a href="https://github.com/GlenKPeterson/fp4java7/blob/master/src/main/java/org/organicdesign/fp/FunctionUtils.java">org/organicdesign/fp/FunctionUtils</a></code> - smartly combine/compose multiple predicates, convert collections to Strings, etc.</li>
 </ul>
 
+I had originally called foldRight foldLeft.
+I bet someone with a clue noticed and said nothing which was very kind, but not very helpful.
+If you see me doing something that looks clearly uneducated, please let me know.
+I aim to take constructive criticism well.
+
 #Dependencies
-- Java 8 (tested with 64-bit Linux build 1.8.0-b129)
+- Java 8 (tested with 64-bit Linux build 1.8.0_31)
  
 #Build Dependencies
-- Maven (tested version: 3.11.0-18-generic 64-bit Linux build)
+- Maven (tested version: 3.2.3 64-bit Linux build)
 
 #Test Dependencies
 - Maven will download jUnit for you
-- As of 2014-03-08, all major areas of functionality are covered by unit tests.
+- As of 2014-03-08, all major areas of functionality were covered by unit tests.
 
 #Change Log
-2015-03-27 version 0.8.1: Renamed LazyRef to Lazy.Ref so that I could add Lazy.Int for computing hashcodes.
+2015-03-27 version 0.8.1:
+Renamed Transformable.foldLeft() to foldRight and swapped the order of inputs on the combiner function. 
+Renamed LazyRef to Lazy.Ref so that I could add Lazy.Int for computing hashcodes.
 Made FunctionX.apply_() methods rethrow RuntimeExceptions unchanged, but (still) wrap checked Exceptions in RuntimeExceptions.
 They were previously wrapped in IllegalStateExceptions, except for SideEffect which tried to cast the exception which never worked.
+Re-implemented Sequence abstraction using Lazy.Ref.
 SideEffect has been deprecated because it may not have been used anywhere.
 Added some tests, improved some documentation, and made a bunch of things private or deleted them in experiments.collections.ImVectorImpl.
 
