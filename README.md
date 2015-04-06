@@ -1,8 +1,4 @@
-Formerly called fp4java7, J-cicle (pronounced "Jay-sick-ul" like a frozen/immutable Java-icicle) is about limiting mutation and replacing loops with lazy transformations.
-
-You are on the Java 8 branch of this project.  If you're using Java 7 or earlier, get the Java 7 legacy support branch from here:
-https://github.com/GlenKPeterson/fp4java7/tree/java7
-
+Like functional programming and Clojure, but have to use Java at work?  Would Clojure be perfect for you if it only had types?  J-cicle (pronounced "Jay-sick-ul" like a frozen/immutable Java-icicle) brings the Clojure collections and a Sequence abstraction to Java, but with the full type saftey and compile-time checking that Java programmers are accustomed to.  It's a 100% Java 8 compatible API (should be compatible back to Java 5)
 
 #Usage
 How hard is it to create an immutable, type safe map in Java?  Are you tired of writing code like this:
@@ -10,7 +6,7 @@ http://glenpeterson.blogspot.com/2013/07/immutable-java-with-lists-and-other.htm
 
 Like Guava, J-cicle cuts through the boilerplate:
 ```java
-Map<String,Integer> sToI = uMap(
+Map<String,Integer> itemMap = uMap(
         "One", 1,
         "Two", 2,
         "Three", 3);
@@ -20,13 +16,13 @@ What if you want to add items conditionally?  Would you create a temporary, muta
 the mutable map, then call Collections.unmodifiableMap(tempMap) on it?  Ouch!  The following will create an
 UnmodifiableMap of 0, 1, 2, or 3 items (no nulls) depending on the values of showFirst, showSecond, and showThird:
 ```java
-Map<String,Integer> sToI = uMapSkipNull(
+Map<String,Integer> itemMap = unMapSkipNull(
         showFirst ? Tuple2.of("One", 1) : null,
         showSecond ? Tuple2.of("Two", 2) : null,
         showThird ? Tuple2.of("Three", 3) : null);
 ```
 
-Similar type-safe methods are available for producing unmodifiable Sets and Lists of any length (uMaps currently go
+Similar type-safe methods are available for producing unmodifiable Sets and Lists of any length (unMaps currently go
 from 0 to 20 type-safe parameters).
 
 What about transforming your unmodifiable data into other unmodifiable data?  Lazily, without any extra processing?
@@ -46,14 +42,10 @@ FunctionUtils.toString(list);
 // Returns: "UnmodifiableRandomAccessList(4,5,6)"
 ```
 These transformations do not change the underlying data.  They build a new collection by chaining together all the
-operations you specify, then lazily applying them in a single pass through the unerlying data.  The laziness is
+operations you specify, then lazily applying them in a single pass.  The laziness is
 implemented as an incremental pull, so that if your last operation is take(1), then the absolute minimum number of
 items will be evaluated through all the functions you specified.  In the example above, items 7, 8, and 9 are never
 processed.
-
-#Learn
-
-There is now a problem-set for learning this tool-kit: https://github.com/GlenKPeterson/LearnFpJava
 
 #Motivations
 
@@ -65,7 +57,7 @@ The goals of this project are to make it easy to use Java:
  - Minimizing the use of primitives and arrays (except for varargs, Suggested by Josh Bloch Items 23, 25, 26, 27, 28, 29)
  - Briefly
  - Returning empty collections instead of <code>null</code> (Josh Bloch Item 43)
- - "Throw exceptions at people, not at code" (Bill Venners quote, but also Josh Bloch Item 59)
+ - "Throw exceptions at people, not at code" (says Bill Venners, but also Josh Bloch Item 59)
  - Concurrency friendly (Josh Bloch Item 66, 67)
  - Context-sensitive equality: prefer Comparators to <code>equals()</code>, <code>hashcode()</code> and <code>compareTo()</code> (Daniel Spiewak, Viktor Klang, Rúnar Óli Bjarnason, Hughes Chabot, java.util.TreeSet, java.util.TreeMap)
  - Compatibly with existing/legacy Java code
@@ -142,22 +134,29 @@ Set<T> toJavaUnmodSet()
 T[] toArray()
 Iterator<T> toIterator()
 ```
+#Learn
+
+There is an outdated problem-set for learning this tool-kit: https://github.com/GlenKPeterson/LearnFpJava
 
 #Details
-The View model implemented here is for lightweight, lazy, immutable, type-safe, and thread-safe transformations.
-The Sequence model is also memoized/cached, so it is useful for repeated queries.
-Sequence is most similar to the Clojure sequence abstraction, but it's pure Java and type-safe.
-Both allow processing in the smallest possible (and therefore laziest) increments.
-I fond myself focusing on View more than Sequence at first because View was adequate for most things I do.
-Sequence is catching up though.
+The crux of this project is to retrofit the Clojure way of transforming data into Java code.  This definitely puts a square peg into a round hole.  There are several layers of conversion for collections:
+ - java.util... collections are the standard Java interfaces that existing code all works with.  Like Guava, we want to be as compatible as possible, while preventing mutation-in-place.
+ - org.organicdesign.fp.collection.Un...  collections extend the java.util collection interfaces of the same name (minus the "Un" prefix) and deprecate and implement all the mutate-in-place methods so that they only throw exceptions.  This is useful in its own right as a way to declare that a function does not modify what is passed, or that what it returns cannot be modified.  Modification errors are caught as early as possible due to deprecation warnings.
+ - org.organicdesign.fp.collection.Im...  are the immutable, lightweight-copy Clojure-centric collection interfaces.  Only the "get" methods from the java.util... collection interfaces remain.  Additional "set" methods that return a new collectoin are added at this level.
+ - org.organicdesign.fp.collection.Im...Impl are the actual implementations of the above interfaces, generally taken directly from Clojure (hence the Eclipse licence for those components).  For starters, we will have the celebrated Vector and the sorted (tree) Set and Map implementations.
 
-The classes in the <code>function</code> package allow you to use the Java 8 functional interfaces (more or less) as "second class" functions in Java 7.
+Within your own FP-centric world, you will use the Im interfaces and implementations and transform them with the Sequence abstraction.  Methods that interact with imperative Java code will take and return either the Un interfaces, or the java.util interfaces as necessary. 
+
+
+The Sequence model implements lightweight, lazy, immutable, type-safe, and thread-safe transformations.  It is also memoized/cached, so it is useful for repeated queries.  Sequence is most similar to the Clojure sequence abstraction, but it's pure Java and type-safe.  Sequence and View both allow processing in the smallest possible (and therefore laziest) increments.  I fond myself focusing on View more than Sequence at first, but Sequence is catching up and may replace View one day if the performance is similar.
+
+The classes in the <code>function</code> package allow you to use the Java 8 functional interfaces smoothly warpping things that throw checked exceptions in Java 8, or as "second class" functions in Java 7.
 
 Some variables declared outside a lambda and used within one must be finial.
 The Mutable.____Ref classes work around this limitation.
 
 #Dependencies
-- Java 8 (tested with 64-bit Linux build 1.8.0_31)
+- Java 8 (tested with 64-bit Linux build 1.8.0_31).  Probably can be adapted to work with Java 5, but before Generics, most of this code will not be type safe, or will be a royal pain without parameterized types.
  
 #Build Dependencies
 - Maven (tested version: 3.2.3 64-bit Linux build)
@@ -218,24 +217,16 @@ Transform Variations:
  - Lazy vs. Eager - lazy is preferred, but some operations (like reduce) are inherently eager.  I think
  you can use flatMap instead of reduce if you want it lazy.
 
-Some collections, like Sets, are unordered and naturally partitioned, so that some processes (such as mapping one set to another) could be carried out in a highly concurrent manner.
-
-A Java 8 version of this project is working, but a few commits behind the Java 7 version.  If
-someone wants that, let me know and I'll post it.
-
-This would be an even smaller project in Scala than in Java 8 so that may be in the works as well, if people would find it useful.
-
-A lot has been said about lightweight copies of immutable collections, but I wonder how far
-mutable builders could go toward not having to copy immutable collections?
+Some collections are naturally partitioned, so that some processes (such as mapping one set to another) could be carried out in a highly concurrent manner.  If that is added some day, any concurrent operation will take a parameter for the max number of threads it should try to use.
 
 #Out of Scope
 
-###T reduceLeft(BiFunction<T, T, T> fun)
-reduceLeft() is like foldLeft without the "u" parameter.
-I implemented it, but deleted it because it seemed like a very special case of foldLeft that only operated on items of the same type as the original collection.
+###T reduceRight(BiFunction<T, T, T> fun)
+reduceRight() is like foldRight without the "u" parameter.
+I implemented it, but deleted it because it seemed like a very special case of foldRight that only operated on items of the same type as the original collection.
 I didn't think it improved readability or ease of use to have both methods.
-How hard is it to pass a 0 or 1 to foldLeft?
-It's easy enough to implement if there is a compelling use case where it's significantly better than foldLeft.
+How hard is it to pass a 0 or 1 to foldRight?
+It's easy enough to implement if there is a compelling use case where it's significantly better than foldRight.
 Otherwise, fewer methods means a simpler interface to learn.
 
 ###View<T> interpose(T item)
@@ -253,9 +244,11 @@ None of those are simple uses of interpose.
 #Licenses
 Java&trade; is a registered trademark of the Oracle Corporation in the US and other countries.  J-cicle is not part of Java.  Oracle is in no way affiliated with the J-cicle project.
 
+J-cicle is not part of Clojure.  Rich Hickey and the Clojure team are in no way affiliated with the J-cicle project, though it borrows heavily from their thoughts and even some of their open-source code.
+
 This work is licensed under both the Apache 2.0 license and the Eclipse Public License.  You must comply with the rules of both licenses (you don't get to choose).  New contributions should be made under the Apache 2.0 license whenever practical.
 
-Most of this work is licensed under the Apache 2.0 license.  However, the persistent collections (Vec-sicle, Mapsicle, Setsicle, etc. in the expiraments/collections folder as of 2015-03-24) are originally copied from, and still based on, the Clojure source code by Rich Hickey which is released under the Eclipse Public License (as of fall 2014).  Those files are derivative works and must remain under the EPL license unless the original authors chooses a new license.
+Most of this work is licensed under the Apache 2.0 license.  However, the persistent collections (ImVectorImpl, ImMapSortedImpl, ImSetSortedImpl, etc. in thecollections folder as of 2015-04-05) are originally copied from, and still based on, the Clojure source code by Rich Hickey which is released under the Eclipse Public License (as of fall 2014).  Those files are derivative works and must remain under the EPL license unless the original authors give permission to change it, or chooses a new license.
 
 I am not a lawyer and this is not legal advice.  Both the EPL and Apache projects list each other's license as being compatible.  I am not aware of a clear difference between them, or a reason why works written under the two licenses cannot be combined.
 
