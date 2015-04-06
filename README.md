@@ -97,8 +97,8 @@ void forEach(Consumer<T> se)
 // Apply the function to each item in the list, accumulating the result in u.
 // You could perform many other transformations with just this one function, but
 // it is clearer to use the most specific transformations that meets your needs.
-// Still, sometimes you need the flexibility foldLeft provides, so here it is:
-U foldLeft(U u, BiFunction<U, T, U> fun)
+// Still, sometimes you need the flexibility foldRight provides, so here it is:
+U foldRight(U u, BiFunction<T, U, U> fun)
 
 // Return only the items for which the given predicate returns true
 View<T> filter(Predicate<T> pred)
@@ -181,13 +181,13 @@ I aim to take constructive criticism well.
 
 #Change Log
 2015-03-27 version 0.8.1:
-Renamed Transformable.foldLeft() to foldRight and swapped the order of inputs on the combiner function. 
-Renamed LazyRef to Lazy.Ref so that I could add Lazy.Int for computing hashcodes.
-Made FunctionX.apply_() methods rethrow RuntimeExceptions unchanged, but (still) wrap checked Exceptions in RuntimeExceptions.
+- Renamed Transformable.foldLeft() to foldRight() and swapped the order of inputs on the combiner function. 
+- Renamed LazyRef to Lazy.Ref so that I could add Lazy.Int for computing hashcodes.
+- Made FunctionX.apply_() methods rethrow RuntimeExceptions unchanged, but (still) wrap checked Exceptions in RuntimeExceptions.
 They were previously wrapped in IllegalStateExceptions, except for SideEffect which tried to cast the exception which never worked.
-Re-implemented Sequence abstraction using Lazy.Ref.
-SideEffect has been deprecated because it may not have been used anywhere.
-Added some tests, improved some documentation, and made a bunch of things private or deleted them in experiments.collections.ImVectorImpl.
+- Re-implemented Sequence abstraction using Lazy.Ref.
+- SideEffect has been deprecated because it may not have been used anywhere.
+- Added some tests, improved some documentation, and made a bunch of things private or deleted them in experiments.collections.ImVectorImpl.
 
 2015-03-14 version 0.8.0: Removed firstMatching - in your code, replace firstMatching(...) with filter(...).first().
 Implemented filter() on Sequence.
@@ -205,22 +205,31 @@ Added unit tests for the above.
  safe if the producer and the values it produces are free from outside influences.
 
 #To Do
-
-Use LazyRef to re-implement Sequence classes much more simply.
-
-I think what I'm calling foldLeft actually processes items in order like foldRight.  I should either fix it to process items in reverse order, or rename it.  You can see this if you pass it the cons() function.
+ - Implement SequenceFlatMapped
+ - Add UnMapSorted and UnSetSorted
+ - Add ImMapSorted and ImSetSorted interfaces
+ - Add the TreeMap and TreeSet implementations from Clojure
+ - Make the Im interfaces implement Sequence
+ - Release 1.0 alpha which is kind of like type-safe Clojure for Java.  It will include:
+    - 3 Immutable collections: Vector, SetOrdered, and MapOrdered.  None of these use equals or hashcode.
+    Vector doesn't need to and Map and Set take a Comparator.
+    - Un-collections which are the Java collection interfaces, only unmodifiable, with mutator methods deprecated and
+    default to throw exceptions.
+    - Im-collections which add "mutator" methods that return a new collection reflecting the change, leaving the old
+    collection unchanged.
+    - Basic sequence abstraction.
+    - Function interfaces that manage exceptions and play nicely with java.util.function.* 
 
 Collection Variations:
  - Immutable vs. Mutable (Persistent vs. Ephemeral) and Permitting lightweight copies
  - Finite vs. Infinite (finite sub-categories: fits in memory or not)
  - Heterogenious vs. Homogenious
- - Write-only Builder with read-only collection?
- - Thread-safe vs. unsafe
+ - Write-only Builder with read-only collection? - No, I think Guava does that already.
+ - Thread-safe vs. unsafe - I think immutable means thread-safe only.
 
 Transform Variations:
- - Lazy vs. Eager
-
-Update Sequence to have all the transforms that View does.
+ - Lazy vs. Eager - lazy is preferred, but some operations (like reduce) are inherently eager.  I think
+ you can use flatMap instead of reduce if you want it lazy.
 
 Some collections, like Sets, are unordered and naturally partitioned, so that some processes (such as mapping one set to another) could be carried out in a highly concurrent manner.
 
