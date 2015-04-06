@@ -30,12 +30,12 @@ Similar type-safe methods are available for producing unmodifiable Sets and List
 from 0 to 20 type-safe parameters).
 
 What about transforming your unmodifiable data into other unmodifiable data?  Lazily, without any extra processing?
-Typical usage (based on this unit test: <a href="https://github.com/GlenKPeterson/fp4java7/blob/master/src/test/java/org/organicdesign/fp/ephemeral/ViewTest.java">ViewTest.java</a>):
+Typical usage (based on this unit test: <a href="https://github.com/GlenKPeterson/fp4java7/blob/master/src/test/java/org/organicdesign/fp/persistent/SequenceTest.java">SequenceTest.java</a>):
 
 ```java
-List<Integer> list = View.ofArray(4,5) //       4,5
-        .prepend(View.ofArray(1,2,3))  // 1,2,3,4,5
-        .append(View.ofArray(6,7,8,9)) // 1,2,3,4,5,6,7,8,9
+List<Integer> list = Sequence.ofArray(4,5) //       4,5
+        .prepend(Sequence.ofArray(1,2,3))  // 1,2,3,4,5
+        .append(Sequence.ofArray(6,7,8,9)) // 1,2,3,4,5,6,7,8,9
         .filter(i -> i > 4)            //         5,6,7,8,9
         .map(i -> i - 2)               //     3,4,5,6,7
         .take(5)                       //     3,4,5,6
@@ -82,12 +82,12 @@ Incremental evaluation prevents some items from being evaluated to produce the r
 
 #API
 
-Functions available in <code>View</code> (as of 2014-03-07):
+Functions available in <code>Sequence</code> (as of 2014-03-07):
 ###Starting Points:
 ```java
-View<T> View.ofArray(T... i)
-View<T> View.of(Iterator<T> i)
-View<T> View.of(Iterable<T> i)
+Sequence<T> Sequence.ofArray(T... i)
+Sequence<T> Sequence.of(Iterator<T> i)
+Sequence<T> Sequence.of(Iterable<T> i)
 ```
 ###Transformations:
 ```java
@@ -101,28 +101,29 @@ void forEach(Consumer<T> se)
 U foldRight(U u, BiFunction<T, U, U> fun)
 
 // Return only the items for which the given predicate returns true
-View<T> filter(Predicate<T> pred)
+Sequence<T> filter(Predicate<T> pred)
 
 // Return items from the beginning of the list until the given predicate returns false
-View<T> takeWhile(Predicate<T> p)
+Sequence<T> takeWhile(Predicate<T> p)
 
 // Return only the first n items
-View<T> take(long numItems)
+Sequence<T> take(long numItems)
 
 // Ignore the first n items and return only those that come after
-View<T> drop(long numItems)
+Sequence<T> drop(long numItems)
 
 // Transform each item into exactly one new item using the given function
-View<U> map(Function<T,U> func)
+Sequence<U> map(Function<T,U> func)
 
-// Add items to the end of this view
-View<T> append(View<T> pv)
+// Add items to the end of this Sequence
+Sequence<T> append(Sequence<T> pv)
 
-// Add items to the beginning of this view
-View<T> prepend(View<T> pv)
+// Add items to the beginning of this Sequence
+Sequence<T> prepend(Sequence<T> pv)
 
 // Transform each item into zero or more new items using the given function
-View<U> flatMap(Function<T,View<U>> func)
+// TODO: IMPLEMENT THIS IN SEQUENCE (as of 2015-04-05 it's only in view).
+// Sequence<U> flatMap(Function<T,Sequence<U>> func)
 ```
 ###Endpoints
 ```java
@@ -151,23 +152,9 @@ I fond myself focusing on View more than Sequence at first because View was adeq
 Sequence is catching up though.
 
 The classes in the <code>function</code> package allow you to use the Java 8 functional interfaces (more or less) as "second class" functions in Java 7.
-When you switch to Java 8, you only need to change the import statement and remove the _ from the apply_() methods.
-The apply_() methods are there to deal with checked exceptions in lambdas in Java 7.
 
 Some variables declared outside a lambda and used within one must be finial.
 The Mutable.____Ref classes work around this limitation.
-
-The most interesting classes are probably (in src/main/java/):
-<ul>
-<li><code><a href="https://github.com/GlenKPeterson/fp4java7/blob/master/src/main/java/org/organicdesign/fp/Transformable.java">org/organicdesign/fp/Transformable</a></code> - allows various functional transformations to be lazily applied: filter, map, forEach, etc., and allows any transformations to be eagerly evaluated into either mutable or unmodifiable collections (Java collections have to fit in memory).</li>
-<li><code><a href="https://github.com/GlenKPeterson/fp4java7/blob/master/src/main/java/org/organicdesign/fp/ephemeral/View.java">org/organicdesign/fp/ephemeral/View</a></code> - a working implementation of most of these transformations</li>
-<li><code><a href="https://github.com/GlenKPeterson/fp4java7/blob/master/src/main/java/org/organicdesign/fp/FunctionUtils.java">org/organicdesign/fp/FunctionUtils</a></code> - smartly combine/compose multiple predicates, convert collections to Strings, etc.</li>
-</ul>
-
-I had originally called foldRight foldLeft.
-I bet someone with a clue noticed and said nothing which was very kind, but not very helpful.
-If you see me doing something that looks clearly uneducated, please let me know.
-I aim to take constructive criticism well.
 
 #Dependencies
 - Java 8 (tested with 64-bit Linux build 1.8.0_31)
@@ -180,7 +167,7 @@ I aim to take constructive criticism well.
 - As of 2014-03-08, all major areas of functionality were covered by unit tests.
 
 #Change Log
-2015-03-27 version 0.8.1:
+2015-04-05 version 0.8.1:
 - Renamed Transformable.foldLeft() to foldRight() and swapped the order of inputs on the combiner function. 
 - Renamed LazyRef to Lazy.Ref so that I could add Lazy.Int for computing hashcodes.
 - Made FunctionX.apply_() methods rethrow RuntimeExceptions unchanged, but (still) wrap checked Exceptions in RuntimeExceptions.
