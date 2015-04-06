@@ -31,7 +31,7 @@ import java.util.TreeSet;
 
 /**
  Represents transformations to be carried out on a collection.  This class also implements the
- methods defined in Realizable so that sub-classes can just implement foldRight and not have to
+ methods defined in Realizable so that sub-classes can just implement foldLeft and not have to
  worry about any Realizable functions.
  @param <T>
  */
@@ -107,7 +107,7 @@ public interface Transformable<T> extends Realizable<T> {
 //    Transformable<T> prepend(Transformable<T> other);
 
 
-    // TODO: You can always use foldRight for this operation.  Does having reduceLeft add more clarity to the underlying code, or does it provide some useful additional functionality?
+    // TODO: You can always use foldLeft for this operation.  Does having reduceLeft add more clarity to the underlying code, or does it provide some useful additional functionality?
 //    /**
 //     Eagerly process entire data source.  This is an extremely powerful method, being the only one
 //     that currently can produce more output items than input items (flatMap would do that too
@@ -119,7 +119,7 @@ public interface Transformable<T> extends Realizable<T> {
 
     /**
      One of the two higher-order functions that can produce more output items than input items
-     (when u is a collection). FlatMap is the other, but foldRight is eager while flatMap is lazy.
+     (when u is a collection). FlatMap is the other, but foldLeft is eager while flatMap is lazy.
      FoldLeft can also produce a single (scalar) value.  In that form, it is often called reduce().
 
      @return an eagerly evaluated result which could be a single value like a sum, or a collection.
@@ -129,10 +129,10 @@ public interface Transformable<T> extends Realizable<T> {
       this parameter.
      * @param fun combines each value in the list with the result so far.  The initial result is u.
      */
-    <U> U foldRight(U u, Function2<T,U,U> fun);
+    <U> U foldLeft(U u, Function2<U,T,U> fun);
 
     /**
-     A form of foldRight() that handles early termination.  If foldRight replaces a loop, and return
+     A form of foldLeft() that handles early termination.  If foldLeft replaces a loop, and return
      is a more general form of break, then this can do anything a loop can do.  If you want to
      terminate based on an input T value rather than an output U, make U = Tuple2(T,V) and have
      terminateWith(Tuple2(T,V) tv) { if tv._1()... }
@@ -146,14 +146,14 @@ public interface Transformable<T> extends Realizable<T> {
      * @param terminateWith returns true when the termination condition is reached and will stop
 processing the input at that time, returning the latest u.
      */
-    <U> U foldRight(U u, Function2<T,U,U> fun, Function1<U,Boolean> terminateWith);
+    <U> U foldLeft(U u, Function2<U,T,U> fun, Function1<U,Boolean> terminateWhen);
 
 
     // Sub-classes cannot inherit from this because the function that you pass in has to know the actal return type.
     // Have to implement this independently on sub-classes.
 //    /**
 //     One of the two higher-order functions that can produce more output items than input items.
-//     foldRight is the other, but flatMap is lazy while foldRight is eager.
+//     foldLeft is the other, but flatMap is lazy while foldLeft is eager.
 //     @return a lazily evaluated collection which is expected to be larger than the input
 //     collection.  For a collection that's the same size, map() is more efficient.  If the expected
 //     return is smaller, use filter followed by map if possible, or vice versa if not.
@@ -163,7 +163,7 @@ processing the input at that time, returning the latest u.
 
     @Override
     default ArrayList<T> toJavaArrayList() {
-        return foldRight(new ArrayList<T>(), (t, ts) -> {
+        return foldLeft(new ArrayList<T>(), (ts, t) -> {
             ts.add(t);
             return ts;
         });
@@ -174,7 +174,7 @@ processing the input at that time, returning the latest u.
 
     @Override
     default <U> HashMap<T,U> toJavaHashMap(final Function1<T,U> f1) {
-        return foldRight(new HashMap<T,U>(), (t, ts) -> {
+        return foldLeft(new HashMap<T,U>(), (ts, t) -> {
             ts.put(t, f1.applyEx(t));
             return ts;
         });
@@ -185,7 +185,7 @@ processing the input at that time, returning the latest u.
 
     @Override
     default <U> HashMap<U,T> toReverseJavaHashMap(final Function1<T,U> f1) {
-        return foldRight(new HashMap<U,T>(), (t, ts) -> {
+        return foldLeft(new HashMap<U,T>(), (ts, t) -> {
             ts.put(f1.applyEx(t), t);
             return ts;
         });
@@ -198,7 +198,7 @@ processing the input at that time, returning the latest u.
 
     @Override
     default TreeSet<T> toJavaTreeSet(Comparator<? super T> comparator) {
-        return foldRight(new TreeSet<T>(comparator), (t, ts) -> {
+        return foldLeft(new TreeSet<T>(comparator), (ts, t) -> {
             ts.add(t);
             return ts;
         });
@@ -216,7 +216,7 @@ processing the input at that time, returning the latest u.
 
     @Override
     default HashSet<T> toJavaHashSet() {
-        return foldRight(new HashSet<T>(), (t, ts) -> {
+        return foldLeft(new HashSet<T>(), (ts, t) -> {
             ts.add(t);
             return ts;
         });

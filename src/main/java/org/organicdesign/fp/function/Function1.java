@@ -234,11 +234,11 @@ public interface Function1<T,U> extends Function<T,U> {
 
         return in
                 .filter(p -> (p != null) && (p != ACCEPT))
-                .foldRight(accept(),
-                        (p, accum) -> (p == REJECT)
-                                ? p
-                                : and(accum, p),
-                        accum -> accum == REJECT);
+                .foldLeft(accept(),
+                          (accum, p) -> (p == REJECT)
+                                        ? p
+                                        : and(accum, p),
+                          accum -> accum == REJECT);
 
     }
 
@@ -269,11 +269,11 @@ public interface Function1<T,U> extends Function<T,U> {
 
         return in
                 .filter(p -> (p != null) && (p != REJECT))
-                .foldRight(reject(),
-                        (p, accum) -> (p == ACCEPT)
-                                ? p
-                                : or(accum, p),
-                        accum -> accum == ACCEPT);
+                .foldLeft(reject(),
+                          (accum, p) -> (p == ACCEPT)
+                                        ? p
+                                        : or(accum, p),
+                          accum -> accum == ACCEPT);
     }
 
     /** A convenience wrapper for of().  This may be a bad idea.  Not sure yet. */

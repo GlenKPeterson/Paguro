@@ -101,13 +101,13 @@ public interface Sequence<T> extends Transformable<T> {
 //    }
 
     @Override
-    default <U> U foldRight(U u, Function2<T,U,U> fun) {
+    default <U> U foldLeft(U u, Function2<U,T,U> fun) {
         Sequence<T> seq = this;
         // System.out.println("seq: " + seq);
         Option<T> item = seq.first();
         // System.out.println("===>item: " + item);
         while (item.isSome()) {
-            u = fun.apply(item.get(), u);
+            u = fun.apply(u, item.get());
             // repeat with next element
             seq = seq.rest();
             item = seq.first();
@@ -116,14 +116,14 @@ public interface Sequence<T> extends Transformable<T> {
     }
 
     @Override
-    default <U> U foldRight(U u, Function2<T,U,U> fun, Function1<U,Boolean> terminateWith) {
+    default <U> U foldLeft(U u, Function2<U,T,U> fun, Function1<U,Boolean> terminateWhen) {
         Sequence<T> seq = this;
         // System.out.println("seq: " + seq);
         Option<T> item = seq.first();
         // System.out.println("===>item: " + item);
         while (item.isSome()) {
-            u = fun.apply(item.get(), u);
-            if (terminateWith.apply(u)) {
+            u = fun.apply(u, item.get());
+            if (terminateWhen.apply(u)) {
                 return u;
             }
             // repeat with next element
@@ -169,7 +169,7 @@ public interface Sequence<T> extends Transformable<T> {
       // of returning USED_UP.  Otherwise, it's a pretty clean copy of SequenceFlatMapped.
 //    /**
 //     One of the two higher-order functions that can produce more output items than input items.
-//     foldRight is the other, but flatMap is lazy while foldRight is eager.
+//     foldLeft is the other, but flatMap is lazy while foldLeft is eager.
 //     @return a lazily evaluated collection which is expected to be larger than the input
 //     collection.  For a collection that's the same size, map() is more efficient.  If the expected
 //     return is smaller, use filter followed by map if possible, or vice versa if not.

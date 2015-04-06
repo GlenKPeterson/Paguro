@@ -75,21 +75,21 @@ public interface View<T> extends Transformable<T> {
 //    }
 
     @Override
-    default <U> U foldRight(U u, Function2<T,U,U> fun) {
+    default <U> U foldLeft(U u, Function2<U,T,U> fun) {
         Option<T> item = next();
         while (item.isSome()) {
-            u = fun.apply(item.get(), u);
+            u = fun.apply(u, item.get());
             item = next();
         }
         return u;
     }
 
     @Override
-    default <U> U foldRight(U u, Function2<T,U,U> fun, Function1<U,Boolean> terminateWith) {
+    default <U> U foldLeft(U u, Function2<U,T,U> fun, Function1<U,Boolean> terminateWhen) {
         Option<T> item = next();
         while (item.isSome()) {
-            u = fun.apply(item.get(), u);
-            if (terminateWith.apply(u)) {
+            u = fun.apply(u, item.get());
+            if (terminateWhen.apply(u)) {
                 return u;
             }
             item = next();
@@ -97,7 +97,7 @@ public interface View<T> extends Transformable<T> {
         return u;
     }
 
-//    default <U> U foldRight(Tuple2<U,Boolean> u,
+//    default <U> U foldLeft(Tuple2<U,Boolean> u,
 //                           BiFunction<U, T, Tuple2<U,Boolean>> fun) {
 //        Option<T> item = next();
 //        while (item.isSome()) {
@@ -140,7 +140,7 @@ public interface View<T> extends Transformable<T> {
     // I don't see how I can legally declare this on Transformable!
     /**
      One of the two higher-order functions that can produce more output items than input items.
-     foldRight is the other, but flatMap is lazy while foldRight is eager.
+     foldLeft is the other, but flatMap is lazy while foldLeft is eager.
      @return a lazily evaluated collection which is expected to be larger than the input
      collection.  For a collection that's the same size, map() is more efficient.  If the expected
      return is smaller, use filter followed by map if possible, or vice versa if not.

@@ -89,8 +89,8 @@ void forEach(Consumer<T> se)
 // Apply the function to each item in the list, accumulating the result in u.
 // You could perform many other transformations with just this one function, but
 // it is clearer to use the most specific transformations that meets your needs.
-// Still, sometimes you need the flexibility foldRight provides, so here it is:
-U foldRight(U u, BiFunction<T, U, U> fun)
+// Still, sometimes you need the flexibility foldLeft provides, so here it is:
+U foldLeft(U u, BiFunction<U, T, U> fun)
 
 // Return only the items for which the given predicate returns true
 Sequence<T> filter(Predicate<T> pred)
@@ -169,7 +169,6 @@ In short, Clojure doesn't have static types.  Scala has an TMTOWTDI attitude tha
 
 #Change Log
 2015-04-05 version 0.8.1:
-- Renamed Transformable.foldLeft() to foldRight() and swapped the order of inputs on the combiner function. 
 - Renamed LazyRef to Lazy.Ref so that I could add Lazy.Int for computing hashcodes.
 - Made FunctionX.apply_() methods rethrow RuntimeExceptions unchanged, but (still) wrap checked Exceptions in RuntimeExceptions.
 They were previously wrapped in IllegalStateExceptions, except for SideEffect which tried to cast the exception which never worked.
@@ -223,12 +222,12 @@ Some collections are naturally partitioned, so that some processes (such as mapp
 
 #Out of Scope
 
-###T reduceRight(BiFunction<T, T, T> fun)
-reduceRight() is like foldRight without the "u" parameter.
-I implemented it, but deleted it because it seemed like a very special case of foldRight that only operated on items of the same type as the original collection.
+###T reduceLeft(BiFunction<T, T, T> fun)
+reduceLeft() is like foldLeft without the "u" parameter.
+I implemented it, but deleted it because it seemed like a very special case of foldLeft that only operated on items of the same type as the original collection.
 I didn't think it improved readability or ease of use to have both methods.
-How hard is it to pass a 0 or 1 to foldRight?
-It's easy enough to implement if there is a compelling use case where it's significantly better than foldRight.
+How hard is it to pass a 0 or 1 to foldLeft?
+It's easy enough to implement if there is a compelling use case where it's significantly better than foldLeft.
 Otherwise, fewer methods means a simpler interface to learn.
 
 ###View<T> interpose(T item)
