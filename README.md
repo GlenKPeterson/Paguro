@@ -140,10 +140,10 @@ There is an outdated problem-set for learning this tool-kit: https://github.com/
 
 #Details
 The crux of this project is to retrofit the Clojure way of transforming data into Java code.  This definitely puts a square peg into a round hole.  There are several layers of conversion for collections:
- - java.util... collections are the standard Java interfaces that existing code all works with.  Like Guava, we want to be as compatible as possible, while preventing mutation-in-place.
- - org.organicdesign.fp.collection.Un...  collections extend the java.util collection interfaces of the same name (minus the "Un" prefix) and deprecate and implement all the mutate-in-place methods so that they only throw exceptions.  This is useful in its own right as a way to declare that a function does not modify what is passed, or that what it returns cannot be modified.  Modification errors are caught as early as possible due to deprecation warnings.
- - org.organicdesign.fp.collection.Im...  are the immutable, lightweight-copy Clojure-centric collection interfaces.  Only the "get" methods from the java.util... collection interfaces remain.  Additional "set" methods that return a new collectoin are added at this level.
- - org.organicdesign.fp.collection.Im...Impl are the actual implementations of the above interfaces, generally taken directly from Clojure (hence the Eclipse licence for those components).  For starters, we will have the celebrated Vector and the sorted (tree) Set and Map implementations.
+ - java.util... collections are the standard Java interfaces that existing code all works with.  Like Guava, we want to be as compatible with these as possible, while preventing mutation-in-place.
+ - org.organicdesign.fp.collection.Un... interfaces extend the java.util collection interfaces of the same name (minus the "Un" prefix) and deprecate and implement all the mutate-in-place methods so that they only throw exceptions.  This is useful in its own right as a way to declare that a function does not modify what is passed, or that what it returns cannot be modified.  Modification errors are caught as early as possible due to deprecation warnings.
+ - org.organicdesign.fp.collection.Im... interfaces are the immutable, lightweight-copy Clojure-centric collection interfaces.  Only the "get" methods from the java.util... collection interfaces remain.  Additional "set" methods that return a new collectoin are added at this level.
+ - org.organicdesign.fp.collection.Im...Impl are the lightweight-copy implementations of the above interfaces, generally taken directly from Clojure (hence the Eclipse licence for those components).  For starters, we will include the celebrated Vector and the sorted (tree) Set and Map implementations.
 
 Within your own FP-centric world, you will use the Im interfaces and implementations and transform them with the Sequence abstraction.  Methods that interact with imperative Java code will take and return either the Un interfaces, or the java.util interfaces as necessary. 
 
@@ -155,8 +155,10 @@ The classes in the <code>function</code> package allow you to use the Java 8 fun
 Some variables declared outside a lambda and used within one must be finial.
 The Mutable.____Ref classes work around this limitation.
 
+In short, Clojure doesn't have static types.  Scala has an TMTOWTDI attitude that reminds me of how C++ and Perl ended up producing write-only code.  Unwilling to move a million lines of code to either language, I tried to bring the best of both to Java.
+
 #Dependencies
-- Java 8 (tested with 64-bit Linux build 1.8.0_31).  Probably can be adapted to work with Java 5, but before Generics, most of this code will not be type safe, or will be a royal pain without parameterized types.
+- Java 8 (tested with 64-bit Linux build 1.8.0_31).  Probably can be meaningfully adapted to work as far back as Java 5 with some work.  I plan to keep new development work on the main branch, but am very willing to help maintain branches back-ported to Java 7, 6, 5,.... if there is interest.
  
 #Build Dependencies
 - Maven (tested version: 3.2.3 64-bit Linux build)
@@ -206,8 +208,8 @@ Added unit tests for the above.
     - Basic sequence abstraction.
     - Function interfaces that manage exceptions and play nicely with java.util.function.* 
 
+# Older Notes
 Collection Variations:
- - Immutable vs. Mutable (Persistent vs. Ephemeral) and Permitting lightweight copies
  - Finite vs. Infinite (finite sub-categories: fits in memory or not)
  - Heterogenious vs. Homogenious
  - Write-only Builder with read-only collection? - No, I think Guava does that already.
