@@ -31,7 +31,7 @@ class ViewFlatMapped<T,U> implements View<U> {
         // You can put nulls in, but you don't get nulls out.
         if (f == null) { return View.emptyView(); }
         // TODO: Is this comparison possible?
-//        if (f == FunctionUtils.IDENTITY) { return (View<U>) v; }
+        if (Function1.IDENTITY.equals(f)) { return (View<U>) v; }
         if ( (v == null) || (v == EMPTY_VIEW) ) { return View.emptyView(); }
         return new ViewFlatMapped<>(v, f);
     }

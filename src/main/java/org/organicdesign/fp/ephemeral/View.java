@@ -148,7 +148,9 @@ public interface View<T> extends Transformable<T> {
      */
     default <U> View<U> flatMap(Function1<T,View<U>> func) { return ViewFlatMapped.of(this, func); }
 
+    /** Add the given View after the end of this one. */
     default View<T> append(View<T> pv) { return ViewPrepended.of(pv, this); }
 
+    /** Add the given View before the beginning of this one. */
     default View<T> prepend(View<T> pv) { return ViewPrepended.of(this, pv); }
 }

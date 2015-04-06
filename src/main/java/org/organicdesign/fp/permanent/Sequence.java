@@ -135,8 +135,8 @@ public interface Sequence<T> extends Transformable<T> {
 
     /**
      Shorten this Transformable to contain no more than the specified number of items.
-     @param numItems the maximum number of items in the returned view.
-     @return a lazy view containing no more than the specified number of items.
+     @param numItems the maximum number of items in the returned Sequence.
+     @return a lazy Sequence containing no more than the specified number of items.
      */
     @Override
     default Transformable<T> take(long numItems) { return SequenceTaken.of(this, numItems); }
@@ -145,9 +145,13 @@ public interface Sequence<T> extends Transformable<T> {
     default Sequence<T> takeWhile(Function1<T,Boolean> predicate) { return SequenceTakenWhile.of(this, predicate); }
 
     /** {@inheritDoc} */
-    @Override default Sequence<T> drop(long numItems) {
-        return SequenceDropped.of(this, numItems);
-    }
+    @Override default Sequence<T> drop(long numItems) { return SequenceDropped.of(this, numItems); }
+
+    /** Add the given Sequence after the end of this one. */
+    default Sequence<T> append(Sequence<T> other) { return SequenceConcatenated.of(this, other); }
+
+    /** Add the given Sequence before the beginning of this one. */
+    default Sequence<T> prepend(Sequence<T> other) { return SequenceConcatenated.of(other, this); }
 
 //    @Override
 //    T reduceLeft(BiFunction<T, T, T> fun) {
@@ -162,7 +166,7 @@ public interface Sequence<T> extends Transformable<T> {
 
 //    // I don't see how I can legally declare this on Transformable!
       // When implementing, the innerSequence needs to call rest() on the parent sequence instead
-      // of returning USED_UP.  Otherwise, it's a pretty clean copy of ViewFlatMapped.
+      // of returning USED_UP.  Otherwise, it's a pretty clean copy of SequenceFlatMapped.
 //    /**
 //     One of the two higher-order functions that can produce more output items than input items.
 //     foldRight is the other, but flatMap is lazy while foldRight is eager.
