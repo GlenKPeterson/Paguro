@@ -198,7 +198,7 @@ Added unit tests for the above.
  - Add ImMapSorted and ImSetSorted interfaces
  - Add the TreeMap and TreeSet implementations from Clojure
  - Make the Im interfaces implement Sequence
- - Release 1.0 alpha which is kind of like type-safe Clojure for Java.  It will include:
+ - Release 1.0 alpha which packages type-safe versions of the Clojure collections and sequence abstraction for Java.  It will include:
     - 3 Immutable collections: Vector, SetOrdered, and MapOrdered.  None of these use equals or hashcode.
     Vector doesn't need to and Map and Set take a Comparator.
     - Un-collections which are the Java collection interfaces, only unmodifiable, with mutator methods deprecated and
