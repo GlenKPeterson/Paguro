@@ -114,8 +114,7 @@ Sequence<T> append(Sequence<T> pv)
 Sequence<T> prepend(Sequence<T> pv)
 
 // Transform each item into zero or more new items using the given function
-// TODO: IMPLEMENT THIS IN SEQUENCE (as of 2015-04-05 it's only in view).
-// Sequence<U> flatMap(Function<T,Sequence<U>> func)
+Sequence<U> flatMap(Function<T,Sequence<U>> func)
 ```
 ###Endpoints
 ```java
@@ -170,8 +169,11 @@ In short, Clojure doesn't have static types.  Scala has an TMTOWTDI attitude tha
 #Change Log
 2015-04-05 version 0.8.1:
 - Renamed LazyRef to Lazy.Ref so that I could add Lazy.Int for computing hashcodes.
-- Made FunctionX.apply_() methods rethrow RuntimeExceptions unchanged, but (still) wrap checked Exceptions in RuntimeExceptions.
-They were previously wrapped in IllegalStateExceptions, except for SideEffect which tried to cast the exception which never worked.
+- Renamed FunctionX.apply_() to just apply() to match java.util.function interfaces.
+ Renamed FunctionX.apply() to applyEx() but this is still what you implement and it can throw an exception.
+ Made FunctionX.apply() methods rethrow RuntimeExceptions unchanged, but (still) wrap checked Exceptions in RuntimeExceptions.
+ They were previously wrapped in IllegalStateExceptions, except for SideEffect which tried to cast the exception which never worked.
+- Added all the functions to Sequence that were previously only in View, plus tests for same.
 - Re-implemented Sequence abstraction using Lazy.Ref.
 - SideEffect has been deprecated because it may not have been used anywhere.
 - Added some tests, improved some documentation, and made a bunch of things private or deleted them in experiments.collections.ImVectorImpl.
@@ -192,7 +194,6 @@ Added unit tests for the above.
  safe if the producer and the values it produces are free from outside influences.
 
 #To Do
- - Implement SequenceFlatMapped
  - Add UnMapSorted and UnSetSorted
  - Add ImMapSorted and ImSetSorted interfaces
  - Add the TreeMap and TreeSet implementations from Clojure

@@ -147,6 +147,16 @@ public interface Sequence<T> extends Transformable<T> {
     /** {@inheritDoc} */
     @Override default Sequence<T> drop(long numItems) { return SequenceDropped.of(this, numItems); }
 
+    /**
+     One of the two higher-order functions that can produce more output items than input items.
+     foldLeft is the other, but flatMap is lazy while foldLeft is eager.
+     @return a lazily evaluated collection which is expected to be larger than the input
+     collection.  For a collection that's the same size, map() is more efficient.  If the expected
+     return is smaller, use filter followed by map if possible, or vice versa if not.
+     @param func yields a Transformable of 0 or more results for each input item.
+     */
+    default <U> Sequence<U> flatMap(Function1<T,Sequence<U>> func) { return SequenceFlatMapped.of(this, func); }
+
     /** Add the given Sequence after the end of this one. */
     default Sequence<T> append(Sequence<T> other) { return SequenceConcatenated.of(this, other); }
 
