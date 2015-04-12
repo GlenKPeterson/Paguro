@@ -188,10 +188,8 @@ public class ImVectorImplTest {
 
     // Time ImVectorImplementation vs. java.util.ArrayList to prove that performance does not degrade
     // if changes are made.
-    @Test public void speedTest() throws NoSuchAlgorithmException {
+    @Test public void speedTest() throws NoSuchAlgorithmException, InterruptedException {
         final int maxItems = 1000000;
-        long bTimer = 0;
-        long tTimer = 0;
 
         System.out.println("Speed tests take time.  The more accurate, the more time.\n" +
                                    "This may fail occasionally, then work when re-run, which is OK.\n" +
@@ -199,52 +197,62 @@ public class ImVectorImplTest {
 
         // These are worst-case timings.
         Map<Integer,Double> benchmarkRatios = unMap(
-                1, 2.1,
-                10, 3.4,
-                100, 4.8,
-                1000, 5.8,
-                10000, 7.0,
-                100000, 8.7,
-                1000000, 4.9);
+                1, 1.2,
+                10, 1.2,
+                100, 3.0,
+                1000, 3.5,
+                10000, 4.9,
+                100000, 8.8,
+                1000000, 5.0);
 
         List<Double> ratios = new ArrayList<>();
 
         for (int numItems = 1; numItems <= maxItems; numItems *= 10) {
-            bTimer = 0;
-            tTimer = 0;
             // Run the speed tests 10 times testing ArrayList and ImVectorImpl alternately.
             int testRepetitions = (numItems < 1000) ? 10000 :
                                   (numItems < 10000) ? 1000 :
                                   (numItems < 100000) ? 100 : 10;
 
-            for (int z = 0; z < testRepetitions; z++) {
-                List<Integer> benchmark = new ArrayList<>();
-                ImVectorImpl<Integer> test = ImVectorImpl.empty();
+            List<Long> testTimes = new ArrayList<>();
+            List<Long> benchTimes = new ArrayList<>();
 
+            for (int z = 0; z < testRepetitions; z++) {
+                Thread.sleep(0); // GC and other processes, this is your chance.
                 long startTime = System.nanoTime();
+                List<Integer> benchmark = new ArrayList<>();
                 for (int i = 0; i < numItems; i++) {
                     benchmark.add(i);
                 }
                 assertEquals(numItems, benchmark.size());
                 assertEquals(Integer.valueOf(numItems / 2), benchmark.get(numItems / 2));
                 assertEquals(Integer.valueOf(numItems - 1), benchmark.get(numItems - 1));
-                bTimer += (System.nanoTime() - startTime);
+                benchTimes.add(System.nanoTime() - startTime);
 
+                Thread.sleep(0); // GC and other processes, this is your chance.
                 startTime = System.nanoTime();
+                ImVectorImpl<Integer> test = ImVectorImpl.empty();
                 for (int i = 0; i < numItems; i++) {
                     test = test.append(i);
                 }
                 assertEquals(numItems, test.size());
                 assertEquals(Integer.valueOf(numItems / 2), test.get(numItems / 2));
                 assertEquals(Integer.valueOf(numItems - 1), test.get(numItems - 1));
-                tTimer += (System.nanoTime() - startTime);
+                testTimes.add(System.nanoTime() - startTime);
             }
-            double ratio = ((double) tTimer) / ((double) bTimer);
-            System.out.println("Iterations: " + numItems + " test: " + tTimer + " benchmark: " + bTimer +
+
+            // We want the median time.  That discards all the unlucky (worst) and lucky (best) times.
+            // That makes it a fairer measurement for this than the mean time.
+            Collections.sort(testTimes);
+            Collections.sort(benchTimes);
+            long testTime = testTimes.get(testTimes.size() / 2);
+            long benchTime = benchTimes.get(benchTimes.size() / 2);
+
+            double ratio = ((double) testTime) / ((double) benchTime);
+            System.out.println("Iterations: " + numItems + " test: " + testTime + " benchmark: " + benchTime +
                                        " test/benchmark: " + ratio);
 
             // Verify that ImVector is less than 4 times slower than ArrayList
-            assertTrue(ratio < benchmarkRatios.get(numItems));
+            assertTrue(ratio <= benchmarkRatios.get(numItems));
             ratios.add(ratio);
         }
 
@@ -252,11 +260,11 @@ public class ImVectorImplTest {
         for (int i = 0; i < ratios.size(); i++) {
             sum += ratios.get(i);
         }
-        double averageRatio = sum / ratios.size();
-        System.out.println("averageRatio: " + averageRatio);
+        double meanRatio = sum / ratios.size();
+        System.out.println("meanRatio: " + meanRatio);
 
         // Worst-case timing.
-        assertTrue(averageRatio < 3.53);
+        assertTrue(meanRatio < 2.9);
     }
 
 }
