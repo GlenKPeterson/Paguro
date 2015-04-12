@@ -19,7 +19,7 @@ Show the dependency tree:
 http://maven.apache.org/plugins/maven-dependency-plugin/examples/resolving-conflicts-using-the-dependency-tree.html
 dependency:tree
 
-	TODO: Rename to BlochItem15 or MinimizeMutability or IceBox
+	TODO: Rename to BlochItem15 or MinimizeMutability or IceBox or UnColl JIm (Unmodifiable Collections for Java Immutability)
 	ImmutableJava is not allowed because Java is a registered trademark of Oracle and specifically prohibited from
 	the names of Java-related products.
 	-->
