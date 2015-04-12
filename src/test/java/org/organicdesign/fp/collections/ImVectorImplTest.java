@@ -4,11 +4,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
+import static org.organicdesign.fp.StaticImports.unMap;
 
 @RunWith(JUnit4.class)
 public class ImVectorImplTest {
@@ -169,5 +173,89 @@ public class ImVectorImplTest {
         List<Integer> oneList = new ArrayList<>();
         oneList.add(1);
         ImVectorImpl.of(Collections.unmodifiableList(oneList)).get(Integer.MAX_VALUE); }
+
+    @Test public void addSeveralItems() throws NoSuchAlgorithmException {
+        final int SEVERAL = SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
+        ImVectorImpl<Integer> is = ImVectorImpl.empty();
+        for (int j = 0; j < SEVERAL; j++){
+            is = is.append(j);
+        }
+        assertEquals(SEVERAL, is.size());
+        for (int j = 0; j < SEVERAL; j++){
+            assertEquals(Integer.valueOf(j), is.get(j));
+        }
+    }
+
+    @Test public void speedTest() throws NoSuchAlgorithmException {
+        // This is a rough number for ImVector. 1,000,000 takes less than 2.5 times as long as ArrayList.
+        // 10,000,000 takes less than 1.5 times as long as ArrayList.
+        // But 2,000,000 takes about 4.6 times as long as ArrayList.
+        final int maxItems = 1000000;
+        long bTimer = 0;
+        long tTimer = 0;
+
+        System.out.println("Speed tests take time.  The more accurate, the more time.\n" +
+                                   "This may fail occasionally, then work when re-run, which is OK.\n" +
+                                   "Better that, than set the limit too high and miss a performance drop.");
+
+        Map<Integer,Double> benchmarkRatios = unMap(
+                1, 2.1,
+                10, 3.4,
+                100, 4.8,
+                1000, 5.8,
+                10000, 7.0,
+                100000, 8.7,
+                1000000, 4.9);
+
+        List<Double> ratios = new ArrayList<>();
+
+        for (int numItems = 1; numItems <= maxItems; numItems *= 10) {
+            bTimer = 0;
+            tTimer = 0;
+            // Run the speed tests 10 times testing ArrayList and ImVectorImpl alternately.
+            int testRepetitions = (numItems < 1000) ? 10000 :
+                                  (numItems < 10000) ? 1000 :
+                                  (numItems < 100000) ? 100 : 10;
+
+            for (int z = 0; z < testRepetitions; z++) {
+                List<Integer> benchmark = new ArrayList<>();
+                ImVectorImpl<Integer> test = ImVectorImpl.empty();
+
+                long startTime = System.nanoTime();
+                for (int i = 0; i < numItems; i++) {
+                    benchmark.add(i);
+                }
+                assertEquals(numItems, benchmark.size());
+                assertEquals(Integer.valueOf(numItems / 2), benchmark.get(numItems / 2));
+                assertEquals(Integer.valueOf(numItems - 1), benchmark.get(numItems - 1));
+                bTimer += (System.nanoTime() - startTime);
+
+                startTime = System.nanoTime();
+                for (int i = 0; i < numItems; i++) {
+                    test = test.append(i);
+                }
+                assertEquals(numItems, test.size());
+                assertEquals(Integer.valueOf(numItems / 2), test.get(numItems / 2));
+                assertEquals(Integer.valueOf(numItems - 1), test.get(numItems - 1));
+                tTimer += (System.nanoTime() - startTime);
+            }
+            double ratio = ((double) tTimer) / ((double) bTimer);
+            System.out.println("Iterations: " + numItems + " test: " + tTimer + " benchmark: " + bTimer +
+                                       " test/benchmark: " + ratio);
+
+            // Verify that ImVector is less than 4 times slower than ArrayList
+            assertTrue(ratio < benchmarkRatios.get(numItems));
+            ratios.add(ratio);
+        }
+
+        double sum = 0;
+        for (int i = 0; i < ratios.size(); i++) {
+            sum += ratios.get(i);
+        }
+        double averageRatio = sum / ratios.size();
+        System.out.println("averageRatio: " + averageRatio);
+
+        assertTrue(averageRatio < 3.53);
+    }
 
 }

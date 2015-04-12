@@ -76,7 +76,7 @@ public class ImVectorImpl<E> implements ImList<E> {
 
     /** Returns the empty ImList (there only needs to be one) */
     @SuppressWarnings("unchecked")
-    public static final <T> ImList<T> empty() { return (ImVectorImpl<T>) EMPTY; }
+    public static final <T> ImVectorImpl<T> empty() { return (ImVectorImpl<T>) EMPTY; }
 
     // We could make this public someday.
     @SuppressWarnings("unchecked")
