@@ -197,6 +197,7 @@ public class ImVectorImplTest {
                                    "This may fail occasionally, then work when re-run, which is OK.\n" +
                                    "Better that, than set the limit too high and miss a performance drop.");
 
+        // These are worst-case timings.
         Map<Integer,Double> benchmarkRatios = unMap(
                 1, 2.1,
                 10, 3.4,
@@ -254,6 +255,7 @@ public class ImVectorImplTest {
         double averageRatio = sum / ratios.size();
         System.out.println("averageRatio: " + averageRatio);
 
+        // Worst-case timing.
         assertTrue(averageRatio < 3.53);
     }
 
