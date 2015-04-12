@@ -251,7 +251,7 @@ public class ImVectorImplTest {
             System.out.println("Iterations: " + numItems + " test: " + testTime + " benchmark: " + benchTime +
                                        " test/benchmark: " + ratio);
 
-            // Verify that ImVector is less than 4 times slower than ArrayList
+            // Verify that the median time is within established bounds for this test
             assertTrue(ratio <= benchmarkRatios.get(numItems));
             ratios.add(ratio);
         }
