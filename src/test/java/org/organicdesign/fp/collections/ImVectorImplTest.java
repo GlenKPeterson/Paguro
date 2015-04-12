@@ -186,10 +186,9 @@ public class ImVectorImplTest {
         }
     }
 
+    // Time ImVectorImplementation vs. java.util.ArrayList to prove that performance does not degrade
+    // if changes are made.
     @Test public void speedTest() throws NoSuchAlgorithmException {
-        // This is a rough number for ImVector. 1,000,000 takes less than 2.5 times as long as ArrayList.
-        // 10,000,000 takes less than 1.5 times as long as ArrayList.
-        // But 2,000,000 takes about 4.6 times as long as ArrayList.
         final int maxItems = 1000000;
         long bTimer = 0;
         long tTimer = 0;
