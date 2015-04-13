@@ -143,7 +143,7 @@ public interface Transformable<T> extends Realizable<T> {
       operations you'll need to pass an identity, e.g. for a sum, pass 0, for a product, pass 1 as
       this parameter.
      * @param fun combines each value in the list with the result so far.  The initial result is u.
-     * @param terminateWith returns true when the termination condition is reached and will stop
+     * @param terminateWhen returns true when the termination condition is reached and will stop
 processing the input at that time, returning the latest u.
      */
     <U> U foldLeft(U u, Function2<U,T,U> fun, Function1<U,Boolean> terminateWhen);
