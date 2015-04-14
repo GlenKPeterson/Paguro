@@ -28,7 +28,7 @@ public interface UnMapSorted<K,V> extends UnMap<K,V>, SortedMap<K,V> {
 // public  K	firstKey()
 
     /** {@inheritDoc} */
-    @Override public UnMapSorted<K,V> headMap(K toKey);
+    @Override default UnMapSorted<K,V> headMap(K toKey) { return subMap(firstKey(), toKey); }
 
     /** Returns a view of the keys contained in this map. */
     @Override UnSet<K> keySet();
@@ -39,12 +39,11 @@ public interface UnMapSorted<K,V> extends UnMap<K,V>, SortedMap<K,V> {
     @Override public UnMapSorted<K,V> subMap(K fromKey, K toKey);
 
     /** {@inheritDoc} */
-    @Override public UnMapSorted<K,V> tailMap(K fromKey);
+    @Override default UnMapSorted<K,V> tailMap(K fromKey) { return subMap(fromKey, lastKey()); }
 
     /** {@inheritDoc} */
     @Override UnCollection<V> values();
 
 // Methods inherited from interface java.util.Map
 // clear, compute, computeIfAbsent, computeIfPresent, containsKey, containsValue, equals, forEach, get, getOrDefault, hashCode, isEmpty, merge, put, putAll, putIfAbsent, remove, remove, replace, replace, replaceAll, size
-
 }

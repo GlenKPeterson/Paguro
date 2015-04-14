@@ -13,44 +13,23 @@
 // limitations under the License.
 package org.organicdesign.fp.function;
 
-import java.util.Comparator;
-import java.util.function.BiFunction;
-
-/**
- This is like Java 8's java.util.function.BiFunction, but retrofitted to turn checked exceptions
- into unchecked ones.
- */
+/** A three-argument, exception-safe functional interface. */
 @FunctionalInterface
-public interface Function2<A,B,R> extends BiFunction<A,B,R> {
+public interface Function3<A,B,C,R> {
     /** Implement this one method and you don't have to worry about checked exceptions. */
-    R applyEx(A a, B b) throws Exception;
+    R applyEx(A a, B b, C c) throws Exception;
 
     /**
      The class that takes a consumer as an argument uses this convenience method so that it
      doesn't have to worry about checked exceptions either.
      */
-    @Override default R apply(A a, B b) {
+    default R apply(A a, B b, C c) {
         try {
-            return applyEx(a, b);
+            return applyEx(a, b, c);
         } catch (RuntimeException re) {
             throw re;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-
-    @SuppressWarnings("ConstantConditions")
-    Comparator<Comparable<Object>> DEFAULT_COMPARATOR =
-            (o1, o2) -> (o1 == o2) ? 0 :
-                        (o1 == null) ? -o2.compareTo(o1) :
-                        o1.compareTo(o2);
-
-    @SuppressWarnings("unchecked")
-    static <T> Comparator<T> defaultComparator() { return (Comparator<T>) DEFAULT_COMPARATOR; }
-
-
-// Don't think this is necessary.  Is it?
-//    default BiFunction<A,B,R> asBiFunction() {
-//        return (A a, B b) -> apply(a, b);
-//    }
 }

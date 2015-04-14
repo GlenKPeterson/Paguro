@@ -42,6 +42,7 @@
       <option name="myName" value="Project Default" />
       <option name="myLocal" value="true" />
       <inspection_tool class="ConditionalExpressionWithIdenticalBranches" enabled="true" level="WARNING" enabled_by_default="true" />
+      <inspection_tool class="Convert2MethodRef" enabled="true" level="INFO" enabled_by_default="true" />
       <inspection_tool class="EqualsBetweenInconvertibleTypes" enabled="true" level="INFO" enabled_by_default="true" />
       <inspection_tool class="FinalPrivateMethod" enabled="false" level="WARNING" enabled_by_default="false" />
       <inspection_tool class="FinalStaticMethod" enabled="false" level="WARNING" enabled_by_default="false" />

@@ -50,7 +50,7 @@ public interface UnIterable<T> extends Iterable<T> {
     }
 
     /** A default comparator for UnIterables comparable */
-    static <F extends Comparable<F>,E extends UnIterable<F>> Comparator<E> comparator() {
+    static <F extends Comparable<F>,E extends UnIterable<F>> Comparator<E> iterableComparator() {
         return new Comparator<E>() {
             @Override
             public int compare(E o1, E o2) {

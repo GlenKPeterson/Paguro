@@ -74,7 +74,8 @@ public interface UnMap<K,V> extends Map<K,V> {
 //        return Arrays.hashCode(entrySet().toArray());
 //    };
 
-// boolean	isEmpty()
+    /** {@inheritDoc} */
+    @Override default boolean isEmpty() { return size() == 0; }
 
     /** Returns a view of the keys contained in this map. */
     @Override UnSet<K> keySet();
@@ -144,6 +145,7 @@ public interface UnMap<K,V> extends Map<K,V> {
         @Override public UnCollection<Object> values() { return UnSet.empty(); }
         @Override public int size() { return 0; }
         @Override public boolean isEmpty() { return true; }
+//        @Override public UnIterator<UnEntry<Object,Object>> iterator() { return UnIterator.empty(); }
         @Override public boolean containsKey(Object key) { return false; }
         @Override public boolean containsValue(Object value) { return false; }
         @Override public Object get(Object key) { return null; }

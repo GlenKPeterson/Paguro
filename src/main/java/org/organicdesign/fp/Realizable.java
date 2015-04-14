@@ -14,6 +14,10 @@
 
 package org.organicdesign.fp;
 
+import org.organicdesign.fp.collections.UnList;
+import org.organicdesign.fp.collections.UnMap;
+import org.organicdesign.fp.collections.UnSet;
+import org.organicdesign.fp.collections.UnSetSorted;
 import org.organicdesign.fp.function.Function1;
 
 import java.util.ArrayList;
@@ -21,10 +25,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
@@ -34,7 +34,7 @@ import java.util.TreeSet;
  */
 public interface Realizable<T> {
     ArrayList<T> toJavaArrayList();
-    List<T> toJavaUnmodList();
+    UnList<T> toUnList();
 
     /**
      @return A map with the keys from the given set, mapped to values using the given function.
@@ -46,7 +46,7 @@ public interface Realizable<T> {
      function.
       * @param f1 Maps keys to values
      */
-    <U> Map<T,U> toJavaUnmodMap(Function1<T,U> f1);
+    <U> UnMap<T,U> toUnMap(Function1<T,U> f1);
 
     /**
      @return A map with the values from the given set, mapped by keys supplied by the given
@@ -60,16 +60,16 @@ public interface Realizable<T> {
      the given function.
       * @param f1 Maps values to keys
      */
-    <U> Map<U,T> toReverseJavaUnmodMap(Function1<T,U> f1);
+    <U> UnMap<U,T> toReverseUnMap(Function1<T,U> f1);
 
     TreeSet<T> toJavaTreeSet(Comparator<? super T> comparator);
-    SortedSet<T> toJavaUnmodSortedSet(Comparator<? super T> comparator);
+    UnSetSorted<T> toUnSetSorted(Comparator<? super T> comparator);
 
     TreeSet<T> toJavaTreeSet();
-    SortedSet<T> toJavaUnmodSortedSet();
+    UnSetSorted<T> toUnSetSorted();
 
     HashSet<T> toJavaHashSet();
-    Set<T> toJavaUnmodSet();
+    UnSet<T> toUnSet();
 
     T[] toArray();
 

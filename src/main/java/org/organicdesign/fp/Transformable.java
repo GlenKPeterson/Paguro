@@ -14,20 +14,21 @@
 
 package org.organicdesign.fp;
 
+import org.organicdesign.fp.collections.UnList;
+import org.organicdesign.fp.collections.UnMap;
+import org.organicdesign.fp.collections.UnSet;
+import org.organicdesign.fp.collections.UnSetSorted;
 import org.organicdesign.fp.function.Function1;
 import org.organicdesign.fp.function.Function2;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
 import java.util.TreeSet;
+
+import static org.organicdesign.fp.StaticImports.un;
 
 /**
  Represents transformations to be carried out on a collection.  This class also implements the
@@ -170,7 +171,7 @@ processing the input at that time, returning the latest u.
     }
 
     @Override
-    default List<T> toJavaUnmodList() { return Collections.unmodifiableList(toJavaArrayList()); }
+    default UnList<T> toUnList() { return un(toJavaArrayList()); }
 
     @Override
     default <U> HashMap<T,U> toJavaHashMap(final Function1<T,U> f1) {
@@ -181,7 +182,7 @@ processing the input at that time, returning the latest u.
     }
 
     @Override
-    default <U> Map<T,U> toJavaUnmodMap(Function1<T,U> f1) { return Collections.unmodifiableMap(toJavaHashMap(f1)); }
+    default <U> UnMap<T,U> toUnMap(Function1<T,U> f1) { return un(toJavaHashMap(f1)); }
 
     @Override
     default <U> HashMap<U,T> toReverseJavaHashMap(final Function1<T,U> f1) {
@@ -192,8 +193,8 @@ processing the input at that time, returning the latest u.
     }
 
     @Override
-    default <U> Map<U,T> toReverseJavaUnmodMap(Function1<T,U> f1) {
-        return Collections.unmodifiableMap(toReverseJavaHashMap(f1));
+    default <U> UnMap<U,T> toReverseUnMap(Function1<T,U> f1) {
+        return un(toReverseJavaHashMap(f1));
     }
 
     @Override
@@ -208,11 +209,11 @@ processing the input at that time, returning the latest u.
 
 
     @Override
-    default SortedSet<T> toJavaUnmodSortedSet(Comparator<? super T> comparator) {
-        return Collections.unmodifiableSortedSet(toJavaTreeSet(comparator));
+    default UnSetSorted<T> toUnSetSorted(Comparator<? super T> comparator) {
+        return un(toJavaTreeSet(comparator));
     }
     @Override
-    default SortedSet<T> toJavaUnmodSortedSet() { return toJavaUnmodSortedSet(null); }
+    default UnSetSorted<T> toUnSetSorted() { return toUnSetSorted(null); }
 
     @Override
     default HashSet<T> toJavaHashSet() {
@@ -223,7 +224,7 @@ processing the input at that time, returning the latest u.
     }
 
     @Override
-    default Set<T> toJavaUnmodSet() { return Collections.unmodifiableSet(toJavaHashSet()); }
+    default UnSet<T> toUnSet() { return un(toJavaHashSet()); }
 
     @Override
     @SuppressWarnings("unchecked")

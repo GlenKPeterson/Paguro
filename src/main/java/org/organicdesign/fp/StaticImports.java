@@ -14,6 +14,7 @@
 
 package org.organicdesign.fp;
 
+import org.organicdesign.fp.collections.PersistentTreeSet;
 import org.organicdesign.fp.collections.UnCollection;
 import org.organicdesign.fp.collections.UnIterator;
 import org.organicdesign.fp.collections.UnList;
@@ -21,10 +22,12 @@ import org.organicdesign.fp.collections.UnListIterator;
 import org.organicdesign.fp.collections.UnMap;
 import org.organicdesign.fp.collections.UnMap.UnEntry;
 import org.organicdesign.fp.collections.UnSet;
+import org.organicdesign.fp.collections.UnSetSorted;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -32,6 +35,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 
 /**
  Contains methods for building immutable collections.  These will never return null, the closest they get is to return
@@ -91,7 +95,7 @@ public class StaticImports {
         };
     }
 
-    /** Returns an unmodifiable version of the given list. */
+    /** Returns an unmodifiable version of the given set. */
     public static <T> UnSet<T> un(Set<T> inner) {
         if (inner == null) { return UnSet.empty(); }
         if (inner instanceof UnSet) { return (UnSet<T>) inner; }
@@ -105,6 +109,33 @@ public class StaticImports {
             @Override public int hashCode() { return inner.hashCode(); }
             @Override public boolean equals(Object o) { return inner.equals(o); }
         };
+    }
+
+    /** Returns an unmodifiable version of the given set. */
+    public static <T> UnSetSorted<T> un(SortedSet<T> set) {
+        if (set == null) { return PersistentTreeSet.empty(); }
+        if (set instanceof UnSetSorted) { return (UnSetSorted<T>) set; }
+        if (set.size() < 1) { return PersistentTreeSet.empty(); }
+        class UnSetSortedWrapper<E> implements UnSetSorted<E> {
+            private final SortedSet<E> inner;
+            private UnSetSortedWrapper(SortedSet<E> i) { inner = i; }
+            @Override public Comparator<? super E> comparator() { return inner.comparator(); }
+            @Override public SortedSet<E> subSet(E fromElement, E toElement) {
+                return inner.subSet(fromElement, toElement);
+            }
+            @Override public SortedSet<E> headSet(E toElement) { return inner.headSet(toElement); }
+            @Override public SortedSet<E> tailSet(E fromElement) { return inner.tailSet(fromElement); }
+            @Override public E first() { return inner.first(); }
+            @Override public E last() { return inner.last(); }
+            @Override public boolean contains(Object o) { return inner.contains(o); }
+            @Override public int size() { return inner.size(); }
+            @Override public boolean isEmpty() { return inner.isEmpty(); }
+            @Override public UnIterator<E> iterator() { return un(inner.iterator()); }
+            @Override public int hashCode() { return inner.hashCode(); }
+            @Override public boolean equals(Object o) {
+                return inner.equals((o instanceof UnSetSortedWrapper) ? ((UnSetSortedWrapper) o).inner : o); }
+        };
+        return new UnSetSortedWrapper<>(set);
     }
 
     /** Returns an unmodifiable version of the given list. */

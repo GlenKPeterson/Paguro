@@ -379,7 +379,8 @@ public class ImVectorImpl<E> implements ImList<E> {
     // Does this need to be compatible with java.util.AbstractList?
     @Override
     public boolean equals(Object other) {
-        return (other instanceof UnList) &&
+        return (other != null) &&
+                (other instanceof UnList) &&
                 (this.size() == ((UnList) other).size()) &&
                 UnIterable.equals(this, (UnList) other);
     }
