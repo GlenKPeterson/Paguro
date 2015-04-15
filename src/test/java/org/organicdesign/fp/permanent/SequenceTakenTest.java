@@ -25,18 +25,14 @@ public class SequenceTakenTest {
                 new Integer[] { 1,2 });
         assertArrayEquals(Sequence.ofArray(1,2,3,4,5,6,7,8,9).take(1).toTypedArray(),
                 new Integer[] { 1 });
-        assertArrayEquals(Sequence.ofArray(1,2,3,4,5,6,7,8,9).take(0).toTypedArray(),
-                new Integer[] {  });
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void exception1() {
-        Sequence.ofArray(1,2,3,4,5,6,7,8,9).take(-1);
-    }
+    public void exception0() { Sequence.ofArray(1,2,3,4,5,6,7,8,9).take(0); }
     @Test(expected = IllegalArgumentException.class)
-    public void exception2() {
-        Sequence.ofArray(1,2,3,4,5,6,7,8,9).take(-99);
-    }
+    public void exception1() { Sequence.ofArray(1,2,3,4,5,6,7,8,9).take(-1); }
+    @Test(expected = IllegalArgumentException.class)
+    public void exception2() { Sequence.ofArray(1,2,3,4,5,6,7,8,9).take(-99); }
 
     @Test
     public void takeItemsInMultiBatches() {
@@ -56,14 +52,14 @@ public class SequenceTakenTest {
                         .take(999).take(1).take(9999999).toTypedArray(),
                 new Integer[] { 1 });
         assertArrayEquals(Sequence.ofArray(1,2,3,4,5,6,7,8,9)
-                        .take(9999).take(0).take(3).toTypedArray(),
-                new Integer[] {  });
+                        .take(9999).take(1).take(3).toTypedArray(),
+                new Integer[] { 1 });
         assertArrayEquals(Sequence.ofArray(1,2,3,4,5,6,7,8,9)
-                        .take(0).take(99999999).take(9999999)
+                        .take(1).take(99999999).take(9999999)
                         .toTypedArray(),
-                new Integer[] {  });
+                new Integer[] { 1 });
         assertArrayEquals(Sequence.ofArray(1,2,3,4,5,6,7,8,9)
-                        .take(99).take(9999).take(0).toTypedArray(),
-                new Integer[] {  });
+                        .take(99).take(9999).take(1).toTypedArray(),
+                new Integer[] { 1 });
     }
 }

@@ -21,14 +21,14 @@ public class SequenceTaken<T> implements Sequence<T> {
     private final Lazy.Ref<Tuple2<T,Sequence<T>>> laz;
 
     SequenceTaken(Sequence<T> v, long n) {
-        laz = Lazy.Ref.of(() -> (Sequence.Empty.SEQUENCE == v)
-                          ? Sequence.emptySeqTuple()
-                          : Tuple2.of(v.first(), new SequenceTaken<>(v.rest(), n - 1)));
+        laz = Lazy.Ref.of(() -> Tuple2.of(v.first(),
+                                          ((n == 1) || (Empty.SEQUENCE == v.rest()))
+                                          ? Sequence.emptySequence()
+                                          : new SequenceTaken<>(v.rest(), n - 1)));
     }
 
     public static <T> Sequence<T> of(Sequence<T> v, long numItems) {
-        if (numItems == 0) { return Sequence.emptySequence(); }
-        if (numItems < 0) { throw new IllegalArgumentException("Num items must be >= 0"); }
+        if (numItems < 1) { throw new IllegalArgumentException("Num items must be >= 1"); }
         return new SequenceTaken<>(v, numItems);
     }
 
