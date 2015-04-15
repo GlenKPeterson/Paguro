@@ -52,10 +52,8 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
      Returns a view of the mappings contained in this map.  The set should actually contain UnMap.Entry items, but that
      return signature is illegal in Java, so you'll just have to remember.
      */
-    @Override
-    public ImSet<Entry<K,V>> entrySet() {
-        return this.foldLeft(PersistentTreeSet.empty(),
-                             (accum, entry) -> (ImSet<Entry<K,V>>) accum.put(entry)); // TODO: Fix this!
+    @Override public ImSet<Entry<K,V>> entrySet() {
+        return this.foldLeft(ImSet.empty(), (accum, entry) -> accum.put(entry));
     }
 
     /** This is correct, but O(n). */

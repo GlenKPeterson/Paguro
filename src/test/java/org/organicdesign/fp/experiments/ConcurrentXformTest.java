@@ -27,24 +27,24 @@ public class ConcurrentXformTest {
     public void arrayCorrectness() {
         Long[] is = new Long[] { 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L };
         IntRange range = IntRange.of(1, 9);
-        assertArrayEquals(ConcurrentXform.of(1, range).toArray(), is);
+        assertArrayEquals(ConcurrentXform.of(1, range).toTypedArray(), is);
 
-        assertArrayEquals(ConcurrentXform.of(2, range).toArray(), is);
-        assertArrayEquals(ConcurrentXform.of(3, range).toArray(), is);
-        assertArrayEquals(ConcurrentXform.of(4, range).toArray(), is);
-        assertArrayEquals(ConcurrentXform.of(5, range).toArray(), is);
+        assertArrayEquals(ConcurrentXform.of(2, range).toTypedArray(), is);
+        assertArrayEquals(ConcurrentXform.of(3, range).toTypedArray(), is);
+        assertArrayEquals(ConcurrentXform.of(4, range).toTypedArray(), is);
+        assertArrayEquals(ConcurrentXform.of(5, range).toTypedArray(), is);
     }
 
     @Test
     public void linkedListCorrectness() {
         Long[] is = new Long[] { 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L };
         IntRange range = IntRange.of(1, 9);
-        assertArrayEquals(ConcurrentXform.of(1, range).toLinkedList().toArray(), is);
+        assertArrayEquals(ConcurrentXform.of(1, range).toLinkedList().toTypedArray(), is);
 
-        assertArrayEquals(ConcurrentXform.of(2, range).toLinkedList().toArray(), is);
-        assertArrayEquals(ConcurrentXform.of(3, range).toLinkedList().toArray(), is);
-        assertArrayEquals(ConcurrentXform.of(4, range).toLinkedList().toArray(), is);
-        assertArrayEquals(ConcurrentXform.of(5, range).toLinkedList().toArray(), is);
+        assertArrayEquals(ConcurrentXform.of(2, range).toLinkedList().toTypedArray(), is);
+        assertArrayEquals(ConcurrentXform.of(3, range).toLinkedList().toTypedArray(), is);
+        assertArrayEquals(ConcurrentXform.of(4, range).toLinkedList().toTypedArray(), is);
+        assertArrayEquals(ConcurrentXform.of(5, range).toLinkedList().toTypedArray(), is);
     }
 
     @Test
@@ -54,7 +54,7 @@ public class ConcurrentXformTest {
         IntRange range = IntRange.of(-10000000, 10000000);
         ConcurrentXform cx = ConcurrentXform.of(2, range);
         long startTime = System.currentTimeMillis();
-        cx.toArray();
+        cx.toTypedArray();
         System.out.println("Time: " + (System.currentTimeMillis() - startTime));
     }
 

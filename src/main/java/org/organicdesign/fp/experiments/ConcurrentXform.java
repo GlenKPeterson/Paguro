@@ -28,7 +28,7 @@ public class ConcurrentXform {
 
     public static ConcurrentXform of(int t, IntRange r) { return new ConcurrentXform(t, r); }
 
-    public Long[] toArray() {
+    public Long[] toTypedArray() {
         if (range.size() > (long) Integer.MAX_VALUE) {
             throw new IllegalStateException("size of range is too big for a Java array.");
         }

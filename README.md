@@ -130,7 +130,7 @@ TreeSet<T> toJavaTreeSet()
 SortedSet<T> toJavaUnmodSortedSet()
 HashSet<T> toJavaHashSet()
 Set<T> toJavaUnmodSet()
-T[] toArray()
+T[] toTypedArray()
 Iterator<T> toIterator()
 ```
 #Learn

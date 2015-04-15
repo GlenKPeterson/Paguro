@@ -35,7 +35,9 @@ class SequenceFromIterator<T> implements Sequence<T> {
 
     SequenceFromIterator(Iterator<T> iter) {
         laz = Lazy.Ref.of(() -> iter.hasNext()
-                ? Tuple2.of(iter.next(), new SequenceFromIterator<>(iter))
+                ? Tuple2.of(iter.next(), iter.hasNext()
+                                         ? new SequenceFromIterator<>(iter)
+                                         : Sequence.emptySequence())
                 : Sequence.emptySeqTuple());
     }
 

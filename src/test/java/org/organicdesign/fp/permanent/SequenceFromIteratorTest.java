@@ -1,4 +1,4 @@
-// Copyright 2015-04-12 PlanBase Inc. & Glen Peterson
+// Copyright 2015-04-14 PlanBase Inc. & Glen Peterson
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,23 +19,25 @@ import org.organicdesign.fp.Mutable;
 import org.organicdesign.fp.function.Function0;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class SequenceFromArrayTest {
+public class SequenceFromIteratorTest {
 
     @Test public void basic() {
-        Integer[] ints = new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9};
-        assertEquals(Arrays.asList(ints),
-                     Sequence.ofArray(ints).toJavaArrayList());
-        assertArrayEquals(ints,
-                          Sequence.ofArray(ints).toTypedArray());
+        List<Integer> ints = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9);
+        assertEquals(ints,
+                     Sequence.of(ints.iterator()).toJavaArrayList());
+        assertArrayEquals(ints.toArray(),
+                          Sequence.of(ints.iterator()).toTypedArray());
     }
+
 
     @Test
     public void construction() {
-        Integer[] ints = new Integer[] { 5,4,3,2,1 };
-        Sequence<Integer> five = Sequence.ofArray(ints);
+        List<Integer> ints = Arrays.asList(5, 4, 3, 2, 1);
+        Sequence<Integer> five = Sequence.of(ints.iterator());
         Sequence<Integer> four = five.rest();
         Sequence<Integer> three = four.rest();
         Sequence<Integer> two = three.rest();
@@ -60,11 +62,20 @@ public class SequenceFromArrayTest {
 
     @Test public void singleInit() {
         final Mutable.ObjectRef<Integer> i = Mutable.ObjectRef.of(0);
-        @SuppressWarnings("unchecked") Function0<Integer>[] ints = new Function0[] {
-                () -> { i.set(i.value() + 1); return 3; },
-                () -> { i.set(i.value() + 1); return 2; },
-                () -> { i.set(i.value() + 1); return 1; } };
-        Sequence<Function0<Integer>> three = Sequence.ofArray(ints);
+        @SuppressWarnings("unchecked") List<Function0<Integer>> ints =
+                Arrays.asList(() -> {
+                    i.set(i.value() + 1);
+                    return 3;
+                },
+                              () -> {
+                                  i.set(i.value() + 1);
+                                  return 2;
+                              },
+                              () -> {
+                                  i.set(i.value() + 1);
+                                  return 1;
+                              });
+        Sequence<Function0<Integer>> three = Sequence.of(ints.iterator());
         Sequence<Function0<Integer>> two = three.rest();
         Sequence<Function0<Integer>> one = two.rest();
         Sequence<Function0<Integer>> zero = one.rest();
@@ -90,4 +101,5 @@ public class SequenceFromArrayTest {
         assertEquals(Integer.valueOf(3), three.first().apply());
         assertEquals(Integer.valueOf(1001), i.value());
     }
+
 }

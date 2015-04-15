@@ -26,26 +26,26 @@ public class ViewTakenWhileTest {
     @Test
     public void takeItemsInOneBatch() {
         assertArrayEquals(View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
-                                  .takeWhile(Function1.accept()).toArray(),
+                                  .takeWhile(Function1.accept()).toTypedArray(),
                           new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 });
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i < 10).toArray(),
+        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i < 10).toTypedArray(),
                           new Integer[] { 1,2,3,4,5,6,7,8,9 });
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i <= 9).toArray(),
+        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i <= 9).toTypedArray(),
                           new Integer[] { 1,2,3,4,5,6,7,8,9 });
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i <= 8).toArray(),
+        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i <= 8).toTypedArray(),
                           new Integer[] { 1,2,3,4,5,6,7,8 });
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i <= 7).toArray(),
+        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i <= 7).toTypedArray(),
                           new Integer[] { 1,2,3,4,5,6,7 });
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i <= 3).toArray(),
+        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i <= 3).toTypedArray(),
                           new Integer[] { 1,2,3 });
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i <= 2).toArray(),
+        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i <= 2).toTypedArray(),
                           new Integer[] { 1,2 });
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i <= 1).toArray(),
+        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i <= 1).toTypedArray(),
                           new Integer[] { 1 });
         assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(Function1.reject())
-                                  .toArray(),
+                                  .toTypedArray(),
                           new Integer[] {  });
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i > 10).toArray(),
+        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i > 10).toTypedArray(),
                           new Integer[] {  });
     }
 

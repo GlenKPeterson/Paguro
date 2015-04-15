@@ -71,7 +71,7 @@ public interface Realizable<T> {
     HashSet<T> toJavaHashSet();
     UnSet<T> toUnSet();
 
-    T[] toArray();
+    T[] toTypedArray();
 
     Iterator<T> toIterator();
 }

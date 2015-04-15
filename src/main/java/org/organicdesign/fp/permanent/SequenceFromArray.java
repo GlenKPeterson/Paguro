@@ -22,8 +22,9 @@ public class SequenceFromArray<T> implements Sequence<T> {
 
     // TODO: Develop tests for this and test for what happens when idx > ts.length or idx < 0;
     SequenceFromArray(int idx, T[] ts) {
-        laz = Lazy.Ref.of(() -> (idx >= ts.length) ? Sequence.emptySeqTuple()
-                                                   : Tuple2.of(ts[idx], new SequenceFromArray<>(idx + 1, ts)));
+        laz = Lazy.Ref.of(() -> Tuple2.of(ts[idx], (idx == (ts.length - 1))
+                                                    ? Sequence.emptySequence()
+                                                    : new SequenceFromArray<>(idx + 1, ts)));
     }
 
     @SafeVarargs

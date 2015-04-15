@@ -214,4 +214,22 @@ public interface Sequence<T> extends Transformable<T> {
         return a == b;
     }
 
+//    public class LazySequence<T> implements Sequence<T> {
+//        private final Lazy.Ref<Tuple2<T,Sequence<T>>> laz;
+//
+//        LazySequence(T first, Sequence<T> rest) {
+//            laz = Lazy.Ref.of(() -> Tuple2.of(first, rest));
+//        }
+//
+//        public static <T> Sequence<T> of(T first, Sequence<T> rest) {
+//            if ( (first == null) &&
+//                 (Sequence.Empty.SEQUENCE == rest) ) { return Sequence.emptySequence(); }
+//            return new LazySequence<>(first, rest);
+//        }
+//
+//        @Override public T first() { return laz.get()._1(); }
+//
+//        @Override public Sequence<T> rest() { return laz.get()._2(); }
+//    }
+
 }

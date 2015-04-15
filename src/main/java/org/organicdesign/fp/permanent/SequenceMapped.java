@@ -24,7 +24,9 @@ public class SequenceMapped<T,U>  implements Sequence<U> {
     SequenceMapped(Sequence<T> seq, Function1<T,U> func) {
         laz = Lazy.Ref.of(() -> (Sequence.Empty.SEQUENCE == seq)
                                 ? Sequence.emptySeqTuple()
-                                : Tuple2.of(func.apply(seq.first()), new SequenceMapped<>(seq.rest(), func)));
+                                : Tuple2.of(func.apply(seq.first()), (Sequence.Empty.SEQUENCE == seq.rest())
+                                                                     ? Sequence.emptySequence()
+                                                                     : new SequenceMapped<>(seq.rest(), func)));
     }
 
     @SuppressWarnings("unchecked")

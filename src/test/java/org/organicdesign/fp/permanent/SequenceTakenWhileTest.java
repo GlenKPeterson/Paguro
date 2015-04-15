@@ -25,28 +25,27 @@ public class SequenceTakenWhileTest {
 
     @Test
     public void takeItemsInOneBatch() {
-        assertArrayEquals(Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
-                                  .takeWhile(Function1.accept()).toArray(),
-                          new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 });
-        assertArrayEquals(Sequence.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i < 10).toArray(),
-                          new Integer[] { 1,2,3,4,5,6,7,8,9 });
-        assertArrayEquals(Sequence.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i <= 9).toArray(),
-                          new Integer[] { 1,2,3,4,5,6,7,8,9 });
-        assertArrayEquals(Sequence.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i <= 8).toArray(),
-                          new Integer[] { 1,2,3,4,5,6,7,8 });
-        assertArrayEquals(Sequence.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i <= 7).toArray(),
-                          new Integer[] { 1,2,3,4,5,6,7 });
-        assertArrayEquals(Sequence.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i <= 3).toArray(),
-                          new Integer[] { 1,2,3 });
-        assertArrayEquals(Sequence.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i <= 2).toArray(),
-                          new Integer[] { 1,2 });
-        assertArrayEquals(Sequence.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i <= 1).toArray(),
-                          new Integer[] { 1 });
-        assertArrayEquals(Sequence.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(Function1.reject())
-                                  .toArray(),
-                          new Integer[] {  });
-        assertArrayEquals(Sequence.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i > 10).toArray(),
-                          new Integer[] {  });
+        Sequence<Integer> seq = Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9);
+        assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
+                          seq.takeWhile(Function1.accept()).toTypedArray());
+        assertArrayEquals(new Integer[] { 1,2,3,4,5,6,7,8,9 },
+                          seq.takeWhile(i -> i < 10).toTypedArray());
+        assertArrayEquals(new Integer[] { 1,2,3,4,5,6,7,8,9 },
+                          seq.takeWhile(i -> i <= 9).toTypedArray());
+        assertArrayEquals(new Integer[] { 1,2,3,4,5,6,7,8 },
+                          seq.takeWhile(i -> i <= 8).toTypedArray());
+        assertArrayEquals(new Integer[] { 1,2,3,4,5,6,7 },
+                          seq.takeWhile(i -> i <= 7).toTypedArray());
+        assertArrayEquals(new Integer[] { 1,2,3 },
+                          seq.takeWhile(i -> i <= 3).toTypedArray());
+        assertArrayEquals(new Integer[] { 1,2 },
+                          seq.takeWhile(i -> i <= 2).toTypedArray());
+        assertArrayEquals(new Integer[] { 1 },
+                          seq.takeWhile(i -> i <= 1).toTypedArray());
+        assertArrayEquals(new Integer[] {  },
+                          seq.takeWhile(Function1.reject()).toTypedArray());
+        assertArrayEquals(new Integer[] {  },
+                          seq.takeWhile(i -> i > 10).toTypedArray());
     }
 
     @Test(expected = IllegalArgumentException.class)

@@ -228,7 +228,7 @@ processing the input at that time, returning the latest u.
 
     @Override
     @SuppressWarnings("unchecked")
-    default T[] toArray() {
+    default T[] toTypedArray() {
         ArrayList<T> al = toJavaArrayList();
         return al.toArray((T[]) new Object[al.size()]);
     }

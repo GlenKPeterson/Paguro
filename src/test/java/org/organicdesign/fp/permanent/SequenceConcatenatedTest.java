@@ -26,38 +26,38 @@ public class SequenceConcatenatedTest {
     public void prepend() {
         assertArrayEquals(new Integer[] { 5, 6, 7, 8, 9 },
                           Sequence.ofArray(5,6,7,8,9)
-                                  .prepend(null).toArray());
+                                  .prepend(null).toTypedArray());
 
         assertArrayEquals(new Integer[] { 5, 6, 7, 8, 9 },
                           Sequence.ofArray(5,6,7,8,9)
-                                  .prepend(Sequence.emptySequence()).toArray());
+                                  .prepend(Sequence.emptySequence()).toTypedArray());
 
         assertArrayEquals(new Integer[] { 4, 5, 6, 7, 8, 9 },
                           Sequence.ofArray(5,6,7,8,9)
-                                  .prepend(Sequence.ofArray(4)).toArray());
+                                  .prepend(Sequence.ofArray(4)).toTypedArray());
 
         assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
                           Sequence.ofArray(5,6,7,8,9)
-                                  .prepend(Sequence.ofArray(1,2,3,4)).toArray());
+                                  .prepend(Sequence.ofArray(1,2,3,4)).toTypedArray());
     }
 
     @Test
     public void append() {
         assertArrayEquals(new Integer[] { 1, 2, 3, 4 },
                           Sequence.ofArray(1,2,3,4)
-                                  .append(null).toArray());
+                                  .append(null).toTypedArray());
 
         assertArrayEquals(new Integer[] { 1, 2, 3, 4 },
                           Sequence.ofArray(1,2,3,4)
-                                  .append(Sequence.emptySequence()).toArray());
+                                  .append(Sequence.emptySequence()).toTypedArray());
 
         assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5 },
                           Sequence.ofArray(1,2,3,4)
-                                  .append(Sequence.ofArray(5)).toArray());
+                                  .append(Sequence.ofArray(5)).toTypedArray());
 
         assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
                           Sequence.ofArray(1,2,3,4)
-                                  .append(Sequence.ofArray(5, 6, 7, 8, 9)).toArray());
+                                  .append(Sequence.ofArray(5, 6, 7, 8, 9)).toTypedArray());
     }
 
     @Test
@@ -70,7 +70,7 @@ public class SequenceConcatenatedTest {
                                   .append(Sequence.ofArray(7,8))  //   2,3,4,5,6,7,8
                                   .prepend(Sequence.ofArray(1))   // 1,2,3,4,5,6,7,8
                                   .append(Sequence.ofArray(9))    // 1,2,3,4,5,6,7,8,9
-                                  .toArray());
+                                  .toTypedArray());
 
         assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
                           Sequence.ofArray(5)
@@ -115,6 +115,6 @@ public class SequenceConcatenatedTest {
                                   .prepend(null)
                                   .append(Sequence.emptySequence()).append(Sequence.emptySequence())
                                   .append(null).append(null).append(null).append(null).append(null)
-                                  .toArray());
+                                  .toTypedArray());
     }
 }

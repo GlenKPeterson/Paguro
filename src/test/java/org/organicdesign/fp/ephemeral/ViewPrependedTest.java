@@ -25,38 +25,38 @@ public class ViewPrependedTest {
     @Test
     public void prepend() {
         assertArrayEquals(View.ofArray(5,6,7,8,9)
-                                  .prepend(null).toArray(),
+                                  .prepend(null).toTypedArray(),
                           new Integer[] { 5, 6, 7, 8, 9 });
 
         assertArrayEquals(View.ofArray(5,6,7,8,9)
-                                  .prepend(View.emptyView()).toArray(),
+                                  .prepend(View.emptyView()).toTypedArray(),
                           new Integer[] { 5, 6, 7, 8, 9 });
 
         assertArrayEquals(View.ofArray(5,6,7,8,9)
-                                  .prepend(View.ofArray(4)).toArray(),
+                                  .prepend(View.ofArray(4)).toTypedArray(),
                           new Integer[] { 4, 5, 6, 7, 8, 9 });
 
         assertArrayEquals(View.ofArray(5,6,7,8,9)
-                                  .prepend(View.ofArray(1,2,3,4)).toArray(),
+                                  .prepend(View.ofArray(1,2,3,4)).toTypedArray(),
                           new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 });
     }
 
     @Test
     public void append() {
         assertArrayEquals(View.ofArray(1,2,3,4)
-                                  .append(null).toArray(),
+                                  .append(null).toTypedArray(),
                           new Integer[] { 1, 2, 3, 4 });
 
         assertArrayEquals(View.ofArray(1,2,3,4)
-                                  .append(View.emptyView()).toArray(),
+                                  .append(View.emptyView()).toTypedArray(),
                           new Integer[] { 1, 2, 3, 4 });
 
         assertArrayEquals(View.ofArray(1,2,3,4)
-                                  .append(View.ofArray(5)).toArray(),
+                                  .append(View.ofArray(5)).toTypedArray(),
                           new Integer[] { 1, 2, 3, 4, 5 });
 
         assertArrayEquals(View.ofArray(1,2,3,4)
-                                  .append(View.ofArray(5, 6, 7, 8, 9)).toArray(),
+                                  .append(View.ofArray(5, 6, 7, 8, 9)).toTypedArray(),
                           new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 });
     }
 
@@ -69,7 +69,7 @@ public class ViewPrependedTest {
                                   .append(View.ofArray(7,8))  //   2,3,4,5,6,7,8
                                   .prepend(View.ofArray(1))   // 1,2,3,4,5,6,7,8
                                   .append(View.ofArray(9))    // 1,2,3,4,5,6,7,8,9
-                                  .toArray(),
+                                  .toTypedArray(),
                           new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 });
 
         assertArrayEquals(View.ofArray(5)
@@ -114,7 +114,7 @@ public class ViewPrependedTest {
                                   .prepend(null)
                                   .append(View.emptyView()).append(View.emptyView())
                                   .append(null).append(null).append(null).append(null).append(null)
-                                  .toArray(),
+                                  .toTypedArray(),
                           new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 });
     }
 

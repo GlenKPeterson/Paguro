@@ -28,4 +28,6 @@ public interface ImSet<E> extends UnSet<E>, Sequence<E> {
      */
     @Override default Object[] toArray() { return UnCollection.toArray(this); }
 
+    // ================================================ STATIC METHODS ================================================
+    static <T> ImSet<T> empty() { return PersistentTreeSet.empty(); }
 }

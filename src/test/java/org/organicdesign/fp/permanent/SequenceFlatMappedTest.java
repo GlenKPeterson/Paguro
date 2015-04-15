@@ -17,8 +17,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(JUnit4.class)
 public class SequenceFlatMappedTest {
@@ -32,17 +32,17 @@ public class SequenceFlatMappedTest {
 
         assertArrayEquals(new Integer[] {},
                           Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
-                                  .flatMap(null).toArray());
+                                  .flatMap(null).toTypedArray());
 
         assertArrayEquals(new Integer[] { 1,2,3, 2,4,6, 3,6,9, 4,8,12, 5,10,15, 6,12,18,
                                   7,14,21, 8,16,24, 9,18,27},
                           Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
-                                  .flatMap(i -> Sequence.ofArray(i, i * 2, i * 3)).toArray());
+                                  .flatMap(i -> Sequence.ofArray(i, i * 2, i * 3)).toTypedArray());
 
         assertArrayEquals(new String[]{"1", "2", "2", "3", "3", "4"},
                           Sequence.ofArray(1, 2, 3)
                                   .flatMap(i -> Sequence.ofArray(String.valueOf(i),
-                                                                 String.valueOf(i + 1))).toArray());
+                                                                 String.valueOf(i + 1))).toTypedArray());
 
     }
 
@@ -57,12 +57,12 @@ public class SequenceFlatMappedTest {
 
         assertArrayEquals(new Integer[] {},
                           Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
-                                  .flatMap(null).flatMap(null).flatMap(null).toArray());
+                                  .flatMap(null).flatMap(null).flatMap(null).toTypedArray());
 
         assertArrayEquals(new Integer[] { 1,2, 2,3, 3,4, 10,11, 20,21, 30,31},
                           Sequence.ofArray(1, 10)
                                   .flatMap(i -> Sequence.ofArray(i, i * 2, i * 3))
                                   .flatMap(i -> Sequence.ofArray(i, i + 1))
-                                  .toArray());
+                                  .toTypedArray());
     }
 }
