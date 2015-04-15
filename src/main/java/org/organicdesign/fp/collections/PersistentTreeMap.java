@@ -8,13 +8,11 @@
 /* rich May 20, 2006 */
 package org.organicdesign.fp.collections;
 
-import org.organicdesign.fp.Option;
 import org.organicdesign.fp.function.Function2;
 import org.organicdesign.fp.permanent.Sequence;
 
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Stack;
 
@@ -56,20 +54,19 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
      */
     @Override
     public ImSet<Entry<K,V>> entrySet() {
-        return null; // TODO: Fix this!
+        return this.foldLeft(PersistentTreeSet.empty(),
+                             (accum, entry) -> (ImSet<Entry<K,V>>) accum.put(entry)); // TODO: Fix this!
     }
 
     /** This is correct, but O(n). */
-    // Does this need to be compatible with java.util.AbstractList?
-    @Override public int hashCode() { return (size() == 0) ? 0 : UnIterable.hashCode(this); }
+    @Override public int hashCode() { return (size() == 0) ? 0 : Sequence.hashCode(this); }
 
     /** This is correct, but definitely O(n), same as java.util.ArrayList. */
-    // Does this need to be compatible with java.util.AbstractList?
     @Override public boolean equals(Object other) {
         return (other != null) &&
-                (other instanceof UnMapSorted) &&
-                (this.size() == ((UnMapSorted) other).size()) &&
-                UnIterable.equals(this, (UnMapSorted) other);
+                (other instanceof ImMapSorted) &&
+                (this.size() == ((ImMapSorted) other).size()) &&
+                Sequence.equals(this, (ImMapSorted) other);
     }
 
     /** Returns a view of the keys contained in this map. */
@@ -86,10 +83,15 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         if (comp.compare(fromKey, toKey) > 0) {
             throw new IllegalArgumentException("fromKey is greater than toKey");
         }
-        ImMapSorted<K,V> ret = this;
-        while (comp.compare(this.first().get().getKey(), fromKey) < 0) {
-            remove(
-        }
+        return this.foldLeft(empty(),
+                             (accum, item) -> (comp.compare(fromKey, accum.firstKey()) <= 0)
+                                              ? accum.assoc(item.getKey(), item.getValue())
+                                              : accum,
+                             (accum) -> (comp.compare(accum.lastKey(), toKey) >= 0));
+//        ImMapSorted<K,V> ret = this;
+//        while (comp.compare(this.first().getKey(), fromKey) < 0) {
+//            remove(
+//        }
     }
 
     /** {@inheritDoc} */
@@ -98,20 +100,19 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         return this.map((e) -> e.getValue()).toUnSetSorted();
     }
 
-    @Override public Option<UnEntry<K,V>> first() {
+    @Override public UnEntry<K,V> first() {
         Node<K,V> t = tree;
         if (t != null) {
             while (t.left() != null) {
                 t = t.left();
             }
         }
-        return t == null ? Option.none() : Option.of(t);
+        return t;
     }
 
     @Override
     public Sequence<UnEntry<K,V>> rest() {
-        Option<UnEntry<K,V>> first = first();
-        return first.isSome() ? without(first.get().getKey()) : Sequence.emptySequence();
+        return size() > 1 ? without(first().getKey()) : Sequence.emptySequence();
     }
 
     // TODO: What use is this?
@@ -288,11 +289,8 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
     public NodeIterator<K,V> reverseIterator() { return new NodeIterator<>(tree, false); }
 
     @Override public K firstKey() {
-        Option<UnEntry<K,V>> min = first();
-        if (min.isSome()) {
-            return min.get().getKey();
-        }
-        throw new NoSuchElementException("this map is empty");
+        if (size() < 1) { throw new NoSuchElementException("this map is empty"); }
+        return first().getKey();
     }
 
     @Override public K lastKey() {

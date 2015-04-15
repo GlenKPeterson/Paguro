@@ -15,7 +15,6 @@
 package org.organicdesign.fp.permanent;
 
 import org.organicdesign.fp.Lazy;
-import org.organicdesign.fp.Option;
 
 public class SequenceDropped<T> implements Sequence<T> {
     private final Lazy.Ref<Sequence<T>> laz;
@@ -24,10 +23,7 @@ public class SequenceDropped<T> implements Sequence<T> {
         laz = Lazy.Ref.of(() -> {
             Sequence<T> seq = v;
             for (long i = n; i > 0; i--) {
-                Option<T> first = seq.first();
-                if (!first.isSome()) {
-                    return Sequence.emptySequence();
-                }
+                if (Empty.SEQUENCE == seq) { return seq; }
                 seq = seq.rest();
             }
             return seq;
@@ -36,11 +32,11 @@ public class SequenceDropped<T> implements Sequence<T> {
 
     public static <T> Sequence<T> of(Sequence<T> v, long numItems) {
         if (numItems < 0) { throw new IllegalArgumentException("You can only drop a non-negative number of items"); }
-        if ( (v == null) || (v == EMPTY_SEQUENCE) ) { return Sequence.emptySequence(); }
+        if ( (v == null) || (Empty.SEQUENCE == v) ) { return Sequence.emptySequence(); }
         return new SequenceDropped<>(v, numItems);
     }
 
-    @Override public Option<T> first() { return laz.get().first(); }
+    @Override public T first() { return laz.get().first(); }
 
     @Override public Sequence<T> rest() { return laz.get().rest(); }
 }

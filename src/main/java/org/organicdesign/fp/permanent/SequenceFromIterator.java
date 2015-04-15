@@ -15,11 +15,11 @@
 package org.organicdesign.fp.permanent;
 
 import org.organicdesign.fp.Lazy;
-import org.organicdesign.fp.Option;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import java.util.Iterator;
 
+// TODO: Generate tests!
 /**
  If you use the source iterator after passing it to this class then the behavior of this class
  will be undefined.  This class is immutable and memoized so that calling it repeatedly returns
@@ -31,11 +31,11 @@ import java.util.Iterator;
  object will present and immutable, lazy, memoized, thread-safe view of the underlying iterator.
  */
 class SequenceFromIterator<T> implements Sequence<T> {
-    private final Lazy.Ref<Tuple2<Option<T>,Sequence<T>>> laz;
+    private final Lazy.Ref<Tuple2<T,Sequence<T>>> laz;
 
     SequenceFromIterator(Iterator<T> iter) {
         laz = Lazy.Ref.of(() -> iter.hasNext()
-                ? Tuple2.of(Option.of(iter.next()), new SequenceFromIterator<>(iter))
+                ? Tuple2.of(iter.next(), new SequenceFromIterator<>(iter))
                 : Sequence.emptySeqTuple());
     }
 
@@ -51,7 +51,7 @@ class SequenceFromIterator<T> implements Sequence<T> {
         return new SequenceFromIterator<>(iiter);
     }
 
-    @Override public Option<T> first() { return laz.get()._1(); }
+    @Override public T first() { return laz.get()._1(); }
 
     @Override public Sequence<T> rest() { return laz.get()._2(); }
 }

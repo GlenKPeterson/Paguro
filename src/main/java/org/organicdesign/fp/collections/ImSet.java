@@ -19,4 +19,13 @@ public interface ImSet<E> extends UnSet<E>, Sequence<E> {
     ImSet<E> put(E e);
 
     ImSet<E> disjoin(E key);
+
+    /**
+     * This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for backwards
+     * compatibility in some performance-critical situations.  If you really need an array, consider using the somewhat
+     * type-safe version of this method instead, but read the caveats first.
+     * {@inheritDoc}
+     */
+    @Override default Object[] toArray() { return UnCollection.toArray(this); }
+
 }

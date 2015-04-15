@@ -1,14 +1,29 @@
+// Copyright 2015-04-12 PlanBase Inc. & Glen Peterson
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package org.organicdesign.fp.permanent;
 
 import org.organicdesign.fp.Lazy;
-import org.organicdesign.fp.Option;
 import org.organicdesign.fp.tuple.Tuple2;
 
 public class SequenceFromArray<T> implements Sequence<T> {
-    private final Lazy.Ref<Tuple2<Option<T>,Sequence<T>>> laz;
+    private final Lazy.Ref<Tuple2<T,Sequence<T>>> laz;
 
-    SequenceFromArray(int startIdx, T[] ts) {
-        laz = Lazy.Ref.of(() -> Tuple2.of(Option.of(ts[startIdx]), from(startIdx + 1, ts)));
+    // TODO: Develop tests for this and test for what happens when idx > ts.length or idx < 0;
+    SequenceFromArray(int idx, T[] ts) {
+        laz = Lazy.Ref.of(() -> (idx >= ts.length) ? Sequence.emptySeqTuple()
+                                                   : Tuple2.of(ts[idx], new SequenceFromArray<>(idx + 1, ts)));
     }
 
     @SafeVarargs
@@ -25,7 +40,7 @@ public class SequenceFromArray<T> implements Sequence<T> {
         return new SequenceFromArray<>(startIdx, i);
     }
 
-    @Override public Option<T> first() { return laz.get()._1(); }
+    @Override public T first() { return laz.get()._1(); }
 
     @Override public Sequence<T> rest() { return laz.get()._2(); }
 }

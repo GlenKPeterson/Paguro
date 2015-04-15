@@ -1,8 +1,6 @@
 package org.organicdesign.fp.permanent;
 
 import org.junit.Test;
-import org.organicdesign.fp.Option;
-import org.organicdesign.fp.ephemeral.View;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,9 +33,9 @@ public class SequenceTest {
         Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         Sequence<Integer> seq = Sequence.ofArray(ints);
 
-        assertEquals(Option.of(1), seq.filter(i -> i == 1).first());
-        assertEquals(Option.of(3), seq.filter(i -> i > 2).first());
-        assertEquals(Option.none(), seq.filter(i -> i > 10).first());
+        assertEquals(Integer.valueOf(1), seq.filter(i -> i == 1).first());
+        assertEquals(Integer.valueOf(3), seq.filter(i -> i > 2).first());
+        assertEquals(null, seq.filter(i -> i > 10).first());
     }
 
     @Test

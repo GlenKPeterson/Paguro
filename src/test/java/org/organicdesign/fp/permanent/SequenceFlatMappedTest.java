@@ -24,11 +24,11 @@ import static org.junit.Assert.assertArrayEquals;
 public class SequenceFlatMappedTest {
     @Test
     public void singleFlatMap() {
-        assertEquals(Sequence.EMPTY_SEQUENCE,
+        assertEquals(Sequence.Empty.SEQUENCE,
                      Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).flatMap(null));
 
-        assertEquals(Sequence.EMPTY_SEQUENCE,
-                     Sequence.EMPTY_SEQUENCE.flatMap(null));
+        assertEquals(Sequence.Empty.SEQUENCE,
+                     Sequence.Empty.SEQUENCE.flatMap(null));
 
         assertArrayEquals(new Integer[] {},
                           Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
@@ -48,12 +48,12 @@ public class SequenceFlatMappedTest {
 
     @Test
     public void flatMapChain() {
-        assertEquals(Sequence.EMPTY_SEQUENCE,
+        assertEquals(Sequence.Empty.SEQUENCE,
                      Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
                              .flatMap(null).flatMap(null).flatMap(null));
 
-        assertEquals(Sequence.EMPTY_SEQUENCE,
-                     Sequence.EMPTY_SEQUENCE.flatMap(null).flatMap(null).flatMap(null));
+        assertEquals(Sequence.Empty.SEQUENCE,
+                     Sequence.Empty.SEQUENCE.flatMap(null).flatMap(null).flatMap(null));
 
         assertArrayEquals(new Integer[] {},
                           Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)

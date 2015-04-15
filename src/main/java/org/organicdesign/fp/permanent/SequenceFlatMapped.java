@@ -15,7 +15,6 @@
 package org.organicdesign.fp.permanent;
 
 import org.organicdesign.fp.Lazy;
-import org.organicdesign.fp.Option;
 import org.organicdesign.fp.function.Function1;
 
 class SequenceFlatMapped<T,U> implements Sequence<U> {
@@ -23,12 +22,10 @@ class SequenceFlatMapped<T,U> implements Sequence<U> {
 
     @SuppressWarnings("unchecked")
     SequenceFlatMapped(Sequence<T> seq, Function1<T,Sequence<U>> f) {
-        laz = Lazy.Ref.of(() -> {
-            final Option<T> first = seq.first();
-            return first.isSome()
-                    ? new SequenceConcatenated<>(f.apply(first.get()), new SequenceFlatMapped(seq.rest(), f))
-                    : Sequence.emptySequence();
-        });
+        laz = Lazy.Ref.of(() -> (Empty.SEQUENCE == seq)
+                                ? Sequence.emptySequence()
+                                : new SequenceConcatenated<>(f.apply(seq.first()),
+                                                             new SequenceFlatMapped(seq.rest(), f)));
     }
 
     @SuppressWarnings("unchecked")
@@ -37,11 +34,11 @@ class SequenceFlatMapped<T,U> implements Sequence<U> {
         if (f == null) { return Sequence.emptySequence(); }
         // Is this comparison possible?
         if (Function1.IDENTITY.equals(f)) { return (Sequence<U>) seq; }
-        if ( (seq == null) || (seq == EMPTY_SEQUENCE) ) { return Sequence.emptySequence(); }
+        if ( (seq == null) || (Empty.SEQUENCE == seq) ) { return Sequence.emptySequence(); }
         return new SequenceFlatMapped<>(seq, f);
     }
 
-    @Override public Option<U> first() { return laz.get().first(); }
+    @Override public U first() { return laz.get().first(); }
 
     @Override public Sequence<U> rest() { return laz.get().rest(); }
 }

@@ -120,11 +120,11 @@ public class StaticImports {
             private final SortedSet<E> inner;
             private UnSetSortedWrapper(SortedSet<E> i) { inner = i; }
             @Override public Comparator<? super E> comparator() { return inner.comparator(); }
-            @Override public SortedSet<E> subSet(E fromElement, E toElement) {
-                return inner.subSet(fromElement, toElement);
+            @Override public UnSetSorted<E> subSet(E fromElement, E toElement) {
+                return un(inner.subSet(fromElement, toElement));
             }
-            @Override public SortedSet<E> headSet(E toElement) { return inner.headSet(toElement); }
-            @Override public SortedSet<E> tailSet(E fromElement) { return inner.tailSet(fromElement); }
+            @Override public UnSetSorted<E> headSet(E toElement) { return un(inner.headSet(toElement)); }
+            @Override public UnSetSorted<E> tailSet(E fromElement) { return un(inner.tailSet(fromElement)); }
             @Override public E first() { return inner.first(); }
             @Override public E last() { return inner.last(); }
             @Override public boolean contains(Object o) { return inner.contains(o); }

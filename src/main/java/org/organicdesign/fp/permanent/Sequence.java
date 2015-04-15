@@ -14,13 +14,13 @@
 
 package org.organicdesign.fp.permanent;
 
-import org.organicdesign.fp.Option;
 import org.organicdesign.fp.Transformable;
 import org.organicdesign.fp.function.Function1;
 import org.organicdesign.fp.function.Function2;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 /**
  A Sequence abstraction that lazy operations can be built from.  The idea is to create a lazy,
@@ -29,21 +29,20 @@ import java.util.Iterator;
  @param <T>
  */
 public interface Sequence<T> extends Transformable<T> {
-    public static final Sequence<?> EMPTY_SEQUENCE = new Sequence<Object>() {
-        /** @return USED_UP */
-        @Override public Option<Object> first() { return Option.none(); }
-
-        /** @return EMPTY_SEQUENCE (this) */
-        @Override public Sequence<Object> rest() { return this; }
-    };
+    enum Empty implements Sequence {
+        SEQUENCE {
+            @Override public Object first() { return null; }
+            @Override public Sequence rest() { return this; }
+        };
+    }
 
     @SuppressWarnings("unchecked")
     public static <T> Sequence<T> emptySequence() {
-        return (Sequence<T>) EMPTY_SEQUENCE;
+        return (Sequence<T>) Empty.SEQUENCE;
     }
 
-    static <U> Tuple2<Option<U>,Sequence<U>> emptySeqTuple() {
-        return Tuple2.of(Option.none(), Sequence.emptySequence());
+    static <U> Tuple2<U,Sequence<U>> emptySeqTuple() {
+        return Tuple2.of(null, Sequence.emptySequence());
     }
 
     public static <T> Sequence<T> of(Iterator<T> i) {
@@ -57,8 +56,10 @@ public interface Sequence<T> extends Transformable<T> {
     @SafeVarargs
     public static <T> Sequence<T> ofArray(T... i) { return SequenceFromArray.of(i); }
 
+//    default Option<T> head() { return (Empty.SEQUENCE == rest()) ? Option.none() : Option.of(first()); }
+
     // ======================================= Base methods =======================================
-    Option<T> first();
+    T first();
     Sequence<T> rest();
 
 //    // ======================================= Other methods ======================================
@@ -76,12 +77,10 @@ public interface Sequence<T> extends Transformable<T> {
     @Override
     default void forEach(Function1<T,?> consumer) {
         Sequence<T> seq = this;
-        Option<T> item = seq.first();
-        while (item.isSome()) {
-            consumer.apply(item.get());
+        while (Empty.SEQUENCE != seq) {
+            consumer.apply(seq.first());
             // repeat with next element
             seq = seq.rest();
-            item = seq.first();
         }
     }
 
@@ -90,12 +89,12 @@ public interface Sequence<T> extends Transformable<T> {
 //    @Override
 //    default Option<T> firstMatching(Predicate<T> pred) {
 //        Sequence<T> seq = this;
-//        Option<T> item = seq.first();
+//        Option<T> item = seq.head();
 //        while (item.isSome()) {
 //            if (pred.test(item.get())) { return item; }
 //            // repeat with next element
 //            seq = seq.rest();
-//            item = seq.first();
+//            item = seq.head();
 //        }
 //        return null;
 //    }
@@ -104,13 +103,11 @@ public interface Sequence<T> extends Transformable<T> {
     default <U> U foldLeft(U u, Function2<U,T,U> fun) {
         Sequence<T> seq = this;
         // System.out.println("seq: " + seq);
-        Option<T> item = seq.first();
         // System.out.println("===>item: " + item);
-        while (item.isSome()) {
-            u = fun.apply(u, item.get());
+        while (Empty.SEQUENCE != seq) {
+            u = fun.apply(u, seq.first());
             // repeat with next element
             seq = seq.rest();
-            item = seq.first();
         }
         return u;
     }
@@ -119,16 +116,14 @@ public interface Sequence<T> extends Transformable<T> {
     default <U> U foldLeft(U u, Function2<U,T,U> fun, Function1<U,Boolean> terminateWhen) {
         Sequence<T> seq = this;
         // System.out.println("seq: " + seq);
-        Option<T> item = seq.first();
         // System.out.println("===>item: " + item);
-        while (item.isSome()) {
-            u = fun.apply(u, item.get());
+        while (Empty.SEQUENCE != seq) {
+            u = fun.apply(u, seq.first());
             if (terminateWhen.apply(u)) {
                 return u;
             }
             // repeat with next element
             seq = seq.rest();
-            item = seq.first();
         }
         return u;
     }
@@ -188,4 +183,35 @@ public interface Sequence<T> extends Transformable<T> {
 //    <U> Sequence<U> flatMap(Function<T,Sequence<U>> func) {
 //        return SequenceFlatMapped.of(this, func);
 //    }
+
+    /** This is correct, but O(n) */
+    static int hashCode(Sequence is) {
+        int ret = 0;
+        while (Empty.SEQUENCE != is) {
+            Object i = is.first();
+            if (i != null) { ret = ret + i.hashCode(); }
+            is = is.rest();
+        }
+        return ret;
+    }
+
+    /** This is correct, but O(n) */
+    static boolean equals(Sequence a, Sequence b) {
+        // Cheapest operation first...
+        if (a == b) { return true; }
+
+        if ( (a == null) ||
+                (a.hashCode() != b.hashCode()) ) {
+            return false;
+        }
+        while ((Empty.SEQUENCE != a) && (Empty.SEQUENCE != b)) {
+            if (!Objects.equals(a.first(), b.first())) {
+                return false;
+            }
+            a = a.rest(); b = b.rest();
+        }
+        // Should both be The empty sequence, otherwise, false.
+        return a == b;
+    }
+
 }

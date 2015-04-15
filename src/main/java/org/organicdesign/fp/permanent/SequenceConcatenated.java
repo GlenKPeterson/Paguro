@@ -14,35 +14,29 @@
 package org.organicdesign.fp.permanent;
 
 import org.organicdesign.fp.Lazy;
-import org.organicdesign.fp.Option;
 
 class SequenceConcatenated<T> implements Sequence<T> {
     private final Lazy.Ref<Sequence<T>> laz;
 
     SequenceConcatenated(Sequence<T> preSeq, Sequence<T> postSeq) {
-        laz = Lazy.Ref.of(() -> {
-            final Option<T> preFirst = preSeq.first();
-            return preFirst.isSome()
-                    ? new Sequence<T>() {
-                        @Override public Option<T> first() { return preFirst; }
-                        @Override public Sequence<T> rest() { return new SequenceConcatenated<>(preSeq.rest(), postSeq); }
-                    }
-                    : postSeq;
+        laz = Lazy.Ref.of(() -> (Empty.SEQUENCE == preSeq) ? postSeq : new Sequence<T>() {
+                @Override public T first() { return preSeq.first(); }
+                @Override public Sequence<T> rest() { return new SequenceConcatenated<>(preSeq.rest(), postSeq); }
         });
     }
 
     public static <T> Sequence<T> of(Sequence<T> pre, Sequence<T> post) {
         // You can put nulls in, but you don't get nulls out.
-        if ( (pre == null) || (pre == EMPTY_SEQUENCE)) {
+        if ( (pre == null) || (Empty.SEQUENCE == pre)) {
             if (post == null) { return Sequence.emptySequence(); }
             return post;
-        } else if ((post == null) || (post == EMPTY_SEQUENCE)) {
+        } else if ((post == null) || (Empty.SEQUENCE == post)) {
             return pre;
         }
         return new SequenceConcatenated<>(pre, post);
     }
 
-    @Override public Option<T> first() { return laz.get().first(); }
+    @Override public T first() { return laz.get().first(); }
 
     @Override public Sequence<T> rest() { return laz.get().rest(); }
 }

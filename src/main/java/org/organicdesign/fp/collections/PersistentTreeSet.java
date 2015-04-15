@@ -9,6 +9,8 @@
 
 package org.organicdesign.fp.collections;
 
+import org.organicdesign.fp.permanent.Sequence;
+
 import java.util.Comparator;
 
 public class PersistentTreeSet<E> implements ImSetSorted<E> {
@@ -81,8 +83,9 @@ public class PersistentTreeSet<E> implements ImSetSorted<E> {
         return PersistentTreeSet.of(impl.subMap(fromElement, toElement));
     }
 
-    // TODO: Have to rename first() in Sequence to head() so that it doesn't conflict with the SortedSet interface.  Doh!
     @Override public E first() { return impl.firstKey(); }
+
+    @Override public Sequence<E> rest() { return impl.without(first()).keySet(); }
 
     @Override public E last() { return impl.lastKey(); }
 
