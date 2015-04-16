@@ -22,24 +22,40 @@ import static org.junit.Assert.assertArrayEquals;
 @RunWith(JUnit4.class)
 public class SequenceDroppedTest {
 
+    @Test public void emptiness() {
+        Sequence<Integer> seq = Sequence.ofArray();
+        assertArrayEquals(new Integer[0], seq.drop(0).toTypedArray());
+        assertArrayEquals(new Integer[0], seq.drop(1).toTypedArray());
+        assertArrayEquals(new Integer[0], seq.drop(2).toTypedArray());
+    }
+
+    @Test public void singleElement() {
+        Sequence<Integer> seq = Sequence.ofArray(1);
+        assertArrayEquals(new Integer[] {1}, seq.drop(0).toTypedArray());
+        assertArrayEquals(new Integer[0], seq.drop(1).toTypedArray());
+        assertArrayEquals(new Integer[0], seq.drop(2).toTypedArray());
+    }
+
+    @Test public void twoElement() {
+        Sequence<Integer> seq = Sequence.ofArray(1,2);
+        assertArrayEquals(new Integer[] {1,2}, seq.drop(0).toTypedArray());
+        assertArrayEquals(new Integer[] {2}, seq.drop(1).toTypedArray());
+        assertArrayEquals(new Integer[0], seq.drop(2).toTypedArray());
+    }
+
     @Test
     public void singleDrops() {
-        assertArrayEquals(new Integer[] {1,2,3,4,5,6,7,8,9},
-                Sequence.ofArray(1,2,3,4,5,6,7,8,9).drop(0).toTypedArray());
-        assertArrayEquals(new Integer[] {2,3,4,5,6,7,8,9},
-                Sequence.ofArray(1,2,3,4,5,6,7,8,9).drop(1).toTypedArray());
-        assertArrayEquals(new Integer[] {3,4,5,6,7,8,9},
-                Sequence.ofArray(1,2,3,4,5,6,7,8,9).drop(2).toTypedArray());
-        assertArrayEquals(new Integer[] {4, 5, 6, 7, 8, 9},
-                Sequence.ofArray(1,2,3,4,5,6,7,8,9).drop(3).toTypedArray());
-        assertArrayEquals(new Integer[] {9},
-                Sequence.ofArray(1,2,3,4,5,6,7,8,9).drop(8).toTypedArray());
-        assertArrayEquals(new Integer[] {},
-                Sequence.ofArray(1,2,3,4,5,6,7,8,9).drop(9).toTypedArray());
-        assertArrayEquals(new Integer[] {},
-                Sequence.ofArray(1,2,3,4,5,6,7,8,9).drop(10).toTypedArray());
-        assertArrayEquals(new Integer[] {},
-                Sequence.ofArray(1,2,3,4,5,6,7,8,9).drop(10000).toTypedArray());
+        Integer[] ints = new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9};
+        Sequence<Integer> seq = Sequence.ofArray(ints);
+        assertArrayEquals(ints, seq.drop(0).toTypedArray());
+        assertArrayEquals(new Integer[] {2,3,4,5,6,7,8,9}, seq.drop(1).toTypedArray());
+        assertArrayEquals(new Integer[] {3,4,5,6,7,8,9}, seq.drop(2).toTypedArray());
+        assertArrayEquals(new Integer[] {4,5,6,7,8,9}, seq.drop(3).toTypedArray());
+        assertArrayEquals(new Integer[]{9}, seq.drop(8).toTypedArray());
+        assertArrayEquals(new Integer[0], Sequence.emptySequence().toTypedArray());
+        assertArrayEquals(new Integer[0], seq.drop(9).toTypedArray());
+        assertArrayEquals(new Integer[0], seq.drop(10).toTypedArray());
+        assertArrayEquals(new Integer[0], seq.drop(10000).toTypedArray());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -49,33 +65,35 @@ public class SequenceDroppedTest {
 
     @Test
     public void multiDrops() {
+        Integer[] ints = new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9};
+        Sequence<Integer> seq = Sequence.ofArray(ints);
         assertArrayEquals(new Integer[] {3,4,5,6,7,8,9},
-                Sequence.ofArray(1,2,3,4,5,6,7,8,9).drop(1).drop(1).toTypedArray());
+                seq.drop(1).drop(1).toTypedArray());
         assertArrayEquals(new Integer[] {4,5,6,7,8,9},
-                Sequence.ofArray(1,2,3,4,5,6,7,8,9).drop(1).drop(1).drop(1).toTypedArray());
+                seq.drop(1).drop(1).drop(1).toTypedArray());
         assertArrayEquals(new Integer[] {9},
-                Sequence.ofArray(1,2,3,4,5,6,7,8,9)
+                seq
                                   .drop(1).drop(1).drop(1).drop(1).drop(1)
                                   .drop(1).drop(1).drop(1).toTypedArray());
         assertArrayEquals(new Integer[] {},
-                Sequence.ofArray(1,2,3,4,5,6,7,8,9)
+                seq
                                   .drop(1).drop(1).drop(1).drop(1).drop(1)
                                   .drop(1).drop(1).drop(1).drop(1).toTypedArray());
         assertArrayEquals(new Integer[] {},
-                Sequence.ofArray(1,2,3,4,5,6,7,8,9)
+                seq
                                   .drop(1).drop(1).drop(1).drop(1).drop(1)
                                   .drop(1).drop(1).drop(1).drop(1).drop(1).toTypedArray());
         assertArrayEquals(new Integer[] {},
-                Sequence.ofArray(1,2,3,4,5,6,7,8,9)
+                seq
                                   .drop(1).drop(1).drop(1).drop(1).drop(1)
                                   .drop(1).drop(1).drop(1).drop(1).drop(1)
                                   .drop(1).drop(1).drop(1).drop(1).drop(1).toTypedArray());
 
         assertArrayEquals(new Integer[] {7,8,9},
-                Sequence.ofArray(1,2,3,4,5,6,7,8,9)
+                seq
                                   .drop(0).drop(1).drop(2).drop(3).toTypedArray());
         assertArrayEquals(new Integer[] {7,8,9},
-                Sequence.ofArray(1,2,3,4,5,6,7,8,9)
+                seq
                                   .drop(3).drop(2).drop(1).drop(0).toTypedArray());
     }
 }

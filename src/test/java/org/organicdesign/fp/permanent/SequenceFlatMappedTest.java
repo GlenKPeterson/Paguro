@@ -16,6 +16,7 @@ package org.organicdesign.fp.permanent;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.organicdesign.fp.Mutable;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -24,11 +25,11 @@ import static org.junit.Assert.assertEquals;
 public class SequenceFlatMappedTest {
     @Test
     public void singleFlatMap() {
-        assertEquals(Sequence.Empty.SEQUENCE,
+        assertEquals(Sequence.emptySequence(),
                      Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).flatMap(null));
 
-        assertEquals(Sequence.Empty.SEQUENCE,
-                     Sequence.Empty.SEQUENCE.flatMap(null));
+        assertEquals(Sequence.emptySequence(),
+                     Sequence.emptySequence().flatMap(null));
 
         assertArrayEquals(new Integer[] {},
                           Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
@@ -46,14 +47,91 @@ public class SequenceFlatMappedTest {
 
     }
 
+    // TODO: Start Here!
+    @Test public void flatEmpty() {
+        assertEquals(Sequence.emptySequence(),
+                     Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).flatMap((a) -> Sequence.emptySequence()));
+
+        assertEquals(Sequence.emptySequence(),
+                     Sequence.ofArray().flatMap((a) -> Sequence.emptySequence()));
+
+        // This tests that I didn't just look ahead 2 or 3 times.  That the look-ahead is sufficient.
+        Mutable.ObjectRef<Integer> count = Mutable.ObjectRef.of(0);
+        assertArrayEquals(new String[]{"a9", "b9"},
+                          Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                                  .flatMap((a) -> {
+                                      count.set(count.value() + 1);
+                                      return (count.value() > 8)
+                                             ? Sequence.ofArray("a" + a, "b" + a)
+                                             : Sequence.emptySequence();
+                                  }).forEach((item) -> {
+                              System.out.println("Item " + item);
+                              return null;
+                          })
+                                  .toTypedArray());
+
+        count.set(0);
+        assertArrayEquals(new String[]{"c8", "d8", "c9", "d9"},
+                          Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                                  .flatMap((a) -> {
+                                      count.set(count.value() + 1);
+                                      return (count.value() > 7)
+                                             ? Sequence.ofArray("c" + a, "d" + a)
+                                             : Sequence.emptySequence();
+                                  }).forEach((item) -> {
+                              System.out.println("Item " + item);
+                              return null;
+                          })
+                                  .toTypedArray());
+
+        count.set(0);
+        assertArrayEquals(new String[]{"e1", "f1", "e2", "f2"},
+                          Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                                  .flatMap((a) -> {
+                                      count.set(count.value() + 1);
+                                      return (count.value() < 3)
+                                             ? Sequence.ofArray("e" + a, "f" + a)
+                                             : Sequence.emptySequence();
+                                  }).forEach((item) -> {
+                              System.out.println("count: " + count.value() + " Item " + item);
+                              return null;
+                          })
+                                  .toTypedArray());
+
+        Mutable.ObjectRef<Sequence<Integer>> shrinkSeq = Mutable.ObjectRef.of(Sequence.ofArray(1, 2, 3));
+        assertArrayEquals(new Integer[]{2, 3, 2},
+                          Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                                  .flatMap((a) -> {
+                                      shrinkSeq.set(shrinkSeq.value().rest());
+                                      return shrinkSeq.value();
+                                  })
+                                  .toTypedArray());
+
+        // Now start by returning an emptySequence, then a seq of length 1, then length 2, etc.
+        // The first emptySequence should not end the processing.
+        Mutable.ObjectRef<Sequence<Integer>> growSeq = Mutable.ObjectRef.of(Sequence.emptySequence());
+        Mutable.ObjectRef<Integer> incInt = Mutable.ObjectRef.of(0);
+        assertArrayEquals(new Integer[]{1, 1,2, 1,2,3,},
+                          Sequence.ofArray(1, 2, 3)
+                                  .flatMap((a) -> {
+                                      if (incInt.value() > 0) {
+                                          growSeq.set(growSeq.value().append(Sequence.ofArray(incInt.value())));
+                                      }
+                                      incInt.set(incInt.value() + 1);
+                                      return growSeq.value();
+                                  })
+                                  .toTypedArray());
+
+    }
+
     @Test
     public void flatMapChain() {
-        assertEquals(Sequence.Empty.SEQUENCE,
+        assertEquals(Sequence.emptySequence(),
                      Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
                              .flatMap(null).flatMap(null).flatMap(null));
 
-        assertEquals(Sequence.Empty.SEQUENCE,
-                     Sequence.Empty.SEQUENCE.flatMap(null).flatMap(null).flatMap(null));
+        assertEquals(Sequence.emptySequence(),
+                     Sequence.emptySequence().flatMap(null).flatMap(null).flatMap(null));
 
         assertArrayEquals(new Integer[] {},
                           Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)

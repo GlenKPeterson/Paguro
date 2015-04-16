@@ -22,8 +22,21 @@ import static org.junit.Assert.assertArrayEquals;
 @RunWith(JUnit4.class)
 public class SequenceConcatenatedTest {
 
-    @Test
-    public void prepend() {
+    @Test public void doubleNull() {
+        assertArrayEquals(new Integer[0],
+                          Sequence.ofArray().append(null).toTypedArray());
+
+        assertArrayEquals(new Integer[0],
+                          Sequence.ofArray().append(Sequence.emptySequence()).toTypedArray());
+
+        assertArrayEquals(new Integer[0],
+                          Sequence.ofArray().prepend(null).toTypedArray());
+
+        assertArrayEquals(new Integer[0],
+                          Sequence.ofArray().prepend(Sequence.emptySequence()).toTypedArray());
+    }
+
+    @Test public void prepend() {
         assertArrayEquals(new Integer[] { 5, 6, 7, 8, 9 },
                           Sequence.ofArray(5,6,7,8,9)
                                   .prepend(null).toTypedArray());

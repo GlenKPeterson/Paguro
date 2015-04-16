@@ -47,11 +47,10 @@ public class SequenceFromArrayTest {
         assertEquals(Integer.valueOf(3), three.first());
         assertEquals(Integer.valueOf(2), two.first());
         assertEquals(Integer.valueOf(1), one.first());
-        assertNull(zero.first());
+        assertEquals(Sequence.emptySequence(), zero);
         assertEquals(Sequence.emptySequence(), zero.rest());
 
-        assertNull(nada.first());
-        assertEquals(Sequence.emptySequence(), nada.rest());
+        assertEquals(Sequence.emptySequence(), nada);
 
         three.rest().rest().rest().rest().rest().rest().rest().rest().rest().rest().rest().rest().rest().rest().rest();
         assertEquals(Integer.valueOf(3), three.first());
@@ -74,7 +73,7 @@ public class SequenceFromArrayTest {
         assertEquals(Integer.valueOf(2), i.value());
         assertEquals(Integer.valueOf(1), one.first().apply());
         assertEquals(Integer.valueOf(3), i.value());
-        assertNull(zero.first());
+        assertEquals(Sequence.emptySequence(), zero);
         assertEquals(Integer.valueOf(3), i.value());
         assertTrue(Sequence.Empty.SEQUENCE == zero.rest());
         assertEquals(Integer.valueOf(3), i.value());

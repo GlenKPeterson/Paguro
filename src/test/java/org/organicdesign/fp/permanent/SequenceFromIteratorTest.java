@@ -19,6 +19,7 @@ import org.organicdesign.fp.Mutable;
 import org.organicdesign.fp.function.Function0;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -49,14 +50,22 @@ public class SequenceFromIteratorTest {
         assertEquals(Integer.valueOf(3), three.first());
         assertEquals(Integer.valueOf(2), two.first());
         assertEquals(Integer.valueOf(1), one.first());
-        assertNull(zero.first());
+        assertEquals(Sequence.emptySequence(), one.rest());
+        assertEquals(Sequence.emptySequence(), zero);
         assertEquals(Sequence.emptySequence(), zero.rest());
 
-        assertNull(nada.first());
+        assertEquals(Sequence.emptySequence(), nada);
         assertEquals(Sequence.emptySequence(), nada.rest());
 
         three.rest().rest().rest().rest().rest().rest().rest().rest().rest().rest().rest().rest().rest().rest().rest();
         assertEquals(Integer.valueOf(3), three.first());
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void exception1() {
+        Sequence<Integer> zero = Sequence.of(Collections.<Integer>emptyList().iterator());
+        assertEquals(Sequence.emptySequence(), zero);
+        zero.first();
     }
 
 
@@ -85,7 +94,11 @@ public class SequenceFromIteratorTest {
         assertEquals(Integer.valueOf(2), i.value());
         assertEquals(Integer.valueOf(1), one.first().apply());
         assertEquals(Integer.valueOf(3), i.value());
-        assertNull(zero.first());
+
+        assertEquals(Sequence.emptySequence(), one.rest());
+        assertEquals(Sequence.emptySequence(), zero);
+        assertEquals(Sequence.emptySequence(), zero.rest());
+
         assertEquals(Integer.valueOf(3), i.value());
         assertTrue(Sequence.Empty.SEQUENCE == zero.rest());
         assertEquals(Integer.valueOf(3), i.value());

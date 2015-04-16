@@ -42,7 +42,7 @@ class SequenceFromIterator<T> implements Sequence<T> {
     }
 
     public static <T> Sequence<T> of(Iterator<T> i) {
-        if (i == null) { return Sequence.emptySequence(); }
+        if ( (i == null) || !i.hasNext() ) { return Sequence.emptySequence(); }
         return new SequenceFromIterator<>(i);
     }
 

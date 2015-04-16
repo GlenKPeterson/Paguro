@@ -56,9 +56,10 @@ public interface Transformable<T> extends Realizable<T> {
 
     /**
      Eagerly processes the entire data source for side effects.
-     * @param consumer the function to do the processing
+     @param consumer the function to do the processing
+     @return the unmodified sequence you started with (for chaining).
      */
-    void forEach(Function1<T,?> consumer);
+    Transformable<T> forEach(Function1<T,?> consumer);
 
 //    /**
 //     Deprecated: use filter(...).first() instead.

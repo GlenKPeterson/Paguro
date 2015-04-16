@@ -14,19 +14,45 @@
 
 package org.organicdesign.fp.permanent;
 
-import org.organicdesign.fp.Lazy;
 import org.organicdesign.fp.function.Function1;
 
-class SequenceFlatMapped<T,U> implements Sequence<U> {
-    private final Lazy.Ref<Sequence<U>> laz;
+import static org.organicdesign.fp.permanent.Sequence.Empty;
 
-    @SuppressWarnings("unchecked")
-    SequenceFlatMapped(Sequence<T> seq, Function1<T,Sequence<U>> f) {
-        laz = Lazy.Ref.of(() -> (Empty.SEQUENCE == seq)
-                                ? Sequence.emptySequence()
-                                : new SequenceConcatenated<>(f.apply(seq.first()),
-                                                             new SequenceFlatMapped(seq.rest(), f)));
+class SequenceFlatMapped {
+//    private final Lazy.Ref<Sequence<U>> laz;
+
+    // TODO: Totally eager and I don't know what to do about it without using Option.
+    private static <T,U> Sequence<U> next(Sequence<T> seq, Function1<T,Sequence<U>> f) {
+        if (Empty.SEQUENCE == seq) { return Sequence.emptySequence(); }
+        Sequence<U> first = f.apply(seq.first());
+        while (Empty.SEQUENCE == first) {
+            seq = seq.rest();
+            if (Empty.SEQUENCE == seq) { return Sequence.emptySequence(); }
+            first = f.apply(seq.first());
+        }
+        Sequence<T> rest = seq.rest();
+        if (Empty.SEQUENCE == rest) { return first; }
+
+        Sequence<U> second = f.apply(rest.first());
+        while (Empty.SEQUENCE == second) {
+            rest = rest.rest();
+            if (Empty.SEQUENCE == rest) { return first; }
+            second = f.apply(rest.first());
+        }
+
+        if (Empty.SEQUENCE == rest.rest()) {
+            return SequenceConcatenated.of(first, second);
+        }
+
+        // Does this recurse eagerly?
+        return SequenceConcatenated.of(first, next(rest, f));
     }
+
+
+//    @SuppressWarnings("unchecked")
+//    SequenceFlatMapped(Sequence<T> seq, Function1<T,Sequence<U>> f) {
+//        laz = Lazy.Ref.of(() -> next(seq, f));
+//    }
 
     @SuppressWarnings("unchecked")
     public static <T,U> Sequence<U> of(Sequence<T> seq, Function1<T,Sequence<U>> f) {
@@ -35,10 +61,11 @@ class SequenceFlatMapped<T,U> implements Sequence<U> {
         // Is this comparison possible?
         if (Function1.IDENTITY.equals(f)) { return (Sequence<U>) seq; }
         if ( (seq == null) || (Empty.SEQUENCE == seq) ) { return Sequence.emptySequence(); }
-        return new SequenceFlatMapped<>(seq, f);
+
+        return next(seq, f);
     }
 
-    @Override public U first() { return laz.get().first(); }
-
-    @Override public Sequence<U> rest() { return laz.get().rest(); }
+//    @Override public U first() { return laz.get().first(); }
+//
+//    @Override public Sequence<U> rest() { return laz.get().rest(); }
 }

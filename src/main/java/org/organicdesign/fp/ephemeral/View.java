@@ -51,13 +51,15 @@ public interface View<T> extends Transformable<T> {
     @Override
     default View<T> filter(Function1<T,Boolean> pred) { return ViewFiltered.of(this, pred); }
 
+    /** Returning an unmodified view is impossible here - just returns null. */
     @Override
-    default void forEach(Function1<T,?> consumer) {
+    default View<T> forEach(Function1<T,?> consumer) {
         Option<T> item = next();
         while (item.isSome()) {
             consumer.apply(item.get());
             item = next();
         }
+        return null;
     }
 
 //    /**

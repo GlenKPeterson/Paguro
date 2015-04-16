@@ -27,7 +27,13 @@ public class SequenceFiltered<T> implements Sequence<T> {
             while (Empty.SEQUENCE != seq) {
                 T item = seq.first();
                 if (predicate.apply(item)) {
-                    return Tuple2.of(item, new SequenceFiltered<>(seq.rest(), predicate));
+                    Sequence<T> rest = seq.rest();
+                    while ( (Empty.SEQUENCE != rest) && !predicate.apply(rest.first())) {
+                        rest = rest.rest();
+                    }
+                    return Tuple2.of(item, (Empty.SEQUENCE == rest)
+                                           ? rest
+                                           : new SequenceFiltered<>(rest, predicate));
                 }
                 // If we didn't find one, repeat with next element
                 seq = seq.rest();
@@ -39,9 +45,15 @@ public class SequenceFiltered<T> implements Sequence<T> {
     public static <T> Sequence<T> of(Sequence<T> s, Function1<T,Boolean> f) {
         if (f == null) { throw new IllegalArgumentException("Must provide a predicate"); }
         if (f == Function1.REJECT) { return Sequence.emptySequence(); }
-        if (f == Function1.ACCEPT) { return s; }
         if ( (s == null) || (Empty.SEQUENCE == s) ) { return Sequence.emptySequence(); }
-        return new SequenceFiltered<>(s, f);
+        if (f == Function1.ACCEPT) { return s; }
+
+        Sequence<T> seq = s;
+        while (!f.apply(seq.first())) {
+            seq = seq.rest();
+            if (Empty.SEQUENCE == seq) { return seq; }
+        }
+        return new SequenceFiltered<>(seq, f);
     }
 
     @Override

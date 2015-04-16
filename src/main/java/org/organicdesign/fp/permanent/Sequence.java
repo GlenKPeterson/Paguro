@@ -29,12 +29,12 @@ import java.util.Objects;
  @param <T>
  */
 public interface Sequence<T> extends Transformable<T> {
-    enum Empty implements Sequence {
-        SEQUENCE {
-            @Override public Object first() { return null; }
-            @Override public Sequence rest() { return this; }
-        };
-    }
+enum Empty implements Sequence {
+    SEQUENCE {
+        @Override public Object first() { throw new UnsupportedOperationException("No first of empty sequence."); }
+        @Override public Sequence rest() { return this; }
+    };
+}
 
     @SuppressWarnings("unchecked")
     public static <T> Sequence<T> emptySequence() {
@@ -75,13 +75,14 @@ public interface Sequence<T> extends Transformable<T> {
     }
 
     @Override
-    default void forEach(Function1<T,?> consumer) {
+    default Sequence<T> forEach(Function1<T,?> consumer) {
         Sequence<T> seq = this;
         while (Empty.SEQUENCE != seq) {
             consumer.apply(seq.first());
             // repeat with next element
             seq = seq.rest();
         }
+        return this;
     }
 
 
@@ -140,7 +141,17 @@ public interface Sequence<T> extends Transformable<T> {
     default Sequence<T> takeWhile(Function1<T,Boolean> predicate) { return SequenceTakenWhile.of(this, predicate); }
 
     /** {@inheritDoc} */
-    @Override default Sequence<T> drop(long numItems) { return SequenceDropped.of(this, numItems); }
+    // TODO: Is there a non-eager way to do this?
+    @Override default Sequence<T> drop(long numItems) {
+        if (numItems < 0) { throw new IllegalArgumentException("You can only drop a non-negative number of items"); }
+        if (numItems == 0) { return this; }
+        Sequence<T> seq = this;
+        for (int i = 0; i < numItems; i++) {
+            if (Empty.SEQUENCE == seq) { return seq; }
+            seq = seq.rest();
+        }
+        return seq;
+    }
 
     /**
      One of the two higher-order functions that can produce more output items than input items.
@@ -150,7 +161,9 @@ public interface Sequence<T> extends Transformable<T> {
      return is smaller, use filter followed by map if possible, or vice versa if not.
      @param func yields a Transformable of 0 or more results for each input item.
      */
-    default <U> Sequence<U> flatMap(Function1<T,Sequence<U>> func) { return SequenceFlatMapped.of(this, func); }
+    default <U> Sequence<U> flatMap(Function1<T,Sequence<U>> func) {
+        return SequenceFlatMapped.of(this, func);
+    }
 
     /** Add the given Sequence after the end of this one. */
     default Sequence<T> append(Sequence<T> other) { return SequenceConcatenated.of(this, other); }

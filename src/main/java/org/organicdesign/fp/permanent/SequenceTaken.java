@@ -28,7 +28,8 @@ public class SequenceTaken<T> implements Sequence<T> {
     }
 
     public static <T> Sequence<T> of(Sequence<T> v, long numItems) {
-        if (numItems < 1) { throw new IllegalArgumentException("Num items must be >= 1"); }
+        if ( (Empty.SEQUENCE == v) || (numItems == 0) ) { return Sequence.emptySequence(); }
+        if (numItems < 0) { throw new IllegalArgumentException("Num items must be >= 0"); }
         return new SequenceTaken<>(v, numItems);
     }
 
