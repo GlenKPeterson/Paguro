@@ -39,33 +39,32 @@ public class SequenceFromIteratorTest {
     public void construction() {
         List<Integer> ints = Arrays.asList(5, 4, 3, 2, 1);
         Sequence<Integer> five = Sequence.of(ints.iterator());
-        Sequence<Integer> four = five.rest();
-        Sequence<Integer> three = four.rest();
-        Sequence<Integer> two = three.rest();
-        Sequence<Integer> one = two.rest();
-        Sequence<Integer> zero = one.rest();
-        Sequence<Integer> nada = zero.rest();
-        assertEquals(Integer.valueOf(5), five.first());
-        assertEquals(Integer.valueOf(4), four.first());
-        assertEquals(Integer.valueOf(3), three.first());
-        assertEquals(Integer.valueOf(2), two.first());
-        assertEquals(Integer.valueOf(1), one.first());
-        assertEquals(Sequence.emptySequence(), one.rest());
-        assertEquals(Sequence.emptySequence(), zero);
-        assertEquals(Sequence.emptySequence(), zero.rest());
+        Sequence<Integer> four = five.tail();
+        Sequence<Integer> three = four.tail();
+        Sequence<Integer> two = three.tail();
+        Sequence<Integer> one = two.tail();
+        Sequence<Integer> zero = one.tail();
+        Sequence<Integer> nada = zero.tail();
+        assertEquals(Integer.valueOf(5), five.head().get());
+        assertEquals(Integer.valueOf(4), four.head().get());
+        assertEquals(Integer.valueOf(3), three.head().get());
+        assertEquals(Integer.valueOf(2), two.head().get());
+        assertEquals(Integer.valueOf(1), one.head().get());
+        assertEquals(Sequence.EMPTY_SEQUENCE, one.tail());
+        assertEquals(Sequence.EMPTY_SEQUENCE, zero);
+        assertEquals(Sequence.EMPTY_SEQUENCE, zero.tail());
 
         assertEquals(Sequence.emptySequence(), nada);
-        assertEquals(Sequence.emptySequence(), nada.rest());
+        assertEquals(Sequence.emptySequence(), nada.tail());
 
-        three.rest().rest().rest().rest().rest().rest().rest().rest().rest().rest().rest().rest().rest().rest().rest();
-        assertEquals(Integer.valueOf(3), three.first());
+        three.tail().tail().tail().tail().tail().tail().tail().tail().tail().tail().tail().tail().tail().tail().tail();
+        assertEquals(Integer.valueOf(3), three.head().get());
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void exception1() {
+    @Test
+    public void blankIterator() {
         Sequence<Integer> zero = Sequence.of(Collections.<Integer>emptyList().iterator());
         assertEquals(Sequence.emptySequence(), zero);
-        zero.first();
     }
 
 
@@ -85,33 +84,33 @@ public class SequenceFromIteratorTest {
                                   return 1;
                               });
         Sequence<Function0<Integer>> three = Sequence.of(ints.iterator());
-        Sequence<Function0<Integer>> two = three.rest();
-        Sequence<Function0<Integer>> one = two.rest();
-        Sequence<Function0<Integer>> zero = one.rest();
-        assertEquals(Integer.valueOf(3), three.first().apply());
+        Sequence<Function0<Integer>> two = three.tail();
+        Sequence<Function0<Integer>> one = two.tail();
+        Sequence<Function0<Integer>> zero = one.tail();
+        assertEquals(Integer.valueOf(3), three.head().get().apply());
         assertEquals(Integer.valueOf(1), i.value());
-        assertEquals(Integer.valueOf(2), two.first().apply());
+        assertEquals(Integer.valueOf(2), two.head().get().apply());
         assertEquals(Integer.valueOf(2), i.value());
-        assertEquals(Integer.valueOf(1), one.first().apply());
+        assertEquals(Integer.valueOf(1), one.head().get().apply());
         assertEquals(Integer.valueOf(3), i.value());
 
-        assertEquals(Sequence.emptySequence(), one.rest());
-        assertEquals(Sequence.emptySequence(), zero);
-        assertEquals(Sequence.emptySequence(), zero.rest());
+        assertEquals(Sequence.<Function0<Integer>>emptySequence(), one.tail());
+        assertFalse(zero.head().isSome());
+        assertEquals(Sequence.<Function0<Integer>>emptySequence(), zero.tail());
 
         assertEquals(Integer.valueOf(3), i.value());
-        assertTrue(Sequence.Empty.SEQUENCE == zero.rest());
+        assertEquals(Sequence.<Function0<Integer>>emptySequence(), one.tail());
         assertEquals(Integer.valueOf(3), i.value());
 
-        assertTrue(Sequence.Empty.SEQUENCE == zero.rest());
+        assertEquals(Sequence.<Function0<Integer>>emptySequence(), one.tail());
         i.set(999);
 
-        three.rest().rest().rest().rest().rest().rest().rest().rest().rest().rest().rest().rest().rest().rest().rest();
-        assertEquals(Integer.valueOf(3), three.first().apply());
+        three.tail().tail().tail().tail().tail().tail().tail().tail().tail().tail().tail().tail().tail().tail().tail();
+        assertEquals(Integer.valueOf(3), three.head().get().apply());
         assertEquals(Integer.valueOf(1000), i.value());
 
-        three.first(); three.first(); three.first();
-        assertEquals(Integer.valueOf(3), three.first().apply());
+        three.head().get(); three.head().get(); three.head().get();
+        assertEquals(Integer.valueOf(3), three.head().get().apply());
         assertEquals(Integer.valueOf(1001), i.value());
     }
 

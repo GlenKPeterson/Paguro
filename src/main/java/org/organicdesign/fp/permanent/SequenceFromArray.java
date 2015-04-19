@@ -15,16 +15,17 @@
 package org.organicdesign.fp.permanent;
 
 import org.organicdesign.fp.Lazy;
+import org.organicdesign.fp.Option;
 import org.organicdesign.fp.tuple.Tuple2;
 
 public class SequenceFromArray<T> implements Sequence<T> {
-    private final Lazy.Ref<Tuple2<T,Sequence<T>>> laz;
+    private final Lazy.Ref<Tuple2<Option<T>,Sequence<T>>> laz;
 
     // TODO: Develop tests for this and test for what happens when idx > ts.length or idx < 0;
     SequenceFromArray(int idx, T[] ts) {
-        laz = Lazy.Ref.of(() -> Tuple2.of(ts[idx], (idx == (ts.length - 1))
-                                                    ? Sequence.emptySequence()
-                                                    : new SequenceFromArray<>(idx + 1, ts)));
+        laz = Lazy.Ref.of(() -> Tuple2.of(Option.of(ts[idx]), (idx == (ts.length - 1))
+                                                              ? Sequence.emptySequence()
+                                                              : new SequenceFromArray<>(idx + 1, ts)));
     }
 
     @SafeVarargs
@@ -41,7 +42,7 @@ public class SequenceFromArray<T> implements Sequence<T> {
         return new SequenceFromArray<>(startIdx, i);
     }
 
-    @Override public T first() { return laz.get()._1(); }
+    @Override public Option<T> head() { return laz.get()._1(); }
 
-    @Override public Sequence<T> rest() { return laz.get()._2(); }
+    @Override public Sequence<T> tail() { return laz.get()._2(); }
 }

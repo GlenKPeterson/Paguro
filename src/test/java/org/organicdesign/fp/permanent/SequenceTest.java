@@ -8,6 +8,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 public class SequenceTest {
 
@@ -33,9 +34,9 @@ public class SequenceTest {
         Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         Sequence<Integer> seq = Sequence.ofArray(ints);
 
-        assertEquals(Integer.valueOf(1), seq.filter(i -> i == 1).first());
-        assertEquals(Integer.valueOf(3), seq.filter(i -> i > 2).first());
-        assertEquals(null, seq.filter(i -> i > 10).first());
+        assertEquals(Integer.valueOf(1), seq.filter(i -> i == 1).head().get());
+        assertEquals(Integer.valueOf(3), seq.filter(i -> i > 2).head().get());
+        assertFalse(seq.filter(i -> i > 10).head().isSome());
     }
 
     @Test

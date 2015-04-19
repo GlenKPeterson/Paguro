@@ -8,6 +8,7 @@
 /* rich May 20, 2006 */
 package org.organicdesign.fp.collections;
 
+import org.organicdesign.fp.Option;
 import org.organicdesign.fp.function.Function2;
 import org.organicdesign.fp.permanent.Sequence;
 
@@ -87,7 +88,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
                                               : accum,
                              (accum) -> (comp.compare(accum.lastKey(), toKey) >= 0));
 //        ImMapSorted<K,V> ret = this;
-//        while (comp.compare(this.first().getKey(), fromKey) < 0) {
+//        while (comp.compare(this.head().getKey(), fromKey) < 0) {
 //            remove(
 //        }
     }
@@ -98,19 +99,19 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         return this.map((e) -> e.getValue()).toUnSetSorted();
     }
 
-    @Override public UnEntry<K,V> first() {
+    @Override public Option<UnEntry<K,V>> head() {
         Node<K,V> t = tree;
         if (t != null) {
             while (t.left() != null) {
                 t = t.left();
             }
         }
-        return t;
+        return Option.of(t);
     }
 
     @Override
-    public Sequence<UnEntry<K,V>> rest() {
-        return size() > 1 ? without(first().getKey()) : Sequence.emptySequence();
+    public Sequence<UnEntry<K,V>> tail() {
+        return size() > 1 ? without(head().get().getKey()) : Sequence.emptySequence();
     }
 
     // TODO: What use is this?
@@ -132,8 +133,8 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 //        PersistentTreeMap<K,V> ret = empty();
 //        for (; items != null; items = items.next().next()) {
 //            if (items.next() == null)
-//                throw new IllegalArgumentException(String.format("No value supplied for key: %s", items.first()));
-//            ret = ret.assoc((K) items.first(), (V) RT.second(items));
+//                throw new IllegalArgumentException(String.format("No value supplied for key: %s", items.head()));
+//            ret = ret.assoc((K) items.head(), (V) RT.second(items));
 //        }
 //        return ret;
 //    }
@@ -144,8 +145,8 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 //        PersistentTreeMap<K,V> ret = new PersistentTreeMap<>(comp);
 //        for (; items != null; items = items.next().next()) {
 //            if (items.next() == null)
-//                throw new IllegalArgumentException(String.format("No value supplied for key: %s", items.first()));
-//            ret = ret.assoc((K) items.first(), (V) RT.second(items));
+//                throw new IllegalArgumentException(String.format("No value supplied for key: %s", items.head()));
+//            ret = ret.assoc((K) items.head(), (V) RT.second(items));
 //        }
 //        return ret;
 //    }
@@ -288,7 +289,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 
     @Override public K firstKey() {
         if (size() < 1) { throw new NoSuchElementException("this map is empty"); }
-        return first().getKey();
+        return head().get().getKey();
     }
 
     @Override public K lastKey() {
@@ -782,13 +783,13 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 //        }
 //
 //        @Override
-//        public Node<K,V> first() {
-//            return stack.first();
+//        public Node<K,V> head() {
+//            return stack.head();
 //        }
 //
 //        @Override
 //        public ISeq<Map.Entry<K,V>> next() {
-//            Node<K,V> t = stack.first();
+//            Node<K,V> t = stack.head();
 //            ISeq<Node<K,V>> nextstack = push(asc ? t.right() : t.left(), stack.next(), asc);
 //            if (nextstack != null) {
 //                return new Seq<>(nextstack, asc, cnt - 1);

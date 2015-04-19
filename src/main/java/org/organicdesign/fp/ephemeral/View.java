@@ -63,7 +63,7 @@ public interface View<T> extends Transformable<T> {
     }
 
 //    /**
-//     Deprecated: use filter(...).first() instead.
+//     Deprecated: use filter(...).head() instead.
 //     */
 //    @Override
 //    @Deprecated

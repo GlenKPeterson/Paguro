@@ -9,6 +9,7 @@
 
 package org.organicdesign.fp.collections;
 
+import org.organicdesign.fp.Option;
 import org.organicdesign.fp.permanent.Sequence;
 
 import java.util.Comparator;
@@ -49,7 +50,7 @@ public class PersistentTreeSet<E> implements ImSetSorted<E> {
 //    static public <T> PersistentTreeSet<T> create(ISeq<T> items) {
 //        PersistentTreeSet<T> ret = emptyTreeSet();
 //        for (; items != null; items = items.next()) {
-//            ret = ret.cons(items.first());
+//            ret = ret.cons(items.head());
 //        }
 //        return ret;
 //    }
@@ -57,7 +58,7 @@ public class PersistentTreeSet<E> implements ImSetSorted<E> {
 //    static public <T> PersistentTreeSet<T> create(Comparator<T> comp, ISeq<T> items) {
 //        PersistentTreeSet<T> ret = new PersistentTreeSet<>(null, new PersistentTreeMap<>(null, comp));
 //        for (; items != null; items = items.next()) {
-//            ret = ret.cons(items.first());
+//            ret = ret.cons(items.head());
 //        }
 //        return ret;
 //    }
@@ -85,7 +86,10 @@ public class PersistentTreeSet<E> implements ImSetSorted<E> {
 
     @Override public E first() { return impl.firstKey(); }
 
-    @Override public Sequence<E> rest() { return impl.without(first()).keySet(); }
+    @Override public Option<E> head() { return size() > 0 ? Option.of(impl.firstKey()) : Option.none(); }
+
+    // TODO: Ensure that KeySet is sorted.
+    @Override public Sequence<E> tail() { return impl.without(first()).keySet(); }
 
     @Override public E last() { return impl.lastKey(); }
 

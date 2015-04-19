@@ -15,6 +15,7 @@
 package org.organicdesign.fp.permanent;
 
 import org.organicdesign.fp.Lazy;
+import org.organicdesign.fp.Option;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import java.util.Iterator;
@@ -31,29 +32,27 @@ import java.util.Iterator;
  object will present and immutable, lazy, memoized, thread-safe view of the underlying iterator.
  */
 class SequenceFromIterator<T> implements Sequence<T> {
-    private final Lazy.Ref<Tuple2<T,Sequence<T>>> laz;
+    private final Lazy.Ref<Tuple2<Option<T>,Sequence<T>>> laz;
 
     SequenceFromIterator(Iterator<T> iter) {
         laz = Lazy.Ref.of(() -> iter.hasNext()
-                ? Tuple2.of(iter.next(), iter.hasNext()
-                                         ? new SequenceFromIterator<>(iter)
-                                         : Sequence.emptySequence())
-                : Sequence.emptySeqTuple());
+                                ? Tuple2.of(Option.of(iter.next()), new SequenceFromIterator<>(iter))
+                                : Sequence.emptySeqTuple());
     }
 
     public static <T> Sequence<T> of(Iterator<T> i) {
-        if ( (i == null) || !i.hasNext() ) { return Sequence.emptySequence(); }
+        if (i == null) { return Sequence.emptySequence(); }
         return new SequenceFromIterator<>(i);
     }
 
     public static <T> Sequence<T> of(Iterable<T> i) {
         if (i == null) { return Sequence.emptySequence(); }
-        Iterator<T> iiter = i.iterator();
-        if (iiter == null) { return Sequence.emptySequence(); }
-        return new SequenceFromIterator<>(iiter);
+        Iterator<T> iter = i.iterator();
+        if (iter == null) { return Sequence.emptySequence(); }
+        return new SequenceFromIterator<>(iter);
     }
 
-    @Override public T first() { return laz.get()._1(); }
+    @Override public Option<T> head() { return laz.get()._1(); }
 
-    @Override public Sequence<T> rest() { return laz.get()._2(); }
+    @Override public Sequence<T> tail() { return laz.get()._2(); }
 }

@@ -15,30 +15,32 @@
 package org.organicdesign.fp.permanent;
 
 import org.organicdesign.fp.Lazy;
+import org.organicdesign.fp.Option;
 import org.organicdesign.fp.function.Function1;
 import org.organicdesign.fp.tuple.Tuple2;
 
 public class SequenceMapped<T,U>  implements Sequence<U> {
-    private final Lazy.Ref<Tuple2<U,Sequence<U>>> laz;
+    private final Lazy.Ref<Tuple2<Option<U>,Sequence<U>>> laz;
 
     SequenceMapped(Sequence<T> seq, Function1<T,U> func) {
-        laz = Lazy.Ref.of(() -> (Sequence.Empty.SEQUENCE == seq)
-                                ? Sequence.emptySeqTuple()
-                                : Tuple2.of(func.apply(seq.first()), (Sequence.Empty.SEQUENCE == seq.rest())
-                                                                     ? Sequence.emptySequence()
-                                                                     : new SequenceMapped<>(seq.rest(), func)));
+        laz = Lazy.Ref.of(() -> {
+            Option<T> first = seq.head();
+            return first.isSome()
+                   ? Tuple2.of(Option.of(func.apply(first.get())), new SequenceMapped<>(seq.tail(), func))
+                   : Sequence.emptySeqTuple();
+        });
     }
 
     @SuppressWarnings("unchecked")
     public static <T,U> Sequence<U> of(Sequence<T> s, Function1<T,U> f) {
+        if (f == null) { throw new IllegalArgumentException("Can't map with a null function."); }
         // You can put nulls in, but you don't get nulls out.
-        if (f == null) { return Sequence.emptySequence(); }
+        if ( (s == null) || (EMPTY_SEQUENCE == s) ) { return Sequence.emptySequence(); }
         if (f == Function1.IDENTITY) { return (Sequence<U>) s; }
-        if ( (s == null) || (Sequence.Empty.SEQUENCE == s) ) { return Sequence.emptySequence(); }
         return new SequenceMapped<>(s, f);
     }
 
-    @Override public U first() { return laz.get()._1(); }
+    @Override public Option<U> head() { return laz.get()._1(); }
 
-    @Override public Sequence<U> rest() { return laz.get()._2(); }
+    @Override public Sequence<U> tail() { return laz.get()._2(); }
 }

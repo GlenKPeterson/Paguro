@@ -62,7 +62,7 @@ public interface Transformable<T> extends Realizable<T> {
     Transformable<T> forEach(Function1<T,?> consumer);
 
 //    /**
-//     Deprecated: use filter(...).first() instead.
+//     Deprecated: use filter(...).head() instead.
 //     Eagerly returns the first item matching the given predicate.
 //     @param pred the test that the item needs to pass
 //     @return the first item that passes the test, or null if no such item is found

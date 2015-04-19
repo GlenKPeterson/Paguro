@@ -14,6 +14,7 @@
 
 package org.organicdesign.fp.permanent;
 
+import org.organicdesign.fp.Option;
 import org.organicdesign.fp.Transformable;
 import org.organicdesign.fp.function.Function1;
 import org.organicdesign.fp.function.Function2;
@@ -29,20 +30,32 @@ import java.util.Objects;
  @param <T>
  */
 public interface Sequence<T> extends Transformable<T> {
-enum Empty implements Sequence {
-    SEQUENCE {
-        @Override public Object first() { throw new UnsupportedOperationException("No first of empty sequence."); }
-        @Override public Sequence rest() { return this; }
+    public static final Sequence<?> EMPTY_SEQUENCE = new Sequence<Object>() {
+        /** @return USED_UP */
+        @Override public Option<Object> head() { return Option.none(); }
+
+        /** @return EMPTY_SEQUENCE (this) */
+        @Override public Sequence<Object> tail() { return this; }
+
+        @Override public int hashCode() { return 0; }
+
+        @Override public boolean equals(Object other) {
+            // Cheapest operation first...
+            if (this == other) { return true; }
+
+            return (other != null) &&
+                    (other instanceof Sequence) &&
+                    !((Sequence) other).head().isSome();
+        }
     };
-}
 
     @SuppressWarnings("unchecked")
     public static <T> Sequence<T> emptySequence() {
-        return (Sequence<T>) Empty.SEQUENCE;
+        return (Sequence<T>) EMPTY_SEQUENCE;
     }
 
-    static <U> Tuple2<U,Sequence<U>> emptySeqTuple() {
-        return Tuple2.of(null, Sequence.emptySequence());
+    static <U> Tuple2<Option<U>,Sequence<U>> emptySeqTuple() {
+        return Tuple2.of(Option.none(), Sequence.emptySequence());
     }
 
     public static <T> Sequence<T> of(Iterator<T> i) {
@@ -56,11 +69,9 @@ enum Empty implements Sequence {
     @SafeVarargs
     public static <T> Sequence<T> ofArray(T... i) { return SequenceFromArray.of(i); }
 
-//    default Option<T> head() { return (Empty.SEQUENCE == rest()) ? Option.none() : Option.of(first()); }
-
     // ======================================= Base methods =======================================
-    T first();
-    Sequence<T> rest();
+    Option<T> head();
+    Sequence<T> tail();
 
 //    // ======================================= Other methods ======================================
 
@@ -77,16 +88,18 @@ enum Empty implements Sequence {
     @Override
     default Sequence<T> forEach(Function1<T,?> consumer) {
         Sequence<T> seq = this;
-        while (Empty.SEQUENCE != seq) {
-            consumer.apply(seq.first());
+        Option<T> item = seq.head();
+        while (item.isSome()) {
+            consumer.apply(item.get());
             // repeat with next element
-            seq = seq.rest();
+            seq = seq.tail();
+            item = seq.head();
         }
         return this;
     }
 
 
-    // Use filter(...).first() instead!
+    // Use filter(...).head() instead!
 //    @Override
 //    default Option<T> firstMatching(Predicate<T> pred) {
 //        Sequence<T> seq = this;
@@ -94,7 +107,7 @@ enum Empty implements Sequence {
 //        while (item.isSome()) {
 //            if (pred.test(item.get())) { return item; }
 //            // repeat with next element
-//            seq = seq.rest();
+//            seq = seq.tail();
 //            item = seq.head();
 //        }
 //        return null;
@@ -105,10 +118,12 @@ enum Empty implements Sequence {
         Sequence<T> seq = this;
         // System.out.println("seq: " + seq);
         // System.out.println("===>item: " + item);
-        while (Empty.SEQUENCE != seq) {
-            u = fun.apply(u, seq.first());
+        Option<T> item = seq.head();
+        while (item.isSome()) {
+            u = fun.apply(u, item.get());
             // repeat with next element
-            seq = seq.rest();
+            seq = seq.tail();
+            item = seq.head();
         }
         return u;
     }
@@ -118,13 +133,15 @@ enum Empty implements Sequence {
         Sequence<T> seq = this;
         // System.out.println("seq: " + seq);
         // System.out.println("===>item: " + item);
-        while (Empty.SEQUENCE != seq) {
-            u = fun.apply(u, seq.first());
+        Option<T> item = seq.head();
+        while (item.isSome()) {
+            u = fun.apply(u, item.get());
             if (terminateWhen.apply(u)) {
                 return u;
             }
             // repeat with next element
-            seq = seq.rest();
+            seq = seq.tail();
+            item = seq.head();
         }
         return u;
     }
@@ -141,17 +158,7 @@ enum Empty implements Sequence {
     default Sequence<T> takeWhile(Function1<T,Boolean> predicate) { return SequenceTakenWhile.of(this, predicate); }
 
     /** {@inheritDoc} */
-    // TODO: Is there a non-eager way to do this?
-    @Override default Sequence<T> drop(long numItems) {
-        if (numItems < 0) { throw new IllegalArgumentException("You can only drop a non-negative number of items"); }
-        if (numItems == 0) { return this; }
-        Sequence<T> seq = this;
-        for (int i = 0; i < numItems; i++) {
-            if (Empty.SEQUENCE == seq) { return seq; }
-            seq = seq.rest();
-        }
-        return seq;
-    }
+    @Override default Sequence<T> drop(long numItems) { return SequenceDropped.of(this, numItems); }
 
     /**
      One of the two higher-order functions that can produce more output items than input items.
@@ -183,7 +190,7 @@ enum Empty implements Sequence {
 //    }
 
 //    // I don't see how I can legally declare this on Transformable!
-      // When implementing, the innerSequence needs to call rest() on the parent sequence instead
+      // When implementing, the innerSequence needs to call tail() on the parent sequence instead
       // of returning USED_UP.  Otherwise, it's a pretty clean copy of SequenceFlatMapped.
 //    /**
 //     One of the two higher-order functions that can produce more output items than input items.
@@ -198,12 +205,14 @@ enum Empty implements Sequence {
 //    }
 
     /** This is correct, but O(n) */
-    static int hashCode(Sequence is) {
+    static int hashCode(Sequence seq) {
         int ret = 0;
-        while (Empty.SEQUENCE != is) {
-            Object i = is.first();
+        Option item = seq.head();
+        while (item.isSome()) {
+            Object i = item.get();
             if (i != null) { ret = ret + i.hashCode(); }
-            is = is.rest();
+            seq = seq.tail();
+            item = seq.head();
         }
         return ret;
     }
@@ -217,14 +226,16 @@ enum Empty implements Sequence {
                 (a.hashCode() != b.hashCode()) ) {
             return false;
         }
-        while ((Empty.SEQUENCE != a) && (Empty.SEQUENCE != b)) {
-            if (!Objects.equals(a.first(), b.first())) {
+        Option oa = a.head(); Option ob = b.head();
+        while (oa.isSome() && ob.isSome()) {
+            if (!Objects.equals(oa.get(), ob.get())) {
                 return false;
             }
-            a = a.rest(); b = b.rest();
+            a = a.tail(); b = b.tail();
+            oa = a.head(); ob = b.head();
         }
-        // Should both be The empty sequence, otherwise, false.
-        return a == b;
+        // Should both be used up (equal length).
+        return !oa.isSome() && !ob.isSome();
     }
 
 //    public class LazySequence<T> implements Sequence<T> {
@@ -240,9 +251,63 @@ enum Empty implements Sequence {
 //            return new LazySequence<>(first, rest);
 //        }
 //
-//        @Override public T first() { return laz.get()._1(); }
+//        @Override public Option<T> head() { return laz.get()._1(); }
 //
-//        @Override public Sequence<T> rest() { return laz.get()._2(); }
+//        @Override public Sequence<T> tail() { return laz.get()._2(); }
+//    }
+
+//    /**
+//     Take a Function0 and lazily initialize a value (and frees the initialization resources) on the first call to get().
+//     Subsequent calls to get() cheaply return the previously initialized value.  This class is thread-safe if the producer
+//     function and the value it produces are pure and free from side effects.
+//     */
+//    class LazySeq<T> implements Sequence<T> {
+//        private Function0<Tuple2<Option<T>,Sequence<T>>> producer;
+//        private Option<T> head;
+//        private Sequence<T> tail;
+//
+//        private LazySeq(Function0<Tuple2<Option<T>,Sequence<T>>> p) { producer = p; }
+//
+//        /**
+//         * Use this function to produce a value on the first call to get().  Delete the pointer to this function when that
+//         * first call completes, but remember the value to return with all subsequent calls to get().
+//         * @param producer will produce the desired value when called.
+//         * @param <T>
+//         * @return
+//         */
+//        public static <T> LazySeq<T> of(Function0<Tuple2<Option<T>,Sequence<T>>> producer) {
+//            if (producer == null) {
+//                throw new IllegalArgumentException("The producer function cannot be null (the value it returns can)");
+//            }
+//            return new LazySeq<>(producer);
+//        }
+//
+//        /**
+//         * The first call to this method initializes the value this class wraps and releases the initialization resources.
+//         * Subsequent calls return the precomputed value.
+//         * @return the same value every time it is called.
+//         */
+//        private void get() {
+//            // Have we produced our value yet (cheap, but not thread-safe check)?
+//            if (producer != null) {
+//                // One thread comes in here at a time, but this can be expensive.
+//                synchronized (this) {
+//                    // Checking again inside the sync block ensures only one thread can produce the value.
+//                    if (producer != null) {
+//                        // Here, a single thread has earned the right to produce our value.
+//                        Tuple2<Option<T>,Sequence<T>> value = producer.apply();
+//                        head = value._1();
+//                        tail = value._2();
+//                        // Delete the producer to 1. mark the work done and 2. free resources.
+//                        producer = null;
+//                    }
+//                }
+//            }
+//            // We're clear to return the lazily computed value.
+//        }
+//        @Override public Option<T> head() { return head; }
+//        @Override public Sequence<T> tail() { return tail; }
+//
 //    }
 
 }
