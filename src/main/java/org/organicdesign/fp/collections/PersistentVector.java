@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author Rich Hickey (Primary author)
  * @author Glen Peterson (Java-centric editor)
  */
-public class ImVectorImpl<E> implements ImList<E> {
+public class PersistentVector<E> implements ImList<E> {
 
     // There's bit shifting going on here because it's a very fast operation.
     // Shifting right by 5 is aeons faster than dividing by 32.
@@ -71,12 +71,12 @@ public class ImVectorImpl<E> implements ImList<E> {
 
     private final static Node EMPTY_NODE = new Node(NOEDIT, new Object[MAX_NODE_LENGTH]);
 
-    private final static ImVectorImpl<?> EMPTY = new ImVectorImpl<>(0, NODE_LENGTH_POW_2, EMPTY_NODE,
+    private final static PersistentVector<?> EMPTY = new PersistentVector<>(0, NODE_LENGTH_POW_2, EMPTY_NODE,
             new Object[]{});
 
     /** Returns the empty ImList (there only needs to be one) */
     @SuppressWarnings("unchecked")
-    public static final <T> ImVectorImpl<T> empty() { return (ImVectorImpl<T>) EMPTY; }
+    public static final <T> PersistentVector<T> empty() { return (PersistentVector<T>) EMPTY; }
 
     // We could make this public someday.
     @SuppressWarnings("unchecked")
@@ -91,7 +91,7 @@ public class ImVectorImpl<E> implements ImList<E> {
     private final E[] tail;
 
     /** Constructor */
-    private ImVectorImpl(int z, int shift, Node root, E[] tail) {
+    private PersistentVector(int z, int shift, Node root, E[] tail) {
         size = z;
         this.shift = shift;
         this.root = root;
@@ -99,7 +99,7 @@ public class ImVectorImpl<E> implements ImList<E> {
     }
 
     /** Public static factory method. */
-    static public <T> ImVectorImpl<T> of(List<T> items) {
+    static public <T> PersistentVector<T> of(List<T> items) {
         MutableVector<T> ret = emptyTransientVector();
         for (T item : items) {
             ret = ret.append(item);
@@ -109,7 +109,7 @@ public class ImVectorImpl<E> implements ImList<E> {
 
     /** Public static factory method. */
     @SafeVarargs
-    static public <T> ImVectorImpl<T> of(T... items) {
+    static public <T> PersistentVector<T> of(T... items) {
         MutableVector<T> ret = emptyTransientVector();
         for (T item : items) {
             ret = ret.append(item);
@@ -164,17 +164,17 @@ public class ImVectorImpl<E> implements ImList<E> {
 
     /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
-    @Override public ImVectorImpl<E> insert(int i, E val) {
+    @Override public PersistentVector<E> insert(int i, E val) {
         if (i >= 0 && i < size) {
             if (i >= tailoff()) {
                 Object[] newTail = new Object[tail.length];
                 System.arraycopy(tail, 0, newTail, 0, tail.length);
                 newTail[i & LOW_BITS] = val;
 
-                return new ImVectorImpl<>(size, shift, root, (E[]) newTail);
+                return new PersistentVector<>(size, shift, root, (E[]) newTail);
             }
 
-            return new ImVectorImpl<>(size, shift, doAssoc(shift, root, i, val), tail);
+            return new PersistentVector<>(size, shift, doAssoc(shift, root, i, val), tail);
         }
         if (i == size) {
             return append(val);
@@ -191,14 +191,14 @@ public class ImVectorImpl<E> implements ImList<E> {
      * @return a new Vecsicle with the additional item.
      */
     @SuppressWarnings("unchecked")
-    public ImVectorImpl<E> append(E val) {
+    public PersistentVector<E> append(E val) {
         //room in tail?
         //	if(tail.length < MAX_NODE_LENGTH)
         if (size - tailoff() < MAX_NODE_LENGTH) {
             Object[] newTail = new Object[tail.length + 1];
             System.arraycopy(tail, 0, newTail, 0, tail.length);
             newTail[tail.length] = val;
-            return new ImVectorImpl<>(size + 1, shift, root, (E[]) newTail);
+            return new PersistentVector<>(size + 1, shift, root, (E[]) newTail);
         }
         //full tail, push into tree
         Node newroot;
@@ -213,7 +213,7 @@ public class ImVectorImpl<E> implements ImList<E> {
         } else {
             newroot = pushTail(shift, root, tailnode);
         }
-        return new ImVectorImpl<>(size + 1, newshift, newroot, (E[]) new Object[]{val});
+        return new PersistentVector<>(size + 1, newshift, newroot, (E[]) new Object[]{val});
     }
 
     private Node pushTail(int level, Node parent, Node tailnode) {
@@ -430,7 +430,7 @@ public class ImVectorImpl<E> implements ImList<E> {
 
         private MutableVector(int c, int s, Node r, F[] t) { size = c; shift = s; root = r; tail = t; }
 
-        private MutableVector(ImVectorImpl<F> v) { this(v.size, v.shift, editableRoot(v.root), editableTail(v.tail)); }
+        private MutableVector(PersistentVector<F> v) { this(v.size, v.shift, editableRoot(v.root), editableTail(v.tail)); }
 
         private Node ensureEditable(Node node) {
             if (node.edit == root.edit)
@@ -452,7 +452,7 @@ public class ImVectorImpl<E> implements ImList<E> {
         }
 
         @SuppressWarnings("unchecked")
-        public ImVectorImpl<F> persistent() {
+        public PersistentVector<F> persistent() {
             ensureEditable();
             //		Thread owner = root.edit.get();
             //		if(owner != null && owner != Thread.currentThread())
@@ -462,7 +462,7 @@ public class ImVectorImpl<E> implements ImList<E> {
             root.edit.set(null);
             F[] trimmedTail = (F[]) new Object[size - tailoff()];
             System.arraycopy(tail, 0, trimmedTail, 0, trimmedTail.length);
-            return new ImVectorImpl<>(size, shift, root, trimmedTail);
+            return new PersistentVector<>(size, shift, root, trimmedTail);
         }
 
         @SuppressWarnings("unchecked")

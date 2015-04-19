@@ -13,19 +13,16 @@ import org.organicdesign.fp.function.Function2;
 import org.organicdesign.fp.permanent.Sequence;
 
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.Stack;
 
 /**
- * Persistent Red Black Tree
- * Note that instances of this class are constant values
- * i.e. add/remove etc return new values
- * <p/>
- * See Okasaki, Kahrs, Larsen et al
- *
- * @author Rich Hickey (Primary author)
- * @author Glen Peterson (Java-centric editor)
+ Persistent Red Black Tree. Note that instances of this class are constant values
+ i.e. add/remove etc return new values.
+
+ See Okasaki, Kahrs, Larsen et al
+
+ @author Rich Hickey (Primary author)
+ @author Glen Peterson (Java-centric editor)
  */
 
 public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
@@ -161,27 +158,13 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         return false; // TODO: implement this!
     }
 
-    /**
-     Returns the value to which the specified key is mapped, or {@code null} if this map contains no mapping for the
-     key.
-     <p/>
-     <p>More formally, if this map contains a mapping from a key {@code k} to a value {@code v} such that {@code
-    (key==null ? k==null : key.equals(k))}, then this method returns {@code v}; otherwise it returns {@code null}.
-     (There can be at most one such mapping.)
-     <p/>
-     <p>If this map permits null values, then a return value of {@code null} does not <i>necessarily</i> indicate that
-     the map contains no mapping for the key; it's also possible that the map explicitly maps the key to {@code null}.
-     The {@link #containsKey containsKey} operation may be used to distinguish these two cases.
-
-     @param key the key whose associated value is to be returned
-     @return the value to which the specified key is mapped, or {@code null} if this map contains no mapping for the key
-     @throws ClassCastException   if the key is of an inappropriate type for this map (<a href="{@docRoot}/java/util/Collection.html#optional-restrictions">optional</a>)
-     @throws NullPointerException if the specified key is null and this map does not permit null keys (<a
-     href="{@docRoot}/java/util/Collection.html#optional-restrictions">optional</a>)
-     */
+    @SuppressWarnings("unchecked")
     @Override
     public V get(Object key) {
-        return null;
+        if (key == null) { return null; }
+        Entry<K,V> entry = entryAt((K) key);
+        if (entry == null) { return null; }
+        return entry.getValue();
     }
 
 // public PersistentTreeMap<K,V> assocEx(K key, V val) {
@@ -285,7 +268,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 //        return new NodeIterator<>(tree, true);
 //    }
 
-    public NodeIterator<K,V> reverseIterator() { return new NodeIterator<>(tree, false); }
+//    public NodeIterator<K,V> reverseIterator() { return new NodeIterator<>(tree, false); }
 
     @Override public K firstKey() {
         if (size() < 1) { throw new NoSuchElementException("this map is empty"); }
@@ -805,78 +788,78 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 //        }
 //    }
 
-    static public class NodeIterator<K, V> implements UnIterator<UnMap.UnEntry<K,V>> {
-        Stack<Node<K,V>> stack = new Stack<>();
-        boolean asc;
+//    static public class NodeIterator<K, V> implements UnIterator<UnMap.UnEntry<K,V>> {
+//        Stack<Node<K,V>> stack = new Stack<>();
+//        boolean asc;
+//
+//        NodeIterator(Node<K,V> t, boolean asc) {
+//            this.asc = asc;
+//            push(t);
+//        }
+//
+//        void push(Node<K,V> t) {
+//            while (t != null) {
+//                stack.push(t);
+//                t = asc ? t.left() : t.right();
+//            }
+//        }
+//
+//        @Override
+//        public boolean hasNext() {
+//            return !stack.isEmpty();
+//        }
+//
+//        @Override
+//        public UnMap.UnEntry<K,V> next() {
+//            Node<K,V> t = stack.pop();
+//            push(asc ? t.right() : t.left());
+//            return t;
+//        }
+//    }
 
-        NodeIterator(Node<K,V> t, boolean asc) {
-            this.asc = asc;
-            push(t);
-        }
-
-        void push(Node<K,V> t) {
-            while (t != null) {
-                stack.push(t);
-                t = asc ? t.left() : t.right();
-            }
-        }
-
-        @Override
-        public boolean hasNext() {
-            return !stack.isEmpty();
-        }
-
-        @Override
-        public UnMap.UnEntry<K,V> next() {
-            Node<K,V> t = stack.pop();
-            push(asc ? t.right() : t.left());
-            return t;
-        }
-    }
-
-    static class KeyIterator<K> implements Iterator<K> {
-        NodeIterator<K,?> it;
-
-        KeyIterator(NodeIterator<K,?> it) {
-            this.it = it;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return it.hasNext();
-        }
-
-        @Override
-        public K next() {
-            return it.next().getKey();
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-    }
-
-    static class ValIterator<V> implements Iterator<V> {
-        NodeIterator<?,V> it;
-
-        ValIterator(NodeIterator<?,V> it) {
-            this.it = it;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return it.hasNext();
-        }
-
-        @Override
-        public V next() {
-            return it.next().getValue();
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-    }
+//    static class KeyIterator<K> implements Iterator<K> {
+//        NodeIterator<K,?> it;
+//
+//        KeyIterator(NodeIterator<K,?> it) {
+//            this.it = it;
+//        }
+//
+//        @Override
+//        public boolean hasNext() {
+//            return it.hasNext();
+//        }
+//
+//        @Override
+//        public K next() {
+//            return it.next().getKey();
+//        }
+//
+//        @Override
+//        public void remove() {
+//            throw new UnsupportedOperationException();
+//        }
+//    }
+//
+//    static class ValIterator<V> implements Iterator<V> {
+//        NodeIterator<?,V> it;
+//
+//        ValIterator(NodeIterator<?,V> it) {
+//            this.it = it;
+//        }
+//
+//        @Override
+//        public boolean hasNext() {
+//            return it.hasNext();
+//        }
+//
+//        @Override
+//        public V next() {
+//            return it.next().getValue();
+//        }
+//
+//        @Override
+//        public void remove() {
+//            throw new UnsupportedOperationException();
+//        }
+//    }
 }

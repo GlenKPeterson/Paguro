@@ -81,7 +81,7 @@ public interface ImList<E> extends UnList<E> {
     default ImList<E> prependSkipNull(E... es) { return prependSkipNull(this, es); }
 
     // ================================================ STATIC METHODS ================================================
-    static <T> ImList<T> empty() { return ImVectorImpl.empty(); }
+    static <T> ImList<T> empty() { return PersistentVector.empty(); }
 
     /**
      * Adds items to the end of the ImList.
