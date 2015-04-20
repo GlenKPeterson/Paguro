@@ -25,14 +25,17 @@ dependency:tree
 	the names of Java-related products.
 	-->
 	<artifactId>J-cicle</artifactId>
-	<version>0.8.1-SNAPSHOT</version>
+	<version>0.8.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>J-cicle</name>
-	<description>Functional Programming Tools for Java (formerly fp4java7).
-		Non-destructive (mutation-free), lazy, (higher order) functional data
-		transformations for Java 8.  Allows loop-free functional programming.
-		Additional general purpose functional tools are provided.</description>
+	<description>Sequential collections for Java (formerly fp4java7).  Instead of changing data in place, a call to
+		a set(x) method returns a new instance with the item added to the collection.  The new instance shares as much
+		data as practical with the old instance.  The three collection implementations are currently taken from Clojure
+		(any bugs are Glen's).  A Sequence abstraction, reminiscent of Clojure's seq is provided as well.
+		A number of helper methods make it easy to use all this in Java, immutably, type-safely, and with good
+		performance.
+	</description>
 	<url>https://github.com/GlenKPeterson/J-cicle</url>
 
 	<licenses>

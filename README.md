@@ -167,6 +167,25 @@ In short, Clojure doesn't have static types.  Scala has an TMTOWTDI attitude tha
 - As of 2014-03-08, all major areas of functionality were covered by unit tests.
 
 #Change Log
+In progress: Release 0.9 alpha which packages type-safe versions of the Clojure collections and sequence abstraction for Java.
+- 3 Immutable collections: Vector, SetOrdered, and MapOrdered.  None of these use equals or hashcode.
+Vector doesn't need to and Map and Set take a Comparator.
+- Un-collections which are the Java collection interfaces, only unmodifiable, with mutator methods deprecated and
+default-implemented to throw exceptions.
+- Im-collections which add "mutator" methods that return a new collection reflecting the change, leaving the old
+collection unchanged.
+- Basic sequence abstraction on the Im- versions of the above.
+- Function interfaces that manage exceptions and play nicely with java.util.function.*
+- Unfortunately, this is not
+
+2015-04-05 version 0.8.2:
+- Renamed Sequence.first() and .rest() to .head() and .tail() so that they wouldn't conflict with TreeSet.first()
+which returns a T instead of an Option<T>.  This was a difficult decision and I actually implemented all of Sequence
+except for flatMap with first() returning a T.  All the functions that could return fewer items that were previously
+lazy became eager.  Flatmap became eager, but also became very difficult to implement correctly.  View is already eager,
+so I renamed the methods to use the more traditional FP names and restored the Option<T>.  If you don't like the names,
+just be glad I didn't use car and cdr.
+
 2015-04-05 version 0.8.1:
 - Renamed LazyRef to Lazy.Ref so that I could add Lazy.Int for computing hashcodes.
 - Renamed FunctionX.apply_() to just apply() to match java.util.function interfaces.
@@ -194,19 +213,9 @@ Added unit tests for the above.
  safe if the producer and the values it produces are free from outside influences.
 
 #To Do
- - Add UnMapSorted and UnSetSorted
- - Add ImMapSorted and ImSetSorted interfaces
- - Add the TreeMap and TreeSet implementations from Clojure
- - Make the Im interfaces implement Sequence
- - Release 1.0 alpha which packages type-safe versions of the Clojure collections and sequence abstraction for Java.  It will include:
-    - 3 Immutable collections: Vector, SetOrdered, and MapOrdered.  None of these use equals or hashcode.
-    Vector doesn't need to and Map and Set take a Comparator.
-    - Un-collections which are the Java collection interfaces, only unmodifiable, with mutator methods deprecated and
-    default to throw exceptions.
-    - Im-collections which add "mutator" methods that return a new collection reflecting the change, leaving the old
-    collection unchanged.
-    - Basic sequence abstraction.
-    - Function interfaces that manage exceptions and play nicely with java.util.function.* 
+ - Add tests for the TreeMap and TreeSet implementations from Clojure
+ - Make StaticImports return Im- collections instead of Un- ones.
+ - Rename methods in Realizable to prefer Im collections.
 
 # Older Notes
 Collection Variations:
