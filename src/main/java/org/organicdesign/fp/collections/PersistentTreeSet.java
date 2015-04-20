@@ -68,12 +68,12 @@ public class PersistentTreeSet<E> implements ImSetSorted<E> {
 
     public static <T> PersistentTreeSet<T> of(ImMapSorted<T,?> i) { return new PersistentTreeSet<>(i); }
 
-    @Override public ImSetSorted<E> put(E e) {
+    @Override public PersistentTreeSet<E> put(E e) {
         return (impl.containsKey(e)) ? this
                                      : new PersistentTreeSet<>(impl.assoc(e, null));
     }
 
-    @Override public ImSetSorted<E> disjoin(E key) {
+    @Override public PersistentTreeSet<E> disjoin(E key) {
         return (impl.containsKey(key)) ? new PersistentTreeSet<>(impl.without(key))
                                        : this;
     }
