@@ -14,16 +14,6 @@
 
 package org.organicdesign.fp;
 
-import org.organicdesign.fp.collections.PersistentTreeSet;
-import org.organicdesign.fp.collections.UnCollection;
-import org.organicdesign.fp.collections.UnIterator;
-import org.organicdesign.fp.collections.UnList;
-import org.organicdesign.fp.collections.UnListIterator;
-import org.organicdesign.fp.collections.UnMap;
-import org.organicdesign.fp.collections.UnMap.UnEntry;
-import org.organicdesign.fp.collections.UnSet;
-import org.organicdesign.fp.collections.UnSetSorted;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -36,6 +26,16 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
+
+import org.organicdesign.fp.collections.PersistentTreeSet;
+import org.organicdesign.fp.collections.UnCollection;
+import org.organicdesign.fp.collections.UnIterator;
+import org.organicdesign.fp.collections.UnList;
+import org.organicdesign.fp.collections.UnListIterator;
+import org.organicdesign.fp.collections.UnMap;
+import org.organicdesign.fp.collections.UnMap.UnEntry;
+import org.organicdesign.fp.collections.UnSet;
+import org.organicdesign.fp.collections.UnSetSorted;
 
 /**
  Contains methods for building immutable collections.  These will never return null, the closest they get is to return
@@ -144,6 +144,10 @@ public class StaticImports {
         if (inner instanceof UnMap) { return (UnMap<K,V>) inner; }
         if (inner.size() < 1) { return UnMap.empty(); }
         return new UnMap<K,V>() {
+            /** {@inheritDoc} */
+            @Override public UnIterator<UnEntry<K,V>> iterator() {
+                return UnMap.UnEntry.wrap(entrySet().iterator());
+            }
             @Override public UnSet<Map.Entry<K,V>> entrySet() { return un(inner.entrySet()); }
             @Override public int size() { return inner.size(); }
             @Override public boolean isEmpty() { return inner.isEmpty(); }

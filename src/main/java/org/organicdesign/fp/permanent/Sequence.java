@@ -210,9 +210,13 @@ public interface Sequence<T> extends Transformable<T> {
      @return an unsynchronized iterator
      */
     @Override
-    default UnIterator<T> iterator() {
-        final Sequence<T> seq = this;
+    default UnIterator<T> iterator() { return toIterator(this); }
 
+    /**
+     This implementation is unsynchronized.
+     @return an unsynchronized iterator
+     */
+    static <T> UnIterator<T> toIterator(Sequence<T> seq) {
         return new UnIterator<T>() {
             private Sequence<T> inner = seq;
 

@@ -196,26 +196,30 @@ public class PersistentVectorTest {
                                    "This may fail occasionally, then work when re-run, which is OK.\n" +
                                    "Better that, than set the limit too high and miss a performance drop.");
 
-        // These are worst-case timings.
+        // These are worst-case timings, indexed by number of items inserted in the test.
         Map<Integer,Double> benchmarkRatios = unMap(
                 1, 1.3,
                 10, 2.7,
-                100, 4.1,
+                100, 4.9,
                 1000, 6.4,
                 10000, 10.2,
                 100000, 13.9,
                 1000000, 7.7);
 
+        // Remember the results of each insertion test to average them later.
         List<Double> ratios = new ArrayList<>();
 
+        // Run tests for increasingly more inserts each time (powers of 10 should be fair since underlying
+        // implementations use powers of 2).
         for (int numItems = 1; numItems <= maxItems; numItems *= 10) {
-            // Run the speed tests 10 times testing ArrayList and ImVectorImpl alternately.
+
+            // Run the speed tests this many times (for better accuracy) testing ArrayList and ImVectorImpl alternately.
             int testRepetitions = (numItems < 1000) ? 10000 :
                                   (numItems < 10000) ? 1000 :
                                   (numItems < 100000) ? 100 : 10;
 
-            Long[] testTimes = new Long[testRepetitions];
-            Long[] benchTimes = new Long[testRepetitions];
+            long[] testTimes = new long[testRepetitions];
+            long[] benchTimes = new long[testRepetitions];
 
             Thread.sleep(0); // GC and other processes, this is your chance.
 
@@ -250,15 +254,19 @@ public class PersistentVectorTest {
             long testTime = testTimes[testTimes.length / 2];
             long benchTime = benchTimes[benchTimes.length / 2];
 
+            // Ratio of mean times of the tested collection vs. the benchmark.
             double ratio = ((double) testTime) / ((double) benchTime);
             System.out.println("Iterations: " + numItems + " test: " + testTime + " benchmark: " + benchTime +
                                        " test/benchmark: " + ratio);
 
             // Verify that the median time is within established bounds for this test
             assertTrue(ratio <= benchmarkRatios.get(numItems));
+
+            // Record these ratios to take an over-all mean later.
             ratios.add(ratio);
         }
 
+        // Compute mean ratio.
         double sum = 0;
         for (int i = 0; i < ratios.size(); i++) {
             sum += ratios.get(i);
@@ -266,8 +274,11 @@ public class PersistentVectorTest {
         double meanRatio = sum / ratios.size();
         System.out.println("meanRatio: " + meanRatio);
 
-        // Worst-case timing.
-        assertTrue(meanRatio < 4.9); // 3.8 for unit tests, 4.9 for unitTests with coverage from IDEA.
+        // Average-case timing over the range of number of inserts.
+        // This is typically 2.5, but max 3.8 for unit tests, max 5.3 for unitTests "with coverage" from IDEA.
+        // I think this means that PersistentVector performs worse with all the other work being done in the background
+        // than ArrayList does.
+        assertTrue(meanRatio < 5.3);
     }
 
 }

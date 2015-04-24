@@ -8,12 +8,13 @@
 /* rich May 20, 2006 */
 package org.organicdesign.fp.collections;
 
+import java.util.Comparator;
+import java.util.NoSuchElementException;
+import java.util.Stack;
+
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.function.Function2;
 import org.organicdesign.fp.permanent.Sequence;
-
-import java.util.Comparator;
-import java.util.NoSuchElementException;
 
 /**
  Persistent Red Black Tree. Note that instances of this class are constant values
@@ -51,7 +52,14 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
      return signature is illegal in Java, so you'll just have to remember.
      */
     @Override public ImSet<Entry<K,V>> entrySet() {
-        return this.foldLeft(ImSet.empty(), (accum, entry) -> accum.put(entry));
+        // This is the pretty way to do it.
+//        return this.foldLeft(ImSet.empty(), (accum, entry) -> accum.put(entry));
+
+        // This may be faster, but I haven't timed it.
+        ImSet<Entry<K,V>> ret = ImSet.empty();
+        UnIterator<UnEntry<K,V>> iter = this.iterator();
+        while (iter.hasNext()) { ret.put(iter.next()); }
+        return ret;
     }
 
     /** This is correct, but O(n). */
@@ -62,7 +70,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         return (other != null) &&
                 (other instanceof ImMapSorted) &&
                 (this.size() == ((ImMapSorted) other).size()) &&
-                Sequence.equals(this, (ImMapSorted) other);
+                UnIterable.equals(this, (ImMapSorted) other);
     }
 
     /** Returns a view of the keys contained in this map. */
@@ -106,9 +114,17 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         return Option.of(t);
     }
 
-    @Override
-    public Sequence<UnEntry<K,V>> tail() {
-        return size() > 1 ? without(head().get().getKey()) : Sequence.emptySequence();
+    @Override public Sequence<UnEntry<K,V>> tail() {
+        if (size() > 1) {
+            // TODO: Consider a NodeSequence implementation instead of wrapping iterator.
+            // The iterator is designed to do this quickly.
+            UnIterator<UnEntry<K,V>> iter = this.iterator();
+            // Drop the head
+            iter.next();
+            // Return a sequence of the tail.
+            return Sequence.of(iter);
+        }
+        return Sequence.emptySequence();
     }
 
     // TODO: What use is this?
@@ -263,10 +279,8 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 //        return null;
 //    }
 
-//    @Override
-//    public UnIterator<UnMap.UnEntry<K,V>> iterator() {
-//        return new NodeIterator<>(tree, true);
-//    }
+    @Override
+    public UnIterator<UnMap.UnEntry<K,V>> iterator() { return new NodeIterator<>(tree, true); }
 
 //    public NodeIterator<K,V> reverseIterator() { return new NodeIterator<>(tree, false); }
 
@@ -788,34 +802,32 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 //        }
 //    }
 
-//    static public class NodeIterator<K, V> implements UnIterator<UnMap.UnEntry<K,V>> {
-//        Stack<Node<K,V>> stack = new Stack<>();
-//        boolean asc;
-//
-//        NodeIterator(Node<K,V> t, boolean asc) {
-//            this.asc = asc;
-//            push(t);
-//        }
-//
-//        void push(Node<K,V> t) {
-//            while (t != null) {
-//                stack.push(t);
-//                t = asc ? t.left() : t.right();
-//            }
-//        }
-//
-//        @Override
-//        public boolean hasNext() {
-//            return !stack.isEmpty();
-//        }
-//
-//        @Override
-//        public UnMap.UnEntry<K,V> next() {
-//            Node<K,V> t = stack.pop();
-//            push(asc ? t.right() : t.left());
-//            return t;
-//        }
-//    }
+    static public class NodeIterator<K, V> implements UnIterator<UnMap.UnEntry<K,V>> {
+        private Stack<Node<K,V>> stack = new Stack<>();
+        private final boolean asc;
+
+        NodeIterator(Node<K,V> t, boolean asc) {
+            this.asc = asc;
+            push(t);
+        }
+
+        private void push(Node<K,V> t) {
+            while (t != null) {
+                stack.push(t);
+                t = asc ? t.left() : t.right();
+            }
+        }
+
+        @Override public boolean hasNext() {
+            return !stack.isEmpty();
+        }
+
+        @Override public UnMap.UnEntry<K,V> next() {
+            Node<K,V> t = stack.pop();
+            push(asc ? t.right() : t.left());
+            return t;
+        }
+    }
 
 //    static class KeyIterator<K> implements Iterator<K> {
 //        NodeIterator<K,?> it;

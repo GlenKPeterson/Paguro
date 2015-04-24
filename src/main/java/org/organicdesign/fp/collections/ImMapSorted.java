@@ -13,9 +13,9 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
-import org.organicdesign.fp.permanent.Sequence;
-
 import java.util.Map;
+
+import org.organicdesign.fp.permanent.Sequence;
 
 /** An immutable sorted map. */
 public interface ImMapSorted<K,V> extends UnMapSorted<K,V>, Sequence<UnMap.UnEntry<K,V>> {
@@ -29,6 +29,9 @@ public interface ImMapSorted<K,V> extends UnMapSorted<K,V>, Sequence<UnMap.UnEnt
 
     /** {@inheritDoc} */
     @Override default ImMapSorted<K,V> headMap(K toKey) { return subMap(firstKey(), toKey); }
+
+    /** {@inheritDoc} */
+    @Override UnIterator<UnEntry<K, V>> iterator();
 
     /** Returns a view of the keys contained in this map. */
     @Override ImSet<K> keySet();

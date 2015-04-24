@@ -18,7 +18,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /** An unmodifiable map */
-public interface UnMap<K,V> extends Map<K,V> {
+public interface UnMap<K,V> extends Map<K,V>, UnIterable<UnMap.UnEntry<K,V>> {
     // Modification Operations
 
     /** Not allowed - this is supposed to be unmodifiable */
@@ -136,6 +136,20 @@ public interface UnMap<K,V> extends Map<K,V> {
         @Override @Deprecated default V setValue(V value) {
             throw new UnsupportedOperationException("Modification attempted");
         }
+
+        static <K,V> UnEntry<K,V> wrap(Map.Entry<K,V> entry) {
+            return new UnMap.UnEntry<K,V>() {
+                @Override public K getKey() { return entry.getKey(); }
+                @Override public V getValue() { return entry.getValue(); }
+            };
+        }
+
+        static <K,V> UnIterator<UnEntry<K,V>> wrap(UnIterator<Map.Entry<K,V>> innerIter) {
+            return new UnIterator<UnEntry<K, V>>() {
+                @Override public boolean hasNext() { return innerIter.hasNext(); }
+                @Override public UnEntry<K, V> next() { return UnMap.UnEntry.wrap(innerIter.next()); }
+            };
+        }
     }
 
     // ==================================================== Static ====================================================
@@ -145,7 +159,7 @@ public interface UnMap<K,V> extends Map<K,V> {
         @Override public UnCollection<Object> values() { return UnSet.empty(); }
         @Override public int size() { return 0; }
         @Override public boolean isEmpty() { return true; }
-//        @Override public UnIterator<UnEntry<Object,Object>> iterator() { return UnIterator.empty(); }
+        @Override public UnIterator<UnEntry<Object,Object>> iterator() { return UnIterator.empty(); }
         @Override public boolean containsKey(Object key) { return false; }
         @Override public boolean containsValue(Object value) { return false; }
         @Override public Object get(Object key) { return null; }

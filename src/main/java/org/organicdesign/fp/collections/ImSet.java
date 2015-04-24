@@ -13,7 +13,6 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
-import org.organicdesign.fp.Option;
 import org.organicdesign.fp.permanent.Sequence;
 
 public interface ImSet<E> extends UnSet<E>, Sequence<E> {
@@ -22,21 +21,7 @@ public interface ImSet<E> extends UnSet<E>, Sequence<E> {
     ImSet<E> disjoin(E key);
 
     @Override
-    default UnIterator<E> iterator() {
-        final Sequence<E> seq = this;
-
-        return new UnIterator<E>() {
-            private Sequence<E> inner = seq;
-
-            @Override public boolean hasNext() { return inner.head().isSome(); }
-
-            @Override public E next() {
-                Option<E> next = inner.head();
-                inner = inner.tail();
-                return next.getOrElse(null);
-            }
-        };
-    }
+    default UnIterator<E> iterator() { return Sequence.toIterator(this); }
 
     /**
      * This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for backwards
