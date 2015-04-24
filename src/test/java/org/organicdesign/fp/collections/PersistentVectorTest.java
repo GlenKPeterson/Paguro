@@ -1,9 +1,5 @@
 package org.organicdesign.fp.collections;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -11,6 +7,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.unMap;
@@ -199,12 +199,12 @@ public class PersistentVectorTest {
         // These are worst-case timings.
         Map<Integer,Double> benchmarkRatios = unMap(
                 1, 1.3,
-                10, 2.6,
+                10, 2.7,
                 100, 4.1,
-                1000, 5.1,
+                1000, 6.4,
                 10000, 10.2,
                 100000, 13.9,
-                1000000, 6.4);
+                1000000, 7.7);
 
         List<Double> ratios = new ArrayList<>();
 
