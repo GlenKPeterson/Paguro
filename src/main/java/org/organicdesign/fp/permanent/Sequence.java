@@ -210,7 +210,7 @@ public interface Sequence<T> extends Transformable<T> {
      @return an unsynchronized iterator
      */
     @Override
-    default UnIterator<T> toIterator() {
+    default UnIterator<T> iterator() {
         final Sequence<T> seq = this;
 
         return new UnIterator<T>() {

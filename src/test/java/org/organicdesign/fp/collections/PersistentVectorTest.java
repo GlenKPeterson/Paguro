@@ -204,7 +204,7 @@ public class PersistentVectorTest {
                 1000, 5.1,
                 10000, 10.2,
                 100000, 13.9,
-                1000000, 5.6);
+                1000000, 6.4);
 
         List<Double> ratios = new ArrayList<>();
 

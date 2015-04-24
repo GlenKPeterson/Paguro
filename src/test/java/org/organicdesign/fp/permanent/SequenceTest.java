@@ -52,7 +52,7 @@ public class SequenceTest {
 
     @Test public void toIterator() {
         Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-        Iterator<Integer> seqIter = Sequence.ofArray(ints).toIterator();
+        Iterator<Integer> seqIter = Sequence.ofArray(ints).iterator();
         Iterator<Integer> listIter = Arrays.asList(ints).iterator();
         while (seqIter.hasNext() && listIter.hasNext()) {
             assertEquals(seqIter.next(), listIter.next());

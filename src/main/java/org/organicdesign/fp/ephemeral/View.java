@@ -14,13 +14,13 @@
 
 package org.organicdesign.fp.ephemeral;
 
+import java.util.Iterator;
+
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.Transformable;
 import org.organicdesign.fp.collections.UnIterator;
 import org.organicdesign.fp.function.Function1;
 import org.organicdesign.fp.function.Function2;
-
-import java.util.Iterator;
 
 /**
  A lightweight, one-time view that lazy, thread-safe operations can be built from.  Because there
@@ -158,7 +158,7 @@ public interface View<T> extends Transformable<T> {
     default View<T> prepend(View<T> pv) { return ViewPrepended.of(this, pv); }
 
     @Override
-    default UnIterator<T> toIterator() {
+    default UnIterator<T> iterator() {
         final View<T> v = this;
         // Maybe not so performant, but gives a chance to see if this is even a useful method.
         return new UnIterator<T>() {

@@ -9,10 +9,10 @@
 
 package org.organicdesign.fp.collections;
 
+import java.util.Comparator;
+
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.permanent.Sequence;
-
-import java.util.Comparator;
 
 public class PersistentTreeSet<E> implements ImSetSorted<E> {
     @SuppressWarnings("unchecked")
@@ -27,11 +27,11 @@ public class PersistentTreeSet<E> implements ImSetSorted<E> {
     /** {@inheritDoc} */
     @Override public boolean isEmpty() { return impl.isEmpty(); }
 
-    /** {@inheritDoc} */
-    @Override
-    public UnIterator<E> iterator() {
-        return toIterator();
-    }
+//    /** {@inheritDoc} */
+//    @Override
+//    public UnIterator<E> iterator() {
+//        return iterator();
+//    }
 
     @Override public boolean equals(Object other) {
         return (other != null) &&

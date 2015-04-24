@@ -14,18 +14,18 @@
 
 package org.organicdesign.fp;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.TreeSet;
+
 import org.organicdesign.fp.collections.UnIterator;
 import org.organicdesign.fp.collections.UnList;
 import org.organicdesign.fp.collections.UnMap;
 import org.organicdesign.fp.collections.UnSet;
 import org.organicdesign.fp.collections.UnSetSorted;
 import org.organicdesign.fp.function.Function1;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.TreeSet;
 
 /**
  Calling any of these methods forces eager evaluation of the entire underlying collection.
@@ -73,5 +73,5 @@ public interface Realizable<T> {
 
     T[] toTypedArray();
 
-    UnIterator<T> toIterator();
+    UnIterator<T> iterator();
 }
