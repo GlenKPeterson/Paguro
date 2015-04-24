@@ -10,27 +10,32 @@ import static org.junit.Assert.*;
 public class PersistentTreeSetTest {
     @Test
     public void assocAndGet() {
-        PersistentTreeSet<String> m1 = PersistentTreeSet.empty();
-        PersistentTreeSet<String> m2 = m1.put("one");
+        PersistentTreeSet<String> s1 = PersistentTreeSet.empty();
+        PersistentTreeSet<String> s2 = s1.put("one");
 
         // Prove m1 unchanged
-        assertEquals(0, m1.size());
-        assertFalse(m1.contains("one"));
+        assertEquals(0, s1.size());
+        assertFalse(s1.contains("one"));
 
         // Show m2 correct.
-        assertEquals(1, m2.size());
+        assertEquals(1, s2.size());
 
-// TODO: Enable and fix!
-//        assertTrue(m2.contains("one"));
-//        assertFalse(m2.contains("two"));
-//
-//        PersistentTreeSet<Integer> m3 = PersistentTreeSet.<Integer>empty().put(1).put(2).put(3);
-//
-//        assertEquals(3, m3.size());
-//        assertTrue(m3.contains(1));
-//        assertTrue(m2.contains(2));
-//        assertTrue(m2.contains(3));
-//        assertFalse(m2.contains(4));
+        assertTrue(s2.contains("one"));
+        assertFalse(s2.contains("two"));
+
+        PersistentTreeSet<Integer> s3 = PersistentTreeSet.<Integer>empty().put(1).put(2).put(3);
+
+        assertEquals(3, s3.size());
+        assertTrue(s3.contains(1));
+        assertTrue(s3.contains(2));
+        assertTrue(s3.contains(3));
+        assertFalse(s3.contains(4));
+
+        assertArrayEquals(new Integer[]{1, 2, 3}, s3.toArray());
+
+        assertArrayEquals(new Integer[]{1, 2, 3},
+                          PersistentTreeSet.<Integer>empty().put(3).put(2).put(1).toArray());
+
     }
 
 }

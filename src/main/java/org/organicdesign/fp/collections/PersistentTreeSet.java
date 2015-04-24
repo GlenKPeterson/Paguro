@@ -19,7 +19,7 @@ public class PersistentTreeSet<E> implements ImSetSorted<E> {
     static public final PersistentTreeSet EMPTY = new PersistentTreeSet(PersistentTreeMap.EMPTY);
 
     /** {@inheritDoc} */
-    @Override public boolean contains(Object o) { return impl.containsValue(o); }
+    @Override public boolean contains(Object o) { return impl.containsKey(o); }
 
     /** {@inheritDoc} */
     @Override public int size() { return impl.size(); }
@@ -30,7 +30,7 @@ public class PersistentTreeSet<E> implements ImSetSorted<E> {
     /** {@inheritDoc} */
     @Override
     public UnIterator<E> iterator() {
-        return impl.keySet().iterator(); // TODO: Infinite loop - Fix this!
+        return toIterator();
     }
 
     @Override public boolean equals(Object other) {
@@ -90,6 +90,22 @@ public class PersistentTreeSet<E> implements ImSetSorted<E> {
 
     // TODO: Ensure that KeySet is sorted.
     @Override public Sequence<E> tail() { return impl.without(first()).keySet(); }
+
+    @Override public String toString() {
+        StringBuilder sB = new StringBuilder("PersistentTreeSet(");
+        int itemsProcessed = 0;
+        for (E item : this) {
+            if (itemsProcessed > 5) {
+                sB.append(",...");
+                break;
+            } else if (itemsProcessed > 0) {
+                sB.append(",");
+            }
+            sB.append(item);
+            itemsProcessed++;
+        }
+        return sB.append(")").toString();
+    }
 
     @Override public E last() { return impl.lastKey(); }
 

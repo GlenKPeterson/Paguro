@@ -16,6 +16,7 @@ package org.organicdesign.fp.ephemeral;
 
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.Transformable;
+import org.organicdesign.fp.collections.UnIterator;
 import org.organicdesign.fp.function.Function1;
 import org.organicdesign.fp.function.Function2;
 
@@ -155,4 +156,22 @@ public interface View<T> extends Transformable<T> {
 
     /** Add the given View before the beginning of this one. */
     default View<T> prepend(View<T> pv) { return ViewPrepended.of(this, pv); }
+
+    @Override
+    default UnIterator<T> toIterator() {
+        final View<T> v = this;
+        // Maybe not so performant, but gives a chance to see if this is even a useful method.
+        return new UnIterator<T>() {
+            private View<T> inner = v;
+            private Option<T> next = v.next();
+
+            @Override public boolean hasNext() { return next.isSome(); }
+
+            @Override public T next() {
+                Option<T> old = next;
+                next = inner.next();
+                return old.getOrElse(null);
+            }
+        };
+    }
 }

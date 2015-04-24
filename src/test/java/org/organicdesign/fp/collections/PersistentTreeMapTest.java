@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -43,36 +44,39 @@ public class PersistentTreeMapTest {
     @Test
     public void order() {
         PersistentTreeMap<String,Integer> m1 = PersistentTreeMap.<String,Integer>empty()
-                .assoc("one", 1)
-                .assoc("two", 2)
-                .assoc("three", 3);
+                .assoc("c", 1)
+                .assoc("b", 2)
+                .assoc("a", 3);
 
         // Prove m1 unchanged
         assertEquals(3, m1.size());
-        assertEquals(Integer.valueOf(1), m1.get("one"));
-        assertEquals(Integer.valueOf(2), m1.get("two"));
-        assertEquals(Integer.valueOf(3), m1.get("three"));
-        assertNull(m1.get("four"));
+        assertEquals(Integer.valueOf(1), m1.get("c"));
+        assertEquals(Integer.valueOf(2), m1.get("b"));
+        assertEquals(Integer.valueOf(3), m1.get("a"));
+        assertNull(m1.get("d"));
 
-        // TODO: fix, then reenable all of this.
-//        assertArrayEquals(new Integer[]{1, 2, 3}, m1.keySet().toArray());
-//        assertArrayEquals(new String[]{"one", "two", "three"}, m1.values().toArray());
+        System.out.println(m1.keySet().toString());
 
-//        assertArrayEquals(new Integer[]{1, 2, 3},
-//                          PersistentTreeMap.<String,Integer>empty()
-//                                  .assoc("three", 3)
-//                                  .assoc("two", 2)
-//                                  .assoc("one", 1)
-//                                  .keySet().toArray());
+        assertArrayEquals(new String[]{"a", "b", "c"}, m1.keySet().toArray());
+
+        // Values are a sorted set as well...
+        assertArrayEquals(new Integer[]{1, 2, 3}, m1.values().toArray());
+
+        assertArrayEquals(new String[]{"a", "b", "c"},
+                          PersistentTreeMap.<String,Integer>empty()
+                                  .assoc("a", 3)
+                                  .assoc("b", 2)
+                                  .assoc("c", 1)
+                                  .keySet().toArray());
 
 
-//        assertArrayEquals(new String[]{"one", "two", "three"},
-//                          PersistentTreeMap.<String,Integer>empty()
-//                                  .assoc("two", 2)
-//                                  .assoc("one", 1)
-//                                  .assoc("three", 3)
-//                                  .values()
-//                                  .toArray());
+        assertArrayEquals(new Integer[]{1, 2, 3},
+                          PersistentTreeMap.<String,Integer>empty()
+                                  .assoc("b", 2)
+                                  .assoc("c", 1)
+                                  .assoc("a", 3)
+                                  .values()
+                                  .toArray());
 
     }
 

@@ -14,6 +14,7 @@
 
 package org.organicdesign.fp;
 
+import org.organicdesign.fp.collections.UnIterator;
 import org.organicdesign.fp.collections.UnList;
 import org.organicdesign.fp.collections.UnMap;
 import org.organicdesign.fp.collections.UnSet;
@@ -25,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.TreeSet;
 
 import static org.organicdesign.fp.StaticImports.un;
@@ -234,9 +234,8 @@ processing the input at that time, returning the latest u.
         return al.toArray((T[]) new Object[al.size()]);
     }
 
-    @Override
-    default Iterator<T> toIterator() {
+    @Override default UnIterator<T> toIterator() {
         // Maybe not so performant, but gives a chance to see if this is even a useful method.
-        return toJavaArrayList().iterator();
+        return un(toJavaArrayList()).iterator();
     }
 }

@@ -16,6 +16,7 @@ package org.organicdesign.fp.permanent;
 
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.Transformable;
+import org.organicdesign.fp.collections.UnIterator;
 import org.organicdesign.fp.function.Function1;
 import org.organicdesign.fp.function.Function2;
 import org.organicdesign.fp.tuple.Tuple2;
@@ -310,4 +311,24 @@ public interface Sequence<T> extends Transformable<T> {
 //
 //    }
 
+    /**
+     This implementation is unsynchronized.
+     @return an unsynchronized iterator
+     */
+    @Override
+    default UnIterator<T> toIterator() {
+        final Sequence<T> seq = this;
+
+        return new UnIterator<T>() {
+            private Sequence<T> inner = seq;
+
+            @Override public boolean hasNext() { return inner.head().isSome(); }
+
+            @Override public T next() {
+                Option<T> next = inner.head();
+                inner = inner.tail();
+                return next.getOrElse(null);
+            }
+        };
+    }
 }

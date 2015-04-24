@@ -14,6 +14,7 @@
 
 package org.organicdesign.fp;
 
+import org.organicdesign.fp.collections.UnIterator;
 import org.organicdesign.fp.collections.UnList;
 import org.organicdesign.fp.collections.UnMap;
 import org.organicdesign.fp.collections.UnSet;
@@ -24,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.TreeSet;
 
 /**
@@ -73,5 +73,5 @@ public interface Realizable<T> {
 
     T[] toTypedArray();
 
-    Iterator<T> toIterator();
+    UnIterator<T> toIterator();
 }

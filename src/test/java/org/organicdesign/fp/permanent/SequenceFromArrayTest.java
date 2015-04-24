@@ -32,8 +32,7 @@ public class SequenceFromArrayTest {
                           Sequence.ofArray(ints).toTypedArray());
     }
 
-    @Test
-    public void construction() {
+    @Test public void construction() {
         Integer[] ints = new Integer[] { 5,4,3,2,1 };
         Sequence<Integer> five = Sequence.ofArray(ints);
         Sequence<Integer> four = five.tail();
@@ -89,5 +88,43 @@ public class SequenceFromArrayTest {
         three.head().get(); three.head().get(); three.head().get();
         assertEquals(Integer.valueOf(3), three.head().get().apply());
         assertEquals(Integer.valueOf(1001), i.value());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subArrayEx() {
+        SequenceFromArray.from(-1, 5,4,3,2,1);
+    }
+
+    @Test public void subArray() {
+        Integer[] ints = new Integer[] { 5,4,3,2,1 };
+        Sequence<Integer> three = SequenceFromArray.from(2, ints);
+        Sequence<Integer> two = three.tail();
+        Sequence<Integer> one = two.tail();
+        Sequence<Integer> zero = one.tail();
+        Sequence<Integer> nada = zero.tail();
+        assertEquals(Integer.valueOf(3), three.head().get());
+        assertEquals(Integer.valueOf(2), two.head().get());
+        assertEquals(Integer.valueOf(1), one.head().get());
+        assertEquals(Sequence.emptySequence(), zero);
+        assertEquals(Sequence.emptySequence(), zero.tail());
+
+        assertEquals(Sequence.emptySequence(), nada);
+
+        three.tail().tail().tail().tail().tail().tail().tail().tail().tail().tail().tail().tail().tail().tail().tail();
+        assertEquals(Integer.valueOf(3), three.head().get());
+
+        assertEquals(Sequence.emptySequence(), SequenceFromArray.from(5, ints));
+        Integer[] noInts = new Integer[0];
+        assertEquals(Sequence.emptySequence(), SequenceFromArray.from(5, noInts));
+        assertEquals(Sequence.emptySequence(), SequenceFromArray.from(0, noInts));
+
+        Integer[] nullInts = null;
+        //noinspection ConstantConditions
+        assertEquals(Sequence.emptySequence(), SequenceFromArray.from(5, nullInts));
+        //noinspection ConstantConditions
+        assertEquals(Sequence.emptySequence(), SequenceFromArray.from(0, nullInts));
+
+        assertEquals(Sequence.emptySequence(), SequenceFromArray.from(5));
+        assertEquals(Sequence.emptySequence(), SequenceFromArray.from(0));
     }
 }
