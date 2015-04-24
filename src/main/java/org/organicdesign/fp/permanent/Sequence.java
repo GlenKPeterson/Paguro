@@ -14,15 +14,15 @@
 
 package org.organicdesign.fp.permanent;
 
+import java.util.Iterator;
+import java.util.Objects;
+
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.Transformable;
 import org.organicdesign.fp.collections.UnIterator;
 import org.organicdesign.fp.function.Function1;
 import org.organicdesign.fp.function.Function2;
 import org.organicdesign.fp.tuple.Tuple2;
-
-import java.util.Iterator;
-import java.util.Objects;
 
 /**
  A Sequence abstraction that lazy operations can be built from.  The idea is to create a lazy,
@@ -153,7 +153,7 @@ public interface Sequence<T> extends Transformable<T> {
      @return a lazy Sequence containing no more than the specified number of items.
      */
     @Override
-    default Transformable<T> take(long numItems) { return SequenceTaken.of(this, numItems); }
+    default Sequence<T> take(long numItems) { return SequenceTaken.of(this, numItems); }
 
     @Override
     default Sequence<T> takeWhile(Function1<T,Boolean> predicate) { return SequenceTakenWhile.of(this, predicate); }
@@ -205,6 +205,27 @@ public interface Sequence<T> extends Transformable<T> {
 //        return SequenceFlatMapped.of(this, func);
 //    }
 
+    /**
+     This implementation is unsynchronized.
+     @return an unsynchronized iterator
+     */
+    @Override
+    default UnIterator<T> toIterator() {
+        final Sequence<T> seq = this;
+
+        return new UnIterator<T>() {
+            private Sequence<T> inner = seq;
+
+            @Override public boolean hasNext() { return inner.head().isSome(); }
+
+            @Override public T next() {
+                Option<T> next = inner.head();
+                inner = inner.tail();
+                return next.getOrElse(null);
+            }
+        };
+    }
+
     /** This is correct, but O(n) */
     static int hashCode(Sequence seq) {
         int ret = 0;
@@ -223,10 +244,8 @@ public interface Sequence<T> extends Transformable<T> {
         // Cheapest operation first...
         if (a == b) { return true; }
 
-        if ( (a == null) ||
-                (a.hashCode() != b.hashCode()) ) {
-            return false;
-        }
+        if (a == null) { return false; }
+
         Option oa = a.head(); Option ob = b.head();
         while (oa.isSome() && ob.isSome()) {
             if (!Objects.equals(oa.get(), ob.get())) {
@@ -310,25 +329,4 @@ public interface Sequence<T> extends Transformable<T> {
 //        @Override public Sequence<T> tail() { return tail; }
 //
 //    }
-
-    /**
-     This implementation is unsynchronized.
-     @return an unsynchronized iterator
-     */
-    @Override
-    default UnIterator<T> toIterator() {
-        final Sequence<T> seq = this;
-
-        return new UnIterator<T>() {
-            private Sequence<T> inner = seq;
-
-            @Override public boolean hasNext() { return inner.head().isSome(); }
-
-            @Override public T next() {
-                Option<T> next = inner.head();
-                inner = inner.tail();
-                return next.getOrElse(null);
-            }
-        };
-    }
 }

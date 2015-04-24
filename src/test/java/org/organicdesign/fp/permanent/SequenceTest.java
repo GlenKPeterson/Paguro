@@ -1,24 +1,92 @@
 package org.organicdesign.fp.permanent;
 
+import java.util.*;
+
 import org.junit.Test;
+import org.organicdesign.fp.Option;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 
 public class SequenceTest {
 
-    @Test
-    public void construction() {
+    @Test public void construction() {
         Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         assertArrayEquals(ints, Sequence.ofArray(ints).toTypedArray());
         assertArrayEquals(ints, Sequence.of(Arrays.asList(ints)).toTypedArray());
         assertArrayEquals(ints, Sequence.of(Arrays.asList(ints).iterator()).toTypedArray());
     }
+
+    @Test public void emptySequence() {
+        assertEquals(0, Sequence.EMPTY_SEQUENCE.hashCode());
+        assertEquals(0, Sequence.EMPTY_SEQUENCE.tail().hashCode());
+        assertEquals(0, Sequence.EMPTY_SEQUENCE.tail().tail().tail().hashCode());
+
+        assertEquals(Option.none(), Sequence.EMPTY_SEQUENCE.head());
+
+        assertEquals(Sequence.EMPTY_SEQUENCE, Sequence.EMPTY_SEQUENCE);
+        assertEquals(Sequence.EMPTY_SEQUENCE, Sequence.EMPTY_SEQUENCE.tail());
+        assertEquals(Sequence.EMPTY_SEQUENCE, Sequence.EMPTY_SEQUENCE.tail().tail());
+        assertTrue(Sequence.EMPTY_SEQUENCE.equals(Sequence.EMPTY_SEQUENCE.tail()));
+        assertTrue(Sequence.EMPTY_SEQUENCE.tail().equals(Sequence.EMPTY_SEQUENCE));
+    }
+
+    @Test public void foldLeftTerm() {
+        Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        assertArrayEquals(new Integer[]{2, 3, 4},
+                          Sequence.ofArray(ints)
+                                  .foldLeft(new ArrayList<>(),
+                                            (accum, i) -> {
+                                                accum.add(i + 1);
+                                                return accum;
+                                            },
+                                            (accum) -> accum.size() == 3).toArray());
+        assertArrayEquals(new Integer[]{2, 3, 4, 5, 6, 7, 8, 9, 10},
+                          Sequence.ofArray(ints)
+                                  .foldLeft(new ArrayList<>(),
+                                            (accum, i) -> {
+                                                accum.add(i + 1);
+                                                return accum;
+                                            },
+                                            (accum) -> accum.size() == 20).toArray());
+    }
+
+    @Test public void toIterator() {
+        Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        Iterator<Integer> seqIter = Sequence.ofArray(ints).toIterator();
+        Iterator<Integer> listIter = Arrays.asList(ints).iterator();
+        while (seqIter.hasNext() && listIter.hasNext()) {
+            assertEquals(seqIter.next(), listIter.next());
+        }
+        assertFalse(seqIter.hasNext());
+        assertFalse(listIter.hasNext());
+    }
+
+    @Test public void objectMethods() {
+        Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        Sequence<Integer> seq1 = Sequence.ofArray(ints).drop(3).take(4);
+        Sequence<Integer> seq2 = Sequence.ofArray(4, 5, 6, 7);
+
+        assertEquals(Sequence.hashCode(seq1), Sequence.hashCode(seq2));
+
+        assertTrue(Sequence.equals(seq1, seq1));
+        assertTrue(Sequence.equals(seq2, seq2));
+
+        assertTrue(Sequence.equals(seq1, seq2));
+        assertTrue(Sequence.equals(seq2, seq1));
+
+        assertEquals(Sequence.hashCode(seq1.tail()), Sequence.hashCode(seq2.tail()));
+        assertTrue(Sequence.equals(seq1.tail(), seq2.tail()));
+        assertTrue(Sequence.equals(seq2.tail(), seq1.tail()));
+
+        assertNotEquals(Sequence.hashCode(seq1.tail()), Sequence.hashCode(seq2));
+        assertNotEquals(Sequence.hashCode(seq1), Sequence.hashCode(seq2.tail()));
+        assertFalse(Sequence.equals(seq1.tail(), seq2));
+        assertFalse(Sequence.equals(seq1, seq2.tail()));
+
+        assertFalse(Sequence.equals(seq2.tail(), seq1));
+        assertFalse(Sequence.equals(seq2, seq1.tail()));
+    }
+
 
     @Test
     public void forEach() {
