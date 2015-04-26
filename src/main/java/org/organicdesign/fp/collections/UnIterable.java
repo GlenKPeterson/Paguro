@@ -10,9 +10,11 @@ public interface UnIterable<T> extends Iterable<T> {
     // ==================================================== Static ====================================================
     /** This is correct, but O(n) */
     static int hashCode(UnIterable is) {
+//        System.out.println("hashCode for: " + is);
         int ret = 0;
         for (Object t : is) {
             if (t != null) {
+//                System.out.println("\tt: " + t + " hashCode: " + t.hashCode());
                 ret = ret + t.hashCode();
             }
         }

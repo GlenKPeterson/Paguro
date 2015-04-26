@@ -43,4 +43,14 @@ public class SequenceMapped<T,U>  implements Sequence<U> {
     @Override public Option<U> head() { return laz.get()._1(); }
 
     @Override public Sequence<U> tail() { return laz.get()._2(); }
+
+    @Override public int hashCode() { return Sequence.hashCode(this); }
+
+    @Override public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if ( (o == null) || !(o instanceof Sequence) ) { return false; }
+        return Sequence.equals(this, (Sequence) o);
+    }
+
+    @Override public String toString() { return Sequence.toString(this); }
 }

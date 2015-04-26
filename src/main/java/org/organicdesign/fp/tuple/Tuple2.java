@@ -14,9 +14,10 @@
 
 package org.organicdesign.fp.tuple;
 
-import org.organicdesign.fp.collections.UnMap;
-
 import java.util.Map.Entry;
+import java.util.Objects;
+
+import org.organicdesign.fp.collections.UnMap;
 
 /**
  Use tuples as immutable, type-safe, data structures instead of defining your own classes (when appropriate).
@@ -45,32 +46,20 @@ public class Tuple2<T,U> implements Entry<T,U>, UnMap.UnEntry<T,U> {
     public U _2() { return _2; }
 
     @Override
-    public String toString() { return "(" + _1 + "," + _2 + ")"; }
+    public String toString() { return "Tuple2(" + _1 + "," + _2 + ")"; }
 
     @Override
     public boolean equals(Object other) {
         // Cheapest operation first...
         if (this == other) { return true; }
         if ((other == null) ||
-            !(other instanceof Tuple2) ||
+            !(other instanceof Entry) ||
             (this.hashCode() != other.hashCode())) {
             return false;
         }
         // Details...
-        @SuppressWarnings("rawtypes") final Tuple2 that = (Tuple2) other;
-
-        if (this._1 == null) {
-            if (that._1 != null) { return false; }
-        } else if ( !this._1.equals(that._1) ) {
-            return false;
-        }
-
-        if (this._2 == null) {
-            if (that._2 != null) { return false; }
-        } else if ( !this._2.equals(that._2) ) {
-            return false;
-        }
-        return true;
+        final Entry that = (Entry) other;
+        return Objects.equals(_1, that.getKey()) && Objects.equals(_2, that.getValue());
     }
 
     @Override

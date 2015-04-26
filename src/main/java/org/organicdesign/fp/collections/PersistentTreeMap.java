@@ -9,7 +9,9 @@
 package org.organicdesign.fp.collections;
 
 import java.util.Comparator;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Stack;
 
 import org.organicdesign.fp.Option;
@@ -63,7 +65,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
     }
 
     /** This is correct, but O(n). */
-    @Override public int hashCode() { return (size() == 0) ? 0 : Sequence.hashCode(this); }
+    @Override public int hashCode() { return (size() == 0) ? 0 : UnIterable.hashCode(keySet()); }
 
     /** This is correct, but definitely O(n), same as java.util.ArrayList. */
     @Override public boolean equals(Object other) {
@@ -76,27 +78,71 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
     /** Returns a view of the keys contained in this map. */
     @Override public ImSet<K> keySet() { return PersistentTreeSet.of(this); }
 
-    /**
-     {@inheritDoc}
+    /** {@inheritDoc} */
+    @Override public ImMapSorted<K,V> subMap(K fromKey, K toKey) {
+        int diff = comp.compare(fromKey, toKey);
 
-     @param fromKey
-     @param toKey
-     */
-    @Override
-    public ImMapSorted<K,V> subMap(K fromKey, K toKey) {
-        if (comp.compare(fromKey, toKey) > 0) {
+        if (diff > 0) {
             throw new IllegalArgumentException("fromKey is greater than toKey");
         }
-        return this.foldLeft(empty(),
-                             (accum, item) -> (comp.compare(fromKey, accum.firstKey()) <= 0)
-                                              ? accum.assoc(item.getKey(), item.getValue())
-                                              : accum,
-                             (accum) -> (comp.compare(accum.lastKey(), toKey) >= 0));
-//        ImMapSorted<K,V> ret = this;
-//        while (comp.compare(this.head().getKey(), fromKey) < 0) {
-//            remove(
-//        }
+        Node<K,V> last = last();
+        K lastKey = last.key();
+        int compFromKeyLastKey = comp.compare(fromKey, lastKey);
+
+        // If no intersect, return empty. We aren't checking the toKey vs. the firstKey() because that's a single pass
+        // through the iterator loop which is probably as cheap as checking here.
+        if ( (diff == 0) || (compFromKeyLastKey > 0) )  {
+            return empty();
+        }
+        // If map is entirely contained, just return it.
+        if ( (comp.compare(fromKey, firstKey()) <= 0) &&
+                    (comp.compare(toKey, lastKey) > 0) ) {
+            return this;
+        }
+        // Don't iterate through entire map for only the last item.
+        if (compFromKeyLastKey == 0) {
+            return of(last.getKey(), last.getValue());
+        }
+
+        ImMapSorted<K,V> ret = empty();
+        UnIterator<UnEntry<K,V>> iter = this.iterator();
+        while (iter.hasNext()) {
+            UnEntry<K,V> next = iter.next();
+            K key = next.getKey();
+//            System.out.println("\tChecking key: " + key);
+            if (comp.compare(toKey, key) <= 0) {
+//                System.out.println("\tPassed end! " + key);
+                break;
+            }
+            if (comp.compare(fromKey, key) > 0) {
+//                System.out.println("\tNot to beginning yet " + key);
+                continue;
+            }
+//            System.out.println("\tValid: " + key);
+            ret = ret.assoc(key, next.getValue());
+        }
+        return ret;
     }
+
+    /** {@inheritDoc} */
+    @Override public String toString() {
+        StringBuilder sB = new StringBuilder("PersistentTreeMap(");
+        int i = 0;
+        for (UnEntry<K,V> entry : this) {
+            if (i > 0) {
+                sB.append(",");
+            } else if (i > 5) {
+                break;
+            }
+            sB.append("UnEntry(").append(entry.getKey()).append(",").append(entry.getValue()).append(")");
+            i++;
+        }
+        if (i < size()) {
+            sB.append("...");
+        }
+        return sB.append(")").toString();
+    }
+
 
     /** {@inheritDoc} */
     @Override
@@ -114,15 +160,48 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         return Option.of(t);
     }
 
+    /** {@inheritDoc} */
+    @Override public ImMapSorted<K,V> tailMap(K fromKey) {
+        Node<K,V> last = last();
+        K lastKey = last.key();
+        int compFromKeyLastKey = comp.compare(fromKey, lastKey);
+
+        // If no intersect, return empty. We aren't checking the toKey vs. the firstKey() because that's a single pass
+        // through the iterator loop which is probably as cheap as checking here.
+        if (compFromKeyLastKey > 0) {
+            return empty();
+        }
+        // If map is entirely contained, just return it.
+        if (comp.compare(fromKey, firstKey()) <= 0) {
+            return this;
+        }
+        // Don't iterate through entire map for only the last item.
+        if (compFromKeyLastKey == 0) {
+            return of(last.getKey(), last.getValue());
+        }
+
+        ImMapSorted<K,V> ret = empty();
+        UnIterator<UnEntry<K,V>> iter = this.iterator();
+        while (iter.hasNext()) {
+            UnEntry<K,V> next = iter.next();
+            K key = next.getKey();
+            if (comp.compare(fromKey, key) > 0) {
+                continue;
+            }
+            ret = ret.assoc(key, next.getValue());
+        }
+        return ret;
+    }
+
+
     @Override public Sequence<UnEntry<K,V>> tail() {
         if (size() > 1) {
-            // TODO: Consider a NodeSequence implementation instead of wrapping iterator.
-            // The iterator is designed to do this quickly.
-            UnIterator<UnEntry<K,V>> iter = this.iterator();
-            // Drop the head
-            iter.next();
-            // Return a sequence of the tail.
-            return Sequence.of(iter);
+            return without(firstKey());
+//            // The iterator is designed to do this quickly.  It also prevents an infinite loop here.
+//            UnIterator<UnEntry<K,V>> iter = this.iterator();
+//            // Drop the head
+//            iter.next();
+//            return tailMap(iter.next().getKey());
         }
         return Sequence.emptySequence();
     }
@@ -140,6 +219,9 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
     }
     public PersistentTreeMap(Comparator<K> c) { this(c, null, 0); }
     public PersistentTreeMap() { this(null, null, 0); }
+
+    @SuppressWarnings("unchecked")
+    public static <K,V> PersistentTreeMap<K,V> of(K key, V val) { return EMPTY.assoc(key, val); }
 
 //    @SuppressWarnings("unchecked")
 //    static public <S, K extends S, V extends S> PersistentTreeMap<K,V> create(ISeq<S> items) {
@@ -170,11 +252,6 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
     }
 
     @SuppressWarnings("unchecked")
-    @Override public boolean containsValue(Object value) {
-        return false; // TODO: implement this!
-    }
-
-    @SuppressWarnings("unchecked")
     @Override
     public V get(Object key) {
         if (key == null) { return null; }
@@ -199,7 +276,6 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         }
         return new PersistentTreeMap<>(comp, t.blacken(), size + 1);
     }
-
 
     @Override
     public PersistentTreeMap<K,V> without(K key) {
@@ -566,6 +642,21 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 
         abstract Node<K,V> replace(K key, V val, Node<K,V> left, Node<K,V> right);
 
+        // Not used in this data structure, but these nodes can be returned!
+        @Override public int hashCode() { return key.hashCode(); }
+
+        // Not used in this data structure, but these nodes can be returned!
+        @Override public boolean equals(Object o) {
+            if (this == o) { return true; }
+            if ( (o == null) || ! (o instanceof Map.Entry) ) { return false; }
+            Map.Entry that = (Map.Entry) o;
+            return Objects.equals(key, that.getKey());
+        }
+
+        @Override public String toString() {
+            return "Node(" + key + ")";
+        }
+
 //        public <R> R kvreduce(Function3<R,K,V,R> f, R init) {
 //            if (left() != null) {
 //                init = left().kvreduce(f, init);
@@ -615,6 +706,26 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 
         @Override Node<K,V> redden() { return new RedVal<>(key, val); }
 
+        // Not used in this data structure, but these nodes can be returned!
+        @Override public int hashCode() {
+            int ret = 0;
+            if (key != null) { ret = key.hashCode(); }
+            if (val != null) { return ret ^ val.hashCode(); }
+            // If it's uninitialized, it's equal to every other uninitialized instance.
+            return ret;
+        }
+
+        // Not used in this data structure, but these nodes can be returned!
+        @Override public boolean equals(Object o) {
+            if (this == o) { return true; }
+            if ( (o == null) || ! (o instanceof Map.Entry) ) { return false; }
+            Map.Entry that = (Map.Entry) o;
+            return Objects.equals(key, that.getKey()) && Objects.equals(val, that.getValue());
+        }
+
+        @Override public String toString() {
+            return "BlackVal(" + key + "," + val + ")";
+        }
     }
 
     static class BlackBranch<K, V> extends Black<K,V> {
@@ -651,6 +762,26 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 
         @Override Node<K,V> redden() { return new RedBranchVal<>(key, val, left, right); }
 
+        // Not used in this data structure, but these nodes can be returned!
+        @Override public int hashCode() {
+            int ret = 0;
+            if (key != null) { ret = key.hashCode(); }
+            if (val != null) { return ret ^ val.hashCode(); }
+            // If it's uninitialized, it's equal to every other uninitialized instance.
+            return ret;
+        }
+
+        // Not used in this data structure, but these nodes can be returned!
+        @Override public boolean equals(Object o) {
+            if (this == o) { return true; }
+            if ( (o == null) || ! (o instanceof Map.Entry) ) { return false; }
+            Map.Entry that = (Map.Entry) o;
+            return Objects.equals(key, that.getKey()) && Objects.equals(val, that.getValue());
+        }
+
+        @Override public String toString() {
+            return "BlackBranchVal(" + key + "," + val + ")";
+        }
     }
 
     static class Red<K, V> extends Node<K,V> {
@@ -686,6 +817,26 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 
         @Override Node<K,V> blacken() { return new BlackVal<>(key, val); }
 
+        // Not used in this data structure, but these nodes can be returned!
+        @Override public int hashCode() {
+            int ret = 0;
+            if (key != null) { ret = key.hashCode(); }
+            if (val != null) { return ret ^ val.hashCode(); }
+            // If it's uninitialized, it's equal to every other uninitialized instance.
+            return ret;
+        }
+
+        // Not used in this data structure, but these nodes can be returned!
+        @Override public boolean equals(Object o) {
+            if (this == o) { return true; }
+            if ( (o == null) || ! (o instanceof Map.Entry) ) { return false; }
+            Map.Entry that = (Map.Entry) o;
+            return Objects.equals(key, that.getKey()) && Objects.equals(val, that.getValue());
+        }
+
+        @Override public String toString() {
+            return "RedVal(" + key + "," + val + ")";
+        }
     }
 
     static class RedBranch<K, V> extends Red<K,V> {
@@ -740,6 +891,27 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         @Override public V val() { return val; }
 
         @Override Node<K,V> blacken() { return new BlackBranchVal<>(key, val, left, right); }
+
+        // Not used in this data structure, but these nodes can be returned!
+        @Override public int hashCode() {
+            int ret = 0;
+            if (key != null) { ret = key.hashCode(); }
+            if (val != null) { return ret ^ val.hashCode(); }
+            // If it's uninitialized, it's equal to every other uninitialized instance.
+            return ret;
+        }
+
+        // Not used in this data structure, but these nodes can be returned!
+        @Override public boolean equals(Object o) {
+            if (this == o) { return true; }
+            if ( (o == null) || ! (o instanceof Map.Entry) ) { return false; }
+            Map.Entry that = (Map.Entry) o;
+            return Objects.equals(key, that.getKey()) && Objects.equals(val, that.getValue());
+        }
+
+        @Override public String toString() {
+            return "RedBranchVal(" + key + "," + val + ")";
+        }
     }
 
 

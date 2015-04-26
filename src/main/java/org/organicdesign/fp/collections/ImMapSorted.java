@@ -42,7 +42,7 @@ public interface ImMapSorted<K,V> extends UnMapSorted<K,V>, Sequence<UnMap.UnEnt
     @Override ImMapSorted<K,V> subMap(K fromKey, K toKey);
 
     /** {@inheritDoc} */
-    @Override default ImMapSorted<K,V> tailMap(K fromKey) { return subMap(fromKey, lastKey()); }
+    @Override ImMapSorted<K,V> tailMap(K fromKey);
 
 
     /** Returns a new map with the given key/value added */

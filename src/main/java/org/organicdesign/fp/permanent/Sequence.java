@@ -230,6 +230,8 @@ public interface Sequence<T> extends Transformable<T> {
         };
     }
 
+    // ==================================================== Static ====================================================
+
     /** This is correct, but O(n) */
     static int hashCode(Sequence seq) {
         int ret = 0;
@@ -248,7 +250,7 @@ public interface Sequence<T> extends Transformable<T> {
         // Cheapest operation first...
         if (a == b) { return true; }
 
-        if (a == null) { return false; }
+        if ( (a == null) || (b == null) ) { return false; }
 
         Option oa = a.head(); Option ob = b.head();
         while (oa.isSome() && ob.isSome()) {
@@ -260,6 +262,29 @@ public interface Sequence<T> extends Transformable<T> {
         }
         // Should both be used up (equal length).
         return !oa.isSome() && !ob.isSome();
+    }
+
+    /** This is correct, but O(n) */
+    static String toString(Sequence seq) {
+        StringBuilder sB = new StringBuilder("Sequence(");
+        Option item = seq.head();
+        int count = 0;
+        while (item.isSome()) {
+            if (count > 0) {
+                sB.append(",");
+            } else if (count > 5) {
+                break;
+            }
+            sB.append(item.get());
+
+            seq = seq.tail();
+            item = seq.head();
+            count++;
+        }
+        if (item.isSome()) {
+            sB.append("...");
+        }
+        return sB.append(")").toString();
     }
 
 //    public class LazySequence<T> implements Sequence<T> {

@@ -36,10 +36,10 @@ public interface UnMapSorted<K,V> extends UnMap<K,V>, SortedMap<K,V> {
 // public  K	lastKey()
 
     /** {@inheritDoc} */
-    @Override public UnMapSorted<K,V> subMap(K fromKey, K toKey);
+    @Override UnMapSorted<K,V> subMap(K fromKey, K toKey);
 
     /** {@inheritDoc} */
-    @Override default UnMapSorted<K,V> tailMap(K fromKey) { return subMap(fromKey, lastKey()); }
+    @Override UnMapSorted<K,V> tailMap(K fromKey);
 
     /** {@inheritDoc} */
     @Override UnCollection<V> values();
