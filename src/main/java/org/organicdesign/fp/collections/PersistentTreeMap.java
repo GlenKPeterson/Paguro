@@ -129,11 +129,8 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         StringBuilder sB = new StringBuilder("PersistentTreeMap(");
         int i = 0;
         for (UnEntry<K,V> entry : this) {
-            if (i > 0) {
-                sB.append(",");
-            } else if (i > 5) {
-                break;
-            }
+            if (i > 0) { sB.append(","); }
+            if (i > 4) { break; }
             sB.append("UnEntry(").append(entry.getKey()).append(",").append(entry.getValue()).append(")");
             i++;
         }
@@ -267,11 +264,14 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
     public PersistentTreeMap<K,V> assoc(K key, V val) {
         Box<Node<K,V>> found = new Box<>(null);
         Node<K,V> t = add(tree, key, val, found);
-        if (t == null)   //null == already contains key
-        {
+        //null == already contains key
+        if (t == null) {
             Node<K,V> foundNode = found.val;
-            if (foundNode.val() == val)  //note only get same collection on identity of val, not equals()
+
+            //note only get same collection on identity of val, not equals()
+            if (foundNode.val() == val) {
                 return this;
+            }
             return new PersistentTreeMap<>(comp, replace(tree, key, val), size);
         }
         return new PersistentTreeMap<>(comp, t.blacken(), size + 1);

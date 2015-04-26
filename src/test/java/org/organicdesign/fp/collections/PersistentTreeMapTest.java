@@ -22,7 +22,8 @@ public class PersistentTreeMapTest {
         assertEquals(Integer.valueOf(1), m2.get("one"));
         assertNull(m1.get("two"));
 
-        PersistentTreeMap<String,Integer> m3 = m2.assoc("two", 2);
+        Integer twoInt = Integer.valueOf(2);
+        PersistentTreeMap<String,Integer> m3 = m2.assoc("two", twoInt);
 
         // Prove m1 unchanged
         assertEquals(0, m1.size());
@@ -37,6 +38,16 @@ public class PersistentTreeMapTest {
         assertEquals(Integer.valueOf(1), m3.get("one"));
         assertEquals(Integer.valueOf(2), m3.get("two"));
         assertNull(m3.get("three"));
+
+//        System.out.println("m3: " + m3);
+//        PersistentTreeMap<String,Integer> m4 = m3.assoc("two", twoInt);
+//        System.out.println("m4: " + m4);
+
+        // Check that inserting the same key/value pair returns the same collection.
+        assertTrue(m3 == m3.assoc("two", twoInt));
+
+        // Check that it uses the == test and not the .equals() test.
+        assertFalse(m3 == m3.assoc("two", new Integer(2)));
     }
 
     @Test public void order() {
@@ -149,8 +160,7 @@ public class PersistentTreeMapTest {
         assertTrue(Sequence.ofArray(UnMap.UnEntry.of(2, "two"), UnMap.UnEntry.of(3, "three"))
                            .equals(PersistentTreeMap.of(1, "one").assoc(2, "two").assoc(3, "three").tail()));
 
-        assertEquals(Sequence.emptySequence(),
-                     PersistentTreeMap.of(1, "one").tail());
+        assertTrue(Sequence.emptySequence().equals(PersistentTreeMap.of(1, "one").tail()));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -189,8 +199,26 @@ public class PersistentTreeMapTest {
     }
 
     @Test public void testToString() {
+        assertEquals("PersistentTreeMap()",
+                     PersistentTreeMap.empty().toString());
+        assertEquals("PersistentTreeMap(UnEntry(1,one))",
+                     PersistentTreeMap.of(1, "one").toString());
+        assertEquals("PersistentTreeMap(UnEntry(1,one),UnEntry(2,two))",
+                     PersistentTreeMap.of(1, "one").assoc(2, "two").toString());
         assertEquals("PersistentTreeMap(UnEntry(1,one),UnEntry(2,two),UnEntry(3,three))",
                      PersistentTreeMap.of(1, "one").assoc(2, "two").assoc(3, "three").toString());
+        assertEquals("PersistentTreeMap(UnEntry(1,one),UnEntry(2,two),UnEntry(3,three),UnEntry(4,four))",
+                     PersistentTreeMap.of(1, "one").assoc(2, "two").assoc(3, "three").assoc(4, "four")
+                             .toString());
+        assertEquals("PersistentTreeMap(UnEntry(1,one),UnEntry(2,two),UnEntry(3,three),UnEntry(4,four),UnEntry(5,five))",
+                     PersistentTreeMap.of(1, "one").assoc(2, "two").assoc(3, "three").assoc(4, "four").assoc(5, "five")
+                             .toString());
+        assertEquals("PersistentTreeMap(UnEntry(1,one),UnEntry(2,two),UnEntry(3,three),UnEntry(4,four),UnEntry(5,five),...)",
+                     PersistentTreeMap.of(1, "one").assoc(2, "two").assoc(3, "three").assoc(4, "four").assoc(5, "five")
+                             .assoc(6, "six").toString());
+        assertEquals("PersistentTreeMap(UnEntry(1,one),UnEntry(2,two),UnEntry(3,three),UnEntry(4,four),UnEntry(5,five),...)",
+                     PersistentTreeMap.of(1, "one").assoc(2, "two").assoc(3, "three").assoc(4, "four").assoc(5, "five")
+                             .assoc(6, "six").assoc(6, "seven").toString());
     }
 
 }
