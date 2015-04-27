@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TreeSet;
 
+import org.organicdesign.fp.collections.UnIterable;
 import org.organicdesign.fp.collections.UnIterator;
 import org.organicdesign.fp.collections.UnList;
 import org.organicdesign.fp.collections.UnMap;
@@ -32,7 +33,7 @@ import org.organicdesign.fp.function.Function1;
  This is incomplete, but enough to run some simple experiments with.
  @param <T>
  */
-public interface Realizable<T> {
+public interface Realizable<T> extends UnIterable<T> {
     ArrayList<T> toJavaArrayList();
     UnList<T> toUnList();
 

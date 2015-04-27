@@ -256,7 +256,7 @@ public class PersistentTreeMapTest {
                              .assoc(6, "six").toString());
         assertEquals("PersistentTreeMap(UnEntry(1,one),UnEntry(2,two),UnEntry(3,three),UnEntry(4,four),UnEntry(5,five),...)",
                      PersistentTreeMap.of(1, "one").assoc(2, "two").assoc(3, "three").assoc(4, "four").assoc(5, "five")
-                             .assoc(6, "six").assoc(6, "seven").toString());
+                             .assoc(6, "six").assoc(7, "seven").toString());
     }
 
     @Test public void without() {
@@ -296,4 +296,33 @@ public class PersistentTreeMapTest {
 
     @Test(expected = NoSuchElementException.class)
     public void lastKeyEx() { PersistentTreeMap.empty().lastKey(); }
+
+    @Test public void largerMap() {
+        PersistentTreeMap<Integer,String> m =
+                PersistentTreeMap.of(1, "one").assoc(2, "two").assoc(3, "three").assoc(4, "four").assoc(5, "five")
+                        .assoc(6, "six").assoc(7, "seven").assoc(8, "eight").assoc(9, "nine").assoc(10, "ten")
+                        .assoc(11, "eleven").assoc(12, "twelve").assoc(13, "thirteen").assoc(14, "fourteen")
+                        .assoc(15, "fifteen").assoc(16, "sixteen").assoc(17, "seventeen").assoc(18, "eighteen")
+                        .assoc(19, "nineteen").assoc(20, "twenty");
+        m = m.without(10);
+        m = m.without(9);
+        m = m.without(11);
+        m = m.assoc(11, "eleven again");
+        m = m.assoc(10, "ten again");
+        m = m.assoc(9, "nine again");
+        m = m.without(1);
+        m = m.assoc(1, "one again");
+        m = m.assoc(21, "twenty one");
+        m = m.without(20);
+        m = m.assoc(20, "twenty again");
+        assertEquals(Sequence.ofArray(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21),
+                     m.keySet());
+        assertTrue(UnIterable.equals(
+                Sequence.ofArray("one again", "two", "three", "four", "five", "six", "seven", "eight",
+                                 "nine again", "ten again", "eleven again", "twelve", "thirteen",
+                                 "fourteen",
+                                 "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty again",
+                                 "twenty one"),
+                m.values()));
+    }
 }

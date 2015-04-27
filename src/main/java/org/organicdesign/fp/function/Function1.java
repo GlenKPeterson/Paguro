@@ -14,18 +14,19 @@
 
 package org.organicdesign.fp.function;
 
-import org.organicdesign.fp.ephemeral.View;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
+
+import org.organicdesign.fp.ephemeral.View;
 
 /**
  This is like Java 8's java.util.function.Function, but retrofitted to turn checked exceptions
  into unchecked ones.
  */
 @FunctionalInterface
-public interface Function1<T,U> extends Function<T,U> {
+public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
     /** Implement this one method and you don't have to worry about checked exceptions. */
     U applyEx(T t) throws Exception;
 
@@ -39,6 +40,8 @@ public interface Function1<T,U> extends Function<T,U> {
             throw new RuntimeException(e);
         }
     }
+
+    @Override default void accept(T t) { apply(t); }
 
     @SuppressWarnings("unchecked")
     default <S> Function1<S,U> compose(final Function1<S,T> f) {

@@ -157,6 +157,13 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
                     @Override public B next() { return iter.next().getValue(); }
                 };
             }
+            @Override public int hashCode() { return UnIterable.hashCode(this); }
+            @Override public boolean equals(Object o) {
+                if (this == o) { return true; }
+                if ( (o == null) || !(o instanceof Iterable) ) { return false; }
+                return UnIterable.equals(this, (Iterable) o);
+            }
+            @Override public String toString() { return UnIterable.toString("ValueWrapper", this); }
         }
         return new ValueWrapper<>(() -> this.iterator());
     }

@@ -157,8 +157,7 @@ public interface View<T> extends Transformable<T> {
     /** Add the given View before the beginning of this one. */
     default View<T> prepend(View<T> pv) { return ViewPrepended.of(this, pv); }
 
-    @Override
-    default UnIterator<T> iterator() {
+    @Override default UnIterator<T> iterator() {
         final View<T> v = this;
         // Maybe not so performant, but gives a chance to see if this is even a useful method.
         return new UnIterator<T>() {

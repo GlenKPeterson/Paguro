@@ -1,5 +1,6 @@
 package org.organicdesign.fp.collections;
 
+import java.util.Iterator;
 import java.util.Objects;
 
 /** An unmodifiable Iterable */
@@ -9,7 +10,8 @@ public interface UnIterable<T> extends Iterable<T> {
 
     // ==================================================== Static ====================================================
     /** This is correct, but O(n) */
-    static int hashCode(UnIterable is) {
+    static int hashCode(Iterable is) {
+        if (is == null) { throw new IllegalArgumentException("Can't have a null iteratable."); }
 //        System.out.println("hashCode for: " + is);
         int ret = 0;
         for (Object t : is) {
@@ -22,15 +24,15 @@ public interface UnIterable<T> extends Iterable<T> {
     }
 
     /** This is correct, but O(n) */
-    static boolean equals(UnIterable a, UnIterable b) {
+    static boolean equals(Iterable a, Iterable b) {
         // Cheapest operation first...
         if (a == b) { return true; }
 
         if ((a == null) || (b == null)) {
             return false;
         }
-        UnIterator as = a.iterator();
-        UnIterator bs = b.iterator();
+        Iterator as = a.iterator();
+        Iterator bs = b.iterator();
         while (as.hasNext() && bs.hasNext()) {
             if (!Objects.equals(as.next(), bs.next())) {
                 return false;
@@ -38,6 +40,51 @@ public interface UnIterable<T> extends Iterable<T> {
         }
         return !as.hasNext() && !bs.hasNext();
     }
+
+    /** Computes a reasonable to-string. */
+    static String toString(String name, Iterable iterable) {
+        if (name == null) { throw new IllegalArgumentException("Can't have a null name."); }
+        if (iterable == null) { throw new IllegalArgumentException("Can't have a null iteratable."); }
+        StringBuilder sB = new StringBuilder();
+        sB.append(name).append("(");
+        int i = 0;
+        Iterator iter = iterable.iterator();
+        while (iter.hasNext()) {
+            Object item = iter.next();
+            if (i > 0) { sB.append(","); }
+            if (i > 4) { break; }
+            sB.append(item);
+            i++;
+        }
+        if (iter.hasNext()) {
+            sB.append("...");
+        }
+        return sB.append(")").toString();
+    }
+
+//    /**
+//     Caution: this is a convenient optimization for immutable data structures and a nightmare waiting to happen to
+//     mutable ones.  Don't go slapping this on immutable wrappers for mutable data.  If all the underlying
+//     data is truly immutable, this allows you to compute the hashCode the first time it is needed, then return
+//     that same code without re-computing it again.  It's the internal version of a memoizer.  Also, use this only
+//     for decent sized collections.  If you only have 2 or 3 fields, this isn't buying you anything.
+//     */
+//    static Lazy.Int lazyHashCode(UnIterable iter) {
+//        if (iter == null) { throw new IllegalArgumentException("Can't have a null iterable."); }
+//        return Lazy.Int.of(() -> UnIterable.hashCode(iter));
+//    }
+//
+//    /**
+//     Caution: this is a convenient optimization for immutable data structures and a nightmare waiting to happen to
+//     mutable ones.  Don't go slapping this on immutable wrappers for mutable data structures.  If all the underlying
+//     data is truly immutable, this allows you to compute a reasonable toString() the first time it is needed, then
+//     return that same String without re-computing it again.  It's the internal version of a memoizer.
+//     */
+//    static Lazy.Ref<String> lazyToString(String name, UnIterable iter) {
+//        if (name == null) { throw new IllegalArgumentException("Can't have a null name."); }
+//        if (iter == null) { throw new IllegalArgumentException("Can't have a null iterable."); }
+//        return Lazy.Ref.of(() -> UnIterable.toString(name, iter));
+//    }
 
 //    /** Lets underlying compareTo method handle comparing nulls to non-null values. */
 //    static <E extends Comparable<E>> int compareHelper(E e1, E e2) {
