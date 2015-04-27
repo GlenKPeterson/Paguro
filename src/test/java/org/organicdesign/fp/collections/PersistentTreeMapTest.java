@@ -79,12 +79,23 @@ public class PersistentTreeMapTest {
                                   .keySet().toArray());
 
 
-        assertArrayEquals(new Integer[]{3, 2, 1},
-                          PersistentTreeMap.of("b", 2)
-                                  .assoc("c", 1)
-                                  .assoc("a", 3)
-                                  .values()
-                                  .toArray());
+        {
+            UnIterator<Integer> iter = PersistentTreeMap.of("b", 2)
+                    .assoc("c", 1)
+                    .assoc("a", 3)
+                    .values().iterator();
+
+            assertTrue(iter.hasNext());
+            assertEquals(Integer.valueOf(3), iter.next());
+
+            assertTrue(iter.hasNext());
+            assertEquals(Integer.valueOf(2), iter.next());
+
+            assertTrue(iter.hasNext());
+            assertEquals(Integer.valueOf(1), iter.next());
+
+            assertFalse(iter.hasNext());
+        }
 
         PersistentTreeMap<String,Integer> m2 = PersistentTreeMap.of("c", 3)
                         .assoc("b", 2)

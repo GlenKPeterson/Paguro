@@ -200,9 +200,9 @@ public class PersistentVectorTest {
         Map<Integer,Double> benchmarkRatios = unMap(
                 1, 1.3,
                 10, 2.7,
-                100, 4.9,
+                100, 6.5,
                 1000, 8.4,
-                10000, 10.2,
+                10000, 10.4,
                 100000, 13.9,
                 1000000, 7.7);
 
