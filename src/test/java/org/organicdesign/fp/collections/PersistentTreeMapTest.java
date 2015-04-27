@@ -1,8 +1,11 @@
 package org.organicdesign.fp.collections;
 
+import java.util.NoSuchElementException;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.organicdesign.fp.function.Function2;
 import org.organicdesign.fp.permanent.Sequence;
 
 import static org.junit.Assert.*;
@@ -67,7 +70,7 @@ public class PersistentTreeMapTest {
         assertArrayEquals(new String[]{"a", "b", "c"}, m1.keySet().toArray());
 
         // Values are a sorted set as well...
-        assertArrayEquals(new Integer[]{1, 2, 3}, m1.values().toArray());
+        assertArrayEquals(new Integer[]{3, 2, 1}, m1.values().toArray());
 
         assertArrayEquals(new String[]{"a", "b", "c"},
                           PersistentTreeMap.of("a", 3)
@@ -76,16 +79,17 @@ public class PersistentTreeMapTest {
                                   .keySet().toArray());
 
 
-        assertArrayEquals(new Integer[]{1, 2, 3},
+        assertArrayEquals(new Integer[]{3, 2, 1},
                           PersistentTreeMap.of("b", 2)
                                   .assoc("c", 1)
                                   .assoc("a", 3)
                                   .values()
                                   .toArray());
 
-        UnIterator<UnMap.UnEntry<String,Integer>> iter = PersistentTreeMap.of("c", 3)
-                .assoc("b", 2)
-                .assoc("a", 1).iterator();
+        PersistentTreeMap<String,Integer> m2 = PersistentTreeMap.of("c", 3)
+                        .assoc("b", 2)
+                        .assoc("a", 1);
+        UnIterator<UnMap.UnEntry<String,Integer>> iter = m2.iterator();
         UnMap.UnEntry<String,Integer> next = iter.next();
         assertEquals("a", next.getKey());
         assertEquals(Integer.valueOf(1), next.getValue());
@@ -97,6 +101,29 @@ public class PersistentTreeMapTest {
         next = iter.next();
         assertEquals("c", next.getKey());
         assertEquals(Integer.valueOf(3), next.getValue());
+
+        assertEquals(Function2.defaultComparator(), m2.comparator());
+        assertNotEquals(String.CASE_INSENSITIVE_ORDER.reversed(), m2.comparator());
+
+        PersistentTreeMap<String,Integer> m3 = PersistentTreeMap.of("a", 1, String.CASE_INSENSITIVE_ORDER.reversed())
+                .assoc("b", 2)
+                .assoc("c", 3);
+        UnIterator<UnMap.UnEntry<String,Integer>> iter2 = m3.iterator();
+
+        next = iter2.next();
+        assertEquals("c", next.getKey());
+        assertEquals(Integer.valueOf(3), next.getValue());
+
+        next = iter2.next();
+        assertEquals("b", next.getKey());
+        assertEquals(Integer.valueOf(2), next.getValue());
+
+        next = iter2.next();
+        assertEquals("a", next.getKey());
+        assertEquals(Integer.valueOf(1), next.getValue());
+
+        assertEquals(String.CASE_INSENSITIVE_ORDER.reversed(), m3.comparator());
+        assertNotEquals(Function2.defaultComparator(), m3.comparator());
     }
 
     @Test public void hashCodeAndEquals() {
@@ -221,4 +248,41 @@ public class PersistentTreeMapTest {
                              .assoc(6, "six").assoc(6, "seven").toString());
     }
 
+    @Test public void without() {
+        PersistentTreeMap<Integer,String> m = PersistentTreeMap.of(1, "one").assoc(2, "two").assoc(3, "three");
+
+        assertEquals(m, m.without(0));
+
+        assertEquals(PersistentTreeMap.of(2, "two").assoc(3, "three"),
+                     m.without(1));
+
+        assertEquals(PersistentTreeMap.of(1, "one").assoc(3, "three"),
+                     m.without(2));
+
+        assertEquals(PersistentTreeMap.of(1, "one").assoc(2, "two"),
+                     m.without(3));
+
+        assertEquals(m, m.without(4));
+
+        assertEquals(PersistentTreeMap.of(3, "three"),
+                     m.without(1).without(2));
+
+        assertEquals(PersistentTreeMap.of(1, "one").assoc(3, "three"),
+                     m.without(2));
+
+        assertEquals(PersistentTreeMap.of(1, "one").assoc(2, "two"),
+                     m.without(3));
+
+        assertEquals(PersistentTreeMap.EMPTY, PersistentTreeMap.empty().without(4));
+    }
+
+    @Test public void lastKey() {
+        PersistentTreeMap<Integer,String> m = PersistentTreeMap.of(1, "one").assoc(2, "two").assoc(3, "three");
+        assertEquals(Integer.valueOf(3), m.lastKey());
+        assertEquals(Integer.valueOf(2), m.without(3).lastKey());
+        assertEquals(Integer.valueOf(1), m.without(2).without(3).lastKey());
+    }
+
+    @Test(expected = NoSuchElementException.class)
+    public void lastKeyEx() { PersistentTreeMap.empty().lastKey(); }
 }

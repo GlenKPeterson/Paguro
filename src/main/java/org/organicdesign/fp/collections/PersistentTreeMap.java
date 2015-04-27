@@ -15,6 +15,7 @@ import java.util.Objects;
 import java.util.Stack;
 
 import org.organicdesign.fp.Option;
+import org.organicdesign.fp.function.Function0;
 import org.organicdesign.fp.function.Function2;
 import org.organicdesign.fp.permanent.Sequence;
 
@@ -34,20 +35,24 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
     private final Node<K,V> tree;
     private final int size;
 
-    final static public PersistentTreeMap EMPTY = new PersistentTreeMap();
+    final static public PersistentTreeMap EMPTY = new PersistentTreeMap<>(Function2.defaultComparator(), null, 0);
 
     @SuppressWarnings("unchecked")
     public static <K, V> PersistentTreeMap<K,V> empty() {
         return (PersistentTreeMap<K,V>) EMPTY;
     }
 
-//    static public <K, V> PersistentTreeMap<K,V> create(Map<K,V> other) {
-//        PersistentTreeMap<K,V> ret = empty();
-//        for (Map.Entry<K,V> e : other.entrySet()) {
-//            ret = ret.assoc(e.getKey(), e.getValue());
-//        }
-//        return ret;
-//    }
+    private PersistentTreeMap(Comparator<K> c, Node<K,V> t, int n) {
+        comp = c; tree = t; size = n;
+    }
+
+    public static <K extends Comparable<K>,V> PersistentTreeMap<K,V> of(K key, V val) {
+        return new PersistentTreeMap<K,V>(Function2.defaultComparator(), null, 0).assoc(key, val);
+    }
+
+    public static <K,V> PersistentTreeMap<K,V> of(K key, V val, Comparator<K> c) {
+        return new PersistentTreeMap<K,V>(c, null, 0).assoc(key, val);
+    }
 
     /**
      Returns a view of the mappings contained in this map.  The set should actually contain UnMap.Entry items, but that
@@ -101,7 +106,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         }
         // Don't iterate through entire map for only the last item.
         if (compFromKeyLastKey == 0) {
-            return of(last.getKey(), last.getValue());
+            return of(last.getKey(), last.getValue(), comp);
         }
 
         ImMapSorted<K,V> ret = empty();
@@ -109,16 +114,12 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         while (iter.hasNext()) {
             UnEntry<K,V> next = iter.next();
             K key = next.getKey();
-//            System.out.println("\tChecking key: " + key);
             if (comp.compare(toKey, key) <= 0) {
-//                System.out.println("\tPassed end! " + key);
                 break;
             }
             if (comp.compare(fromKey, key) > 0) {
-//                System.out.println("\tNot to beginning yet " + key);
                 continue;
             }
-//            System.out.println("\tValid: " + key);
             ret = ret.assoc(key, next.getValue());
         }
         return ret;
@@ -140,11 +141,24 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         return sB.append(")").toString();
     }
 
-
     /** {@inheritDoc} */
-    @Override
-    public UnCollection<V> values() {
-        return this.map((e) -> e.getValue()).toUnSetSorted();
+    @Override public UnCollection<V> values() {
+        class ValueWrapper<B,Z> implements UnCollection<B> {
+            private final Function0<UnIterator<UnEntry<Z,B>>> iterFactory;
+            private ValueWrapper(Function0<UnIterator<UnEntry<Z,B>>> f) { iterFactory = f; }
+
+            @Override public int size() { return size; }
+
+            /** An unmodifiable iterator {@inheritDoc} */
+            @Override public UnIterator<B> iterator() {
+                final UnIterator<UnMap.UnEntry<Z,B>> iter = iterFactory.apply();
+                return new UnIterator<B>() {
+                    @Override public boolean hasNext() { return iter.hasNext(); }
+                    @Override public B next() { return iter.next().getValue(); }
+                };
+            }
+        }
+        return new ValueWrapper<>(() -> this.iterator());
     }
 
     @Override public Option<UnEntry<K,V>> head() {
@@ -174,7 +188,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         }
         // Don't iterate through entire map for only the last item.
         if (compFromKeyLastKey == 0) {
-            return of(last.getKey(), last.getValue());
+            return of(last.getKey(), last.getValue(), comp);
         }
 
         ImMapSorted<K,V> ret = empty();
@@ -203,22 +217,11 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         return Sequence.emptySequence();
     }
 
-    // TODO: What use is this?
+    // TODO: Replace with Mutable.Ref, or make methods return Tuple2.
     private class Box<E> {
         public E val;
         public Box(E val) { this.val = val; }
     }
-
-    private PersistentTreeMap(Comparator<K> c, Node<K,V> t, int n) {
-        comp = (c == null) ? Function2.defaultComparator() : c;
-        tree = t;
-        size = n;
-    }
-    public PersistentTreeMap(Comparator<K> c) { this(c, null, 0); }
-    public PersistentTreeMap() { this(null, null, 0); }
-
-    @SuppressWarnings("unchecked")
-    public static <K,V> PersistentTreeMap<K,V> of(K key, V val) { return EMPTY.assoc(key, val); }
 
 //    @SuppressWarnings("unchecked")
 //    static public <S, K extends S, V extends S> PersistentTreeMap<K,V> create(ISeq<S> items) {
@@ -242,6 +245,8 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 //        }
 //        return ret;
 //    }
+
+    @Override public Comparator<? super K> comparator() { return comp; }
 
     @SuppressWarnings("unchecked")
     @Override public boolean containsKey(Object key) {
@@ -277,15 +282,16 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         return new PersistentTreeMap<>(comp, t.blacken(), size + 1);
     }
 
-    @Override
-    public PersistentTreeMap<K,V> without(K key) {
+    @Override public PersistentTreeMap<K,V> without(K key) {
         Box<Node<K,V>> found = new Box<>(null);
         Node<K,V> t = remove(tree, key, found);
         if (t == null) {
-            if (found.val == null)//null == doesn't contain key
+            //null == doesn't contain key
+            if (found.val == null) {
                 return this;
+            }
             //empty
-            return new PersistentTreeMap<>(comp);
+            return new PersistentTreeMap<>(comp, null, 0);
         }
         return new PersistentTreeMap<>(comp, t.blacken(), size - 1);
     }
@@ -303,9 +309,6 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 //            return Seq.create(tree, false, size);
 //        return null;
 //    }
-
-    @Override
-    public Comparator<? super K> comparator() { return comp; }
 
 //    @Override
 //    public Object entryKey(Map.Entry<K,V> entry) {
@@ -395,11 +398,6 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 // public Object valAt(Object key){
 // Default implementation now inherited from ILookup
 
-    @SuppressWarnings("UnusedDeclaration")
-    public int capacity() {
-        return size;
-    }
-
     @Override public int size() { return size; }
 
     public Node<K,V> entryAt(K key) {
@@ -422,7 +420,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 //	return ((Comparable) k1).compareTo(k2);
     }
 
-    Node<K,V> add(Node<K,V> t, K key, V val, Box<Node<K,V>> found) {
+    private Node<K,V> add(Node<K,V> t, K key, V val, Box<Node<K,V>> found) {
         if (t == null) {
             if (val == null)
                 return new Red<>(key);
@@ -441,7 +439,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         return t.addRight(ins);
     }
 
-    Node<K,V> remove(Node<K,V> t, K key, Box<Node<K,V>> found) {
+    private Node<K,V> remove(Node<K,V> t, K key, Box<Node<K,V>> found) {
         if (t == null)
             return null; //not found indicator
         int c = doCompare(key, t.key);
@@ -468,7 +466,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
     //static <K,V, K1 extends K, K2 extends K, V1 extends V, V2 extends V>
 //Node<K,V> append(Node<K1,V1> left, Node<K2,V2> right){
     @SuppressWarnings("unchecked")
-    static <K, V> Node<K,V> append(Node<? extends K,? extends V> left,
+    private static <K, V> Node<K,V> append(Node<? extends K,? extends V> left,
                                    Node<? extends K,? extends V> right) {
         if (left == null)
             return (Node<K,V>) right;
@@ -499,7 +497,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         }
     }
 
-    static <K, V, K1 extends K, V1 extends V>
+    private static <K, V, K1 extends K, V1 extends V>
     Node<K,V> balanceLeftDel(K1 key, V1 val,
                              Node<? extends K,? extends V> del,
                              Node<? extends K,? extends V> right) {
@@ -515,7 +513,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
             throw new UnsupportedOperationException("Invariant violation");
     }
 
-    static <K, V, K1 extends K, V1 extends V>
+    private static <K, V, K1 extends K, V1 extends V>
     Node<K,V> balanceRightDel(K1 key, V1 val,
                               Node<? extends K,? extends V> left,
                               Node<? extends K,? extends V> del) {
@@ -531,7 +529,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
             throw new UnsupportedOperationException("Invariant violation");
     }
 
-    static <K, V, K1 extends K, V1 extends V>
+    private static <K, V, K1 extends K, V1 extends V>
     Node<K,V> leftBalance(K1 key, V1 val,
                           Node<? extends K,? extends V> ins,
                           Node<? extends K,? extends V> right) {
@@ -546,7 +544,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
     }
 
 
-    static <K, V, K1 extends K, V1 extends V>
+    private static <K, V, K1 extends K, V1 extends V>
     Node<K,V> rightBalance(K1 key, V1 val,
                            Node<? extends K,? extends V> left,
                            Node<? extends K,? extends V> ins) {
@@ -560,7 +558,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
             return black(key, val, left, ins);
     }
 
-    Node<K,V> replace(Node<K,V> t, K key, V val) {
+    private Node<K,V> replace(Node<K,V> t, K key, V val) {
         int c = doCompare(key, t.key);
         return t.replace(t.key,
                          c == 0 ? val : t.val(),
@@ -569,7 +567,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
     }
 
     @SuppressWarnings({"unchecked", "RedundantCast", "Convert2Diamond"})
-    static <K, V, K1 extends K, V1 extends V>
+    private static <K, V, K1 extends K, V1 extends V>
     Red<K,V> red(K1 key, V1 val,
                  Node<? extends K,? extends V> left,
                  Node<? extends K,? extends V> right) {
@@ -584,7 +582,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
     }
 
     @SuppressWarnings({"unchecked", "RedundantCast", "Convert2Diamond"})
-    static <K, V, K1 extends K, V1 extends V>
+    private static <K, V, K1 extends K, V1 extends V>
     Black<K,V> black(K1 key, V1 val,
                      Node<? extends K,? extends V> left,
                      Node<? extends K,? extends V> right) {
@@ -603,7 +601,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 //        private Reduced(A a) { val = a; }
 //    }
 
-    static abstract class Node<K, V> implements UnEntry<K,V> {
+    private static abstract class Node<K, V> implements UnEntry<K,V> {
         final K key;
 
         Node(K key) { this.key = key; }
@@ -674,7 +672,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 //        }
     } // end class Node.
 
-    static class Black<K, V> extends Node<K,V> {
+    private static class Black<K, V> extends Node<K,V> {
         public Black(K key) { super(key); }
 
         @Override Node<K,V> addLeft(Node<K,V> ins) { return ins.balanceLeft(this); }
@@ -691,10 +689,9 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 
         @Override
         Node<K,V> replace(K key, V val, Node<K,V> left, Node<K,V> right) { return black(key, val, left, right); }
-
     }
 
-    static class BlackVal<K, V> extends Black<K,V> {
+    private static class BlackVal<K, V> extends Black<K,V> {
         final V val;
 
         public BlackVal(K key, V val) {
@@ -728,7 +725,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         }
     }
 
-    static class BlackBranch<K, V> extends Black<K,V> {
+    private static class BlackBranch<K, V> extends Black<K,V> {
         final Node<K,V> left;
 
         final Node<K,V> right;
@@ -750,7 +747,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 
     }
 
-    static class BlackBranchVal<K, V> extends BlackBranch<K,V> {
+    private static class BlackBranchVal<K, V> extends BlackBranch<K,V> {
         final V val;
 
         public BlackBranchVal(K key, V val, Node<K,V> left, Node<K,V> right) {
@@ -784,7 +781,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         }
     }
 
-    static class Red<K, V> extends Node<K,V> {
+    private static class Red<K, V> extends Node<K,V> {
         public Red(K key) { super(key); }
 
         @Override Node<K,V> addLeft(Node<K,V> ins) { return red(key, val(), ins, right()); }
@@ -805,7 +802,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 
     }
 
-    static class RedVal<K, V> extends Red<K,V> {
+    private static class RedVal<K, V> extends Red<K,V> {
         final V val;
 
         public RedVal(K key, V val) {
@@ -839,7 +836,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         }
     }
 
-    static class RedBranch<K, V> extends Red<K,V> {
+    private static class RedBranch<K, V> extends Red<K,V> {
         final Node<K,V> left;
 
         final Node<K,V> right;
@@ -880,7 +877,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
     }
 
 
-    static class RedBranchVal<K, V> extends RedBranch<K,V> {
+    private static class RedBranchVal<K, V> extends RedBranch<K,V> {
         final V val;
 
         public RedBranchVal(K key, V val, Node<K,V> left, Node<K,V> right) {
