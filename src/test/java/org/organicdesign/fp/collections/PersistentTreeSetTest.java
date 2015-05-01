@@ -11,6 +11,10 @@ import static org.junit.Assert.*;
 
 @RunWith(JUnit4.class)
 public class PersistentTreeSetTest {
+
+    public static final Comparator<String> STR_LEN_COMP = (a, b) -> a.length() - b.length();
+
+
     @Test public void assocAndGet() {
         PersistentTreeSet<String> s1 = PersistentTreeSet.empty();
         assertTrue(s1.isEmpty());
@@ -104,16 +108,14 @@ public class PersistentTreeSetTest {
         assertEquals(Function2.defaultComparator(), s1.comparator());
 
 
-        Comparator<String> comp = (a, b) -> a.length() - b.length();
-
-        PersistentTreeSet<String> s2 = PersistentTreeSet.ofComp(comp,
+        PersistentTreeSet<String> s2 = PersistentTreeSet.ofComp(STR_LEN_COMP,
                                                                 "hello", "an", "work", "b", "the");
-        assertEquals(comp, s2.comparator());
+        assertEquals(STR_LEN_COMP, s2.comparator());
         assertEquals(5, s2.size());
         assertEquals("b", s2.first());
         assertEquals("hello", s2.last());
 
-        assertEquals(comp, s2.subSet("", "                 ").comparator());
+        assertEquals(STR_LEN_COMP, s2.subSet("", "                 ").comparator());
 
         assertArrayEquals(new String[]{"b", "an", "the", "work", "hello"},
                           s2.toTypedArray());
@@ -127,7 +129,7 @@ public class PersistentTreeSetTest {
         assertArrayEquals(new String[]{"b", "an", "the", "work", "hello"},
                           s2.subSet("z", "aaaaaa").toTypedArray());
 
-        assertEquals(comp, s2.subSet("a", "four").comparator());
+        assertEquals(STR_LEN_COMP, s2.subSet("a", "four").comparator());
 
         assertArrayEquals(new String[]{"b", "an", "the"},
                           s2.subSet("a", "four").toTypedArray());
@@ -141,12 +143,15 @@ public class PersistentTreeSetTest {
         assertArrayEquals(new String[0],
                           s2.subSet("the", "the").toTypedArray());
 
-        assertEquals(comp, s2.comparator());
+        assertEquals(STR_LEN_COMP, s2.comparator());
     }
 
-//    // TODO: Finish this!
-//    @Test public void testToString() {
-//
-//    }
+    // TODO: Finish this!
+    @Test public void testToString() {
+        PersistentTreeSet<String> s2 = PersistentTreeSet.ofComp(STR_LEN_COMP);
+
+        assertEquals("PersistentTreeSet(b,an,the,work,hello)",
+                     s2.put("hello").put("an").put("work").put("b").put("the").toString());
+    }
 
 }
