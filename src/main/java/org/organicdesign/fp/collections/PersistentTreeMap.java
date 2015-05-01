@@ -55,7 +55,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
     }
 
     public static <K,V> PersistentTreeMap<K,V> of(Comparator<K> c) {
-        return new PersistentTreeMap<K,V>(c, null, 0);
+        return new PersistentTreeMap<>(c, null, 0);
     }
 
     /**
@@ -72,7 +72,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         ImSet<Entry<K,V>> ret = PersistentTreeSet.ofComp((a, b) -> comp.compare(a.getKey(), b.getKey()));
 
         UnIterator<UnEntry<K,V>> iter = this.iterator();
-        while (iter.hasNext()) { ret.put(iter.next()); }
+        while (iter.hasNext()) { ret = ret.put(iter.next()); }
         return ret;
     }
 
@@ -150,13 +150,12 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 
     /** {@inheritDoc} */
     @Override public UnCollection<V> values() {
-        class ValueWrapper<B,Z> implements UnCollection<B> {
+        class ValueColl<B,Z> implements UnCollection<B> {
             private final Function0<UnIterator<UnEntry<Z,B>>> iterFactory;
-            private ValueWrapper(Function0<UnIterator<UnEntry<Z,B>>> f) { iterFactory = f; }
+            private ValueColl(Function0<UnIterator<UnEntry<Z, B>>> f) { iterFactory = f; }
 
             @Override public int size() { return size; }
 
-            /** An unmodifiable iterator {@inheritDoc} */
             @Override public UnIterator<B> iterator() {
                 final UnIterator<UnMap.UnEntry<Z,B>> iter = iterFactory.apply();
                 return new UnIterator<B>() {
@@ -172,7 +171,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
             }
             @Override public String toString() { return UnIterable.toString("ValueWrapper", this); }
         }
-        return new ValueWrapper<>(() -> this.iterator());
+        return new ValueColl<>(() -> this.iterator());
     }
 
     @Override public Option<UnEntry<K,V>> head() {

@@ -1,5 +1,7 @@
 package org.organicdesign.fp.collections;
 
+import java.util.Arrays;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.junit.Test;
@@ -324,5 +326,35 @@ public class PersistentTreeMapTest {
                                  "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty again",
                                  "twenty one"),
                 m.values()));
+    }
+
+    @Test public void entrySet() {
+        PersistentTreeMap<Integer,String> m =
+                PersistentTreeMap.of(1, "one").assoc(2, "two").assoc(3, "three").assoc(4, "four").assoc(5, "five");
+        ImSet<Map.Entry<Integer,String>> s =
+                PersistentTreeSet.ofComp((a, b) -> a.getKey() - b.getKey(),
+                                         UnMap.UnEntry.of(1, "one"),
+                                         UnMap.UnEntry.of(2, "two"),
+                                         UnMap.UnEntry.of(3, "three"),
+                                         UnMap.UnEntry.of(4, "four"),
+                                         UnMap.UnEntry.of(5, "five"));
+        assertEquals(s, m.entrySet());
+    }
+
+    @Test public void values() {
+        PersistentTreeMap<Integer,String> m =
+                PersistentTreeMap.of(4, "four").assoc(5, "five").assoc(2, "two").assoc(3, "three").assoc(1, "one");
+
+        assertArrayEquals(new String[] {"one", "two", "three", "four", "five"},
+                          m.values().toArray(new String[5]));
+
+        assertTrue(m.values().equals(Arrays.asList("one", "two", "three", "four", "five")));
+        assertNotEquals(0, m.values().hashCode());
+        assertNotEquals(m.values().hashCode(), PersistentTreeMap.of(4, "four").assoc(5, "five").hashCode());
+        assertEquals(m.values().hashCode(),
+                     PersistentTreeMap.of(4, "four").assoc(2, "two").assoc(5, "five").assoc(1, "one").assoc(3, "three")
+                             .values()
+                             .hashCode());
+
     }
 }
