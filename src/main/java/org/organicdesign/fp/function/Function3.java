@@ -13,6 +13,11 @@
 // limitations under the License.
 package org.organicdesign.fp.function;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.organicdesign.fp.Option;
+
 /** A three-argument, exception-safe functional interface. */
 @FunctionalInterface
 public interface Function3<A,B,C,R> {
@@ -32,4 +37,36 @@ public interface Function3<A,B,C,R> {
             throw new RuntimeException(e);
         }
     }
+
+    /**
+     Use only on pure functions with no side effects.  Wrap an expensive function with this and for each input
+     value, the output will only be computed once.  Subsequent calls with the same input will return identical output
+     very quickly.  Please note that the parameters to f need to implement equals() and hashCode() correctly
+     for this to work correctly and quickly.  Also, make sure your domain is very small!  This function uses O(n^3)
+     memory.
+     */
+    static <A,B,C,D> Function3<A,B,C,D> memoize(Function3<A,B,C,D> f) {
+        return new Function3<A,B,C,D>() {
+            private final Map<A,Map<B,Map<C,Option<D>>>> aMap = new HashMap<>();
+            @Override
+            public synchronized D applyEx(A a, B b, C c) throws Exception {
+                Map<B,Map<C,Option<D>>> bMap = aMap.get(a);
+                if (bMap == null) {
+                    bMap = new HashMap<>();
+                    aMap.put(a, bMap);
+                }
+                Map<C,Option<D>> cMap = bMap.get(b);
+                if (cMap == null) {
+                    cMap = new HashMap<>();
+                    bMap.put(b, cMap);
+                }
+                Option<D> val = cMap.get(c);
+                if ((val != null) && val.isSome()) { return val.get(); }
+                D ret = f.apply(a, b, c);
+                cMap.put(c, Option.of(ret));
+                return ret;
+            }
+        };
+    }
+
 }

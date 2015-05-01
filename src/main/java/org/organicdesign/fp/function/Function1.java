@@ -15,10 +15,13 @@
 package org.organicdesign.fp.function;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.organicdesign.fp.Option;
 import org.organicdesign.fp.ephemeral.View;
 
 /**
@@ -312,5 +315,25 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
 
         @SuppressWarnings("unchecked")
         public abstract <T> Function1<T,Boolean> combineArray(Function1<T,Boolean>... in);
+    }
+
+    /**
+     Use only on pure functions with no side effects.  Wrap an expensive function with this and for each input
+     value, the output will only be computed once.  Subsequent calls with the same input will return identical output
+     very quickly.  Please note that the return values from f need to implement equals() and hashCode() correctly
+     for this to work correctly and quickly.
+     */
+    static <A,B> Function1<A,B> memoize(Function1<A,B> f) {
+        return new Function1<A, B>() {
+            private final Map<A,Option<B>> memo = new HashMap<>();
+            @Override
+            public synchronized B applyEx(A a) throws Exception {
+                Option<B> val = memo.get(a);
+                if ( (val != null) && val.isSome() ) { return val.get(); }
+                B ret = f.apply(a);
+                memo.put(a, Option.of(ret));
+                return ret;
+            }
+        };
     }
 }

@@ -58,6 +58,8 @@ public class Lazy {
             // We're clear to return the lazily computed value.
             return value;
         }
+
+        public String toString() { return "Lazy.Ref(" + ((producer == null) ? value : "*not-computed-yet*") + ")"; }
     }
 
 
@@ -111,6 +113,7 @@ public class Lazy {
             // We're clear to return the lazily computed value.
             return value;
         }
+        public String toString() { return "Lazy.Int(" + ((producer == null) ? value : "*not-computed-yet*") + ")"; }
     }
 
 

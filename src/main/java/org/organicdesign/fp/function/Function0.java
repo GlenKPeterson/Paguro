@@ -49,6 +49,38 @@ public interface Function0<U> extends Supplier<U> {
             return null;
         }
     };
+
+    /**
+     Wraps a value in a constant function.  If you need to "memoize" some really expensive operation, use it to wrap
+     a Lazy.Ref.
+     */
+    static <K> Function0<K> constantFunction(final K k) {
+        return new Function0<K>() {
+            @Override public K applyEx() {
+                return k;
+            }
+            @Override public int hashCode() { return (k == null) ? 0 : k.hashCode(); }
+            @Override public boolean equals(Object o) {
+                if (this == o) { return true; }
+                if ( (o == null) || !(o instanceof Supplier) ) { return false; }
+                return k.equals(((Supplier) o).get());
+            }
+            @Override public String toString() { return "() -> " + k; };
+        };
+    }
+
+//    /**
+//     Use only on pure functions with no side effects.
+//     In this case, that means a constant function (always returns the same value).
+//     */
+//    static <T> Function0<T> memoize(Function0<T> f) {
+//        return new Function0<T>() {
+//            Lazy.Ref<T> ref = Lazy.Ref.of(() -> f.apply());
+//            @Override public T applyEx() throws Exception {
+//                return ref.get();
+//            }
+//        };
+//    }
 // Don't think this is necessary.  Is it?
 //    default Supplier<U> asSupplier() {
 //        return () -> apply();
