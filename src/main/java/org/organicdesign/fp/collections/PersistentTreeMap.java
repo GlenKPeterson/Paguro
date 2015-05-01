@@ -54,6 +54,10 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         return new PersistentTreeMap<K,V>(c, null, 0).assoc(key, val);
     }
 
+    public static <K,V> PersistentTreeMap<K,V> of(Comparator<K> c) {
+        return new PersistentTreeMap<K,V>(c, null, 0);
+    }
+
     /**
      Returns a view of the mappings contained in this map.  The set should actually contain UnMap.Entry items, but that
      return signature is illegal in Java, so you'll just have to remember.
@@ -63,7 +67,10 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 //        return this.foldLeft(ImSet.empty(), (accum, entry) -> accum.put(entry));
 
         // This may be faster, but I haven't timed it.
-        ImSet<Entry<K,V>> ret = ImSet.empty();
+
+        // Preserve comparator!
+        ImSet<Entry<K,V>> ret = PersistentTreeSet.ofComp((a, b) -> comp.compare(a.getKey(), b.getKey()));
+
         UnIterator<UnEntry<K,V>> iter = this.iterator();
         while (iter.hasNext()) { ret.put(iter.next()); }
         return ret;
@@ -81,7 +88,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
     }
 
     /** Returns a view of the keys contained in this map. */
-    @Override public ImSet<K> keySet() { return PersistentTreeSet.of(this); }
+    @Override public ImSet<K> keySet() { return PersistentTreeSet.ofMap(this); }
 
     /** {@inheritDoc} */
     @Override public ImMapSorted<K,V> subMap(K fromKey, K toKey) {
@@ -109,7 +116,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
             return of(last.getKey(), last.getValue(), comp);
         }
 
-        ImMapSorted<K,V> ret = empty();
+        ImMapSorted<K,V> ret = new PersistentTreeMap<>(comp, null, 0);
         UnIterator<UnEntry<K,V>> iter = this.iterator();
         while (iter.hasNext()) {
             UnEntry<K,V> next = iter.next();

@@ -65,8 +65,32 @@ public class PersistentTreeSet<E> implements ImSetSorted<E> {
 
     private PersistentTreeSet(ImMapSorted<E,?> i) { impl = i; }
 
+    public static <T> PersistentTreeSet<T> ofComp(Comparator<T> comp) {
+        return new PersistentTreeSet<>(PersistentTreeMap.of(comp));
+    }
 
-    public static <T> PersistentTreeSet<T> of(ImMapSorted<T,?> i) { return new PersistentTreeSet<>(i); }
+    @SafeVarargs
+    public static <T> PersistentTreeSet<T> ofComp(Comparator<T> comp, T... items) {
+        PersistentTreeSet<T> ret = new PersistentTreeSet<>(PersistentTreeMap.of(comp));
+        if ( (items == null) || (items.length < 1) ) { return ret; }
+        for (T item : items) {
+            ret = ret.put(item);
+        }
+        return ret;
+    }
+
+    @SafeVarargs
+    public static <T extends Comparable<T>> PersistentTreeSet<T> of(T... items) {
+        // empty() uses default comparator
+        if ( (items == null) || (items.length < 1) ) { return empty(); }
+        PersistentTreeSet<T> ret = empty();
+        for (T item : items) {
+            ret = ret.put(item);
+        }
+        return ret;
+    }
+
+    public static <T> PersistentTreeSet<T> ofMap(ImMapSorted<T,?> i) { return new PersistentTreeSet<>(i); }
 
     @Override public PersistentTreeSet<E> put(E e) {
         return (impl.containsKey(e)) ? this
@@ -81,7 +105,7 @@ public class PersistentTreeSet<E> implements ImSetSorted<E> {
     @Override public Comparator<? super E> comparator() { return impl.comparator(); }
 
     @Override public ImSetSorted<E> subSet(E fromElement, E toElement) {
-        return PersistentTreeSet.of(impl.subMap(fromElement, toElement));
+        return PersistentTreeSet.ofMap(impl.subMap(fromElement, toElement));
     }
 
     @Override public E first() { return impl.firstKey(); }
@@ -91,21 +115,7 @@ public class PersistentTreeSet<E> implements ImSetSorted<E> {
     // TODO: Ensure that KeySet is sorted.
     @Override public Sequence<E> tail() { return impl.without(first()).keySet(); }
 
-    @Override public String toString() {
-        StringBuilder sB = new StringBuilder("PersistentTreeSet(");
-        int itemsProcessed = 0;
-        for (E item : this) {
-            if (itemsProcessed > 5) {
-                sB.append(",...");
-                break;
-            } else if (itemsProcessed > 0) {
-                sB.append(",");
-            }
-            sB.append(item);
-            itemsProcessed++;
-        }
-        return sB.append(")").toString();
-    }
+    @Override public String toString() { return UnIterable.toString("PersistentTreeSet", this); }
 
     @Override public E last() { return impl.lastKey(); }
 
