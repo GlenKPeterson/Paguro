@@ -1,4 +1,6 @@
-Like functional programming and Clojure, but have to use Java at work?  Would Clojure be perfect for you if it only had types?  J-cicle (pronounced "Jay-sick-ul" like a frozen/immutable Java-icicle) brings the Clojure collections and a Sequence abstraction to Java, but with the full type saftey and compile-time checking that Java programmers are accustomed to.  It's a 100% Java 8 compatible API (should be compatible back to Java 5)
+J-cicle (pronounced "Jay-sick-ul" like a frozen/immutable Java&trade;-icicle) brings Clojure collections, a Sequence
+abstraction, memoization, and some syntactical sugar to Java with the full type saftey and compile-time checking
+that Java programmers are accustomed to.  It's a 100% Java 8 compatible API.
 
 #Usage
 How hard is it to create an immutable, type safe map in Java?  Are you tired of writing code like this:
@@ -24,6 +26,15 @@ Map<String,Integer> itemMap = unMapSkipNull(
 
 Similar type-safe methods are available for producing unmodifiable Sets and Lists of any length (unMaps currently go
 from 0 to 20 type-safe parameters).
+
+What if you want to add another item to an immutable map?
+
+```java
+Map<String,Integer> itemMap = iMap(
+        "One", 1,
+        "Two", 2,
+        "Three", 3).assoc("Four", 4);
+```
 
 What about transforming your unmodifiable data into other unmodifiable data?  Lazily, without any extra processing?
 Typical usage (based on this unit test: <a href="https://github.com/GlenKPeterson/fp4java7/blob/master/src/test/java/org/organicdesign/fp/persistent/SequenceTest.java">SequenceTest.java</a>):
@@ -176,7 +187,7 @@ default-implemented to throw exceptions.
 collection unchanged.
 - Basic sequence abstraction on the Im- versions of the above.
 - Function interfaces that manage exceptions and play nicely with java.util.function.*
-- Unfortunately, this is not
+- Memoization methods on functional interfaces.
 
 2015-04-05 version 0.8.2:
 - Renamed Sequence.first() and .rest() to .head() and .tail() so that they wouldn't conflict with TreeSet.first()
