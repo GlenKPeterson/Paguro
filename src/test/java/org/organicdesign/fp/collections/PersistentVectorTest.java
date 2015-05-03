@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import org.junit.Test;
@@ -281,4 +282,79 @@ public class PersistentVectorTest {
         assertTrue(meanRatio < 5.6);
     }
 
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void putEx() { PersistentVector.empty().put(1, "Hello"); }
+
+    @Test public void put() {
+        PersistentVector<String> pv = PersistentVector.empty();
+        pv = pv.put(0, "Hello").put(1, "World");
+        assertArrayEquals(new String[] { "Hello", "World" },
+                          pv.toArray());
+
+        assertArrayEquals(new String[]{"Goodbye", "World"},
+                          pv.put(0, "Goodbye").toArray());
+
+        PersistentVector<Integer> pv2 = PersistentVector.empty();
+        int len = 999;
+        Integer[] test = new Integer[len];
+        for (int i = 0; i < len; i++) {
+            pv2 = pv2.put(i, i);
+            test[i] = i;
+        }
+        assertArrayEquals(test, pv2.toArray());
+
+        for (int i = 0; i < len; i++) {
+            pv2 = pv2.put(i, len - i);
+            test[i] = len - i;
+        }
+        assertArrayEquals(test, pv2.toArray());
+    }
+
+    @Test public void listIterator() {
+        PersistentVector<Integer> pv2 = PersistentVector.empty();
+        int len = 999;
+        Integer[] test = new Integer[len];
+
+        for (int i = 0; i < len; i++) {
+            pv2 = pv2.put(i, len - i);
+            test[i] = len - i;
+        }
+        assertArrayEquals(test, pv2.toArray());
+
+        List<Integer> tList = Arrays.asList(test);
+        ListIterator<Integer> benchmark = tList.listIterator(7);
+        ListIterator<Integer> subjectIter = pv2.listIterator(7);
+
+        assertEquals(benchmark.hasNext(), subjectIter.hasNext());
+        assertEquals(benchmark.hasPrevious(), subjectIter.hasPrevious());
+        assertEquals(benchmark.nextIndex(), subjectIter.nextIndex());
+        assertEquals(benchmark.previousIndex(), subjectIter.previousIndex());
+
+        while(benchmark.hasNext() && subjectIter.hasNext()) {
+            assertEquals(benchmark.next(), subjectIter.next());
+            assertEquals(benchmark.hasNext(), subjectIter.hasNext());
+            assertEquals(benchmark.hasPrevious(), subjectIter.hasPrevious());
+            assertEquals(benchmark.nextIndex(), subjectIter.nextIndex());
+            assertEquals(benchmark.previousIndex(), subjectIter.previousIndex());
+        }
+
+        assertEquals(benchmark.hasNext(), subjectIter.hasNext());
+        assertEquals(benchmark.hasPrevious(), subjectIter.hasPrevious());
+        assertEquals(benchmark.nextIndex(), subjectIter.nextIndex());
+        assertEquals(benchmark.previousIndex(), subjectIter.previousIndex());
+
+        while(benchmark.hasPrevious() && subjectIter.hasPrevious()) {
+            assertEquals(benchmark.previous(), subjectIter.previous());
+            assertEquals(benchmark.hasNext(), subjectIter.hasNext());
+            assertEquals(benchmark.hasPrevious(), subjectIter.hasPrevious());
+            assertEquals(benchmark.nextIndex(), subjectIter.nextIndex());
+            assertEquals(benchmark.previousIndex(), subjectIter.previousIndex());
+        }
+
+        assertEquals(benchmark.hasNext(), subjectIter.hasNext());
+        assertEquals(benchmark.hasPrevious(), subjectIter.hasPrevious());
+        assertEquals(benchmark.nextIndex(), subjectIter.nextIndex());
+        assertEquals(benchmark.previousIndex(), subjectIter.previousIndex());
+
+    }
 }

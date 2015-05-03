@@ -258,14 +258,14 @@ public class PersistentVector<E> implements ImList<E> {
             }
 
             /** {@inheritDoc} */
-            @Override public int nextIndex() { return i + 1; }
+            @Override public int nextIndex() { return i; }
             /** {@inheritDoc} */
             @Override public E previous() {
                 if (i - base == 0) {
-                    array = leafNodeArrayFor(i);
-                    base += MAX_NODE_LENGTH;
+                    array = leafNodeArrayFor(i - 1);
+                    base -= MAX_NODE_LENGTH;
                 }
-                return array[i-- & LOW_BITS]; // TODO: Should we have decremented i sooner?
+                return array[--i & LOW_BITS];
             }
             /** {@inheritDoc} */
             @Override public int previousIndex() { return i - 1; }

@@ -75,11 +75,11 @@ public interface ImList<E> extends UnList<E> {
     }
 
     /**
-     Replace the item at the given index
+     Replace the item at the given index.  Note: i.put(i.size(), o) is equivalent to i.append(o).
 
      @param idx the index where the value should be stored.
      @param e the value to store
-     @return a new ImList with the additional item at the end.
+     @return a new ImList with the replaced item
      */
     ImList<E> put(int idx, E e);
 
