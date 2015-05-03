@@ -22,28 +22,38 @@ public interface ImList<E> extends UnList<E> {
 // E get(int index) {
 
     /**
-     * Inserts a new item at the specified index.
-     * @param i the zero-based index to insert at (pushes current item and all subsequent items up)
-     * @param val the value to insert
-     * @return a new Vecsicle with the additional item.
+     This default implementation is at least O(n) slow.
+     Inserts a new item at the specified index, shifting that item and subsequent items up/right.
+     @param i the zero-based index to insert at
+     @param val the value to insert
+     @return a new ImList with the additional item.
      */
-    ImList<E> insert(int i, E val);
+    default ImList<E> insert(int i, E val) {
+        if (i == size()) { return append(val); }
+
+        if ( (i > size()) || (i < 0) ) {
+            throw new IllegalArgumentException("Can't insert outside the possible bounds");
+        }
+
+        UnIterator<E> iter = iterator();
+        ImList<E> v = PersistentVector.empty();
+        int j = 0;
+        for (; j < i; j++) {
+            v = v.append(iter.next());
+        }
+        v = v.append(val);
+        for (; j < size(); j++) {
+            v = v.append(iter.next());
+        }
+        return v;
+    }
 
     /**
      * Adds items to the end of the ImList.
-     * @param es the values to insert
-     * @return a new ImList with the additional items at the end.
+     * @param e the values to insert
+     * @return a new ImList with the additional item at the end.
      */
-    @SuppressWarnings("unchecked")
-    default ImList<E> append(E... es) { return append(this, es); }
-
-    /**
-     * Adds items to the end of the ImList.
-     * @param es the values to insert
-     * @return a new ImList with the additional items at the end.
-     */
-    @SuppressWarnings("unchecked")
-    default ImList<E> appendSkipNull(E... es) { return appendSkipNull(this, es); }
+    ImList<E> append(E e);
 
     /**
      * Returns the item at this index, but takes any Number as an argument.
@@ -65,85 +75,79 @@ public interface ImList<E> extends UnList<E> {
     }
 
     /**
-     * Inserts items at the beginning of the ImList.
-     * @param es the values to insert
-     * @return a new ImList beginning with the additional items.
-     */
-    @SuppressWarnings("unchecked")
-    default ImList<E> prepend(E... es) { return prepend(this, es); }
+     Replace the item at the given index
 
-    /**
-     * Inserts items at the beginning of the ImList.
-     * @param es the values to insert
-     * @return a new ImList beginning with the additional items.
+     @param idx the index where the value should be stored.
+     @param e the value to store
+     @return a new ImList with the additional item at the end.
      */
-    @SuppressWarnings("unchecked")
-    default ImList<E> prependSkipNull(E... es) { return prependSkipNull(this, es); }
+    ImList<E> put(int idx, E e);
 
     // ================================================ STATIC METHODS ================================================
-    static <T> ImList<T> empty() { return PersistentVector.empty(); }
+//    static <T> ImList<T> empty() { return PersistentVector.empty(); }
 
-    /**
-     * Adds items to the end of the ImList.
-     * @param es the values to insert
-     * @return a new ImList with the additional items at the end.
-     */
-    @SafeVarargs
-    static <E> ImList<E> append(ImList<E> l, E... es) {
-        if ((es == null) || (es.length < 1)) {
-            return l;
-        }
-        for (E e : es) {
-            l = l.insert(l.size() - 1, e);
-        }
-        return l;
-    }
-
-    /**
-     * Adds items to the end of the ImList.
-     * @param es the values to insert
-     * @return a new ImList with the additional items at the end.
-     */
-    @SafeVarargs
-    static <E> ImList<E> appendSkipNull(ImList<E> l, E... es) {
-        if ( (es == null) || (es.length < 1) ) { return l; }
-        for (E e : es) {
-            if (e != null) {
-                l = l.insert(l.size() - 1, e);
-            }
-        }
-        return l;
-    }
-
-    /**
-     * Inserts items at the beginning of the ImList.
-     * @param es the values to insert
-     * @return a new ImList beginning with the additional items.
-     */
-    @SafeVarargs
-    static <E> ImList<E> prepend(ImList<E> l, E... es) {
-        if ( (es == null) || (es.length < 1) ) { return l; }
-        for (E e : es) {
-            l = l.insert(0, e);
-        }
-        return l;
-    }
-
-    /**
-     * Inserts items at the beginning of the ImList.
-     * @param es the values to insert
-     * @return a new ImList beginning with the additional items.
-     */
-    @SafeVarargs
-    static <E> ImList<E> prependSkipNull(ImList<E> l, E... es) {
-        if ( (es == null) || (es.length < 1) ) { return l; }
-        for (E e : es) {
-            if (e != null) {
-                l = l.insert(0, e);
-            }
-        }
-        return l;
-    }
+//    /**
+//     * Inserts a new item at the specified index.
+//     * @param i the zero-based index to insert at (pushes current item and all subsequent items up)
+//     * @param val the value to insert
+//     * @return a new ImList with the additional item.
+//     */
+//    static <E> ImList<E> insert(ImList<E> list, int i, E val) {
+//        if (i == list.size()) { return list.append(val); }
+//
+//        if ( (i > list.size()) || (i < 0) ) {
+//            throw new IllegalArgumentException("Can't insert outside the possible bounds");
+//        }
+//
+//        UnIterator<E> uli = list.iterator();
+//        ImList<E> v = PersistentVector.empty();
+//        for (int j = 0; j < i; j++) {
+//            v = v.append(uli.next());
+//        }
+//        v = v.append(val);
+//        for (int j = i; j < list.size(); j++) {
+//            v = v.append(uli.next());
+//        }
+//        return v;
+//    }
+//
+//    /**
+//     * Adds items to the end of the ImList.
+//     * @param es the values to insert
+//     * @return a new ImList with the additional items at the end.
+//     */
+//    static <E> ImList<E> append(ImList<E> l, E e) {
+//        return l.insert(l.size() - 1, e);
+//    }
+//
+//    /**
+//     * Adds items to the end of the ImList.
+//     * @param es the values to insert
+//     * @return a new ImList with the additional items at the end.
+//     */
+//    static <E> ImList<E> appendSkipNull(ImList<E> l, E e) {
+//        if (e == null) { return l; }
+//        return l.append(e);
+//    }
+//
+//    /**
+//     * Inserts items at the beginning of the ImList.
+//     * @param es the values to insert
+//     * @return a new ImList beginning with the additional items.
+//     */
+//    static <E> ImList<E> prepend(ImList<E> l, E e) {
+//        return l.insert(0, e);
+//    }
+//
+//    /**
+//     * Inserts items at the beginning of the ImList.
+//     * @param es the values to insert
+//     * @return a new ImList beginning with the additional items.
+//     */
+//    static <E> ImList<E> prependSkipNull(ImList<E> l, E e) {
+//        if (e == null) { return l; }
+//        return l.insert(0, e);
+//    }
 
 
 }

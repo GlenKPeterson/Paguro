@@ -164,7 +164,7 @@ public class PersistentVector<E> implements ImList<E> {
 
     /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
-    @Override public PersistentVector<E> insert(int i, E val) {
+    @Override public PersistentVector<E> put(int i, E val) {
         if (i >= 0 && i < size) {
             if (i >= tailoff()) {
                 Object[] newTail = new Object[tail.length];
@@ -191,7 +191,7 @@ public class PersistentVector<E> implements ImList<E> {
      * @return a new Vecsicle with the additional item.
      */
     @SuppressWarnings("unchecked")
-    public PersistentVector<E> append(E val) {
+    @Override public PersistentVector<E> append(E val) {
         //room in tail?
         //	if(tail.length < MAX_NODE_LENGTH)
         if (size - tailoff() < MAX_NODE_LENGTH) {
@@ -377,12 +377,15 @@ public class PersistentVector<E> implements ImList<E> {
 
     /** This is correct, but definitely O(n), same as java.util.ArrayList. */
     // Does this need to be compatible with java.util.AbstractList?
-    @Override
-    public boolean equals(Object other) {
+    @Override public boolean equals(Object other) {
         return (other != null) &&
                 (other instanceof UnList) &&
                 (this.size() == ((UnList) other).size()) &&
                 UnIterable.equals(this, (UnList) other);
+    }
+
+    @Override public String toString() {
+        return UnIterable.toString("PersistentVector", this);
     }
 
     private static Node doAssoc(int level, Node node, int i, Object val) {
