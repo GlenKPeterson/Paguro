@@ -50,82 +50,54 @@ public class StaticImports {
     // Prevent instantiation
     private StaticImports() { throw new UnsupportedOperationException("No instantiation"); }
 
-    /** Returns an unmodifiable version of the given listiterator. */
+    // EqualsWhichDoesntCheckParameterClass Note:
+    // http://codereview.stackexchange.com/questions/88333/is-one-sided-equality-more-helpful-or-more-confusing-than-quick-failure
+    // "There is no one-sided equality. If it is one-sided, that is it's asymmetric, then it's just wrong."
+    // Which is a little ironic because with inheritance, there are many cases in Java where equality is one-sided.
+
+    /** Returns an unmodifiable version of the given iterator. */
     public static <T> UnIterator<T> un(Iterator<T> iter) {
         if (iter == null) { return UnIterator.empty(); }
         if (iter instanceof UnIterator) { return (UnIterator<T>) iter; }
-        // Declare a real class instead of an anonymous one so that we can check the class of the object passed to the
-        // equals() method and compare the inner objects if that's appropriate.
-        class UnIteratorWrapper<E> implements UnIterator<E> {
-            private final Iterator<E> inner;
-            private UnIteratorWrapper(Iterator<E> i) { inner = i; }
-            @Override public boolean hasNext() { return inner.hasNext(); }
-            @Override public E next() { return inner.next(); }
-
-            @Override public int hashCode() { return inner.hashCode(); }
-            @Override public boolean equals(Object o) {
-                // typical implementations of equals() check the exact class of the passed object so actually give up
-                // the inner, wrapped object to allow the class check to pass in those cases.  This is one-sided,
-                // but might work in a few more cases, but maybe provide inconsistent results in others?  For best
-                // results, use Sorted collections that don't call this method.
-                return inner.equals((o instanceof UnIteratorWrapper) ? ((UnIteratorWrapper) o).inner : o);
-            }
+        return new UnIterator<T>() {
+            @Override public boolean hasNext() { return iter.hasNext(); }
+            @Override public T next() { return iter.next(); }
+            @Override public int hashCode() { return iter.hashCode(); }
+            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
+            @Override public boolean equals(Object o) { return iter.equals(o); }
         };
-        return new UnIteratorWrapper<>(iter);
     }
 
     /** Returns an unmodifiable version of the given listiterator. */
     public static <T> UnListIterator<T> un(ListIterator<T> iter) {
         if (iter == null) { return UnListIterator.empty(); }
         if (iter instanceof UnListIterator) { return (UnListIterator<T>) iter; }
-        // Declare a real class instead of an anonymous one so that we can check the class of the object passed to the
-        // equals() method and compare the inner objects if that's appropriate.
-        class UnListIteratorWrapper<E> implements UnListIterator<E> {
-            private final ListIterator<E> inner;
-            private UnListIteratorWrapper(ListIterator<E> i) { inner = i; }
-            @Override public boolean hasNext() { return inner.hasNext(); }
-            @Override public E next() { return inner.next(); }
-            @Override public boolean hasPrevious() { return inner.hasPrevious(); }
-            @Override public E previous() { return inner.previous(); }
-            @Override public int nextIndex() { return inner.nextIndex(); }
-            @Override public int previousIndex() { return inner.previousIndex(); }
-
-            @Override public int hashCode() { return inner.hashCode(); }
-            @Override public boolean equals(Object o) {
-                // typical implementations of equals() check the exact class of the passed object so actually give up
-                // the inner, wrapped object to allow the class check to pass in those cases.  This is one-sided,
-                // but might work in a few more cases, but maybe provide inconsistent results in others?  For best
-                // results, use Sorted collections that don't call this method.
-                return inner.equals((o instanceof UnListIteratorWrapper) ? ((UnListIteratorWrapper) o).inner : o);
-            }
+        return new UnListIterator<T>() {
+            @Override public boolean hasNext() { return iter.hasNext(); }
+            @Override public T next() { return iter.next(); }
+            @Override public boolean hasPrevious() { return iter.hasPrevious(); }
+            @Override public T previous() { return iter.previous(); }
+            @Override public int nextIndex() { return iter.nextIndex(); }
+            @Override public int previousIndex() { return iter.previousIndex(); }
+            @Override public int hashCode() { return iter.hashCode(); }
+            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
+            @Override public boolean equals(Object o) { return iter.equals(o); }
         };
-        return new UnListIteratorWrapper<>(iter);
     }
 
     /** Returns an unmodifiable version of the given list. */
-    public static <T> UnList<T> un(List<T> list) {
-        if (list == null) { return UnList.empty(); }
-        if (list instanceof UnList) { return (UnList<T>) list; }
-        if (list.size() < 1) { return UnList.empty(); }
-        // Declare a real class instead of an anonymous one so that we can check the class of the object passed to the
-        // equals() method and compare the inner objects if that's appropriate.
-        class UnListWrapper<E> implements UnList<E> {
-            private final List<E> inner;
-            private UnListWrapper(List<E> i) { inner = i; }
-            @Override public UnListIterator<E> listIterator(int index) { return un(inner.listIterator(index)); }
+    public static <T> UnList<T> un(List<T> inner) {
+        if (inner == null) { return UnList.empty(); }
+        if (inner instanceof UnList) { return (UnList<T>) inner; }
+        if (inner.size() < 1) { return UnList.empty(); }
+        return new UnList<T>() {
+            @Override public UnListIterator<T> listIterator(int index) { return un(inner.listIterator(index)); }
             @Override public int size() { return inner.size(); }
-            @Override public E get(int index) { return inner.get(index); }
-
+            @Override public T get(int index) { return inner.get(index); }
             @Override public int hashCode() { return inner.hashCode(); }
-            @Override public boolean equals(Object o) {
-                // typical implementations of equals() check the exact class of the passed object so actually give up
-                // the inner, wrapped object to allow the class check to pass in those cases.  This is one-sided,
-                // but might work in a few more cases, but maybe provide inconsistent results in others?  For best
-                // results, use Sorted collections that don't call this method.
-                return inner.equals((o instanceof UnListWrapper) ? ((UnListWrapper) o).inner : o);
-            }
+            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
+            @Override public boolean equals(Object o) { return inner.equals(o); }
         };
-        return new UnListWrapper<>(list);
     }
 
     /** Returns an unmodifiable version of the given set. */
@@ -133,25 +105,15 @@ public class StaticImports {
         if (set == null) { return UnSet.empty(); }
         if (set instanceof UnSet) { return (UnSet<T>) set; }
         if (set.size() < 1) { return UnSet.empty(); }
-        // Declare a real class instead of an anonymous one so that we can check the class of the object passed to the
-        // equals() method and compare the inner objects if that's appropriate.
-        class UnSetWrapper<E> implements UnSet<E> {
-            private final Set<E> inner;
-            private UnSetWrapper(Set<E> i) { inner = i; }
-            @Override public boolean contains(Object o) { return inner.contains(o); }
-            @Override public int size() { return inner.size(); }
-            @Override public boolean isEmpty() { return inner.isEmpty(); }
-            @Override public UnIterator<E> iterator() { return un(inner.iterator()); }
-            @Override public int hashCode() { return inner.hashCode(); }
-            @Override public boolean equals(Object o) {
-                // typical implementations of equals() check the exact class of the passed object so actually give up
-                // the inner, wrapped object to allow the class check to pass in those cases.  This is one-sided,
-                // but might work in a few more cases, but maybe provide inconsistent results in others?  For best
-                // results, use Sorted collections that don't call this method.
-                return inner.equals((o instanceof UnSetWrapper) ? ((UnSetWrapper) o).inner : o);
-            }
+        return new UnSet<T>() {
+            @Override public boolean contains(Object o) { return set.contains(o); }
+            @Override public int size() { return set.size(); }
+            @Override public boolean isEmpty() { return set.isEmpty(); }
+            @Override public UnIterator<T> iterator() { return un(set.iterator()); }
+            @Override public int hashCode() { return set.hashCode(); }
+            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
+            @Override public boolean equals(Object o) { return set.equals(o); }
         };
-        return new UnSetWrapper<>(set);
     }
 
     /** Returns an unmodifiable version of the given set. */
@@ -159,90 +121,59 @@ public class StaticImports {
         if (set == null) { return PersistentTreeSet.empty(); }
         if (set instanceof UnSetSorted) { return (UnSetSorted<T>) set; }
         if (set.size() < 1) { return PersistentTreeSet.empty(); }
-        // Declare a real class instead of an anonymous one so that we can check the class of the object passed to the
-        // equals() method and compare the inner objects if that's appropriate.
-        class UnSetSortedWrapper<E> implements UnSetSorted<E> {
-            private final SortedSet<E> inner;
-            private UnSetSortedWrapper(SortedSet<E> i) { inner = i; }
-            @Override public Comparator<? super E> comparator() { return inner.comparator(); }
-            @Override public UnSetSorted<E> subSet(E fromElement, E toElement) {
-                return un(inner.subSet(fromElement, toElement));
+        return new UnSetSorted<T>() {
+            @Override public Comparator<? super T> comparator() { return set.comparator(); }
+            @Override public UnSetSorted<T> subSet(T fromElement, T toElement) {
+                return un(set.subSet(fromElement, toElement));
             }
-            @Override public UnSetSorted<E> headSet(E toElement) { return un(inner.headSet(toElement)); }
-            @Override public UnSetSorted<E> tailSet(E fromElement) { return un(inner.tailSet(fromElement)); }
-            @Override public E first() { return inner.first(); }
-            @Override public E last() { return inner.last(); }
-            @Override public boolean contains(Object o) { return inner.contains(o); }
-            @Override public int size() { return inner.size(); }
-            @Override public boolean isEmpty() { return inner.isEmpty(); }
-            @Override public UnIterator<E> iterator() { return un(inner.iterator()); }
-            @Override public int hashCode() { return inner.hashCode(); }
-            @Override public boolean equals(Object o) {
-                // typical implementations of equals() check the exact class of the passed object so actually give up
-                // the inner, wrapped object to allow the class check to pass in those cases.  This is one-sided,
-                // but might work in a few more cases, but maybe provide inconsistent results in others?  For best
-                // results, use Sorted collections that don't call this method.
-                return inner.equals((o instanceof UnSetSortedWrapper) ? ((UnSetSortedWrapper) o).inner : o);
-            }
+            @Override public UnSetSorted<T> headSet(T toElement) { return un(set.headSet(toElement)); }
+            @Override public UnSetSorted<T> tailSet(T fromElement) { return un(set.tailSet(fromElement)); }
+            @Override public T first() { return set.first(); }
+            @Override public T last() { return set.last(); }
+            @Override public boolean contains(Object o) { return set.contains(o); }
+            @Override public int size() { return set.size(); }
+            @Override public boolean isEmpty() { return set.isEmpty(); }
+            @Override public UnIterator<T> iterator() { return un(set.iterator()); }
+            @Override public int hashCode() { return set.hashCode(); }
+            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
+            @Override public boolean equals(Object o) { return set.equals(o); }
         };
-        return new UnSetSortedWrapper<>(set);
     }
 
     /** Returns an unmodifiable version of the given map. */
-    public static <K1,V1> UnMap<K1,V1> un(Map<K1,V1> map) {
+    public static <K,V> UnMap<K,V> un(Map<K,V> map) {
         if (map == null) { return UnMap.empty(); }
-        if (map instanceof UnMap) { return (UnMap<K1,V1>) map; }
+        if (map instanceof UnMap) { return (UnMap<K,V>) map; }
         if (map.size() < 1) { return UnMap.empty(); }
-        // Declare a real class instead of an anonymous one so that we can check the class of the object passed to the
-        // equals() method and compare the inner objects if that's appropriate.
-        class UnMapWrapper<K,V> implements UnMap<K,V> {
-            private final Map<K,V> inner;
-            private UnMapWrapper(Map<K,V> m) { inner = m; }
-            @Override public UnSet<Map.Entry<K,V>> entrySet() { return un(inner.entrySet()); }
-            @Override public int size() { return inner.size(); }
-            @Override public boolean isEmpty() { return inner.isEmpty(); }
-            @Override public boolean containsKey(Object key) { return inner.containsKey(key); }
-            @Override public boolean containsValue(Object value) { return inner.containsValue(value); }
-            @Override public V get(Object key) { return inner.get(key); }
-            @Override public UnSet<K> keySet() { return un(inner.keySet()); }
-            @Override public UnCollection<V> values() { return un(inner.values()); }
-            @Override public int hashCode() { return inner.hashCode(); }
-            @Override public boolean equals(Object o) {
-                // typical implementations of equals() check the exact class of the passed object so actually give up
-                // the inner, wrapped object to allow the class check to pass in those cases.  This is one-sided,
-                // but might work in a few more cases, but maybe provide inconsistent results in others?  For best
-                // results, use Sorted collections that don't call this method.
-                return inner.equals((o instanceof UnMapWrapper) ? ((UnMapWrapper) o).inner : o);
-            }
+        return new UnMap<K,V>() {
+            @Override public UnSet<Map.Entry<K,V>> entrySet() { return un(map.entrySet()); }
+            @Override public int size() { return map.size(); }
+            @Override public boolean isEmpty() { return map.isEmpty(); }
+            @Override public boolean containsKey(Object key) { return map.containsKey(key); }
+            @Override public boolean containsValue(Object value) { return map.containsValue(value); }
+            @Override public V get(Object key) { return map.get(key); }
+            @Override public UnSet<K> keySet() { return un(map.keySet()); }
+            @Override public UnCollection<V> values() { return un(map.values()); }
+            @Override public int hashCode() { return map.hashCode(); }
+            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
+            @Override public boolean equals(Object o) { return map.equals(o); }
         };
-        return new UnMapWrapper<>(map);
     }
 
-    /** Returns an unmodifiable version of the given list. */
+    /** Returns an unmodifiable version of the given collection. */
     public static <T> UnCollection<T> un(Collection<T> coll) {
         if (coll == null) { return UnCollection.empty(); }
         if (coll instanceof UnCollection) { return (UnCollection<T>) coll; }
         if (coll.size() < 1) { return UnCollection.empty(); }
-        // Declare a real class instead of an anonymous one so that we can check the class of the object passed to the
-        // equals() method and compare the inner objects if that's appropriate.
-        class UnCollectionWrapper<E> implements UnCollection<E> {
-            private final Collection<E> inner;
-            private UnCollectionWrapper(Collection<E> c) { inner = c; }
-            @Override public boolean contains(Object o) { return inner.contains(o); }
-            @Override public int size() { return inner.size(); }
-            @Override public boolean isEmpty() { return inner.isEmpty(); }
-            @Override public UnIterator<E> iterator() { return un(inner.iterator()); }
-
-            @Override public int hashCode() { return inner.hashCode(); }
-            @Override public boolean equals(Object o) {
-                // typical implementations of equals() check the exact class of the passed object so actually give up
-                // the inner, wrapped object to allow the class check to pass in those cases.  This is one-sided,
-                // but might work in a few more cases, but maybe provide inconsistent results in others?  For best
-                // results, use Sorted collections that don't call this method.
-                return inner.equals((o instanceof UnCollectionWrapper) ? ((UnCollectionWrapper) o).inner : o);
-            }
+        return new UnCollection<T>() {
+            @Override public boolean contains(Object o) { return coll.contains(o); }
+            @Override public int size() { return coll.size(); }
+            @Override public boolean isEmpty() { return coll.isEmpty(); }
+            @Override public UnIterator<T> iterator() { return un(coll.iterator()); }
+            @Override public int hashCode() { return coll.hashCode(); }
+            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
+            @Override public boolean equals(Object o) { return coll.equals(o); }
         };
-        return new UnCollectionWrapper<>(coll);
     }
 
     /** Returns an unmodifiable Map containing all passed pairs (including null keys/values/values). */

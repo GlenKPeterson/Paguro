@@ -8,6 +8,8 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
+import static org.organicdesign.fp.StaticImports.un;
+
 /**
  * An unmodifiable version of {@link java.util.List} which formalizes the return type of
  * Collections.unmodifiableList()
@@ -45,24 +47,16 @@ public interface UnList<E> extends List<E>, UnCollection<E> {
     }
 
     /**
-     * The default implementation of this method has O(this.size()) performance.
-     *
-     * {@inheritDoc}
+     The default implementation of this method has O(this.size()) performance.
+
+     {@inheritDoc}
      */
-    @Override default boolean contains(Object o) {
-        UnIterator<E> iter = iterator();
-        while (iter.hasNext()) {
-            if (Objects.equals(iter.next(), o)) {
-                return true;
-            }
-        }
-        return false;
-    }
+    @Override default boolean contains(Object o) { return UnCollection.contains(this, o); }
 
     /**
-     * The default implementation of this method has O(this.size() * that.size()) performance.
-     *
-     * {@inheritDoc}
+     The default implementation of this method has O(this.size() * that.size()) performance.
+
+     {@inheritDoc}
      */
     @Override default boolean containsAll(Collection<?> c) { return UnCollection.containsAll(this, c); }
 
@@ -161,9 +155,17 @@ public interface UnList<E> extends List<E>, UnCollection<E> {
         if (fromIndex == (size() - 1)) {
             return empty();
         }
+// I thing this should be the implementation in ImList.
+//        PersistentVector<E> pv = PersistentVector.empty();
+//        for (int i = fromIndex; i < toIndex; i++) {
+//            pv = pv.append(this.get(i));
+//        }
+//        return pv;
         List<E> ls = new ArrayList<>();
-        ls.addAll(this);
-        return (UnList<E>) ls.subList(fromIndex, toIndex);
+        for (int i = fromIndex; i < toIndex; i++) {
+            ls.add(this.get(i));
+        }
+        return un(ls);
     }
 
     /**
