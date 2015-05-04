@@ -31,24 +31,16 @@ public interface UnCollection<E> extends Collection<E>, UnIterable<E> {
     }
 
     /**
-     * This is quick for sets and maps, but it's slow for Lists.
-     *
-     * {@inheritDoc}
+     This is quick for sets O(1) or O(log n), but slow for Lists O(n).
+
+     {@inheritDoc}
      */
-    @Override default boolean contains(Object o) {
-        UnIterator<E> iter = iterator();
-        while (iter.hasNext()) {
-            if (Objects.equals(iter.next(), o)) {
-                return true;
-            }
-        }
-        return false;
-    }
+    @Override default boolean contains(Object o) { return contains(this, o); }
 
     /**
-     * This is quick for sets and maps, but it's slow for Lists.
-     *
-     * {@inheritDoc}
+     This is quick for sets O(m) or O(m log n), but slow for Lists O(m * n).
+
+     {@inheritDoc}
      */
     @Override default boolean containsAll(Collection<?> c) { return containsAll(this, c); }
 
@@ -94,14 +86,7 @@ public interface UnCollection<E> extends Collection<E>, UnIterable<E> {
      *
      * {@inheritDoc}
      */
-    @Override default Object[] toArray() {
-        Object[] os = new Object[size()];
-        UnIterator iter = iterator();
-        for (int i = 0; i < size(); i++) {
-            os[i] = iter.next();
-        }
-        return os;
-    }
+    @Override default Object[] toArray() { return toArray(this); }
 
     /**
      * This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for backwards
@@ -116,37 +101,41 @@ public interface UnCollection<E> extends Collection<E>, UnIterable<E> {
      *
      * {@inheritDoc}
      */
-    @SuppressWarnings("unchecked")
-    @Override default <T> T[] toArray(T[] as) {
-        if (as == null) {
-            throw new IllegalArgumentException("You can't pass null to this method.");
-        }
-        if (as.length < size()) {
-            as = (T[]) new Object[size()];
-        }
-        UnIterator<E> iter = iterator();
-        int i = 0;
-        for (; i < size(); i++) {
-            as[i] = (T) iter.next();
-        }
-        for (; i < size(); i++) {
-            as[i] = null;
-        }
-        return as;
-    }
+    @Override default <T> T[] toArray(T[] as) { return toArray(this, as); }
 
 //forEach
 
     // ==================================================== Static ====================================================
+
+    /** This is quick for sets, but slow for Lists. */
+    static boolean contains(Collection uc, Object o) {
+        for (Object item : uc) {
+            if (Objects.equals(item, o)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** This is quick for sets, but slow for Lists. */
+    static <T> boolean containsAll(Collection<T> ts, Collection<?> c) {
+        for (Object item : c) {
+            //noinspection SuspiciousMethodCalls
+            if (!ts.contains(item)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     /**
      * This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for backwards
      * compatibility in some performance-critical situations.  If you really need an array, consider using the somewhat
      * type-safe version of this method instead, but read the caveats first.
      */
-    static Object[] toArray(UnCollection uc) {
+    static Object[] toArray(Collection uc) {
         Object[] os = new Object[uc.size()];
-        UnIterator iter = uc.iterator();
+        Iterator iter = uc.iterator();
         for (int i = 0; i < uc.size(); i++) {
             os[i] = iter.next();
         }
@@ -165,14 +154,11 @@ public interface UnCollection<E> extends Collection<E>, UnIterable<E> {
      * is too large.
      */
     @SuppressWarnings("unchecked")
-    static <T> T[] toArray(UnCollection uc, T[] as) {
-        if (as == null) {
-            throw new IllegalArgumentException("You can't pass null to this method.");
-        }
+    static <T> T[] toArray(Collection uc, T[] as) {
         if (as.length < uc.size()) {
             as = (T[]) new Object[uc.size()];
         }
-        UnIterator<T> iter = uc.iterator();
+        Iterator<T> iter = uc.iterator();
         int i = 0;
         for (; i < uc.size(); i++) {
             as[i] = iter.next();
@@ -181,20 +167,6 @@ public interface UnCollection<E> extends Collection<E>, UnIterable<E> {
             as[i] = null;
         }
         return as;
-    }
-
-    /**
-     * This is quick for sets and maps, but it's slow for Lists.
-     */
-    static <T> boolean containsAll(Collection<T> ts, Collection<?> c) {
-        Iterator iter = c.iterator();
-        while (iter.hasNext()) {
-            //noinspection SuspiciousMethodCalls
-            if (!ts.contains(iter.next())) {
-                return false;
-            }
-        }
-        return true;
     }
 
     static UnCollection<Object> EMPTY = new UnCollection<Object>() {
