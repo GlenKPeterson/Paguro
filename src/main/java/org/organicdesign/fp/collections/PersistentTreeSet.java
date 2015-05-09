@@ -66,12 +66,12 @@ public class PersistentTreeSet<E> implements ImSetSorted<E> {
     private PersistentTreeSet(ImMapSorted<E,?> i) { impl = i; }
 
     public static <T> PersistentTreeSet<T> ofComp(Comparator<T> comp) {
-        return new PersistentTreeSet<>(PersistentTreeMap.of(comp));
+        return new PersistentTreeSet<>(PersistentTreeMap.ofComp(comp));
     }
 
     @SafeVarargs
     public static <T> PersistentTreeSet<T> ofComp(Comparator<T> comp, T... items) {
-        PersistentTreeSet<T> ret = new PersistentTreeSet<>(PersistentTreeMap.of(comp));
+        PersistentTreeSet<T> ret = new PersistentTreeSet<>(PersistentTreeMap.ofComp(comp));
         if ( (items == null) || (items.length < 1) ) { return ret; }
         for (T item : items) {
             ret = ret.put(item);

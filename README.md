@@ -25,7 +25,7 @@ Map<String,Integer> itemMap = unMapSkipNull(
 ```
 
 Similar type-safe methods are available for producing unmodifiable Sets and Lists of any length (unMaps currently go
-from 0 to 20 type-safe parameters).
+from 0 to 10 type-safe parameters, or an infinite number of Map.Entries or Tuples).
 
 What if you want to add another item to an immutable map?
 

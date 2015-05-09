@@ -12,7 +12,6 @@
 package org.organicdesign.fp.collections;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 // TODO: http://functionaljava.googlecode.com/svn/artifacts/2.21/javadoc/fj/data/Seq.html
@@ -103,7 +102,7 @@ public class PersistentVector<E> implements ImList<E> {
     }
 
     /** Public static factory method. */
-    static public <T> PersistentVector<T> of(List<T> items) {
+    static public <T> PersistentVector<T> of(Iterable<T> items) {
         MutableVector<T> ret = emptyTransientVector();
         for (T item : items) {
             ret = ret.append(item);

@@ -46,9 +46,16 @@ public interface Function2<A,B,R> extends BiFunction<A,B,R> {
 
     @SuppressWarnings("ConstantConditions")
     Comparator<Comparable<Object>> DEFAULT_COMPARATOR =
-            (o1, o2) -> (o1 == o2) ? 0 :
-                        (o1 == null) ? -o2.compareTo(o1) :
-                        o1.compareTo(o2);
+            (o1, o2) -> {
+                if (o1 == o2) { return 0; }
+                if (o1 == null) {
+                    if (o2 == null) {
+                        return 0;
+                    }
+                    return -o2.compareTo(o1);
+                }
+                return o1.compareTo(o2);
+            };
 
     @SuppressWarnings("unchecked")
     static <T> Comparator<T> defaultComparator() { return (Comparator<T>) DEFAULT_COMPARATOR; }

@@ -7,6 +7,7 @@ import java.util.NoSuchElementException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.organicdesign.fp.StaticImportsTest;
 import org.organicdesign.fp.function.Function2;
 import org.organicdesign.fp.permanent.Sequence;
 import org.organicdesign.fp.tuple.Tuple2;
@@ -57,9 +58,10 @@ public class PersistentTreeMapTest {
     }
 
     @Test public void order() {
-        PersistentTreeMap<String,Integer> m1 = PersistentTreeMap.of("c", 1)
-                .assoc("b", 2)
-                .assoc("a", 3);
+        PersistentTreeMap<String,Integer> m1 = PersistentTreeMap.of(
+                "c", 1,
+                "b", 2,
+                "a", 3);
 
         // Prove m1 unchanged
         assertEquals(3, m1.size());
@@ -76,9 +78,9 @@ public class PersistentTreeMapTest {
         assertArrayEquals(new Integer[]{3, 2, 1}, m1.values().toArray());
 
         assertArrayEquals(new String[]{"a", "b", "c"},
-                          PersistentTreeMap.of("a", 3)
-                                  .assoc("b", 2)
-                                  .assoc("c", 1)
+                          PersistentTreeMap.of("a", 3,
+                                               "b", 2,
+                                               "c", 1)
                                   .keySet().toArray());
 
 
@@ -119,9 +121,11 @@ public class PersistentTreeMapTest {
         assertEquals(Function2.defaultComparator(), m2.comparator());
         assertNotEquals(String.CASE_INSENSITIVE_ORDER.reversed(), m2.comparator());
 
-        PersistentTreeMap<String,Integer> m3 = PersistentTreeMap.of("a", 1, String.CASE_INSENSITIVE_ORDER.reversed())
-                .assoc("b", 2)
-                .assoc("c", 3);
+        PersistentTreeMap<String,Integer> m3 =
+                PersistentTreeMap.ofCompSkipNull(String.CASE_INSENSITIVE_ORDER.reversed(),
+                                                 Tuple2.of("a", 1),
+                                                 Tuple2.of("b", 2),
+                                                 Tuple2.of("c", 3));
         UnIterator<UnMap.UnEntry<String,Integer>> iter2 = m3.iterator();
 
         next = iter2.next();
@@ -332,8 +336,8 @@ public class PersistentTreeMapTest {
         m = m.assoc(21, "twenty one");
         m = m.without(20);
         m = m.assoc(20, "twenty again");
-        assertArrayEquals(new Integer[] { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21},
-                     m.keySet().toArray());
+        assertArrayEquals(new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21},
+                          m.keySet().toArray());
         assertTrue(UnIterable.equals(
                 Sequence.ofArray("one again", "two", "three", "four", "five", "six", "seven", "eight",
                                  "nine again", "ten again", "eleven again", "twelve", "thirteen",
@@ -361,7 +365,7 @@ public class PersistentTreeMapTest {
         PersistentTreeMap<Integer,String> m =
                 PersistentTreeMap.of(4, "four").assoc(5, "five").assoc(2, "two").assoc(3, "three").assoc(1, "one");
 
-        assertArrayEquals(new String[] {"one", "two", "three", "four", "five"},
+        assertArrayEquals(new String[]{"one", "two", "three", "four", "five"},
                           m.values().toArray(new String[5]));
 
         assertTrue(m.values().equals(Arrays.asList("one", "two", "three", "four", "five")));
@@ -369,8 +373,280 @@ public class PersistentTreeMapTest {
         assertNotEquals(m.values().hashCode(), PersistentTreeMap.of(4, "four").assoc(5, "five").hashCode());
         assertEquals(m.values().hashCode(),
                      PersistentTreeMap.of(4, "four").assoc(2, "two").assoc(5, "five").assoc(1, "one").assoc(3, "three")
-                             .values()
-                             .hashCode());
+                                      .values()
+                                      .hashCode());
 
+    }
+
+    @Test public void testImMap10() {
+        int max = 10;
+        Map<Integer,String> a = PersistentTreeMap.of(1, "One", 2, "Two", 3, "Three", 4, "Four", 5, "Five", 6, "Six",
+                                                     7, "Seven", 8, "Eight", 9, "Nine", 10, "Ten");
+        StaticImportsTest.mapHelper(a, max);
+        Map<Integer,String> b = PersistentTreeMap.ofSkipNull(
+                Tuple2.of(1, "One"), Tuple2.of(2, "Two"), Tuple2.of(3, "Three"),
+                Tuple2.of(4, "Four"), Tuple2.of(5, "Five"), Tuple2.of(6, "Six"),
+                Tuple2.of(7, "Seven"), Tuple2.of(8, "Eight"), Tuple2.of(9, "Nine"),
+                Tuple2.of(10, "Ten"));
+        StaticImportsTest.mapHelper(b, max);
+        Map<Integer,String> c = PersistentTreeMap.ofComp(Function2.defaultComparator(),
+                                                         1, "One", 2, "Two", 3, "Three", 4, "Four", 5, "Five", 6, "Six",
+                                                         7, "Seven", 8, "Eight", 9, "Nine", 10, "Ten");
+        assertEquals(a, b);
+        assertEquals(b, a);
+        assertEquals(a, c);
+        assertEquals(c, a);
+        assertEquals(b, c);
+        assertEquals(c, b);
+        assertEquals(a.hashCode(), b.hashCode());
+        assertEquals(a.hashCode(), c.hashCode());
+        StaticImportsTest.mapHelperOdd(PersistentTreeMap.ofSkipNull(
+                Tuple2.of(1, "One"), null, Tuple2.of(3, "Three"), null, Tuple2.of(5, "Five"), null,
+                Tuple2.of(7, "Seven"), null, Tuple2.of(9, "Nine"), null), max);
+        StaticImportsTest.mapHelperEven(PersistentTreeMap.ofSkipNull(
+                null, Tuple2.of(2, "Two"), null, Tuple2.of(4, "Four"), null,
+                Tuple2.of(6, "Six"), null, Tuple2.of(8, "Eight"), null, Tuple2.of(10, "Ten")), max);
+    }
+
+    @Test public void testImMap9() {
+        int max = 9;
+        Map<Integer,String> a = PersistentTreeMap.of(1, "One", 2, "Two", 3, "Three", 4, "Four", 5, "Five", 6, "Six",
+                                                     7, "Seven", 8, "Eight", 9, "Nine");
+        StaticImportsTest.mapHelper(a, max);
+        Map<Integer,String> b = PersistentTreeMap.ofSkipNull(
+                Tuple2.of(1, "One"), Tuple2.of(2, "Two"), Tuple2.of(3, "Three"),
+                Tuple2.of(4, "Four"), Tuple2.of(5, "Five"), Tuple2.of(6, "Six"),
+                Tuple2.of(7, "Seven"), Tuple2.of(8, "Eight"), Tuple2.of(9, "Nine"));
+        StaticImportsTest.mapHelper(b, max);
+        Map<Integer,String> c = PersistentTreeMap.ofComp(Function2.defaultComparator(),
+                                                         1, "One", 2, "Two", 3, "Three", 4, "Four", 5, "Five", 6, "Six",
+                                                         7, "Seven", 8, "Eight", 9, "Nine");
+        assertEquals(a, b);
+        assertEquals(b, a);
+        assertEquals(a, c);
+        assertEquals(c, a);
+        assertEquals(b, c);
+        assertEquals(c, b);
+        assertEquals(a.hashCode(), b.hashCode());
+        assertEquals(a.hashCode(), c.hashCode());
+        StaticImportsTest.mapHelperOdd(PersistentTreeMap.ofSkipNull(
+                Tuple2.of(1, "One"), null, Tuple2.of(3, "Three"), null, Tuple2.of(5, "Five"), null,
+                Tuple2.of(7, "Seven"), null, Tuple2.of(9, "Nine")), max);
+        StaticImportsTest.mapHelperEven(PersistentTreeMap.ofSkipNull(
+                null, Tuple2.of(2, "Two"), null, Tuple2.of(4, "Four"), null,
+                Tuple2.of(6, "Six"), null, Tuple2.of(8, "Eight"), null), max);
+    }
+
+    @Test public void testImMap8() {
+        int max = 8;
+        Map<Integer,String> a = PersistentTreeMap.of(1, "One", 2, "Two", 3, "Three", 4, "Four", 5, "Five", 6, "Six",
+                                                     7, "Seven", 8, "Eight");
+        StaticImportsTest.mapHelper(a, max);
+        Map<Integer,String> b = PersistentTreeMap.ofSkipNull(
+                Tuple2.of(1, "One"), Tuple2.of(2, "Two"), Tuple2.of(3, "Three"),
+                Tuple2.of(4, "Four"), Tuple2.of(5, "Five"), Tuple2.of(6, "Six"),
+                Tuple2.of(7, "Seven"), Tuple2.of(8, "Eight"));
+        StaticImportsTest.mapHelper(b, max);
+        Map<Integer,String> c = PersistentTreeMap.ofComp(Function2.defaultComparator(),
+                                                         1, "One", 2, "Two", 3, "Three", 4, "Four", 5, "Five", 6, "Six",
+                                                         7, "Seven", 8, "Eight");
+        assertEquals(a, b);
+        assertEquals(b, a);
+        assertEquals(a, c);
+        assertEquals(c, a);
+        assertEquals(b, c);
+        assertEquals(c, b);
+        assertEquals(a.hashCode(), b.hashCode());
+        assertEquals(a.hashCode(), c.hashCode());
+        StaticImportsTest.mapHelperOdd(PersistentTreeMap.ofSkipNull(
+                Tuple2.of(1, "One"), null, Tuple2.of(3, "Three"), null, Tuple2.of(5, "Five"), null,
+                Tuple2.of(7, "Seven"), null), max);
+        StaticImportsTest.mapHelperEven(PersistentTreeMap.ofSkipNull(
+                null, Tuple2.of(2, "Two"), null, Tuple2.of(4, "Four"), null,
+                Tuple2.of(6, "Six"), null, Tuple2.of(8, "Eight")), max);
+    }
+
+    @Test public void testImMap7() {
+        int max = 7;
+        Map<Integer,String> a = PersistentTreeMap.of(1, "One", 2, "Two", 3, "Three", 4, "Four", 5, "Five", 6, "Six",
+                                                     7, "Seven");
+        StaticImportsTest.mapHelper(a, max);
+        Map<Integer,String> b = PersistentTreeMap.ofSkipNull(
+                Tuple2.of(1, "One"), Tuple2.of(2, "Two"), Tuple2.of(3, "Three"),
+                Tuple2.of(4, "Four"), Tuple2.of(5, "Five"), Tuple2.of(6, "Six"),
+                Tuple2.of(7, "Seven"));
+        StaticImportsTest.mapHelper(b, max);
+        Map<Integer,String> c = PersistentTreeMap.ofComp(Function2.defaultComparator(),
+                                                         1, "One", 2, "Two", 3, "Three", 4, "Four", 5, "Five", 6, "Six",
+                                                         7, "Seven");
+        assertEquals(a, b);
+        assertEquals(b, a);
+        assertEquals(a, c);
+        assertEquals(c, a);
+        assertEquals(b, c);
+        assertEquals(c, b);
+        assertEquals(a.hashCode(), b.hashCode());
+        assertEquals(a.hashCode(), c.hashCode());
+        StaticImportsTest.mapHelperOdd(PersistentTreeMap.ofSkipNull(
+                Tuple2.of(1, "One"), null, Tuple2.of(3, "Three"), null, Tuple2.of(5, "Five"), null,
+                Tuple2.of(7, "Seven")), max);
+        StaticImportsTest.mapHelperEven(PersistentTreeMap.ofSkipNull(
+                null, Tuple2.of(2, "Two"), null, Tuple2.of(4, "Four"), null,
+                Tuple2.of(6, "Six"), null), max);
+    }
+
+    @Test public void testImMap6() {
+        int max = 6;
+        Map<Integer,String> a = PersistentTreeMap.of(1, "One", 2, "Two", 3, "Three", 4, "Four", 5, "Five", 6, "Six");
+        StaticImportsTest.mapHelper(a, max);
+        Map<Integer,String> b = PersistentTreeMap.ofSkipNull(
+                Tuple2.of(1, "One"), Tuple2.of(2, "Two"), Tuple2.of(3, "Three"),
+                Tuple2.of(4, "Four"), Tuple2.of(5, "Five"), Tuple2.of(6, "Six"));
+        StaticImportsTest.mapHelper(b, max);
+        Map<Integer,String> c = PersistentTreeMap.ofComp(Function2.defaultComparator(),
+                                                         1, "One", 2, "Two", 3, "Three", 4, "Four", 5, "Five",
+                                                         6, "Six");
+        assertEquals(a, b);
+        assertEquals(b, a);
+        assertEquals(a, c);
+        assertEquals(c, a);
+        assertEquals(b, c);
+        assertEquals(c, b);
+        assertEquals(a.hashCode(), b.hashCode());
+        assertEquals(a.hashCode(), c.hashCode());
+        StaticImportsTest.mapHelperOdd(PersistentTreeMap.ofSkipNull(
+                Tuple2.of(1, "One"), null, Tuple2.of(3, "Three"), null, Tuple2.of(5, "Five"), null), max);
+        StaticImportsTest.mapHelperEven(PersistentTreeMap.ofSkipNull(
+                null, Tuple2.of(2, "Two"), null, Tuple2.of(4, "Four"), null,
+                Tuple2.of(6, "Six")), max);
+    }
+
+    @Test public void testImMap5() {
+        int max = 5;
+        Map<Integer,String> a = PersistentTreeMap.of(1, "One", 2, "Two", 3, "Three", 4, "Four", 5, "Five");
+        StaticImportsTest.mapHelper(a, max);
+        Map<Integer,String> b = PersistentTreeMap.ofSkipNull(
+                Tuple2.of(1, "One"), Tuple2.of(2, "Two"), Tuple2.of(3, "Three"),
+                Tuple2.of(4, "Four"), Tuple2.of(5, "Five"));
+        StaticImportsTest.mapHelper(b, max);
+        Map<Integer,String> c = PersistentTreeMap.ofComp(Function2.defaultComparator(),
+                                                         1, "One", 2, "Two", 3, "Three", 4, "Four", 5, "Five");
+        assertEquals(a, b);
+        assertEquals(b, a);
+        assertEquals(a, c);
+        assertEquals(c, a);
+        assertEquals(b, c);
+        assertEquals(c, b);
+        assertEquals(a.hashCode(), b.hashCode());
+        assertEquals(a.hashCode(), c.hashCode());
+        StaticImportsTest.mapHelperOdd(PersistentTreeMap.ofSkipNull(
+                Tuple2.of(1, "One"), null, Tuple2.of(3, "Three"), null, Tuple2.of(5, "Five")), max);
+        StaticImportsTest.mapHelperEven(PersistentTreeMap.ofSkipNull(
+                null, Tuple2.of(2, "Two"), null, Tuple2.of(4, "Four"), null), max);
+    }
+
+    @Test public void testImMap4() {
+        int max = 4;
+        Map<Integer,String> a = PersistentTreeMap.of(1, "One", 2, "Two", 3, "Three", 4, "Four");
+        StaticImportsTest.mapHelper(a, max);
+        Map<Integer,String> b = PersistentTreeMap.ofSkipNull(
+                Tuple2.of(1, "One"), Tuple2.of(2, "Two"), Tuple2.of(3, "Three"),
+                Tuple2.of(4, "Four"));
+        StaticImportsTest.mapHelper(b, max);
+        Map<Integer,String> c = PersistentTreeMap.ofComp(Function2.defaultComparator(),
+                                                         1, "One", 2, "Two", 3, "Three", 4, "Four");
+        assertEquals(a, b);
+        assertEquals(b, a);
+        assertEquals(a, c);
+        assertEquals(c, a);
+        assertEquals(b, c);
+        assertEquals(c, b);
+        assertEquals(a.hashCode(), b.hashCode());
+        assertEquals(a.hashCode(), c.hashCode());
+        StaticImportsTest.mapHelperOdd(PersistentTreeMap.ofSkipNull(
+                Tuple2.of(1, "One"), null, Tuple2.of(3, "Three"), null), max);
+        StaticImportsTest.mapHelperEven(PersistentTreeMap.ofSkipNull(
+                null, Tuple2.of(2, "Two"), null, Tuple2.of(4, "Four")), max);
+    }
+
+    @Test public void testImMap3() {
+        int max = 3;
+        Map<Integer,String> a = PersistentTreeMap.of(1, "One", 2, "Two", 3, "Three");
+        StaticImportsTest.mapHelper(a, max);
+        Map<Integer,String> b = PersistentTreeMap.ofSkipNull(
+                Tuple2.of(1, "One"), Tuple2.of(2, "Two"), Tuple2.of(3, "Three"));
+        StaticImportsTest.mapHelper(b, max);
+        Map<Integer,String> c = PersistentTreeMap.ofComp(Function2.defaultComparator(),
+                                                         1, "One", 2, "Two", 3, "Three");
+        assertEquals(a, b);
+        assertEquals(b, a);
+        assertEquals(a, c);
+        assertEquals(c, a);
+        assertEquals(b, c);
+        assertEquals(c, b);
+        assertEquals(a.hashCode(), b.hashCode());
+        assertEquals(a.hashCode(), c.hashCode());
+        StaticImportsTest.mapHelperOdd(PersistentTreeMap.ofSkipNull(
+                Tuple2.of(1, "One"), null, Tuple2.of(3, "Three")), max);
+        StaticImportsTest.mapHelperEven(PersistentTreeMap.ofSkipNull(
+                null, Tuple2.of(2, "Two"), null), max);
+    }
+
+    @Test public void testImMap2() {
+        int max = 2;
+        Map<Integer,String> a = PersistentTreeMap.of(1, "One", 2, "Two");
+        StaticImportsTest.mapHelper(a, max);
+        Map<Integer,String> b = PersistentTreeMap.ofSkipNull(
+                Tuple2.of(1, "One"), Tuple2.of(2, "Two"));
+        StaticImportsTest.mapHelper(b, max);
+        Map<Integer,String> c = PersistentTreeMap.ofComp(Function2.defaultComparator(),
+                                                         1, "One", 2, "Two");
+        assertEquals(a, b);
+        assertEquals(b, a);
+        assertEquals(a, c);
+        assertEquals(c, a);
+        assertEquals(b, c);
+        assertEquals(c, b);
+        assertEquals(a.hashCode(), b.hashCode());
+        assertEquals(a.hashCode(), c.hashCode());
+        StaticImportsTest.mapHelperOdd(PersistentTreeMap.ofSkipNull(
+                Tuple2.of(1, "One"), null), max);
+        StaticImportsTest.mapHelperEven(PersistentTreeMap.ofSkipNull(
+                null, Tuple2.of(2, "Two")), max);
+    }
+
+    @Test public void testImMap1() {
+        int max = 1;
+        Map<Integer,String> a = PersistentTreeMap.of(1, "One");
+        StaticImportsTest.mapHelper(a, max);
+        Map<Integer,String> b = PersistentTreeMap.ofSkipNull(
+                Tuple2.of(1, "One"));
+        StaticImportsTest.mapHelper(b, max);
+        Map<Integer,String> c = PersistentTreeMap.ofComp(Function2.defaultComparator(),
+                                                         1, "One");
+        assertEquals(a, b);
+        assertEquals(b, a);
+        assertEquals(a, c);
+        assertEquals(c, a);
+        assertEquals(b, c);
+        assertEquals(c, b);
+        assertEquals(a.hashCode(), b.hashCode());
+        assertEquals(a.hashCode(), c.hashCode());
+        StaticImportsTest.mapHelperOdd(PersistentTreeMap.ofSkipNull(
+                Tuple2.of(1, "One")), max);
+        StaticImportsTest.mapHelperEven(PersistentTreeMap.ofSkipNull(
+                null), max);
+    }
+
+    @Test public void testImMap0() {
+        int max = 0;
+        Map<Integer,String> b = PersistentTreeMap.ofSkipNull();
+        StaticImportsTest.mapHelper(b, max);
+        Map<Integer,String> c = PersistentTreeMap.ofComp(Function2.defaultComparator());
+        assertEquals(b, c);
+        assertEquals(c, b);
+        assertEquals(b.hashCode(), c.hashCode());
+        StaticImportsTest.mapHelperOdd(PersistentTreeMap.ofSkipNull(), max);
+        StaticImportsTest.mapHelperEven(PersistentTreeMap.ofSkipNull(), max);
     }
 }
