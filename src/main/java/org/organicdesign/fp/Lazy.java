@@ -59,6 +59,9 @@ public class Lazy {
             return value;
         }
 
+        // I don't like this because it's not referentially transparent.
+//        public boolean isRealizedYet() { return producer == null; }
+
         public String toString() { return "Lazy.Ref(" + ((producer == null) ? value : "*not-computed-yet*") + ")"; }
     }
 

@@ -45,13 +45,15 @@ class SequenceFlatMapped<T,U> implements Sequence<U> {
 
     @Override public Sequence<U> tail() { return laz.get().tail(); }
 
-    @Override public int hashCode() { return Sequence.hashCode(this); }
-
-    @Override public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if ( (o == null) || !(o instanceof Sequence) ) { return false; }
-        return Sequence.equals(this, (Sequence) o);
-    }
-
-    @Override public String toString() { return Sequence.toString(this); }
+//    @Override public int hashCode() { return Sequence.hashCode(this); }
+//
+//    @Override public boolean equals(Object o) {
+//        if (this == o) { return true; }
+//        if ( (o == null) || !(o instanceof Sequence) ) { return false; }
+//        return Sequence.equals(this, (Sequence) o);
+//    }
+//
+//    @Override public String toString() {
+//        return "SequenceFlatMapped(" + (laz.isRealizedYet() ? laz.get().head() : "*lazy*") + ",...)";
+//    }
 }

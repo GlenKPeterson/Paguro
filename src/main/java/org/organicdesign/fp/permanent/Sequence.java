@@ -15,7 +15,6 @@
 package org.organicdesign.fp.permanent;
 
 import java.util.Iterator;
-import java.util.Objects;
 
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.Transformable;
@@ -230,62 +229,46 @@ public interface Sequence<T> extends Transformable<T> {
         };
     }
 
-    // ==================================================== Static ====================================================
+    // Use these methods on UnIterable instead.
+//    // ==================================================== Static ====================================================
+//
+//    /** This is correct, but realizes the entire sequence (which may not terminate) and it's O(n) */
+//    static int hashCode(Sequence seq) {
+//        int ret = 0;
+//        Option item = seq.head();
+//        while (item.isSome()) {
+//            Object i = item.get();
+//            if (i != null) { ret = ret + i.hashCode(); }
+//            seq = seq.tail();
+//            item = seq.head();
+//        }
+//        return ret;
+//    }
+//
+//    /** This is correct, but realizes the entire sequence (which may not terminate) and it's O(n) */
+//    static boolean equals(Sequence a, Sequence b) {
+//        // Cheapest operation first...
+//        if (a == b) { return true; }
+//
+//        if ( (a == null) || (b == null) ) { return false; }
+//
+//        Option oa = a.head(); Option ob = b.head();
+//        while (oa.isSome() && ob.isSome()) {
+//            if (!Objects.equals(oa.get(), ob.get())) {
+//                return false;
+//            }
+//            a = a.tail(); b = b.tail();
+//            oa = a.head(); ob = b.head();
+//        }
+//        // Should both be used up (equal length).
+//        return !oa.isSome() && !ob.isSome();
+//    }
 
-    /** This is correct, but O(n) */
-    static int hashCode(Sequence seq) {
-        int ret = 0;
-        Option item = seq.head();
-        while (item.isSome()) {
-            Object i = item.get();
-            if (i != null) { ret = ret + i.hashCode(); }
-            seq = seq.tail();
-            item = seq.head();
-        }
-        return ret;
-    }
-
-    /** This is correct, but O(n) */
-    static boolean equals(Sequence a, Sequence b) {
-        // Cheapest operation first...
-        if (a == b) { return true; }
-
-        if ( (a == null) || (b == null) ) { return false; }
-
-        Option oa = a.head(); Option ob = b.head();
-        while (oa.isSome() && ob.isSome()) {
-            if (!Objects.equals(oa.get(), ob.get())) {
-                return false;
-            }
-            a = a.tail(); b = b.tail();
-            oa = a.head(); ob = b.head();
-        }
-        // Should both be used up (equal length).
-        return !oa.isSome() && !ob.isSome();
-    }
-
-    /** This is correct, but O(n) */
-    static String toString(Sequence seq) {
-        StringBuilder sB = new StringBuilder("Sequence(");
-        Option item = seq.head();
-        int count = 0;
-        while (item.isSome()) {
-            if (count > 0) {
-                sB.append(",");
-            } else if (count > 5) {
-                break;
-            }
-            sB.append(item.get());
-
-            seq = seq.tail();
-            item = seq.head();
-            count++;
-        }
-        if (item.isSome()) {
-            sB.append("...");
-        }
-        return sB.append(")").toString();
-    }
+// Don't want this - call UnIterable.toString instead.
+//    /** This is correct, but realizes some of the sequence, and it's O(n) */
+//    static String toString(Sequence seq) {
+//        return UnIterable.toString("Sequence", seq);
+//    }
 
 //    public class LazySequence<T> implements Sequence<T> {
 //        private final Lazy.Ref<Tuple2<T,Sequence<T>>> laz;

@@ -51,13 +51,15 @@ public class SequenceFiltered<T> implements Sequence<T> {
     @Override
     public Sequence<T> tail() { return laz.get()._2(); }
 
-    @Override public int hashCode() { return Sequence.hashCode(this); }
-
-    @Override public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if ( (o == null) || !(o instanceof Sequence) ) { return false; }
-        return Sequence.equals(this, (Sequence) o);
-    }
-
-    @Override public String toString() { return Sequence.toString(this); }
+//    @Override public int hashCode() { return Sequence.hashCode(this); }
+//
+//    @Override public boolean equals(Object o) {
+//        if (this == o) { return true; }
+//        if ( (o == null) || !(o instanceof Sequence) ) { return false; }
+//        return Sequence.equals(this, (Sequence) o);
+//    }
+//
+//    @Override public String toString() {
+//        return "SequenceFiltered(" + (laz.isRealizedYet() ? laz.get()._1() : "*lazy*") + ",...)";
+//    }
 }

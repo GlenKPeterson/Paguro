@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.junit.Test;
 import org.organicdesign.fp.Option;
+import org.organicdesign.fp.collections.UnIterable;
 
 import static org.junit.Assert.*;
 
@@ -66,30 +67,28 @@ public class SequenceTest {
         Sequence<Integer> seq1 = Sequence.ofArray(ints).drop(3).take(4);
         Sequence<Integer> seq2 = Sequence.ofArray(4, 5, 6, 7);
 
-        assertEquals(Sequence.hashCode(seq1), Sequence.hashCode(seq2));
+        assertEquals(UnIterable.hashCode(seq1), UnIterable.hashCode(seq2));
 
-        assertTrue(Sequence.equals(seq1, seq1));
-        assertTrue(Sequence.equals(seq2, seq2));
+        assertTrue(UnIterable.equals(seq1, seq1));
+        assertTrue(UnIterable.equals(seq2, seq2));
 
-        assertTrue(Sequence.equals(seq1, seq2));
-        assertTrue(Sequence.equals(seq2, seq1));
+        assertTrue(UnIterable.equals(seq1, seq2));
+        assertTrue(UnIterable.equals(seq2, seq1));
 
-        assertEquals(Sequence.hashCode(seq1.tail()), Sequence.hashCode(seq2.tail()));
-        assertTrue(Sequence.equals(seq1.tail(), seq2.tail()));
-        assertTrue(Sequence.equals(seq2.tail(), seq1.tail()));
+        assertEquals(UnIterable.hashCode(seq1.tail()), UnIterable.hashCode(seq2.tail()));
+        assertTrue(UnIterable.equals(seq1.tail(), seq2.tail()));
+        assertTrue(UnIterable.equals(seq2.tail(), seq1.tail()));
 
-        assertNotEquals(Sequence.hashCode(seq1.tail()), Sequence.hashCode(seq2));
-        assertNotEquals(Sequence.hashCode(seq1), Sequence.hashCode(seq2.tail()));
-        assertFalse(Sequence.equals(seq1.tail(), seq2));
-        assertFalse(Sequence.equals(seq1, seq2.tail()));
+        assertNotEquals(UnIterable.hashCode(seq1.tail()), UnIterable.hashCode(seq2));
+        assertNotEquals(UnIterable.hashCode(seq1), UnIterable.hashCode(seq2.tail()));
+        assertFalse(UnIterable.equals(seq1.tail(), seq2));
+        assertFalse(UnIterable.equals(seq1, seq2.tail()));
 
-        assertFalse(Sequence.equals(seq2.tail(), seq1));
-        assertFalse(Sequence.equals(seq2, seq1.tail()));
+        assertFalse(UnIterable.equals(seq2.tail(), seq1));
+        assertFalse(UnIterable.equals(seq2, seq1.tail()));
     }
 
-
-    @Test
-    public void forEach() {
+    @Test public void forEach() {
         Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         Sequence<Integer> seq = Sequence.ofArray(ints);
         final List<Integer> output = new ArrayList<>();
@@ -124,13 +123,12 @@ public class SequenceTest {
         assertArrayEquals(Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
                                   .drop(9999).take(3).toTypedArray(),
                           new Integer[]{});
-        assertArrayEquals(Sequence.ofArray(1,2,3,4,5,6,7,8,9)
+        assertArrayEquals(Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
                                   .drop(3).take(0).toTypedArray(),
                    new Integer[] { });
     }
 
-    @Test
-    public void chain1() {
+    @Test public void chain1() {
         assertArrayEquals(Sequence.ofArray(5)                      //         5
                                   .prepend(Sequence.ofArray(4))    //       4,5
                                   .append(Sequence.ofArray(6))     //       4,5,6
@@ -145,5 +143,4 @@ public class SequenceTest {
                                   .toTypedArray(),
                           new Integer[]{4, 5, 6});
     }
-
 }
