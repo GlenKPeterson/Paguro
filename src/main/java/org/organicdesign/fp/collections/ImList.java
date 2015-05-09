@@ -55,12 +55,13 @@ public interface ImList<E> extends UnList<E> {
      */
     ImList<E> append(E e);
 
-    /**
-     * Returns the item at this index, but takes any Number as an argument.
-     * @param n the zero-based index to get from the vector.
-     * @return the value at that index.
-     */
-    default E get(Number n) { return get(n.intValue()); }
+// I don't know if this is a good idea or not and I don't want to have to support it if not.
+//    /**
+//     * Returns the item at this index, but takes any Number as an argument.
+//     * @param n the zero-based index to get from the vector.
+//     * @return the value at that index.
+//     */
+//    default E get(Number n) { return get(n.intValue()); }
 
     /**
      * Returns the item at this index.

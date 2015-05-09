@@ -29,4 +29,16 @@ public class ImListTest {
         assertEquals("PersistentVector(Computer ,science ,is ,no ,more ,...)",
                      p.toString());
     }
+
+    @Test public void get() {
+        PersistentVector<String> pv = PersistentVector.of("Four", "score", "and", "seven", "years", "ago...");
+        assertEquals("Million", pv.get(Integer.MIN_VALUE, "Million"));
+        assertEquals("Million", pv.get(-1, "Million"));
+
+        assertEquals("Four", pv.get(0, "Million"));
+        assertEquals("ago...", pv.get(5, "Million"));
+
+        assertEquals("Million", pv.get(6, "Million"));
+        assertEquals("Million", pv.get(Integer.MAX_VALUE, "Million"));
+    }
 }
