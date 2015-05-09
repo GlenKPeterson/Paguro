@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.organicdesign.fp.Option;
+import org.organicdesign.fp.tuple.Tuple3;
 
 /** A three-argument, exception-safe functional interface. */
 @FunctionalInterface
@@ -47,23 +48,14 @@ public interface Function3<A,B,C,R> {
      */
     static <A,B,C,D> Function3<A,B,C,D> memoize(Function3<A,B,C,D> f) {
         return new Function3<A,B,C,D>() {
-            private final Map<A,Map<B,Map<C,Option<D>>>> aMap = new HashMap<>();
+            private final Map<Tuple3<A,B,C>,Option<D>> map = new HashMap<>();
             @Override
             public synchronized D applyEx(A a, B b, C c) throws Exception {
-                Map<B,Map<C,Option<D>>> bMap = aMap.get(a);
-                if (bMap == null) {
-                    bMap = new HashMap<>();
-                    aMap.put(a, bMap);
-                }
-                Map<C,Option<D>> cMap = bMap.get(b);
-                if (cMap == null) {
-                    cMap = new HashMap<>();
-                    bMap.put(b, cMap);
-                }
-                Option<D> val = cMap.get(c);
-                if ((val != null) && val.isSome()) { return val.get(); }
+                Tuple3<A,B,C> t3 = Tuple3.of(a, b, c);
+                Option<D> val = map.get(t3);
+                if (val != null) { return val.get(); }
                 D ret = f.apply(a, b, c);
-                cMap.put(c, Option.of(ret));
+                map.put(t3, Option.of(ret));
                 return ret;
             }
         };

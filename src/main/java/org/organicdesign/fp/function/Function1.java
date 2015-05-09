@@ -47,7 +47,7 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
     @Override default void accept(T t) { apply(t); }
 
     @SuppressWarnings("unchecked")
-    default <S> Function1<S,U> compose(final Function1<S,T> f) {
+    default <S> Function1<S,U> compose(final Function1<? super S, ? extends T> f) {
         if (f == IDENTITY) {
             // This violates type safety, but makes sense - composing any function with the
             // identity function should return the original function unchanged.  If you mess up the
@@ -71,11 +71,12 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
             return t;
         }
 
+        @SuppressWarnings("unchecked")
         @Override
-        public <S> Function1<S, Object> compose(Function1<S, Object> f) {
+        public <S> Function1<S,Object> compose(Function1<? super S, ? extends Object> f) {
             // Composing any function with the identity function has no effect on the original
             // function (by definition of identity) - just return it.
-            return f;
+            return (Function1<S,Object>) f;
         }
     };
 

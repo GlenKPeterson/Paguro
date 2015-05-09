@@ -1,10 +1,13 @@
 package org.organicdesign.fp.function;
 
+import java.io.IOException;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import java.io.IOException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(JUnit4.class)
 public class Function0Test {
@@ -24,5 +27,13 @@ public class Function0Test {
                 throw new IllegalStateException("test exception");
             }
         }.apply();
+    }
+
+    @Test public void constantFunction() {
+        Function0<Integer> f = Function0.constantFunction(7);
+        assertEquals(Integer.valueOf(7), f.apply());
+        assertEquals(Integer.valueOf(7), f.get());
+        assertEquals(f.hashCode(), Function0.constantFunction(Integer.valueOf(7)).hashCode());
+        assertTrue(f.equals(Function0.constantFunction(Integer.valueOf(7))));
     }
 }
