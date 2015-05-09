@@ -44,7 +44,7 @@ public interface UnMap<K,V> extends Map<K,V>, UnIterable<UnMap.UnEntry<K,V>> {
 // boolean	containsKey(Object key)
 // boolean	containsValue(Object value)
 
-    /** Maps are not designed for this - it has O(n) performance. {@inheritDoc} */
+    /** Most maps are not designed for this - the default implementation has O(n) performance. {@inheritDoc} */
     @Override default boolean containsValue(Object value) {
         for (UnEntry<K,V> entry : this) {
             if (Objects.equals(value, entry.getValue())) {

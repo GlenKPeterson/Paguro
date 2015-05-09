@@ -149,11 +149,8 @@ public interface UnList<E> extends List<E>, UnCollection<E> {
 
     /** {@inheritDoc} */
     @Override default UnList<E> subList(int fromIndex, int toIndex) {
-        if ( (fromIndex == 0) && (toIndex == (size() - 1)) ) {
+        if ( (fromIndex == 0) && (toIndex == size()) ) {
             return this;
-        }
-        if (fromIndex == (size() - 1)) {
-            return empty();
         }
 // I thing this should be the implementation in ImList.
 //        PersistentVector<E> pv = PersistentVector.empty();

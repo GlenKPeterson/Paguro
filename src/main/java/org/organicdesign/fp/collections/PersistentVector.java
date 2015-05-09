@@ -15,6 +15,10 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+// TODO: http://functionaljava.googlecode.com/svn/artifacts/2.21/javadoc/fj/data/Seq.html
+// TODO: https://sourcegraph.com/github.com/functionaljava/functionaljava@627d9dfa6725bcb301361477fcbc50c6efe77f61/.tree/core/src/main/java/fj/data/Seq.java
+// TODO: Theoretically even better? https://github.com/clojure/core.rrb-vector/blob/master/src/main/clojure/clojure/core/rrb_vector.clj
+
 /**
  * This started out as Rich Hickey's PersistentVector class from Clojure in late 2014.  Glen added generic types, tried
  * to make it a little more pure-Java friendly, and removed dependencies on other Clojure stuff.
