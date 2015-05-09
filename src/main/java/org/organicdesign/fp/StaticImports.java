@@ -61,6 +61,8 @@ public class StaticImports {
         return new UnIterator<T>() {
             @Override public boolean hasNext() { return iter.hasNext(); }
             @Override public T next() { return iter.next(); }
+            // Not sure why I'm doing this because you generally can't meaningfully implement hashCode() or equals() on
+            // an iterator in a way that it has a practical value.
             @Override public int hashCode() { return iter.hashCode(); }
             @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
             @Override public boolean equals(Object o) { return iter.equals(o); }
