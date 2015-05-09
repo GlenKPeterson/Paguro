@@ -39,17 +39,13 @@ public class Tuple3<T,U,V> {
     public V _3() { return _3; }
 
     @Override
-    public String toString() { return "(" + _1 + "," + _2 + "," + _3 + ")"; }
+    public String toString() { return "Tuple3(" + _1 + "," + _2 + "," + _3 + ")"; }
 
     @Override
     public boolean equals(Object other) {
         // Cheapest operation first...
         if (this == other) { return true; }
-        if ((other == null) ||
-            !(other instanceof Tuple3) ||
-            (this.hashCode() != other.hashCode())) {
-            return false;
-        }
+        if (!(other instanceof Tuple3)) { return false; }
         // Details...
         @SuppressWarnings("rawtypes") final Tuple3 that = (Tuple3) other;
 

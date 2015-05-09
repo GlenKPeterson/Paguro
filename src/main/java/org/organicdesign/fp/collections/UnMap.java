@@ -153,10 +153,7 @@ public interface UnMap<K,V> extends Map<K,V>, UnIterable<UnMap.UnEntry<K,V>> {
         }
 
         static <K,V> UnEntry<K,V> wrap(Map.Entry<K,V> entry) {
-            return new UnMap.UnEntry<K,V>() {
-                @Override public K getKey() { return entry.getKey(); }
-                @Override public V getValue() { return entry.getValue(); }
-            };
+            return Tuple2.of(entry.getKey(), entry.getValue());
         }
 
         static <K,V> UnIterator<UnEntry<K,V>> wrap(UnIterator<Map.Entry<K,V>> innerIter) {

@@ -46,15 +46,15 @@ public interface Function3<A,B,C,R> {
      for this to work correctly and quickly.  Also, make sure your domain is very small!  This function uses O(n^3)
      memory.
      */
-    static <A,B,C,D> Function3<A,B,C,D> memoize(Function3<A,B,C,D> f) {
-        return new Function3<A,B,C,D>() {
-            private final Map<Tuple3<A,B,C>,Option<D>> map = new HashMap<>();
+    static <A,B,C,Z> Function3<A,B,C,Z> memoize(Function3<A,B,C,Z> f) {
+        return new Function3<A,B,C,Z>() {
+            private final Map<Tuple3<A,B,C>,Option<Z>> map = new HashMap<>();
             @Override
-            public synchronized D applyEx(A a, B b, C c) throws Exception {
+            public synchronized Z applyEx(A a, B b, C c) throws Exception {
                 Tuple3<A,B,C> t3 = Tuple3.of(a, b, c);
-                Option<D> val = map.get(t3);
+                Option<Z> val = map.get(t3);
                 if (val != null) { return val.get(); }
-                D ret = f.apply(a, b, c);
+                Z ret = f.apply(a, b, c);
                 map.put(t3, Option.of(ret));
                 return ret;
             }

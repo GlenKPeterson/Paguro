@@ -9,6 +9,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.organicdesign.fp.function.Function2;
 import org.organicdesign.fp.permanent.Sequence;
+import org.organicdesign.fp.tuple.Tuple2;
 
 import static org.junit.Assert.*;
 
@@ -196,11 +197,25 @@ public class PersistentTreeMapTest {
         assertEquals(PersistentTreeMap.empty(),
                      PersistentTreeMap.of(1, "one").assoc(2, "two").assoc(3, "three").tailMap(999999999));
 
-
-        assertTrue(Sequence.ofArray(UnMap.UnEntry.of(2, "two"), UnMap.UnEntry.of(3, "three"))
-                           .equals(PersistentTreeMap.of(1, "one").assoc(2, "two").assoc(3, "three").tail()));
+        assertArrayEquals(new UnMap.UnEntry[]{Tuple2.of(2, "two"), Tuple2.of(3, "three")},
+                          PersistentTreeMap.of(1, "one").assoc(2, "two").assoc(3, "three").tail()
+                                           .map((u) -> Tuple2.of(u.getKey(), u.getValue())).toTypedArray());
 
         assertTrue(Sequence.emptySequence().equals(PersistentTreeMap.of(1, "one").tail()));
+    }
+
+    public void friendlierArrayEq(Object[] a1, Object[] a2) {
+        if (a1 == null) {
+            assertNull(a2);
+            return;
+        } else if (a2 == null) {
+            assertNull(a1);
+            return;
+        }
+        assertEquals(a1.length, a2.length);
+        for (int i = 0; i < a1.length; i++) {
+            assertTrue(a1[i].equals(a2[i]));
+        }
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -338,7 +353,8 @@ public class PersistentTreeMapTest {
                                          UnMap.UnEntry.of(3, "three"),
                                          UnMap.UnEntry.of(4, "four"),
                                          UnMap.UnEntry.of(5, "five"));
-        assertEquals(s, m.entrySet());
+        assertArrayEquals(s.toArray(),
+                          m.entrySet().map((u) -> Tuple2.of(u.getKey(), u.getValue())).toTypedArray());
     }
 
     @Test public void values() {

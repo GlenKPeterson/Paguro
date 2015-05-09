@@ -52,11 +52,7 @@ public class Tuple2<T,U> implements Entry<T,U>, UnMap.UnEntry<T,U> {
     public boolean equals(Object other) {
         // Cheapest operation first...
         if (this == other) { return true; }
-        if ((other == null) ||
-            !(other instanceof Entry) ||
-            (this.hashCode() != other.hashCode())) {
-            return false;
-        }
+        if (!(other instanceof Entry)) { return false; }
         // Details...
         final Entry that = (Entry) other;
         return Objects.equals(_1, that.getKey()) && Objects.equals(_2, that.getValue());
@@ -66,7 +62,7 @@ public class Tuple2<T,U> implements Entry<T,U>, UnMap.UnEntry<T,U> {
     public int hashCode() {
         int ret = 0;
         if (_1 != null) { ret = _1.hashCode(); }
-        if (_2 != null) { return ret ^ _2.hashCode(); }
+        if (_2 != null) { return ret + _2.hashCode(); }
         // If it's uninitialized, it's equal to every other uninitialized instance.
         return ret;
     }

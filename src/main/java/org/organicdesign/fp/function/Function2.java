@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 
 import org.organicdesign.fp.Option;
+import org.organicdesign.fp.tuple.Tuple2;
 
 /**
  This is like Java 8's java.util.function.BiFunction, but retrofitted to turn checked exceptions
@@ -64,21 +65,16 @@ public interface Function2<A,B,R> extends BiFunction<A,B,R> {
      very quickly.  Please note that the parameters to f need to implement equals() and hashCode() correctly
      for this to work correctly and quickly.
      */
-    static <A,B,C> Function2<A,B,C> memoize(Function2<A,B,C> f) {
-        return new Function2<A,B,C>() {
-            private final Map<A,Map<B,Option<C>>> memo = new HashMap<>();
+    static <A,B,Z> Function2<A,B,Z> memoize(Function2<A,B,Z> f) {
+        return new Function2<A,B,Z>() {
+            private final Map<Tuple2<A,B>,Option<Z>> map = new HashMap<>();
             @Override
-            public synchronized C applyEx(A a, B b) throws Exception {
-                Map<B,Option<C>> map = memo.get(a);
-                if (map == null) {
-                    map = new HashMap<>();
-                    memo.put(a, map);
-                } else {
-                    Option<C> val = map.get(b);
-                    if ((val != null) && val.isSome()) { return val.get(); }
-                }
-                C ret = f.apply(a, b);
-                map.put(b, Option.of(ret));
+            public synchronized Z applyEx(A a, B b) throws Exception {
+                Tuple2<A,B> t = Tuple2.of(a, b);
+                Option<Z> val = map.get(t);
+                if (val != null) { return val.get(); }
+                Z ret = f.apply(a, b);
+                map.put(t, Option.of(ret));
                 return ret;
             }
         };
