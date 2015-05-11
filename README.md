@@ -1,5 +1,5 @@
-You are on the Java 8 branch of this project.  If you're using Java 7 or earlier, get the Java 7 legacy support branch from here:
-https://github.com/GlenKPeterson/fp4java7/tree/java7
+A pre-alpha version of this project includes immutable collections.  The API has changed significantly and the project has been renamed, but this is where development continues:
+https://github.com/GlenKPeterson/J-cicle/tree/2015-03-29_ImUnClojCollections
 
 #Usage
 
