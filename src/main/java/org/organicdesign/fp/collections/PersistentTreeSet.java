@@ -10,13 +10,28 @@
 package org.organicdesign.fp.collections;
 
 import java.util.Comparator;
+import java.util.Objects;
 
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.permanent.Sequence;
 
 public class PersistentTreeSet<E> implements ImSetSorted<E> {
+
+    /**
+     Be extremely careful with this because it uses the default comparator, which only works for items that implement
+     Comparable (have a "natural ordering").  An attempt to use it with other items will blow up at runtime.  Either
+     a withComparator() method will be added, or this will be removed.
+     */
     @SuppressWarnings("unchecked")
     static public final PersistentTreeSet EMPTY = new PersistentTreeSet(PersistentTreeMap.EMPTY);
+
+    /**
+     Be extremely careful with this because it uses the default comparator, which only works for items that implement
+     Comparable (have a "natural ordering").  An attempt to use it with other items will blow up at runtime.  Either
+     a withComparator() method will be added, or this will be removed.
+     */
+    @SuppressWarnings("unchecked")
+    static public <T> PersistentTreeSet<T> empty() { return EMPTY; }
 
     /** {@inheritDoc} */
     @Override public boolean contains(Object o) { return impl.containsKey(o); }
@@ -35,15 +50,13 @@ public class PersistentTreeSet<E> implements ImSetSorted<E> {
 
     @Override public boolean equals(Object other) {
         return (other != null) &&
-                (other instanceof ImSetSorted) &&
-                (this.size() == ((ImSetSorted) other).size()) &&
-                UnIterable.equals(this, (ImSetSorted) other);
+               (other instanceof ImSetSorted) &&
+               (this.size() == ((ImSetSorted) other).size()) &&
+               Objects.equals(comparator(), ((ImSetSorted) other).comparator()) &&
+               UnIterable.equals(this, (ImSetSorted) other);
     }
 
     @Override public int hashCode() { return (size() == 0) ? 0 : UnIterable.hashCode(this); }
-
-    @SuppressWarnings("unchecked")
-    static public <T> PersistentTreeSet<T> empty() { return EMPTY; }
 
     final ImMapSorted<E,?> impl;
 

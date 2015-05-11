@@ -35,8 +35,18 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
     private final Node<K,V> tree;
     private final int size;
 
+    /**
+     Be extremely careful with this because it uses the default comparator, which only works for items that implement
+     Comparable (have a "natural ordering").  An attempt to use it with other items will blow up at runtime.  Either
+     a withComparator() method will be added, or this will be removed.
+     */
     final static public PersistentTreeMap EMPTY = new PersistentTreeMap<>(Function2.defaultComparator(), null, 0);
 
+    /**
+     Be extremely careful with this because it uses the default comparator, which only works for items that implement
+     Comparable (have a "natural ordering").  An attempt to use it with other items will blow up at runtime.  Either
+     a withComparator() method will be added, or this will be removed.
+     */
     @SuppressWarnings("unchecked")
     public static <K, V> PersistentTreeMap<K,V> empty() {
         return (PersistentTreeMap<K,V>) EMPTY;
@@ -46,6 +56,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         comp = c; tree = t; size = n;
     }
 
+    /** Returns a new PersistentTreeMap of the given comparable keys and their paired values. */
     public static <K extends Comparable<K>,V>
     PersistentTreeMap<K,V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7,
                               K k8, V v8, K k9, V v9, K k10, V v10) {
@@ -54,6 +65,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
                 .assoc(k6, v6).assoc(k7, v7).assoc(k8, v8).assoc(k9, v9).assoc(k10, v10);
     }
 
+    /** Returns a new PersistentTreeMap of the given comparable keys and their paired values. */
     public static <K extends Comparable<K>,V>
     PersistentTreeMap<K,V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7,
                               K k8, V v8, K k9, V v9) {
@@ -62,6 +74,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
                 .assoc(k6, v6).assoc(k7, v7).assoc(k8, v8).assoc(k9, v9);
     }
 
+    /** Returns a new PersistentTreeMap of the given comparable keys and their paired values. */
     public static <K extends Comparable<K>,V>
     PersistentTreeMap<K,V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7,
                               K k8, V v8) {
@@ -70,6 +83,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
                 .assoc(k6, v6).assoc(k7, v7).assoc(k8, v8);
     }
 
+    /** Returns a new PersistentTreeMap of the given comparable keys and their paired values. */
     public static <K extends Comparable<K>,V>
     PersistentTreeMap<K,V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7) {
         return new PersistentTreeMap<K,V>(Function2.defaultComparator(), null, 0)
@@ -77,6 +91,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
                 .assoc(k6, v6).assoc(k7, v7);
     }
 
+    /** Returns a new PersistentTreeMap of the given comparable keys and their paired values. */
     public static <K extends Comparable<K>,V>
     PersistentTreeMap<K,V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6) {
         return new PersistentTreeMap<K,V>(Function2.defaultComparator(), null, 0)
@@ -84,36 +99,44 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
                 .assoc(k6, v6);
     }
 
+    /** Returns a new PersistentTreeMap of the given comparable keys and their paired values. */
     public static <K extends Comparable<K>,V>
     PersistentTreeMap<K,V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
         return new PersistentTreeMap<K,V>(Function2.defaultComparator(), null, 0)
                 .assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).assoc(k5, v5);
     }
 
+    /** Returns a new PersistentTreeMap of the given comparable keys and their paired values. */
     public static <K extends Comparable<K>,V>
     PersistentTreeMap<K,V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
         return new PersistentTreeMap<K,V>(Function2.defaultComparator(), null, 0)
                 .assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4);
     }
 
+    /** Returns a new PersistentTreeMap of the given comparable keys and their paired values. */
     public static <K extends Comparable<K>,V>
     PersistentTreeMap<K,V> of(K k1, V v1, K k2, V v2, K k3, V v3) {
         return new PersistentTreeMap<K,V>(Function2.defaultComparator(), null, 0)
                 .assoc(k1, v1).assoc(k2, v2).assoc(k3, v3);
     }
 
+    /** Returns a new PersistentTreeMap of the given comparable keys and their paired values. */
     public static <K extends Comparable<K>,V>
     PersistentTreeMap<K,V> of(K k1, V v1, K k2, V v2) {
         return new PersistentTreeMap<K,V>(Function2.defaultComparator(), null, 0)
                 .assoc(k1, v1).assoc(k2, v2);
     }
 
+    /** Returns a new PersistentTreeMap of the given comparable keys and their paired values. */
     public static <K extends Comparable<K>,V> PersistentTreeMap<K,V> of(K k1, V v1) {
         return new PersistentTreeMap<K,V>(Function2.defaultComparator(), null, 0)
                 .assoc(k1, v1);
     }
 
 
+    /**
+     Returns a new PersistentTreeMap of the given comparable keys and their paired values, skipping any null Entries.
+     */
     @SafeVarargs
     public static <K extends Comparable<K>,V> PersistentTreeMap<K,V>
     ofSkipNull(Map.Entry<K,V>... es) {
@@ -127,6 +150,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         return map;
     }
 
+    /** Returns a new PersistentTreeMap of the specified comparator and the given key/value pairs. */
     public static <K,V> PersistentTreeMap<K,V>
     ofComp(Comparator<? super K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7,
            K k8, V v8, K k9, V v9, K k10, V v10) {
@@ -135,6 +159,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
                 .assoc(k6, v6).assoc(k7, v7).assoc(k8, v8).assoc(k9, v9).assoc(k10, v10);
     }
 
+    /** Returns a new PersistentTreeMap of the specified comparator and the given key/value pairs. */
     public static <K,V> PersistentTreeMap<K,V>
     ofComp(Comparator<? super K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7,
            K k8, V v8, K k9, V v9) {
@@ -143,6 +168,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
                 .assoc(k6, v6).assoc(k7, v7).assoc(k8, v8).assoc(k9, v9);
     }
 
+    /** Returns a new PersistentTreeMap of the specified comparator and the given key/value pairs. */
     public static <K,V> PersistentTreeMap<K,V>
     ofComp(Comparator<? super K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7,
            K k8, V v8) {
@@ -151,6 +177,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
                 .assoc(k6, v6).assoc(k7, v7).assoc(k8, v8);
     }
 
+    /** Returns a new PersistentTreeMap of the specified comparator and the given key/value pairs. */
     public static <K,V> PersistentTreeMap<K,V>
     ofComp(Comparator<? super K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7) {
         return new PersistentTreeMap<K,V>(c, null, 0)
@@ -158,6 +185,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
                 .assoc(k6, v6).assoc(k7, v7);
     }
 
+    /** Returns a new PersistentTreeMap of the specified comparator and the given key/value pairs. */
     public static <K,V> PersistentTreeMap<K,V>
     ofComp(Comparator<? super K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6) {
         return new PersistentTreeMap<K,V>(c, null, 0)
@@ -165,36 +193,42 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
                 .assoc(k6, v6);
     }
 
+    /** Returns a new PersistentTreeMap of the specified comparator and the given key/value pairs. */
     public static <K,V> PersistentTreeMap<K,V>
     ofComp(Comparator<? super K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
         return new PersistentTreeMap<K,V>(c, null, 0)
                 .assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).assoc(k5, v5);
     }
 
+    /** Returns a new PersistentTreeMap of the specified comparator and the given key/value pairs. */
     public static <K,V> PersistentTreeMap<K,V>
     ofComp(Comparator<? super K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
         return new PersistentTreeMap<K,V>(c, null, 0)
                 .assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4);
     }
 
+    /** Returns a new PersistentTreeMap of the specified comparator and the given key/value pairs. */
     public static <K,V> PersistentTreeMap<K,V>
     ofComp(Comparator<? super K> c, K k1, V v1, K k2, V v2, K k3, V v3) {
         return new PersistentTreeMap<K,V>(c, null, 0)
                 .assoc(k1, v1).assoc(k2, v2).assoc(k3, v3);
     }
 
+    /** Returns a new PersistentTreeMap of the specified comparator and the given key/value pairs. */
     public static <K,V> PersistentTreeMap<K,V>
     ofComp(Comparator<? super K> c, K k1, V v1, K k2, V v2) {
         return new PersistentTreeMap<K,V>(c, null, 0)
                 .assoc(k1, v1).assoc(k2, v2);
     }
 
+    /** Returns a new PersistentTreeMap of the specified comparator and the given key/value pairs. */
     public static <K,V> PersistentTreeMap<K,V>
     ofComp(Comparator<? super K> c, K k1, V v1) {
         return new PersistentTreeMap<K,V>(c, null, 0)
                 .assoc(k1, v1);
     }
 
+    /** Returns a new PersistentTreeMap of the specified comparator and the given key/value pairs. */
     @SafeVarargs
     public static <K,V> PersistentTreeMap<K,V>
     ofCompSkipNull(Comparator<? super K> c, Map.Entry<K,V>... es) {
@@ -208,6 +242,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         return map;
     }
 
+    /** Returns a new empty PersistentTreeMap that will use the specified comparator. */
     public static <K,V> PersistentTreeMap<K,V> ofComp(Comparator<? super K> c) {
         return new PersistentTreeMap<>(c, null, 0);
     }
@@ -288,7 +323,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         return ret;
     }
 
-    /** {@inheritDoc} */
+    /** Returns a string describing the first few items in this map (for debugging). */
     @Override public String toString() {
         StringBuilder sB = new StringBuilder("PersistentTreeMap(");
         int i = 0;
@@ -330,6 +365,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         return new ValueColl<>(() -> this.iterator());
     }
 
+    /** {@inheritDoc} */
     @Override public Option<UnEntry<K,V>> head() {
         Node<K,V> t = tree;
         if (t != null) {
@@ -373,7 +409,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         return ret;
     }
 
-
+    /** {@inheritDoc} */
     @Override public Sequence<UnEntry<K,V>> tail() {
         if (size() > 1) {
             return without(firstKey());
@@ -415,13 +451,20 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 //        return ret;
 //    }
 
+    /**
+     Returns the comparator used to order the keys in this map.  If this map uses the natural ordering of its keys,
+     this will return Function2.DEFAULT_COMPARATOR.  That's slightly different from java.util.SortedMap, so let me know
+     if that causes a problem.
+     */
     @Override public Comparator<? super K> comparator() { return comp; }
 
+    /** Returns true if the map contains the given key. */
     @SuppressWarnings("unchecked")
     @Override public boolean containsKey(Object key) {
         return entryAt((K) key) != null;
     }
 
+    /** Returns the value associated with the given key. */
     @SuppressWarnings("unchecked")
     @Override
     public V get(Object key) {
@@ -434,6 +477,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 // public PersistentTreeMap<K,V> assocEx(K key, V val) {
 // Inherits default implementation of assocEx from IPersistentMap
 
+    /** {@inheritDoc} */
     @Override public PersistentTreeMap<K,V> assoc(K key, V val) {
         Box<Node<K,V>> found = new Box<>(null);
         Node<K,V> t = add(tree, key, val, found);
@@ -450,6 +494,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         return new PersistentTreeMap<>(comp, t.blacken(), size + 1);
     }
 
+    /** {@inheritDoc} */
     @Override public PersistentTreeMap<K,V> without(K key) {
         Box<Node<K,V>> found = new Box<>(null);
         Node<K,V> t = remove(tree, key, found);
@@ -526,16 +571,19 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 //        return null;
 //    }
 
+    /** {@inheritDoc} */
     @Override
     public UnIterator<UnMap.UnEntry<K,V>> iterator() { return new NodeIterator<>(tree, true); }
 
 //    public NodeIterator<K,V> reverseIterator() { return new NodeIterator<>(tree, false); }
 
+    /** {@inheritDoc} */
     @Override public K firstKey() {
         if (size() < 1) { throw new NoSuchElementException("this map is empty"); }
         return head().get().getKey();
     }
 
+    /** {@inheritDoc} */
     @Override public K lastKey() {
         Node<K,V> max = last();
         if (max == null) {
@@ -544,6 +592,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         return max.getKey();
     }
 
+    /** {@inheritDoc} */
     public Node<K,V> last() {
         Node<K,V> t = tree;
         if (t != null) {
@@ -566,12 +615,14 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 // public Object valAt(Object key){
 // Default implementation now inherited from ILookup
 
+    /** {@inheritDoc} */
     @Override public int size() { return size; }
 
+    /** {@inheritDoc} */
     public Node<K,V> entryAt(K key) {
         Node<K,V> t = tree;
         while (t != null) {
-            int c = doCompare(key, t.key);
+            int c = comp.compare(key, t.key);
             if (c == 0)
                 return t;
             else if (c < 0)
@@ -582,19 +633,13 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         return null; // t; // t is always null
     }
 
-    public int doCompare(K k1, K k2) {
-//	if(comp != null)
-        return comp.compare(k1, k2);
-//	return ((Comparable) k1).compareTo(k2);
-    }
-
     private Node<K,V> add(Node<K,V> t, K key, V val, Box<Node<K,V>> found) {
         if (t == null) {
             if (val == null)
                 return new Red<>(key);
             return new RedVal<>(key, val);
         }
-        int c = doCompare(key, t.key);
+        int c = comp.compare(key, t.key);
         if (c == 0) {
             found.val = t;
             return null;
@@ -610,7 +655,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
     private Node<K,V> remove(Node<K,V> t, K key, Box<Node<K,V>> found) {
         if (t == null)
             return null; //not found indicator
-        int c = doCompare(key, t.key);
+        int c = comp.compare(key, t.key);
         if (c == 0) {
             found.val = t;
             return append(t.left(), t.right());
@@ -727,7 +772,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
     }
 
     private Node<K,V> replace(Node<K,V> t, K key, V val) {
-        int c = doCompare(key, t.key);
+        int c = comp.compare(key, t.key);
         return t.replace(t.key,
                          c == 0 ? val : t.val(),
                          c < 0 ? replace(t.left(), key, val) : t.left(),
@@ -1139,7 +1184,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 //        }
 //    }
 
-    static public class NodeIterator<K, V> implements UnIterator<UnMap.UnEntry<K,V>> {
+    private static class NodeIterator<K, V> implements UnIterator<UnMap.UnEntry<K,V>> {
         private Stack<Node<K,V>> stack = new Stack<>();
         private final boolean asc;
 

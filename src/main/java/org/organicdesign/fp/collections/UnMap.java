@@ -90,6 +90,7 @@ public interface UnMap<K,V> extends Map<K,V>, UnIterable<UnMap.UnEntry<K,V>> {
     /** {@inheritDoc} */
     @Override default boolean isEmpty() { return size() == 0; }
 
+    /** {@inheritDoc} */
     @Override default UnIterator<UnEntry<K,V>> iterator() { return UnMap.UnEntry.wrap(entrySet().iterator()); }
 
     /** Returns a view of the keys contained in this map. */

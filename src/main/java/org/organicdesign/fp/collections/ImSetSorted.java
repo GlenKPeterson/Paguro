@@ -21,13 +21,13 @@ public interface ImSetSorted<E> extends ImSet<E>, UnSetSorted<E> {
     /** {@inheritDoc} */
     @Override ImSetSorted<E> disjoin(E key);
 
-    /** {@inheritDoc} */
+    /** Return the elements in this set up (but excluding) to the given element */
     @Override default ImSetSorted<E> headSet(E toElement) { return subSet(first(), toElement); }
 
-    /** {@inheritDoc} */
+    /** Return the elements in this set from the start element (inclusive) to the end element (exclusive) */
     @Override ImSetSorted<E> subSet(E fromElement, E toElement);
 
-    /** {@inheritDoc} */
+    /** Return the elements in this from the given element to the end */
     @Override default ImSetSorted<E> tailSet(E fromElement) { return subSet(fromElement, last()); }
 
 }

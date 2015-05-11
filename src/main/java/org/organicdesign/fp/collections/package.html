@@ -6,15 +6,12 @@
 <h3>Definitions</h3>
 <dl>
     <dt>Mutable</dt>
-    <dd>This is a reasonable term for the java.util collections.&#160;
+    <dd>This is what we'll call the java.util collections.&#160;
         They are built on an assumption that you will modify them in-place, rarely if ever making any copies.&#160;
         This was sensible when they were created in the 1990's when memory was expensive, the
-        garbage collector was in it's infancy, and multi-processor systems were rare.&#160;
-        But today, memory is cheap, the garbage collector is one of the wonders of the modern world, and even your phone has several processors.&#160;
-        We have to extend these interfaces for backward compatibility, but the sub-interfaces
-        both throw UnsupportedOperationException and deprecate the modification methods.&#160;
-        That way, your IDE and the compiler give you warnings when you try to use the wrong method.&#160;
-        If you ignore all that, it will throw an exception at runtime.</dd>
+        garbage collector was in its infancy, and multi-processor systems were rare.&#160;
+        Today, memory is cheap, the garbage collector is one of the wonders of the modern world, and even your phone has several processors.&#160;
+        We have to extend these interfaces for backward compatibility.</dd>
 
     <dt>Unmodifiable</dt>
     <dd>This is what the Collections.unmodifiableXxxx() methods return.&#160;
@@ -23,10 +20,11 @@
         interfaces having the same "get" methods (readers), but without any "set" methods (modifiers).&#160;
         It is useful for a function to accept Unmodifiable interfaces in order to say,
         "I'm not going to modify this" and return Unmodifiable interfaces to say, "You can't modify this."&#160;
-        Since that's not possible, this package provides the next-best thing which is "Un" interfaces which extend the java.util mutable collections.&#160;
-        Mutator methods are overridden to throw UnsupportedOperationExceptions when called.&#160;
-        In addition, mutator methods are deprecated, so when you replace a List with an UnList in existing code, your IDE will tell you if any uses
-        within scope try to modify it.</dd>
+        Since that's not possible, the "Un-" interfaces in this package extend the java.util mutable collections.&#160;
+        All mutator methods are overridden to throw UnsupportedOperationExceptions.&#160;
+        Mutator methods are also deprecated, so your IDE will warn you if you try to use them.&#160;
+        In general, the "Un-" interfaces only take away mutation methods.&#160;
+        They do not add functionality.</dd>
 
     <dt>Immutable</dt>
     <dd>This is what the Clojure collections provide.&#160;
@@ -35,7 +33,8 @@
         For this to work, each "set" method needs to return a new collection.&#160;
         Unfortunately, the java.util mutable collections "set" methods all return something else, like a boolean indicating success,
         or the item you just inserted.&#160;
-        This package works around that limitation by providing mutator methods with different names.</dd>
+        This package works around that limitation by providing modification methods with different names and other
+        helper-methods for expression-oriented functional programming.</dd>
 </dl>
 
 <h3>Description</h3>

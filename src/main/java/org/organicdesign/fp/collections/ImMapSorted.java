@@ -27,10 +27,13 @@ public interface ImMapSorted<K,V> extends UnMapSorted<K,V>, Sequence<UnMap.UnEnt
 
 // public  K	firstKey()
 
-    /** {@inheritDoc} */
+    /** Return the elements in this map up (but excluding) to the given element */
     @Override default ImMapSorted<K,V> headMap(K toKey) { return subMap(firstKey(), toKey); }
 
-    /** {@inheritDoc} */
+    /**
+     Returns an iterator over the UnEntries of this map in order.
+     @return an Iterator.
+     */
     @Override UnIterator<UnEntry<K, V>> iterator();
 
     /** Returns a view of the keys contained in this map. */
@@ -38,12 +41,11 @@ public interface ImMapSorted<K,V> extends UnMapSorted<K,V>, Sequence<UnMap.UnEnt
 
 // public  K	lastKey()
 
-    /** {@inheritDoc} */
+    /** Return the elements in this map from the start element (inclusive) to the end element (exclusive) */
     @Override ImMapSorted<K,V> subMap(K fromKey, K toKey);
 
-    /** {@inheritDoc} */
+    /** Return the elements in this from the given element to the end */
     @Override ImMapSorted<K,V> tailMap(K fromKey);
-
 
     /** Returns a new map with the given key/value added */
     ImMapSorted<K,V> assoc(K key, V val);
