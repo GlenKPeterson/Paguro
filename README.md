@@ -1,4 +1,4 @@
-J-cicle (pronounced "Jay-sick-ul" like a frozen/immutable Java&trade;-icicle) brings Clojure collections, a Sequence abstraction, memoization, and some syntactical sugar to Java 8 with the full type saftey and compile-time checking that Java programmers are accustomed to.
+J-cicle (pronounced "Jay-sick-ul" like a frozen/immutable Java&trade;-icicle) brings Clojure collections, a Sequence abstraction, memoization, and some syntactical sugar to Java.  Fluent interfaces encourage you to write expressions (that evaluate) instead of statements (that produce void).  It pushes Java toward Clojure, but keeps the type saftey, objects, classes, and C-like syntax that Java programmers are accustomed to.
 
 *** Caution: Pre-alpha quality. ***
 
