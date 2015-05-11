@@ -13,12 +13,14 @@
 
 package org.organicdesign.fp;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
 
@@ -26,14 +28,19 @@ import static junit.framework.TestCase.assertEquals;
 public class FunctionUtilsTest {
 
     @Test
-    public void iterableToString() {
+    public void testToString() {
         List<Integer> is = new ArrayList<>();
         is.add(1);
         is.add(2);
         is.add(3);
         is.add(4);
         is.add(5);
-        assertEquals("ArrayList(1,2,3,4,5)", FunctionUtils.toString(is));
+        assertEquals("Array of Integer(1,2,3,4,5)", FunctionUtils.toString(is.toArray()));
+
+        Map<String,Integer> m = new TreeMap<>();
+        m.put("Hello", 99);
+        m.put("World", -237);
+        assertEquals("TreeMap(Entry(Hello,99),Entry(World,-237))", FunctionUtils.toString(m));
     }
 //    @SuppressWarnings("Convert2Lambda")
 //    public static final Predicate<Integer> r = new Predicate<Integer>() {

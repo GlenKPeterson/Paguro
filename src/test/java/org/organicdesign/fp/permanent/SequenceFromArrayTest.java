@@ -14,11 +14,11 @@
 
 package org.organicdesign.fp.permanent;
 
+import java.util.Arrays;
+
 import org.junit.Test;
 import org.organicdesign.fp.Mutable;
 import org.organicdesign.fp.function.Function0;
-
-import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
@@ -57,7 +57,7 @@ public class SequenceFromArrayTest {
 
 
     @Test public void singleInit() {
-        final Mutable.ObjectRef<Integer> i = Mutable.ObjectRef.of(0);
+        final Mutable.Ref<Integer> i = Mutable.Ref.of(0);
         @SuppressWarnings("unchecked") Function0<Integer>[] ints = new Function0[] {
                 () -> { i.set(i.value() + 1); return 3; },
                 () -> { i.set(i.value() + 1); return 2; },

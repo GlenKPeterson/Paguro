@@ -17,39 +17,14 @@ package org.organicdesign.fp;
 import java.util.Map;
 
 /**
- Utilities that functional programmers would want, but aren't supplied in Java 7 (or 8)
+ A couple utilities that aren't supplied in Java.  Most of these have been moved to other classes.  For instance,
+ toString(Iterable) has been moved to UnIterable.  All the functions for composing predicates are now on Function1.
  */
 public class FunctionUtils {
 
     // I don't want any instances of this class.
     private FunctionUtils() {}
 
-
-    /** Returns a String showing the type and first few elements of a Collection */
-    public static <T> String toString(Iterable<T> iterable) {
-        if (iterable == null) {
-            return "null";
-        }
-        StringBuilder sB = new StringBuilder();
-
-        sB.append(iterable.getClass().getSimpleName());
-        sB.append("(");
-
-        int i = 0;
-        for (T item : iterable) {
-            if (i > 4) {
-                sB.append("...");
-                break;
-            } else if (i > 0) {
-                sB.append(",");
-            }
-            sB.append(String.valueOf(item));
-            i++;
-        }
-
-        sB.append(")");
-        return sB.toString();
-    }
 
     /** Returns a String showing the type and first few elements of a map */
     public static <A,B> String toString(Map<A,B> map) {

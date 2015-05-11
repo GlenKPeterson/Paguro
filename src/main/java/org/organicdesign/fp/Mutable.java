@@ -17,23 +17,23 @@ package org.organicdesign.fp;
 /**
  Java 8 requires that variables declared outside a lambda, but used inside a lambda must be <i>effectively</i> final
  and this class makes that possible for variables that are not (effectively) final.
- Java 7 and earlier require that they all be final.  Because these are often used where performance is critical,
- some primitive versions are available.
+ Java 7 and earlier require that they all be final.  Because ints are often used where performance is critical, a
+ primitive IntRef is available, though that may be removed in future versions.
  */
 public class Mutable {
     // Prevent instantiation
     private Mutable() { throw new UnsupportedOperationException("No instantiation"); }
 
-    /** Wraps a primitive boolean to make it appear final when used inside a lambda. */
-    public static class BooleanRef {
-        private boolean b;
-        private BooleanRef(boolean boo) { b = boo; }
-        public static BooleanRef of(boolean boo) {
-            return new BooleanRef(boo);
-        }
-        public boolean isTrue() { return b; }
-        public void set(boolean boo) { b = boo; }
-    }
+//    /** Wraps a primitive boolean to make it appear final when used inside a lambda. */
+//    public static class BooleanRef {
+//        private boolean b;
+//        private BooleanRef(boolean boo) { b = boo; }
+//        public static BooleanRef of(boolean boo) {
+//            return new BooleanRef(boo);
+//        }
+//        public boolean isTrue() { return b; }
+//        public void set(boolean boo) { b = boo; }
+//    }
 
     /** Wraps a primitive int to make it appear final when used inside a lambda. */
     public static class IntRef {
@@ -45,24 +45,24 @@ public class Mutable {
         public IntRef set(int x) { i = x; return this; }
     }
 
-    /** Wraps a primitive long to make it appear final when used inside a lambda. */
-    public static class LongRef {
-        private long i;
-        private LongRef(long in) { i = in; }
-        public static LongRef of(long in) { return new LongRef(in); }
-        public long value() { return i; }
-        public LongRef increment() { i++; return this; }
-        public LongRef set(long x) { i = x; return this; }
-    }
+//    /** Wraps a primitive long to make it appear final when used inside a lambda. */
+//    public static class LongRef {
+//        private long i;
+//        private LongRef(long in) { i = in; }
+//        public static LongRef of(long in) { return new LongRef(in); }
+//        public long value() { return i; }
+//        public LongRef increment() { i++; return this; }
+//        public LongRef set(long x) { i = x; return this; }
+//    }
 
     /** Wraps any object to make it appear final when used inside a lambda. */
-    public static class ObjectRef<T> {
+    public static class Ref<T> {
         private T t;
-        private ObjectRef(T in) { t = in; }
-        public static <T> ObjectRef<T> of(T obj) {
-            return new ObjectRef<T>(obj);
+        private Ref(T in) { t = in; }
+        public static <T> Ref<T> of(T obj) {
+            return new Ref<T>(obj);
         }
         public T value() { return t; }
-        public ObjectRef<T> set(T x) { t = x; return this; }
+        public Ref<T> set(T x) { t = x; return this; }
     }
 }

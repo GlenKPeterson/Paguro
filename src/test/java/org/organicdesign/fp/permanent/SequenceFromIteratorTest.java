@@ -14,13 +14,13 @@
 
 package org.organicdesign.fp.permanent;
 
-import org.junit.Test;
-import org.organicdesign.fp.Mutable;
-import org.organicdesign.fp.function.Function0;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import org.junit.Test;
+import org.organicdesign.fp.Mutable;
+import org.organicdesign.fp.function.Function0;
 
 import static org.junit.Assert.*;
 
@@ -69,7 +69,7 @@ public class SequenceFromIteratorTest {
 
 
     @Test public void singleInit() {
-        final Mutable.ObjectRef<Integer> i = Mutable.ObjectRef.of(0);
+        final Mutable.Ref<Integer> i = Mutable.Ref.of(0);
         @SuppressWarnings("unchecked") List<Function0<Integer>> ints =
                 Arrays.asList(() -> {
                     i.set(i.value() + 1);

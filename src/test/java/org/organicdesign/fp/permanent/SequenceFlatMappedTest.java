@@ -66,7 +66,7 @@ public class SequenceFlatMappedTest {
                      Sequence.ofArray().flatMap((a) -> Sequence.emptySequence()));
 
         // This tests that I didn't just look ahead 2 or 3 times.  That the look-ahead is sufficient.
-        Mutable.ObjectRef<Integer> count = Mutable.ObjectRef.of(0);
+        Mutable.Ref<Integer> count = Mutable.Ref.of(0);
         assertArrayEquals(new String[]{"a9", "b9"},
                           Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
                                   .flatMap((a) -> {
@@ -110,7 +110,7 @@ public class SequenceFlatMappedTest {
 //                          })
                                   .toTypedArray());
 
-        Mutable.ObjectRef<Sequence<Integer>> shrinkSeq = Mutable.ObjectRef.of(Sequence.ofArray(1, 2, 3));
+        Mutable.Ref<Sequence<Integer>> shrinkSeq = Mutable.Ref.of(Sequence.ofArray(1, 2, 3));
         assertArrayEquals(new Integer[]{2, 3, 3},
                           Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
                                   .flatMap((a) -> {
@@ -122,8 +122,8 @@ public class SequenceFlatMappedTest {
 
         // Now start by returning an emptySequence, then a seq of length 1, then length 2, etc.
         // The first emptySequence should not end the processing.
-        Mutable.ObjectRef<Sequence<Integer>> growSeq = Mutable.ObjectRef.of(Sequence.emptySequence());
-        Mutable.ObjectRef<Integer> incInt = Mutable.ObjectRef.of(0);
+        Mutable.Ref<Sequence<Integer>> growSeq = Mutable.Ref.of(Sequence.emptySequence());
+        Mutable.Ref<Integer> incInt = Mutable.Ref.of(0);
         assertArrayEquals(new Integer[]{1, 1,2},
                           Sequence.ofArray(1, 2, 3)
                                   .flatMap((a) -> {

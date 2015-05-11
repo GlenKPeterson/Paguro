@@ -1,8 +1,8 @@
 package org.organicdesign.fp.collections;
 
 /**
- * Holds Immutable "modification" methods that return a new ImList (for safety) reflecting the modification while
- * sharing as much data structure with the previous ImList as possible (for performance).
+ Holds Immutable "modification" methods that return a new ImList reflecting the modification while sharing as much data
+ structure with the previous ImList as possible (for performance).
  */
 public interface ImList<E> extends UnList<E> {
 // Do we want to make an ImIterator thatis truly immutable - a Sequence?
