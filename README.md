@@ -1,6 +1,6 @@
-J-cicle (pronounced "Jay-sick-ul" like a frozen/immutable Java&trade;-icicle) brings Clojure collections, a Sequence
-abstraction, memoization, and some syntactical sugar to Java with the full type saftey and compile-time checking
-that Java programmers are accustomed to.  It's a 100% Java 8 compatible API.
+J-cicle (pronounced "Jay-sick-ul" like a frozen/immutable Java&trade;-icicle) brings Clojure collections, a Sequence abstraction, memoization, and some syntactical sugar to Java 8 with the full type saftey and compile-time checking that Java programmers are accustomed to.
+
+*** Caution: Pre-alpha quality. ***
 
 #Usage
 How hard is it to create an immutable, type safe map in Java?  Are you tired of writing code like this:
