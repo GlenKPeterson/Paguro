@@ -55,7 +55,7 @@ public class PersistentTreeSet<E> implements ImSetSorted<E> {
 //        return ret;
 //    }
 //
-//    static public <T> PersistentTreeSet<T> create(Comparator<T> comp, ISeq<T> items) {
+//    static public <T> PersistentTreeSet<T> create(Comparator<? super T> comp, ISeq<T> items) {
 //        PersistentTreeSet<T> ret = new PersistentTreeSet<>(null, new PersistentTreeMap<>(null, comp));
 //        for (; items != null; items = items.next()) {
 //            ret = ret.cons(items.head());
@@ -65,12 +65,12 @@ public class PersistentTreeSet<E> implements ImSetSorted<E> {
 
     private PersistentTreeSet(ImMapSorted<E,?> i) { impl = i; }
 
-    public static <T> PersistentTreeSet<T> ofComp(Comparator<T> comp) {
+    public static <T> PersistentTreeSet<T> ofComp(Comparator<? super T> comp) {
         return new PersistentTreeSet<>(PersistentTreeMap.ofComp(comp));
     }
 
     @SafeVarargs
-    public static <T> PersistentTreeSet<T> ofComp(Comparator<T> comp, T... items) {
+    public static <T> PersistentTreeSet<T> ofComp(Comparator<? super T> comp, T... items) {
         PersistentTreeSet<T> ret = new PersistentTreeSet<>(PersistentTreeMap.ofComp(comp));
         if ( (items == null) || (items.length < 1) ) { return ret; }
         for (T item : items) {

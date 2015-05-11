@@ -50,7 +50,7 @@ public interface Sequence<T> extends Transformable<T> {
     };
 
     @SuppressWarnings("unchecked")
-    public static <T> Sequence<T> emptySequence() {
+    static <T> Sequence<T> emptySequence() {
         return (Sequence<T>) EMPTY_SEQUENCE;
     }
 
@@ -58,16 +58,16 @@ public interface Sequence<T> extends Transformable<T> {
         return Tuple2.of(Option.none(), Sequence.emptySequence());
     }
 
-    public static <T> Sequence<T> of(Iterator<T> i) {
+    static <T> Sequence<T> of(Iterator<T> i) {
         return SequenceFromIterator.of(i);
     }
 
-    public static <T> Sequence<T> of(Iterable<T> i) {
+    static <T> Sequence<T> of(Iterable<T> i) {
         return SequenceFromIterator.of(i);
     }
 
     @SafeVarargs
-    public static <T> Sequence<T> ofArray(T... i) { return SequenceFromArray.of(i); }
+    static <T> Sequence<T> ofArray(T... i) { return SequenceFromArray.of(i); }
 
     // ======================================= Base methods =======================================
     Option<T> head();

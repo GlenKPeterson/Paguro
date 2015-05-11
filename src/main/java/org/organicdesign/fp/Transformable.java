@@ -18,12 +18,15 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.TreeSet;
 
+import org.organicdesign.fp.collections.ImList;
+import org.organicdesign.fp.collections.ImMapSorted;
+import org.organicdesign.fp.collections.PersistentTreeMap;
+import org.organicdesign.fp.collections.PersistentTreeSet;
+import org.organicdesign.fp.collections.PersistentVector;
 import org.organicdesign.fp.collections.UnIterator;
-import org.organicdesign.fp.collections.UnList;
-import org.organicdesign.fp.collections.UnMap;
-import org.organicdesign.fp.collections.UnSet;
 import org.organicdesign.fp.collections.UnSetSorted;
 import org.organicdesign.fp.function.Function1;
 import org.organicdesign.fp.function.Function2;
@@ -165,67 +168,53 @@ processing the input at that time, returning the latest u.
 
     @Override
     default ArrayList<T> toJavaArrayList() {
-        return foldLeft(new ArrayList<T>(), (ts, t) -> {
+        return foldLeft(new ArrayList<>(), (ts, t) -> {
             ts.add(t);
             return ts;
         });
     }
 
-    @Override
-    default UnList<T> toUnList() { return un(toJavaArrayList()); }
+    @Override default ImList<T> toImList() {
+        return foldLeft(PersistentVector.empty(), (ts, t) -> ts.append(t));
+    }
 
     @Override
-    default <U> HashMap<T,U> toJavaHashMap(final Function1<T,U> f1) {
-        return foldLeft(new HashMap<T,U>(), (ts, t) -> {
-            ts.put(t, f1.applyEx(t));
+    default <U,V> HashMap<U,V> toJavaHashMap(final Function1<T,Map.Entry<U,V>> f1) {
+        return foldLeft(new HashMap<>(), (ts, t) -> {
+            Map.Entry<U,V> entry = f1.apply(t);
+            ts.put(entry.getKey(), entry.getValue());
             return ts;
         });
     }
 
-    @Override
-    default <U> UnMap<T,U> toUnMap(Function1<T,U> f1) { return un(toJavaHashMap(f1)); }
+//    @Override
+//    default <U,V> UnMap<U,V> toUnMap(Function1<T,Map.Entry<U,V>> f1) { return un(toJavaHashMap(f1)); }
 
     @Override
-    default <U> HashMap<U,T> toReverseJavaHashMap(final Function1<T,U> f1) {
-        return foldLeft(new HashMap<U,T>(), (ts, t) -> {
-            ts.put(f1.applyEx(t), t);
-            return ts;
-        });
-    }
-
-    @Override
-    default <U> UnMap<U,T> toReverseUnMap(Function1<T,U> f1) {
-        return un(toReverseJavaHashMap(f1));
+    default <U,V> ImMapSorted<U,V> toImMapSorted(Comparator<? super U> comp, Function1<T,Map.Entry<U,V>> f1) {
+        return foldLeft((ImMapSorted<U, V>) PersistentTreeMap.<U, V>ofComp(comp),
+                        (ts, t) -> ts.assoc(f1.apply(t)));
     }
 
     @Override
     default TreeSet<T> toJavaTreeSet(Comparator<? super T> comparator) {
-        return foldLeft(new TreeSet<T>(comparator), (ts, t) -> {
+        return foldLeft(new TreeSet<>(comparator), (ts, t) -> {
             ts.add(t);
             return ts;
         });
     }
-    @Override
-    default TreeSet<T> toJavaTreeSet() { return toJavaTreeSet(null); }
 
-
-    @Override
-    default UnSetSorted<T> toUnSetSorted(Comparator<? super T> comparator) {
-        return un(toJavaTreeSet(comparator));
+    @Override default UnSetSorted<T> toImSetSorted(Comparator<? super T> comparator) {
+        return foldLeft(PersistentTreeSet.ofComp(comparator), (accum, t) -> accum.put(t));
     }
-    @Override
-    default UnSetSorted<T> toUnSetSorted() { return toUnSetSorted(null); }
 
     @Override
     default HashSet<T> toJavaHashSet() {
-        return foldLeft(new HashSet<T>(), (ts, t) -> {
+        return foldLeft(new HashSet<>(), (ts, t) -> {
             ts.add(t);
             return ts;
         });
     }
-
-    @Override
-    default UnSet<T> toUnSet() { return un(toJavaHashSet()); }
 
     @Override
     @SuppressWarnings("unchecked")

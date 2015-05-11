@@ -31,7 +31,7 @@ import org.organicdesign.fp.permanent.Sequence;
 
 public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 
-    private final Comparator<K> comp;
+    private final Comparator<? super K> comp;
     private final Node<K,V> tree;
     private final int size;
 
@@ -42,7 +42,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         return (PersistentTreeMap<K,V>) EMPTY;
     }
 
-    private PersistentTreeMap(Comparator<K> c, Node<K,V> t, int n) {
+    private PersistentTreeMap(Comparator<? super K> c, Node<K,V> t, int n) {
         comp = c; tree = t; size = n;
     }
 
@@ -128,7 +128,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
     }
 
     public static <K,V> PersistentTreeMap<K,V>
-    ofComp(Comparator<K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7,
+    ofComp(Comparator<? super K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7,
            K k8, V v8, K k9, V v9, K k10, V v10) {
         return new PersistentTreeMap<K,V>(c, null, 0)
                 .assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).assoc(k5, v5)
@@ -136,7 +136,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
     }
 
     public static <K,V> PersistentTreeMap<K,V>
-    ofComp(Comparator<K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7,
+    ofComp(Comparator<? super K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7,
            K k8, V v8, K k9, V v9) {
         return new PersistentTreeMap<K,V>(c, null, 0)
                 .assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).assoc(k5, v5)
@@ -144,7 +144,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
     }
 
     public static <K,V> PersistentTreeMap<K,V>
-    ofComp(Comparator<K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7,
+    ofComp(Comparator<? super K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7,
            K k8, V v8) {
         return new PersistentTreeMap<K,V>(c, null, 0)
                 .assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).assoc(k5, v5)
@@ -152,52 +152,52 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
     }
 
     public static <K,V> PersistentTreeMap<K,V>
-    ofComp(Comparator<K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7) {
+    ofComp(Comparator<? super K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7) {
         return new PersistentTreeMap<K,V>(c, null, 0)
                 .assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).assoc(k5, v5)
                 .assoc(k6, v6).assoc(k7, v7);
     }
 
     public static <K,V> PersistentTreeMap<K,V>
-    ofComp(Comparator<K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6) {
+    ofComp(Comparator<? super K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6) {
         return new PersistentTreeMap<K,V>(c, null, 0)
                 .assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).assoc(k5, v5)
                 .assoc(k6, v6);
     }
 
     public static <K,V> PersistentTreeMap<K,V>
-    ofComp(Comparator<K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
+    ofComp(Comparator<? super K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
         return new PersistentTreeMap<K,V>(c, null, 0)
                 .assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).assoc(k5, v5);
     }
 
     public static <K,V> PersistentTreeMap<K,V>
-    ofComp(Comparator<K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
+    ofComp(Comparator<? super K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
         return new PersistentTreeMap<K,V>(c, null, 0)
                 .assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4);
     }
 
     public static <K,V> PersistentTreeMap<K,V>
-    ofComp(Comparator<K> c, K k1, V v1, K k2, V v2, K k3, V v3) {
+    ofComp(Comparator<? super K> c, K k1, V v1, K k2, V v2, K k3, V v3) {
         return new PersistentTreeMap<K,V>(c, null, 0)
                 .assoc(k1, v1).assoc(k2, v2).assoc(k3, v3);
     }
 
     public static <K,V> PersistentTreeMap<K,V>
-    ofComp(Comparator<K> c, K k1, V v1, K k2, V v2) {
+    ofComp(Comparator<? super K> c, K k1, V v1, K k2, V v2) {
         return new PersistentTreeMap<K,V>(c, null, 0)
                 .assoc(k1, v1).assoc(k2, v2);
     }
 
     public static <K,V> PersistentTreeMap<K,V>
-    ofComp(Comparator<K> c, K k1, V v1) {
+    ofComp(Comparator<? super K> c, K k1, V v1) {
         return new PersistentTreeMap<K,V>(c, null, 0)
                 .assoc(k1, v1);
     }
 
     @SafeVarargs
     public static <K,V> PersistentTreeMap<K,V>
-    ofCompSkipNull(Comparator<K> c, Map.Entry<K,V>... es) {
+    ofCompSkipNull(Comparator<? super K> c, Map.Entry<K,V>... es) {
         if (es == null) { return empty(); }
         PersistentTreeMap<K,V> map = new PersistentTreeMap<>(c, null, 0);
         for (Map.Entry<K,V> entry : es) {
@@ -208,7 +208,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         return map;
     }
 
-    public static <K,V> PersistentTreeMap<K,V> ofComp(Comparator<K> c) {
+    public static <K,V> PersistentTreeMap<K,V> ofComp(Comparator<? super K> c) {
         return new PersistentTreeMap<>(c, null, 0);
     }
 
@@ -405,7 +405,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 
 //    @SuppressWarnings("unchecked")
 //    static public <S, K extends S, V extends S>
-//    PersistentTreeMap<K,V> create(Comparator<K> comp, ISeq<S> items) {
+//    PersistentTreeMap<K,V> create(Comparator<? super K> comp, ISeq<S> items) {
 //        PersistentTreeMap<K,V> ret = new PersistentTreeMap<>(comp);
 //        for (; items != null; items = items.next().next()) {
 //            if (items.next() == null)
@@ -434,8 +434,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 // public PersistentTreeMap<K,V> assocEx(K key, V val) {
 // Inherits default implementation of assocEx from IPersistentMap
 
-    @Override
-    public PersistentTreeMap<K,V> assoc(K key, V val) {
+    @Override public PersistentTreeMap<K,V> assoc(K key, V val) {
         Box<Node<K,V>> found = new Box<>(null);
         Node<K,V> t = add(tree, key, val, found);
         //null == already contains key

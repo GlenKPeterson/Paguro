@@ -18,13 +18,13 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.TreeSet;
 
+import org.organicdesign.fp.collections.ImList;
+import org.organicdesign.fp.collections.ImMapSorted;
 import org.organicdesign.fp.collections.UnIterable;
 import org.organicdesign.fp.collections.UnIterator;
-import org.organicdesign.fp.collections.UnList;
-import org.organicdesign.fp.collections.UnMap;
-import org.organicdesign.fp.collections.UnSet;
 import org.organicdesign.fp.collections.UnSetSorted;
 import org.organicdesign.fp.function.Function1;
 
@@ -35,42 +35,38 @@ import org.organicdesign.fp.function.Function1;
  */
 public interface Realizable<T> extends UnIterable<T> {
     ArrayList<T> toJavaArrayList();
-    UnList<T> toUnList();
+    ImList<T> toImList();
 
     /**
      @return A map with the keys from the given set, mapped to values using the given function.
       * @param f1 Maps keys to values
      */
-    <U> HashMap<T,U> toJavaHashMap(Function1<T,U> f1);
+    <U,V> HashMap<U,V> toJavaHashMap(final Function1<T,Map.Entry<U,V>> f1);
+
+//    /**
+//     @return A map with the keys from the given set, mapped to values using the given function.
+//      * @param f1 Maps keys to values
+//     */
+//    <U,V> SortedMap<U,V> toJavaSortedMap(final Function1<T,Map.Entry<U,V>> f1);
+
+//    /**
+//     @return An unmodifiable map with the keys from the given set, mapped to values using the given
+//     function.
+//      * @param f1 Maps keys to values
+//     */
+//    <U,V> UnMap<U,V> toUnMap(Function1<T,Map.Entry<U,V>> f1);
+
     /**
-     @return An unmodifiable map with the keys from the given set, mapped to values using the given
+     @return An immutable map with the keys from the given set, mapped to values using the given
      function.
       * @param f1 Maps keys to values
      */
-    <U> UnMap<T,U> toUnMap(Function1<T,U> f1);
-
-    /**
-     @return A map with the values from the given set, mapped by keys supplied by the given
-     function.
-      * @param f1 Maps values to keys
-     */
-    <U> HashMap<U,T> toReverseJavaHashMap(Function1<T,U> f1);
-
-    /**
-     @return An unmodifiable map with the values from the given set, mapped by keys supplied by
-     the given function.
-      * @param f1 Maps values to keys
-     */
-    <U> UnMap<U,T> toReverseUnMap(Function1<T,U> f1);
+    <U,V> ImMapSorted<U,V> toImMapSorted(Comparator<? super U> comp, Function1<T,Map.Entry<U,V>> f1);
 
     TreeSet<T> toJavaTreeSet(Comparator<? super T> comparator);
-    UnSetSorted<T> toUnSetSorted(Comparator<? super T> comparator);
-
-    TreeSet<T> toJavaTreeSet();
-    UnSetSorted<T> toUnSetSorted();
+    UnSetSorted<T> toImSetSorted(Comparator<? super T> comparator);
 
     HashSet<T> toJavaHashSet();
-    UnSet<T> toUnSet();
 
     T[] toTypedArray();
 
