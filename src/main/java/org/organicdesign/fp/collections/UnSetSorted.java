@@ -15,10 +15,14 @@ package org.organicdesign.fp.collections;
 
 import java.util.SortedSet;
 
+/** An unmodifiable SortedSet. */
 public interface UnSetSorted<E> extends UnSet<E>, SortedSet<E> {
+    /** {@inheritDoc} */
     @Override default UnSetSorted<E> headSet(E toElement) { return subSet(first(), toElement); }
 
+    /** {@inheritDoc} */
     @Override UnSetSorted<E> subSet(E fromElement, E toElement);
 
+    /** {@inheritDoc} */
     @Override default UnSetSorted<E> tailSet(E fromElement) { return subSet(fromElement, last()); }
 }

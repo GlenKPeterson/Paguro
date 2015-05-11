@@ -20,10 +20,9 @@ import java.util.Objects;
 import org.organicdesign.fp.collections.UnMap;
 
 /**
- Use tuples as immutable, type-safe, data structures instead of defining your own classes (when appropriate).
- Defining your own class is better for building models, but tuples can be more convenient, especially for adapter code.
+Holds 2 items of potentially different types, and implements Map.Entry (and UnMap.UnEntry (there is no ImMap.ImEntry)).
  */
-public class Tuple2<T,U> implements Entry<T,U>, UnMap.UnEntry<T,U> {
+public final class Tuple2<T,U> implements Entry<T,U>, UnMap.UnEntry<T,U> {
     private final T _1;
     private final U _2;
     private Tuple2(T t, U u) { _1 = t; _2 = u; }

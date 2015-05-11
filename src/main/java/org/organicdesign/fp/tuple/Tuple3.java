@@ -17,10 +17,9 @@ package org.organicdesign.fp.tuple;
 import java.util.Objects;
 
 /**
- Use tuples as immutable, type-safe, data structures instead of defining your own classes (when appropriate).
- Defining your own class is better for building models, but tuples can be more convenient, especially for adapter code.
+ Holds 3 items of potentially different types.
  */
-public class Tuple3<T,U,V> {
+public final class Tuple3<T,U,V> {
     private final T _1;
     private final U _2;
     private final V _3;

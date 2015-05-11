@@ -15,13 +15,16 @@ package org.organicdesign.fp.collections;
 
 import org.organicdesign.fp.permanent.Sequence;
 
+/** An immutable set interface */
 public interface ImSet<E> extends UnSet<E>, Sequence<E> {
+    /** Adds an item, returning a modified version of the set (leaving the original set unchanged). */
     ImSet<E> put(E e);
 
+    /** Removes the given item, returning a modified version of the set (leaving the original set unchanged). */
     ImSet<E> disjoin(E key);
 
-    @Override
-    default UnIterator<E> iterator() { return Sequence.toIterator(this); }
+    /** {@inheritDoc} */
+    @Override default UnIterator<E> iterator() { return Sequence.toIterator(this); }
 
     /**
      * This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for backwards
@@ -30,7 +33,4 @@ public interface ImSet<E> extends UnSet<E>, Sequence<E> {
      * {@inheritDoc}
      */
     @Override default Object[] toArray() { return UnCollection.toArray(this); }
-
-    // ================================================ STATIC METHODS ================================================
-    static <T> ImSet<T> empty() { return PersistentTreeSet.empty(); }
 }

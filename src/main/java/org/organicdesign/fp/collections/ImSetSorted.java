@@ -13,15 +13,21 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
+/** An immutable sorted set interface */
 public interface ImSetSorted<E> extends ImSet<E>, UnSetSorted<E> {
+    /** {@inheritDoc} */
     @Override ImSetSorted<E> put(E e);
 
+    /** {@inheritDoc} */
     @Override ImSetSorted<E> disjoin(E key);
 
+    /** {@inheritDoc} */
     @Override default ImSetSorted<E> headSet(E toElement) { return subSet(first(), toElement); }
 
+    /** {@inheritDoc} */
     @Override ImSetSorted<E> subSet(E fromElement, E toElement);
 
+    /** {@inheritDoc} */
     @Override default ImSetSorted<E> tailSet(E fromElement) { return subSet(fromElement, last()); }
 
 }

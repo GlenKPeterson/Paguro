@@ -48,6 +48,7 @@ public interface ImMapSorted<K,V> extends UnMapSorted<K,V>, Sequence<UnMap.UnEnt
     /** Returns a new map with the given key/value added */
     ImMapSorted<K,V> assoc(K key, V val);
 
+    /** Returns a new map with an immutable copy of the given entry added */
     default ImMapSorted<K,V> assoc(Map.Entry<K,V> entry) { return assoc(entry.getKey(), entry.getValue()); }
 
     /** Returns a new map with the given key/value removed */
