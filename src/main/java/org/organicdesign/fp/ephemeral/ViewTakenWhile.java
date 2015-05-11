@@ -19,12 +19,12 @@ import org.organicdesign.fp.function.Function1;
 
 public class ViewTakenWhile<T> implements View<T> {
     private final View<T> innerView;
-    private final Function1<T,Boolean> pred;
+    private final Function1<? super T,Boolean> pred;
     private boolean done = false;
 
-    ViewTakenWhile(View<T> v, Function1<T,Boolean> p) { innerView = v; pred = p; }
+    ViewTakenWhile(View<T> v, Function1<? super T,Boolean> p) { innerView = v; pred = p; }
 
-    public static <T> View<T> of(View<T> v, Function1<T,Boolean> p) {
+    public static <T> View<T> of(View<T> v, Function1<? super T,Boolean> p) {
         if (p == null) { throw new IllegalArgumentException("Must provide a predicate"); }
         if ( (p == Function1.REJECT) ||
              (v == null) ||

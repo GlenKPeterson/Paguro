@@ -21,11 +21,11 @@ class ViewFiltered<T> implements View<T> {
 
     private final View<T> view;
 
-    private final Function1<T,Boolean> predicate;
+    private final Function1<? super T,Boolean> predicate;
 
-    ViewFiltered(View<T> v, Function1<T,Boolean> f) { view = v; predicate = f; }
+    ViewFiltered(View<T> v, Function1<? super T,Boolean> f) { view = v; predicate = f; }
 
-    public static <T> View<T> of(View<T> v, Function1<T,Boolean> f) {
+    public static <T> View<T> of(View<T> v, Function1<? super T,Boolean> f) {
         if (f == null) { throw new IllegalArgumentException("Must provide a predicate"); }
         if (f == Function1.REJECT) { return View.emptyView(); }
         if (f == Function1.ACCEPT) { return v; }

@@ -76,17 +76,17 @@ public interface Sequence<T> extends Transformable<T> {
 //    // ======================================= Other methods ======================================
 
     @Override
-    default <U> Sequence<U> map(Function1<T,U> func) {
+    default <U> Sequence<U> map(Function1<? super T,? extends U> func) {
         return SequenceMapped.of(this, func);
     }
 
     @Override
-    default Sequence<T> filter(Function1<T,Boolean> predicate) {
+    default Sequence<T> filter(Function1<? super T,Boolean> predicate) {
         return SequenceFiltered.of(this, predicate);
     }
 
     @Override
-    default Sequence<T> forEach(Function1<T,?> consumer) {
+    default Sequence<T> forEach(Function1<? super T,?> consumer) {
         Sequence<T> seq = this;
         Option<T> item = seq.head();
         while (item.isSome()) {
@@ -114,7 +114,7 @@ public interface Sequence<T> extends Transformable<T> {
 //    }
 
     @Override
-    default <U> U foldLeft(U u, Function2<U,T,U> fun) {
+    default <U> U foldLeft(U u, Function2<U,? super T,U> fun) {
         Sequence<T> seq = this;
         // System.out.println("seq: " + seq);
         // System.out.println("===>item: " + item);
@@ -129,7 +129,7 @@ public interface Sequence<T> extends Transformable<T> {
     }
 
     @Override
-    default <U> U foldLeft(U u, Function2<U,T,U> fun, Function1<U,Boolean> terminateWhen) {
+    default <U> U foldLeft(U u, Function2<U,? super T,U> fun, Function1<? super U,Boolean> terminateWhen) {
         Sequence<T> seq = this;
         // System.out.println("seq: " + seq);
         // System.out.println("===>item: " + item);
@@ -155,7 +155,7 @@ public interface Sequence<T> extends Transformable<T> {
     default Sequence<T> take(long numItems) { return SequenceTaken.of(this, numItems); }
 
     @Override
-    default Sequence<T> takeWhile(Function1<T,Boolean> predicate) { return SequenceTakenWhile.of(this, predicate); }
+    default Sequence<T> takeWhile(Function1<? super T,Boolean> predicate) { return SequenceTakenWhile.of(this, predicate); }
 
     /** {@inheritDoc} */
     @Override default Sequence<T> drop(long numItems) { return SequenceDropped.of(this, numItems); }
@@ -168,7 +168,7 @@ public interface Sequence<T> extends Transformable<T> {
      return is smaller, use filter followed by map if possible, or vice versa if not.
      @param func yields a Transformable of 0 or more results for each input item.
      */
-    default <U> Sequence<U> flatMap(Function1<T,Sequence<U>> func) {
+    default <U> Sequence<U> flatMap(Function1<? super T,Sequence<U>> func) {
         return SequenceFlatMapped.of(this, func);
     }
 

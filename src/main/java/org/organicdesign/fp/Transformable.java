@@ -19,6 +19,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.organicdesign.fp.collections.ImList;
@@ -47,7 +48,7 @@ public interface Transformable<T> extends Realizable<T> {
      return values of the given function in the same order as the input values.
       * @param func a function that returns a new value for any value in the input
      */
-    <U> Transformable<U> map(Function1<T,U> func);
+    <U> Transformable<U> map(Function1<? super T,? extends U> func);
 
     /**
      Lazily applies the filter function to the underlying data source and returns a new view
@@ -55,14 +56,14 @@ public interface Transformable<T> extends Realizable<T> {
      @return a lazy view of only the filtered items.
       * @param predicate a function that returns true for items to keep, false for items to drop
      */
-    Transformable<T> filter(Function1<T,Boolean> predicate);
+    Transformable<T> filter(Function1<? super T,Boolean> predicate);
 
     /**
      Eagerly processes the entire data source for side effects.
      @param consumer the function to do the processing
      @return the unmodified sequence you started with (for chaining).
      */
-    Transformable<T> forEach(Function1<T,?> consumer);
+    Transformable<T> forEach(Function1<? super T,?> consumer);
 
 //    /**
 //     Deprecated: use filter(...).head() instead.
@@ -88,7 +89,7 @@ public interface Transformable<T> extends Realizable<T> {
      the entire transformable.
       * @param predicate the test.
      */
-    Transformable<T> takeWhile(Function1<T,Boolean> predicate);
+    Transformable<T> takeWhile(Function1<? super T,Boolean> predicate);
 
     /**
      Note that all dropped items will be evaluated as they are dropped.  Any side effects
@@ -134,7 +135,7 @@ public interface Transformable<T> extends Realizable<T> {
       this parameter.
      * @param fun combines each value in the list with the result so far.  The initial result is u.
      */
-    <U> U foldLeft(U u, Function2<U,T,U> fun);
+    <U> U foldLeft(U u, Function2<U,? super T,U> fun);
 
     /**
      A form of foldLeft() that handles early termination.  If foldLeft replaces a loop, and return
@@ -151,7 +152,7 @@ public interface Transformable<T> extends Realizable<T> {
      * @param terminateWhen returns true when the termination condition is reached and will stop
 processing the input at that time, returning the latest u.
      */
-    <U> U foldLeft(U u, Function2<U,T,U> fun, Function1<U,Boolean> terminateWhen);
+    <U> U foldLeft(U u, Function2<U,? super T,U> fun, Function1<? super U,Boolean> terminateWhen);
 
 
     // Sub-classes cannot inherit from this because the function that you pass in has to know the actal return type.
@@ -179,8 +180,17 @@ processing the input at that time, returning the latest u.
     }
 
     @Override
-    default <U,V> HashMap<U,V> toJavaHashMap(final Function1<T,Map.Entry<U,V>> f1) {
+    default <U,V> HashMap<U,V> toJavaHashMap(final Function1<? super T,Map.Entry<U,V>> f1) {
         return foldLeft(new HashMap<>(), (ts, t) -> {
+            Map.Entry<U,V> entry = f1.apply(t);
+            ts.put(entry.getKey(), entry.getValue());
+            return ts;
+        });
+    }
+
+    @Override
+    default <U,V> TreeMap<U,V> toJavaTreeMap(final Function1<? super T,Map.Entry<U,V>> f1) {
+        return foldLeft(new TreeMap<>(), (ts, t) -> {
             Map.Entry<U,V> entry = f1.apply(t);
             ts.put(entry.getKey(), entry.getValue());
             return ts;
@@ -191,7 +201,7 @@ processing the input at that time, returning the latest u.
 //    default <U,V> UnMap<U,V> toUnMap(Function1<T,Map.Entry<U,V>> f1) { return un(toJavaHashMap(f1)); }
 
     @Override
-    default <U,V> ImMapSorted<U,V> toImMapSorted(Comparator<? super U> comp, Function1<T,Map.Entry<U,V>> f1) {
+    default <U,V> ImMapSorted<U,V> toImMapSorted(Comparator<? super U> comp, Function1<? super T,Map.Entry<U,V>> f1) {
         return foldLeft((ImMapSorted<U, V>) PersistentTreeMap.<U, V>ofComp(comp),
                         (ts, t) -> ts.assoc(f1.apply(t)));
     }

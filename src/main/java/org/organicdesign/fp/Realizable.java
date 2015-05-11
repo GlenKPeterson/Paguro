@@ -19,6 +19,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.organicdesign.fp.collections.ImList;
@@ -41,13 +42,13 @@ public interface Realizable<T> extends UnIterable<T> {
      @return A map with the keys from the given set, mapped to values using the given function.
       * @param f1 Maps keys to values
      */
-    <U,V> HashMap<U,V> toJavaHashMap(final Function1<T,Map.Entry<U,V>> f1);
+    <U,V> HashMap<U,V> toJavaHashMap(final Function1<? super T,Map.Entry<U,V>> f1);
 
-//    /**
-//     @return A map with the keys from the given set, mapped to values using the given function.
-//      * @param f1 Maps keys to values
-//     */
-//    <U,V> SortedMap<U,V> toJavaSortedMap(final Function1<T,Map.Entry<U,V>> f1);
+    /**
+     @return A map with the keys from the given set, mapped to values using the given function.
+      * @param f1 Maps keys to values
+     */
+    <U,V> TreeMap<U,V> toJavaTreeMap(final Function1<? super T,Map.Entry<U,V>> f1);
 
 //    /**
 //     @return An unmodifiable map with the keys from the given set, mapped to values using the given
@@ -61,14 +62,15 @@ public interface Realizable<T> extends UnIterable<T> {
      function.
       * @param f1 Maps keys to values
      */
-    <U,V> ImMapSorted<U,V> toImMapSorted(Comparator<? super U> comp, Function1<T,Map.Entry<U,V>> f1);
+    <U,V> ImMapSorted<U,V> toImMapSorted(Comparator<? super U> comp, Function1<? super T,Map.Entry<U,V>> f1);
 
     TreeSet<T> toJavaTreeSet(Comparator<? super T> comparator);
+
     UnSetSorted<T> toImSetSorted(Comparator<? super T> comparator);
 
     HashSet<T> toJavaHashSet();
 
     T[] toTypedArray();
 
-    UnIterator<T> iterator();
+    @Override UnIterator<T> iterator();
 }

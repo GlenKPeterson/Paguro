@@ -22,7 +22,7 @@ import org.organicdesign.fp.tuple.Tuple2;
 public class SequenceFiltered<T> implements Sequence<T> {
     private final Lazy.Ref<Tuple2<Option<T>,Sequence<T>>> laz;
 
-    SequenceFiltered(Sequence<T> s, Function1<T,Boolean> predicate) {
+    SequenceFiltered(Sequence<T> s, Function1<? super T,Boolean> predicate) {
         laz = Lazy.Ref.of(() -> {
             Sequence<T> seq = s;
             Option<T> item = seq.head();
@@ -38,7 +38,7 @@ public class SequenceFiltered<T> implements Sequence<T> {
         });
     }
 
-    public static <T> Sequence<T> of(Sequence<T> s, Function1<T,Boolean> f) {
+    public static <T> Sequence<T> of(Sequence<T> s, Function1<? super T,Boolean> f) {
         if (f == null) { throw new IllegalArgumentException("Must provide a predicate"); }
         if ( (f == Function1.REJECT) || (s == null) || (EMPTY_SEQUENCE == s) ) { return Sequence.emptySequence(); }
         if (f == Function1.ACCEPT) { return s; }

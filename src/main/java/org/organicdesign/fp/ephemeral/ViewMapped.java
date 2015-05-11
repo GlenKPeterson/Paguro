@@ -19,12 +19,12 @@ import org.organicdesign.fp.function.Function1;
 
 class ViewMapped<T,U> implements View<U> {
     private final View<T> view;
-    private final Function1<T,U> func;
+    private final Function1<? super T,? extends U> func;
 
-    ViewMapped(View<T> v, Function1<T,U> f) { view = v; func = f; }
+    ViewMapped(View<T> v, Function1<? super T,? extends U> f) { view = v; func = f; }
 
     @SuppressWarnings("unchecked")
-    public static <T,U> View<U> of(View<T> v, Function1<T,U> f) {
+    public static <T,U> View<U> of(View<T> v, Function1<? super T,? extends U> f) {
         // You can put nulls in, but you don't get nulls out.
         if (f == null) { return View.emptyView(); }
         if (f == Function1.IDENTITY) { return (View<U>) v; }

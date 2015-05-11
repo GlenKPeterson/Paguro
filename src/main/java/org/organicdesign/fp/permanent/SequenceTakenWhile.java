@@ -9,7 +9,7 @@ import org.organicdesign.fp.tuple.Tuple2;
 public class SequenceTakenWhile<T> implements Sequence<T> {
     private final Lazy.Ref<Tuple2<Option<T>,Sequence<T>>> laz;
 
-    SequenceTakenWhile(Sequence<T> seq, Function1<T,Boolean> pred) {
+    SequenceTakenWhile(Sequence<T> seq, Function1<? super T,Boolean> pred) {
         laz = Lazy.Ref.of(() -> {
             Option<T> first = seq.head();
             return (first.isSome() && pred.apply(first.get()))
@@ -18,7 +18,7 @@ public class SequenceTakenWhile<T> implements Sequence<T> {
         });
     }
 
-    public static <T> Sequence<T> of(Sequence<T> v, Function1<T,Boolean> p) {
+    public static <T> Sequence<T> of(Sequence<T> v, Function1<? super T,Boolean> p) {
         if (p == null) { throw new IllegalArgumentException("Must provide a predicate"); }
         if ( (p == Function1.REJECT) || (v == null) || (EMPTY_SEQUENCE == v) ) {
             return Sequence.emptySequence();

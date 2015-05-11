@@ -22,12 +22,12 @@ class ViewFlatMapped<T,U> implements View<U> {
 
     private View<U> innerView = View.emptyView();
 
-    private final Function1<T,View<U>> func;
+    private final Function1<? super T,View<U>> func;
 
-    ViewFlatMapped(View<T> v, Function1<T,View<U>> f) { outerView = v; func = f; }
+    ViewFlatMapped(View<T> v, Function1<? super T,View<U>> f) { outerView = v; func = f; }
 
     @SuppressWarnings("unchecked")
-    public static <T,U> View<U> of(View<T> v, Function1<T,View<U>> f) {
+    public static <T,U> View<U> of(View<T> v, Function1<? super T,View<U>> f) {
         // You can put nulls in, but you don't get nulls out.
         if (f == null) { return View.emptyView(); }
         // TODO: Is this comparison possible?

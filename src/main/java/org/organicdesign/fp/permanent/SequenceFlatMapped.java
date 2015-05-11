@@ -22,7 +22,7 @@ class SequenceFlatMapped<T,U> implements Sequence<U> {
     private final Lazy.Ref<Sequence<U>> laz;
 
     @SuppressWarnings("unchecked")
-    SequenceFlatMapped(Sequence<T> seq, Function1<T,Sequence<U>> f) {
+    SequenceFlatMapped(Sequence<T> seq, Function1<? super T,Sequence<U>> f) {
         laz = Lazy.Ref.of(() -> {
             final Option<T> first = seq.head();
             return first.isSome()
@@ -32,7 +32,7 @@ class SequenceFlatMapped<T,U> implements Sequence<U> {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T,U> Sequence<U> of(Sequence<T> seq, Function1<T,Sequence<U>> f) {
+    public static <T,U> Sequence<U> of(Sequence<T> seq, Function1<? super T,Sequence<U>> f) {
         if (f == null) { throw new IllegalArgumentException("Can't flatmap with a null function."); }
         // You can put nulls in, but you don't get nulls out.
         if ( (seq == null) || (EMPTY_SEQUENCE == seq) ) { return Sequence.emptySequence(); }

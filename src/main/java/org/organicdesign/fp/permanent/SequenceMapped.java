@@ -22,7 +22,7 @@ import org.organicdesign.fp.tuple.Tuple2;
 public class SequenceMapped<T,U>  implements Sequence<U> {
     private final Lazy.Ref<Tuple2<Option<U>,Sequence<U>>> laz;
 
-    SequenceMapped(Sequence<T> seq, Function1<T,U> func) {
+    SequenceMapped(Sequence<T> seq, Function1<? super T,? extends U> func) {
         laz = Lazy.Ref.of(() -> {
             Option<T> first = seq.head();
             return first.isSome()
@@ -32,7 +32,7 @@ public class SequenceMapped<T,U>  implements Sequence<U> {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T,U> Sequence<U> of(Sequence<T> s, Function1<T,U> f) {
+    public static <T,U> Sequence<U> of(Sequence<T> s, Function1<? super T,? extends U> f) {
         if (f == null) { throw new IllegalArgumentException("Can't map with a null function."); }
         // You can put nulls in, but you don't get nulls out.
         if ( (s == null) || (EMPTY_SEQUENCE == s) ) { return Sequence.emptySequence(); }

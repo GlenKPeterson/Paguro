@@ -47,14 +47,14 @@ public interface View<T> extends Transformable<T> {
     Option<T> next();
 
     @Override
-    default <U> View<U> map(Function1<T,U> func) { return ViewMapped.of(this, func); }
+    default <U> View<U> map(Function1<? super T,? extends U> func) { return ViewMapped.of(this, func); }
 
     @Override
-    default View<T> filter(Function1<T,Boolean> pred) { return ViewFiltered.of(this, pred); }
+    default View<T> filter(Function1<? super T,Boolean> pred) { return ViewFiltered.of(this, pred); }
 
     /** Returning an unmodified view is impossible here - just returns null. */
     @Override
-    default View<T> forEach(Function1<T,?> consumer) {
+    default View<T> forEach(Function1<? super T,?> consumer) {
         Option<T> item = next();
         while (item.isSome()) {
             consumer.apply(item.get());
@@ -78,7 +78,7 @@ public interface View<T> extends Transformable<T> {
 //    }
 
     @Override
-    default <U> U foldLeft(U u, Function2<U,T,U> fun) {
+    default <U> U foldLeft(U u, Function2<U,? super T,U> fun) {
         Option<T> item = next();
         while (item.isSome()) {
             u = fun.apply(u, item.get());
@@ -88,7 +88,7 @@ public interface View<T> extends Transformable<T> {
     }
 
     @Override
-    default <U> U foldLeft(U u, Function2<U,T,U> fun, Function1<U,Boolean> terminateWhen) {
+    default <U> U foldLeft(U u, Function2<U,? super T,U> fun, Function1<? super U,Boolean> terminateWhen) {
         Option<T> item = next();
         while (item.isSome()) {
             u = fun.apply(u, item.get());
@@ -133,7 +133,9 @@ public interface View<T> extends Transformable<T> {
      */
     @Override default View<T> take(long numItems) { return ViewTaken.of(this, numItems); }
 
-    @Override default View<T> takeWhile(Function1<T,Boolean> predicate) { return ViewTakenWhile.of(this, predicate); }
+    @Override default View<T> takeWhile(Function1<? super T,Boolean> predicate) {
+        return ViewTakenWhile.of(this, predicate);
+    }
 
     // default View<T> takeUntilInclusive(Predicate<T> p) { return ViewTakenUntilIncl.of(this, p); }
 
@@ -149,7 +151,7 @@ public interface View<T> extends Transformable<T> {
      return is smaller, use filter followed by map if possible, or vice versa if not.
      @param func yields a Transformable of 0 or more results for each input item.
      */
-    default <U> View<U> flatMap(Function1<T,View<U>> func) { return ViewFlatMapped.of(this, func); }
+    default <U> View<U> flatMap(Function1<? super T,View<U>> func) { return ViewFlatMapped.of(this, func); }
 
     /** Add the given View after the end of this one. */
     default View<T> append(View<T> pv) { return ViewPrepended.of(pv, this); }
