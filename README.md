@@ -210,7 +210,7 @@ In short, Clojure doesn't have static types.  Scala has an TMTOWTDI attitude tha
 
 #Change Log
 2015-05-13 Release 0.9 alpha which packages type-safe versions of the Clojure collections and sequence abstraction for Java.
-- 3 Immutable collections: Vector, SetOrdered, and MapOrdered.  None of these use equals or hashcode.
+- 3 Immutable collections: [PersistentVector](src/main/java/org/organicdesign/fp/collections/PersistentVector.java), [PersistentTreeMap](src/main/java/org/organicdesign/fp/collections/PersistentTreeMap.java), and [PersistentTreeSet](src/main/java/org/organicdesign/fp/collections/PersistentTreeSet.java).  None of these use equals() or hashcode().
 Vector doesn't need to and Map and Set take a Comparator.
 - Un-collections which are the Java collection interfaces, only unmodifiable, with mutator methods deprecated and
 default-implemented to throw exceptions.
