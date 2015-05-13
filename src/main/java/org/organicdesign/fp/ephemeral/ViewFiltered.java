@@ -14,23 +14,21 @@
 
 package org.organicdesign.fp.ephemeral;
 
-import java.util.function.Predicate;
-
-import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.Option;
+import org.organicdesign.fp.function.Function1;
 
 class ViewFiltered<T> implements View<T> {
 
     private final View<T> view;
 
-    private final Predicate<T> predicate;
+    private final Function1<? super T,Boolean> predicate;
 
-    ViewFiltered(View<T> v, Predicate<T> f) { view = v; predicate = f; }
+    ViewFiltered(View<T> v, Function1<? super T,Boolean> f) { view = v; predicate = f; }
 
-    public static <T> View<T> of(View<T> v, Predicate<T> f) {
+    public static <T> View<T> of(View<T> v, Function1<? super T,Boolean> f) {
         if (f == null) { throw new IllegalArgumentException("Must provide a predicate"); }
-        if (f == FunctionUtils.REJECT) { return View.emptyView(); }
-        if (f == FunctionUtils.ACCEPT) { return v; }
+        if (f == Function1.REJECT) { return View.emptyView(); }
+        if (f == Function1.ACCEPT) { return v; }
         if ( (v == null) || (v == EMPTY_VIEW) ) { return View.emptyView(); }
         return new ViewFiltered<>(v, f);
     }
@@ -39,7 +37,7 @@ class ViewFiltered<T> implements View<T> {
     public Option<T> next() {
         Option<T> item = view.next();
         while (item.isSome()) {
-            if (predicate.test(item.get())) { return item; }
+            if (predicate.apply(item.get())) { return item; }
             item = view.next();
         }
         return Option.none();

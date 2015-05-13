@@ -14,25 +14,23 @@
 
 package org.organicdesign.fp.experiments;
 
-import java.util.function.Predicate;
-
-import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.ephemeral.View;
+import org.organicdesign.fp.function.Function1;
 
 public class ViewTakenUntilIncl<T> implements View<T> {
     private final View<T> innerView;
-    private final Predicate<T> pred;
+    private final Function1<T,Boolean> pred;
     private boolean done = false;
 
-    ViewTakenUntilIncl(View<T> v, Predicate<T> p) { innerView = v; pred = p; }
+    ViewTakenUntilIncl(View<T> v, Function1<T,Boolean> p) { innerView = v; pred = p; }
 
-    public static <T> View<T> of(View<T> v, Predicate<T> p) {
+    public static <T> View<T> of(View<T> v, Function1<T,Boolean> p) {
         if (p == null) { throw new IllegalArgumentException("Must provide a predicate"); }
-        if ( (p == FunctionUtils.REJECT) ||
+        if ( (p == Function1.REJECT) ||
              (v == null) ||
              (v == EMPTY_VIEW) ) { return View.emptyView(); }
-        if (p == FunctionUtils.ACCEPT) { return v; }
+        if (p == Function1.ACCEPT) { return v; }
         return new ViewTakenUntilIncl<>(v, p);
     }
 
@@ -42,7 +40,7 @@ public class ViewTakenUntilIncl<T> implements View<T> {
         Option<T> item = innerView.next();
 
         if ( !item.isSome() ||
-             pred.test(item.get()) ) {
+             pred.apply(item.get()) ) {
             done = true;
         }
         return item;

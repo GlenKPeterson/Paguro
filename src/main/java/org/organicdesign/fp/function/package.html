@@ -1,0 +1,26 @@
+<html>
+<body>
+<p>Exception-friendly functional interfaces named by the number of arguments: Function0, Function1, Function2....
+    All of these have an <code>apply()</code> method that that throws an Exception and returns a result.
+    Implementers should override the apply method.
+    Each interface also has a default <code>apply_()</code> method for consumers of this function to call.
+    It re-throws all exceptions after wrapping any checked exceptions in unchecked <code>RuntimeException</code>s.</p>
+
+<p>For simplicity, there are no primitive versions of these functions, no "void" return types (except SideEffect), and no special-purpose funny names.
+    If you don't want to return a result, declare the return type as <code>?</code> and return null.
+    Comparing just the Consumer interfaces from { @link java.util.function}:</p>
+
+<table>
+    <tr><th>java.util.function</th><th>org.organicdesign.fp.function</th></tr>
+    <tr><td>Consumer&lt;T&gt;</td><td>Function1&lt;T,?&gt;</td></tr>
+    <tr><td>DoubleConsumer</td><td>Function1&lt;Double,?&gt;</td></tr>
+    <tr><td>IntConsumer</td><td>Function1&lt;Integer,?&gt;</td></tr>
+    <tr><td>LongConsumer</td><td>Function1&lt;Long,?&gt;</td></tr>
+    <tr><td>BiConsumer&lt;T,U&gt;</td><td>Function2&lt;T,U,?&gt;</td></tr>
+    <tr><td>ObjDoubleConsumer&lt;T&gt;</td><td>Function2&lt;T,Double,?&gt;</td></tr>
+    <tr><td>ObjIntConsumer&lt;T&gt;</td><td>Function2&lt;T,Integer,?&gt;</td></tr>
+    <tr><td>ObjLongConsumer&lt;T&gt;</td><td>Function2&lt;T,Long,?&gt;</td></tr>
+</table>
+
+</body>
+</html>

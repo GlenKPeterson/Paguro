@@ -14,12 +14,11 @@
 package org.organicdesign.fp.experiments;
 
 import org.organicdesign.fp.Mutable;
+import org.organicdesign.fp.experiments.collection.mutable.MutableLinkedList;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import org.organicdesign.fp.experiments.collection.mutable.MutableLinkedList;
 
 public class ConcurrentXform {
     private final int maxThreads;
@@ -29,7 +28,7 @@ public class ConcurrentXform {
 
     public static ConcurrentXform of(int t, IntRange r) { return new ConcurrentXform(t, r); }
 
-    public Long[] toArray() {
+    public Long[] toTypedArray() {
         if (range.size() > (long) Integer.MAX_VALUE) {
             throw new IllegalStateException("size of range is too big for a Java array.");
         }
@@ -50,6 +49,7 @@ public class ConcurrentXform {
                     // System.out.println("\tidx: " + idx.value() + " value: " + (Int) i);
                     ret[idx.value()] = item;
                     idx.increment();
+                    return null;
                 });
             } else {
                 System.out.println("Starting thread: " + i);
@@ -61,6 +61,7 @@ public class ConcurrentXform {
     //                        System.out.println("\tidx: " + idx.value() + " value: " + (Int) i);
                             ret[idx.value()] = item;
                             idx.increment();
+                            return null;
                         });
                     }
                 };

@@ -15,12 +15,14 @@
 package org.organicdesign.fp.tuple;
 
 import java.util.Map.Entry;
+import java.util.Objects;
+
+import org.organicdesign.fp.collections.UnMap;
 
 /**
- Use tuples as immutable, type-safe, data structures instead of defining your own classes (when appropriate).
- Defining your own class is better for building models, but tuples can be more convenient, especially for adapter code.
+Holds 2 items of potentially different types, and implements Map.Entry (and UnMap.UnEntry (there is no ImMap.ImEntry)).
  */
-public class Tuple2<T,U> implements Entry<T,U> {
+public final class Tuple2<T,U> implements Entry<T,U>, UnMap.UnEntry<T,U> {
     private final T _1;
     private final U _2;
     private Tuple2(T t, U u) { _1 = t; _2 = u; }
@@ -43,39 +45,23 @@ public class Tuple2<T,U> implements Entry<T,U> {
     public U _2() { return _2; }
 
     @Override
-    public String toString() { return "(" + _1 + "," + _2 + ")"; }
+    public String toString() { return "Tuple2(" + _1 + "," + _2 + ")"; }
 
     @Override
     public boolean equals(Object other) {
         // Cheapest operation first...
         if (this == other) { return true; }
-        if ((other == null) ||
-            !(other instanceof Tuple2) ||
-            (this.hashCode() != other.hashCode())) {
-            return false;
-        }
+        if (!(other instanceof Entry)) { return false; }
         // Details...
-        @SuppressWarnings("rawtypes") final Tuple2 that = (Tuple2) other;
-
-        if (this._1 == null) {
-            if (that._1 != null) { return false; }
-        } else if ( !this._1.equals(that._1) ) {
-            return false;
-        }
-
-        if (this._2 == null) {
-            if (that._2 != null) { return false; }
-        } else if ( !this._2.equals(that._2) ) {
-            return false;
-        }
-        return true;
+        final Entry that = (Entry) other;
+        return Objects.equals(_1, that.getKey()) && Objects.equals(_2, that.getValue());
     }
 
     @Override
     public int hashCode() {
         int ret = 0;
         if (_1 != null) { ret = _1.hashCode(); }
-        if (_2 != null) { return ret ^ _2.hashCode(); }
+        if (_2 != null) { return ret + _2.hashCode(); }
         // If it's uninitialized, it's equal to every other uninitialized instance.
         return ret;
     }
@@ -86,5 +72,6 @@ public class Tuple2<T,U> implements Entry<T,U> {
     /** Returns the second field of the tuple.  This field naming scheme is to implement Map.Entry. */
     @Override public U getValue() { return _2; }
     /** This method is required to implement Map.Entry, but calling it only issues an exception */
+    @SuppressWarnings("deprecation")
     @Override @Deprecated public U setValue(U value) { throw new UnsupportedOperationException("Tuple2 is immutable"); }
 }

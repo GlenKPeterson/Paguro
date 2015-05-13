@@ -14,35 +14,45 @@
 
 package org.organicdesign.fp.permanent;
 
-import java.util.function.Function;
-
-import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.LazyRef;
 import org.organicdesign.fp.Option;
+import org.organicdesign.fp.function.Function1;
+import org.organicdesign.fp.tuple.Tuple2;
 
 public class SequenceMapped<T,U>  implements Sequence<U> {
-    private final Sequence<T> seq;
-    private final Function<T,U> func;
+    private final LazyRef<Tuple2<Option<U>,Sequence<U>>> laz;
 
-    private SequenceMapped(Sequence<T> s, Function<T,U> f) { seq = s; func = f; }
+    SequenceMapped(Sequence<T> seq, Function1<? super T,? extends U> func) {
+        laz = LazyRef.of(() -> {
+            Option<T> first = seq.head();
+            return first.isSome()
+                   ? Tuple2.of(Option.of(func.apply(first.get())), new SequenceMapped<>(seq.tail(), func))
+                   : Sequence.emptySeqTuple();
+        });
+    }
 
     @SuppressWarnings("unchecked")
-    public static <T,U> Sequence<U> of(Sequence<T> s, Function<T,U> f) {
+    public static <T,U> Sequence<U> of(Sequence<T> s, Function1<? super T,? extends U> f) {
+        if (f == null) { throw new IllegalArgumentException("Can't map with a null function."); }
         // You can put nulls in, but you don't get nulls out.
-        if (f == null) { return Sequence.emptySequence(); }
-        if (f == FunctionUtils.IDENTITY) { return (Sequence<U>) s; }
-        if ( (s == null) || (s == EMPTY_SEQUENCE) ) { return Sequence.emptySequence(); }
+        if ( (s == null) || (EMPTY_SEQUENCE == s) ) { return Sequence.emptySequence(); }
+        if (f == Function1.IDENTITY) { return (Sequence<U>) s; }
         return new SequenceMapped<>(s, f);
     }
 
-    @Override
-    public Option<U> first() {
-        Option<T> item = seq.first();
-        if (!item.isSome()) { return Option.none(); }
-        return Option.of(func.apply(item.get()));
-    }
+    @Override public Option<U> head() { return laz.get()._1(); }
 
-    @Override
-    public Sequence<U> rest() {
-        return of(seq.rest(), func);
-    }
+    @Override public Sequence<U> tail() { return laz.get()._2(); }
+
+//    @Override public int hashCode() { return Sequence.hashCode(this); }
+//
+//    @Override public boolean equals(Object o) {
+//        if (this == o) { return true; }
+//        if ( (o == null) || !(o instanceof Sequence) ) { return false; }
+//        return Sequence.equals(this, (Sequence) o);
+//    }
+//
+//    @Override public String toString() {
+//        return "SequenceMapped(" + (laz.isRealizedYet() ? laz.get()._1() : "*lazy*") + ",...)";
+//    }
 }

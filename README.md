@@ -1,50 +1,106 @@
-A pre-alpha version of this project includes immutable collections.  The API has changed significantly and the project has been renamed, but this is where development continues:
-https://github.com/GlenKPeterson/J-cicle/tree/2015-03-29_ImUnClojCollections
+J-cicle (pronounced "Jay-sick-ul" like a frozen/immutable Java&trade;-icicle) brings Clojure collections,
+a Sequence abstraction, memoization, and some syntactical sugar to Java.
+Fluent interfaces encourage you to write expressions (that evaluate) instead of statements (that produce void).
+It pushes Java toward Clojure, but keeps the type saftey, objects, classes, and C-like syntax that Java programmers are accustomed to.
+
+*** Caution: Pre-alpha quality. ***
 
 #Usage
-
-Typical usage (based on this unit test: <a href="https://github.com/GlenKPeterson/fp4java7/blob/master/src/test/java/org/organicdesign/fp/ephemeral/ViewTest.java">ViewTest.java</a>):
-
+Create an immutable, type safe map:
 ```java
-List<Integer> list = View.ofArray(5)    //         5
-        .prepend(View.ofArray(1,2,3,4)) // 1,2,3,4,5
-        .append(View.ofArray(6,7,8,9))  // 1,2,3,4,5,6,7,8,9
-        .filter(i -> i > 3)             //       4,5,6,7,8,9
-        .map(i -> i - 2)                //   2,3,4,5,6,7
-        .take(5)                        //   2,3,4,5,6
-        .drop(2)                        //       4,5,6
-        .toJavaUnmodList();
-
-FunctionUtils.toString(list);
-// Returns: "UnmodifiableRandomAccessList(4,5,6)"
+Map<String,Integer> itemMap = PersistentMapSorted.of(
+        "One", 1,
+        "Two", 2,
+        "Three", 3);
 ```
 
-Unlike Java 8 streams, these transformations do not change the underlying data.  They build a new collection by chaining together all the operations you specify, then lazily applying them in a single pass through the unerlying data.  The laziness is implemented as an incremental pull, so that if your last operation is take(1), then the absolute minimum number of items will be evaluated through all the functions you specified.
+What if you want to add items conditionally?  Would you create a temporary, mutable map, test each item, adding some to
+the mutable map, then call Collections.unmodifiableMap(tempMap) on it?  Ouch!  The following will create an
+UnmodifiableMap of 0, 1, 2, or 3 items (no nulls) depending on the values of showFirst, showSecond, and showThird:
+```java
+Map<String,Integer> itemMap = PersistentMapSorted.ofSkipNull(
+        showFirst ? Tuple2.of("One", 1) : null,
+        showSecond ? Tuple2.of("Two", 2) : null,
+        showThird ? Tuple2.of("Three", 3) : null);
+```
 
-#Learn
+Similar type-safe methods are available for producing unmodifiable Sets and Lists of any length (unMaps currently go
+from 0 to 10 type-safe keys and values, or an infinite number of Map.Entries or Tuples).
 
-There is now a problem-set for learning this tool-kit: https://github.com/GlenKPeterson/LearnFpJava
+What if you want to add another item to an immutable map?
+
+```java
+itemMap = itemMap.assoc("Four", 4);
+```
+
+What about transforming your unmodifiable data into other unmodifiable data?  Lazily, without any extra processing?
+Typical usage (based on this unit test: <a href="https://github.com/GlenKPeterson/fp4java7/blob/master/src/test/java/org/organicdesign/fp/persistent/SequenceTest.java">SequenceTest.java</a>):
+
+```java
+ImList<Integer> list = Sequence.ofArray(4,5)//       4,5
+        .prepend(Sequence.ofArray(1,2,3))   // 1,2,3,4,5
+        .append(Sequence.ofArray(6,7,8,9))  // 1,2,3,4,5,6,7,8,9
+        .filter(i -> i > 4)                 //         5,6,7,8,9
+        .map(i -> i - 2)                    //     3,4,5,6,7
+        .take(5)                            //     3,4,5,6
+        .drop(2)                            //         5,6
+        .toImList();
+
+list.toString(); // Returns: "PersistentVector(4,5,6)"
+```
+These transformations do not change the underlying data.  They build a new collection by chaining together all the
+operations you specify, then lazily applying them in a single pass.  The laziness is
+implemented as an incremental pull, so that if your last operation is take(1), then the absolute minimum number of
+items will be evaluated through all the functions you specified.  In the example above, items 7, 8, and 9 are never
+processed.
 
 #Motivations
 
-Higher order functions are not just briefer to write and read, they are less to *think* about.  They are useful abstractions that simplify your code and focus your attention on your goals rather than the details of how to accomplish them.  Function chaining: <code>xs.map(x -> x + 1).filter(x -> x > 7).take(1)</code> defines what you are doing and how you are doing it in the simplest possible way, hiding all details about how to iterate through the underlying collection.
+The goals of this project are to make it easy to use Java:
 
-The alternative - loops - are bundles of unnecessary complexity.  Loops generally require setting up accumulators, then running a gamut of <code>if</code>, <code>break</code>, and <code>continue</code> statements, like some kind of mad obstacle race that involves as many state changes as possible.  Different kinds of collections require different looping constructs - more complexity.  Looping code is vulnerable to "off-by-one" boundary overflow/underflow, improper initialization, accidental exit, infinite loops, forgetting to update a counter, updating the wrong counter...  The list goes on!  None of that has anything to do with why the loop was created in the first place which is to transform the underlying data.
+ - Immutably (Josh Bloch Item 15)
+ - Type safely (Josh Bloch Item 23)
+ - Functionally (using first-class functions more easily)
+ - Expressively/Briefly (Expressions over statements: all API calls evaluate to something useful for subsequent calls).
+ - Minimizing the use of primitives and arrays (except for varargs, Suggested by Josh Bloch Items 23, 25, 26, 27, 28, 29)
+ - Returning empty collections instead of <code>null</code> (Josh Bloch Item 43)
+ - "Throw exceptions at people, not at code" (says Bill Venners, but also Josh Bloch Item 59)
+ - Concurrency friendly (Josh Bloch Item 66, 67)
+ - Context-sensitive equality: prefer Comparators to <code>equals()</code>, <code>hashcode()</code> and <code>compareTo()</code> (Daniel Spiewak, Viktor Klang, Rúnar Óli Bjarnason, Hughes Chabot, java.util.TreeSet, java.util.TreeMap)
+ - Compatibly with existing/legacy Java code
 
-You don't have to write that kind of code any more.  If you want to map one set of values according to a given function, say so with xs.map().  Filter?  xs.filter().  It's clearer, simpler, and like type safety, it eliminates whole classes of errors.
+Higher order functions are not just briefer to write and read, they are less to *think* about.
+They are useful abstractions that simplify your code and focus your attention on your goals rather than the details of how to accomplish them.
+Function chaining: <code>xs.map(x -> x + 1).filter(x -> x > 7).head()</code> defines what you are doing and how you are doing it in the simplest possible way, hiding all details about how to iterate through the underlying collection.
 
-No data is changed when using the transformers in this project.  They allow you to write nearly stateless programs whose statements chain together and evaluate into a useful result.  Lisp works like this, only the syntax makes the evaluation go inside out from the order you read the statements in (hence Clojure's two arrow operators).  With method chaining, the evaluation happens in the same order as the methods are written on the page, much like piping commands to one another in shell scripts.
+The alternative - loops - are bundles of unnecessary complexity.
+Loops generally require setting up accumulators, then running a gamut of <code>if</code>, <code>break</code>, and <code>continue</code> statements, like some kind of mad obstacle race that involves as many state changes as possible.
+Different kinds of collections require different looping constructs - more complexity.
+Looping code is vulnerable to "off-by-one" boundary overflow/underflow, improper initialization, accidental exit, infinite loops, forgetting to update a counter, updating the wrong counter...  The list goes on!
+None of that has anything to do with why the loop was created in the first place which is to transform the underlying data.
 
-Incremental evaluation prevents some items from being evaluated to produce the results you need which is sometimes more efficient than traditional whole-collection transforms.  There may be cases where a well hand-written loop will be faster, but in general, the overhead for using these transformations is minimal and, I believe, well worth the clarity, safety, and productivity benefits they provide.  If you find a better/faster implementation, please submit your improvements!
+You don't have to write that kind of code any more.
+If you want to map one set of values according to a given function, say so with xs.map().
+Filter?  xs.filter().
+It's clearer, simpler, and like type safety, it eliminates whole classes of errors.
+
+No data is changed when using the permanent transformers in this project.
+They allow you to write nearly elegant programs whose function calls chain together and evaluate into a useful result.
+Clojure works like this, only the syntax makes the evaluation go inside out from the order you read the statements in (hence Clojure's two arrow operators).
+With method chaining, the evaluation happens in the same order as the methods are written on the page, much like piping commands to one another in shell scripts.
+
+Incremental evaluation prevents some items from being evaluated to produce the results you need which is sometimes more efficient than traditional whole-collection transforms.
+There may be cases where a well hand-written loop will be faster, but in general, the overhead for using these transformations is minimal and, I believe, well worth the clarity, safety, and productivity benefits they provide.
+If you find a better/faster implementation, please submit your improvements!
 
 #API
 
-Functions available in <code>View</code> (as of 2014-03-07):
+Functions available in <code>Sequence</code> (as of 2014-03-07):
 ###Starting Points:
 ```java
-View<T> View.ofArray(T... i)
-View<T> View.of(Iterator<T> i)
-View<T> View.of(Iterable<T> i)
+Sequence<T> Sequence.ofArray(T... i)
+Sequence<T> Sequence.of(Iterator<T> i)
+Sequence<T> Sequence.of(Iterable<T> i)
 ```
 ###Transformations:
 ```java
@@ -58,79 +114,133 @@ void forEach(Consumer<T> se)
 U foldLeft(U u, BiFunction<U, T, U> fun)
 
 // Return only the items for which the given predicate returns true
-View<T> filter(Predicate<T> pred)
+Sequence<T> filter(Predicate<T> pred)
 
 // Return items from the beginning of the list until the given predicate returns false
-View<T> takeWhile(Predicate<T> p)
+Sequence<T> takeWhile(Predicate<T> p)
 
 // Return only the first n items
-View<T> take(long numItems)
+Sequence<T> take(long numItems)
 
 // Ignore the first n items and return only those that come after
-View<T> drop(long numItems)
+Sequence<T> drop(long numItems)
 
 // Transform each item into exactly one new item using the given function
-View<U> map(Function<T,U> func)
+Sequence<U> map(Function<T,U> func)
 
-// Add items to the end of this view
-View<T> append(View<T> pv)
+// Add items to the end of this Sequence
+Sequence<T> append(Sequence<T> pv)
 
-// Add items to the beginning of this view
-View<T> prepend(View<T> pv)
+// Add items to the beginning of this Sequence
+Sequence<T> prepend(Sequence<T> pv)
 
 // Transform each item into zero or more new items using the given function
-View<U> flatMap(Function<T,View<U>> func)
+Sequence<U> flatMap(Function<T,Sequence<U>> func)
 ```
 ###Endpoints
 ```java
-ArrayList<T> toJavaArrayList()
-List<T> toJavaUnmodList()
-HashMap<T,U> toJavaHashMap(Function<T,U> f1)
-Map<T,U> toJavaUnmodMap(Function<T,U> f1)
-HashMap<U,T> toReverseJavaHashMap(Function<T,U> f1)
-Map<U,T> toReverseJavaUnmodMap(Function<T,U> f1)
-TreeSet<T> toJavaTreeSet(Comparator<? super T> comparator)
-SortedSet<T> toJavaUnmodSortedSet(Comparator<? super T> comparator)
-TreeSet<T> toJavaTreeSet()
-SortedSet<T> toJavaUnmodSortedSet()
-HashSet<T> toJavaHashSet()
-Set<T> toJavaUnmodSet()
-T[] toArray()
-Iterator<T> toIterator()
+// A one-time use, not-thread-safe way to get each value of this Realizable in turn.
+UnIterator<T> iterator()
+
+// The contents of this Realizable as a thread-safe immutable list.
+ImList<T> toImList()
+
+// The contents of this Realizable as an thread-safe, immutable, sorted (tree) map.
+<U,V> ImMapSorted<U,V>	toImMapSorted(Comparator<? super U> comp, Function1<? super T,Map.Entry<U,V>> f1)
+
+// The contents of this Realizable presented as an immutable, sorted (tree) set.
+ImSetSorted<T>	toImSetSorted(Comparator<? super T> comp)
+
+// The contents copied to a mutable list.
+List<T>	toJavaList()
+
+// Returns the contents of this Realizable copied to a mutable hash map.
+<U,V> Map<U,V>	toJavaMap(Function1<? super T,Map.Entry<U,V>> f1)
+
+// Returns the contents of this Realizable copied to a mutable tree map.
+<U,V> SortedMap<U,V>	toJavaMapSorted(Function1<? super T,Map.Entry<U,V>> f1)
+
+// Returns the contents of this Realizable copied to a mutable hash set.
+Set<T>	toJavaSet()
+
+// Returns the contents of this Realizable copied to a mutable tree set.
+SortedSet<T>	toJavaSetSorted(Comparator<? super T> comp)
+
+// Returns a type-safe version of toArray() that doesn't require that you pass an array of the proper type and size.
+default T[]	toTypedArray()
+
+// This method will be replaced with toImMap() once a PersistentHashMap is added to this project.
+default <U,V> UnMap<U,V>	toUnMap(Function1<? super T,Map.Entry<U,V>> f1)
+
+// This method will be replaced with toImSet() once a PersistentHashMap is added to this project.
+default UnSet<T>	toUnSet()
 ```
+#Learn
+
+There is an outdated problem-set for learning this tool-kit: https://github.com/GlenKPeterson/LearnFpJava
 
 #Details
-The View model implemented here is for lightweight, lazy, immutable, type-safe, and thread-safe transformations.
-The Sequence model is also memoized/cached, so it is useful for repeated queries.
-Sequence is most similar to the Clojure sequence abstraction, but it's pure Java and type-safe.
-Both allow processing in the smallest possible (and therefore laziest) increments.
-I find myself focusing on View more than Sequence because View seems to be adequite for most things I do.
+The crux of this project is to retrofit the Clojure way of transforming data into Java code.  This definitely puts a square peg into a round hole.  There are several layers of conversion for collections:
+ - java.util... collections are the standard Java interfaces that existing code all works with.  Like Guava, we want to be as compatible with these as possible, while preventing mutation-in-place.
+ - org.organicdesign.fp.collection.Un... interfaces extend the java.util collection interfaces of the same name (minus the "Un" prefix) and deprecate and implement all the mutate-in-place methods so that they only throw exceptions.  This is useful in its own right as a way to declare that a function does not modify what is passed, or that what it returns cannot be modified.  Modification errors are caught as early as possible due to deprecation warnings.
+ - org.organicdesign.fp.collection.Im... interfaces are the immutable, lightweight-copy Clojure-centric collection interfaces.  Only the "get" methods from the java.util... collection interfaces remain.  Additional "set" methods that return a new collectoin are added at this level.
+ - org.organicdesign.fp.collection.Im...Impl are the lightweight-copy implementations of the above interfaces, generally taken directly from Clojure (hence the Eclipse licence for those components).  For starters, we will include the celebrated Vector and the sorted (tree) Set and Map implementations.
 
-The classes in the <code>function</code> package allow you to use the Java 8 functional interfaces (more or less) as "second class" functions in Java 7.
-When you switch to Java 8, you only need to change the import statement and remove the _ from the apply_() methods.
-The apply_() methods are there to deal with checked exceptions in lambdas in Java 7.
+Within your own FP-centric world, you will use the Im interfaces and implementations and transform them with the Sequence abstraction.  Methods that interact with imperative Java code will take and return either the Un interfaces, or the java.util interfaces as necessary. 
+
+
+The Sequence model implements lightweight, lazy, immutable, type-safe, and thread-safe transformations.  It is also memoized/cached, so it is useful for repeated queries.  Sequence is most similar to the Clojure sequence abstraction, but it's pure Java and type-safe.  Sequence and View both allow processing in the smallest possible (and therefore laziest) increments.  I fond myself focusing on View more than Sequence at first, but Sequence is catching up and may replace View one day if the performance is similar.
+
+The classes in the <code>function</code> package allow you to use the Java 8 functional interfaces smoothly warpping things that throw checked exceptions in Java 8, or as "second class" functions in Java 7.
 
 Some variables declared outside a lambda and used within one must be finial.
 The Mutable.____Ref classes work around this limitation.
 
-The most interesting classes are probably (in src/main/java/):
-<ul>
-<li><code><a href="https://github.com/GlenKPeterson/fp4java7/blob/master/src/main/java/org/organicdesign/fp/Transformable.java">org/organicdesign/fp/Transformable</a></code> - allows various functional transformations to be lazily applied: filter, map, forEach, etc., and allows any transformations to be eagerly evaluated into either mutable or unmodifiable collections (Java collections have to fit in memory).</li>
-<li><code><a href="https://github.com/GlenKPeterson/fp4java7/blob/master/src/main/java/org/organicdesign/fp/ephemeral/View.java">org/organicdesign/fp/ephemeral/View</a></code> - a working implementation of most of these transformations</li>
-<li><code><a href="https://github.com/GlenKPeterson/fp4java7/blob/master/src/main/java/org/organicdesign/fp/FunctionUtils.java">org/organicdesign/fp/FunctionUtils</a></code> - smartly combine/compose multiple predicates, convert collections to Strings, etc.</li>
-</ul>
+In short, Clojure doesn't have static types.  Scala has an TMTOWTDI attitude that reminds me of how C++ and Perl ended up producing write-only code.  Unwilling to move a million lines of code to either language, I tried to bring the best of both to Java.
 
 #Dependencies
-- Java 8 (tested with 64-bit Linux build 1.8.0-b129)
+- Java 8 (tested with 64-bit Linux build 1.8.0_31).  Probably can be meaningfully adapted to work as far back as Java 5 with some work.  I plan to keep new development work on the main branch, but am very willing to help maintain branches back-ported to Java 7, 6, 5,.... if there is interest.
  
 #Build Dependencies
-- Maven (tested version: 3.11.0-18-generic 64-bit Linux build)
+- Maven (tested version: 3.2.3 64-bit Linux build)
 
 #Test Dependencies
 - Maven will download jUnit for you
-- As of 2014-03-08, all major areas of functionality are covered by unit tests.
+- As of 2014-03-08, all major areas of functionality were covered by unit tests.
 
 #Change Log
+2015-05-13 Release 0.9 alpha which packages type-safe versions of the Clojure collections and sequence abstraction for Java.
+- 3 Immutable collections: Vector, SetOrdered, and MapOrdered.  None of these use equals or hashcode.
+Vector doesn't need to and Map and Set take a Comparator.
+- Un-collections which are the Java collection interfaces, only unmodifiable, with mutator methods deprecated and
+default-implemented to throw exceptions.
+- Im-collections which add "mutator" methods that return a new collection reflecting the change, leaving the old
+collection unchanged.
+- Basic sequence abstraction on the Im- versions of the above.
+- Function interfaces that manage exceptions and play nicely with java.util.function.*
+- Memoization methods on functional interfaces.
+
+2015-04-05 version 0.8.2:
+- Renamed Sequence.first() and .rest() to .head() and .tail() so that they wouldn't conflict with TreeSet.first()
+which returns a T instead of an Option<T>.  This was a difficult decision and I actually implemented all of Sequence
+except for flatMap with first() returning a T.  All the functions that could return fewer items that were previously
+lazy became eager.  Flatmap became eager, but also became very difficult to implement correctly.  View is already eager,
+so I renamed the methods to use the more traditional FP names and restored the Option<T>.  If you don't like the names,
+just be glad I didn't use car and cdr.
+
+2015-04-05 version 0.8.1:
+- Renamed FunctionX.apply_() to just apply() to match java.util.function interfaces.
+ Renamed FunctionX.apply() to applyEx() but this is still what you implement and it can throw an exception.
+ Made FunctionX.apply() methods rethrow RuntimeExceptions unchanged, but (still) wrap checked Exceptions in RuntimeExceptions.
+ They were previously wrapped in IllegalStateExceptions, except for SideEffect which tried to cast the exception which never worked.
+- Added all the functions to Sequence that were previously only in View, plus tests for same.
+- Re-implemented Sequence abstraction using LazyRef.
+- SideEffect has been deprecated because it may not have been used anywhere.
+- Added some tests, improved some documentation, and made a bunch of things private or deleted them in experiments.collections.ImVectorImpl.
+
+2015-03-14 version 0.8.0: Removed firstMatching - in your code, replace firstMatching(...) with filter(...).head().
+Implemented filter() on Sequence.
+
 0.7.4:
 Added uMapSkipNull and other skipNull versions of the StaticImports methods.  This allows little one-liner add-if items
 to still go efficiently into an immutable map.  Next step is to probably implement an immutable map that you can
@@ -144,37 +254,22 @@ Added unit tests for the above.
  safe if the producer and the values it produces are free from outside influences.
 
 #To Do
+ - Add tests for the TreeMap and TreeSet implementations from Clojure
+ - Make StaticImports return Im- collections instead of Un- ones.
+ - Rename methods in Realizable to prefer Im collections.
 
-Remove firstMatching
-```java
-// Return the first item for which the given predicate returns true.
-// You can call filter(...).take(1) to achieve the same result
-// (because Views are incrementally evaluated) so this may not be strictly
-// necessary (I might remove it in a future release).
-T firstMatching(Predicate<T> pred)
-```
-
+# Older Notes
 Collection Variations:
- - Mutable vs. Immutable
- - Lazy vs. Eager
- - Persistent vs. Ephemeral
  - Finite vs. Infinite (finite sub-categories: fits in memory or not)
- - Write-only Builder with read-only collection?
- - Permitting lightweight copies (goes well with Immutable)
- - Type-safe
- - Thread-safe
+ - Heterogenious vs. Homogenious
+ - Write-only Builder with read-only collection? - No, I think Guava does that already.
+ - Thread-safe vs. unsafe - I think immutable means thread-safe only.
 
-Update Sequence to have all the transforms that View does.
+Transform Variations:
+ - Lazy vs. Eager - lazy is preferred, but some operations (like reduce) are inherently eager.  I think
+ you can use flatMap instead of reduce if you want it lazy.
 
-Some collections, like Sets, are unordered and naturally partitioned, so that some processes (such as mapping one set to another) could be carried out in a highly concurrent manner.
-
-A Java 8 version of this project is working, but a few commits behind the Java 7 version.  If
-someone wants that, let me know and I'll post it.
-
-This would be an even smaller project in Scala than in Java 8 so that may be in the works as well, if people would find it useful.
-
-A lot has been said about lightweight copies of immutable collections, but I wonder how far
-mutable builders could go toward not having to copy immutable collections?
+Some collections are naturally partitioned, so that some processes (such as mapping one set to another) could be carried out in a highly concurrent manner.  If that is added some day, any concurrent operation will take a parameter for the max number of threads it should try to use.
 
 #Out of Scope
 
@@ -197,3 +292,58 @@ a, b, c, and d.
 a,b,c...
 
 None of those are simple uses of interpose.
+
+#Licenses
+Java&trade; is a registered trademark of the Oracle Corporation in the US and other countries.  J-cicle is not part of Java.  Oracle is in no way affiliated with the J-cicle project.
+
+J-cicle is not part of Clojure.  Rich Hickey and the Clojure team are in no way affiliated with the J-cicle project, though it borrows heavily from their thoughts and even some of their open-source code.
+
+This work is licensed under both the Apache 2.0 license and the Eclipse Public License.  You must comply with the rules of both licenses (you don't get to choose).  New contributions should be made under the Apache 2.0 license whenever practical.
+
+Most of this work is licensed under the Apache 2.0 license.  However, the persistent collections (ImVectorImpl, ImMapSortedImpl, ImSetSortedImpl, etc. in thecollections folder as of 2015-04-05) are originally copied from, and still based on, the Clojure source code by Rich Hickey which is released under the Eclipse Public License (as of fall 2014).  Those files are derivative works and must remain under the EPL license unless the original authors give permission to change it, or chooses a new license.
+
+I am not a lawyer and this is not legal advice.  Both the EPL and Apache projects list each other's license as being compatible.  I am not aware of a clear difference between them, or a reason why works written under the two licenses cannot be combined.
+
+As of 2015-03-24, the following statements made me think the Apache and EPL licenses were compatible.
+
+###From Apache
+> For the purposes of being a dependency to an Apache product, which licenses
+> are considered to be similar in terms to the Apache License 2.0?
+>
+> Works under the following licenses may be included within Apache products:
+>
+> ...
+>
+> Eclipse Distribution License 1.0
+>
+> ...
+>
+> Many of these licenses have specific attribution terms that need to be
+> adhered to, for example CC-A, often by adding them to the NOTICE file. Ensure
+> you are doing this when including these works. Note, this list is
+> colloquially known as the Category A list.
+
+Source (as of 2015-03-24): https://www.apache.org/legal/resolved
+
+###From Eclipse
+> What licenses are acceptable for third-party code redistributed by Eclipse
+> projects?
+>
+> Eclipse views license compatibility through the lens of enabling successful
+> commercial adoption of Eclipse technology in software products and services.
+> We wish to create a commercial ecosystem based on the redistribution of
+> Eclipse software technologies in commercially licensed software products.
+> Determining whether a license for third-party code is acceptable often
+> requires the input and advice of Eclipse’s legal advisors. If you have any
+> questions, please contact license@eclipse.org.
+>
+> The current list of licenses approved for use by third-party code
+> redistributed by Eclipse projects is:
+>
+> Apache Software License 1.1
+>
+> Apache Software License 2.0
+>
+> ...
+
+Source (as of 2015-03-24): https://eclipse.org/legal/eplfaq.php#3RDPARTY

@@ -1,23 +1,9 @@
-// Copyright 2015-03-06 PlanBase Inc. & Glen Peterson
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package org.organicdesign.fp;
 
 import org.organicdesign.fp.function.Function0;
 
 /**
- Take a Function0 and lazily initialize a value (and frees the initialization resources) on the first call to get().
+ Lazily initialize a value (and free the initialization resources) on the first call to get().
  Subsequent calls to get() cheaply return the previously initialized value.  This class is thread-safe if the producer
  function and the value it produces are pure and free from side effects.
  */
@@ -42,9 +28,9 @@ public class LazyRef<T> {
     }
 
     /**
-     * The first call to this method initializes the value this class wraps and releases the initialization resources.
-     * Subsequent calls return the precomputed value.
-     * @return the same value every time it is called.
+     The first call to this method initializes the value this class wraps and releases the initialization resources.
+     Subsequent calls return the precomputed value.
+     @return the same value every time it is called.
      */
     public T get() {
         // Have we produced our value yet (cheap, but not thread-safe check)?
@@ -54,7 +40,7 @@ public class LazyRef<T> {
                 // Checking again inside the sync block ensures only one thread can produce the value.
                 if (producer != null) {
                     // Here, a single thread has earned the right to produce our value.
-                    value = producer.apply_();
+                    value = producer.apply();
                     // Delete the producer to 1. mark the work done and 2. free resources.
                     producer = null;
                 }
@@ -63,4 +49,15 @@ public class LazyRef<T> {
         // We're clear to return the lazily computed value.
         return value;
     }
+
+    // I don't like this because it's not referentially transparent.
+//        public boolean isRealizedYet() { return producer == null; }
+
+    // I don't like this because it's not referentially transparent, but it could be helpful for testing.
+    /**
+     Useful for debugging, but not referentially transparent (sometimes returns LazyRef(*not-computed-yet*),
+     sometimes shows the value that was computed).
+     @return a string describing this LazyRef and showing whether or not its value has been computed yet.
+     */
+    public String toString() { return "LazyRef(" + ((producer == null) ? value : "*not-computed-yet*") + ")"; }
 }

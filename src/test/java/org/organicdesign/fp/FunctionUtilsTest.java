@@ -13,16 +13,35 @@
 
 package org.organicdesign.fp;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.organicdesign.fp.ephemeral.View;
 
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertArrayEquals;
+import static junit.framework.TestCase.assertEquals;
 
 @RunWith(JUnit4.class)
 public class FunctionUtilsTest {
+
+    @Test
+    public void testToString() {
+        List<Integer> is = new ArrayList<>();
+        is.add(1);
+        is.add(2);
+        is.add(3);
+        is.add(4);
+        is.add(5);
+        assertEquals("Array of Integer(1,2,3,4,5)", FunctionUtils.toString(is.toArray()));
+
+        Map<String,Integer> m = new TreeMap<>();
+        m.put("Hello", 99);
+        m.put("World", -237);
+        assertEquals("TreeMap(Entry(Hello,99),Entry(World,-237))", FunctionUtils.toString(m));
+    }
 //    @SuppressWarnings("Convert2Lambda")
 //    public static final Predicate<Integer> r = new Predicate<Integer>() {
 //        @Override
@@ -64,88 +83,5 @@ public class FunctionUtilsTest {
 ////        throw new IllegalStateException("Type of p is: " + p.getClass().getCanonicalName());
 ////    }
 
-    @Test
-    public void composePredicatesWithAnd() {
-        assertTrue(FunctionUtils.andArray() == FunctionUtils.accept());
-        assertTrue(FunctionUtils.and(null) == FunctionUtils.accept());
-        assertTrue(FunctionUtils.and(View.emptyView()) == FunctionUtils.accept());
 
-        assertTrue(FunctionUtils.andArray(FunctionUtils.accept()) == FunctionUtils.accept());
-        assertTrue(FunctionUtils.and(View.ofArray(FunctionUtils.accept())) ==
-                   FunctionUtils.accept());
-
-        assertTrue(FunctionUtils.<Object>andArray(FunctionUtils.accept(),
-                                                  FunctionUtils.accept(),
-                                                  FunctionUtils.accept()) ==
-                   FunctionUtils.accept());
-        assertTrue(FunctionUtils.<Object>and(View.ofArray(FunctionUtils.accept(),
-                                                          FunctionUtils.accept(),
-                                                          FunctionUtils.accept())) ==
-                   FunctionUtils.accept());
-
-        assertTrue(FunctionUtils.andArray(FunctionUtils.reject()) == FunctionUtils.reject());
-        assertTrue(FunctionUtils.and(View.ofArray(FunctionUtils.reject())) ==
-                   FunctionUtils.reject());
-    }
-
-    @Test
-    public void composePredicatesWithOr() {
-        assertTrue(FunctionUtils.orArray() == FunctionUtils.reject());
-        assertTrue(FunctionUtils.or(null) == FunctionUtils.reject());
-
-        assertTrue(FunctionUtils.orArray(FunctionUtils.accept()) == FunctionUtils.accept());
-        assertTrue(FunctionUtils.or(View.ofArray(FunctionUtils.accept())) ==
-                   FunctionUtils.accept());
-
-        assertTrue(FunctionUtils.<Object>orArray(FunctionUtils.reject(),
-                                                 FunctionUtils.reject(),
-                                                 FunctionUtils.reject(),
-                                                 FunctionUtils.accept()) ==
-                   FunctionUtils.accept());
-        assertTrue(FunctionUtils.<Object>or(View.ofArray(FunctionUtils.reject(),
-                                                         FunctionUtils.reject(),
-                                                         FunctionUtils.reject(),
-                                                         FunctionUtils.accept())) ==
-                   FunctionUtils.accept());
-
-        assertTrue(FunctionUtils.<Object>orArray(FunctionUtils.accept(),
-                                                 FunctionUtils.reject(),
-                                                 FunctionUtils.reject(),
-                                                 FunctionUtils.reject()) ==
-                   FunctionUtils.accept());
-        assertTrue(FunctionUtils.<Object>or(View.ofArray(FunctionUtils.accept(),
-                                                         FunctionUtils.reject(),
-                                                         FunctionUtils.reject(),
-                                                         FunctionUtils.reject())) ==
-                   FunctionUtils.accept());
-
-        assertTrue(FunctionUtils.orArray(FunctionUtils.reject()) == FunctionUtils.reject());
-        assertTrue(FunctionUtils.or(View.ofArray(FunctionUtils.reject())) ==
-                   FunctionUtils.reject());
-    }
-
-    @Test
-    public void filtersOfPredicates() {
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
-                                  .filter(FunctionUtils.andArray(i -> i > 2,
-                                                                 i -> i < 6))
-                                  .toJavaArrayList()
-                                  .toArray(),
-                          new Integer[] { 3,4,5 });
-
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
-                                  .filter(FunctionUtils.orArray(i -> i < 3,
-                                                                i -> i > 5))
-                                  .toJavaArrayList()
-                                  .toArray(),
-                          new Integer[] { 1,2, 6,7,8,9 });
-
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
-                                  .filter(FunctionUtils.orArray(i -> i < 3,
-                                                                i -> i == 4,
-                                                                i -> i > 5))
-                                  .toJavaArrayList()
-                                  .toArray(),
-                          new Integer[] { 1,2, 4, 6,7,8,9 });
-    }
 }

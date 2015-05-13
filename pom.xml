@@ -3,20 +3,55 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.organicdesign.fp</groupId>
-	<artifactId>fp4java7</artifactId>
-	<version>0.7.4-SNAPSHOT</version>
+	<!--
+To build javadoc:
+javadoc:javadoc
+
+To see updated versions available: http://mojo.codehaus.org/versions-maven-plugin/
+versions:display-dependency-updates
+
+To see third-party licenses: http://mojo.codehaus.org/license-maven-plugin/
+license:add-third-party
+
+pmd:cpd reports on cut and pasted code in your project.
+
+Show the dependency tree:
+http://maven.apache.org/plugins/maven-dependency-plugin/examples/resolving-conflicts-using-the-dependency-tree.html
+dependency:tree
+
+	TODO: Rename to BlochItem15 or MinimizeMutability or IceBox or UnColl JImm (Unmodifiable Collections for Java Immutability)
+    TODO: Really, more like Sequential, or Incremental mutability - different kind of updates.  Consecutive, successional...
+    TODO: Flonium, as in Wonderflonium that Dr. Horrible used for his freeze ray
+	ImmutableJava is not allowed because Java is a registered trademark of Oracle and specifically prohibited from
+	the names of Java-related products.
+	-->
+	<artifactId>J-cicle</artifactId>
+	<version>0.9.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>Functional Programming Tools for Java 8</name>
-	<description>Non-destructive (mutation-free), lazy, (higher order) functional data transformations for Java 8.
-		Allows loop-free functional programming.
-		Additional general purpose functional tools are provided.</description>
-	<url>https://github.com/GlenKPeterson/fp4java7</url>
+	<name>J-cicle</name>
+	<description>Sequential collections for Java (formerly fp4java7).  Instead of changing data in place, a call to
+		a set(x) method returns a new instance with the item added to the collection.  The new instance shares as much
+		data as practical with the old instance.  The three collection implementations are currently taken from Clojure
+		(any bugs are Glen's).  A Sequence abstraction, reminiscent of Clojure's seq is provided as well.
+		A number of helper methods make it easy to use all this in Java, immutably, type-safely, and with good
+		performance.
+	</description>
+	<url>https://github.com/GlenKPeterson/J-cicle</url>
 
 	<licenses>
 		<license>
 			<name>The Apache License, Version 2.0</name>
 			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<comments>The license for most of the files in this
+				project.</comments>
+		</license>
+		<license>
+			<name>Eclipse Public License - v 1.0</name>
+			<url>http://www.eclipse.org/legal/epl-v10.html</url>
+			<comments>For the persistent collections in the
+				collections/ folder. These files are derivative
+				works based on the Clojure source code.</comments>
 		</license>
 	</licenses>
 	<developers>
@@ -34,10 +69,22 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.1</version>
 				<configuration>
+					<!--
+                    I'm favoring the maven.compiler properties over this for now...
+					<compilerVersion>1.8</compilerVersion>
+					<source>1.8</source>
+					<target>1.8</target>
+					 -->
 					<compilerArgs>
 						<arg>-Xlint</arg>
 					</compilerArgs>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<!-- JavaDoc wasn't providing the right links to the Java APIs with the default version of the plugin on my machine. -->
+				<version>2.10.2</version>
 			</plugin>
 		</plugins>
 	</build>
@@ -46,7 +93,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.11</version>
+			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

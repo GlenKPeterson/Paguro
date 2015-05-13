@@ -1,0 +1,54 @@
+<html>
+<body>
+<p>Unmodifiable collection interfaces that extend the java.util collections, plus immutable implementations
+    copied from Clojure.</p>
+
+<h3>Definitions</h3>
+<dl>
+    <dt>Mutable</dt>
+    <dd>This is what we'll call the java.util collections.&#160;
+        They are built on an assumption that you will modify them in-place, rarely if ever making any copies.&#160;
+        This was sensible when they were created in the 1990's when memory was expensive, the
+        garbage collector was in its infancy, and multi-processor systems were rare.&#160;
+        Today, memory is cheap, the garbage collector is one of the wonders of the modern world, and even your phone has several processors.&#160;
+        We have to extend these interfaces for backward compatibility.</dd>
+
+    <dt>Unmodifiable</dt>
+    <dd>This is what the Collections.unmodifiableXxxx() methods return.&#160;
+        They implement the Mutable interfaces, but throw an UnsupportedOperationException when a mutation method is called.&#160;
+        It is a shame that the java.util mutable collection interfaces are not extended from Unmodifiable
+        interfaces having the same "get" methods (readers), but without any "set" methods (modifiers).&#160;
+        It is useful for a function to accept Unmodifiable interfaces in order to say,
+        "I'm not going to modify this" and return Unmodifiable interfaces to say, "You can't modify this."&#160;
+        Since that's not possible, the "Un-" interfaces in this package extend the java.util mutable collections.&#160;
+        All mutator methods are overridden to throw UnsupportedOperationExceptions.&#160;
+        Mutator methods are also deprecated, so your IDE will warn you if you try to use them.&#160;
+        In general, the "Un-" interfaces only take away mutation methods.&#160;
+        They do not add functionality.</dd>
+
+    <dt>Immutable</dt>
+    <dd>This is what the Clojure collections provide.&#160;
+        The collection itself cannot be changed, yet it has "modification" methods that return a new immutable collection reflecting the change
+        while still sharing as much data as possible with the original collection so that these methods are relatively fast and lightweight.&#160;
+        For this to work, each "set" method needs to return a new collection.&#160;
+        Unfortunately, the java.util mutable collections "set" methods all return something else, like a boolean indicating success,
+        or the item you just inserted.&#160;
+        This package works around that limitation by providing modification methods with different names and other
+        helper-methods for expression-oriented functional programming.</dd>
+</dl>
+
+<h3>Description</h3>
+<p>In a perfect world, all the Java APIs and existing code would be magically rewritten to use Immutable (according to the above definition) collections.&#160;
+    Next best would be if java.util would have unmodifiable collections interfaces (UnCollection, UnList, UnSet, UnMap..) at the top of the interface hierarchy.&#160;
+    Those interfaces would have only "get" methods (no "set" methods).&#160;
+    Each of the current java.util collection interfaces would extend the "Un" interfaces to add the "set" methods which could remain unchanged for backwards compatibility.&#160;
+    Immutable "Im" interfaces could then extend the "Un" interfaces without any deprecations or UnsupportedOperationExceptions.</p>
+
+<p>We don't have the perfect hierarchy, but we still want to make it as easy as possible to work with existing Java code.&#160;
+    This package contains Unmodifiable "Un" interfaces which override, deprecate, and implement each of the "set" methods in the java.util collections interfaces.&#160;
+    Each of the "Un" collection interfaces is then extended by an "Im" interface which represents an "Immutable" collection.&#160;
+    The Immutable interfaces further provide new alternative "set" methods which return the "altered" collection, as well as some convenience methods.&#160;
+    Finally, there are various implementations of the Immutable interfaces (currently, they are all copied from Clojure).</p>
+
+</body>
+</html>

@@ -16,7 +16,7 @@ package org.organicdesign.fp.ephemeral;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.function.Function1;
 
 import static org.junit.Assert.assertArrayEquals;
 
@@ -26,31 +26,29 @@ public class ViewTakenWhileTest {
     @Test
     public void takeItemsInOneBatch() {
         assertArrayEquals(View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
-                                  .takeWhile(FunctionUtils.accept()).toArray(),
+                                  .takeWhile(Function1.accept()).toTypedArray(),
                           new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 });
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i < 10).toArray(),
+        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i < 10).toTypedArray(),
                           new Integer[] { 1,2,3,4,5,6,7,8,9 });
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i <= 9).toArray(),
+        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i <= 9).toTypedArray(),
                           new Integer[] { 1,2,3,4,5,6,7,8,9 });
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i <= 8).toArray(),
+        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i <= 8).toTypedArray(),
                           new Integer[] { 1,2,3,4,5,6,7,8 });
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i <= 7).toArray(),
+        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i <= 7).toTypedArray(),
                           new Integer[] { 1,2,3,4,5,6,7 });
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i <= 3).toArray(),
+        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i <= 3).toTypedArray(),
                           new Integer[] { 1,2,3 });
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i <= 2).toArray(),
+        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i <= 2).toTypedArray(),
                           new Integer[] { 1,2 });
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i <= 1).toArray(),
+        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i <= 1).toTypedArray(),
                           new Integer[] { 1 });
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(FunctionUtils.reject())
-                                  .toArray(),
+        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(Function1.reject())
+                                  .toTypedArray(),
                           new Integer[] {  });
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i > 10).toArray(),
+        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(i -> i > 10).toTypedArray(),
                           new Integer[] {  });
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void exception1() {
-        View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(null);
-    }
+    public void exception1() { View.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(null); }
 }

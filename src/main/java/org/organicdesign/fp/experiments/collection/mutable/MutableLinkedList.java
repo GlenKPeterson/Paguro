@@ -59,7 +59,7 @@ public class MutableLinkedList<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public T[] toArray() {
+    public T[] toTypedArray() {
         if (size > Integer.MAX_VALUE) {
             throw new IllegalStateException("Too big to fit in an array");
         }

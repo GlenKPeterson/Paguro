@@ -14,11 +14,12 @@
 
 package org.organicdesign.fp.tuple;
 
+import java.util.Objects;
+
 /**
- Use tuples as immutable, type-safe, data structures instead of defining your own classes (when appropriate).
- Defining your own class is better for building models, but tuples can be more convenient, especially for adapter code.
+ Holds 3 items of potentially different types.
  */
-public class Tuple3<T,U,V> {
+public final class Tuple3<T,U,V> {
     private final T _1;
     private final U _2;
     private final V _3;
@@ -37,46 +38,27 @@ public class Tuple3<T,U,V> {
     public V _3() { return _3; }
 
     @Override
-    public String toString() { return "(" + _1 + "," + _2 + "," + _3 + ")"; }
+    public String toString() { return "Tuple3(" + _1 + "," + _2 + "," + _3 + ")"; }
 
     @Override
     public boolean equals(Object other) {
         // Cheapest operation first...
         if (this == other) { return true; }
-        if ((other == null) ||
-            !(other instanceof Tuple3) ||
-            (this.hashCode() != other.hashCode())) {
-            return false;
-        }
+        if (!(other instanceof Tuple3)) { return false; }
         // Details...
         @SuppressWarnings("rawtypes") final Tuple3 that = (Tuple3) other;
 
-        if (this._1 == null) {
-            if (that._1 != null) { return false; }
-        } else if ( !this._1.equals(that._1) ) {
-            return false;
-        }
-
-        if (this._2 == null) {
-            if (that._2 != null) { return false; }
-        } else if ( !this._2.equals(that._2) ) {
-            return false;
-        }
-
-        if (this._3 == null) {
-            if (that._3 != null) { return false; }
-        } else if ( !this._3.equals(that._3) ) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this._1, that._1()) &&
+               Objects.equals(this._2, that._2()) &&
+               Objects.equals(this._3, that._3());
     }
 
     @Override
     public int hashCode() {
         int ret = 0;
         if (_1 != null) { ret = _1.hashCode(); }
-        if (_2 != null) { ret ^= _2.hashCode(); }
-        if (_3 != null) { ret ^= _3.hashCode(); }
+        if (_2 != null) { ret += _2.hashCode(); }
+        if (_3 != null) { ret += _3.hashCode(); }
         // If it's uninitialized, it's equal to every other uninitialized instance.
         return ret;
     }

@@ -14,30 +14,75 @@
 
 package org.organicdesign.fp.function;
 
+import java.util.function.Supplier;
+
 /**
- This is like Java 8's java.util.function.Producer, but retrofitted to turn checked exceptions
- into unchecked ones.  It's also called a thunk and is used to delay evaluation.
+ This is like Java 8's java.util.function.Supplier, but retrofitted to turn checked exceptions
+ into unchecked ones.  It's also called a thunk when used to delay evaluation.
  */
-public interface Function0<U> {
+@FunctionalInterface
+public interface Function0<U> extends Supplier<U> {
     /** Implement this one method and you don't have to worry about checked exceptions. */
-    U apply() throws Exception;
+    U applyEx() throws Exception;
 
     /**
      The class that takes a consumer as an argument uses this convenience method so that it
      doesn't have to worry about checked exceptions either.
      */
-    default U apply_() {
+    default U apply() {
         try {
-            return apply();
+            return applyEx();
+        } catch (RuntimeException re) {
+            throw re;
         } catch (Exception e) {
-            throw new IllegalStateException(e);
+            throw new RuntimeException(e);
         }
     }
 
+    /** {@inheritDoc} */
+    @Override default U get() { return apply(); }
+
+    // ==================================================== Static ====================================================
     public static final Function0<Object> NULL = new Function0<Object>() {
         @Override
-        public Object apply() throws Exception {
+        public Object applyEx() throws Exception {
             return null;
         }
     };
+
+    /**
+     Wraps a value in a constant function.  If you need to "memoize" some really expensive operation, use it to wrap
+     a LazyRef.
+     */
+    static <K> Function0<K> constantFunction(final K k) {
+        return new Function0<K>() {
+            @Override public K applyEx() {
+                return k;
+            }
+            @Override public int hashCode() { return (k == null) ? 0 : k.hashCode(); }
+            @Override public boolean equals(Object o) {
+                if (this == o) { return true; }
+                if ( (o == null) || !(o instanceof Supplier) ) { return false; }
+                return k.equals(((Supplier) o).get());
+            }
+            @Override public String toString() { return "() -> " + k; };
+        };
+    }
+
+//    /**
+//     Use only on pure functions with no side effects.
+//     In this case, that means a constant function (always returns the same value).
+//     */
+//    static <T> Function0<T> memoize(Function0<T> f) {
+//        return new Function0<T>() {
+//            LazyRef<T> ref = LazyRef.of(() -> f.apply());
+//            @Override public T applyEx() throws Exception {
+//                return ref.get();
+//            }
+//        };
+//    }
+// Don't think this is necessary.  Is it?
+//    default Supplier<U> asSupplier() {
+//        return () -> apply();
+//    }
 }

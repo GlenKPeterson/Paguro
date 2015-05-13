@@ -16,7 +16,9 @@ package org.organicdesign.fp.permanent;
 
 import java.util.Iterator;
 
+import org.organicdesign.fp.LazyRef;
 import org.organicdesign.fp.Option;
+import org.organicdesign.fp.tuple.Tuple2;
 
 /**
  If you use the source iterator after passing it to this class then the behavior of this class
@@ -29,12 +31,13 @@ import org.organicdesign.fp.Option;
  object will present and immutable, lazy, memoized, thread-safe view of the underlying iterator.
  */
 class SequenceFromIterator<T> implements Sequence<T> {
+    private final LazyRef<Tuple2<Option<T>,Sequence<T>>> laz;
 
-    private final Iterator<T> iter;
-    private Option<T> first = null;
-    private Sequence<T> rest;
-
-    private SequenceFromIterator(Iterator<T> i) { iter = i; }
+    SequenceFromIterator(Iterator<T> iter) {
+        laz = LazyRef.of(() -> iter.hasNext()
+                                ? Tuple2.of(Option.of(iter.next()), new SequenceFromIterator<>(iter))
+                                : Sequence.emptySeqTuple());
+    }
 
     public static <T> Sequence<T> of(Iterator<T> i) {
         if (i == null) { return Sequence.emptySequence(); }
@@ -43,31 +46,24 @@ class SequenceFromIterator<T> implements Sequence<T> {
 
     public static <T> Sequence<T> of(Iterable<T> i) {
         if (i == null) { return Sequence.emptySequence(); }
-        Iterator<T> iiter = i.iterator();
-        if (iiter == null) { return Sequence.emptySequence(); }
-        return new SequenceFromIterator<>(iiter);
+        Iterator<T> iter = i.iterator();
+        if (iter == null) { return Sequence.emptySequence(); }
+        return new SequenceFromIterator<>(iter);
     }
 
-    private synchronized void init() {
-        if (first == null) {
-            if (iter.hasNext()) {
-                first = Option.of(iter.next());
-                rest = of(iter);
-            } else {
-                first = Option.none();
-                rest = Sequence.emptySequence();
-            }
-        }
-    }
+    @Override public Option<T> head() { return laz.get()._1(); }
 
-    @Override
-    public Option<T> first() {
-        init();
-        return first;
-    }
-    @Override
-    public Sequence<T> rest() {
-        init();
-        return rest;
-    }
+    @Override public Sequence<T> tail() { return laz.get()._2(); }
+
+//    @Override public int hashCode() { return Sequence.hashCode(this); }
+//
+//    @Override public boolean equals(Object o) {
+//        if (this == o) { return true; }
+//        if ( (o == null) || !(o instanceof Sequence) ) { return false; }
+//        return Sequence.equals(this, (Sequence) o);
+//    }
+//
+//    @Override public String toString() {
+//        return "SequenceFromIterator(" + (laz.isRealizedYet() ? laz.get()._1() : "*lazy*") + ",...)";
+//    }
 }

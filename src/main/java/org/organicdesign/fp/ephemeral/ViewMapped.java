@@ -14,22 +14,20 @@
 
 package org.organicdesign.fp.ephemeral;
 
-import java.util.function.Function;
-
-import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.Option;
+import org.organicdesign.fp.function.Function1;
 
 class ViewMapped<T,U> implements View<U> {
     private final View<T> view;
-    private final Function<T,U> func;
+    private final Function1<? super T,? extends U> func;
 
-    ViewMapped(View<T> v, Function<T,U> f) { view = v; func = f; }
+    ViewMapped(View<T> v, Function1<? super T,? extends U> f) { view = v; func = f; }
 
     @SuppressWarnings("unchecked")
-    public static <T,U> View<U> of(View<T> v, Function<T,U> f) {
+    public static <T,U> View<U> of(View<T> v, Function1<? super T,? extends U> f) {
         // You can put nulls in, but you don't get nulls out.
         if (f == null) { return View.emptyView(); }
-        if (f == FunctionUtils.IDENTITY) { return (View<U>) v; }
+        if (f == Function1.IDENTITY) { return (View<U>) v; }
         if ( (v == null) || (v == EMPTY_VIEW) ) { return View.emptyView(); }
         return new ViewMapped<>(v, f);
     }

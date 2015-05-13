@@ -14,58 +14,52 @@
 
 package org.organicdesign.fp.permanent;
 
-import java.util.function.Predicate;
-
-import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.LazyRef;
 import org.organicdesign.fp.Option;
+import org.organicdesign.fp.function.Function1;
+import org.organicdesign.fp.tuple.Tuple2;
 
 public class SequenceFiltered<T> implements Sequence<T> {
-    private Sequence<T> seq;
-    private final Predicate<T> predicate;
-    private Option<T> first = null;
+    private final LazyRef<Tuple2<Option<T>,Sequence<T>>> laz;
 
-    private SequenceFiltered(Sequence<T> s, Predicate<T> f) { seq = s; predicate = f; }
+    SequenceFiltered(Sequence<T> s, Function1<? super T,Boolean> predicate) {
+        laz = LazyRef.of(() -> {
+            Sequence<T> seq = s;
+            Option<T> item = seq.head();
+            while (item.isSome()) {
+                if (predicate.apply(item.get())) {
+                    return Tuple2.of(item, new SequenceFiltered<>(seq.tail(), predicate));
+                }
+                // If we didn't find one, repeat with next element
+                seq = seq.tail();
+                item = seq.head();
+            }
+            return Sequence.emptySeqTuple();
+        });
+    }
 
-    public static <T> Sequence<T> of(Sequence<T> s, Predicate<T> f) {
+    public static <T> Sequence<T> of(Sequence<T> s, Function1<? super T,Boolean> f) {
         if (f == null) { throw new IllegalArgumentException("Must provide a predicate"); }
-        if (f == FunctionUtils.REJECT) { return Sequence.emptySequence(); }
-        if (f == FunctionUtils.ACCEPT) { return s; }
-        if ( (s == null) || (s == EMPTY_SEQUENCE) ) { return Sequence.emptySequence(); }
+        if ( (f == Function1.REJECT) || (s == null) || (EMPTY_SEQUENCE == s) ) { return Sequence.emptySequence(); }
+        if (f == Function1.ACCEPT) { return s; }
         return new SequenceFiltered<>(s, f);
     }
 
-    private synchronized void init() {
-        if (first == null) {
-            while (seq != EMPTY_SEQUENCE) {
-                Option<T> item = seq.first();
-                if (!item.isSome()) {
-                    break;
-                }
-
-                if (predicate.test(item.get())) {
-                    first = item;
-                    seq = of(seq.rest(), predicate);
-                    return;
-                }
-
-                // If we didn't find one, repeat with next element
-                seq = seq.rest();
-            }
-            first = Option.none();
-            seq = Sequence.emptySequence();
-        }
-    }
+    @Override
+    public Option<T> head() { return laz.get()._1(); }
 
     @Override
-    public Option<T> first() {
-        init();
-        return first;
-    }
+    public Sequence<T> tail() { return laz.get()._2(); }
 
-    @Override
-    public Sequence<T> rest() {
-        init();
-        // if initialized, seq has been replaced with the appropriate filtered sequence.
-        return seq;
-    }
+//    @Override public int hashCode() { return Sequence.hashCode(this); }
+//
+//    @Override public boolean equals(Object o) {
+//        if (this == o) { return true; }
+//        if ( (o == null) || !(o instanceof Sequence) ) { return false; }
+//        return Sequence.equals(this, (Sequence) o);
+//    }
+//
+//    @Override public String toString() {
+//        return "SequenceFiltered(" + (laz.isRealizedYet() ? laz.get()._1() : "*lazy*") + ",...)";
+//    }
 }

@@ -22,27 +22,31 @@ import java.util.function.Supplier;
  Supplier could implement SideEffect so that they could be used more interchangeably, but
  Java inheritence prohibits overriding methods with the same arguments and different return types.
  So we have an asSupplier() convenience method built in.
+ This is deprecated because it just doesn't seem like a good idea.  You can return null from a Function0.
  */
+@Deprecated
 @FunctionalInterface
 public interface SideEffect {
 
     /** Implement this one method and you don't have to worry about checked exceptions. */
-    void apply() throws Exception;
+    void applyEx() throws Exception;
 
     /** The caller should use this convenience method to avoid checked exceptions. */
-    default void apply_() {
+    default void apply() {
         try {
-            apply();
+            applyEx();
+        } catch (RuntimeException re) {
+            throw re;
         } catch (Exception e) {
-            throw (RuntimeException) e;
+            throw new RuntimeException(e);
         }
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "deprecation"})
     default <T> Supplier<T> asSupplier() {
         final SideEffect parent = this;
         return () -> {
-            parent.apply_();
+            parent.apply();
             return (T) null;
         };
     }

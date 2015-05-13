@@ -13,44 +13,43 @@
 
 package org.organicdesign.fp.ephemeral;
 
-import java.util.function.Function;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.function.Function1;
 
 import static org.junit.Assert.assertArrayEquals;
 
 @RunWith(JUnit4.class)
 public class ViewMappedTest {
 
-    private static final Function<Integer,Integer> plusOne = x -> x + 1;
-    private static final Function<Integer,Integer> minusOne = x -> x - 1;
+    private static final Function1<Integer,Integer> plusOne = x -> x + 1;
+    private static final Function1<Integer,Integer> minusOne = x -> x - 1;
 
     @Test
     public void mapInOneBatch() {
         assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
-                                  .map(FunctionUtils.identity()).toArray(),
+                                  .map(Function1.identity()).toTypedArray(),
                           new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 });
 
         assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
-                                  .map(plusOne).toArray(),
+                                  .map(plusOne).toTypedArray(),
                           new Integer[] { 2,3,4,5,6,7,8,9,10 });
         assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
-                                  .map(minusOne).toArray(),
+                                  .map(minusOne).toTypedArray(),
                           new Integer[] { 0,1,2,3,4,5,6,7,8 });
 
         assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
-                                  .map(plusOne).map(minusOne).toArray(),
+                                  .map(plusOne).map(minusOne).toTypedArray(),
                           new Integer[] { 1,2,3,4,5,6,7,8,9 });
 
         assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
-                                  .map(minusOne).map(plusOne).toArray(),
+                                  .map(minusOne).map(plusOne).toTypedArray(),
                           new Integer[] { 1,2,3,4,5,6,7,8,9 });
 
         assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
-                                  .map(plusOne).map(plusOne).toArray(),
+                                  .map(plusOne).map(plusOne).toTypedArray(),
                           new Integer[] { 3,4,5,6,7,8,9,10,11 });
 
     }
@@ -60,14 +59,14 @@ public class ViewMappedTest {
         assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
                                   .map(plusOne).map(plusOne).map(plusOne).map(plusOne).map(plusOne)
                                   .map(plusOne).map(plusOne).map(plusOne).map(plusOne).map(plusOne)
-                                  .toArray(),
+                                  .toTypedArray(),
                           new Integer[] { 11,12,13,14,15,16,17,18,19 });
 
         assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
                                   .map(minusOne).map(minusOne).map(minusOne).map(minusOne)
                                   .map(minusOne).map(minusOne).map(minusOne).map(minusOne)
                                   .map(minusOne).map(minusOne)
-                                  .toArray(),
+                                  .toTypedArray(),
                           new Integer[] { -9,-8,-7,-6,-5,-4,-3,-2,-1 });
 
     }

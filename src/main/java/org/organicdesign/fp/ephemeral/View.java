@@ -15,40 +15,30 @@
 package org.organicdesign.fp.ephemeral;
 
 import java.util.Iterator;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.Transformable;
+import org.organicdesign.fp.collections.UnIterator;
+import org.organicdesign.fp.function.Function1;
+import org.organicdesign.fp.function.Function2;
 
 /**
  A lightweight, one-time view that lazy, thread-safe operations can be built from.  Because there
  is no caching/memoization, this may be useful for data sources that do not fit in memory.
- @param <T>
  */
 
 public interface View<T> extends Transformable<T> {
-    public static final View<?> EMPTY_VIEW = Option::none;
+    static final View<?> EMPTY_VIEW = Option::none;
 
     @SuppressWarnings("unchecked")
-    public static <U> View<U> emptyView() {
-        return (View<U>) EMPTY_VIEW;
-    }
+    static <U> View<U> emptyView() { return (View<U>) EMPTY_VIEW; }
 
-    public static <T> View<T> of(Iterator<T> i) {
-        return ViewFromIterator.of(i);
-    }
+    static <T> View<T> of(Iterator<T> i) { return ViewFromIterator.of(i); }
 
-    public static <T> View<T> of(Iterable<T> i) {
-        return ViewFromIterator.of(i);
-    }
+    static <T> View<T> of(Iterable<T> i) { return ViewFromIterator.of(i); }
 
     @SafeVarargs
-    public static <T> View<T> ofArray(T... i) {
-        return ViewFromArray.of(i);
-    }
+    static <T> View<T> ofArray(T... i) { return ViewFromArray.of(i); }
 
     /**
       This is the distinguishing method of the view interface.
@@ -57,40 +47,38 @@ public interface View<T> extends Transformable<T> {
     Option<T> next();
 
     @Override
-    default <U> View<U> map(Function<T,U> func) {
-        return ViewMapped.of(this, func);
-    }
+    default <U> View<U> map(Function1<? super T,? extends U> func) { return ViewMapped.of(this, func); }
 
     @Override
-    default View<T> filter(Predicate<T> pred) {
-        return ViewFiltered.of(this, pred);
-    }
+    default View<T> filter(Function1<? super T,Boolean> pred) { return ViewFiltered.of(this, pred); }
 
+    /** Returning an unmodified view is impossible here - just returns null. */
     @Override
-    default void forEach(Consumer<T> se) {
+    default View<T> forEach(Function1<? super T,?> consumer) {
         Option<T> item = next();
         while (item.isSome()) {
-            se.accept(item.get());
-            item = next();
-        }
-    }
-
-    /**
-     Deprecated: use filter(...).take(1) instead.
-     */
-    @Override
-    @Deprecated
-    default Option<T> firstMatching(Predicate<T> pred) {
-        Option<T> item = next();
-        while (item.isSome()) {
-            if (pred.test(item.get())) { return item; }
+            consumer.apply(item.get());
             item = next();
         }
         return null;
     }
 
+//    /**
+//     Deprecated: use filter(...).head() instead.
+//     */
+//    @Override
+//    @Deprecated
+//    default Option<T> firstMatching(Predicate<T> pred) {
+//        Option<T> item = next();
+//        while (item.isSome()) {
+//            if (pred.test(item.get())) { return item; }
+//            item = next();
+//        }
+//        return null;
+//    }
+
     @Override
-    default <U> U foldLeft(U u, BiFunction<U, T, U> fun) {
+    default <U> U foldLeft(U u, Function2<U,? super T,U> fun) {
         Option<T> item = next();
         while (item.isSome()) {
             u = fun.apply(u, item.get());
@@ -100,11 +88,11 @@ public interface View<T> extends Transformable<T> {
     }
 
     @Override
-    default <U> U foldLeft(U u, BiFunction<U, T, U> fun, Predicate<U> terminateWith) {
+    default <U> U foldLeft(U u, Function2<U,? super T,U> fun, Function1<? super U,Boolean> terminateWhen) {
         Option<T> item = next();
         while (item.isSome()) {
             u = fun.apply(u, item.get());
-            if (terminateWith.test(u)) {
+            if (terminateWhen.apply(u)) {
                 return u;
             }
             item = next();
@@ -116,7 +104,7 @@ public interface View<T> extends Transformable<T> {
 //                           BiFunction<U, T, Tuple2<U,Boolean>> fun) {
 //        Option<T> item = next();
 //        while (item.isSome()) {
-//            u = fun.apply(u._1(), item.get());
+//            u = fun.applyEx(u._1(), item.get());
 //            if (u._2()) {
 //                return u._1();
 //            }
@@ -131,7 +119,7 @@ public interface View<T> extends Transformable<T> {
 //        T accum = item;
 //        while (item != None()) {
 //            item = next();
-//            accum = fun.apply_(accum, item);
+//            accum = fun.apply(accum, item);
 //        }
 //        return accum;
 //    }
@@ -143,23 +131,16 @@ public interface View<T> extends Transformable<T> {
      @param numItems the maximum number of items in the returned view.
      @return a lazy view containing no more than the specified number of items.
      */
-    default View<T> take(long numItems) { return ViewTaken.of(this, numItems); }
+    @Override default View<T> take(long numItems) { return ViewTaken.of(this, numItems); }
 
-    @Override
-    default View<T> takeWhile(Predicate<T> p) { return ViewTakenWhile.of(this, p); }
+    @Override default View<T> takeWhile(Function1<? super T,Boolean> predicate) {
+        return ViewTakenWhile.of(this, predicate);
+    }
 
     // default View<T> takeUntilInclusive(Predicate<T> p) { return ViewTakenUntilIncl.of(this, p); }
 
-    /**
-     Note that all dropped items will be evaluated as they are dropped.  Any side effects
-     (including delays) caused by evaluating these items will be incurred.  For this reason,
-     you should always drop as early in your chain of functions as practical.
-     @param numItems the number of items at the beginning of this view to ignore
-     @return a lazy view with the specified number of items ignored.
-     */
-    default View<T> drop(long numItems) {
-        return ViewDropped.of(this, numItems);
-    }
+    /** {@inheritDoc} */
+    @Override default View<T> drop(long numItems) { return ViewDropped.of(this, numItems); }
 
     // I don't see how I can legally declare this on Transformable!
     /**
@@ -170,15 +151,28 @@ public interface View<T> extends Transformable<T> {
      return is smaller, use filter followed by map if possible, or vice versa if not.
      @param func yields a Transformable of 0 or more results for each input item.
      */
-    default <U> View<U> flatMap(Function<T,View<U>> func) {
-        return ViewFlatMapped.of(this, func);
-    }
+    default <U> View<U> flatMap(Function1<? super T,View<U>> func) { return ViewFlatMapped.of(this, func); }
 
-    default View<T> append(View<T> pv) {
-        return ViewPrepended.of(pv, this);
-    }
+    /** Add the given View after the end of this one. */
+    default View<T> append(View<T> pv) { return ViewPrepended.of(pv, this); }
 
-    default View<T> prepend(View<T> pv) {
-        return ViewPrepended.of(this, pv);
+    /** Add the given View before the beginning of this one. */
+    default View<T> prepend(View<T> pv) { return ViewPrepended.of(this, pv); }
+
+    @Override default UnIterator<T> iterator() {
+        final View<T> v = this;
+        // Maybe not so performant, but gives a chance to see if this is even a useful method.
+        return new UnIterator<T>() {
+            private View<T> inner = v;
+            private Option<T> next = v.next();
+
+            @Override public boolean hasNext() { return next.isSome(); }
+
+            @Override public T next() {
+                Option<T> old = next;
+                next = inner.next();
+                return old.getOrElse(null);
+            }
+        };
     }
 }

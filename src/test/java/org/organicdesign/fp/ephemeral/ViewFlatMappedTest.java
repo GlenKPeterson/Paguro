@@ -31,17 +31,17 @@ public class ViewFlatMappedTest {
                      View.EMPTY_VIEW);
 
         assertArrayEquals(View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
-                                  .flatMap(null).toArray(),
+                                  .flatMap(null).toTypedArray(),
                           new Integer[] {});
 
         assertArrayEquals(View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
-                                  .flatMap(i -> View.ofArray(i, i * 2, i * 3)).toArray(),
+                                  .flatMap(i -> View.ofArray(i, i * 2, i * 3)).toTypedArray(),
                           new Integer[] { 1,2,3, 2,4,6, 3,6,9, 4,8,12, 5,10,15, 6,12,18,
                                           7,14,21, 8,16,24, 9,18,27});
 
         assertArrayEquals(View.ofArray(1, 2, 3)
                                   .flatMap(i -> View.ofArray(String.valueOf(i),
-                                                             String.valueOf(i + 1))).toArray(),
+                                                             String.valueOf(i + 1))).toTypedArray(),
                           new String[] { "1","2", "2","3", "3","4"});
 
     }
@@ -56,13 +56,13 @@ public class ViewFlatMappedTest {
                      View.EMPTY_VIEW);
 
         assertArrayEquals(View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
-                                  .flatMap(null).flatMap(null).flatMap(null).toArray(),
+                                  .flatMap(null).flatMap(null).flatMap(null).toTypedArray(),
                           new Integer[] {});
 
         assertArrayEquals(View.ofArray(1, 10)
                                   .flatMap(i -> View.ofArray(i, i * 2, i * 3))
                                   .flatMap(i -> View.ofArray(i, i + 1))
-                                  .toArray(),
+                                  .toTypedArray(),
                           new Integer[] { 1,2, 2,3, 3,4, 10,11, 20,21, 30,31});
     }
 }
