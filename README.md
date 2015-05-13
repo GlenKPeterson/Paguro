@@ -3,7 +3,9 @@ a Sequence abstraction, memoization, and some syntactical sugar to Java.
 Fluent interfaces encourage you to write expressions (that evaluate) instead of statements (that produce void).
 It pushes Java toward Clojure, but keeps the type saftey, objects, classes, and C-like syntax that Java programmers are accustomed to.
 
-*** Caution: Pre-alpha quality. ***
+*** Caution: Alpha quality. ***
+But test coverage is high:
+![Test Coverage](testCoverage.png)
 
 #Usage
 Create an immutable, type safe map:
