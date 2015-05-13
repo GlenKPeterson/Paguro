@@ -24,7 +24,7 @@ Map<String,Integer> itemMap = PersistentMapSorted.ofSkipNull(
         showThird ? Tuple2.of("Three", 3) : null);
 ```
 
-Similar type-safe methods are available for producing unmodifiable Sets and Lists of any length (unMaps currently go
+Similar type-safe methods are available for producing [unmodifiable Sets and Lists of any length](src/main/java/org/organicdesign/fp/StaticImports.java#L180) (unMaps currently go
 from 0 to 10 type-safe keys and values, or an infinite number of Map.Entries or Tuples).
 
 What if you want to add another item to an immutable map?
