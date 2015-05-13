@@ -1,14 +1,14 @@
-J-cicle (pronounced "Jay-sick-ul" like a frozen/immutable Java&trade;-icicle) brings Clojure collections, a Sequence abstraction, memoization, and some syntactical sugar to Java.  Fluent interfaces encourage you to write expressions (that evaluate) instead of statements (that produce void).  It pushes Java toward Clojure, but keeps the type saftey, objects, classes, and C-like syntax that Java programmers are accustomed to.
+J-cicle (pronounced "Jay-sick-ul" like a frozen/immutable Java&trade;-icicle) brings Clojure collections,
+a Sequence abstraction, memoization, and some syntactical sugar to Java.
+Fluent interfaces encourage you to write expressions (that evaluate) instead of statements (that produce void).
+It pushes Java toward Clojure, but keeps the type saftey, objects, classes, and C-like syntax that Java programmers are accustomed to.
 
 *** Caution: Pre-alpha quality. ***
 
 #Usage
-How hard is it to create an immutable, type safe map in Java?  Are you tired of writing code like this:
-http://glenpeterson.blogspot.com/2013/07/immutable-java-with-lists-and-other.html
-
-Like Guava, J-cicle cuts through the boilerplate:
+Create an immutable, type safe map:
 ```java
-Map<String,Integer> itemMap = uMap(
+Map<String,Integer> itemMap = PersistentMapSorted.of(
         "One", 1,
         "Two", 2,
         "Three", 3);
@@ -18,39 +18,35 @@ What if you want to add items conditionally?  Would you create a temporary, muta
 the mutable map, then call Collections.unmodifiableMap(tempMap) on it?  Ouch!  The following will create an
 UnmodifiableMap of 0, 1, 2, or 3 items (no nulls) depending on the values of showFirst, showSecond, and showThird:
 ```java
-Map<String,Integer> itemMap = unMapSkipNull(
+Map<String,Integer> itemMap = PersistentMapSorted.ofSkipNull(
         showFirst ? Tuple2.of("One", 1) : null,
         showSecond ? Tuple2.of("Two", 2) : null,
         showThird ? Tuple2.of("Three", 3) : null);
 ```
 
 Similar type-safe methods are available for producing unmodifiable Sets and Lists of any length (unMaps currently go
-from 0 to 10 type-safe parameters, or an infinite number of Map.Entries or Tuples).
+from 0 to 10 type-safe keys and values, or an infinite number of Map.Entries or Tuples).
 
 What if you want to add another item to an immutable map?
 
 ```java
-Map<String,Integer> itemMap = iMap(
-        "One", 1,
-        "Two", 2,
-        "Three", 3).assoc("Four", 4);
+itemMap = itemMap.assoc("Four", 4);
 ```
 
 What about transforming your unmodifiable data into other unmodifiable data?  Lazily, without any extra processing?
 Typical usage (based on this unit test: <a href="https://github.com/GlenKPeterson/fp4java7/blob/master/src/test/java/org/organicdesign/fp/persistent/SequenceTest.java">SequenceTest.java</a>):
 
 ```java
-List<Integer> list = Sequence.ofArray(4,5) //       4,5
-        .prepend(Sequence.ofArray(1,2,3))  // 1,2,3,4,5
-        .append(Sequence.ofArray(6,7,8,9)) // 1,2,3,4,5,6,7,8,9
-        .filter(i -> i > 4)            //         5,6,7,8,9
-        .map(i -> i - 2)               //     3,4,5,6,7
-        .take(5)                       //     3,4,5,6
-        .drop(2)                       //         5,6
-        .toJavaUnmodList();
+ImList<Integer> list = Sequence.ofArray(4,5)//       4,5
+        .prepend(Sequence.ofArray(1,2,3))   // 1,2,3,4,5
+        .append(Sequence.ofArray(6,7,8,9))  // 1,2,3,4,5,6,7,8,9
+        .filter(i -> i > 4)                 //         5,6,7,8,9
+        .map(i -> i - 2)                    //     3,4,5,6,7
+        .take(5)                            //     3,4,5,6
+        .drop(2)                            //         5,6
+        .toImList();
 
-FunctionUtils.toString(list);
-// Returns: "UnmodifiableRandomAccessList(4,5,6)"
+list.toString(); // Returns: "PersistentVector(4,5,6)"
 ```
 These transformations do not change the underlying data.  They build a new collection by chaining together all the
 operations you specify, then lazily applying them in a single pass.  The laziness is
@@ -65,23 +61,37 @@ The goals of this project are to make it easy to use Java:
  - Immutably (Josh Bloch Item 15)
  - Type safely (Josh Bloch Item 23)
  - Functionally (using first-class functions more easily)
+ - Expressively/Briefly (Expressions over statements: all API calls evaluate to something useful for subsequent calls).
  - Minimizing the use of primitives and arrays (except for varargs, Suggested by Josh Bloch Items 23, 25, 26, 27, 28, 29)
- - Briefly
  - Returning empty collections instead of <code>null</code> (Josh Bloch Item 43)
  - "Throw exceptions at people, not at code" (says Bill Venners, but also Josh Bloch Item 59)
  - Concurrency friendly (Josh Bloch Item 66, 67)
  - Context-sensitive equality: prefer Comparators to <code>equals()</code>, <code>hashcode()</code> and <code>compareTo()</code> (Daniel Spiewak, Viktor Klang, Rúnar Óli Bjarnason, Hughes Chabot, java.util.TreeSet, java.util.TreeMap)
  - Compatibly with existing/legacy Java code
 
-Higher order functions are not just briefer to write and read, they are less to *think* about.  They are useful abstractions that simplify your code and focus your attention on your goals rather than the details of how to accomplish them.  Function chaining: <code>xs.map(x -> x + 1).filter(x -> x > 7).head()</code> defines what you are doing and how you are doing it in the simplest possible way, hiding all details about how to iterate through the underlying collection.
+Higher order functions are not just briefer to write and read, they are less to *think* about.
+They are useful abstractions that simplify your code and focus your attention on your goals rather than the details of how to accomplish them.
+Function chaining: <code>xs.map(x -> x + 1).filter(x -> x > 7).head()</code> defines what you are doing and how you are doing it in the simplest possible way, hiding all details about how to iterate through the underlying collection.
 
-The alternative - loops - are bundles of unnecessary complexity.  Loops generally require setting up accumulators, then running a gamut of <code>if</code>, <code>break</code>, and <code>continue</code> statements, like some kind of mad obstacle race that involves as many state changes as possible.  Different kinds of collections require different looping constructs - more complexity.  Looping code is vulnerable to "off-by-one" boundary overflow/underflow, improper initialization, accidental exit, infinite loops, forgetting to update a counter, updating the wrong counter...  The list goes on!  None of that has anything to do with why the loop was created in the first place which is to transform the underlying data.
+The alternative - loops - are bundles of unnecessary complexity.
+Loops generally require setting up accumulators, then running a gamut of <code>if</code>, <code>break</code>, and <code>continue</code> statements, like some kind of mad obstacle race that involves as many state changes as possible.
+Different kinds of collections require different looping constructs - more complexity.
+Looping code is vulnerable to "off-by-one" boundary overflow/underflow, improper initialization, accidental exit, infinite loops, forgetting to update a counter, updating the wrong counter...  The list goes on!
+None of that has anything to do with why the loop was created in the first place which is to transform the underlying data.
 
-You don't have to write that kind of code any more.  If you want to map one set of values according to a given function, say so with xs.map().  Filter?  xs.filter().  It's clearer, simpler, and like type safety, it eliminates whole classes of errors.
+You don't have to write that kind of code any more.
+If you want to map one set of values according to a given function, say so with xs.map().
+Filter?  xs.filter().
+It's clearer, simpler, and like type safety, it eliminates whole classes of errors.
 
-No data is changed when using the transformers in this project.  They allow you to write nearly stateless programs whose statements chain together and evaluate into a useful result.  Clojure works like this, only the syntax makes the evaluation go inside out from the order you read the statements in (hence Clojure's two arrow operators).  With method chaining, the evaluation happens in the same order as the methods are written on the page, much like piping commands to one another in shell scripts.
+No data is changed when using the permanent transformers in this project.
+They allow you to write nearly elegant programs whose function calls chain together and evaluate into a useful result.
+Clojure works like this, only the syntax makes the evaluation go inside out from the order you read the statements in (hence Clojure's two arrow operators).
+With method chaining, the evaluation happens in the same order as the methods are written on the page, much like piping commands to one another in shell scripts.
 
-Incremental evaluation prevents some items from being evaluated to produce the results you need which is sometimes more efficient than traditional whole-collection transforms.  There may be cases where a well hand-written loop will be faster, but in general, the overhead for using these transformations is minimal and, I believe, well worth the clarity, safety, and productivity benefits they provide.  If you find a better/faster implementation, please submit your improvements!
+Incremental evaluation prevents some items from being evaluated to produce the results you need which is sometimes more efficient than traditional whole-collection transforms.
+There may be cases where a well hand-written loop will be faster, but in general, the overhead for using these transformations is minimal and, I believe, well worth the clarity, safety, and productivity benefits they provide.
+If you find a better/faster implementation, please submit your improvements!
 
 #API
 
@@ -129,20 +139,41 @@ Sequence<U> flatMap(Function<T,Sequence<U>> func)
 ```
 ###Endpoints
 ```java
-ArrayList<T> toJavaArrayList()
-List<T> toJavaUnmodList()
-HashMap<T,U> toJavaHashMap(Function<T,U> f1)
-Map<T,U> toJavaUnmodMap(Function<T,U> f1)
-HashMap<U,T> toReverseJavaHashMap(Function<T,U> f1)
-Map<U,T> toReverseJavaUnmodMap(Function<T,U> f1)
-TreeSet<T> toJavaTreeSet(Comparator<? super T> comparator)
-SortedSet<T> toJavaUnmodSortedSet(Comparator<? super T> comparator)
-TreeSet<T> toJavaTreeSet()
-SortedSet<T> toJavaUnmodSortedSet()
-HashSet<T> toJavaHashSet()
-Set<T> toJavaUnmodSet()
-T[] toTypedArray()
-Iterator<T> toIterator()
+// A one-time use, not-thread-safe way to get each value of this Realizable in turn.
+UnIterator<T> iterator()
+
+// The contents of this Realizable as a thread-safe immutable list.
+ImList<T> toImList()
+
+// The contents of this Realizable as an thread-safe, immutable, sorted (tree) map.
+<U,V> ImMapSorted<U,V>	toImMapSorted(Comparator<? super U> comp, Function1<? super T,Map.Entry<U,V>> f1)
+
+// The contents of this Realizable presented as an immutable, sorted (tree) set.
+ImSetSorted<T>	toImSetSorted(Comparator<? super T> comp)
+
+// The contents copied to a mutable list.
+List<T>	toJavaList()
+
+// Returns the contents of this Realizable copied to a mutable hash map.
+<U,V> Map<U,V>	toJavaMap(Function1<? super T,Map.Entry<U,V>> f1)
+
+// Returns the contents of this Realizable copied to a mutable tree map.
+<U,V> SortedMap<U,V>	toJavaMapSorted(Function1<? super T,Map.Entry<U,V>> f1)
+
+// Returns the contents of this Realizable copied to a mutable hash set.
+Set<T>	toJavaSet()
+
+// Returns the contents of this Realizable copied to a mutable tree set.
+SortedSet<T>	toJavaSetSorted(Comparator<? super T> comp)
+
+// Returns a type-safe version of toArray() that doesn't require that you pass an array of the proper type and size.
+default T[]	toTypedArray()
+
+// This method will be replaced with toImMap() once a PersistentHashMap is added to this project.
+default <U,V> UnMap<U,V>	toUnMap(Function1<? super T,Map.Entry<U,V>> f1)
+
+// This method will be replaced with toImSet() once a PersistentHashMap is added to this project.
+default UnSet<T>	toUnSet()
 ```
 #Learn
 
@@ -178,7 +209,7 @@ In short, Clojure doesn't have static types.  Scala has an TMTOWTDI attitude tha
 - As of 2014-03-08, all major areas of functionality were covered by unit tests.
 
 #Change Log
-In progress: Release 0.9 alpha which packages type-safe versions of the Clojure collections and sequence abstraction for Java.
+2015-05-13 Release 0.9 alpha which packages type-safe versions of the Clojure collections and sequence abstraction for Java.
 - 3 Immutable collections: Vector, SetOrdered, and MapOrdered.  None of these use equals or hashcode.
 Vector doesn't need to and Map and Set take a Comparator.
 - Un-collections which are the Java collection interfaces, only unmodifiable, with mutator methods deprecated and

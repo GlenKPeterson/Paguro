@@ -26,7 +26,7 @@ dependency:tree
 	the names of Java-related products.
 	-->
 	<artifactId>J-cicle</artifactId>
-	<version>0.8.2-SNAPSHOT</version>
+	<version>0.9.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>J-cicle</name>
