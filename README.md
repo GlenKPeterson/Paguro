@@ -62,7 +62,7 @@ The goals of this project are to make it easy to use Java:
  - Immutably (Josh Bloch Item 15)
  - Type safely (Josh Bloch Item 23)
  - Functionally (using first-class functions more easily)
- - Expressively/Briefly (Expressions over statements: all API calls evaluate to something useful for subsequent calls).
+ - Expressiveness/Brevity (Expressions over statements: all API calls evaluate to something useful for subsequent calls).
  - Minimizing the use of primitives and arrays (except for varargs, Suggested by Josh Bloch Items 23, 25, 26, 27, 28, 29)
  - Returning empty collections instead of <code>null</code> (Josh Bloch Item 43)
  - "Throw exceptions at people, not at code" (says Bill Venners, but also Josh Bloch Item 59)
