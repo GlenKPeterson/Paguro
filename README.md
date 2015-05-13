@@ -34,7 +34,7 @@ itemMap = itemMap.assoc("Four", 4);
 ```
 
 What about transforming your unmodifiable data into other unmodifiable data?  Lazily, without any extra processing?
-Typical usage (based on this unit test: [SequenceTest.java](src/test/java/org/organicdesign/fp/persistent/SequenceTest.java)):
+Typical usage (based on this unit test: [SequenceTest.java](src/test/java/org/organicdesign/fp/permanent/SequenceTest.java)):
 
 ```java
 ImList<Integer> list = Sequence.ofArray(4,5)//       4,5
