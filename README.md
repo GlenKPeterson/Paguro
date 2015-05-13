@@ -254,22 +254,8 @@ Added unit tests for the above.
  safe if the producer and the values it produces are free from outside influences.
 
 #To Do
- - Add tests for the TreeMap and TreeSet implementations from Clojure
- - Make StaticImports return Im- collections instead of Un- ones.
- - Rename methods in Realizable to prefer Im collections.
-
-# Older Notes
-Collection Variations:
- - Finite vs. Infinite (finite sub-categories: fits in memory or not)
- - Heterogenious vs. Homogenious
- - Write-only Builder with read-only collection? - No, I think Guava does that already.
- - Thread-safe vs. unsafe - I think immutable means thread-safe only.
-
-Transform Variations:
- - Lazy vs. Eager - lazy is preferred, but some operations (like reduce) are inherently eager.  I think
- you can use flatMap instead of reduce if you want it lazy.
-
-Some collections are naturally partitioned, so that some processes (such as mapping one set to another) could be carried out in a highly concurrent manner.  If that is added some day, any concurrent operation will take a parameter for the max number of threads it should try to use.
+ - Add PersistentHashMap and PersistentHashSet implementations from Clojure
+ - Change the two "Un" methods in Realizable to "Im" methods, using these collections.
 
 #Out of Scope
 
