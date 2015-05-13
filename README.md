@@ -70,7 +70,7 @@ The goals of this project are to make it easy to use Java:
  - Returning empty collections instead of <code>null</code> (Josh Bloch Item 43)
  - "Throw exceptions at people, not at code" (says Bill Venners, but also Josh Bloch Item 59)
  - Concurrency friendly (Josh Bloch Item 66, 67)
- - Context-sensitive equality: prefer Comparators to <code>equals()</code>, <code>hashcode()</code> and <code>compareTo()</code> (Daniel Spiewak, Viktor Klang, Rúnar Óli Bjarnason, Hughes Chabot, java.util.TreeSet, java.util.TreeMap)
+ - Context-sensitive equality: prefer Comparators to <code>equals()</code>, <code>hashcode()</code> and <code>compareTo()</code> ([Daniel Spiewak, Viktor Klang, Rúnar Óli Bjarnason, Hughes Chabot](http://glenpeterson.blogspot.com/2013/09/object-equality-is-context-relative.html), java.util.TreeSet, java.util.TreeMap)
  - Compatibly with existing/legacy Java code
 
 Higher order functions are not just briefer to write and read, they are less to *think* about.
