@@ -260,6 +260,8 @@ Added unit tests for the above.
 #To Do
  - Add PersistentHashMap and PersistentHashSet implementations from Clojure
  - Change the two "Un" methods in Realizable to "Im" methods, using these collections.
+ - Add a [Persistent RRB Tree](http://infoscience.epfl.ch/record/169879/files/RMTrees.pdf) and compare its performance to the PersistentVector.
+ - Pick a better name for this project!
 
 #Out of Scope
 
