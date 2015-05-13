@@ -258,10 +258,10 @@ Added unit tests for the above.
  safe if the producer and the values it produces are free from outside influences.
 
 #To Do
- - Add PersistentHashMap and PersistentHashSet implementations from Clojure
- - Change the two "Un" methods in Realizable to "Im" methods, using these collections.
- - Add a [Persistent RRB Tree](http://infoscience.epfl.ch/record/169879/files/RMTrees.pdf) and compare its performance to the PersistentVector.
  - Pick a better name for this project!
+ - Add PersistentHashMap and PersistentHashSet implementations from Clojure.  OTOH, I'd like to see how long I can live without hashCode() or equals().
+ - Change the two "Un" methods in Realizable to "Im" methods, using these collections (see note on previous item).
+ - Add a [Persistent RRB Tree](http://infoscience.epfl.ch/record/169879/files/RMTrees.pdf) and compare its performance to the PersistentVector.
 
 #Out of Scope
 
