@@ -310,7 +310,7 @@ As of 2015-03-24, the following statements made me think the Apache and EPL lice
 > you are doing this when including these works. Note, this list is
 > colloquially known as the Category A list.
 
-Source (as of 2015-03-24): https://www.apache.org/legal/resolved
+Source (as of 2015-05-13): https://www.apache.org/legal/resolved#category-a
 
 ###From Eclipse
 > What licenses are acceptable for third-party code redistributed by Eclipse
@@ -333,4 +333,4 @@ Source (as of 2015-03-24): https://www.apache.org/legal/resolved
 >
 > ...
 
-Source (as of 2015-03-24): https://eclipse.org/legal/eplfaq.php#3RDPARTY
+Source (as of 2015-05-13): https://eclipse.org/legal/eplfaq.php#3RDPARTY
