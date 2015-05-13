@@ -6,7 +6,7 @@ It pushes Java toward Clojure, but keeps the type saftey, objects, classes, and 
 Currently an *** Alpha Release *** but test coverage is high:
 ![Test Coverage](testCoverage.png)
 
-For complete documentation, please build the javadoc:
+For complete API documentation, please build the javadoc:
 `mvn javadoc:javadoc`
 
 #Usage
