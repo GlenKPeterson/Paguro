@@ -14,14 +14,14 @@
 
 package org.organicdesign.fp.permanent;
 
-import org.organicdesign.fp.Lazy;
+import org.organicdesign.fp.LazyRef;
 import org.organicdesign.fp.Option;
 
 public class SequenceDropped<T> implements Sequence<T> {
-    private final Lazy.Ref<Sequence<T>> laz;
+    private final LazyRef<Sequence<T>> laz;
 
     SequenceDropped(Sequence<T> v, long n) {
-        laz = Lazy.Ref.of(() -> {
+        laz = LazyRef.of(() -> {
             Sequence<T> seq = v;
             for (long i = n; i > 0; i--) {
                 if (!seq.head().isSome()) { return Sequence.emptySequence(); }

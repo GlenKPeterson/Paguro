@@ -271,10 +271,10 @@ public interface Sequence<T> extends Transformable<T> {
 //    }
 
 //    public class LazySequence<T> implements Sequence<T> {
-//        private final Lazy.Ref<Tuple2<T,Sequence<T>>> laz;
+//        private final LazyRef<Tuple2<T,Sequence<T>>> laz;
 //
 //        LazySequence(T first, Sequence<T> rest) {
-//            laz = Lazy.Ref.of(() -> Tuple2.of(first, rest));
+//            laz = LazyRef.of(() -> Tuple2.of(first, rest));
 //        }
 //
 //        public static <T> Sequence<T> of(T first, Sequence<T> rest) {

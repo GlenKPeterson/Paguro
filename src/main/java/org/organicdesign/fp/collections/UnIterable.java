@@ -80,10 +80,10 @@ public interface UnIterable<T> extends Iterable<T> {
 //     data is truly immutable, this allows you to compute a reasonable toString() the first time it is needed, then
 //     return that same String without re-computing it again.  It's the internal version of a memoizer.
 //     */
-//    static Lazy.Ref<String> lazyToString(String name, UnIterable iter) {
+//    static LazyRef<String> lazyToString(String name, UnIterable iter) {
 //        if (name == null) { throw new IllegalArgumentException("Can't have a null name."); }
 //        if (iter == null) { throw new IllegalArgumentException("Can't have a null iterable."); }
-//        return Lazy.Ref.of(() -> UnIterable.toString(name, iter));
+//        return LazyRef.of(() -> UnIterable.toString(name, iter));
 //    }
 
 //    /** Lets underlying compareTo method handle comparing nulls to non-null values. */

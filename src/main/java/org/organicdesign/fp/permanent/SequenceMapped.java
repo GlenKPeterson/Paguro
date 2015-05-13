@@ -14,16 +14,16 @@
 
 package org.organicdesign.fp.permanent;
 
-import org.organicdesign.fp.Lazy;
+import org.organicdesign.fp.LazyRef;
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.function.Function1;
 import org.organicdesign.fp.tuple.Tuple2;
 
 public class SequenceMapped<T,U>  implements Sequence<U> {
-    private final Lazy.Ref<Tuple2<Option<U>,Sequence<U>>> laz;
+    private final LazyRef<Tuple2<Option<U>,Sequence<U>>> laz;
 
     SequenceMapped(Sequence<T> seq, Function1<? super T,? extends U> func) {
-        laz = Lazy.Ref.of(() -> {
+        laz = LazyRef.of(() -> {
             Option<T> first = seq.head();
             return first.isSome()
                    ? Tuple2.of(Option.of(func.apply(first.get())), new SequenceMapped<>(seq.tail(), func))

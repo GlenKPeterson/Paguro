@@ -14,16 +14,16 @@
 
 package org.organicdesign.fp.permanent;
 
-import org.organicdesign.fp.Lazy;
+import org.organicdesign.fp.LazyRef;
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.tuple.Tuple2;
 
 public class SequenceFromArray<T> implements Sequence<T> {
-    private final Lazy.Ref<Tuple2<Option<T>,Sequence<T>>> laz;
+    private final LazyRef<Tuple2<Option<T>,Sequence<T>>> laz;
 
     // TODO: Develop tests for this and test for what happens when idx > ts.length or idx < 0;
     SequenceFromArray(int idx, T[] ts) {
-        laz = Lazy.Ref.of(() -> Tuple2.of(Option.of(ts[idx]), (idx == (ts.length - 1))
+        laz = LazyRef.of(() -> Tuple2.of(Option.of(ts[idx]), (idx == (ts.length - 1))
                                                               ? Sequence.emptySequence()
                                                               : new SequenceFromArray<>(idx + 1, ts)));
     }

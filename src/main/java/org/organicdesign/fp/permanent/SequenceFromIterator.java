@@ -16,7 +16,7 @@ package org.organicdesign.fp.permanent;
 
 import java.util.Iterator;
 
-import org.organicdesign.fp.Lazy;
+import org.organicdesign.fp.LazyRef;
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.tuple.Tuple2;
 
@@ -31,10 +31,10 @@ import org.organicdesign.fp.tuple.Tuple2;
  object will present and immutable, lazy, memoized, thread-safe view of the underlying iterator.
  */
 class SequenceFromIterator<T> implements Sequence<T> {
-    private final Lazy.Ref<Tuple2<Option<T>,Sequence<T>>> laz;
+    private final LazyRef<Tuple2<Option<T>,Sequence<T>>> laz;
 
     SequenceFromIterator(Iterator<T> iter) {
-        laz = Lazy.Ref.of(() -> iter.hasNext()
+        laz = LazyRef.of(() -> iter.hasNext()
                                 ? Tuple2.of(Option.of(iter.next()), new SequenceFromIterator<>(iter))
                                 : Sequence.emptySeqTuple());
     }

@@ -20,7 +20,7 @@ import org.organicdesign.fp.function.Function0;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(JUnit4.class)
-public class LazyTest {
+public class LazyRefTest {
 
     @Test
     public void testLazyRef() {
@@ -30,7 +30,7 @@ public class LazyTest {
         assertEquals(f.apply(), new Integer(5));
         assertEquals(f.apply(), new Integer(6));
 
-        Lazy.Ref<Integer> lr = Lazy.Ref.of(f);
+        LazyRef<Integer> lr = LazyRef.of(f);
         assertEquals(lr.get(), new Integer(7));
 
         assertEquals(f.apply(), new Integer(8));
@@ -41,23 +41,23 @@ public class LazyTest {
         assertEquals(lr.get(), new Integer(7));
     }
 
-    @Test
-    public void testLazyInt() {
-        Mutable.IntRef intRef = Mutable.IntRef.of(3);
-        Function0<Integer> f = () -> intRef.increment().value();
-        assertEquals(f.apply(), new Integer(4));
-        assertEquals(f.apply(), new Integer(5));
-        assertEquals(f.apply(), new Integer(6));
-
-        Lazy.Int lr = Lazy.Int.of(f);
-        assertEquals(lr.get(), 7);
-
-        assertEquals(f.apply(), new Integer(8));
-        intRef.set(-1);
-
-        assertEquals(lr.get(), 7);
-        assertEquals(lr.get(), 7);
-        assertEquals(lr.get(), 7);
-    }
+//    @Test
+//    public void testLazyInt() {
+//        Mutable.IntRef intRef = Mutable.IntRef.of(3);
+//        Function0<Integer> f = () -> intRef.increment().value();
+//        assertEquals(f.apply(), new Integer(4));
+//        assertEquals(f.apply(), new Integer(5));
+//        assertEquals(f.apply(), new Integer(6));
+//
+//        Lazy.Int lr = Lazy.Int.of(f);
+//        assertEquals(lr.get(), 7);
+//
+//        assertEquals(f.apply(), new Integer(8));
+//        intRef.set(-1);
+//
+//        assertEquals(lr.get(), 7);
+//        assertEquals(lr.get(), 7);
+//        assertEquals(lr.get(), 7);
+//    }
 
 }

@@ -15,9 +15,10 @@
 package org.organicdesign.fp;
 
 /**
- Java 8 requires that variables declared outside a lambda, but used inside a lambda must be <i>effectively</i> final
- and this class makes that possible for variables that are not (effectively) final.
- Java 7 and earlier require that they all be final.  Because ints are often used where performance is critical, a
+ Java 8 requires that variables used in a lambda, but declared outside it must be <i>effectively</i> final.
+ Java 7 and earlier require that they all be final.
+ This class works around that limitation by wrapping your object inside a final, but mutable container.
+ Because ints are often used where performance is critical, a
  primitive IntRef is available, though that may be removed in future versions.
  */
 public class Mutable {

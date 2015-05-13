@@ -14,16 +14,16 @@
 
 package org.organicdesign.fp.permanent;
 
-import org.organicdesign.fp.Lazy;
+import org.organicdesign.fp.LazyRef;
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.function.Function1;
 
 class SequenceFlatMapped<T,U> implements Sequence<U> {
-    private final Lazy.Ref<Sequence<U>> laz;
+    private final LazyRef<Sequence<U>> laz;
 
     @SuppressWarnings("unchecked")
     SequenceFlatMapped(Sequence<T> seq, Function1<? super T,Sequence<U>> f) {
-        laz = Lazy.Ref.of(() -> {
+        laz = LazyRef.of(() -> {
             final Option<T> first = seq.head();
             return first.isSome()
                     ? new SequenceConcatenated<>(f.apply(first.get()), new SequenceFlatMapped(seq.tail(), f))

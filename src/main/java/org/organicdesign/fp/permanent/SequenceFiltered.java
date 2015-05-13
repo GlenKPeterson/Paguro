@@ -14,16 +14,16 @@
 
 package org.organicdesign.fp.permanent;
 
-import org.organicdesign.fp.Lazy;
+import org.organicdesign.fp.LazyRef;
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.function.Function1;
 import org.organicdesign.fp.tuple.Tuple2;
 
 public class SequenceFiltered<T> implements Sequence<T> {
-    private final Lazy.Ref<Tuple2<Option<T>,Sequence<T>>> laz;
+    private final LazyRef<Tuple2<Option<T>,Sequence<T>>> laz;
 
     SequenceFiltered(Sequence<T> s, Function1<? super T,Boolean> predicate) {
-        laz = Lazy.Ref.of(() -> {
+        laz = LazyRef.of(() -> {
             Sequence<T> seq = s;
             Option<T> item = seq.head();
             while (item.isSome()) {

@@ -52,7 +52,7 @@ public interface Function0<U> extends Supplier<U> {
 
     /**
      Wraps a value in a constant function.  If you need to "memoize" some really expensive operation, use it to wrap
-     a Lazy.Ref.
+     a LazyRef.
      */
     static <K> Function0<K> constantFunction(final K k) {
         return new Function0<K>() {
@@ -75,7 +75,7 @@ public interface Function0<U> extends Supplier<U> {
 //     */
 //    static <T> Function0<T> memoize(Function0<T> f) {
 //        return new Function0<T>() {
-//            Lazy.Ref<T> ref = Lazy.Ref.of(() -> f.apply());
+//            LazyRef<T> ref = LazyRef.of(() -> f.apply());
 //            @Override public T applyEx() throws Exception {
 //                return ref.get();
 //            }
