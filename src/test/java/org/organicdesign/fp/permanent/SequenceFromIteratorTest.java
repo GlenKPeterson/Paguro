@@ -29,7 +29,7 @@ public class SequenceFromIteratorTest {
     @Test public void basic() {
         List<Integer> ints = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9);
         assertEquals(ints,
-                     Sequence.of(ints.iterator()).toJavaArrayList());
+                     Sequence.of(ints.iterator()).toJavaList());
         assertArrayEquals(ints.toArray(),
                           Sequence.of(ints.iterator()).toTypedArray());
     }

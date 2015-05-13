@@ -50,7 +50,7 @@ dependency:tree
 			<name>Eclipse Public License - v 1.0</name>
 			<url>http://www.eclipse.org/legal/epl-v10.html</url>
 			<comments>For the persistent collections in the
-				experiments/collections folder. These files are derivative
+				collections/ folder. These files are derivative
 				works based on the Clojure source code.</comments>
 		</license>
 	</licenses>

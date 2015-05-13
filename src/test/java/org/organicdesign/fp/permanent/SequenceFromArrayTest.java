@@ -27,7 +27,7 @@ public class SequenceFromArrayTest {
     @Test public void basic() {
         Integer[] ints = new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9};
         assertEquals(Arrays.asList(ints),
-                     Sequence.ofArray(ints).toJavaArrayList());
+                     Sequence.ofArray(ints).toJavaList());
         assertArrayEquals(ints,
                           Sequence.ofArray(ints).toTypedArray());
     }

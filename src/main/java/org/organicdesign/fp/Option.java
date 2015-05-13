@@ -23,17 +23,27 @@ import org.organicdesign.fp.function.Function1;
  */
 public interface Option<T> {
 
+    /** Return the value wrapped in this Option.  Only safe to call this on Some. */
     T get();
+
+    /** If this is Some, return the value wrapped in this Option.  Otherwise, return the given value. */
     T getOrElse(T t);
+
+    /** Is this Some? */
     boolean isSome();
+
+    /** Pass in a function to execute if its Some and another to execute if its None. */
     <U> U patMat(Function1<T,U> has, Function0<U> hasNot);
 
     // ==================================================== Static ====================================================
+    /** None is a singleton and this is its only instance. */
     Option NONE = new None();
 
+    /** Calling this instead of referring to NONE directly can make the type infrencer happy. */
     @SuppressWarnings("unchecked")
     static <T> Option<T> none() { return NONE; }
 
+    /** Public static factory method for contructing Options. */
     static <T> Option<T> of(T t) {
         if (NONE.equals(t)) {
             return none();
@@ -41,6 +51,7 @@ public interface Option<T> {
         return new Some<>(t);
     }
 
+    /** Construct an option, but if t is null, make it None instead of Some. */
     static <T> Option<T> someOrNullNoneOf(T t) {
         if ( (t == null) || NONE.equals(t) ) {
             return none();
@@ -49,8 +60,8 @@ public interface Option<T> {
     }
 
     /** Represents the absence of a value */
-    class None<T> implements Option<T> {
-        //private None();
+    final class None<T> implements Option<T> {
+        private None() {}
 
         @Override
         public T get() { throw new IllegalStateException("Called get on None"); }
@@ -75,9 +86,12 @@ public interface Option<T> {
         @Deprecated // Has no effect.  Darn!
         @Override
         public boolean equals(Object other) {
-            if (this == other) { return true; }
-            return (other != null) && (other instanceof None);
+            return (this == other) || (other instanceof None);
         }
+
+        // Defend our singleton property in the face of deserialization.  Not sure this is necessary, but probably
+        // won't hurt.
+        private Object readResolve() { return NONE; }
     }
 
     /** Represents the presence of a value, even if that value is null. */
