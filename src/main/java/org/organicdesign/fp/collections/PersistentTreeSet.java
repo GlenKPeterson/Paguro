@@ -15,6 +15,9 @@ import java.util.Objects;
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.permanent.Sequence;
 
+/**
+ A wrapper that turns a PersistentTreeMap into a set.
+ */
 public class PersistentTreeSet<E> implements ImSetSorted<E> {
 
     /**
@@ -33,32 +36,7 @@ public class PersistentTreeSet<E> implements ImSetSorted<E> {
     @SuppressWarnings("unchecked")
     static public <T> PersistentTreeSet<T> empty() { return EMPTY; }
 
-    /** {@inheritDoc} */
-    @Override public boolean contains(Object o) { return impl.containsKey(o); }
-
-    /** {@inheritDoc} */
-    @Override public int size() { return impl.size(); }
-
-    /** {@inheritDoc} */
-    @Override public boolean isEmpty() { return impl.isEmpty(); }
-
-//    /** {@inheritDoc} */
-//    @Override
-//    public UnIterator<E> iterator() {
-//        return iterator();
-//    }
-
-    @Override public boolean equals(Object other) {
-        return (other != null) &&
-               (other instanceof ImSetSorted) &&
-               (this.size() == ((ImSetSorted) other).size()) &&
-               Objects.equals(comparator(), ((ImSetSorted) other).comparator()) &&
-               UnIterable.equals(this, (ImSetSorted) other);
-    }
-
-    @Override public int hashCode() { return (size() == 0) ? 0 : UnIterable.hashCode(this); }
-
-    final ImMapSorted<E,?> impl;
+    private final ImMapSorted<E,?> impl;
 
 //    static public <T> PersistentTreeSet<T> create(ISeq<T> items) {
 //        PersistentTreeSet<T> ret = emptyTreeSet();
@@ -78,10 +56,15 @@ public class PersistentTreeSet<E> implements ImSetSorted<E> {
 
     private PersistentTreeSet(ImMapSorted<E,?> i) { impl = i; }
 
+    /**
+     Returns a new PersistentTreeSet of the given comparator.  Always use this instead of starting with empty() because
+     there is no way to assign a comparator later on.
+     */
     public static <T> PersistentTreeSet<T> ofComp(Comparator<? super T> comp) {
         return new PersistentTreeSet<>(PersistentTreeMap.ofComp(comp));
     }
 
+    /** Returns a new PersistentTreeSet of the given comparator and items. */
     @SafeVarargs
     public static <T> PersistentTreeSet<T> ofComp(Comparator<? super T> comp, T... items) {
         PersistentTreeSet<T> ret = new PersistentTreeSet<>(PersistentTreeMap.ofComp(comp));
@@ -92,6 +75,7 @@ public class PersistentTreeSet<E> implements ImSetSorted<E> {
         return ret;
     }
 
+    /** Returns a new PersistentTreeSet of the given comparable items. */
     @SafeVarargs
     public static <T extends Comparable<T>> PersistentTreeSet<T> of(T... items) {
         // empty() uses default comparator
@@ -103,34 +87,88 @@ public class PersistentTreeSet<E> implements ImSetSorted<E> {
         return ret;
     }
 
+    /**
+     Returns a new PersistentTreeSet of the keys and comparator in the given map.  Since PersistentTreeSet is just a
+     wrapper for a PersistentTreeMap, this can be a very cheap operation.
+     */
     public static <T> PersistentTreeSet<T> ofMap(ImMapSorted<T,?> i) { return new PersistentTreeSet<>(i); }
 
-    @Override public PersistentTreeSet<E> put(E e) {
-        return (impl.containsKey(e)) ? this
-                                     : new PersistentTreeSet<>(impl.assoc(e, null));
-    }
+    /**
+     Returns the comparator used to order the items in this set.  If this set uses the natural ordering of its keys,
+     this will return Function2.DEFAULT_COMPARATOR.  That's slightly different from java.util.SortedSet, so let me know
+     if that causes a problem.
+     */
+    @Override public Comparator<? super E> comparator() { return impl.comparator(); }
 
+    /** Returns true if the set contains the given item in O(log n) time.  This is the defining method of a set. */
+    @SuppressWarnings("SuspiciousMethodCalls")
+    @Override public boolean contains(Object o) { return impl.containsKey(o); }
+
+    /** {@inheritDoc} */
     @Override public PersistentTreeSet<E> disjoin(E key) {
         return (impl.containsKey(key)) ? new PersistentTreeSet<>(impl.without(key))
                                        : this;
     }
 
-    @Override public Comparator<? super E> comparator() { return impl.comparator(); }
+//    /** {@inheritDoc} */
+//    @Override
+//    public UnIterator<E> iterator() {
+//        return iterator();
+//    }
 
+    /** {@inheritDoc} */
+    @Override public boolean equals(Object other) {
+        return (other != null) &&
+               (other instanceof ImSetSorted) &&
+               (this.size() == ((ImSetSorted) other).size()) &&
+               Objects.equals(comparator(), ((ImSetSorted) other).comparator()) &&
+               UnIterable.equals(this, (ImSetSorted) other);
+    }
+
+    /**
+     Use head() inherited from Sequence instead of this method which is inherited from SortedSet.  head() returns an
+     Option of the first element where as this method throws an exception if this set is empty.  I had to rename
+     the method on Sequence from first() to head() to work around this.  Also returning an Option is thread-safe for
+     building a lazy sequence.  The alternative, examining the rest() of a sequence to see if it's == Sequence.empty()
+     gets ugly very quickly and makes many transformations eager (especially flatMap).
+     */
+    @Override public E first() { return impl.firstKey(); }
+
+    /** {@inheritDoc} */
+    @Override public int hashCode() { return (size() == 0) ? 0 : UnIterable.hashCode(this); }
+
+    /** {@inheritDoc} */
+    @Override public Option<E> head() { return size() > 0 ? Option.of(impl.firstKey()) : Option.none(); }
+
+    /** {@inheritDoc} */
+    @Override public boolean isEmpty() { return impl.isEmpty(); }
+
+    /**
+     Inherited from SortedSet, returns the last item in this set, or throw an exception if this set is empty.
+     Good luck with that.
+     */
+    @Override public E last() { return impl.lastKey(); }
+
+    /** {@inheritDoc} */
+    @Override public PersistentTreeSet<E> put(E e) {
+        return (impl.containsKey(e)) ? this
+                                     : new PersistentTreeSet<>(impl.assoc(e, null));
+    }
+
+    /** The size of this set. */
+    @Override public int size() { return impl.size(); }
+
+    /** {@inheritDoc} */
     @Override public ImSetSorted<E> subSet(E fromElement, E toElement) {
         return PersistentTreeSet.ofMap(impl.subMap(fromElement, toElement));
     }
 
-    @Override public E first() { return impl.firstKey(); }
-
-    @Override public Option<E> head() { return size() > 0 ? Option.of(impl.firstKey()) : Option.none(); }
-
     // TODO: Ensure that KeySet is sorted.
+    /** {@inheritDoc} */
     @Override public Sequence<E> tail() { return impl.without(first()).keySet(); }
 
+    /** Returns a string representation of this set. */
     @Override public String toString() { return UnIterable.toString("PersistentTreeSet", this); }
-
-    @Override public E last() { return impl.lastKey(); }
 
 //    @Override
 //    public ISeq<E> rseq() {

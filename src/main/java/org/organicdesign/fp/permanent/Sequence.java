@@ -70,7 +70,16 @@ public interface Sequence<T> extends Transformable<T> {
     static <T> Sequence<T> ofArray(T... i) { return SequenceFromArray.of(i); }
 
     // ======================================= Base methods =======================================
+    /**
+     The first item in this sequence.  This was originally called first() but that conflicted with SortedSet.first()
+     which did not return an Option and threw an exception when the set was empty.
+     */
     Option<T> head();
+
+    /**
+     The rest of this sequnce (all the items after its head).  This was originally called rest(), but when I renamed
+     first() to head(), I renamed rest() to tail() so that it wouldn't mix metaphors.
+     */
     Sequence<T> tail();
 
 //    // ======================================= Other methods ======================================

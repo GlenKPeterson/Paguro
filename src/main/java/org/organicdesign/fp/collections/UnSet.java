@@ -23,16 +23,21 @@ public interface UnSet<E> extends UnCollection<E>, Set<E> {
         throw new UnsupportedOperationException("Modification attempted");
     }
 
-    /* Sets have to override this - the default implementation in UnCollection stinks. */
-    /** {@inheritDoc} */
+    /**
+     Returns true if the set contains the given item.  This is the defining method of a set.
+     Sets have to override this because the default implementation in UnCollection is O(n) whereas a sorted set
+     should be O(log n) or O(1).
+     */
     @Override boolean contains(Object o);
     /** {@inheritDoc} */
     @Override default boolean containsAll(Collection<?> c) { return UnCollection.containsAll(this, c); }
 // boolean	equals(Object o)
 // int	hashCode()
 
-    /* Sets have to override this - the default implementation in UnCollection stinks. */
-    /** {@inheritDoc} */
+    /**
+     This is a convenience method inherited from Collection that returns true if size() == 0 (if this set contains no
+     elements).
+     */
     @Override boolean isEmpty();
 
     /** {@inheritDoc} */
