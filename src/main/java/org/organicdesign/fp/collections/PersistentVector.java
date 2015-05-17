@@ -159,7 +159,7 @@ public class PersistentVector<E> implements ImList<E> {
         throw new IndexOutOfBoundsException();
     }
 
-    /** {@inheritDoc} */
+    /** Returns the item specified by the given index. */
     @Override public E get(int i) {
         E[] node = leafNodeArrayFor(i);
         return node[i & LOW_BITS];

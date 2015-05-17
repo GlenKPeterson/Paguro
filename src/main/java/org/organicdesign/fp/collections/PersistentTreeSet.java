@@ -126,11 +126,13 @@ public class PersistentTreeSet<E> implements ImSetSorted<E> {
     }
 
     /**
-     Use head() inherited from Sequence instead of this method which is inherited from SortedSet.  head() returns an
-     Option of the first element where as this method throws an exception if this set is empty.  I had to rename
-     the method on Sequence from first() to head() to work around this.  Also returning an Option is thread-safe for
-     building a lazy sequence.  The alternative, examining the rest() of a sequence to see if it's == Sequence.empty()
-     gets ugly very quickly and makes many transformations eager (especially flatMap).
+     Use head() inherited from Sequence instead of this method which is inherited from SortedSet.  This method
+     returns the first element if it exists, or throws a NoSuchElementException if the set is empty.
+
+     head() returns an Option of the first element where as this method throws an exception if this set is empty.
+     I had to rename the method on Sequence from first() to head() to work around this.  Also returning an Option is
+     thread-safe for building a lazy sequence.  The alternative, examining the rest() of a sequence to see if it's
+     == Sequence.empty() gets ugly very quickly and makes many transformations eager (especially flatMap).
      */
     @Override public E first() { return impl.firstKey(); }
 

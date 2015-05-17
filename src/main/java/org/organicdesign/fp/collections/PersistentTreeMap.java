@@ -288,8 +288,8 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         if (diff > 0) {
             throw new IllegalArgumentException("fromKey is greater than toKey");
         }
-        Node<K,V> last = last();
-        K lastKey = last.key();
+        UnEntry<K,V> last = last();
+        K lastKey = last.getKey();
         int compFromKeyLastKey = comp.compare(fromKey, lastKey);
 
         // If no intersect, return empty. We aren't checking the toKey vs. the firstKey() because that's a single pass
@@ -378,8 +378,8 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 
     /** {@inheritDoc} */
     @Override public ImMapSorted<K,V> tailMap(K fromKey) {
-        Node<K,V> last = last();
-        K lastKey = last.key();
+        UnEntry<K,V> last = last();
+        K lastKey = last.getKey();
         int compFromKeyLastKey = comp.compare(fromKey, lastKey);
 
         // If no intersect, return empty. We aren't checking the toKey vs. the firstKey() because that's a single pass
@@ -577,23 +577,23 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 
 //    public NodeIterator<K,V> reverseIterator() { return new NodeIterator<>(tree, false); }
 
-    /** {@inheritDoc} */
+    /** Returns the first key in this map or throws a NoSuchElementException if the map is empty. */
     @Override public K firstKey() {
         if (size() < 1) { throw new NoSuchElementException("this map is empty"); }
         return head().get().getKey();
     }
 
-    /** {@inheritDoc} */
+    /** Returns the last key in this map or throws a NoSuchElementException if the map is empty. */
     @Override public K lastKey() {
-        Node<K,V> max = last();
+        UnEntry<K,V> max = last();
         if (max == null) {
             throw new NoSuchElementException("this map is empty");
         }
         return max.getKey();
     }
 
-    /** {@inheritDoc} */
-    public Node<K,V> last() {
+    /** Returns the last key/value pair in this map, or null if the map is empty. */
+    public UnEntry<K,V> last() {
         Node<K,V> t = tree;
         if (t != null) {
             while (t.right() != null)
@@ -615,11 +615,11 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 // public Object valAt(Object key){
 // Default implementation now inherited from ILookup
 
-    /** {@inheritDoc} */
+    /** Returns the number of key/value mappings in this map. */
     @Override public int size() { return size; }
 
-    /** {@inheritDoc} */
-    public Node<K,V> entryAt(K key) {
+    /** Returns the key/value pair matching the given key, or null if the key is not found. */
+    public UnEntry<K,V> entryAt(K key) {
         Node<K,V> t = tree;
         while (t != null) {
             int c = comp.compare(key, t.key);
