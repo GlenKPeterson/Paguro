@@ -24,31 +24,40 @@ public class ViewTakenTest {
 
     @Test
     public void takeItemsInOneBatch() {
-        assertArrayEquals(View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
-                                  .take(9999).toTypedArray(),
-                          new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 });
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).take(10).toTypedArray(),
-                          new Integer[] { 1,2,3,4,5,6,7,8,9 });
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).take(9).toTypedArray(),
-                          new Integer[] { 1,2,3,4,5,6,7,8,9 });
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).take(8).toTypedArray(),
-                          new Integer[] { 1,2,3,4,5,6,7,8 });
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).take(7).toTypedArray(),
-                          new Integer[] { 1,2,3,4,5,6,7 });
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).take(3).toTypedArray(),
-                          new Integer[] { 1,2,3 });
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).take(2).toTypedArray(),
-                          new Integer[] { 1,2 });
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).take(1).toTypedArray(),
-                          new Integer[] { 1 });
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9).take(0).toTypedArray(),
-                          new Integer[] {  });
+        assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
+                          View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                                  .take(9999).toTypedArray());
+
+        assertArrayEquals(new Integer[] { 1,2,3,4,5,6,7,8,9 },
+                          View.ofArray(1,2,3,4,5,6,7,8,9).take(10).toTypedArray());
+
+        assertArrayEquals(new Integer[] { 1,2,3,4,5,6,7,8,9 },
+                          View.ofArray(1,2,3,4,5,6,7,8,9).take(9).toTypedArray());
+
+        assertArrayEquals(new Integer[] { 1,2,3,4,5,6,7,8 },
+                          View.ofArray(1,2,3,4,5,6,7,8,9).take(8).toTypedArray());
+
+        assertArrayEquals(new Integer[] { 1,2,3,4,5,6,7 },
+                          View.ofArray(1,2,3,4,5,6,7,8,9).take(7).toTypedArray());
+
+        assertArrayEquals(new Integer[] { 1,2,3 },
+                          View.ofArray(1,2,3,4,5,6,7,8,9).take(3).toTypedArray());
+
+        assertArrayEquals(new Integer[] { 1,2 },
+                          View.ofArray(1,2,3,4,5,6,7,8,9).take(2).toTypedArray());
+
+        assertArrayEquals(new Integer[] { 1 },
+                          View.ofArray(1,2,3,4,5,6,7,8,9).take(1).toTypedArray());
+
+        assertArrayEquals(new Integer[] {  },
+                          View.ofArray(1,2,3,4,5,6,7,8,9).take(0).toTypedArray());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void exception1() {
         View.ofArray(1,2,3,4,5,6,7,8,9).take(-1);
     }
+
     @Test(expected = IllegalArgumentException.class)
     public void exception2() {
         View.ofArray(1,2,3,4,5,6,7,8,9).take(-99);
@@ -56,31 +65,38 @@ public class ViewTakenTest {
 
     @Test
     public void takeItemsInMultiBatches() {
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
-                                  .take(10).take(9999).take(10).toTypedArray(),
-                          new Integer[] { 1,2,3,4,5,6,7,8,9 });
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
-                                  .take(9).take(9).take(9).toTypedArray(),
-                          new Integer[] { 1,2,3,4,5,6,7,8,9 });
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
-                                  .take(8).take(7).take(6).toTypedArray(),
-                          new Integer[] { 1,2,3,4,5,6 });
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
-                                  .take(6).take(7).take(8).toTypedArray(),
-                          new Integer[] { 1,2,3,4,5,6 });
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
-                                  .take(999).take(1).take(9999999).toTypedArray(),
-                          new Integer[] { 1 });
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
-                                  .take(9999).take(0).take(3).toTypedArray(),
-                          new Integer[] {  });
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
+        assertArrayEquals(new Integer[] { 1,2,3,4,5,6,7,8,9 },
+                          View.ofArray(1,2,3,4,5,6,7,8,9)
+                                  .take(10).take(9999).take(10).toTypedArray());
+
+        assertArrayEquals(new Integer[] { 1,2,3,4,5,6,7,8,9 },
+                          View.ofArray(1,2,3,4,5,6,7,8,9)
+                                  .take(9).take(9).take(9).toTypedArray());
+
+        assertArrayEquals(new Integer[] { 1,2,3,4,5,6 },
+                          View.ofArray(1,2,3,4,5,6,7,8,9)
+                                  .take(8).take(7).take(6).toTypedArray());
+
+        assertArrayEquals(new Integer[] { 1,2,3,4,5,6 },
+                          View.ofArray(1,2,3,4,5,6,7,8,9)
+                                  .take(6).take(7).take(8).toTypedArray());
+
+        assertArrayEquals(new Integer[] { 1 },
+                          View.ofArray(1,2,3,4,5,6,7,8,9)
+                                  .take(999).take(1).take(9999999).toTypedArray());
+
+        assertArrayEquals(new Integer[] {  },
+                          View.ofArray(1,2,3,4,5,6,7,8,9)
+                                  .take(9999).take(0).take(3).toTypedArray());
+
+        assertArrayEquals(new Integer[] {  },
+                          View.ofArray(1,2,3,4,5,6,7,8,9)
                                   .take(0).take(99999999).take(9999999)
-                                  .toTypedArray(),
-                          new Integer[] {  });
-        assertArrayEquals(View.ofArray(1,2,3,4,5,6,7,8,9)
-                                  .take(99).take(9999).take(0).toTypedArray(),
-                          new Integer[] {  });
+                                  .toTypedArray());
+
+        assertArrayEquals(new Integer[] {  },
+                          View.ofArray(1,2,3,4,5,6,7,8,9)
+                                  .take(99).take(9999).take(0).toTypedArray());
     }
 }
     

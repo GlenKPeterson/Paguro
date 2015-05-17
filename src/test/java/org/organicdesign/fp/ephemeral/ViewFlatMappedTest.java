@@ -24,45 +24,45 @@ import static org.junit.Assert.assertArrayEquals;
 public class ViewFlatMappedTest {
     @Test
     public void singleFlatMap() {
-        assertEquals(View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).flatMap(null),
-                     View.EMPTY_VIEW);
+        assertEquals(View.EMPTY_VIEW,
+                     View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).flatMap(null));
 
-        assertEquals(View.EMPTY_VIEW.flatMap(null),
-                     View.EMPTY_VIEW);
+        assertEquals(View.EMPTY_VIEW,
+                     View.EMPTY_VIEW.flatMap(null));
 
-        assertArrayEquals(View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
-                                  .flatMap(null).toTypedArray(),
-                          new Integer[] {});
+        assertArrayEquals(new Integer[] {},
+                          View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                              .flatMap(null).toTypedArray());
 
-        assertArrayEquals(View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
-                                  .flatMap(i -> View.ofArray(i, i * 2, i * 3)).toTypedArray(),
-                          new Integer[] { 1,2,3, 2,4,6, 3,6,9, 4,8,12, 5,10,15, 6,12,18,
-                                          7,14,21, 8,16,24, 9,18,27});
+        assertArrayEquals(new Integer[] { 1,2,3, 2,4,6, 3,6,9, 4,8,12, 5,10,15, 6,12,18,
+                                          7,14,21, 8,16,24, 9,18,27},
+                          View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                              .flatMap(i -> View.ofArray(i, i * 2, i * 3)).toTypedArray());
 
-        assertArrayEquals(View.ofArray(1, 2, 3)
-                                  .flatMap(i -> View.ofArray(String.valueOf(i),
-                                                             String.valueOf(i + 1))).toTypedArray(),
-                          new String[] { "1","2", "2","3", "3","4"});
+        assertArrayEquals(new String[] { "1","2", "2","3", "3","4"},
+                          View.ofArray(1, 2, 3)
+                              .flatMap(i -> View.ofArray(String.valueOf(i),
+                                                         String.valueOf(i + 1))).toTypedArray());
 
     }
 
     @Test
     public void flatMapChain() {
-        assertEquals(View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
-                             .flatMap(null).flatMap(null).flatMap(null),
-                     View.EMPTY_VIEW);
+        assertEquals(View.EMPTY_VIEW,
+                     View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                             .flatMap(null).flatMap(null).flatMap(null));
 
-        assertEquals(View.EMPTY_VIEW.flatMap(null).flatMap(null).flatMap(null),
-                     View.EMPTY_VIEW);
+        assertEquals(View.EMPTY_VIEW,
+                     View.EMPTY_VIEW.flatMap(null).flatMap(null).flatMap(null));
 
-        assertArrayEquals(View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
-                                  .flatMap(null).flatMap(null).flatMap(null).toTypedArray(),
-                          new Integer[] {});
+        assertArrayEquals(new Integer[] {},
+                          View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                                  .flatMap(null).flatMap(null).flatMap(null).toTypedArray());
 
-        assertArrayEquals(View.ofArray(1, 10)
+        assertArrayEquals(new Integer[] { 1,2, 2,3, 3,4, 10,11, 20,21, 30,31},
+                          View.ofArray(1, 10)
                                   .flatMap(i -> View.ofArray(i, i * 2, i * 3))
                                   .flatMap(i -> View.ofArray(i, i + 1))
-                                  .toTypedArray(),
-                          new Integer[] { 1,2, 2,3, 3,4, 10,11, 20,21, 30,31});
+                                  .toTypedArray());
     }
 }
