@@ -106,29 +106,29 @@ public class PersistentVectorInsertable<V> implements ImList<V> {
 
         @SuppressWarnings("unchecked")
         Branch<V> insertReplaceSlave(int idx, Node<V> v, boolean isInsert) {
-            System.out.println("insertReplaceSlave(" + idx + ", " + v + ", " + isInsert + ")");
-            System.out.println("\tvalues: " + FunctionUtils.toString(values));
+//            System.out.println("insertReplaceSlave(" + idx + ", " + v + ", " + isInsert + ")");
+//            System.out.println("\tvalues: " + FunctionUtils.toString(values));
             Node<V>[] newKids = (Node<V>[]) new Node[isInsert ? values.length + 1 : values.length];
             // Copy the old kids up to the split kid
             System.arraycopy(values, 0, newKids, 0, Math.min(idx, values.length));
-            System.out.println("\tcopied old kids up to insert point: " + FunctionUtils.toString(newKids));
+//            System.out.println("\tcopied old kids up to insert point: " + FunctionUtils.toString(newKids));
             newKids[idx] = v;
-            System.out.println("\tInserted new kid at insertion point: " + FunctionUtils.toString(newKids));
+//            System.out.println("\tInserted new kid at insertion point: " + FunctionUtils.toString(newKids));
             if (idx < (values.length - 1)) {
                 // Copy the old kids from the split-kid onward
                 System.arraycopy(values, (isInsert ? idx : idx + 1), newKids, idx + 1, (values.length - idx));
-                System.out.println("\tCopied remaining old kids after insertion point: " + FunctionUtils.toString(newKids));
+//                System.out.println("\tCopied remaining old kids after insertion point: " + FunctionUtils.toString(newKids));
 
             }
             Branch<V> b = new Branch<>(totalSize + 1, newKids);
-            System.out.println("\tinsertReplaceSlave returns: " + b);
+//            System.out.println("\tinsertReplaceSlave returns: " + b);
             return b;
         }
 
         public Branch<V> replace(int idx, Node<V> v) { return insertReplaceSlave(idx, v, false); }
 
         public Branch<V> insertNonFull(int idx, Node<V> v) {
-            System.out.println("insertNonFull(" + idx + ", " + v + ")");
+//            System.out.println("insertNonFull(" + idx + ", " + v + ")");
             if (isFull()) { throw new IllegalStateException("Can't insert on a full node!"); }
             return insertReplaceSlave(idx, v, true);
         }
@@ -147,7 +147,7 @@ public class PersistentVectorInsertable<V> implements ImList<V> {
      */
     @SuppressWarnings("unchecked")
     static <V> Branch<V> splitChild(Branch<V> node, int idx) {
-        System.out.println("splitChild(" + node + ", " + idx + ")");
+//        System.out.println("splitChild(" + node + ", " + idx + ")");
         if (node.isFull()) {
             throw new IllegalArgumentException("Can't call splitChild on a full parent node.");
         }
@@ -159,10 +159,10 @@ public class PersistentVectorInsertable<V> implements ImList<V> {
         // Copy the old kids up to the split kid
         System.arraycopy(node.values(), 0, newKids, 0, idx);
 
-        System.out.println("node.values(): " + FunctionUtils.toString(node.values()) +
-                           " node.values.length: " + node.values.length +
-                           " newKids.length: " + newKids.length +
-                           " idx: " + idx);
+//        System.out.println("node.values(): " + FunctionUtils.toString(node.values()) +
+//                           " node.values.length: " + node.values.length +
+//                           " newKids.length: " + newKids.length +
+//                           " idx: " + idx);
 
         // Copy the old kids from the split-kid onward, leaving 2 spaces in the new array for the split kids.
         System.arraycopy(node.values(), idx + 1, newKids, idx + 2, (node.values.length - idx) - 1);
@@ -208,7 +208,7 @@ public class PersistentVectorInsertable<V> implements ImList<V> {
      Based on Cormen, Leiserson, Rivest, Stein pp. 496.  Mistakes are my own.
      */
     private static <V> Node<V> insertNonFull(Node<V> node, final int origIdx, V v) {
-        System.out.println("insertNonFull(" + node + ", " + v + ", " + origIdx + ")");
+//        System.out.println("insertNonFull(" + node + ", " + v + ", " + origIdx + ")");
 
         // TODO: I prevent these situations elsewhere, so can skip this check.
         if ( (origIdx < 0) || (origIdx > (node.totalSize)) ) {
@@ -222,17 +222,17 @@ public class PersistentVectorInsertable<V> implements ImList<V> {
         int sizeIdx = origIdx;
         for (int valIdx = 0; valIdx < branch.values.length; valIdx++) {
             Node<V> nextLevNode = branch.nodeAt(valIdx);
-            System.out.println("nextLevNode: " + nextLevNode);
+//            System.out.println("nextLevNode: " + nextLevNode);
             // We've found the right node if this nextLevNode contains our index,
             // or if the index is one greater than the index of the last nextLevNode (append to that node).
             if ( (sizeIdx < nextLevNode.totalSize) ||
                  (valIdx == (branch.values.length - 1)) ) {
-                System.out.println("sizeIdx:" + sizeIdx + " < nextLevNode.totalSize:" + nextLevNode.totalSize);
+//                System.out.println("sizeIdx:" + sizeIdx + " < nextLevNode.totalSize:" + nextLevNode.totalSize);
                 if (nextLevNode.isFull()) {
-                    System.out.println("\nnextLevNode.isFull, so call splitChild...");
+//                    System.out.println("\nnextLevNode.isFull, so call splitChild...");
                     // here we have a new branch, otherwise, it's an old one.  Do we care?
                     branch = splitChild(branch, valIdx); // need the index relative to branch's nodes.
-                    System.out.println("\nHere is our new branch with the splitChild: " + branch);
+//                    System.out.println("\nHere is our new branch with the splitChild: " + branch);
 
                     nextLevNode = branch.nodeAt(valIdx);
 
@@ -247,9 +247,9 @@ public class PersistentVectorInsertable<V> implements ImList<V> {
                     }
                 }
                 Node<V> tempNode = insertNonFull(nextLevNode, sizeIdx, v);
-                System.out.println("Here is the temporary node returned by insetNonFull: " + tempNode);
+//                System.out.println("Here is the temporary node returned by insetNonFull: " + tempNode);
                 Node<V> newBranch = branch.replace(valIdx, tempNode);
-                System.out.println("about to return newBranch: " + newBranch);
+//                System.out.println("about to return newBranch: " + newBranch);
                 return newBranch;
 
 //                    // Recursive call
@@ -307,14 +307,14 @@ public class PersistentVectorInsertable<V> implements ImList<V> {
             // Make a new branch node with only the root of this tree in it.
             // Then split that new node to make a new vector.
             // Then call insert on that and return the result.
-            System.out.println("\tTree is full: " + tree);
+//            System.out.println("\tTree is full: " + tree);
             Branch<V> nextTree = new Branch<>(tree);
-            System.out.println("\tPushed tree into new Node: " + nextTree);
+//            System.out.println("\tPushed tree into new Node: " + nextTree);
             nextTree = splitChild(nextTree, 0);
-            System.out.println("\tSplit the original node: " + nextTree);
-            System.out.println("\tAbout to insert new item at: " + idx);
+//            System.out.println("\tSplit the original node: " + nextTree);
+//            System.out.println("\tAbout to insert new item at: " + idx);
             Node<V> lastTree = insertNonFull(nextTree, idx, v);
-            System.out.println("\tInserted new item: " + lastTree);
+//            System.out.println("\tInserted new item: " + lastTree);
 
             return new PersistentVectorInsertable<>(lastTree);
         }
@@ -364,7 +364,7 @@ public class PersistentVectorInsertable<V> implements ImList<V> {
      */
     Option<Tuple2<Leaf<V>,Integer>> findNodeForIdx(Node<V> node, int idx) {
         // TODO: This check is only necessary at the top level, but it's safer to check every time while debugging.
-        System.out.println("node.totalSize: " + node.totalSize + " idx: " + idx);
+//        System.out.println("node.totalSize: " + node.totalSize + " idx: " + idx);
         if ( (idx < 0) || (idx >= node.totalSize) ) {
             throw new IndexOutOfBoundsException();
         }
