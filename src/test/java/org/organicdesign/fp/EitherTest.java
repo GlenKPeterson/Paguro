@@ -40,11 +40,13 @@ public class EitherTest {
                                    (r) -> "Hello".equals(r)));
     }
 
+    @SuppressWarnings("deprecation")
     @Test (expected = UnsupportedOperationException.class)
     public void leftEx() {
         Either.left("Hello").right();
     }
 
+    @SuppressWarnings("deprecation")
     @Test (expected = UnsupportedOperationException.class)
     public void rightEx() {
         Either.right("Hello").left();

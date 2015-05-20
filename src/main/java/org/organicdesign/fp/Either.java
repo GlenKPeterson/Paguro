@@ -60,6 +60,7 @@ public interface Either<L,R> {
         /** Returns the left value. */
         @Override public L left() { return left; }
         /** Throws an UnsupportedOperationException because you can't ask a Left for a right value. */
+        @Deprecated
         @Override public R right() {
             throw new UnsupportedOperationException("This Either does not have a right.");
         }
@@ -88,6 +89,7 @@ public interface Either<L,R> {
         private Right(R r) { right = r; }
 
         /** Throws an UnsupportedOperationException because you can't ask a Right for a left value. */
+        @Deprecated
         @Override public L left() {
             throw new UnsupportedOperationException("This Either does not have a left.");
         }
