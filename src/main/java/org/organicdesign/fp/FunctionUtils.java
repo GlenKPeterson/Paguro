@@ -62,8 +62,9 @@ public class FunctionUtils {
         sB.append("Array");
 
         if ( (as.length > 0) && (as[0] != null) ) {
-            sB.append(" of ");
+            sB.append("<");
             sB.append(as[0].getClass().getSimpleName());
+            sB.append(">");
         }
 
         sB.append("(");

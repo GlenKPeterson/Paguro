@@ -35,7 +35,7 @@ public class FunctionUtilsTest {
         is.add(3);
         is.add(4);
         is.add(5);
-        assertEquals("Array of Integer(1,2,3,4,5)", FunctionUtils.toString(is.toArray()));
+        assertEquals("Array<Integer>(1,2,3,4,5)", FunctionUtils.toString(is.toArray()));
 
         Map<String,Integer> m = new TreeMap<>();
         m.put("Hello", 99);

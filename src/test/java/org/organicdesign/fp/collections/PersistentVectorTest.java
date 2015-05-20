@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -205,7 +204,7 @@ public class PersistentVectorTest {
 
     // Time ImVectorImplementation vs. java.util.ArrayList to prove that performance does not degrade
     // if changes are made.
-    @Ignore
+//    @Ignore
     @Test public void speedTest() throws NoSuchAlgorithmException, InterruptedException {
         final int maxItems = 1000000;
 
