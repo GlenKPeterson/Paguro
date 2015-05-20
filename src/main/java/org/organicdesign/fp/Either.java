@@ -42,6 +42,15 @@ public interface Either<L,R> {
     /** Construct a new Right from the given object. */
     static <L,R> Right<L,R> right(R right) { return new Right<>(right); }
 
+    /**
+     Pattern-match, applying the first function if the given either is a Left, the second if it's a Right.
+
+     @param either the non-null Either to match against
+     @param l the function to apply if the either is a Left
+     @param r the function to apply if the either is a Right
+     @return the result of whichever function is applied.
+     @throws IllegalArgumentException if either is null.
+     */
     static <L,R,T> T patMatch(Either<L,R> either,
                               Function1<? super L,T> l,
                               Function1<? super R,T> r) {
