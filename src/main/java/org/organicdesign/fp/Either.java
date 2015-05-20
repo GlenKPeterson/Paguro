@@ -43,8 +43,8 @@ public interface Either<L,R> {
     static <L,R> Right<L,R> right(R right) { return new Right<>(right); }
 
     static <L,R,T> T patMatch(Either<L,R> either,
-                              Function1<L,T> l,
-                              Function1<R,T> r) {
+                              Function1<? super L,T> l,
+                              Function1<? super R,T> r) {
         if (either == null) {
             throw new IllegalArgumentException("Can't handle a null either");
         }
