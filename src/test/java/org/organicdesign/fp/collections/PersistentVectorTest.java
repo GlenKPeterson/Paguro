@@ -220,7 +220,7 @@ public class PersistentVectorTest {
                 1000, 9.0,
                 10000, 18.0,
                 100000, 13.9,
-                1000000, 7.7);
+                1000000, 7.8);
 
         // Remember the results of each insertion test to average them later.
         List<Double> ratios = new ArrayList<>();

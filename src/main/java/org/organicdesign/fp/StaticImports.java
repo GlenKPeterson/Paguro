@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.SortedSet;
 
 import org.organicdesign.fp.collections.PersistentTreeSet;
@@ -33,6 +34,7 @@ import org.organicdesign.fp.collections.UnIterator;
 import org.organicdesign.fp.collections.UnList;
 import org.organicdesign.fp.collections.UnListIterator;
 import org.organicdesign.fp.collections.UnMap;
+import org.organicdesign.fp.collections.UnMapSorted;
 import org.organicdesign.fp.collections.UnSet;
 import org.organicdesign.fp.collections.UnSetSorted;
 
@@ -156,6 +158,31 @@ public class StaticImports {
             @Override public boolean containsValue(Object value) { return map.containsValue(value); }
             @Override public V get(Object key) { return map.get(key); }
             @Override public UnSet<K> keySet() { return un(map.keySet()); }
+            @Override public UnCollection<V> values() { return un(map.values()); }
+            @Override public int hashCode() { return map.hashCode(); }
+            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
+            @Override public boolean equals(Object o) { return map.equals(o); }
+        };
+    }
+
+    /** Returns an unmodifiable version of the given sorted map. */
+    public static <K,V> UnMapSorted<K,V> un(SortedMap<K,V> map) {
+        if (map == null) { return UnMapSorted.empty(); }
+        if (map instanceof UnMapSorted) { return (UnMapSorted<K,V>) map; }
+        if (map.size() < 1) { return UnMapSorted.empty(); }
+        return new UnMapSorted<K,V>() {
+            @Override public UnSet<Map.Entry<K,V>> entrySet() { return un(map.entrySet()); }
+            @Override public int size() { return map.size(); }
+            @Override public boolean isEmpty() { return map.isEmpty(); }
+            @Override public boolean containsKey(Object key) { return map.containsKey(key); }
+            @Override public boolean containsValue(Object value) { return map.containsValue(value); }
+            @Override public V get(Object key) { return map.get(key); }
+            @Override public UnSet<K> keySet() { return un(map.keySet()); }
+            @Override public Comparator<? super K> comparator() { return map.comparator(); }
+            @Override public UnMapSorted<K,V> subMap(K fromKey, K toKey) { return un(map.subMap(fromKey, toKey)); }
+            @Override public UnMapSorted<K,V> tailMap(K fromKey) { return un(map.tailMap(fromKey)); }
+            @Override public K firstKey() { return map.firstKey(); }
+            @Override public K lastKey() { return map.lastKey(); }
             @Override public UnCollection<V> values() { return un(map.values()); }
             @Override public int hashCode() { return map.hashCode(); }
             @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.

@@ -13,11 +13,36 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
+import java.util.Comparator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.SortedMap;
 
 /** An unmodifiable SortedMap. */
 public interface UnMapSorted<K,V> extends UnMap<K,V>, SortedMap<K,V> {
+
+    // ==================================================== Static ====================================================
+    UnMapSorted<Object,Object> EMPTY = new UnMapSorted<Object,Object>() {
+        @Override public UnSet<Map.Entry<Object,Object>> entrySet() { return UnSet.empty(); }
+        @Override public UnSet<Object> keySet() { return UnSet.empty(); }
+        @Override public Comparator<? super Object> comparator() { return null; }
+        @Override public UnMapSorted<Object,Object> subMap(Object fromKey, Object toKey) { return this; }
+        @Override public UnMapSorted<Object,Object> tailMap(Object fromKey) { return this; }
+        @Override public Object firstKey() { throw new NoSuchElementException("empty map"); }
+        @Override public Object lastKey() { throw new NoSuchElementException("empty map"); }
+        @Override public UnCollection<Object> values() { return UnSet.empty(); }
+        @Override public int size() { return 0; }
+        @Override public boolean isEmpty() { return true; }
+        @Override public UnIterator<UnEntry<Object,Object>> iterator() { return UnIterator.empty(); }
+        @Override public boolean containsKey(Object key) { return false; }
+        @Override public boolean containsValue(Object value) { return false; }
+        @Override public Object get(Object key) { return null; }
+    };
+    @SuppressWarnings("unchecked")
+    static <T,U> UnMapSorted<T,U> empty() { return (UnMapSorted<T,U>) EMPTY; }
+
+    // =================================================== Instance ===================================================
+
 // public Comparator<? super K>	comparator()
 
     /**
