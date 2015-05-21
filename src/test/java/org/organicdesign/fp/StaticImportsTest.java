@@ -15,6 +15,7 @@
 package org.organicdesign.fp;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -23,12 +24,12 @@ import java.util.Set;
 
 import org.junit.Test;
 import org.organicdesign.fp.collections.UnList;
+import org.organicdesign.fp.collections.UnListIterator;
 import org.organicdesign.fp.collections.UnMap;
 import org.organicdesign.fp.collections.UnSet;
 import org.organicdesign.fp.tuple.Tuple2;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.*;
 
 
@@ -285,6 +286,51 @@ public class StaticImportsTest {
         assertEquals(c, b);
         assertEquals(b, c);
         assertEquals(a.hashCode(), c.hashCode());
+    }
+
+    @Test public void unListIterator() {
+        UnListIterator<Integer> uli = un(Arrays.asList(5, 4, 3).listIterator());
+        assertFalse(uli.hasPrevious());
+        assertTrue(uli.hasNext());
+
+        assertEquals(-1, uli.previousIndex());
+        assertEquals(0, uli.nextIndex());
+        assertEquals(Integer.valueOf(5), uli.next());
+        assertTrue(uli.hasPrevious());
+        assertTrue(uli.hasNext());
+
+        assertEquals(0, uli.previousIndex());
+        assertEquals(1, uli.nextIndex());
+        assertEquals(Integer.valueOf(4), uli.next());
+        assertTrue(uli.hasPrevious());
+        assertTrue(uli.hasNext());
+
+        assertEquals(1, uli.previousIndex());
+        assertEquals(2, uli.nextIndex());
+        assertEquals(Integer.valueOf(3), uli.next());
+        assertTrue(uli.hasPrevious());
+        assertFalse(uli.hasNext());
+
+        assertEquals(2, uli.previousIndex());
+        assertEquals(3, uli.nextIndex());
+        assertEquals(Integer.valueOf(3), uli.previous());
+        assertTrue(uli.hasPrevious());
+        assertTrue(uli.hasNext());
+
+        assertEquals(1, uli.previousIndex());
+        assertEquals(2, uli.nextIndex());
+        assertEquals(Integer.valueOf(4), uli.previous());
+        assertTrue(uli.hasPrevious());
+        assertTrue(uli.hasNext());
+
+        assertEquals(0, uli.previousIndex());
+        assertEquals(1, uli.nextIndex());
+        assertEquals(Integer.valueOf(5), uli.previous());
+        assertFalse(uli.hasPrevious());
+        assertTrue(uli.hasNext());
+
+        assertEquals(-1, uli.previousIndex());
+        assertEquals(0, uli.nextIndex());
     }
 
 //    @Test public void testLazyHashcoder() {
