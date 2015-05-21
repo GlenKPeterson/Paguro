@@ -1,7 +1,16 @@
 J-cicle (pronounced "Jay-sick-ul" like a frozen/immutable Java&trade;-icicle) brings Clojure collections,
-a Sequence abstraction, memoization, and some syntactical sugar to Java.
+a Sequence abstraction, and other Functional Programming benefits to Java.
 Fluent interfaces encourage you to write expressions (that evaluate) instead of statements (that produce void).
-It pushes Java toward Clojure, but keeps the type saftey, objects, classes, and C-like syntax that Java programmers are accustomed to.
+Immutable collections are fast enough to make it unnecessary to modify data in place.
+J-cicle pushes Java toward Clojure, but keeps the type saftey, objects, classes, and C-like syntax that Java programmers
+are accustomed to.
+
+Migrating large code bases to another language is not always practical.
+This project lets you think about your code the way that Clojure and to some degree Scala programmers do, but still write Java.
+Java does not have the terseness or regularity of Clojure.
+Its type system is not nearly as advanced as Scala's.
+But it can still provide many of the best aspects of both these languages if used carefully.
+This project encourages that kind of use.
 
 Currently an *** Alpha Release *** but test coverage is high:
 ![Test Coverage](testCoverage.png)
@@ -28,8 +37,8 @@ Map<String,Integer> itemMap = PersistentMapSorted.ofSkipNull(
         showThird ? Tuple2.of("Three", 3) : null);
 ```
 
-Similar type-safe methods are available for producing [unmodifiable Sets and Lists of any length](src/main/java/org/organicdesign/fp/StaticImports.java#L180) (unMaps currently go
-from 0 to 10 type-safe keys and values, or an infinite number of Map.Entries or Tuples).
+Similar type-safe methods are available for producing [unmodifiable Sets and Lists of any length](src/main/java/org/organicdesign/fp/StaticImports.java#L180)
+(unMaps currently go from 0 to 10 type-safe keys and values, or an infinite number of Map.Entries or Tuples).
 
 What if you want to add another item to an immutable map?
 
@@ -37,7 +46,8 @@ What if you want to add another item to an immutable map?
 itemMap = itemMap.assoc("Four", 4);
 ```
 
-What about transforming your unmodifiable data into other unmodifiable data?  Lazily, without any extra processing?
+What about transforming your unmodifiable data into other unmodifiable data?
+Lazily, without processing any more items than necessary?
 Typical usage (based on this unit test: [SequenceTest.java](src/test/java/org/organicdesign/fp/permanent/SequenceTest.java#L145)):
 
 ```java
@@ -99,7 +109,7 @@ If you find a better/faster implementation, please submit your improvements!
 
 #API
 
-Functions available in <code>Sequence</code> (as of 2014-03-07):
+Functions available in <code>Sequence</code> (as of 2015-03-15):
 ###Starting Points:
 ```java
 Sequence<T> Sequence.ofArray(T... i)
