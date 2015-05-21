@@ -21,12 +21,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.junit.Test;
 import org.organicdesign.fp.collections.UnList;
 import org.organicdesign.fp.collections.UnListIterator;
 import org.organicdesign.fp.collections.UnMap;
 import org.organicdesign.fp.collections.UnSet;
+import org.organicdesign.fp.collections.UnSetSorted;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import static org.junit.Assert.*;
@@ -331,6 +333,39 @@ public class StaticImportsTest {
 
         assertEquals(-1, uli.previousIndex());
         assertEquals(0, uli.nextIndex());
+    }
+
+    @Test public void unSetSorted() {
+        UnSetSorted<Integer> ts = un(new TreeSet<>(Arrays.asList(5, 4, 3)));
+        assertNull(ts.comparator());
+        // headSet is exclusive.
+        assertTrue(ts.headSet(4).contains(3));
+        assertFalse(ts.headSet(4).contains(4));
+        assertFalse(ts.headSet(4).contains(5));
+
+        // tailSet is inclusive.
+        assertTrue(ts.tailSet(4).contains(5));
+        assertTrue(ts.tailSet(4).contains(4));
+        assertFalse(ts.tailSet(4).contains(3));
+
+        assertEquals(Integer.valueOf(3), ts.first());
+        assertEquals(Integer.valueOf(5), ts.last());
+
+        assertFalse(ts.contains(2));
+        assertTrue(ts.contains(3));
+        assertTrue(ts.contains(4));
+        assertTrue(ts.contains(5));
+        assertFalse(ts.contains(6));
+
+        // low endpoint (inclusive) to high endpoint (exclusive)
+        assertFalse(ts.subSet(4, 5).contains(5));
+        assertTrue(ts.subSet(4, 5).contains(4));
+        assertFalse(ts.subSet(4, 5).contains(3));
+
+        assertFalse(ts.isEmpty());
+
+        assertEquals(ts.hashCode(), un(new TreeSet<>(Arrays.asList(5, 4, 3))).hashCode());
+        assertEquals(ts, un(new TreeSet<>(Arrays.asList(5, 4, 3))));
     }
 
 //    @Test public void testLazyHashcoder() {
