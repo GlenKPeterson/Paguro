@@ -24,7 +24,14 @@ import org.organicdesign.fp.function.Function1;
  <a href="https://www.youtube.com/watch?v=bCTZQi2dpl8" target="_blank">Bill Venners, Scalactic, SuperSafe, and
  Functional Error Handling talk at SF Scala 2015-02-24</a> convinced me that Or is friendlier than
  <a href="http://www.scala-lang.org/api/rc2/scala/Either.html" target="_blank">Either</a>.
- This class is based on Bill Venners' Or.  Any errors are my own.
+ This class is based on Bill Venners' Or.  I did not make Every, One, and Many sub-classes, figuring that you can
+ make an Or&lt;GoodType,ImList&lt;BadType&gt;&gt; if you expect that.
+
+ Bill makes the point that there are still some reasons to throw exceptions, but he says to "Throw exceptions at
+ developers, not at code" meaning that if there's code in your program that can recover from the issue, use a
+ functional return type (like Or).  Throw exceptions for things a program can't handle without developer intervention.
+
+ Any errors are my own.
  */
 public interface Or<G,B> {
     /** Returns true if this Or has a good value. */
