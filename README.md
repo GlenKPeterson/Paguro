@@ -1,4 +1,4 @@
-J-cicle (pronounced "Jay-sick-ul" like a frozen/immutable Java&trade;-icicle) brings Clojure collections,
+J-cicle (pronounced "Jay-sickle", like a frozen/immutable Java&trade;-icicle) brings Clojure collections,
 a Sequence abstraction, and other Functional Programming benefits to Java.
 Fluent interfaces encourage you to write expressions (that evaluate) instead of statements (that produce void).
 Immutable collections are fast enough to make it unnecessary to modify data in place.
