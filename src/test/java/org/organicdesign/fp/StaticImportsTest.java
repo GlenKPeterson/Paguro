@@ -14,6 +14,7 @@
 
 package org.organicdesign.fp;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,12 +24,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.junit.Test;
+import org.organicdesign.fp.collections.UnCollection;
 import org.organicdesign.fp.collections.UnList;
 import org.organicdesign.fp.collections.UnListIterator;
 import org.organicdesign.fp.collections.UnMap;
+import org.organicdesign.fp.collections.UnMapSorted;
 import org.organicdesign.fp.collections.UnSet;
 import org.organicdesign.fp.collections.UnSetSorted;
 import org.organicdesign.fp.function.Function2;
@@ -333,6 +338,11 @@ public class StaticImportsTest {
         assertEquals(c, b);
         assertEquals(b, c);
         assertEquals(a.hashCode(), c.hashCode());
+
+        assertEquals(UnSet.empty(), unSet());
+
+        assertEquals(UnSet.empty(), unSetSkipNull(null, null));
+        assertEquals(UnSet.empty(), unSetSkipNull());
     }
 
     @Test public void testUnList3() {
@@ -344,16 +354,14 @@ public class StaticImportsTest {
         b.add(2);
         b.add(3);
 
-        assertEquals(a, b);
-        assertEquals(b, a);
-        assertEquals(a.hashCode(), b.hashCode());
-
         UnList<Integer> c = unListSkipNull(null, 1, null, 2, null, 3);
-        assertEquals(c, a);
-        assertEquals(a, c);
-        assertEquals(c, b);
-        assertEquals(b, c);
-        assertEquals(a.hashCode(), c.hashCode());
+        equalsHelper(a, b, c, unList(1, 2));
+
+        assertEquals(UnList.empty(), unList());
+
+        assertEquals(UnList.empty(), unListSkipNull(null, null));
+        assertEquals(UnList.empty(), unListSkipNull());
+
     }
 
     @Test public void unListIterator() {
@@ -462,20 +470,187 @@ public class StaticImportsTest {
         );
     }
 
-//    @Test public void unMapTest() {
-//        UnSet<Integer> s = un(new HashSet<>(Arrays.asList(5, 4, 3)));
-//
-//        assertTrue(s.contains(3));
-//        assertFalse(s.contains(-1));
-//        assertFalse(s.isEmpty());
-//        assertTrue(un(Collections.emptySet()).isEmpty());
-//
-//        equalsHelper(s,
-//                     un(new HashSet<>(Arrays.asList(3, 4, 5))),
-//                     new HashSet<>(Arrays.asList(4, 3, 5)),
-//                     un(new HashSet<>(Arrays.asList(4, 5, 6)))
-//        );
-//    }
+    @Test public void unMapTest() {
+        final UnMap<Integer,String> ts;
+        Map<Integer,String> sm = new TreeMap<>();
+        sm.put(5, "five");
+        sm.put(4, "four");
+        sm.put(3, "three");
+        ts = un(sm);
+
+        assertEquals(3, ts.size());
+        assertFalse(ts.isEmpty());
+
+        assertFalse(ts.containsKey(2));
+        assertTrue(ts.containsKey(3));
+        assertTrue(ts.containsKey(4));
+        assertTrue(ts.containsKey(5));
+        assertFalse(ts.containsKey(6));
+
+        assertFalse(ts.containsValue("two"));
+        assertTrue(ts.containsValue("three"));
+        assertTrue(ts.containsValue("four"));
+        assertTrue(ts.containsValue("five"));
+        assertFalse(ts.containsValue("six"));
+
+        assertFalse(ts.isEmpty());
+
+        final UnMap<Integer,String> m2;
+        {
+            Map<Integer,String> sm2 = new TreeMap<>();
+            sm2.put(3, "three");
+            sm2.put(4, "four");
+            sm2.put(5, "five");
+            m2 = un(sm2);
+        }
+
+        final UnMap<Integer,String> m3;
+        {
+            Map<Integer,String> sm3 = new TreeMap<>();
+            sm3.put(4, "four");
+            sm3.put(5, "five");
+            sm3.put(6, "six");
+            m3 = un(sm3);
+        }
+
+        equalsHelper(ts, m2, sm, m3);
+
+        assertEquals(3, ts.entrySet().size());
+        assertFalse(ts.entrySet().isEmpty());
+
+        assertEquals(3, ts.keySet().size());
+        assertFalse(ts.keySet().isEmpty());
+
+        assertEquals(3, ts.values().size());
+        assertFalse(ts.values().isEmpty());
+
+        equalsHelper(ts.entrySet(), m2.entrySet(), sm.entrySet(), m3.entrySet());
+        equalsHelper(ts.keySet(), m2.keySet(), sm.keySet(), m3.keySet());
+
+        assertEquals(m3, m3);
+
+        // Wow.  TreeMap.values() returns something that doesn't implement equals.
+//        assertEquals(m3.values(), m3.values());
+        assertEquals(new ArrayList<>(m3.values()), new ArrayList<>(m3.values()));
+
+        equalsHelper(new ArrayList<>(ts.values()), new ArrayList<>(m2.values()),
+                     new ArrayList<>(sm.values()), new ArrayList<>(m3.values()));
+    }
+
+    @Test public void unMapSorted() {
+        final UnMapSorted<Integer,String> ts;
+        SortedMap<Integer,String> sm = new TreeMap<>();
+        sm.put(5, "five");
+        sm.put(4, "four");
+        sm.put(3, "three");
+        ts = un(sm);
+
+        assertEquals(3, ts.size());
+        assertFalse(ts.isEmpty());
+
+        assertNull(ts.comparator());
+        // headMap is exclusive.
+        assertTrue(ts.headMap(4).containsKey(3));
+        assertFalse(ts.headMap(4).containsKey(4));
+        assertFalse(ts.headMap(4).containsKey(5));
+
+        assertTrue(ts.headMap(4).containsValue("three"));
+        assertFalse(ts.headMap(4).containsValue("four"));
+        assertFalse(ts.headMap(4).containsValue("five"));
+
+        // tailMap is inclusive.
+        assertTrue(ts.tailMap(4).containsKey(5));
+        assertTrue(ts.tailMap(4).containsKey(4));
+        assertFalse(ts.tailMap(4).containsKey(3));
+
+        assertTrue(ts.tailMap(4).containsValue("five"));
+        assertTrue(ts.tailMap(4).containsValue("four"));
+        assertFalse(ts.tailMap(4).containsValue("three"));
+
+        assertEquals(Integer.valueOf(3), ts.firstKey());
+        assertEquals(Integer.valueOf(5), ts.lastKey());
+
+        assertFalse(ts.containsKey(2));
+        assertTrue(ts.containsKey(3));
+        assertTrue(ts.containsKey(4));
+        assertTrue(ts.containsKey(5));
+        assertFalse(ts.containsKey(6));
+
+        assertFalse(ts.containsValue("two"));
+        assertTrue(ts.containsValue("three"));
+        assertTrue(ts.containsValue("four"));
+        assertTrue(ts.containsValue("five"));
+        assertFalse(ts.containsValue("six"));
+
+        // low endpoint (inclusive) to high endpoint (exclusive)
+        assertFalse(ts.subMap(4, 5).containsKey(5));
+        assertTrue(ts.subMap(4, 5).containsKey(4));
+        assertFalse(ts.subMap(4, 5).containsKey(3));
+
+        assertFalse(ts.isEmpty());
+
+        final UnMapSorted<Integer,String> m2;
+        {
+            SortedMap<Integer,String> sm2 = new TreeMap<>();
+            sm2.put(3, "three");
+            sm2.put(4, "four");
+            sm2.put(5, "five");
+            m2 = un(sm2);
+        }
+
+        final UnMapSorted<Integer,String> m3;
+        {
+            SortedMap<Integer,String> sm3 = new TreeMap<>();
+            sm3.put(4, "four");
+            sm3.put(5, "five");
+            sm3.put(6, "six");
+            m3 = un(sm3);
+        }
+
+        equalsHelper(ts, m2, sm, m3);
+
+        assertEquals(3, ts.entrySet().size());
+        assertFalse(ts.entrySet().isEmpty());
+
+        assertEquals(3, ts.keySet().size());
+        assertFalse(ts.keySet().isEmpty());
+
+        assertEquals(3, ts.values().size());
+        assertFalse(ts.values().isEmpty());
+
+        equalsHelper(ts.entrySet(), m2.entrySet(), sm.entrySet(), m3.entrySet());
+        equalsHelper(ts.keySet(), m2.keySet(), sm.keySet(), m3.keySet());
+
+        assertEquals(m3, m3);
+
+        // Wow.  TreeMap.values() returns something that doesn't implement equals.
+//        assertEquals(m3.values(), m3.values());
+        assertEquals(new ArrayList<>(m3.values()), new ArrayList<>(m3.values()));
+
+        equalsHelper(new ArrayList<>(ts.values()), new ArrayList<>(m2.values()),
+                     new ArrayList<>(sm.values()), new ArrayList<>(m3.values()));
+    }
+
+    @Test public void unCollection() {
+        ArrayDeque<Integer> ad = new ArrayDeque<>(Arrays.asList(1, 2, 3));
+        UnCollection<Integer> a = un(new ArrayDeque<>(Arrays.asList(1, 2, 3)));
+        assertEquals(3, a.size());
+        assertTrue(a.contains(2));
+        assertFalse(a.isEmpty());
+
+        assertEquals(3, a.size());
+        assertTrue(a.contains(2));
+        assertFalse(a.isEmpty());
+
+//        UnCollection<Integer> b = un(new ArrayDeque<>(Arrays.asList(1, 2, 3)));
+//        assertEquals(a.hashCode(), b.hashCode());
+//        assertEquals(a, b);
+//        assertTrue(a.equals(b));
+//        assertTrue(b.equals(a));
+
+        equalsHelper(new ArrayList<>(a), new ArrayList<>(ad), Arrays.asList(1, 2, 3),
+                     Arrays.asList(3, 2, 1));
+    }
 
 
 //    @Test public void testLazyHashcoder() {
