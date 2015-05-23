@@ -30,7 +30,8 @@ import org.organicdesign.fp.tuple.Tuple2;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.un;
-import static org.organicdesign.fp.testUtils.EqualsContract.equalsHashCode;
+import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
+import static org.organicdesign.fp.testUtils.EqualsContract.equalsSameHashCode;
 
 @RunWith(JUnit4.class)
 public class PersistentTreeMapTest {
@@ -163,35 +164,35 @@ public class PersistentTreeMapTest {
     }
 
     @Test public void hashCodeAndEquals() {
-        equalsHashCode(PersistentTreeMap.of("one", 1).assoc("two", 2).assoc("three", 3),
-                       PersistentTreeMap.of("three", 3).assoc("two", 2).assoc("one", 1),
-                       PersistentTreeMap.of("two", 2, "three", 3, "one", 1),
-                       PersistentTreeMap.of("two", 2, "three", 3, "four", 4));
+        equalsDistinctHashCode(PersistentTreeMap.of("one", 1).assoc("two", 2).assoc("three", 3),
+                               PersistentTreeMap.of("three", 3).assoc("two", 2).assoc("one", 1),
+                               PersistentTreeMap.of("two", 2, "three", 3, "one", 1),
+                               PersistentTreeMap.of("two", 2, "three", 3, "four", 4));
 
         SortedMap<String,Integer> m = new TreeMap<>();
         m.put("one", 1);
         m.put("two", 2);
         m.put("three", 3);
 
-        equalsHashCode(PersistentTreeMap.of("one", 1, "two", 2, "three", 3),
-                       m,
-                       un(m),
-                       PersistentTreeMap.of("two", 2, "three", 3, "four", 4));
+        equalsDistinctHashCode(PersistentTreeMap.of("one", 1, "two", 2, "three", 3),
+                               m,
+                               un(m),
+                               PersistentTreeMap.of("two", 2, "three", 3, "four", 4));
 
-        equalsHashCode(PersistentTreeMap.of("one", 1).assoc("two", 2).assoc("three", 3),
-                       PersistentTreeMap.of("three", 3).assoc("two", 2).assoc("one", 1),
-                       PersistentTreeMap.of("two", 2, "three", 3, "one", 1),
-                       PersistentTreeMap.of("zne", 1, "two", 2, "three", 3));
+        equalsDistinctHashCode(PersistentTreeMap.of("one", 1).assoc("two", 2).assoc("three", 3),
+                               PersistentTreeMap.of("three", 3).assoc("two", 2).assoc("one", 1),
+                               PersistentTreeMap.of("two", 2, "three", 3, "one", 1),
+                               PersistentTreeMap.of("zne", 1, "two", 2, "three", 3));
 
-        equalsHashCode(PersistentTreeMap.of("one", 1).assoc("two", 2).assoc("three", 3),
-                       PersistentTreeMap.of("three", 3).assoc("two", 2).assoc("one", 1),
-                       PersistentTreeMap.of("two", 2, "three", 3, "one", 1),
-                       PersistentTreeMap.of("one", 1, "two", 2, "three", 2));
+        equalsDistinctHashCode(PersistentTreeMap.of("one", 1).assoc("two", 2).assoc("three", 3),
+                               PersistentTreeMap.of("three", 3).assoc("two", 2).assoc("one", 1),
+                               PersistentTreeMap.of("two", 2, "three", 3, "one", 1),
+                               PersistentTreeMap.of("one", 1, "two", 2, "three", 2));
 
-        equalsHashCode(PersistentTreeMap.of("one", 1).assoc("two", 2).assoc("three", 3),
-                       PersistentTreeMap.of("three", 3).assoc("two", 2).assoc("one", 1),
-                       PersistentTreeMap.of("two", 2, "three", 3, "one", 1),
-                       PersistentTreeMap.of(1, "one", 2, "two", 3, "three3"));
+        equalsSameHashCode(PersistentTreeMap.of("one", 1).assoc("two", 2).assoc("three", 3),
+                           PersistentTreeMap.of("three", 3).assoc("two", 2).assoc("one", 1),
+                           PersistentTreeMap.of("two", 2, "three", 3, "one", 1),
+                           PersistentTreeMap.of(1, "one", 2, "two", 3, "three"));
     }
 
     @Test public void sequence() {

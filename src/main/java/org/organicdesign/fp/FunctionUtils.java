@@ -84,4 +84,101 @@ public class FunctionUtils {
         sB.append(")");
         return sB.toString();
     }
+
+//    public static String truncateIfNecessary(String in, int maxLen) {
+//        if ( (in == null) || (in.length() <= maxLen) ) {
+//            return in;
+//        }
+//        return in.substring(0, maxLen);
+//    }
+//
+//    public static Date earliestOrNull(Date... dates) {
+//        if ( (dates == null) || (dates.length < 1) ) {
+//            return null;
+//        }
+//        Date earliest = null;
+//        for (Date date : dates) {
+//            if (earliest == null) {
+//                earliest = date;
+//            } else if ((date != null) && (date.before(earliest)) ) {
+//                earliest = date;
+//            }
+//        }
+//        return earliest;
+//    }
+//
+//    public enum EnglishListType {
+//        AND("and"),
+//        OR("or");
+//        public final String word;
+//        EnglishListType(String s) {
+//            word = s;
+//        }
+//    }
+//
+//    public static String unsafeEnglishList(Collection<?> rips, EnglishListType type) {
+//        if ( (rips == null) || (rips.size() < 1) ) {
+//            return "";
+//        }
+//        StringBuilder sB = new StringBuilder();
+//        int i = 0;
+//        for (Object rip : rips) {
+//            i++;
+//            if (i > 1) {
+//                if (rips.size() > 2) {
+//                    // if there are three or more rips, print with commas
+//                    // between all but the last two - they get ", and "
+//                    if (i < rips.size()) {
+//                        sB.append(", ");
+//                    } else {
+//                        // The serial comma!
+//                        sB.append(", ");
+//                        sB.append(type.word);
+//                        sB.append(" ");
+//                    }
+//                } else if ( (rips.size() == 2) && (i == 2) ) {
+//                    // If there are two rips, print with " and " inbetween
+//                    sB.append(" ");
+//                    sB.append(type.word);
+//                    sB.append(" ");
+//                }
+//            }
+//            // print it.  This is safe because these strings are hard-coded
+//            // above, do not come from the user, and are HTML-safe.
+//            sB.append(rip.toString());
+//        }
+//        return sB.toString();
+//    }
+//
+//    public static String commaSepList(Iterable<?> is) {
+//        StringBuilder sB = new StringBuilder();
+//        boolean isFirst = true;
+//        for (Object o : is) {
+//            if (isFirst) {
+//                isFirst = false;
+//            } else {
+//                sB.append(", ");
+//            }
+//            sB.append(String.valueOf(o));
+//        }
+//        return sB.toString();
+//    }
+
+    public static String ordinal(final int origI) {
+        final int i = (origI < 0) ? -origI : origI;
+        final int modTen = i % 10;
+        if ( (modTen < 4) && (modTen > 0)) {
+            int modHundred = i % 100;
+            if ( (modHundred < 21) && (modHundred > 3) ) {
+                return Integer.toString(origI) + "th";
+            }
+            switch (modTen) {
+                case 1: return Integer.toString(origI) + "st";
+                case 2: return Integer.toString(origI) + "nd";
+                case 3: return Integer.toString(origI) + "rd";
+            }
+        }
+        return Integer.toString(origI) + "th";
+    }
+
 }

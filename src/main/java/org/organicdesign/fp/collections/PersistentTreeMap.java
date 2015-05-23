@@ -623,6 +623,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
     /** Returns the number of key/value mappings in this map. */
     @Override public int size() { return size; }
 
+    // In TreeMap, this is final Entry<K,V> getEntry(Object key)
     /** Returns the key/value pair matching the given key, or null if the key is not found. */
     public UnEntry<K,V> entryAt(K key) {
         Node<K,V> t = tree;

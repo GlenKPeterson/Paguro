@@ -10,7 +10,7 @@
 package org.organicdesign.fp.collections;
 
 import java.util.Comparator;
-import java.util.Objects;
+import java.util.SortedSet;
 
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.permanent.Sequence;
@@ -116,13 +116,19 @@ public class PersistentTreeSet<E> implements ImSetSorted<E> {
 //        return iterator();
 //    }
 
-    /** {@inheritDoc} */
+    /**
+     This is designed to be correct, rather than fully compatible with TreeSet.equals().
+     TreeSet.equals() does not take ordering into account and this does.
+
+     You want better equality?  Define an Equator.  This is for Java@trade; interop.
+     */
     @Override public boolean equals(Object other) {
-        return (other != null) &&
-               (other instanceof ImSetSorted) &&
-               (this.size() == ((ImSetSorted) other).size()) &&
-               Objects.equals(comparator(), ((ImSetSorted) other).comparator()) &&
-               UnIterable.equals(this, (ImSetSorted) other);
+        if (this == other) { return true; }
+        if ( !(other instanceof SortedSet) ) { return false; }
+        SortedSet that = ((SortedSet) other);
+
+        if (size() != that.size()) { return false; }
+        return UnIterable.equals(this, that);
     }
 
     /**
