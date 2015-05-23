@@ -12,6 +12,7 @@
 package org.organicdesign.fp.collections;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 // TODO: http://functionaljava.googlecode.com/svn/artifacts/2.21/javadoc/fj/data/Seq.html
@@ -374,17 +375,28 @@ public class PersistentVector<E> implements ImList<E> {
 //        }
 //    }
 
-    /** This is correct, but O(n). */
-    // Does this need to be compatible with java.util.AbstractList?
-    @Override public int hashCode() { return (size() == 0) ? 0 : UnIterable.hashCode(this); }
+    /** This is correct, but O(n).  This implementation is compatible with java.util.AbstractList. */
+    @Override public int hashCode() {
+        int ret = 1;
+        for (E item : this) {
+            ret *= 31;
+            if (item != null) {
+                ret += item.hashCode();
+            }
+        }
+        return ret;
+    }
 
-    /** This is correct, but definitely O(n), same as java.util.ArrayList. */
-    // Does this need to be compatible with java.util.AbstractList?
+    /**
+     This is correct, but definitely O(n), same as java.util.ArrayList.
+     This implementation is compatible with java.util.AbstractList.
+     */
     @Override public boolean equals(Object other) {
-        return (other != null) &&
-                (other instanceof UnList) &&
-                (this.size() == ((UnList) other).size()) &&
-                UnIterable.equals(this, (UnList) other);
+        if (this == other) { return true; }
+        if ( !(other instanceof List) ) { return false; }
+        List that = (List) other;
+        return (this.size() == that.size()) &&
+                UnIterable.equals(this, that);
     }
 
     @Override public String toString() {

@@ -29,7 +29,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import static org.junit.Assert.*;
+import static org.organicdesign.fp.StaticImports.un;
 import static org.organicdesign.fp.StaticImports.unMap;
+import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
 
 @RunWith(JUnit4.class)
 public class PersistentVectorTest {
@@ -41,12 +43,6 @@ public class PersistentVectorTest {
         assertArrayEquals(threeIntArray, resultArray);
     }
 
-    public void helpEquality(Object o1, Object o2) {
-        assertTrue(o1.equals(o2));
-        assertTrue(o2.equals(o1));
-        assertEquals(o1.hashCode(), o2.hashCode());
-    }
-
     @Test
     public void empty() {
         ImList<Integer> empty1 = PersistentVector.empty();
@@ -54,16 +50,11 @@ public class PersistentVectorTest {
         ImList<Integer> empty3 = PersistentVector.of(new ArrayList<>());
         ImList<Integer> empty4 = PersistentVector.of();
 
-        helpEquality(empty1, empty1);
-        helpEquality(empty1, empty2);
-        helpEquality(empty1, empty3);
-        helpEquality(empty1, empty4);
-        helpEquality(empty2, empty2);
-        helpEquality(empty2, empty3);
-        helpEquality(empty2, empty4);
-        helpEquality(empty3, empty3);
-        helpEquality(empty3, empty4);
-        helpEquality(empty4, empty4);
+        equalsDistinctHashCode(empty1, empty2, empty3,
+                               PersistentVector.of(1));
+
+        equalsDistinctHashCode(empty2, empty3, empty4,
+                               PersistentVector.of((Integer) null));
     }
 
     @Test(expected = IndexOutOfBoundsException.class)
@@ -118,12 +109,8 @@ public class PersistentVectorTest {
         ImList<Integer> one2 = PersistentVector.of(oneList);
         ImList<Integer> one3 = PersistentVector.of(Collections.unmodifiableList(oneList));
 
-        helpEquality(one1, one1);
-        helpEquality(one1, one2);
-        helpEquality(one1, one3);
-        helpEquality(one2, one2);
-        helpEquality(one2, one3);
-        helpEquality(one3, one3);
+        equalsDistinctHashCode(one1, one2, one3,
+                               PersistentVector.of(-1));
     }
 
     @Test(expected = IndexOutOfBoundsException.class)
@@ -201,6 +188,18 @@ public class PersistentVectorTest {
         for (int j = 0; j < SEVERAL; j++){
             assertEquals(Integer.valueOf(j), is.get(j));
         }
+    }
+
+    @Test
+    public void transienceTest() {
+        ImList<Integer> list = PersistentVector.of(1,2,3,4,5,6,7,8,9,0,11,12,13,14,15,16,17,18,19,20,
+                                                   21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40);
+        List<Integer> l2 = Arrays.asList(1,2,3,4,5,6,7,8,9,0,11,12,13,14,15,16,17,18,19,20,
+                                         21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40);
+        List<Integer> different = Arrays.asList(1,2,3,4,5,6,7,8,9,0,11,12,13,14,15,16,17,18,19,20,
+                                                 21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,41);
+
+        equalsDistinctHashCode(list, l2, un(l2), different);
     }
 
     // Time ImVectorImplementation vs. java.util.ArrayList to prove that performance does not degrade

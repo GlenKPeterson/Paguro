@@ -77,9 +77,12 @@ public class EqualsContract {
 
         // Symmetric (effectively covers Transitive as well)
         UnList.permutations(equivs, (a, b) -> {
-            assertEquals(a.hashCode(), b.hashCode());
-            assertTrue(a.equals(b));
-            assertTrue(b.equals(a));
+            assertEquals("Found an unequal hashCode while inspecting permutations",
+                         a.hashCode(), b.hashCode());
+            assertTrue("Failed equals while inspecting permutations",
+                       a.equals(b));
+            assertTrue("Failed reflexive equals while inspecting permutations",
+                       b.equals(a));
             return null;
         });
     }
