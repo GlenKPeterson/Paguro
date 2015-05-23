@@ -36,80 +36,17 @@ import org.organicdesign.fp.collections.UnMap;
 import org.organicdesign.fp.collections.UnMapSorted;
 import org.organicdesign.fp.collections.UnSet;
 import org.organicdesign.fp.collections.UnSetSorted;
-import org.organicdesign.fp.function.Function2;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.*;
+import static org.organicdesign.fp.testUtils.EqualsContract.equalsHashCode;
 
 
 public class StaticImportsTest {
 
     public static String[] ss = {"One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven",
             "Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen","Twenty"};
-
-    /** This probably needs to go in the regular project instead of the unit tests. */
-    public static <T> void permutations(List<T> items, Function2<? super T,? super T,?> f) {
-        for (int i = 0; i < items.size(); i++) {
-            for (int j = i + 1; j < items.size(); j++) {
-                f.apply(items.get(i), items.get(j));
-            }
-        }
-    }
-
-    /**
-     Tests Reflexive, Symmetric, Transitive, Consistent, and non-nullity properties
-     of the equals() contract.  If you think this is confusing, realize that there is no
-     way to implement a one-sided equals() correctly with inheritence - it's a broken concept, but it's
-     still used so often that you have to do your best with it.
-     @param equiv1 First equivalent (but unique) object
-     @param equiv2 Second equivalent (but unique) object (could be a different class)
-     @param equiv3 Third equivalent (but unique) object (could be a different class)
-     @param different Non-equivalent object with a different hashCode (should be a compatible class)
-     @param <S> The super-class of all these objects - could be an interface that these should be equal within.
-     */
-    public static <S, T1 extends S, T2 extends S, T3 extends S, T4 extends S>
-    void equalsHelper(T1 equiv1, T2 equiv2, T3 equiv3, T4 different) {
-        if ( (equiv1 == equiv2) ||
-             (equiv1 == equiv3) ||
-             (equiv1 == different) ||
-             (equiv2 == equiv3) ||
-             (equiv2 == different) ||
-             (equiv3 == different) ) {
-            throw new IllegalArgumentException("You must provide four different (having different memory locations) but 3 equivalent objects");
-        }
-        List<S> equivs = Arrays.asList(equiv1, equiv2, equiv3);
-
-        //noinspection ObjectEqualsNull
-        assertFalse(different.equals(null));
-        assertEquals(different.hashCode(), different.hashCode());
-        //noinspection EqualsWithItself
-        assertTrue(different.equals(different));
-
-        // Reflexive
-        for(S equiv : equivs) {
-            assertEquals(equiv.hashCode(), equiv.hashCode());
-            assertNotEquals(equiv.hashCode(), different.hashCode());
-            //noinspection EqualsWithItself
-            assertTrue(equiv.equals(equiv));
-            assertFalse(equiv.equals(different));
-            assertFalse(different.equals(equiv));
-
-            // Check null
-            //noinspection ObjectEqualsNull
-            assertFalse(equiv.equals(null));
-        };
-
-        // Symmetric (covers Transitive as well)
-        permutations(equivs, (a, b) -> {
-            assertEquals(a.hashCode(), b.hashCode());
-            assertTrue(a.equals(b));
-            assertTrue(b.equals(a));
-            return null;
-        });
-    }
-
-
 
     public static void mapHelper(Map<Integer,String> m, int max) {
         assertEquals("Size check", max, m.size());
@@ -355,7 +292,7 @@ public class StaticImportsTest {
         b.add(3);
 
         UnList<Integer> c = unListSkipNull(null, 1, null, 2, null, 3);
-        equalsHelper(a, b, c, unList(1, 2));
+        equalsHashCode(a, b, c, unList(1, 2));
 
         assertEquals(UnList.empty(), unList());
 
@@ -410,10 +347,10 @@ public class StaticImportsTest {
     }
 
     @Test public void unListTest() {
-        equalsHelper(un(Arrays.asList(3, 4, 5)),
-                     un(new ArrayList<>(Arrays.asList(3, 4, 5))),
-                     new LinkedList<>(Arrays.asList(3, 4, 5)),
-                     new ArrayList<>(Arrays.asList(4, 5, 6)));
+        equalsHashCode(un(Arrays.asList(3, 4, 5)),
+                       un(new ArrayList<>(Arrays.asList(3, 4, 5))),
+                       new LinkedList<>(Arrays.asList(3, 4, 5)),
+                       new ArrayList<>(Arrays.asList(4, 5, 6)));
     }
 
     @Test public void unSetTest() {
@@ -424,10 +361,10 @@ public class StaticImportsTest {
         assertFalse(s.isEmpty());
         assertTrue(un(Collections.emptySet()).isEmpty());
 
-        equalsHelper(s,
-                     un(new HashSet<>(Arrays.asList(3, 4, 5))),
-                     new HashSet<>(Arrays.asList(4, 3, 5)),
-                     un(new HashSet<>(Arrays.asList(4, 5, 6)))
+        equalsHashCode(s,
+                       un(new HashSet<>(Arrays.asList(3, 4, 5))),
+                       new HashSet<>(Arrays.asList(4, 3, 5)),
+                       un(new HashSet<>(Arrays.asList(4, 5, 6)))
         );
     }
 
@@ -463,10 +400,10 @@ public class StaticImportsTest {
         assertEquals(ts.hashCode(), un(new TreeSet<>(Arrays.asList(5, 4, 3))).hashCode());
         assertEquals(ts, un(new TreeSet<>(Arrays.asList(5, 4, 3))));
 
-        equalsHelper(un(new TreeSet<>(Arrays.asList(5, 4, 3))),
-                     un(new TreeSet<>(Arrays.asList(3, 4, 5))),
-                     new TreeSet<>(Arrays.asList(4, 3, 5)),
-                     un(new TreeSet<>(Arrays.asList(4, 5, 6)))
+        equalsHashCode(un(new TreeSet<>(Arrays.asList(5, 4, 3))),
+                       un(new TreeSet<>(Arrays.asList(3, 4, 5))),
+                       new TreeSet<>(Arrays.asList(4, 3, 5)),
+                       un(new TreeSet<>(Arrays.asList(4, 5, 6)))
         );
     }
 
@@ -513,7 +450,7 @@ public class StaticImportsTest {
             m3 = un(sm3);
         }
 
-        equalsHelper(ts, m2, sm, m3);
+        equalsHashCode(ts, m2, sm, m3);
 
         assertEquals(3, ts.entrySet().size());
         assertFalse(ts.entrySet().isEmpty());
@@ -524,8 +461,8 @@ public class StaticImportsTest {
         assertEquals(3, ts.values().size());
         assertFalse(ts.values().isEmpty());
 
-        equalsHelper(ts.entrySet(), m2.entrySet(), sm.entrySet(), m3.entrySet());
-        equalsHelper(ts.keySet(), m2.keySet(), sm.keySet(), m3.keySet());
+        equalsHashCode(ts.entrySet(), m2.entrySet(), sm.entrySet(), m3.entrySet());
+        equalsHashCode(ts.keySet(), m2.keySet(), sm.keySet(), m3.keySet());
 
         assertEquals(m3, m3);
 
@@ -533,8 +470,8 @@ public class StaticImportsTest {
 //        assertEquals(m3.values(), m3.values());
         assertEquals(new ArrayList<>(m3.values()), new ArrayList<>(m3.values()));
 
-        equalsHelper(new ArrayList<>(ts.values()), new ArrayList<>(m2.values()),
-                     new ArrayList<>(sm.values()), new ArrayList<>(m3.values()));
+        equalsHashCode(new ArrayList<>(ts.values()), new ArrayList<>(m2.values()),
+                       new ArrayList<>(sm.values()), new ArrayList<>(m3.values()));
     }
 
     @Test public void unMapSorted() {
@@ -607,7 +544,7 @@ public class StaticImportsTest {
             m3 = un(sm3);
         }
 
-        equalsHelper(ts, m2, sm, m3);
+        equalsHashCode(ts, m2, sm, m3);
 
         assertEquals(3, ts.entrySet().size());
         assertFalse(ts.entrySet().isEmpty());
@@ -618,8 +555,8 @@ public class StaticImportsTest {
         assertEquals(3, ts.values().size());
         assertFalse(ts.values().isEmpty());
 
-        equalsHelper(ts.entrySet(), m2.entrySet(), sm.entrySet(), m3.entrySet());
-        equalsHelper(ts.keySet(), m2.keySet(), sm.keySet(), m3.keySet());
+        equalsHashCode(ts.entrySet(), m2.entrySet(), sm.entrySet(), m3.entrySet());
+        equalsHashCode(ts.keySet(), m2.keySet(), sm.keySet(), m3.keySet());
 
         assertEquals(m3, m3);
 
@@ -627,8 +564,8 @@ public class StaticImportsTest {
 //        assertEquals(m3.values(), m3.values());
         assertEquals(new ArrayList<>(m3.values()), new ArrayList<>(m3.values()));
 
-        equalsHelper(new ArrayList<>(ts.values()), new ArrayList<>(m2.values()),
-                     new ArrayList<>(sm.values()), new ArrayList<>(m3.values()));
+        equalsHashCode(new ArrayList<>(ts.values()), new ArrayList<>(m2.values()),
+                       new ArrayList<>(sm.values()), new ArrayList<>(m3.values()));
     }
 
     @Test public void unCollection() {
@@ -648,8 +585,8 @@ public class StaticImportsTest {
 //        assertTrue(a.equals(b));
 //        assertTrue(b.equals(a));
 
-        equalsHelper(new ArrayList<>(a), new ArrayList<>(ad), Arrays.asList(1, 2, 3),
-                     Arrays.asList(3, 2, 1));
+        equalsHashCode(new ArrayList<>(a), new ArrayList<>(ad), Arrays.asList(1, 2, 3),
+                       Arrays.asList(3, 2, 1));
     }
 
 

@@ -8,10 +8,12 @@
 /* rich May 20, 2006 */
 package org.organicdesign.fp.collections;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.SortedMap;
 import java.util.Stack;
 
 import org.organicdesign.fp.Option;
@@ -266,16 +268,19 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
     }
 
     /** This is correct, but O(n). */
-    @Override public int hashCode() { return (size() == 0) ? 0 : UnIterable.hashCode(keySet()); }
+    @Override public int hashCode() { return (size() == 0) ? 0 : UnIterable.hashCode(entrySet()); }
 
     /** This is correct, but definitely O(n), same as java.util.ArrayList. */
     @Override public boolean equals(Object other) {
         if (this == other) { return true; }
-        if ( !(other instanceof ImMapSorted) ) { return false; }
-        ImMapSorted that = (ImMapSorted) other;
-        return this.comp.equals(that.comparator()) &&
-               this.size == ((ImMapSorted) other).size() &&
-               UnIterable.equals(this, (ImMapSorted) other);
+        if ( !(other instanceof SortedMap) ) { return false; }
+        SortedMap that = (SortedMap) other;
+        // java.util.TreeMap doesn't involve the comparator, and its effect plays out in the order
+        // of the values.  I'm uncomfortable with this, but for now I'm aiming for
+        // Compatibility with TreeMap.
+//        return this.comp.equals(that.comparator()) &&
+        return this.size == that.size() &&
+               UnIterable.equals(this, that.entrySet());
     }
 
     /** Returns a view of the keys contained in this map. */
@@ -357,10 +362,10 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
             @Override public int hashCode() { return UnIterable.hashCode(this); }
             @Override public boolean equals(Object o) {
                 if (this == o) { return true; }
-                if ( (o == null) || !(o instanceof Iterable) ) { return false; }
-                return UnIterable.equals(this, (Iterable) o);
+                if ( !(o instanceof Collection) ) { return false; }
+                return UnIterable.equals(this, (Collection) o);
             }
-            @Override public String toString() { return UnIterable.toString("ValueWrapper", this); }
+            @Override public String toString() { return UnIterable.toString("ValueColl", this); }
         }
         return new ValueColl<>(() -> this.iterator());
     }
@@ -859,9 +864,10 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         // Not used in this data structure, but these nodes can be returned!
         @Override public boolean equals(Object o) {
             if (this == o) { return true; }
-            if ( (o == null) || ! (o instanceof Map.Entry) ) { return false; }
+            if ( !(o instanceof Map.Entry) ) { return false; }
             Map.Entry that = (Map.Entry) o;
-            return Objects.equals(key, that.getKey());
+            return Objects.equals(key, that.getKey()) &&
+                   Objects.equals(val(), that.getValue());
         }
 
         @Override public String toString() {
@@ -918,19 +924,18 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 
         // Not used in this data structure, but these nodes can be returned!
         @Override public int hashCode() {
-            int ret = 0;
-            if (key != null) { ret = key.hashCode(); }
-            if (val != null) { return ret ^ val.hashCode(); }
-            // If it's uninitialized, it's equal to every other uninitialized instance.
-            return ret;
+            // This is specified in java.util.Map as part of the map contract.
+            return  (key == null ? 0 : key.hashCode()) ^
+                    (val == null ? 0 : val.hashCode());
         }
 
         // Not used in this data structure, but these nodes can be returned!
         @Override public boolean equals(Object o) {
             if (this == o) { return true; }
-            if ( (o == null) || ! (o instanceof Map.Entry) ) { return false; }
+            if ( !(o instanceof Map.Entry) ) { return false; }
             Map.Entry that = (Map.Entry) o;
-            return Objects.equals(key, that.getKey()) && Objects.equals(val, that.getValue());
+            return Objects.equals(key, that.getKey()) &&
+                   Objects.equals(val, that.getValue());
         }
 
         @Override public String toString() {
@@ -974,19 +979,18 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 
         // Not used in this data structure, but these nodes can be returned!
         @Override public int hashCode() {
-            int ret = 0;
-            if (key != null) { ret = key.hashCode(); }
-            if (val != null) { return ret ^ val.hashCode(); }
-            // If it's uninitialized, it's equal to every other uninitialized instance.
-            return ret;
+            // This is specified in java.util.Map as part of the map contract.
+            return  (key == null ? 0 : key.hashCode()) ^
+                    (val == null ? 0 : val.hashCode());
         }
 
         // Not used in this data structure, but these nodes can be returned!
         @Override public boolean equals(Object o) {
             if (this == o) { return true; }
-            if ( (o == null) || ! (o instanceof Map.Entry) ) { return false; }
+            if ( !(o instanceof Map.Entry) ) { return false; }
             Map.Entry that = (Map.Entry) o;
-            return Objects.equals(key, that.getKey()) && Objects.equals(val, that.getValue());
+            return Objects.equals(key, that.getKey()) &&
+                   Objects.equals(val, that.getValue());
         }
 
         @Override public String toString() {
@@ -1029,19 +1033,18 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 
         // Not used in this data structure, but these nodes can be returned!
         @Override public int hashCode() {
-            int ret = 0;
-            if (key != null) { ret = key.hashCode(); }
-            if (val != null) { return ret ^ val.hashCode(); }
-            // If it's uninitialized, it's equal to every other uninitialized instance.
-            return ret;
+            // This is specified in java.util.Map as part of the map contract.
+            return  (key == null ? 0 : key.hashCode()) ^
+                    (val == null ? 0 : val.hashCode());
         }
 
         // Not used in this data structure, but these nodes can be returned!
         @Override public boolean equals(Object o) {
             if (this == o) { return true; }
-            if ( (o == null) || ! (o instanceof Map.Entry) ) { return false; }
+            if ( !(o instanceof Map.Entry) ) { return false; }
             Map.Entry that = (Map.Entry) o;
-            return Objects.equals(key, that.getKey()) && Objects.equals(val, that.getValue());
+            return Objects.equals(key, that.getKey()) &&
+                   Objects.equals(val, that.getValue());
         }
 
         @Override public String toString() {
@@ -1086,7 +1089,6 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
         }
 
         @Override Node<K,V> blacken() { return new BlackBranch<>(key, left, right); }
-
     }
 
 
@@ -1104,17 +1106,15 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 
         // Not used in this data structure, but these nodes can be returned!
         @Override public int hashCode() {
-            int ret = 0;
-            if (key != null) { ret = key.hashCode(); }
-            if (val != null) { return ret ^ val.hashCode(); }
-            // If it's uninitialized, it's equal to every other uninitialized instance.
-            return ret;
+            // This is specified in java.util.Map as part of the map contract.
+            return  (key == null ? 0 : key.hashCode()) ^
+                    (val == null ? 0 : val.hashCode());
         }
 
         // Not used in this data structure, but these nodes can be returned!
         @Override public boolean equals(Object o) {
             if (this == o) { return true; }
-            if ( (o == null) || ! (o instanceof Map.Entry) ) { return false; }
+            if ( !(o instanceof Map.Entry) ) { return false; }
             Map.Entry that = (Map.Entry) o;
             return Objects.equals(key, that.getKey()) && Objects.equals(val, that.getValue());
         }

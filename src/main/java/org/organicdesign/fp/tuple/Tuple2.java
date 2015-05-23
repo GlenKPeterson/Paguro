@@ -59,11 +59,9 @@ public final class Tuple2<T,U> implements Entry<T,U>, UnMap.UnEntry<T,U> {
 
     @Override
     public int hashCode() {
-        int ret = 0;
-        if (_1 != null) { ret = _1.hashCode(); }
-        if (_2 != null) { return ret + _2.hashCode(); }
-        // If it's uninitialized, it's equal to every other uninitialized instance.
-        return ret;
+        // This is specified in java.util.Map as part of the map contract.
+        return  (_1 == null ? 0 : _1.hashCode()) ^
+                (_2 == null ? 0 : _2.hashCode());
     }
 
     // Inherited from Map.Entry

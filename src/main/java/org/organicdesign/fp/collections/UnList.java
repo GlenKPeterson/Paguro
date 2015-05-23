@@ -21,6 +21,8 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
+import org.organicdesign.fp.function.Function2;
+
 import static org.organicdesign.fp.StaticImports.un;
 
 /**
@@ -30,6 +32,33 @@ import static org.organicdesign.fp.StaticImports.un;
  * {@inheritDoc}
  */
 public interface UnList<E> extends List<E>, UnCollection<E> {
+
+    // ==================================================== Static ====================================================
+
+    /** The EMPTY list - a sentinel value for use in == comparisons. */
+    UnList<Object> EMPTY = new UnList<Object>() {
+        @Override public UnListIterator<Object> listIterator(int index) { return UnListIterator.empty(); }
+        @Override public int size() { return 0; }
+        @Override public Object get(int index) { throw new IndexOutOfBoundsException(); }
+    };
+
+    /** Returns a type-aware version of the EMPTY list. */
+    @SuppressWarnings("unchecked")
+    static <T> UnList<T> empty() { return (UnList<T>) EMPTY; }
+
+    /**
+     Apply the given function against all unique pairings of items in the list.  Does this belong on Function2 instead
+     of List?
+     */
+    static <T> void permutations(List<T> items, Function2<? super T,? super T,?> f) {
+        for (int i = 0; i < items.size(); i++) {
+            for (int j = i + 1; j < items.size(); j++) {
+                f.apply(items.get(i), items.get(j));
+            }
+        }
+    }
+
+    // =================================================== Instance ===================================================
 
     /** Not allowed - this is supposed to be unmodifiable */
     @SuppressWarnings("deprecation")
@@ -213,13 +242,4 @@ public interface UnList<E> extends List<E>, UnCollection<E> {
 //Methods inherited from interface java.lang.Iterable
 //forEach
 
-    // ==================================================== Static ====================================================
-    UnList<Object> EMPTY = new UnList<Object>() {
-        @Override public UnListIterator<Object> listIterator(int index) { return UnListIterator.empty(); }
-        @Override public int size() { return 0; }
-        @Override public Object get(int index) { throw new IndexOutOfBoundsException(); }
-    };
-
-    @SuppressWarnings("unchecked")
-    static <T> UnList<T> empty() { return (UnList<T>) EMPTY; }
 }

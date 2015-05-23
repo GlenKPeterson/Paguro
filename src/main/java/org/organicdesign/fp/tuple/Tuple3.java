@@ -55,11 +55,9 @@ public final class Tuple3<T,U,V> {
 
     @Override
     public int hashCode() {
-        int ret = 0;
-        if (_1 != null) { ret = _1.hashCode(); }
-        if (_2 != null) { ret += _2.hashCode(); }
-        if (_3 != null) { ret += _3.hashCode(); }
-        // If it's uninitialized, it's equal to every other uninitialized instance.
-        return ret;
+        // This matches Tuple2 which implements Entry which is specified in java.util.Map as part of the map contract.
+        return  ( (_1 == null ? 0 : _1.hashCode()) ^
+                  (_2 == null ? 0 : _2.hashCode()) ) +
+                (_3 == null ? 0 : _3.hashCode());
     }
 }

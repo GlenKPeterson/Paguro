@@ -17,6 +17,8 @@ package org.organicdesign.fp.collections;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,6 +29,8 @@ import org.organicdesign.fp.permanent.Sequence;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import static org.junit.Assert.*;
+import static org.organicdesign.fp.StaticImports.un;
+import static org.organicdesign.fp.testUtils.EqualsContract.equalsHashCode;
 
 @RunWith(JUnit4.class)
 public class PersistentTreeMapTest {
@@ -159,41 +163,35 @@ public class PersistentTreeMapTest {
     }
 
     @Test public void hashCodeAndEquals() {
-        assertEquals(PersistentTreeMap.empty().hashCode(),
-                     PersistentTreeMap.empty().hashCode());
+        equalsHashCode(PersistentTreeMap.of("one", 1).assoc("two", 2).assoc("three", 3),
+                       PersistentTreeMap.of("three", 3).assoc("two", 2).assoc("one", 1),
+                       PersistentTreeMap.of("two", 2, "three", 3, "one", 1),
+                       PersistentTreeMap.of("two", 2, "three", 3, "four", 4));
 
-        assertEquals(PersistentTreeMap.of("one", 1).hashCode(),
-                     PersistentTreeMap.of("one", 1).hashCode());
+        SortedMap<String,Integer> m = new TreeMap<>();
+        m.put("one", 1);
+        m.put("two", 2);
+        m.put("three", 3);
 
-        assertEquals(PersistentTreeMap.of("one", 1).hashCode(),
-                     PersistentTreeMap.of("one", 99999999).hashCode());
+        equalsHashCode(PersistentTreeMap.of("one", 1, "two", 2, "three", 3),
+                       m,
+                       un(m),
+                       PersistentTreeMap.of("two", 2, "three", 3, "four", 4));
 
-        assertNotEquals(PersistentTreeMap.of("onf", 1).hashCode(),
-                        PersistentTreeMap.of("one", 1).hashCode());
+        equalsHashCode(PersistentTreeMap.of("one", 1).assoc("two", 2).assoc("three", 3),
+                       PersistentTreeMap.of("three", 3).assoc("two", 2).assoc("one", 1),
+                       PersistentTreeMap.of("two", 2, "three", 3, "one", 1),
+                       PersistentTreeMap.of("zne", 1, "two", 2, "three", 3));
 
-        assertEquals(PersistentTreeMap.of("one", 1).assoc("two", 2).assoc("three", 3).hashCode(),
-                     PersistentTreeMap.of("one", 1).assoc("two", 2).assoc("three", 3).hashCode());
+        equalsHashCode(PersistentTreeMap.of("one", 1).assoc("two", 2).assoc("three", 3),
+                       PersistentTreeMap.of("three", 3).assoc("two", 2).assoc("one", 1),
+                       PersistentTreeMap.of("two", 2, "three", 3, "one", 1),
+                       PersistentTreeMap.of("one", 1, "two", 2, "three", 2));
 
-        assertNotEquals(PersistentTreeMap.of("one", 1).assoc("two", 2).assoc("three", 3).hashCode(),
-                        PersistentTreeMap.of(1, "one").assoc(2, "two").assoc(3, "three").hashCode());
-
-        assertNotEquals(PersistentTreeMap.of("Zne", 1).assoc("two", 2).assoc("three", 3).hashCode(),
-                        PersistentTreeMap.of("one", 1).assoc("two", 2).assoc("three", 3).hashCode());
-
-        assertEquals(PersistentTreeMap.of("one", 1).assoc("two", 2).assoc("three", 3),
-                     PersistentTreeMap.of("one", 1).assoc("two", 2).assoc("three", 3));
-
-        assertNotEquals(PersistentTreeMap.of("one", 1).assoc("two", 2).assoc("three", 3),
-                        PersistentTreeMap.of(1, "one").assoc(2, "two").assoc(3, "three"));
-
-        assertNotEquals(PersistentTreeMap.of("Zne", 1).assoc("two", 2).assoc("three", 3),
-                        PersistentTreeMap.of("one", 1).assoc("two", 2).assoc("three", 3));
-
-        //noinspection ObjectEqualsNull
-        assertFalse(PersistentTreeMap.of("one", 1).equals(null));
-        //noinspection ObjectEqualsNull
-        assertFalse(PersistentTreeMap.empty().equals(null));
-
+        equalsHashCode(PersistentTreeMap.of("one", 1).assoc("two", 2).assoc("three", 3),
+                       PersistentTreeMap.of("three", 3).assoc("two", 2).assoc("one", 1),
+                       PersistentTreeMap.of("two", 2, "three", 3, "one", 1),
+                       PersistentTreeMap.of(1, "one", 2, "two", 3, "three3"));
     }
 
     @Test public void sequence() {
@@ -648,8 +646,7 @@ public class PersistentTreeMapTest {
         assertEquals(a.hashCode(), c.hashCode());
         StaticImportsTest.mapHelperOdd(PersistentTreeMap.ofSkipNull(
                 Tuple2.of(1, "One")), max);
-        StaticImportsTest.mapHelperEven(PersistentTreeMap.ofSkipNull(
-                null), max);
+        StaticImportsTest.mapHelperEven(PersistentTreeMap.ofSkipNull((Map.Entry<Integer,String>) null), max);
     }
 
     @Test public void testImMap0() {
