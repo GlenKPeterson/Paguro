@@ -31,7 +31,12 @@ public class LazyRefTest {
         assertEquals(f.apply(), new Integer(6));
 
         LazyRef<Integer> lr = LazyRef.of(f);
+
+        assertEquals("LazyRef(*not-computed-yet*)", lr.toString());
+
         assertEquals(lr.get(), new Integer(7));
+
+        assertEquals("LazyRef(7)", lr.toString());
 
         assertEquals(f.apply(), new Integer(8));
         intRef.set(-1);
@@ -39,6 +44,11 @@ public class LazyRefTest {
         assertEquals(lr.get(), new Integer(7));
         assertEquals(lr.get(), new Integer(7));
         assertEquals(lr.get(), new Integer(7));
+    }
+
+    @Test (expected = IllegalArgumentException.class)
+    public void ofEx() {
+        LazyRef.of(null);
     }
 
 //    @Test

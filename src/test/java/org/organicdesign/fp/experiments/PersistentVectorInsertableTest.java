@@ -16,8 +16,8 @@ public class PersistentVectorInsertableTest {
             assertEquals(Integer.valueOf(i), pvi.get(i));
             assertEquals(i + 1, pvi.size());
         }
-        System.out.println("\n\nFinal Vector:");
-        System.out.println(pvi.toString());
+//        System.out.println("\n\nFinal Vector:");
+//        System.out.println(pvi.toString());
 
         for (int i = 0; i < 200; i++) {
             assertEquals(Integer.valueOf(i), pvi.get(i));

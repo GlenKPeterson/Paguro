@@ -39,7 +39,7 @@ public class FunctionUtils {
         int i = 0;
         for (Map.Entry<A,B> item : map.entrySet()) {
             if (i > 4) {
-                sB.append("...");
+                sB.append(",...");
                 break;
             } else if (i > 0) {
                 sB.append(",");
@@ -72,7 +72,7 @@ public class FunctionUtils {
         int i = 0;
         for (Object item : as) {
             if (i > 4) {
-                sB.append("...");
+                sB.append(",...");
                 break;
             } else if (i > 0) {
                 sB.append(",");
