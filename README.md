@@ -12,7 +12,7 @@ Its type system is not nearly as advanced as Scala's.
 But it can still provide many of the best aspects of both these languages if used carefully.
 This project encourages that kind of use.
 
-Currently an *** Alpha Release *** but test coverage is high:
+Currently an *** Alpha Release *** but test coverage is above 80%:
 ![Test Coverage](testCoverage.png)
 
 For complete API documentation, please build the javadoc:
