@@ -25,11 +25,11 @@ dependency:tree
 	ImmutableJava is not allowed because Java is a registered trademark of Oracle and specifically prohibited from
 	the names of Java-related products.
 	-->
-	<artifactId>J-cicle</artifactId>
+	<artifactId>UncleJim</artifactId>
 	<version>0.9.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>J-cicle</name>
+	<name>UncleJim</name>
 	<description>Sequential collections for Java (formerly fp4java7).  Instead of changing data in place, a call to
 		a set(x) method returns a new instance with the item added to the collection.  The new instance shares as much
 		data as practical with the old instance.  The three collection implementations are currently taken from Clojure
@@ -37,7 +37,7 @@ dependency:tree
 		A number of helper methods make it easy to use all this in Java, immutably, type-safely, and with good
 		performance.
 	</description>
-	<url>https://github.com/GlenKPeterson/J-cicle</url>
+	<url>https://github.com/GlenKPeterson/UncleJim</url>
 
 	<licenses>
 		<license>
