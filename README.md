@@ -24,9 +24,7 @@ Map<String,Integer> itemMap = PersistentMapSorted.of(
         "Three", 3);
 ```
 
-What if you want to add items conditionally?  Would you create a temporary, mutable map, test each item, adding some to
-the mutable map, then call Collections.unmodifiableMap(tempMap) on it?  Ouch!  The following will create an
-UnmodifiableMap of 0, 1, 2, or 3 items (no nulls) depending on the values of showFirst, showSecond, and showThird:
+Create an UnmodifiableMap of 0, 1, 2, or 3 items (no nulls) depending on the values of showFirst, showSecond, and showThird:
 ```java
 Map<String,Integer> itemMap = PersistentMapSorted.ofSkipNull(
         showFirst ? Tuple2.of("One", 1) : null,
@@ -35,17 +33,15 @@ Map<String,Integer> itemMap = PersistentMapSorted.ofSkipNull(
 ```
 
 Similar type-safe methods are available for producing [unmodifiable Sets and Lists of any length](src/main/java/org/organicdesign/fp/StaticImports.java#L180)
-(unMaps currently go from 0 to 10 type-safe keys and values, or an infinite number of Map.Entries or Tuples).
+(unMaps currently go from 0 to 10 type-safe keys and values, or an infinite number of Map.Entries/Tuple2s).
 
-What if you want to add another item to an immutable map?
+Add another item to an immutable map?
 
 ```java
 itemMap = itemMap.assoc("Four", 4);
 ```
 
-What about transforming your unmodifiable data into other unmodifiable data?
-Lazily, without processing any more items than necessary?
-Typical usage (based on this unit test: [SequenceTest.java](src/test/java/org/organicdesign/fp/permanent/SequenceTest.java#L145)):
+Transform unmodifiable data into other unmodifiable data, lazily, without processing any more items than necessary (based on this unit test: [SequenceTest.java](src/test/java/org/organicdesign/fp/permanent/SequenceTest.java#L145)):
 
 ```java
 ImList<Integer> list = Sequence.ofArray(4,5)//       4,5
