@@ -188,26 +188,23 @@ default UnSet<T>	toUnSet()
 There is an outdated problem-set for learning this tool-kit: https://github.com/GlenKPeterson/LearnFpJava
 
 #Details
-The crux of this project is to retrofit the Clojure way of transforming data into Java code.  This definitely puts a square peg into a round hole.  There are several layers of conversion for collections:
- - java.util... collections are the standard Java interfaces that existing code all works with.  Like Guava, we want to be as compatible with these as possible, while preventing mutation-in-place.
- - org.organicdesign.fp.collection.Un... interfaces extend the java.util collection interfaces of the same name (minus the "Un" prefix) and deprecate and implement all the mutate-in-place methods so that they only throw exceptions.  This is useful in its own right as a way to declare that a function does not modify what is passed, or that what it returns cannot be modified.  Modification errors are caught as early as possible due to deprecation warnings.
- - org.organicdesign.fp.collection.Im... interfaces are the immutable, lightweight-copy Clojure-centric collection interfaces.  Only the "get" methods from the java.util... collection interfaces remain.  Additional "set" methods that return a new collectoin are added at this level.
- - org.organicdesign.fp.collection.Im...Impl are the lightweight-copy implementations of the above interfaces, generally taken directly from Clojure (hence the Eclipse licence for those components).  For starters, we will include the celebrated Vector and the sorted (tree) Set and Map implementations.
+ - Like Guava, we want to be as compatible with the java.util... collections as possible, while preventing mutation-in-place.
+ - org.organicdesign.fp.collection.**Un**... interfaces extend the java.util collection interfaces of the same name (minus the "Un" prefix) deprecate all the mutate-in-place methods to make your IDE show them in red, and implement them to throw UnsupportedOperationExceptions to fail fast if you try to use them anyway.  These interfaces are useful in its own right as a way to declare that a function does not modify what is passed, or that what it returns cannot be modified.  Modification errors are caught as early as possible due to deprecation warnings.
+ - org.organicdesign.fp.collection.**Im**... interfaces are the immutable, lightweight-copy collection interfaces.  Only the "get" methods from the java.util... collection interfaces remain.  Additional "set" methods that return a new collectoin are added at this level.
+ - org.organicdesign.fp.collection.**Persistent**... implementations have been taken directly from Clojure (hence the Eclipse licence for those components).  For starters, we will include the celebrated Vector and the sorted (tree) Set and Map implementations.  We will add the hash-based Set and Map later, but they will take a separate Equator to handle equals() and hashCode() much the way the tree-based collections take a Comparator.
 
-Within your own FP-centric world, you will use the Im interfaces and implementations and transform them with the Sequence abstraction.  Methods that interact with imperative Java code will take and return either the Un interfaces, or the java.util interfaces as necessary. 
+Within your own FP-centric world, you will use the Im interfaces and implementations and transform them with the Sequence abstraction.  Methods that interact with imperative Java code will take the java.util interfaces and return either the Im- interfaces, or Un- interfaces as necessary.  Where practical, try to use the Im-interfaces instead of their implementations, as new, better immutable collection designs surface every few years.
 
+The Sequence model implements lazy, immutable, type-safe, and thread-safe transformations.  It is also memoized/cached, so it is useful for repeated queries.  Sequence is most similar to the Clojure sequence abstraction, but it's pure Java and type-safe.  Sequence and View both allow processing in the smallest possible (and therefore laziest) increments.  I fond myself focusing on View more than Sequence at first, but Sequence has caught up and may replace View if the performance is similar.
 
-The Sequence model implements lightweight, lazy, immutable, type-safe, and thread-safe transformations.  It is also memoized/cached, so it is useful for repeated queries.  Sequence is most similar to the Clojure sequence abstraction, but it's pure Java and type-safe.  Sequence and View both allow processing in the smallest possible (and therefore laziest) increments.  I fond myself focusing on View more than Sequence at first, but Sequence is catching up and may replace View one day if the performance is similar.
+The classes in the <code>function</code> package allow you to use the Java 8 functional interfaces smoothly warpping things that throw checked exceptions in Java 8, or as "second class" functions in Java 7.  They are all named Function*N*  where *N* is the number of arguments they take.  They all automatically wrap and re-throw checked exceptions.  There are no versions for primitives, or that return **void**.  Well, except for SideEffect, which may be removed.
 
-The classes in the <code>function</code> package allow you to use the Java 8 functional interfaces smoothly warpping things that throw checked exceptions in Java 8, or as "second class" functions in Java 7.
-
-Some variables declared outside a lambda and used within one must be finial.
-The Mutable.____Ref classes work around this limitation.
+In Java, variables declared outside a lambda and used within one must be effectively finial.  The Mutable.Ref class works around this limitation.
 
 In short, Clojure doesn't have static types.  Scala has an TMTOWTDI attitude that reminds me of how C++ and Perl ended up producing write-only code.  Unwilling to move a million lines of code to either language, I tried to bring the best of both to Java.
 
 #Dependencies
-- Java 8 (tested with 64-bit Linux build 1.8.0_31).  Probably can be meaningfully adapted to work as far back as Java 5 with some work.  I plan to keep new development work on the main branch, but am very willing to help maintain branches back-ported to Java 7, 6, 5,.... if there is interest.
+- Java 8 (tested with 64-bit Linux build 1.8.0_45).  Probably can be meaningfully adapted to work well as far back as Java 5 with some work.  I plan to keep new development work on the main branch, but am very willing to help maintain branches back-ported to Java 7, 6, 5,.... if other people can share the load.
  
 #Build Dependencies
 - Maven (tested version: 3.2.3 64-bit Linux build)
@@ -220,12 +217,10 @@ In short, Clojure doesn't have static types.  Scala has an TMTOWTDI attitude tha
 2015-05-13 Release 0.9 alpha which packages type-safe versions of the Clojure collections and sequence abstraction for Java.
 - 3 Immutable collections: [PersistentVector](src/main/java/org/organicdesign/fp/collections/PersistentVector.java), [PersistentTreeMap](src/main/java/org/organicdesign/fp/collections/PersistentTreeMap.java), and [PersistentTreeSet](src/main/java/org/organicdesign/fp/collections/PersistentTreeSet.java).  None of these use equals() or hashcode().
 Vector doesn't need to and Map and Set take a Comparator.
-- Un-collections which are the Java collection interfaces, only unmodifiable, with mutator methods deprecated and
-default-implemented to throw exceptions.
-- Im-collections which add "mutator" methods that return a new collection reflecting the change, leaving the old
-collection unchanged.
+- Un-collections which are the Java collection interfaces, but unmodifiable.  These interfaces deprecate the mutator methods and implement them to throw exceptions.  Plus, UnMap implements UnIterable<UnMap.UnEntry<K,V>>.
+- Im-collections which add functional "mutator" methods that return a new collection reflecting the change, leaving the old collection unchanged.
 - Basic sequence abstraction on the Im- versions of the above.
-- Function interfaces that manage exceptions and play nicely with java.util.function.*
+- Function interfaces that manage exceptions and play nicely with java.util.function.* when practical.
 - Memoization methods on functional interfaces.
 
 2015-04-05 version 0.8.2:
