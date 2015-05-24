@@ -9,11 +9,11 @@
 
 package org.organicdesign.fp.collections;
 
-import java.util.Comparator;
-import java.util.SortedSet;
-
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.permanent.Sequence;
+
+import java.util.Comparator;
+import java.util.SortedSet;
 
 /**
  A wrapper that turns a PersistentTreeMap into a set.
@@ -94,9 +94,8 @@ public class PersistentTreeSet<E> implements ImSetSorted<E> {
     public static <T> PersistentTreeSet<T> ofMap(ImMapSorted<T,?> i) { return new PersistentTreeSet<>(i); }
 
     /**
-     Returns the comparator used to order the items in this set.  If this set uses the natural ordering of its keys,
-     this will return Function2.DEFAULT_COMPARATOR.  That's slightly different from java.util.SortedSet, so let me know
-     if that causes a problem.
+     Returns the comparator used to order the items in this set, or null if it uses Function2.DEFAULT_COMPARATOR
+     (for compatibility with java.util.SortedSet).
      */
     @Override public Comparator<? super E> comparator() { return impl.comparator(); }
 

@@ -14,14 +14,13 @@
 
 package org.organicdesign.fp.collections;
 
-import java.util.Comparator;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.organicdesign.fp.function.Function2;
+
+import java.util.Comparator;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.un;
@@ -152,7 +151,7 @@ public class PersistentTreeSetTest {
         assertArrayEquals(new Integer[0],
                           s1.subSet(3, 3).toTypedArray());
 
-        assertEquals(Function2.defaultComparator(), s1.comparator());
+        assertNull(s1.comparator());
 
 
         PersistentTreeSet<String> s2 = PersistentTreeSet.ofComp(STR_LEN_COMP,

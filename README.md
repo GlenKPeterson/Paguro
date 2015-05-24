@@ -215,6 +215,9 @@ In short, Clojure doesn't have static types.  Scala has an TMTOWTDI attitude tha
 - As of 2014-03-08, all major areas of functionality were covered by unit tests.
 
 #Change Log
+2015-05-24 version 0.9.3: Made TreeSet and TreeMap.comparator() return null when the default comparator is used (to 
+match the contract in SortedMap and SortedSet).
+
 2015-05-24 version 0.9.2: Moved experiments to my One-off_Examples project.
 
 2015-05-24 version 0.9.1: Renamed project from J-cicle to UncleJim.

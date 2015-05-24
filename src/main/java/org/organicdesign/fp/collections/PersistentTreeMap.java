@@ -8,6 +8,11 @@
 /* rich May 20, 2006 */
 package org.organicdesign.fp.collections;
 
+import org.organicdesign.fp.Option;
+import org.organicdesign.fp.function.Function0;
+import org.organicdesign.fp.function.Function2;
+import org.organicdesign.fp.permanent.Sequence;
+
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
@@ -15,11 +20,6 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.SortedMap;
 import java.util.Stack;
-
-import org.organicdesign.fp.Option;
-import org.organicdesign.fp.function.Function0;
-import org.organicdesign.fp.function.Function2;
-import org.organicdesign.fp.permanent.Sequence;
 
 /**
  Persistent Red Black Tree. Note that instances of this class are constant values
@@ -457,11 +457,10 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
 //    }
 
     /**
-     Returns the comparator used to order the keys in this map.  If this map uses the natural ordering of its keys,
-     this will return Function2.DEFAULT_COMPARATOR.  That's slightly different from java.util.SortedMap, so let me know
-     if that causes a problem.
+     Returns the comparator used to order the keys in this map, or null if it uses Function2.DEFAULT_COMPARATOR
+     (for compatibility with java.util.SortedMap).
      */
-    @Override public Comparator<? super K> comparator() { return comp; }
+    @Override public Comparator<? super K> comparator() { return (comp == Function2.DEFAULT_COMPARATOR) ? null : comp; }
 
     /** Returns true if the map contains the given key. */
     @SuppressWarnings("unchecked")

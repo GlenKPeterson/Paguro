@@ -14,12 +14,6 @@
 
 package org.organicdesign.fp.collections;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -27,6 +21,12 @@ import org.organicdesign.fp.StaticImportsTest;
 import org.organicdesign.fp.function.Function2;
 import org.organicdesign.fp.permanent.Sequence;
 import org.organicdesign.fp.tuple.Tuple2;
+
+import java.util.Arrays;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.un;
@@ -137,7 +137,7 @@ public class PersistentTreeMapTest {
         assertEquals("c", next.getKey());
         assertEquals(Integer.valueOf(3), next.getValue());
 
-        assertEquals(Function2.defaultComparator(), m2.comparator());
+        assertNull(m2.comparator());
         assertNotEquals(String.CASE_INSENSITIVE_ORDER.reversed(), m2.comparator());
 
         PersistentTreeMap<String,Integer> m3 =
