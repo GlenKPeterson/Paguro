@@ -40,23 +40,22 @@ public interface Equator<T> {
 
         @Override default boolean equalTo(T o1, T o2) { return compare(o1, o2) == 0; }
 
-        // TODO: Make the types work out here:
-//        ComparisonContext<Comparable<Object>> DEFAULT_COMPARISON_CONTEXT = new ComparisonContext<Comparable<Object>>() {
-//            @Override public int hash(Comparable<Object> o) { return (o == null) ? 0 : o.hashCode(); }
-//            @SuppressWarnings("ConstantConditions")
-//            @Override public int compare(Comparable<Object> o1, Comparable<Object> o2) {
-//                if (o1 == null) {
-//                    if (o2 == null) { return 0; }
-//                    return o2.compareTo(o1);
-//                }
-//                return o1.compareTo(o2);
-//            }
-//        };
-//
-//        @SuppressWarnings("unchecked")
-//        static <T extends Comparable<T>> ComparisonContext<T> defaultComparisonContext() {
-//            return (ComparisonContext<T>) DEFAULT_COMPARISON_CONTEXT;
-//        }
+        ComparisonContext<Comparable<Object>> DEFAULT_CONTEXT = new ComparisonContext<Comparable<Object>>() {
+            @Override public int hash(Comparable<Object> o) { return (o == null) ? 0 : o.hashCode(); }
+            @SuppressWarnings("ConstantConditions")
+            @Override public int compare(Comparable<Object> o1, Comparable<Object> o2) {
+                if (o1 == null) {
+                    if (o2 == null) { return 0; }
+                    return o2.compareTo(o1);
+                }
+                return o1.compareTo(o2);
+            }
+        };
+
+        @SuppressWarnings("unchecked")
+        static <T> ComparisonContext<T> defaultComparisonContext() {
+            return (ComparisonContext<T>) DEFAULT_CONTEXT;
+        }
     }
 
     // =================================================== Instance ===================================================
