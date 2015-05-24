@@ -1,14 +1,11 @@
-J-cicle (pronounced "Jay-sickle", like a frozen/immutable Java&trade;-icicle) brings Clojure collections,
-a Sequence abstraction, and other Functional Programming benefits to Java.
+Uncle Jim (or **UnColl JImm** from Unmodifiable Collections for Java&trade; Immutability) brings immutable collections, a Sequence abstraction, and other Functional Programming benefits to Java.
 Fluent interfaces encourage you to write expressions (that evaluate) instead of statements (that produce void).
-Immutable collections are fast enough to make it unnecessary to modify data in place.
-J-cicle pushes Java toward Clojure, but keeps the type saftey, objects, classes, and C-like syntax that Java programmers
-are accustomed to.
+Immutable collections are fast enough to make it unnecessary to modify data in place.  Unmodifiable wrappers for existing Java collections help you retrofit legacy code.  UncleJim pushes Java toward Clojure, but keeps the type saftey, objects, classes, and C-like syntax that Java programmers are accustomed to.
 
 Migrating large code bases to another language is not always practical.
 This project lets you think about your code the way that Clojure and to some degree Scala programmers do, but still write Java.
-Java does not have the terseness or regularity of Clojure.
-Its type system is not nearly as advanced as Scala's.
+Java may not have the terseness or regularity of Clojure.
+Its type system is not as advanced as Scala's.
 But it can still provide many of the best aspects of both these languages if used carefully.
 This project encourages that kind of use.
 
@@ -296,9 +293,9 @@ a,b,c...
 None of those are simple uses of interpose.
 
 #Licenses
-Java&trade; is a registered trademark of the Oracle Corporation in the US and other countries.  J-cicle is not part of Java.  Oracle is in no way affiliated with the J-cicle project.
+Java&trade; is a registered trademark of the Oracle Corporation in the US and other countries.  UncleJim is not part of Java.  Oracle is in no way affiliated with the UncleJim project.
 
-J-cicle is not part of Clojure.  Rich Hickey and the Clojure team are in no way affiliated with the J-cicle project, though it borrows heavily from their thoughts and even some of their open-source code.
+UncleJim is not part of Clojure.  Rich Hickey and the Clojure team are in no way affiliated with the UncleJim project, though it borrows heavily from their thoughts and even some of their open-source code.
 
 Most of this work is licensed under the Apache 2.0 license.  However, the persistent collections (PersistentVector, PersistentSortedMap, PersistentSortedSet in the collections folder as of 2015-05-13) are originally copied from, and still based on, the Clojure source code by Rich Hickey which is released under the Eclipse Public License (as of fall 2014).  Those files are derivative works and must remain under the EPL license unless the original authors give permission to change it, or chooses a new license.  New contributions should be made under the Apache 2.0 license whenever practical.
 
