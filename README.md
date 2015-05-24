@@ -1,4 +1,4 @@
-UncleJim (or UnColl JImm from **Un**modifiable **Coll**ections for **J**ava&trade; **Imm**utability) brings immutable collections, a Sequence abstraction, and other Functional Programming benefits to Java.
+UncleJim (or "UnColl JImm" from **Un**modifiable **Coll**ections for **J**ava&trade; **Imm**utability) brings immutable collections, a Sequence abstraction, and other Functional Programming benefits to Java.
 Fluent interfaces encourage you to write expressions (that evaluate) instead of statements (that produce void).
 Immutable collections are fast enough to make it unnecessary to modify data in place.  Unmodifiable wrappers for existing Java collections help you retrofit legacy code.  UncleJim pushes Java toward Clojure, but keeps the type saftey, objects, classes, and C-like syntax that Java programmers are accustomed to.
 
