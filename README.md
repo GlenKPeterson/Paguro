@@ -19,7 +19,7 @@ For complete API documentation, please build the javadoc:
 #Usage
 Create an immutable, type safe map:
 ```java
-Map<String,Integer> itemMap = PersistentMapSorted.of(
+ImMap<String,Integer> itemMap = PersistentMapSorted.of(
         "One", 1,
         "Two", 2,
         "Three", 3);
@@ -27,7 +27,7 @@ Map<String,Integer> itemMap = PersistentMapSorted.of(
 
 Create an UnmodifiableMap of 0, 1, 2, or 3 items (no nulls) depending on the values of showFirst, showSecond, and showThird:
 ```java
-Map<String,Integer> itemMap = PersistentMapSorted.ofSkipNull(
+ImMap<String,Integer> itemMap = PersistentMapSorted.ofSkipNull(
         showFirst ? Tuple2.of("One", 1) : null,
         showSecond ? Tuple2.of("Two", 2) : null,
         showThird ? Tuple2.of("Three", 3) : null);
@@ -75,6 +75,7 @@ The goals of this project are to make it easy to use Java:
  - "Throw exceptions at people, not at code" (says Bill Venners, but also Josh Bloch Item 59)
  - Concurrency friendly (Josh Bloch Item 66, 67)
  - Context-sensitive equality: prefer Comparators to <code>equals()</code>, <code>hashcode()</code> and <code>compareTo()</code> ([Daniel Spiewak, Viktor Klang, Rúnar Óli Bjarnason, Hughes Chabot](http://glenpeterson.blogspot.com/2013/09/object-equality-is-context-relative.html), java.util.TreeSet, java.util.TreeMap)
+ - Sensible toString() implementations (like Scala)
  - Compatibly with existing/legacy Java code
 
 Higher order functions are not just briefer to write and read, they are less to *think* about.
