@@ -18,16 +18,16 @@
       <profile default="true" name="Default" enabled="false">
         <processorPath useClasspath="true" />
       </profile>
-      <profile default="false" name="Annotation profile for J-cicle" enabled="true">
+      <profile default="false" name="Annotation profile for UncleJim" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
-        <module name="J-cicle" />
+        <module name="UncleJim" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="J-cicle" target="1.8" />
+      <module name="UncleJim" target="1.8" />
     </bytecodeTargetLevel>
   </component>
   <component name="CopyrightManager" default="" />
@@ -203,7 +203,7 @@
   </component>
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/J-cicle.iml" filepath="$PROJECT_DIR$/J-cicle.iml" />
+      <module fileurl="file://$PROJECT_DIR$/UncleJim.iml" filepath="$PROJECT_DIR$/UncleJim.iml" />
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
