@@ -16,6 +16,8 @@ package org.organicdesign.fp;
 import org.organicdesign.fp.function.Function0;
 import org.organicdesign.fp.function.Function1;
 
+import java.util.Objects;
+
 /**
  Indicates presence or absence of a value (null is a valid, present value) or end-of-stream.
  This is NOT a type-safe null.
@@ -61,33 +63,24 @@ public interface Option<T> {
 
     /** Represents the absence of a value */
     final class None<T> implements Option<T> {
+        /** Private constructor for singleton. */
         private None() {}
 
-        @Override
-        public T get() { throw new IllegalStateException("Called get on None"); }
+        @Override public T get() { throw new IllegalStateException("Called get on None"); }
 
-        @Override
-        public T getOrElse(T t) { return t; }
+        @Override public T getOrElse(T t) { return t; }
 
-        @Override
-        public boolean isSome() { return false; }
+        @Override public boolean isSome() { return false; }
 
-        @Override
-        public <U> U patMat(Function1<T,U> has, Function0<U> hasNot) {
-            return hasNot.get();
-        }
+        @Override public <U> U patMat(Function1<T,U> has, Function0<U> hasNot) { return hasNot.get(); }
 
         /** Valid, but deprecated because it's usually an error to call this in client code. */
         @Deprecated // Has no effect.  Darn!
-        @Override
-        public int hashCode() { return 0; }
+        @Override public int hashCode() { return 0; }
 
         /** Valid, but deprecated because it's usually an error to call this in client code. */
         @Deprecated // Has no effect.  Darn!
-        @Override
-        public boolean equals(Object other) {
-            return (this == other) || (other instanceof None);
-        }
+        @Override public boolean equals(Object other) { return (this == other) || (other instanceof None); }
 
         // Defend our singleton property in the face of deserialization.  Not sure this is necessary, but probably
         // won't hurt.
@@ -101,44 +94,31 @@ public interface Option<T> {
 
         //public static Some<T> of(T t) { return new Option(t); }
 
-        @Override
-        public T get() { return item; }
+        @Override public T get() { return item; }
 
-        @Override
-        public T getOrElse(T t) { return item; }
+        @Override public T getOrElse(T t) { return item; }
 
-        @Override
-        public boolean isSome() { return true; }
+        @Override public boolean isSome() { return true; }
 
-        @Override
-        public <U> U patMat(Function1<T,U> has, Function0<U> hasNot) {
+        @Override public <U> U patMat(Function1<T,U> has, Function0<U> hasNot) {
             return has.apply(item);
         }
 
         /** Valid, but deprecated because it's usually an error to call this in client code. */
         @Deprecated // Has no effect.  Darn!
-        @Override
-        public int hashCode() {
-            return item.hashCode();
+        @Override public int hashCode() {
+            // We return Integer.MIN_VALUE for null to make it different from None which always returns zero.
+            return item == null ? Integer.MIN_VALUE : item.hashCode();
         }
 
         /** Valid, but deprecated because it's usually an error to call this in client code. */
         @Deprecated // Has no effect.  Darn!
-        @Override
-        public boolean equals(Object other) {
-            // Cheapest operation first...
+        @Override public boolean equals(Object other) {
             if (this == other) { return true; }
+            if ( !(other instanceof Option) ) { return false; }
 
-            if ((other == null) ||
-                !(other instanceof Option) ||
-                (this.hashCode() != other.hashCode())) {
-                return false;
-            }
-            // Details...
-            final Some that = (Some) other;
-
-            // If this is not a database object, compare "significant" fields here.
-            return this.item.equals(that.item);
+            final Option that = (Option) other;
+            return that.isSome() && Objects.equals(this.item, that.get());
         }
     }
 }
