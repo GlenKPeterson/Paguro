@@ -14,8 +14,6 @@
 
 package org.organicdesign.fp.ephemeral;
 
-import java.util.Iterator;
-
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.Transformable;
 import org.organicdesign.fp.collections.UnIterator;
@@ -33,9 +31,10 @@ public interface View<T> extends Transformable<T> {
     @SuppressWarnings("unchecked")
     static <U> View<U> emptyView() { return (View<U>) EMPTY_VIEW; }
 
-    static <T> View<T> of(Iterator<T> i) { return ViewFromIterator.of(i); }
+    // Just wrong.  You can't trust an iterator that you didn't get yourself.
+//    static <T> View<T> of(Iterator<T> i) { return ViewFromIterable.of(i); }
 
-    static <T> View<T> of(Iterable<T> i) { return ViewFromIterator.of(i); }
+    static <T> View<T> of(Iterable<T> i) { return ViewFromIterable.of(i); }
 
     @SafeVarargs
     static <T> View<T> ofArray(T... i) { return ViewFromArray.of(i); }

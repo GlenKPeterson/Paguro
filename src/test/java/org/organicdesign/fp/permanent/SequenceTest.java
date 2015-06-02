@@ -14,11 +14,14 @@
 
 package org.organicdesign.fp.permanent;
 
-import java.util.*;
-
 import org.junit.Test;
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.collections.UnIterable;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -28,7 +31,6 @@ public class SequenceTest {
         Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         assertArrayEquals(ints, Sequence.ofArray(ints).toTypedArray());
         assertArrayEquals(ints, Sequence.of(Arrays.asList(ints)).toTypedArray());
-        assertArrayEquals(ints, Sequence.of(Arrays.asList(ints).iterator()).toTypedArray());
     }
 
     @Test public void emptySequence() {

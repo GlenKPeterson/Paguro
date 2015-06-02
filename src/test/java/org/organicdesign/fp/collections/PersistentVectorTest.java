@@ -182,7 +182,7 @@ public class PersistentVectorTest {
         final int SEVERAL = SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
         PersistentVector<Integer> is = PersistentVector.empty();
         for (int j = 0; j < SEVERAL; j++){
-            is = is.append(j);
+            is = is.appendOne(j);
         }
         assertEquals(SEVERAL, is.size());
         for (int j = 0; j < SEVERAL; j++){
@@ -255,7 +255,7 @@ public class PersistentVectorTest {
                 startTime = System.nanoTime();
                 PersistentVector<Integer> test = PersistentVector.empty();
                 for (int i = 0; i < numItems; i++) {
-                    test = test.append(i);
+                    test = test.appendOne(i);
                 }
                 assertEquals(numItems, test.size());
                 assertEquals(Integer.valueOf(numItems / 2), test.get(numItems / 2));

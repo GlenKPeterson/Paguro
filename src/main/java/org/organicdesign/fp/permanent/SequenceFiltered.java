@@ -22,7 +22,7 @@ import org.organicdesign.fp.tuple.Tuple2;
 public class SequenceFiltered<T> implements Sequence<T> {
     private final LazyRef<Tuple2<Option<T>,Sequence<T>>> laz;
 
-    SequenceFiltered(Sequence<T> s, Function1<? super T,Boolean> predicate) {
+    private SequenceFiltered(Sequence<T> s, Function1<? super T,Boolean> predicate) {
         laz = LazyRef.of(() -> {
             Sequence<T> seq = s;
             Option<T> item = seq.head();

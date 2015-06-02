@@ -21,7 +21,7 @@ import org.organicdesign.fp.tuple.Tuple2;
 public class SequenceTaken<T> implements Sequence<T> {
     private final LazyRef<Tuple2<Option<T>,Sequence<T>>> laz;
 
-    SequenceTaken(Sequence<T> v, long n) {
+    private SequenceTaken(Sequence<T> v, long n) {
         laz = LazyRef.of(() -> {
             Option<T> first = v.head();
             return Tuple2.of(first,

@@ -9,7 +9,7 @@ import org.organicdesign.fp.tuple.Tuple2;
 public class SequenceTakenWhile<T> implements Sequence<T> {
     private final LazyRef<Tuple2<Option<T>,Sequence<T>>> laz;
 
-    SequenceTakenWhile(Sequence<T> seq, Function1<? super T,Boolean> pred) {
+    private SequenceTakenWhile(Sequence<T> seq, Function1<? super T,Boolean> pred) {
         laz = LazyRef.of(() -> {
             Option<T> first = seq.head();
             return (first.isSome() && pred.apply(first.get()))

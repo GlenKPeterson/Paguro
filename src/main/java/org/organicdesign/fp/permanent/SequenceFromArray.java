@@ -22,7 +22,7 @@ public class SequenceFromArray<T> implements Sequence<T> {
     private final LazyRef<Tuple2<Option<T>,Sequence<T>>> laz;
 
     // TODO: Develop tests for this and test for what happens when idx > ts.length or idx < 0;
-    SequenceFromArray(int idx, T[] ts) {
+    private SequenceFromArray(int idx, T[] ts) {
         laz = LazyRef.of(() -> Tuple2.of(Option.of(ts[idx]), (idx == (ts.length - 1))
                                                               ? Sequence.emptySequence()
                                                               : new SequenceFromArray<>(idx + 1, ts)));

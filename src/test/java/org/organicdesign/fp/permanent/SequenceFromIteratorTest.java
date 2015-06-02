@@ -14,13 +14,13 @@
 
 package org.organicdesign.fp.permanent;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import org.junit.Test;
 import org.organicdesign.fp.Mutable;
 import org.organicdesign.fp.function.Function0;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -29,16 +29,16 @@ public class SequenceFromIteratorTest {
     @Test public void basic() {
         List<Integer> ints = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9);
         assertEquals(ints,
-                     Sequence.of(ints.iterator()).toJavaList());
+                     Sequence.of(ints).toJavaList());
         assertArrayEquals(ints.toArray(),
-                          Sequence.of(ints.iterator()).toTypedArray());
+                          Sequence.of(ints).toTypedArray());
     }
 
 
     @Test
     public void construction() {
         List<Integer> ints = Arrays.asList(5, 4, 3, 2, 1);
-        Sequence<Integer> five = Sequence.of(ints.iterator());
+        Sequence<Integer> five = Sequence.of(ints);
         Sequence<Integer> four = five.tail();
         Sequence<Integer> three = four.tail();
         Sequence<Integer> two = three.tail();
@@ -63,7 +63,7 @@ public class SequenceFromIteratorTest {
 
     @Test
     public void blankIterator() {
-        Sequence<Integer> zero = Sequence.of(Collections.<Integer>emptyList().iterator());
+        Sequence<Integer> zero = Sequence.of(Collections.<Integer>emptyList());
         assertEquals(Sequence.emptySequence(), zero);
     }
 
@@ -83,7 +83,7 @@ public class SequenceFromIteratorTest {
                                   i.set(i.value() + 1);
                                   return 1;
                               });
-        Sequence<Function0<Integer>> three = Sequence.of(ints.iterator());
+        Sequence<Function0<Integer>> three = Sequence.of(ints);
         Sequence<Function0<Integer>> two = three.tail();
         Sequence<Function0<Integer>> one = two.tail();
         Sequence<Function0<Integer>> zero = one.tail();

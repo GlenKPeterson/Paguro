@@ -14,6 +14,17 @@
 
 package org.organicdesign.fp;
 
+import org.organicdesign.fp.collections.PersistentTreeSet;
+import org.organicdesign.fp.collections.UnCollection;
+import org.organicdesign.fp.collections.UnIterable;
+import org.organicdesign.fp.collections.UnIterator;
+import org.organicdesign.fp.collections.UnList;
+import org.organicdesign.fp.collections.UnListIterator;
+import org.organicdesign.fp.collections.UnMap;
+import org.organicdesign.fp.collections.UnMapSorted;
+import org.organicdesign.fp.collections.UnSet;
+import org.organicdesign.fp.collections.UnSetSorted;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,16 +38,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
-
-import org.organicdesign.fp.collections.PersistentTreeSet;
-import org.organicdesign.fp.collections.UnCollection;
-import org.organicdesign.fp.collections.UnIterator;
-import org.organicdesign.fp.collections.UnList;
-import org.organicdesign.fp.collections.UnListIterator;
-import org.organicdesign.fp.collections.UnMap;
-import org.organicdesign.fp.collections.UnMapSorted;
-import org.organicdesign.fp.collections.UnSet;
-import org.organicdesign.fp.collections.UnSetSorted;
 
 /**
  Contains methods for building immutable collections.  These will never return null, the closest they get is to return
@@ -56,8 +57,27 @@ public class StaticImports {
     // "There is no one-sided equality. If it is one-sided, that is it's asymmetric, then it's just wrong."
     // Which is a little ironic because with inheritance, there are many cases in Java where equality is one-sided.
 
+    /** Returns an unmodifiable version of the given iterable. */
+    // TODO: Test this.
+    public static <T> UnIterable<T> un(Iterable<T> iterable) {
+        if (iterable == null) { return UnIterable.empty(); }
+        if (iterable instanceof UnIterable) { return (UnIterable<T>) iterable; }
+        return () -> new UnIterator<T>() {
+            private final Iterator<T> iter = iterable.iterator();
+            @Override public boolean hasNext() { return iter.hasNext(); }
+            @Override public T next() { return iter.next(); }
+            // Defining equals and hashcode makes no sense because can't call them without changing the iterator
+            // which both makes it useless, and changes the equals and hashcode results.
+//            @Override public int hashCode() { return iter.hashCode(); }
+//            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
+//            @Override public boolean equals(Object o) { return iter.equals(o); }
+        };
+    }
+
     /** Returns an unmodifiable version of the given iterator. */
-    public static <T> UnIterator<T> un(Iterator<T> iter) {
+    // TODO: Never make this public.  We can't trust an iterator that we didn't get
+    // brand new ourselves, because iterators are inherently unsafe to share.
+    private static <T> UnIterator<T> un(Iterator<T> iter) {
         if (iter == null) { return UnIterator.empty(); }
         if (iter instanceof UnIterator) { return (UnIterator<T>) iter; }
         return new UnIterator<T>() {

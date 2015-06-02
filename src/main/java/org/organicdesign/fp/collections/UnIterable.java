@@ -9,6 +9,9 @@ public interface UnIterable<T> extends Iterable<T> {
     @Override UnIterator<T> iterator();
 
     // ==================================================== Static ====================================================
+
+    static <E> UnIterable<E> empty() { return () -> UnIterator.empty(); }
+
     /** This is correct, but O(n) */
     static int hashCode(Iterable is) {
         if (is == null) { throw new IllegalArgumentException("Can't have a null iteratable."); }

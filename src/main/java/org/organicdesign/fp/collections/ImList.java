@@ -13,14 +13,18 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
+import org.organicdesign.fp.Option;
+import org.organicdesign.fp.permanent.Sequence;
+
 /**
  Holds Immutable "modification" methods that return a new ImList reflecting the modification while sharing as much data
  structure with the previous ImList as possible (for performance).
  */
-public interface ImList<E> extends UnList<E> {
-// Do we want to make an ImIterator thatis truly immutable - a Sequence?
-//    /** {@inheritDoc} */
-//    @Override default UnIterator<E> iterator() { return listIterator(0); }
+public interface ImList<E> extends UnList<E>, Sequence<E> {
+    // Do we want to make an ImIterator that's truly immutable - a Sequence?
+    // Kind of a moot point when this overrides the same method on Sequence.
+    /** {@inheritDoc} */
+    @Override default UnIterator<E> iterator() { return listIterator(0); }
 //
 //    /** {@inheritDoc} */
 //    @Override default UnListIterator<E> listIterator() { return listIterator(0); }
@@ -42,7 +46,7 @@ public interface ImList<E> extends UnList<E> {
      @return a new ImList with the additional item.
      */
     default ImList<E> insert(int i, E val) {
-        if (i == size()) { return append(val); }
+        if (i == size()) { return appendOne(val); }
 
         if ( (i > size()) || (i < 0) ) {
             throw new IllegalArgumentException("Can't insert outside the possible bounds");
@@ -52,11 +56,11 @@ public interface ImList<E> extends UnList<E> {
         ImList<E> v = PersistentVector.empty();
         int j = 0;
         for (; j < i; j++) {
-            v = v.append(iter.next());
+            v = v.appendOne(iter.next());
         }
-        v = v.append(val);
+        v = v.appendOne(val);
         for (; j < size(); j++) {
-            v = v.append(iter.next());
+            v = v.appendOne(iter.next());
         }
         return v;
     }
@@ -66,7 +70,28 @@ public interface ImList<E> extends UnList<E> {
      * @param e the values to insert
      * @return a new ImList with the additional item at the end.
      */
-    ImList<E> append(E e);
+    ImList<E> appendOne(E e);
+
+//    /** {@inheritDoc} */
+//    @Override ImList<E> append(Sequence<E> other);
+
+
+    /**
+     The first item in this sequence.  This was originally called first() but that conflicted with SortedSet.first()
+     which did not return an Option and threw an exception when the set was empty.
+     */
+    @Override default Option<E> head() {
+        return size() > 0 ? Option.of(get(0)) : Option.none();
+    }
+
+    /**
+     The rest of this sequnce (all the items after its head).  This was originally called rest(), but when I renamed
+     first() to head(), I renamed rest() to tail() so that it wouldn't mix metaphors.
+     */
+    @Override default Sequence<E> tail() {
+        return Sequence.of(this).tail();
+    }
+
 
 // I don't know if this is a good idea or not and I don't want to have to support it if not.
 //    /**

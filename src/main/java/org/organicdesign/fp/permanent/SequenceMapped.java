@@ -22,7 +22,7 @@ import org.organicdesign.fp.tuple.Tuple2;
 public class SequenceMapped<T,U>  implements Sequence<U> {
     private final LazyRef<Tuple2<Option<U>,Sequence<U>>> laz;
 
-    SequenceMapped(Sequence<T> seq, Function1<? super T,? extends U> func) {
+    private SequenceMapped(Sequence<T> seq, Function1<? super T,? extends U> func) {
         laz = LazyRef.of(() -> {
             Option<T> first = seq.head();
             return first.isSome()

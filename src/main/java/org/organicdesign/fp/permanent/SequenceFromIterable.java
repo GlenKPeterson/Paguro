@@ -14,11 +14,11 @@
 
 package org.organicdesign.fp.permanent;
 
-import java.util.Iterator;
-
 import org.organicdesign.fp.LazyRef;
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.tuple.Tuple2;
+
+import java.util.Iterator;
 
 /**
  If you use the source iterator after passing it to this class then the behavior of this class
@@ -30,31 +30,38 @@ import org.organicdesign.fp.tuple.Tuple2;
  As long as you do not touch the iterator after passing it to the constructor of this object, this
  object will present and immutable, lazy, memoized, thread-safe view of the underlying iterator.
  */
-class SequenceFromIterator<T> implements Sequence<T> {
+class SequenceFromIterable<T> implements Sequence<T> {
     private final LazyRef<Tuple2<Option<T>,Sequence<T>>> laz;
 
-    SequenceFromIterator(Iterator<T> iter) {
+    // This must always be private because it wraps an iterator
+    // And we cannot accept an iterator from anyone but oursleves.
+    private SequenceFromIterable(Iterator<T> iter) {
         laz = LazyRef.of(() -> iter.hasNext()
-                                ? Tuple2.of(Option.of(iter.next()), new SequenceFromIterator<>(iter))
+                                ? Tuple2.of(Option.of(iter.next()), new SequenceFromIterable<>(iter))
                                 : Sequence.emptySeqTuple());
     }
 
-    public static <T> Sequence<T> of(Iterator<T> i) {
-        if (i == null) { return Sequence.emptySequence(); }
-        return new SequenceFromIterator<>(i);
-    }
+    // Just wrong.  You can't share an iterator with anyone else,
+    // So only accept an Iterable, to guarantee that we can grab our own,
+    // private iterator.
+//    public static <T> Sequence<T> of(Iterator<T> i) {
+//        if (i == null) { return Sequence.emptySequence(); }
+//        return new SequenceFromIterable<>(i);
+//    }
 
     public static <T> Sequence<T> of(Iterable<T> i) {
         if (i == null) { return Sequence.emptySequence(); }
         Iterator<T> iter = i.iterator();
         if (iter == null) { return Sequence.emptySequence(); }
-        return new SequenceFromIterator<>(iter);
+        return new SequenceFromIterable<>(iter);
     }
 
     @Override public Option<T> head() { return laz.get()._1(); }
 
     @Override public Sequence<T> tail() { return laz.get()._2(); }
 
+    // You can't get a hashcode or equals for something backed by an iterator because doing so is eager (not lazy)
+    // and also changes the state of the iterator
 //    @Override public int hashCode() { return Sequence.hashCode(this); }
 //
 //    @Override public boolean equals(Object o) {
@@ -64,6 +71,6 @@ class SequenceFromIterator<T> implements Sequence<T> {
 //    }
 //
 //    @Override public String toString() {
-//        return "SequenceFromIterator(" + (laz.isRealizedYet() ? laz.get()._1() : "*lazy*") + ",...)";
+//        return "SequenceFromIterable(" + (laz.isRealizedYet() ? laz.get()._1() : "*lazy*") + ",...)";
 //    }
 }

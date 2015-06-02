@@ -22,7 +22,7 @@ class SequenceFlatMapped<T,U> implements Sequence<U> {
     private final LazyRef<Sequence<U>> laz;
 
     @SuppressWarnings("unchecked")
-    SequenceFlatMapped(Sequence<T> seq, Function1<? super T,Sequence<U>> f) {
+    private SequenceFlatMapped(Sequence<T> seq, Function1<? super T,Sequence<U>> f) {
         laz = LazyRef.of(() -> {
             final Option<T> first = seq.head();
             return first.isSome()

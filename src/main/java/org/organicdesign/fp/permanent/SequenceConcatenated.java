@@ -19,7 +19,6 @@ import org.organicdesign.fp.Option;
 class SequenceConcatenated<T> implements Sequence<T> {
     private final LazyRef<Sequence<T>> laz;
 
-    // TODO: Is there a better way of making a lazy Sequence that I could just return here?
     SequenceConcatenated(Sequence<T> preSeq, Sequence<T> postSeq) {
         laz = LazyRef.of(() -> {
             final Option<T> preFirst = preSeq.head();

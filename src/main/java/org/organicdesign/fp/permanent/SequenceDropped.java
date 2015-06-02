@@ -20,7 +20,7 @@ import org.organicdesign.fp.Option;
 public class SequenceDropped<T> implements Sequence<T> {
     private final LazyRef<Sequence<T>> laz;
 
-    SequenceDropped(Sequence<T> v, long n) {
+    private SequenceDropped(Sequence<T> v, long n) {
         laz = LazyRef.of(() -> {
             Sequence<T> seq = v;
             for (long i = n; i > 0; i--) {

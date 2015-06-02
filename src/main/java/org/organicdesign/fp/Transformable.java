@@ -14,6 +14,15 @@
 
 package org.organicdesign.fp;
 
+import org.organicdesign.fp.collections.ImList;
+import org.organicdesign.fp.collections.ImMapSorted;
+import org.organicdesign.fp.collections.ImSetSorted;
+import org.organicdesign.fp.collections.PersistentTreeMap;
+import org.organicdesign.fp.collections.PersistentTreeSet;
+import org.organicdesign.fp.collections.PersistentVector;
+import org.organicdesign.fp.function.Function1;
+import org.organicdesign.fp.function.Function2;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -25,15 +34,6 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
-import org.organicdesign.fp.collections.ImList;
-import org.organicdesign.fp.collections.ImMapSorted;
-import org.organicdesign.fp.collections.ImSetSorted;
-import org.organicdesign.fp.collections.PersistentTreeMap;
-import org.organicdesign.fp.collections.PersistentTreeSet;
-import org.organicdesign.fp.collections.PersistentVector;
-import org.organicdesign.fp.function.Function1;
-import org.organicdesign.fp.function.Function2;
 
 /**
  Represents transformations to be carried out on a collection.  This class also implements the
@@ -178,7 +178,7 @@ public interface Transformable<T> extends Realizable<T> {
     }
 
     /** {@inheritDoc} */
-    @Override default ImList<T> toImList() { return foldLeft(PersistentVector.empty(), (ts, t) -> ts.append(t)); }
+    @Override default ImList<T> toImList() { return foldLeft(PersistentVector.empty(), (ts, t) -> ts.appendOne(t)); }
 
     /** {@inheritDoc} */
     @Override default <U,V> Map<U,V> toJavaMap(final Function1<? super T,Map.Entry<U,V>> f1) {

@@ -14,8 +14,6 @@
 
 package org.organicdesign.fp.permanent;
 
-import java.util.Iterator;
-
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.Transformable;
 import org.organicdesign.fp.collections.UnIterator;
@@ -58,12 +56,15 @@ public interface Sequence<T> extends Transformable<T> {
         return Tuple2.of(Option.none(), Sequence.emptySequence());
     }
 
-    static <T> Sequence<T> of(Iterator<T> i) {
-        return SequenceFromIterator.of(i);
-    }
+    // This is just wrong.  You can't reliably share an iterator with anyone else.
+    // Therefore, you can only wrap an Interable so that you can get your own private
+    // iterator from it.
+//    static <T> Sequence<T> of(Iterator<T> i) {
+//        return SequenceFromIterable.of(i);
+//    }
 
     static <T> Sequence<T> of(Iterable<T> i) {
-        return SequenceFromIterator.of(i);
+        return SequenceFromIterable.of(i);
     }
 
     @SafeVarargs
