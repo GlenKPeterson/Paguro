@@ -25,61 +25,61 @@ public class ViewDroppedTest {
     @Test
     public void singleDrops() {
         assertArrayEquals(new Integer[] {1,2,3,4,5,6,7,8,9},
-                          View.ofArray(1,2,3,4,5,6,7,8,9).drop(0).toTypedArray());
+                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9).drop(0).toTypedArray());
         assertArrayEquals(new Integer[] {2,3,4,5,6,7,8,9},
-                          View.ofArray(1,2,3,4,5,6,7,8,9).drop(1).toTypedArray());
+                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9).drop(1).toTypedArray());
         assertArrayEquals(new Integer[] {3,4,5,6,7,8,9},
-                          View.ofArray(1,2,3,4,5,6,7,8,9).drop(2).toTypedArray());
+                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9).drop(2).toTypedArray());
         assertArrayEquals(new Integer[] {4, 5, 6, 7, 8, 9},
-                          View.ofArray(1,2,3,4,5,6,7,8,9).drop(3).toTypedArray());
+                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9).drop(3).toTypedArray());
         assertArrayEquals(new Integer[] {9},
-                          View.ofArray(1,2,3,4,5,6,7,8,9).drop(8).toTypedArray());
+                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9).drop(8).toTypedArray());
         assertArrayEquals(new Integer[] {},
-                          View.ofArray(1,2,3,4,5,6,7,8,9).drop(9).toTypedArray());
+                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9).drop(9).toTypedArray());
         assertArrayEquals(new Integer[] {},
-                          View.ofArray(1,2,3,4,5,6,7,8,9).drop(10).toTypedArray());
+                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9).drop(10).toTypedArray());
         assertArrayEquals(new Integer[] {},
-                          View.ofArray(1,2,3,4,5,6,7,8,9).drop(10000).toTypedArray());
+                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9).drop(10000).toTypedArray());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void exception1() {
-        View.ofArray(1,2,3,4,5,6,7,8,9).drop(-1);
+        View.of(1, 2, 3, 4, 5, 6, 7, 8, 9).drop(-1);
     }
     @Test(expected = IllegalArgumentException.class)
     public void exception2() {
-        View.ofArray(1,2,3,4,5,6,7,8,9).drop(-99);
+        View.of(1, 2, 3, 4, 5, 6, 7, 8, 9).drop(-99);
     }
 
     @Test
     public void multiDrops() {
         assertArrayEquals(new Integer[] {3,4,5,6,7,8,9},
-                          View.ofArray(1,2,3,4,5,6,7,8,9).drop(1).drop(1).toTypedArray());
+                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9).drop(1).drop(1).toTypedArray());
         assertArrayEquals(new Integer[] {4,5,6,7,8,9},
-                          View.ofArray(1,2,3,4,5,6,7,8,9).drop(1).drop(1).drop(1).toTypedArray());
+                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9).drop(1).drop(1).drop(1).toTypedArray());
         assertArrayEquals(new Integer[] {9},
-                          View.ofArray(1,2,3,4,5,6,7,8,9)
+                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
                                   .drop(1).drop(1).drop(1).drop(1).drop(1)
                                   .drop(1).drop(1).drop(1).toTypedArray());
         assertArrayEquals(new Integer[] {},
-                          View.ofArray(1,2,3,4,5,6,7,8,9)
+                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
                                   .drop(1).drop(1).drop(1).drop(1).drop(1)
                                   .drop(1).drop(1).drop(1).drop(1).toTypedArray());
         assertArrayEquals(new Integer[] {},
-                          View.ofArray(1,2,3,4,5,6,7,8,9)
+                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
                                   .drop(1).drop(1).drop(1).drop(1).drop(1)
                                   .drop(1).drop(1).drop(1).drop(1).drop(1).toTypedArray());
         assertArrayEquals(new Integer[] {},
-                          View.ofArray(1,2,3,4,5,6,7,8,9)
+                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
                                   .drop(1).drop(1).drop(1).drop(1).drop(1)
                                   .drop(1).drop(1).drop(1).drop(1).drop(1)
                                   .drop(1).drop(1).drop(1).drop(1).drop(1).toTypedArray());
 
         assertArrayEquals(new Integer[] {7,8,9},
-                          View.ofArray(1,2,3,4,5,6,7,8,9)
+                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
                                   .drop(0).drop(1).drop(2).drop(3).toTypedArray());
         assertArrayEquals(new Integer[] {7,8,9},
-                          View.ofArray(1,2,3,4,5,6,7,8,9)
+                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
                                   .drop(3).drop(2).drop(1).drop(0).toTypedArray());
     }
 }

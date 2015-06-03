@@ -25,54 +25,54 @@ import static org.junit.Assert.assertEquals;
 @RunWith(JUnit4.class)
 public class SequenceFlatMappedTest {
     public static final Function1<Integer,Sequence<Integer>> emptySeqFunc = (i) -> Sequence.emptySequence();
-    public static final Function1<Object,Sequence<Object>> identSeqFunc = (i) -> Sequence.ofArray(i);
+    public static final Function1<Object,Sequence<Object>> identSeqFunc = (i) -> Sequence.of(i);
 
     @Test(expected = IllegalArgumentException.class)
     public void testNullFunction() {
-        Sequence.ofArray(1, 2, 3).flatMap(null);
+        Sequence.of(1, 2, 3).flatMap(null);
     }
 
 
     @Test
     public void singleFlatMap() {
         assertEquals(Sequence.emptySequence(),
-                     Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).flatMap(emptySeqFunc));
+                     Sequence.of(1, 2, 3, 4, 5, 6, 7, 8, 9).flatMap(emptySeqFunc));
 
         assertEquals(Sequence.emptySequence(),
                      Sequence.emptySequence().flatMap(identSeqFunc));
 
         assertArrayEquals(new Integer[] {},
-                          Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                          Sequence.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
                                   .flatMap(emptySeqFunc).toTypedArray());
 
         assertArrayEquals(new Integer[] { 1,2,3, 2,4,6, 3,6,9, 4,8,12, 5,10,15, 6,12,18,
                                   7,14,21, 8,16,24, 9,18,27},
-                          Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
-                                  .flatMap(i -> Sequence.ofArray(i, i * 2, i * 3)).toTypedArray());
+                          Sequence.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                                  .flatMap(i -> Sequence.of(i, i * 2, i * 3)).toTypedArray());
 
         assertArrayEquals(new String[]{"1", "2", "2", "3", "3", "4"},
-                          Sequence.ofArray(1, 2, 3)
-                                  .flatMap(i -> Sequence.ofArray(String.valueOf(i),
-                                                                 String.valueOf(i + 1))).toTypedArray());
+                          Sequence.of(1, 2, 3)
+                                  .flatMap(i -> Sequence.of(String.valueOf(i),
+                                                            String.valueOf(i + 1))).toTypedArray());
 
     }
 
     // TODO: Start Here!
     @Test public void flatEmpty() {
         assertEquals(Sequence.emptySequence(),
-                     Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).flatMap((a) -> Sequence.emptySequence()));
+                     Sequence.of(1, 2, 3, 4, 5, 6, 7, 8, 9).flatMap((a) -> Sequence.emptySequence()));
 
         assertEquals(Sequence.emptySequence(),
-                     Sequence.ofArray().flatMap((a) -> Sequence.emptySequence()));
+                     Sequence.of().flatMap((a) -> Sequence.emptySequence()));
 
         // This tests that I didn't just look ahead 2 or 3 times.  That the look-ahead is sufficient.
         Mutable.Ref<Integer> count = Mutable.Ref.of(0);
         assertArrayEquals(new String[]{"a9", "b9"},
-                          Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                          Sequence.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
                                   .flatMap((a) -> {
                                       count.set(count.value() + 1);
                                       return (count.value() > 8)
-                                             ? Sequence.ofArray("a" + a, "b" + a)
+                                             ? Sequence.of("a" + a, "b" + a)
                                              : Sequence.emptySequence();
                                   }).forEach((item) -> {
                               System.out.println("Item " + item);
@@ -82,11 +82,11 @@ public class SequenceFlatMappedTest {
 
         count.set(0);
         assertArrayEquals(new String[]{"c8", "d8", "c9", "d9"},
-                          Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                          Sequence.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
                                   .flatMap((a) -> {
                                       count.set(count.value() + 1);
                                       return (count.value() > 7)
-                                             ? Sequence.ofArray("c" + a, "d" + a)
+                                             ? Sequence.of("c" + a, "d" + a)
                                              : Sequence.emptySequence();
                                   })
 //                                  .forEach((item) -> {
@@ -97,11 +97,11 @@ public class SequenceFlatMappedTest {
 
         count.set(0);
         assertArrayEquals(new String[]{"e1", "f1", "e2", "f2"},
-                          Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                          Sequence.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
                                   .flatMap((a) -> {
                                       count.set(count.value() + 1);
                                       return (count.value() < 3)
-                                             ? Sequence.ofArray("e" + a, "f" + a)
+                                             ? Sequence.of("e" + a, "f" + a)
                                              : Sequence.emptySequence();
                                   })
 //                                  .forEach((item) -> {
@@ -110,9 +110,9 @@ public class SequenceFlatMappedTest {
 //                          })
                                   .toTypedArray());
 
-        Mutable.Ref<Sequence<Integer>> shrinkSeq = Mutable.Ref.of(Sequence.ofArray(1, 2, 3));
+        Mutable.Ref<Sequence<Integer>> shrinkSeq = Mutable.Ref.of(Sequence.of(1, 2, 3));
         assertArrayEquals(new Integer[]{2, 3, 3},
-                          Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                          Sequence.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
                                   .flatMap((a) -> {
                                       shrinkSeq.set(shrinkSeq.value().tail());
 //                                      System.out.print("seq val: " + shrinkSeq.value());
@@ -125,10 +125,10 @@ public class SequenceFlatMappedTest {
         Mutable.Ref<Sequence<Integer>> growSeq = Mutable.Ref.of(Sequence.emptySequence());
         Mutable.Ref<Integer> incInt = Mutable.Ref.of(0);
         assertArrayEquals(new Integer[]{1, 1,2},
-                          Sequence.ofArray(1, 2, 3)
+                          Sequence.of(1, 2, 3)
                                   .flatMap((a) -> {
                                       if (incInt.value() > 0) {
-                                          growSeq.set(growSeq.value().concat(Sequence.ofArray(incInt.value())));
+                                          growSeq.set(growSeq.value().concat(Sequence.of(incInt.value())));
                                       }
                                       incInt.set(incInt.value() + 1);
                                       return growSeq.value();
@@ -140,20 +140,20 @@ public class SequenceFlatMappedTest {
     @Test
     public void flatMapChain() {
         assertEquals(Sequence.emptySequence(),
-                     Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                     Sequence.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
                              .flatMap(emptySeqFunc).flatMap(emptySeqFunc).flatMap(emptySeqFunc));
 
         assertEquals(Sequence.emptySequence(),
                      Sequence.emptySequence().flatMap(identSeqFunc).flatMap(identSeqFunc).flatMap(identSeqFunc));
 
         assertArrayEquals(new Integer[] {},
-                          Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                          Sequence.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
                                   .flatMap(emptySeqFunc).flatMap(emptySeqFunc).flatMap(emptySeqFunc).toTypedArray());
 
         assertArrayEquals(new Integer[] { 1,2, 2,3, 3,4, 10,11, 20,21, 30,31},
-                          Sequence.ofArray(1, 10)
-                                  .flatMap(i -> Sequence.ofArray(i, i * 2, i * 3))
-                                  .flatMap(i -> Sequence.ofArray(i, i + 1))
+                          Sequence.of(1, 10)
+                                  .flatMap(i -> Sequence.of(i, i * 2, i * 3))
+                                  .flatMap(i -> Sequence.of(i, i + 1))
                                   .toTypedArray());
     }
 }

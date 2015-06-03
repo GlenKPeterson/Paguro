@@ -26,41 +26,41 @@ public class ViewTest {
     @Test
     public void construction() {
         Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-        assertArrayEquals(ints, View.ofArray(ints).toTypedArray());
-        assertArrayEquals(ints, View.of(Arrays.asList(ints)).toTypedArray());
+        assertArrayEquals(ints, View.of(ints).toTypedArray());
+        assertArrayEquals(ints, View.ofIter(Arrays.asList(ints)).toTypedArray());
     }
 
     @Test
     public void takeAndDrop() {
         assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
-                          View.ofArray(1,2,3,4,5,6,7,8,9).drop(0).take(8888).toTypedArray());
+                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9).drop(0).take(8888).toTypedArray());
 
         assertArrayEquals(new Integer[] { 2 },
-                          View.ofArray(1,2,3,4,5,6,7,8,9).drop(1).take(1).toTypedArray());
+                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9).drop(1).take(1).toTypedArray());
 
         assertArrayEquals(new Integer[] { 3,4 },
-                          View.ofArray(1,2,3,4,5,6,7,8,9).drop(2).take(2).toTypedArray());
+                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9).drop(2).take(2).toTypedArray());
 
         assertArrayEquals(new Integer[] { 4,5,6 },
-                          View.ofArray(1,2,3,4,5,6,7,8,9).drop(3).take(3).toTypedArray());
+                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9).drop(3).take(3).toTypedArray());
 
         assertArrayEquals(new Integer[] { },
-                          View.ofArray(1,2,3,4,5,6,7,8,9).drop(9999).take(3).toTypedArray());
+                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9).drop(9999).take(3).toTypedArray());
 
         assertArrayEquals(new Integer[] { },
-                          View.ofArray(1,2,3,4,5,6,7,8,9).drop(3).take(0).toTypedArray());
+                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9).drop(3).take(0).toTypedArray());
     }
 
     @Test
     public void chain1() {
         assertArrayEquals(new Integer[] { 4, 5, 6 },
-                          View.ofArray(5)                     //         5
-                                  .prepend(View.ofArray(4))   //       4,5
-                                  .append(View.ofArray(6))    //       4,5,6
-                                  .prepend(View.ofArray(2,3)) //   2,3,4,5,6
-                                  .append(View.ofArray(7,8))  //   2,3,4,5,6,7,8
-                                  .prepend(View.ofArray(1))   // 1,2,3,4,5,6,7,8
-                                  .append(View.ofArray(9))    // 1,2,3,4,5,6,7,8,9
+                          View.of(5)                     //         5
+                                  .prepend(View.of(4))   //       4,5
+                                  .append(View.of(6))    //       4,5,6
+                                  .prepend(View.of(2, 3)) //   2,3,4,5,6
+                                  .append(View.of(7, 8))  //   2,3,4,5,6,7,8
+                                  .prepend(View.of(1))   // 1,2,3,4,5,6,7,8
+                                  .append(View.of(9))    // 1,2,3,4,5,6,7,8,9
                                   .filter(i -> i > 3)         //       4,5,6,7,8,9
                                   .map(i -> i - 2)            //   2,3,4,5,6,7
                                   .take(5)                    //   2,3,4,5,6

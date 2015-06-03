@@ -34,10 +34,10 @@ public interface View<T> extends Transformable<T> {
     // Just wrong.  You can't trust an iterator that you didn't get yourself.
 //    static <T> View<T> of(Iterator<T> i) { return ViewFromIterable.of(i); }
 
-    static <T> View<T> of(Iterable<T> i) { return ViewFromIterable.of(i); }
+    static <T> View<T> ofIter(Iterable<T> i) { return ViewFromIterable.of(i); }
 
     @SafeVarargs
-    static <T> View<T> ofArray(T... i) { return ViewFromArray.of(i); }
+    static <T> View<T> of(T... i) { return ViewFromArray.of(i); }
 
     /**
       This is the distinguishing method of the view interface.

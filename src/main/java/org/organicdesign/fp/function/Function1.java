@@ -252,7 +252,7 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
     /** A convenience wrapper for and().  This may be a bad idea.  Not sure yet. */
     @SafeVarargs // Not really sure how safe these varargs are...
     public static <T> Function1<T,Boolean> andArray(Function1<T,Boolean>... in) {
-        return and(View.ofArray(in));
+        return and(View.of(in));
     }
 
     /**
@@ -286,7 +286,7 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
     /** A convenience wrapper for of().  This may be a bad idea.  Not sure yet. */
     @SafeVarargs
     public static <T> Function1<T,Boolean> orArray(Function1<T,Boolean>... in) {
-        return or(View.ofArray(in));
+        return or(View.of(in));
     }
 
     enum BooleanCombiner {

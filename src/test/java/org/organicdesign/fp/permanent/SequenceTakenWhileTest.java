@@ -25,7 +25,7 @@ public class SequenceTakenWhileTest {
 
     @Test
     public void takeItemsInOneBatch() {
-        Sequence<Integer> seq = Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9);
+        Sequence<Integer> seq = Sequence.of(1, 2, 3, 4, 5, 6, 7, 8, 9);
         assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
                           seq.takeWhile(Function1.accept()).toTypedArray());
         assertArrayEquals(new Integer[] { 1,2,3,4,5,6,7,8,9 },
@@ -50,6 +50,6 @@ public class SequenceTakenWhileTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void exception1() {
-        Sequence.ofArray(1,2,3,4,5,6,7,8,9).takeWhile(null);
+        Sequence.of(1, 2, 3, 4, 5, 6, 7, 8, 9).takeWhile(null);
     }
 }

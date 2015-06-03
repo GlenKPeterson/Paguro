@@ -29,27 +29,27 @@ public class ViewMappedTest {
     @Test
     public void mapInOneBatch() {
         assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
-                          View.ofArray(1,2,3,4,5,6,7,8,9)
+                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
                               .map(Function1.identity()).toTypedArray());
 
         assertArrayEquals(new Integer[] { 2,3,4,5,6,7,8,9,10 },
-                          View.ofArray(1,2,3,4,5,6,7,8,9)
+                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
                               .map(plusOne).toTypedArray());
 
         assertArrayEquals(new Integer[] { 0,1,2,3,4,5,6,7,8 },
-                          View.ofArray(1,2,3,4,5,6,7,8,9)
+                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
                               .map(minusOne).toTypedArray());
 
         assertArrayEquals(new Integer[] { 1,2,3,4,5,6,7,8,9 },
-                          View.ofArray(1,2,3,4,5,6,7,8,9)
+                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
                               .map(plusOne).map(minusOne).toTypedArray());
 
         assertArrayEquals(new Integer[] { 1,2,3,4,5,6,7,8,9 },
-                          View.ofArray(1,2,3,4,5,6,7,8,9)
+                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
                               .map(minusOne).map(plusOne).toTypedArray());
 
         assertArrayEquals(new Integer[] { 3,4,5,6,7,8,9,10,11 },
-                          View.ofArray(1,2,3,4,5,6,7,8,9)
+                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
                               .map(plusOne).map(plusOne).toTypedArray());
 
     }
@@ -57,13 +57,13 @@ public class ViewMappedTest {
     public void mapInMultipleBatches() {
 
         assertArrayEquals(new Integer[] { 11,12,13,14,15,16,17,18,19 },
-                          View.ofArray(1,2,3,4,5,6,7,8,9)
+                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
                               .map(plusOne).map(plusOne).map(plusOne).map(plusOne).map(plusOne)
                               .map(plusOne).map(plusOne).map(plusOne).map(plusOne).map(plusOne)
                               .toTypedArray());
 
         assertArrayEquals(new Integer[] { -9,-8,-7,-6,-5,-4,-3,-2,-1 },
-                          View.ofArray(1,2,3,4,5,6,7,8,9)
+                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
                               .map(minusOne).map(minusOne).map(minusOne).map(minusOne)
                               .map(minusOne).map(minusOne).map(minusOne).map(minusOne)
                               .map(minusOne).map(minusOne)

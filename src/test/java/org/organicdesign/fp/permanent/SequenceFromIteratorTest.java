@@ -29,16 +29,16 @@ public class SequenceFromIteratorTest {
     @Test public void basic() {
         List<Integer> ints = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9);
         assertEquals(ints,
-                     Sequence.of(ints).toJavaList());
+                     Sequence.ofIter(ints).toJavaList());
         assertArrayEquals(ints.toArray(),
-                          Sequence.of(ints).toTypedArray());
+                          Sequence.ofIter(ints).toTypedArray());
     }
 
 
     @Test
     public void construction() {
         List<Integer> ints = Arrays.asList(5, 4, 3, 2, 1);
-        Sequence<Integer> five = Sequence.of(ints);
+        Sequence<Integer> five = Sequence.ofIter(ints);
         Sequence<Integer> four = five.tail();
         Sequence<Integer> three = four.tail();
         Sequence<Integer> two = three.tail();
@@ -63,7 +63,7 @@ public class SequenceFromIteratorTest {
 
     @Test
     public void blankIterator() {
-        Sequence<Integer> zero = Sequence.of(Collections.<Integer>emptyList());
+        Sequence<Integer> zero = Sequence.ofIter(Collections.<Integer>emptyList());
         assertEquals(Sequence.emptySequence(), zero);
     }
 
@@ -83,7 +83,7 @@ public class SequenceFromIteratorTest {
                                   i.set(i.value() + 1);
                                   return 1;
                               });
-        Sequence<Function0<Integer>> three = Sequence.of(ints);
+        Sequence<Function0<Integer>> three = Sequence.ofIter(ints);
         Sequence<Function0<Integer>> two = three.tail();
         Sequence<Function0<Integer>> one = two.tail();
         Sequence<Function0<Integer>> zero = one.tail();

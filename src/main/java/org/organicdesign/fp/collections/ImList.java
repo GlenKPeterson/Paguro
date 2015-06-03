@@ -89,7 +89,7 @@ public interface ImList<E> extends UnList<E>, Sequence<E> {
      first() to head(), I renamed rest() to tail() so that it wouldn't mix metaphors.
      */
     @Override default Sequence<E> tail() {
-        return Sequence.of(this).tail();
+        return Sequence.ofIter(this).tail();
     }
 
 

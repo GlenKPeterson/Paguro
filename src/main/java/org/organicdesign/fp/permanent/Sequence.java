@@ -63,12 +63,12 @@ public interface Sequence<T> extends Transformable<T> {
 //        return SequenceFromIterable.of(i);
 //    }
 
-    static <T> Sequence<T> of(Iterable<T> i) {
+    static <T> Sequence<T> ofIter(Iterable<T> i) {
         return SequenceFromIterable.of(i);
     }
 
     @SafeVarargs
-    static <T> Sequence<T> ofArray(T... i) { return SequenceFromArray.of(i); }
+    static <T> Sequence<T> of(T... i) { return SequenceFromArray.of(i); }
 
     // ======================================= Base methods =======================================
     /**
