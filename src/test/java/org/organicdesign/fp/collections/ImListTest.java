@@ -16,6 +16,7 @@ package org.organicdesign.fp.collections;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 public class ImListTest {
@@ -54,5 +55,11 @@ public class ImListTest {
 
         assertEquals("Million", pv.get(6, "Million"));
         assertEquals("Million", pv.get(Integer.MAX_VALUE, "Million"));
+    }
+
+    @Test public void append() {
+        assertArrayEquals(new String[]{"a", "b", "c", "d", "e", "f"},
+                          PersistentVector.of("a", "b", "c")
+                                  .append("d", "e", "f").toTypedArray());
     }
 }
