@@ -109,10 +109,10 @@ public interface Transformable<T> extends Realizable<T> {
 // Transformable does not provide a way to get to the first argument or the "rest".  It seems kind of a useless
 // interface if the persistent Sequence is fast enough to get rid of the View.
 //    /** Add the given Transformable after the end of this one. */
-//    Transformable<T> append(Transformable<T> other);
+//    Transformable<T> concat(Transformable<T> other);
 //
 //    /** Add the given Transformable before the beginning of this one. */
-//    Transformable<T> prepend(Transformable<T> other);
+//    Transformable<T> precat(Transformable<T> other);
 
 
     // TODO: You can always use foldLeft for this operation.  Does having reduceLeft add more clarity to the underlying code, or does it provide some useful additional functionality?
@@ -178,7 +178,7 @@ public interface Transformable<T> extends Realizable<T> {
     }
 
     /** {@inheritDoc} */
-    @Override default ImList<T> toImList() { return foldLeft(PersistentVector.empty(), (ts, t) -> ts.appendOne(t)); }
+    @Override default ImList<T> toImList() { return foldLeft(PersistentVector.empty(), (ts, t) -> ts.append(t)); }
 
     /** {@inheritDoc} */
     @Override default <U,V> Map<U,V> toJavaMap(final Function1<? super T,Map.Entry<U,V>> f1) {

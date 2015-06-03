@@ -183,10 +183,10 @@ public interface Sequence<T> extends Transformable<T> {
     }
 
     /** Add the given Sequence after the end of this one. */
-    default Sequence<T> append(Sequence<T> other) { return SequenceConcatenated.of(this, other); }
+    default Sequence<T> concat(Sequence<T> other) { return SequenceConcatenated.of(this, other); }
 
     /** Add the given Sequence before the beginning of this one. */
-    default Sequence<T> prepend(Sequence<T> other) { return SequenceConcatenated.of(other, this); }
+    default Sequence<T> precat(Sequence<T> other) { return SequenceConcatenated.of(other, this); }
 
 //    @Override
 //    T reduceLeft(BiFunction<T, T, T> fun) {

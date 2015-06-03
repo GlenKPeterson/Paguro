@@ -46,7 +46,7 @@ public interface ImList<E> extends UnList<E>, Sequence<E> {
      @return a new ImList with the additional item.
      */
     default ImList<E> insert(int i, E val) {
-        if (i == size()) { return appendOne(val); }
+        if (i == size()) { return append(val); }
 
         if ( (i > size()) || (i < 0) ) {
             throw new IllegalArgumentException("Can't insert outside the possible bounds");
@@ -56,11 +56,11 @@ public interface ImList<E> extends UnList<E>, Sequence<E> {
         ImList<E> v = PersistentVector.empty();
         int j = 0;
         for (; j < i; j++) {
-            v = v.appendOne(iter.next());
+            v = v.append(iter.next());
         }
-        v = v.appendOne(val);
+        v = v.append(val);
         for (; j < size(); j++) {
-            v = v.appendOne(iter.next());
+            v = v.append(iter.next());
         }
         return v;
     }
@@ -70,10 +70,10 @@ public interface ImList<E> extends UnList<E>, Sequence<E> {
      * @param e the values to insert
      * @return a new ImList with the additional item at the end.
      */
-    ImList<E> appendOne(E e);
+    ImList<E> append(E e);
 
 //    /** {@inheritDoc} */
-//    @Override ImList<E> append(Sequence<E> other);
+//    @Override ImList<E> concat(Sequence<E> other);
 
 
     /**
@@ -114,14 +114,14 @@ public interface ImList<E> extends UnList<E>, Sequence<E> {
     }
 
     /**
-     Replace the item at the given index.  Note: i.replace(i.size(), o) used to be equivalent to i.append(o), but it
+     Replace the item at the given index.  Note: i.replace(i.size(), o) used to be equivalent to i.concat(o), but it
      probably won't be for the RRB tree implementation, so this will change too.
 
      @param idx the index where the value should be stored.
      @param e the value to store
      @return a new ImList with the replaced item
      */
-    // TODO: Don't make i.replace(i.size(), o) equivalent to i.append(o)
+    // TODO: Don't make i.replace(i.size(), o) equivalent to i.concat(o)
     ImList<E> replace(int idx, E e);
 
     // ================================================ STATIC METHODS ================================================
@@ -134,7 +134,7 @@ public interface ImList<E> extends UnList<E>, Sequence<E> {
 //     * @return a new ImList with the additional item.
 //     */
 //    static <E> ImList<E> insert(ImList<E> list, int i, E val) {
-//        if (i == list.size()) { return list.append(val); }
+//        if (i == list.size()) { return list.concat(val); }
 //
 //        if ( (i > list.size()) || (i < 0) ) {
 //            throw new IllegalArgumentException("Can't insert outside the possible bounds");
@@ -143,11 +143,11 @@ public interface ImList<E> extends UnList<E>, Sequence<E> {
 //        UnIterator<E> uli = list.iterator();
 //        ImList<E> v = PersistentVector.empty();
 //        for (int j = 0; j < i; j++) {
-//            v = v.append(uli.next());
+//            v = v.concat(uli.next());
 //        }
-//        v = v.append(val);
+//        v = v.concat(val);
 //        for (int j = i; j < list.size(); j++) {
-//            v = v.append(uli.next());
+//            v = v.concat(uli.next());
 //        }
 //        return v;
 //    }
@@ -157,7 +157,7 @@ public interface ImList<E> extends UnList<E>, Sequence<E> {
 //     * @param es the values to insert
 //     * @return a new ImList with the additional items at the end.
 //     */
-//    static <E> ImList<E> append(ImList<E> l, E e) {
+//    static <E> ImList<E> concat(ImList<E> l, E e) {
 //        return l.insert(l.size() - 1, e);
 //    }
 //
@@ -168,7 +168,7 @@ public interface ImList<E> extends UnList<E>, Sequence<E> {
 //     */
 //    static <E> ImList<E> appendSkipNull(ImList<E> l, E e) {
 //        if (e == null) { return l; }
-//        return l.append(e);
+//        return l.concat(e);
 //    }
 //
 //    /**

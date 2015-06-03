@@ -146,12 +146,12 @@ public class SequenceTest {
 
     @Test public void chain1() {
         assertArrayEquals(Sequence.ofArray(5)                      //         5
-                                  .prepend(Sequence.ofArray(4))    //       4,5
-                                  .append(Sequence.ofArray(6))     //       4,5,6
-                                  .prepend(Sequence.ofArray(2, 3)) //   2,3,4,5,6
-                                  .append(Sequence.ofArray(7, 8))  //   2,3,4,5,6,7,8
-                                  .prepend(Sequence.ofArray(1))    // 1,2,3,4,5,6,7,8
-                                  .append(Sequence.ofArray(9))     // 1,2,3,4,5,6,7,8,9
+                                  .precat(Sequence.ofArray(4))    //       4,5
+                                  .concat(Sequence.ofArray(6))     //       4,5,6
+                                  .precat(Sequence.ofArray(2, 3)) //   2,3,4,5,6
+                                  .concat(Sequence.ofArray(7, 8))  //   2,3,4,5,6,7,8
+                                  .precat(Sequence.ofArray(1))    // 1,2,3,4,5,6,7,8
+                                  .concat(Sequence.ofArray(9))     // 1,2,3,4,5,6,7,8,9
                                   .filter(i -> i > 3)              //       4,5,6,7,8,9
                                   .map(i -> i - 2)                 //   2,3,4,5,6,7
                                   .take(5)                         //   2,3,4,5,6

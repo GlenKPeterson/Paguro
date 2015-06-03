@@ -24,110 +24,110 @@ public class SequenceConcatenatedTest {
 
     @Test public void doubleNull() {
         assertArrayEquals(new Integer[0],
-                          Sequence.ofArray().append(null).toTypedArray());
+                          Sequence.ofArray().concat(null).toTypedArray());
 
         assertArrayEquals(new Integer[0],
-                          Sequence.ofArray().append(Sequence.emptySequence()).toTypedArray());
+                          Sequence.ofArray().concat(Sequence.emptySequence()).toTypedArray());
 
         assertArrayEquals(new Integer[0],
-                          Sequence.ofArray().prepend(null).toTypedArray());
+                          Sequence.ofArray().precat(null).toTypedArray());
 
         assertArrayEquals(new Integer[0],
-                          Sequence.ofArray().prepend(Sequence.emptySequence()).toTypedArray());
+                          Sequence.ofArray().precat(Sequence.emptySequence()).toTypedArray());
     }
 
     @Test public void prepend() {
         assertArrayEquals(new Integer[] { 5, 6, 7, 8, 9 },
                           Sequence.ofArray(5,6,7,8,9)
-                                  .prepend(null).toTypedArray());
+                                  .precat(null).toTypedArray());
 
         assertArrayEquals(new Integer[] { 5, 6, 7, 8, 9 },
                           Sequence.ofArray(5,6,7,8,9)
-                                  .prepend(Sequence.emptySequence()).toTypedArray());
+                                  .precat(Sequence.emptySequence()).toTypedArray());
 
         assertArrayEquals(new Integer[] { 4, 5, 6, 7, 8, 9 },
                           Sequence.ofArray(5,6,7,8,9)
-                                  .prepend(Sequence.ofArray(4)).toTypedArray());
+                                  .precat(Sequence.ofArray(4)).toTypedArray());
 
         assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
                           Sequence.ofArray(5,6,7,8,9)
-                                  .prepend(Sequence.ofArray(1,2,3,4)).toTypedArray());
+                                  .precat(Sequence.ofArray(1, 2, 3, 4)).toTypedArray());
     }
 
     @Test
     public void append() {
         assertArrayEquals(new Integer[] { 1, 2, 3, 4 },
                           Sequence.ofArray(1,2,3,4)
-                                  .append(null).toTypedArray());
+                                  .concat(null).toTypedArray());
 
         assertArrayEquals(new Integer[] { 1, 2, 3, 4 },
                           Sequence.ofArray(1,2,3,4)
-                                  .append(Sequence.emptySequence()).toTypedArray());
+                                  .concat(Sequence.emptySequence()).toTypedArray());
 
         assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5 },
                           Sequence.ofArray(1,2,3,4)
-                                  .append(Sequence.ofArray(5)).toTypedArray());
+                                  .concat(Sequence.ofArray(5)).toTypedArray());
 
         assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
                           Sequence.ofArray(1,2,3,4)
-                                  .append(Sequence.ofArray(5, 6, 7, 8, 9)).toTypedArray());
+                                  .concat(Sequence.ofArray(5, 6, 7, 8, 9)).toTypedArray());
     }
 
     @Test
     public void chainedPrependAppend() {
         assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
                           Sequence.ofArray(5)                     //         5
-                                  .prepend(Sequence.ofArray(4))   //       4,5
-                                  .append(Sequence.ofArray(6))    //       4,5,6
-                                  .prepend(Sequence.ofArray(2,3)) //   2,3,4,5,6
-                                  .append(Sequence.ofArray(7,8))  //   2,3,4,5,6,7,8
-                                  .prepend(Sequence.ofArray(1))   // 1,2,3,4,5,6,7,8
-                                  .append(Sequence.ofArray(9))    // 1,2,3,4,5,6,7,8,9
+                                  .precat(Sequence.ofArray(4))   //       4,5
+                                  .concat(Sequence.ofArray(6))    //       4,5,6
+                                  .precat(Sequence.ofArray(2, 3)) //   2,3,4,5,6
+                                  .concat(Sequence.ofArray(7, 8))  //   2,3,4,5,6,7,8
+                                  .precat(Sequence.ofArray(1))   // 1,2,3,4,5,6,7,8
+                                  .concat(Sequence.ofArray(9))    // 1,2,3,4,5,6,7,8,9
                                   .toTypedArray());
 
         assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
                           Sequence.ofArray(5)
-                                  .prepend(null).prepend(null).prepend(null).prepend(null)
-                                  .prepend(Sequence.emptySequence()).prepend(Sequence.emptySequence())
-                                  .prepend(null)
-                                  .append(Sequence.emptySequence()).append(Sequence.emptySequence())
-                                  .append(null).append(null).append(null).append(null).append(null)
-                                  .prepend(Sequence.ofArray(4))
-                                  .prepend(null).prepend(null).prepend(null).prepend(null)
-                                  .prepend(Sequence.emptySequence()).prepend(Sequence.emptySequence())
-                                  .prepend(null)
-                                  .append(Sequence.emptySequence()).append(Sequence.emptySequence())
-                                  .append(null).append(null).append(null).append(null).append(null)
-                                  .append(Sequence.ofArray(6))
-                                  .prepend(null).prepend(null).prepend(null).prepend(null)
-                                  .prepend(Sequence.emptySequence()).prepend(Sequence.emptySequence())
-                                  .prepend(null)
-                                  .append(Sequence.emptySequence()).append(Sequence.emptySequence())
-                                  .append(null).append(null).append(null).append(null).append(null)
-                                  .prepend(Sequence.ofArray(2,3))
-                                  .prepend(null).prepend(null).prepend(null).prepend(null)
-                                  .prepend(Sequence.emptySequence()).prepend(Sequence.emptySequence())
-                                  .prepend(null)
-                                  .append(Sequence.emptySequence()).append(Sequence.emptySequence())
-                                  .append(null).append(null).append(null).append(null).append(null)
-                                  .append(Sequence.ofArray(7,8))
-                                  .prepend(null).prepend(null).prepend(null).prepend(null)
-                                  .prepend(Sequence.emptySequence()).prepend(Sequence.emptySequence())
-                                  .prepend(null)
-                                  .append(Sequence.emptySequence()).append(Sequence.emptySequence())
-                                  .append(null).append(null).append(null).append(null).append(null)
-                                  .prepend(Sequence.ofArray(1))
-                                  .prepend(null).prepend(null).prepend(null).prepend(null)
-                                  .prepend(Sequence.emptySequence()).prepend(Sequence.emptySequence())
-                                  .prepend(null)
-                                  .append(Sequence.emptySequence()).append(Sequence.emptySequence())
-                                  .append(null).append(null).append(null).append(null).append(null)
-                                  .append(Sequence.ofArray(9))
-                                  .prepend(null).prepend(null).prepend(null).prepend(null)
-                                  .prepend(Sequence.emptySequence()).prepend(Sequence.emptySequence())
-                                  .prepend(null)
-                                  .append(Sequence.emptySequence()).append(Sequence.emptySequence())
-                                  .append(null).append(null).append(null).append(null).append(null)
+                                  .precat(null).precat(null).precat(null).precat(null)
+                                  .precat(Sequence.emptySequence()).precat(Sequence.emptySequence())
+                                  .precat(null)
+                                  .concat(Sequence.emptySequence()).concat(Sequence.emptySequence())
+                                  .concat(null).concat(null).concat(null).concat(null).concat(null)
+                                  .precat(Sequence.ofArray(4))
+                                  .precat(null).precat(null).precat(null).precat(null)
+                                  .precat(Sequence.emptySequence()).precat(Sequence.emptySequence())
+                                  .precat(null)
+                                  .concat(Sequence.emptySequence()).concat(Sequence.emptySequence())
+                                  .concat(null).concat(null).concat(null).concat(null).concat(null)
+                                  .concat(Sequence.ofArray(6))
+                                  .precat(null).precat(null).precat(null).precat(null)
+                                  .precat(Sequence.emptySequence()).precat(Sequence.emptySequence())
+                                  .precat(null)
+                                  .concat(Sequence.emptySequence()).concat(Sequence.emptySequence())
+                                  .concat(null).concat(null).concat(null).concat(null).concat(null)
+                                  .precat(Sequence.ofArray(2, 3))
+                                  .precat(null).precat(null).precat(null).precat(null)
+                                  .precat(Sequence.emptySequence()).precat(Sequence.emptySequence())
+                                  .precat(null)
+                                  .concat(Sequence.emptySequence()).concat(Sequence.emptySequence())
+                                  .concat(null).concat(null).concat(null).concat(null).concat(null)
+                                  .concat(Sequence.ofArray(7, 8))
+                                  .precat(null).precat(null).precat(null).precat(null)
+                                  .precat(Sequence.emptySequence()).precat(Sequence.emptySequence())
+                                  .precat(null)
+                                  .concat(Sequence.emptySequence()).concat(Sequence.emptySequence())
+                                  .concat(null).concat(null).concat(null).concat(null).concat(null)
+                                  .precat(Sequence.ofArray(1))
+                                  .precat(null).precat(null).precat(null).precat(null)
+                                  .precat(Sequence.emptySequence()).precat(Sequence.emptySequence())
+                                  .precat(null)
+                                  .concat(Sequence.emptySequence()).concat(Sequence.emptySequence())
+                                  .concat(null).concat(null).concat(null).concat(null).concat(null)
+                                  .concat(Sequence.ofArray(9))
+                                  .precat(null).precat(null).precat(null).precat(null)
+                                  .precat(Sequence.emptySequence()).precat(Sequence.emptySequence())
+                                  .precat(null)
+                                  .concat(Sequence.emptySequence()).concat(Sequence.emptySequence())
+                                  .concat(null).concat(null).concat(null).concat(null).concat(null)
                                   .toTypedArray());
     }
 }

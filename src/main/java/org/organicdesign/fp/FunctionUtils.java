@@ -129,23 +129,23 @@ public class FunctionUtils {
 //                    // if there are three or more rips, print with commas
 //                    // between all but the last two - they get ", and "
 //                    if (i < rips.size()) {
-//                        sB.append(", ");
+//                        sB.concat(", ");
 //                    } else {
 //                        // The serial comma!
-//                        sB.append(", ");
-//                        sB.append(type.word);
-//                        sB.append(" ");
+//                        sB.concat(", ");
+//                        sB.concat(type.word);
+//                        sB.concat(" ");
 //                    }
 //                } else if ( (rips.size() == 2) && (i == 2) ) {
 //                    // If there are two rips, print with " and " inbetween
-//                    sB.append(" ");
-//                    sB.append(type.word);
-//                    sB.append(" ");
+//                    sB.concat(" ");
+//                    sB.concat(type.word);
+//                    sB.concat(" ");
 //                }
 //            }
 //            // print it.  This is safe because these strings are hard-coded
 //            // above, do not come from the user, and are HTML-safe.
-//            sB.append(rip.toString());
+//            sB.concat(rip.toString());
 //        }
 //        return sB.toString();
 //    }
@@ -157,9 +157,9 @@ public class FunctionUtils {
 //            if (isFirst) {
 //                isFirst = false;
 //            } else {
-//                sB.append(", ");
+//                sB.concat(", ");
 //            }
-//            sB.append(String.valueOf(o));
+//            sB.concat(String.valueOf(o));
 //        }
 //        return sB.toString();
 //    }

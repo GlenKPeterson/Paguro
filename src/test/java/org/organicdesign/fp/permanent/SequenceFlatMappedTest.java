@@ -128,7 +128,7 @@ public class SequenceFlatMappedTest {
                           Sequence.ofArray(1, 2, 3)
                                   .flatMap((a) -> {
                                       if (incInt.value() > 0) {
-                                          growSeq.set(growSeq.value().append(Sequence.ofArray(incInt.value())));
+                                          growSeq.set(growSeq.value().concat(Sequence.ofArray(incInt.value())));
                                       }
                                       incInt.set(incInt.value() + 1);
                                       return growSeq.value();

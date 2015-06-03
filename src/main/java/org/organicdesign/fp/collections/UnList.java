@@ -13,6 +13,8 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
+import org.organicdesign.fp.function.Function2;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -20,8 +22,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
-
-import org.organicdesign.fp.function.Function2;
 
 import static org.organicdesign.fp.StaticImports.un;
 
@@ -194,7 +194,7 @@ public interface UnList<E> extends List<E>, UnCollection<E> {
         if ( (fromIndex == 0) && (toIndex == size()) ) {
             return this;
         }
-// I thing this should be the implementation in ImList.
+// I think this should be the implementation in ImList.
 //        PersistentVector<E> pv = PersistentVector.empty();
 //        for (int i = fromIndex; i < toIndex; i++) {
 //            pv = pv.append(this.get(i));

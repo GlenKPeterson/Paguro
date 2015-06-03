@@ -682,7 +682,7 @@ public class PersistentTreeMap<K,V> implements ImMapSorted<K,V> {
     }
 
     //static <K,V, K1 extends K, K2 extends K, V1 extends V, V2 extends V>
-//Node<K,V> append(Node<K1,V1> left, Node<K2,V2> right){
+//Node<K,V> concat(Node<K1,V1> left, Node<K2,V2> right){
     @SuppressWarnings("unchecked")
     private static <K, V> Node<K,V> append(Node<? extends K,? extends V> left,
                                    Node<? extends K,? extends V> right) {
