@@ -215,6 +215,12 @@ In short, Clojure doesn't have static types.  Scala has an TMTOWTDI attitude tha
 - As of 2014-03-08, all major areas of functionality were covered by unit tests.
 
 #Change Log
+2015-06-02 version 0.9.4: Renamed methods so that append/prepend means to add one item, while concat/precat means to add many items.
+Changed ImList.put() to ImList.replace() to clarify how it's different from inserting (it doesn't push subsequent items to the right).
+Made ImList and PersistentVector implement Sequence.
+Changed everything that wrapped an Iterator to take an Iterable instead - can't trust an iterator that's been exposed to other code.
+Test coverage was above 85% by line at one point.
+
 2015-05-24 version 0.9.3: Made TreeSet and TreeMap.comparator() return null when the default comparator is used (to 
 match the contract in SortedMap and SortedSet).
 
