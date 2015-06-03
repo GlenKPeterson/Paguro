@@ -46,8 +46,8 @@ public class PersistentVectorTest {
     @Test
     public void empty() {
         ImList<Integer> empty1 = PersistentVector.empty();
-        ImList<Integer> empty2 = PersistentVector.of(Collections.emptyList());
-        ImList<Integer> empty3 = PersistentVector.of(new ArrayList<>());
+        ImList<Integer> empty2 = PersistentVector.ofIter(Collections.emptyList());
+        ImList<Integer> empty3 = PersistentVector.ofIter(new ArrayList<>());
         ImList<Integer> empty4 = PersistentVector.of();
 
         equalsDistinctHashCode(empty1, empty2, empty3,
@@ -69,26 +69,26 @@ public class PersistentVectorTest {
     public void emptyEx04() { PersistentVector.empty().get(Integer.MAX_VALUE); }
 
     @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx10() { PersistentVector.of(Collections.emptyList()).get(Integer.MIN_VALUE); }
+    public void emptyEx10() { PersistentVector.ofIter(Collections.emptyList()).get(Integer.MIN_VALUE); }
     @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx11() { PersistentVector.of(Collections.emptyList()).get(-1); }
+    public void emptyEx11() { PersistentVector.ofIter(Collections.emptyList()).get(-1); }
     @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx12() { PersistentVector.of(Collections.emptyList()).get(0); }
+    public void emptyEx12() { PersistentVector.ofIter(Collections.emptyList()).get(0); }
     @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx13() { PersistentVector.of(Collections.emptyList()).get(1); }
+    public void emptyEx13() { PersistentVector.ofIter(Collections.emptyList()).get(1); }
     @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx14() { PersistentVector.of(Collections.emptyList()).get(Integer.MAX_VALUE); }
+    public void emptyEx14() { PersistentVector.ofIter(Collections.emptyList()).get(Integer.MAX_VALUE); }
 
     @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx20() { PersistentVector.of(new ArrayList<>()).get(Integer.MIN_VALUE); }
+    public void emptyEx20() { PersistentVector.ofIter(new ArrayList<>()).get(Integer.MIN_VALUE); }
     @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx21() { PersistentVector.of(new ArrayList<>()).get(-1); }
+    public void emptyEx21() { PersistentVector.ofIter(new ArrayList<>()).get(-1); }
     @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx22() { PersistentVector.of(new ArrayList<>()).get(0); }
+    public void emptyEx22() { PersistentVector.ofIter(new ArrayList<>()).get(0); }
     @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx23() { PersistentVector.of(new ArrayList<>()).get(1); }
+    public void emptyEx23() { PersistentVector.ofIter(new ArrayList<>()).get(1); }
     @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx24() { PersistentVector.of(new ArrayList<>()).get(Integer.MAX_VALUE); }
+    public void emptyEx24() { PersistentVector.ofIter(new ArrayList<>()).get(Integer.MAX_VALUE); }
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void emptyEx30() { PersistentVector.of().get(Integer.MIN_VALUE); }
@@ -106,8 +106,8 @@ public class PersistentVectorTest {
         ImList<Integer> one1 = PersistentVector.of(1);
         List<Integer> oneList = new ArrayList<>();
         oneList.add(1);
-        ImList<Integer> one2 = PersistentVector.of(oneList);
-        ImList<Integer> one3 = PersistentVector.of(Collections.unmodifiableList(oneList));
+        ImList<Integer> one2 = PersistentVector.ofIter(oneList);
+        ImList<Integer> one3 = PersistentVector.ofIter(Collections.unmodifiableList(oneList));
 
         equalsDistinctHashCode(one1, one2, one3,
                                PersistentVector.of(-1));
@@ -130,53 +130,53 @@ public class PersistentVectorTest {
     public void oneEx10() {
         List<Integer> oneList = new ArrayList<>();
         oneList.add(1);
-        PersistentVector.of(oneList).get(Integer.MIN_VALUE); }
+        PersistentVector.ofIter(oneList).get(Integer.MIN_VALUE); }
     @Test(expected = IndexOutOfBoundsException.class)
     public void oneEx11() {
         List<Integer> oneList = new ArrayList<>();
         oneList.add(1);
-        PersistentVector.of(oneList).get(-1); }
+        PersistentVector.ofIter(oneList).get(-1); }
     @Test
     public void oneIsOne2() {
         List<Integer> oneList = new ArrayList<>();
         oneList.add(1);
-        assertEquals(Integer.valueOf(1), PersistentVector.of(oneList).get(0)); }
+        assertEquals(Integer.valueOf(1), PersistentVector.ofIter(oneList).get(0)); }
     @Test(expected = IndexOutOfBoundsException.class)
     public void oneEx13() {
         List<Integer> oneList = new ArrayList<>();
         oneList.add(1);
-        PersistentVector.of(oneList).get(1); }
+        PersistentVector.ofIter(oneList).get(1); }
     @Test(expected = IndexOutOfBoundsException.class)
     public void oneEx14() {
         List<Integer> oneList = new ArrayList<>();
         oneList.add(1);
-        PersistentVector.of(oneList).get(Integer.MAX_VALUE); }
+        PersistentVector.ofIter(oneList).get(Integer.MAX_VALUE); }
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void oneEx20() {
         List<Integer> oneList = new ArrayList<>();
         oneList.add(1);
-        PersistentVector.of(Collections.unmodifiableList(oneList)).get(Integer.MIN_VALUE); }
+        PersistentVector.ofIter(Collections.unmodifiableList(oneList)).get(Integer.MIN_VALUE); }
     @Test(expected = IndexOutOfBoundsException.class)
     public void oneEx21() {
         List<Integer> oneList = new ArrayList<>();
         oneList.add(1);
-        PersistentVector.of(Collections.unmodifiableList(oneList)).get(-1); }
+        PersistentVector.ofIter(Collections.unmodifiableList(oneList)).get(-1); }
     @Test
     public void oneIsOne3() {
         List<Integer> oneList = new ArrayList<>();
         oneList.add(1);
-        assertEquals(Integer.valueOf(1), PersistentVector.of(Collections.unmodifiableList(oneList)).get(0)); }
+        assertEquals(Integer.valueOf(1), PersistentVector.ofIter(Collections.unmodifiableList(oneList)).get(0)); }
     @Test(expected = IndexOutOfBoundsException.class)
     public void oneEx23() {
         List<Integer> oneList = new ArrayList<>();
         oneList.add(1);
-        PersistentVector.of(Collections.unmodifiableList(oneList)).get(1); }
+        PersistentVector.ofIter(Collections.unmodifiableList(oneList)).get(1); }
     @Test(expected = IndexOutOfBoundsException.class)
     public void oneEx24() {
         List<Integer> oneList = new ArrayList<>();
         oneList.add(1);
-        PersistentVector.of(Collections.unmodifiableList(oneList)).get(Integer.MAX_VALUE); }
+        PersistentVector.ofIter(Collections.unmodifiableList(oneList)).get(Integer.MAX_VALUE); }
 
     @Test public void addSeveralItems() throws NoSuchAlgorithmException {
         final int SEVERAL = SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;

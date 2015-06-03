@@ -103,7 +103,7 @@ public class PersistentVector<E> implements ImList<E> {
     }
 
     /** Public static factory method. */
-    static public <T> PersistentVector<T> of(Iterable<T> items) {
+    static public <T> PersistentVector<T> ofIter(Iterable<T> items) {
         MutableVector<T> ret = emptyTransientVector();
         for (T item : items) {
             ret = ret.append(item);
@@ -119,6 +119,18 @@ public class PersistentVector<E> implements ImList<E> {
             ret = ret.append(item);
         }
         return ret.persistent();
+    }
+
+    @SafeVarargs
+    public static <T> PersistentVector<T> ofSkipNull(T... items) {
+        if (items == null) { return empty(); }
+        PersistentVector<T> ret = empty();
+        for (T item : items) {
+            if (item != null) {
+                ret = ret.appendOne(item);
+            }
+        }
+        return ret;
     }
 
     // IEditableCollection has this return ITransientCollection<E>,
