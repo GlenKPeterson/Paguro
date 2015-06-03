@@ -197,7 +197,7 @@ public interface UnList<E> extends List<E>, UnCollection<E> {
 // I think this should be the implementation in ImList.
 //        PersistentVector<E> pv = PersistentVector.empty();
 //        for (int i = fromIndex; i < toIndex; i++) {
-//            pv = pv.append(this.get(i));
+//            pv = pv.appendOne(this.get(i));
 //        }
 //        return pv;
         List<E> ls = new ArrayList<>();

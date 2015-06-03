@@ -178,7 +178,7 @@ public interface Transformable<T> extends Realizable<T> {
     }
 
     /** {@inheritDoc} */
-    @Override default ImList<T> toImList() { return foldLeft(PersistentVector.empty(), (ts, t) -> ts.append(t)); }
+    @Override default ImList<T> toImList() { return foldLeft(PersistentVector.empty(), (ts, t) -> ts.appendOne(t)); }
 
     /** {@inheritDoc} */
     @Override default <U,V> Map<U,V> toJavaMap(final Function1<? super T,Map.Entry<U,V>> f1) {

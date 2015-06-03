@@ -46,7 +46,7 @@ public interface ImList<E> extends UnList<E>, Sequence<E> {
      @return a new ImList with the additional item.
      */
     default ImList<E> insert(int i, E val) {
-        if (i == size()) { return append(val); }
+        if (i == size()) { return appendOne(val); }
 
         if ( (i > size()) || (i < 0) ) {
             throw new IllegalArgumentException("Can't insert outside the possible bounds");
@@ -56,11 +56,11 @@ public interface ImList<E> extends UnList<E>, Sequence<E> {
         ImList<E> v = PersistentVector.empty();
         int j = 0;
         for (; j < i; j++) {
-            v = v.append(iter.next());
+            v = v.appendOne(iter.next());
         }
-        v = v.append(val);
+        v = v.appendOne(val);
         for (; j < size(); j++) {
-            v = v.append(iter.next());
+            v = v.appendOne(iter.next());
         }
         return v;
     }
@@ -70,7 +70,20 @@ public interface ImList<E> extends UnList<E>, Sequence<E> {
      * @param e the values to insert
      * @return a new ImList with the additional item at the end.
      */
-    ImList<E> append(E e);
+    ImList<E> appendOne(E e);
+
+    /**
+     * Adds items to the end of the ImList.
+     * @param es the values to insert
+     * @return a new ImList with the additional items at the end.
+     */
+    @SuppressWarnings("unchecked")
+    @Override default ImList<E> append(E... es) {
+        for (E e : es) {
+            appendOne(e);
+        }
+        return this;
+    };
 
 //    /** {@inheritDoc} */
 //    @Override ImList<E> concat(Sequence<E> other);

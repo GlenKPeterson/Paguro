@@ -28,7 +28,7 @@ import org.organicdesign.fp.tuple.Tuple2;
  @param <T>
  */
 public interface Sequence<T> extends Transformable<T> {
-    public static final Sequence<?> EMPTY_SEQUENCE = new Sequence<Object>() {
+    Sequence<?> EMPTY_SEQUENCE = new Sequence<Object>() {
         /** @return USED_UP */
         @Override public Option<Object> head() { return Option.none(); }
 
@@ -187,6 +187,16 @@ public interface Sequence<T> extends Transformable<T> {
 
     /** Add the given Sequence before the beginning of this one. */
     default Sequence<T> precat(Sequence<T> other) { return SequenceConcatenated.of(other, this); }
+
+    /** Add the given items at the end of this sequence. */
+    @SuppressWarnings("unchecked")
+    default Sequence<T> append(T... ts) {
+        return SequenceConcatenated.of(this, SequenceFromArray.of(ts));
+    }
+
+    /** Add the given items at the beginning of this sequence. */
+    @SuppressWarnings("unchecked")
+    default Sequence<T> prepend(T... ts) { return SequenceConcatenated.of(SequenceFromArray.of(ts), this); }
 
 //    @Override
 //    T reduceLeft(BiFunction<T, T, T> fun) {
