@@ -79,10 +79,11 @@ public interface ImList<E> extends UnList<E>, Sequence<E> {
      */
     @SuppressWarnings("unchecked")
     @Override default ImList<E> append(E... es) {
+        ImList<E> result = this;
         for (E e : es) {
-            appendOne(e);
+            result = result.appendOne(e);
         }
-        return this;
+        return result;
     };
 
 //    /** {@inheritDoc} */
