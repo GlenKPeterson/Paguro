@@ -220,6 +220,20 @@ public class PersistentVector<E> implements ImList<E> {
         return new PersistentVector<>(size + 1, newshift, newroot, (E[]) new Object[]{val});
     }
 
+    /**
+     * Adds items to the end of this PersistentVector.
+     * @param es the values to insert
+     * @return a new PersistentVector with the additional items at the end.
+     */
+    @SuppressWarnings("unchecked")
+    @Override public PersistentVector<E> append(E... es) {
+        PersistentVector<E> result = this;
+        for (E e : es) {
+            result = result.appendOne(e);
+        }
+        return result;
+    };
+
     private Node pushTail(int level, Node parent, Node tailnode) {
         //if parent is leaf, insert node,
         // else does it map to an existing child? -> nodeToInsert = pushNode one more level
