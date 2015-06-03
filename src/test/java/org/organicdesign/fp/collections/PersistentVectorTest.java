@@ -14,6 +14,11 @@
 
 package org.organicdesign.fp.collections;
 
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -22,11 +27,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.un;
@@ -298,28 +298,28 @@ public class PersistentVectorTest {
     }
 
     @Test(expected = IndexOutOfBoundsException.class)
-    public void putEx() { PersistentVector.empty().put(1, "Hello"); }
+    public void putEx() { PersistentVector.empty().replace(1, "Hello"); }
 
-    @Test public void put() {
+    @Test public void replace() {
         PersistentVector<String> pv = PersistentVector.empty();
-        pv = pv.put(0, "Hello").put(1, "World");
+        pv = pv.appendOne("Hello").appendOne("World");
         assertArrayEquals(new String[] { "Hello", "World" },
                           pv.toArray());
 
         assertArrayEquals(new String[]{"Goodbye", "World"},
-                          pv.put(0, "Goodbye").toArray());
+                          pv.replace(0, "Goodbye").toArray());
 
         PersistentVector<Integer> pv2 = PersistentVector.empty();
         int len = 999;
         Integer[] test = new Integer[len];
         for (int i = 0; i < len; i++) {
-            pv2 = pv2.put(i, i);
+            pv2 = pv2.appendOne(i);
             test[i] = i;
         }
         assertArrayEquals(test, pv2.toArray());
 
         for (int i = 0; i < len; i++) {
-            pv2 = pv2.put(i, len - i);
+            pv2 = pv2.replace(i, len - i);
             test[i] = len - i;
         }
         assertArrayEquals(test, pv2.toArray());
@@ -331,7 +331,7 @@ public class PersistentVectorTest {
         Integer[] test = new Integer[len];
 
         for (int i = 0; i < len; i++) {
-            pv2 = pv2.put(i, len - i);
+            pv2 = pv2.appendOne(len - i);
             test[i] = len - i;
         }
         assertArrayEquals(test, pv2.toArray());

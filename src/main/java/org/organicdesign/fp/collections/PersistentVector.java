@@ -168,7 +168,7 @@ public class PersistentVector<E> implements ImList<E> {
 
     /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
-    @Override public PersistentVector<E> put(int i, E val) {
+    @Override public PersistentVector<E> replace(int i, E val) {
         if (i >= 0 && i < size) {
             if (i >= tailoff()) {
                 Object[] newTail = new Object[tail.length];

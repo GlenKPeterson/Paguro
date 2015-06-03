@@ -114,14 +114,15 @@ public interface ImList<E> extends UnList<E>, Sequence<E> {
     }
 
     /**
-     Replace the item at the given index.  Note: i.put(i.size(), o) is equivalent to i.append(o).
+     Replace the item at the given index.  Note: i.replace(i.size(), o) used to be equivalent to i.append(o), but it
+     probably won't be for the RRB tree implementation, so this will change too.
 
      @param idx the index where the value should be stored.
      @param e the value to store
      @return a new ImList with the replaced item
      */
-    // TODO: Rename this to replace, and don't make i.put(i.size(), o) equivalent to i.append(o)
-    ImList<E> put(int idx, E e);
+    // TODO: Don't make i.replace(i.size(), o) equivalent to i.append(o)
+    ImList<E> replace(int idx, E e);
 
     // ================================================ STATIC METHODS ================================================
 //    static <T> ImList<T> empty() { return PersistentVector.empty(); }
