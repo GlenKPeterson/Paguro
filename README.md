@@ -215,6 +215,11 @@ In short, Clojure doesn't have static types.  Scala has an TMTOWTDI attitude tha
 - As of 2014-03-08, all major areas of functionality were covered by unit tests.
 
 #Change Log
+2015-06-04 version 0.9.5: Renamed everything from Sorted to Ordered.
+Added an UnIteratorOrdered that extends UnIterator.  Same methods, just with an ordering guarantee.
+Made UnMap and UnSet extend UnIterator, UnMapOrdered and UnSetOrdered extend UnIteratorOrdered.
+Deleted some unnecessary wrapping methods in StaticImports.
+
 2015-06-02 version 0.9.4: Renamed methods so that append/prepend means to add one item, while concat/precat means to add many items.
 Changed ImList.put() to ImList.replace() to clarify how it's different from inserting (it doesn't push subsequent items to the right).
 Made ImList and PersistentVector implement Sequence.
