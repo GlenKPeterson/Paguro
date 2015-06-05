@@ -22,9 +22,9 @@ import org.organicdesign.fp.collections.UnIteratorOrdered;
 import org.organicdesign.fp.collections.UnList;
 import org.organicdesign.fp.collections.UnListIterator;
 import org.organicdesign.fp.collections.UnMap;
-import org.organicdesign.fp.collections.UnMapSorted;
+import org.organicdesign.fp.collections.UnMapOrdered;
 import org.organicdesign.fp.collections.UnSet;
-import org.organicdesign.fp.collections.UnSetSorted;
+import org.organicdesign.fp.collections.UnSetOrdered;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import java.util.Arrays;
@@ -143,17 +143,17 @@ public class StaticImports {
     }
 
     /** Returns an unmodifiable version of the given set. */
-    public static <T> UnSetSorted<T> un(SortedSet<T> set) {
+    public static <T> UnSetOrdered<T> un(SortedSet<T> set) {
         if (set == null) { return PersistentTreeSet.empty(); }
-        if (set instanceof UnSetSorted) { return (UnSetSorted<T>) set; }
+        if (set instanceof UnSetOrdered) { return (UnSetOrdered<T>) set; }
         if (set.size() < 1) { return PersistentTreeSet.empty(); }
-        return new UnSetSorted<T>() {
+        return new UnSetOrdered<T>() {
             @Override public Comparator<? super T> comparator() { return set.comparator(); }
-            @Override public UnSetSorted<T> subSet(T fromElement, T toElement) {
+            @Override public UnSetOrdered<T> subSet(T fromElement, T toElement) {
                 return un(set.subSet(fromElement, toElement));
             }
-            @Override public UnSetSorted<T> headSet(T toElement) { return un(set.headSet(toElement)); }
-            @Override public UnSetSorted<T> tailSet(T fromElement) { return un(set.tailSet(fromElement)); }
+            @Override public UnSetOrdered<T> headSet(T toElement) { return un(set.headSet(toElement)); }
+            @Override public UnSetOrdered<T> tailSet(T fromElement) { return un(set.tailSet(fromElement)); }
             @Override public T first() { return set.first(); }
             @Override public T last() { return set.last(); }
             @Override public boolean contains(Object o) { return set.contains(o); }
@@ -197,14 +197,14 @@ public class StaticImports {
     }
 
     /** Returns an unmodifiable version of the given sorted map. */
-    public static <K,V> UnMapSorted<K,V> un(SortedMap<K,V> map) {
-        if (map == null) { return UnMapSorted.empty(); }
-        if (map instanceof UnMapSorted) { return (UnMapSorted<K,V>) map; }
-        if (map.size() < 1) { return UnMapSorted.empty(); }
-        return new UnMapSorted<K,V>() {
+    public static <K,V> UnMapOrdered<K,V> un(SortedMap<K,V> map) {
+        if (map == null) { return UnMapOrdered.empty(); }
+        if (map instanceof UnMapOrdered) { return (UnMapOrdered<K,V>) map; }
+        if (map.size() < 1) { return UnMapOrdered.empty(); }
+        return new UnMapOrdered<K,V>() {
             // TODO: Test this.
-            @Override public UnSetSorted<Entry<K,V>> entrySet() {
-                return new UnSetSorted<Entry<K,V>>() {
+            @Override public UnSetOrdered<Entry<K,V>> entrySet() {
+                return new UnSetOrdered<Entry<K,V>>() {
                     Set<Map.Entry<K,V>> entrySet = map.entrySet();
                     @Override public UnIteratorOrdered<Entry<K,V>> iterator() {
                         return new UnIteratorOrdered<Entry<K,V>>() {
@@ -213,7 +213,7 @@ public class StaticImports {
                             @Override public Entry<K,V> next() { return iter.next(); }
                         };
                     }
-                    @Override public UnSetSorted<Entry<K,V>> subSet(Entry<K,V> fromElement, Entry<K,V> toElement) {
+                    @Override public UnSetOrdered<Entry<K,V>> subSet(Entry<K,V> fromElement, Entry<K,V> toElement) {
                         // This is recursive.  I hope it's not an infinite loop 'cause I don't want to write this
                         // all out again.
                         return un(map.subMap(fromElement.getKey(), toElement.getKey())).entrySet();
@@ -245,8 +245,8 @@ public class StaticImports {
             @Override public V get(Object key) { return map.get(key); }
             @Override public UnSet<K> keySet() { return un(map.keySet()); }
             @Override public Comparator<? super K> comparator() { return map.comparator(); }
-            @Override public UnMapSorted<K,V> subMap(K fromKey, K toKey) { return un(map.subMap(fromKey, toKey)); }
-            @Override public UnMapSorted<K,V> tailMap(K fromKey) { return un(map.tailMap(fromKey)); }
+            @Override public UnMapOrdered<K,V> subMap(K fromKey, K toKey) { return un(map.subMap(fromKey, toKey)); }
+            @Override public UnMapOrdered<K,V> tailMap(K fromKey) { return un(map.tailMap(fromKey)); }
             @Override public K firstKey() { return map.firstKey(); }
             @Override public K lastKey() { return map.lastKey(); }
             @Override public UnCollection<V> values() { return un(map.values()); }

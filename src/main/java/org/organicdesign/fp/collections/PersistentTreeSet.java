@@ -18,7 +18,7 @@ import java.util.SortedSet;
 /**
  A wrapper that turns a PersistentTreeMap into a set.
  */
-public class PersistentTreeSet<E> implements ImSetSorted<E> {
+public class PersistentTreeSet<E> implements ImSetOrdered<E> {
 
     /**
      Be extremely careful with this because it uses the default comparator, which only works for items that implement
@@ -37,7 +37,7 @@ public class PersistentTreeSet<E> implements ImSetSorted<E> {
     @SuppressWarnings("unchecked")
     static public <T> PersistentTreeSet<T> empty() { return EMPTY; }
 
-    private final ImMapSorted<E,?> impl;
+    private final ImMapOrdered<E,?> impl;
 
 //    static public <T> PersistentTreeSet<T> create(ISeq<T> items) {
 //        PersistentTreeSet<T> ret = emptyTreeSet();
@@ -55,7 +55,7 @@ public class PersistentTreeSet<E> implements ImSetSorted<E> {
 //        return ret;
 //    }
 
-    private PersistentTreeSet(ImMapSorted<E,?> i) { impl = i; }
+    private PersistentTreeSet(ImMapOrdered<E,?> i) { impl = i; }
 
     /**
      Returns a new PersistentTreeSet of the given comparator.  Always use this instead of starting with empty() because
@@ -92,7 +92,7 @@ public class PersistentTreeSet<E> implements ImSetSorted<E> {
      Returns a new PersistentTreeSet of the keys and comparator in the given map.  Since PersistentTreeSet is just a
      wrapper for a PersistentTreeMap, this can be a very cheap operation.
      */
-    public static <T> PersistentTreeSet<T> ofMap(ImMapSorted<T,?> i) { return new PersistentTreeSet<>(i); }
+    public static <T> PersistentTreeSet<T> ofMap(ImMapOrdered<T,?> i) { return new PersistentTreeSet<>(i); }
 
     /**
      Returns the comparator used to order the items in this set, or null if it uses Function2.DEFAULT_COMPARATOR
@@ -174,7 +174,7 @@ public class PersistentTreeSet<E> implements ImSetSorted<E> {
     @Override public int size() { return impl.size(); }
 
     /** {@inheritDoc} */
-    @Override public ImSetSorted<E> subSet(E fromElement, E toElement) {
+    @Override public ImSetOrdered<E> subSet(E fromElement, E toElement) {
         return PersistentTreeSet.ofMap(impl.subMap(fromElement, toElement));
     }
 

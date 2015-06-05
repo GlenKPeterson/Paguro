@@ -15,8 +15,8 @@
 package org.organicdesign.fp;
 
 import org.organicdesign.fp.collections.ImList;
-import org.organicdesign.fp.collections.ImMapSorted;
-import org.organicdesign.fp.collections.ImSetSorted;
+import org.organicdesign.fp.collections.ImMapOrdered;
+import org.organicdesign.fp.collections.ImSetOrdered;
 import org.organicdesign.fp.collections.PersistentTreeMap;
 import org.organicdesign.fp.collections.PersistentTreeSet;
 import org.organicdesign.fp.collections.PersistentVector;
@@ -203,8 +203,8 @@ public interface Transformable<T> extends Realizable<T> {
 
     /** {@inheritDoc} */
     @Override
-    default <U,V> ImMapSorted<U,V> toImMapSorted(Comparator<? super U> comp, Function1<? super T,Map.Entry<U,V>> f1) {
-        return foldLeft((ImMapSorted<U, V>) PersistentTreeMap.<U, V>ofComp(comp),
+    default <U,V> ImMapOrdered<U,V> toImMapSorted(Comparator<? super U> comp, Function1<? super T,Map.Entry<U,V>> f1) {
+        return foldLeft((ImMapOrdered<U, V>) PersistentTreeMap.<U, V>ofComp(comp),
                         (ts, t) -> ts.assoc(f1.apply(t)));
     }
 
@@ -217,7 +217,7 @@ public interface Transformable<T> extends Realizable<T> {
     }
 
     /** {@inheritDoc} */
-    @Override default ImSetSorted<T> toImSetSorted(Comparator<? super T> comparator) {
+    @Override default ImSetOrdered<T> toImSetSorted(Comparator<? super T> comparator) {
         return foldLeft(PersistentTreeSet.ofComp(comparator), (accum, t) -> accum.put(t));
     }
 

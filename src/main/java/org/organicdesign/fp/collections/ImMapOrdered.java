@@ -18,17 +18,18 @@ import org.organicdesign.fp.permanent.Sequence;
 import java.util.Map;
 
 /** An immutable sorted map. */
-public interface ImMapSorted<K,V> extends UnMapSorted<K,V>, Sequence<UnMap.UnEntry<K,V>> {
+public interface ImMapOrdered<K,V> extends UnMapOrdered<K,V>, Sequence<UnMap.UnEntry<K,V>> {
 
     /**
      * Returns a view of the mappings contained in this map.  The set should actually contain UnMap.Entry items, but
      * that return signature is illegal in Java, so you'll just have to remember. */
-    @Override ImSetSorted<Map.Entry<K,V>> entrySet();
+    @Override
+    ImSetOrdered<Entry<K,V>> entrySet();
 
 // public  K	firstKey()
 
     /** Return the elements in this map up (but excluding) to the given element */
-    @Override default ImMapSorted<K,V> headMap(K toKey) { return subMap(firstKey(), toKey); }
+    @Override default ImMapOrdered<K,V> headMap(K toKey) { return subMap(firstKey(), toKey); }
 
     /**
      Returns an iterator over the UnEntries of this map in order.
@@ -42,17 +43,19 @@ public interface ImMapSorted<K,V> extends UnMapSorted<K,V>, Sequence<UnMap.UnEnt
 // public  K	lastKey()
 
     /** Return the elements in this map from the start element (inclusive) to the end element (exclusive) */
-    @Override ImMapSorted<K,V> subMap(K fromKey, K toKey);
+    @Override
+    ImMapOrdered<K,V> subMap(K fromKey, K toKey);
 
     /** Return the elements in this from the given element to the end */
-    @Override ImMapSorted<K,V> tailMap(K fromKey);
+    @Override
+    ImMapOrdered<K,V> tailMap(K fromKey);
 
     /** Returns a new map with the given key/value added */
-    ImMapSorted<K,V> assoc(K key, V val);
+    ImMapOrdered<K,V> assoc(K key, V val);
 
     /** Returns a new map with an immutable copy of the given entry added */
-    default ImMapSorted<K,V> assoc(Map.Entry<K,V> entry) { return assoc(entry.getKey(), entry.getValue()); }
+    default ImMapOrdered<K,V> assoc(Map.Entry<K,V> entry) { return assoc(entry.getKey(), entry.getValue()); }
 
     /** Returns a new map with the given key/value removed */
-    ImMapSorted<K,V> without(K key);
+    ImMapOrdered<K,V> without(K key);
 }

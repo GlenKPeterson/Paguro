@@ -22,8 +22,8 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 
 import org.organicdesign.fp.collections.ImList;
-import org.organicdesign.fp.collections.ImMapSorted;
-import org.organicdesign.fp.collections.ImSetSorted;
+import org.organicdesign.fp.collections.ImMapOrdered;
+import org.organicdesign.fp.collections.ImSetOrdered;
 import org.organicdesign.fp.collections.UnIterable;
 import org.organicdesign.fp.collections.UnIterator;
 import org.organicdesign.fp.collections.UnMap;
@@ -57,7 +57,7 @@ public interface Realizable<T> extends UnIterable<T> {
      @param f1 Maps each item in this collection to a key/value pair.  If the collection is composed of Map.Entries,
      you can pass Function1.identity() here.
      */
-    <U,V> ImMapSorted<U,V> toImMapSorted(Comparator<? super U> comp, Function1<? super T,Map.Entry<U,V>> f1);
+    <U,V> ImMapOrdered<U,V> toImMapSorted(Comparator<? super U> comp, Function1<? super T,Map.Entry<U,V>> f1);
 
     /**
      The contents of this Realizable presented as an immutable, sorted (tree) set.  Use this when you want to quickly
@@ -65,7 +65,7 @@ public interface Realizable<T> extends UnIterable<T> {
      @return An immutable set
      @param comp Determines the ordering.  If T implements Comparable, you can pass Function2.defaultComparator() here.
      */
-    ImSetSorted<T> toImSetSorted(Comparator<? super T> comp);
+    ImSetOrdered<T> toImSetSorted(Comparator<? super T> comp);
 
     /** The contents copied to a mutable list.  Use toImList unless you need to modify the list in-place. */
     List<T> toJavaList();

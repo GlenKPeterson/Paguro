@@ -18,9 +18,9 @@ import org.junit.Test;
 import org.organicdesign.fp.collections.UnCollection;
 import org.organicdesign.fp.collections.UnListIterator;
 import org.organicdesign.fp.collections.UnMap;
-import org.organicdesign.fp.collections.UnMapSorted;
+import org.organicdesign.fp.collections.UnMapOrdered;
 import org.organicdesign.fp.collections.UnSet;
-import org.organicdesign.fp.collections.UnSetSorted;
+import org.organicdesign.fp.collections.UnSetOrdered;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import java.util.ArrayDeque;
@@ -348,7 +348,7 @@ public class StaticImportsTest {
     }
 
     @Test public void unSetSorted() {
-        UnSetSorted<Integer> ts = un(new TreeSet<>(Arrays.asList(5, 4, 3)));
+        UnSetOrdered<Integer> ts = un(new TreeSet<>(Arrays.asList(5, 4, 3)));
         assertNull(ts.comparator());
         // headSet is exclusive.
         assertTrue(ts.headSet(4).contains(3));
@@ -454,7 +454,7 @@ public class StaticImportsTest {
     }
 
     @Test public void unMapSorted() {
-        final UnMapSorted<Integer,String> ts;
+        final UnMapOrdered<Integer,String> ts;
         SortedMap<Integer,String> sm = new TreeMap<>();
         sm.put(5, "five");
         sm.put(4, "four");
@@ -505,7 +505,7 @@ public class StaticImportsTest {
 
         assertFalse(ts.isEmpty());
 
-        final UnMapSorted<Integer,String> m2;
+        final UnMapOrdered<Integer,String> m2;
         {
             SortedMap<Integer,String> sm2 = new TreeMap<>();
             sm2.put(3, "three");
@@ -514,7 +514,7 @@ public class StaticImportsTest {
             m2 = un(sm2);
         }
 
-        final UnMapSorted<Integer,String> m3;
+        final UnMapOrdered<Integer,String> m3;
         {
             SortedMap<Integer,String> sm3 = new TreeMap<>();
             sm3.put(4, "four");
