@@ -25,6 +25,7 @@ public class PersistentTreeSet<E> implements ImSetSorted<E> {
      Comparable (have a "natural ordering").  An attempt to use it with other items will blow up at runtime.  Either
      a withComparator() method will be added, or this will be removed.
      */
+    // TODO: Should really require a comparator.
     @SuppressWarnings("unchecked")
     static public final PersistentTreeSet EMPTY = new PersistentTreeSet(PersistentTreeMap.EMPTY);
 
@@ -109,11 +110,18 @@ public class PersistentTreeSet<E> implements ImSetSorted<E> {
                                        : this;
     }
 
-//    /** {@inheritDoc} */
-//    @Override
-//    public UnIterator<E> iterator() {
-//        return iterator();
-//    }
+    /** {@inheritDoc} */
+    @Override
+    public UnIteratorOrdered<E> iterator() {
+        return new UnIteratorOrdered<E>() {
+            UnIteratorOrdered<? extends UnMap.UnEntry<E,?>> iter = impl.iterator();
+            @Override public boolean hasNext() { return iter.hasNext(); }
+            @Override public E next() {
+                UnMap.UnEntry<E,?> e = iter.next();
+                return e == null ? null : e.getKey();
+            }
+        };
+    }
 
     /**
      This is designed to be correct, rather than fully compatible with TreeSet.equals().
@@ -127,7 +135,7 @@ public class PersistentTreeSet<E> implements ImSetSorted<E> {
         SortedSet that = ((SortedSet) other);
 
         if (size() != that.size()) { return false; }
-        return UnIterable.equals(this, that);
+        return UnIterableOrdered.equals(this, that);
     }
 
     /**
@@ -142,7 +150,7 @@ public class PersistentTreeSet<E> implements ImSetSorted<E> {
     @Override public E first() { return impl.firstKey(); }
 
     /** {@inheritDoc} */
-    @Override public int hashCode() { return (size() == 0) ? 0 : UnIterable.hashCode(this); }
+    @Override public int hashCode() { return (size() == 0) ? 0 : UnIterableOrdered.hashCode(this); }
 
     /** {@inheritDoc} */
     @Override public Option<E> head() { return size() > 0 ? Option.of(impl.firstKey()) : Option.none(); }
@@ -175,7 +183,7 @@ public class PersistentTreeSet<E> implements ImSetSorted<E> {
     @Override public Sequence<E> tail() { return impl.without(first()).keySet(); }
 
     /** Returns a string representation of this set. */
-    @Override public String toString() { return UnIterable.toString("PersistentTreeSet", this); }
+    @Override public String toString() { return UnIterableOrdered.toString("PersistentTreeSet", this); }
 
 //    @Override
 //    public ISeq<E> rseq() {

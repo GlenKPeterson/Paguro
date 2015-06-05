@@ -422,11 +422,11 @@ public class PersistentVector<E> implements ImList<E> {
         if ( !(other instanceof List) ) { return false; }
         List that = (List) other;
         return (this.size() == that.size()) &&
-                UnIterable.equals(this, that);
+                UnIterableOrdered.equals(this, that);
     }
 
     @Override public String toString() {
-        return UnIterable.toString("PersistentVector", this);
+        return UnIterableOrdered.toString("PersistentVector", this);
     }
 
     private static Node doAssoc(int level, Node node, int i, Object val) {

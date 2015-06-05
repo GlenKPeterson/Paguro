@@ -18,14 +18,15 @@ import org.organicdesign.fp.collections.PersistentTreeSet;
 import org.organicdesign.fp.collections.UnCollection;
 import org.organicdesign.fp.collections.UnIterable;
 import org.organicdesign.fp.collections.UnIterator;
+import org.organicdesign.fp.collections.UnIteratorOrdered;
 import org.organicdesign.fp.collections.UnList;
 import org.organicdesign.fp.collections.UnListIterator;
 import org.organicdesign.fp.collections.UnMap;
 import org.organicdesign.fp.collections.UnMapSorted;
 import org.organicdesign.fp.collections.UnSet;
 import org.organicdesign.fp.collections.UnSetSorted;
+import org.organicdesign.fp.tuple.Tuple2;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -158,7 +159,13 @@ public class StaticImports {
             @Override public boolean contains(Object o) { return set.contains(o); }
             @Override public int size() { return set.size(); }
             @Override public boolean isEmpty() { return set.isEmpty(); }
-            @Override public UnIterator<T> iterator() { return un(set.iterator()); }
+            @Override public UnIteratorOrdered<T> iterator() {
+                return new UnIteratorOrdered<T>() {
+                    Iterator<T> iter = set.iterator();
+                    @Override public boolean hasNext() { return iter.hasNext(); }
+                    @Override public T next() { return iter.next(); }
+                };
+            }
             @Override public int hashCode() { return set.hashCode(); }
             @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
             @Override public boolean equals(Object o) { return set.equals(o); }
@@ -171,6 +178,10 @@ public class StaticImports {
         if (map instanceof UnMap) { return (UnMap<K,V>) map; }
         if (map.size() < 1) { return UnMap.empty(); }
         return new UnMap<K,V>() {
+            /** {@inheritDoc} */
+            @Override
+            public UnIterator<UnEntry<K,V>> iterator() { return UnMap.UnEntry.wrap(map.entrySet().iterator()); }
+
             @Override public UnSet<Map.Entry<K,V>> entrySet() { return un(map.entrySet()); }
             @Override public int size() { return map.size(); }
             @Override public boolean isEmpty() { return map.isEmpty(); }
@@ -191,7 +202,42 @@ public class StaticImports {
         if (map instanceof UnMapSorted) { return (UnMapSorted<K,V>) map; }
         if (map.size() < 1) { return UnMapSorted.empty(); }
         return new UnMapSorted<K,V>() {
-            @Override public UnSet<Map.Entry<K,V>> entrySet() { return un(map.entrySet()); }
+            // TODO: Test this.
+            @Override public UnSetSorted<Entry<K,V>> entrySet() {
+                return new UnSetSorted<Entry<K,V>>() {
+                    Set<Map.Entry<K,V>> entrySet = map.entrySet();
+                    @Override public UnIteratorOrdered<Entry<K,V>> iterator() {
+                        return new UnIteratorOrdered<Entry<K,V>>() {
+                            Iterator<Entry<K,V>> iter = entrySet.iterator();
+                            @Override public boolean hasNext() { return iter.hasNext(); }
+                            @Override public Entry<K,V> next() { return iter.next(); }
+                        };
+                    }
+                    @Override public UnSetSorted<Entry<K,V>> subSet(Entry<K,V> fromElement, Entry<K,V> toElement) {
+                        // This is recursive.  I hope it's not an infinite loop 'cause I don't want to write this
+                        // all out again.
+                        return un(map.subMap(fromElement.getKey(), toElement.getKey())).entrySet();
+                    }
+                    @Override public Comparator<? super Entry<K,V>> comparator() {
+                        return (o1, o2) -> map.comparator().compare(o1.getKey(), o2.getKey());
+                    }
+                    @Override public Entry<K,V> first() {
+                        K key = map.firstKey();
+                        return Tuple2.of(key, map.get(key));
+                    }
+
+                    @Override public Entry<K,V> last() {
+                        K key = map.lastKey();
+                        return Tuple2.of(key, map.get(key));
+                    }
+                    @Override public boolean contains(Object o) { return entrySet.contains(o); }
+                    @Override public boolean isEmpty() { return entrySet.isEmpty(); }
+                    @Override public int size() { return entrySet.size(); }
+                    @Override public int hashCode() { return entrySet.hashCode(); }
+                    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
+                    @Override public boolean equals(Object o) { return entrySet.equals(o); }
+                };
+            }
             @Override public int size() { return map.size(); }
             @Override public boolean isEmpty() { return map.isEmpty(); }
             @Override public boolean containsKey(Object key) { return map.containsKey(key); }
@@ -328,31 +374,6 @@ public class StaticImports {
             }
         }
         return (s.size() > 0) ? un(s) : UnSet.empty();
-    }
-
-    /** Returns an unmodifiable List containing all passed items (including null items). */
-    @SuppressWarnings("unchecked")
-    @SafeVarargs
-    public static <T> UnList<T> unList(T... ts) {
-        return ( (ts == null) || (ts.length < 1) )
-                ? UnList.empty()
-                : un(Arrays.asList(ts));
-    }
-
-    /** Returns an unmodifiable List containing any non-null passed items. */
-    @SuppressWarnings("unchecked")
-    @SafeVarargs
-    public static <T> UnList<T> unListSkipNull(T... ts) {
-        if ( (ts == null) || (ts.length < 1) ) {
-            return UnList.empty();
-        }
-        List<T> s = new ArrayList<>();
-        for (T t : ts) {
-            if (t != null) {
-                s.add(t);
-            }
-        }
-        return (s.size() > 0) ? un(s) : UnList.empty();
     }
 
 //    /**

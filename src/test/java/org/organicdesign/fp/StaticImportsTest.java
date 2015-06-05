@@ -14,6 +14,15 @@
 
 package org.organicdesign.fp;
 
+import org.junit.Test;
+import org.organicdesign.fp.collections.UnCollection;
+import org.organicdesign.fp.collections.UnListIterator;
+import org.organicdesign.fp.collections.UnMap;
+import org.organicdesign.fp.collections.UnMapSorted;
+import org.organicdesign.fp.collections.UnSet;
+import org.organicdesign.fp.collections.UnSetSorted;
+import org.organicdesign.fp.tuple.Tuple2;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,22 +30,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
-import org.junit.Test;
-import org.organicdesign.fp.collections.UnCollection;
-import org.organicdesign.fp.collections.UnList;
-import org.organicdesign.fp.collections.UnListIterator;
-import org.organicdesign.fp.collections.UnMap;
-import org.organicdesign.fp.collections.UnMapSorted;
-import org.organicdesign.fp.collections.UnSet;
-import org.organicdesign.fp.collections.UnSetSorted;
-import org.organicdesign.fp.tuple.Tuple2;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.*;
@@ -280,25 +278,6 @@ public class StaticImportsTest {
 
         assertEquals(UnSet.empty(), unSetSkipNull(null, null));
         assertEquals(UnSet.empty(), unSetSkipNull());
-    }
-
-    @Test public void testUnList3() {
-        UnList<Integer> a = unList(1, 2, 3);
-        assertEquals(3, a.size());
-
-        List<Integer> b = new ArrayList<>();
-        b.add(1);
-        b.add(2);
-        b.add(3);
-
-        UnList<Integer> c = unListSkipNull(null, 1, null, 2, null, 3);
-        equalsDistinctHashCode(a, b, c, unList(1, 3, 2));
-
-        assertEquals(UnList.empty(), unList());
-
-        assertEquals(UnList.empty(), unListSkipNull(null, null));
-        assertEquals(UnList.empty(), unListSkipNull());
-
     }
 
     @Test public void unListIterator() {

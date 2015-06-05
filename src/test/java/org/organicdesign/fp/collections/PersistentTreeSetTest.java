@@ -40,7 +40,7 @@ public class PersistentTreeSetTest {
 
         SortedSet<String> ss2 = new TreeSet<>();
         ss2.add("bye");
-        ss2.add("Hello");
+        ss2.add("12345");
 
         // Uses comparator.compare(a, b) == 0 to define equality.  This is good.
         assertNotEquals(ss2, ss);

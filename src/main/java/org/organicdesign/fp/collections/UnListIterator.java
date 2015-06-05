@@ -5,7 +5,7 @@ import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 
 /** An unmodifiable ListIterator */
-public interface UnListIterator<E> extends ListIterator<E>, UnIterator<E> {
+public interface UnListIterator<E> extends ListIterator<E>, UnIteratorOrdered<E> {
 
     /** Not allowed - this is supposed to be unmodifiable */
     @Override @Deprecated default void add(E element) {

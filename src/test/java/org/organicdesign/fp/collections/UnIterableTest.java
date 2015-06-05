@@ -20,18 +20,18 @@ public class UnIterableTest {
             @Override public Integer next() { return intern.next(); }
         };
 
-        assertEquals(UnIterable.hashCode(a), UnIterable.hashCode(a));
-        assertEquals(UnIterable.hashCode(a), UnIterable.hashCode(b));
-        assertNotEquals(UnIterable.hashCode(a), UnIterable.hashCode(c));
+        assertEquals(UnIterableOrdered.hashCode(a), UnIterableOrdered.hashCode(a));
+        assertEquals(UnIterableOrdered.hashCode(a), UnIterableOrdered.hashCode(b));
+        assertNotEquals(UnIterableOrdered.hashCode(a), UnIterableOrdered.hashCode(c));
 
-        assertTrue(UnIterable.equals(a, a));
-        assertTrue(UnIterable.equals(a, b));
-        assertTrue(UnIterable.equals(b, a));
-        assertTrue(UnIterable.equals(null, null));
-        assertFalse(UnIterable.equals(a, null));
-        assertFalse(UnIterable.equals(null, a));
-        assertFalse(UnIterable.equals(a, c));
-        assertFalse(UnIterable.equals(c, a));
+        assertTrue(UnIterableOrdered.equals(a, a));
+        assertTrue(UnIterableOrdered.equals(a, b));
+        assertTrue(UnIterableOrdered.equals(b, a));
+        assertTrue(UnIterableOrdered.equals(null, null));
+        assertFalse(UnIterableOrdered.equals(a, null));
+        assertFalse(UnIterableOrdered.equals(null, a));
+        assertFalse(UnIterableOrdered.equals(a, c));
+        assertFalse(UnIterableOrdered.equals(c, a));
     }
 
     @Test public void equalsHashcode() {
@@ -56,18 +56,18 @@ public class UnIterableTest {
             @Override public Integer next() { return intern.next(); }
         };
 
-        assertEquals(UnIterable.hashCode(a), UnIterable.hashCode(a));
-        assertEquals(UnIterable.hashCode(a), UnIterable.hashCode(b));
-        assertNotEquals(UnIterable.hashCode(a), UnIterable.hashCode(c));
-        assertNotEquals(UnIterable.hashCode(b), UnIterable.hashCode(d));
+        assertEquals(UnIterableOrdered.hashCode(a), UnIterableOrdered.hashCode(a));
+        assertEquals(UnIterableOrdered.hashCode(a), UnIterableOrdered.hashCode(b));
+        assertNotEquals(UnIterableOrdered.hashCode(a), UnIterableOrdered.hashCode(c));
+        assertNotEquals(UnIterableOrdered.hashCode(b), UnIterableOrdered.hashCode(d));
 
-        assertTrue(UnIterable.equals(a, a));
-        assertTrue(UnIterable.equals(a, b));
-        assertTrue(UnIterable.equals(b, a));
-        assertFalse(UnIterable.equals(a, c));
-        assertFalse(UnIterable.equals(c, a));
-        assertFalse(UnIterable.equals(b, d));
-        assertFalse(UnIterable.equals(d, b));
+        assertTrue(UnIterableOrdered.equals(a, a));
+        assertTrue(UnIterableOrdered.equals(a, b));
+        assertTrue(UnIterableOrdered.equals(b, a));
+        assertFalse(UnIterableOrdered.equals(a, c));
+        assertFalse(UnIterableOrdered.equals(c, a));
+        assertFalse(UnIterableOrdered.equals(b, d));
+        assertFalse(UnIterableOrdered.equals(d, b));
     }
 
 //    @Test public void compareHelper() {

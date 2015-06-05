@@ -19,11 +19,11 @@ import java.util.NoSuchElementException;
 import java.util.SortedMap;
 
 /** An unmodifiable SortedMap. */
-public interface UnMapSorted<K,V> extends UnMap<K,V>, SortedMap<K,V> {
+public interface UnMapSorted<K,V> extends UnMap<K,V>, SortedMap<K,V>, UnIterableOrdered<UnMap.UnEntry<K,V>> {
 
     // ==================================================== Static ====================================================
     UnMapSorted<Object,Object> EMPTY = new UnMapSorted<Object,Object>() {
-        @Override public UnSet<Map.Entry<Object,Object>> entrySet() { return UnSet.empty(); }
+        @Override public UnSetSorted<Map.Entry<Object,Object>> entrySet() { return UnSetSorted.empty(); }
         @Override public UnSet<Object> keySet() { return UnSet.empty(); }
         @Override public Comparator<? super Object> comparator() { return null; }
         @Override public UnMapSorted<Object,Object> subMap(Object fromKey, Object toKey) { return this; }
@@ -33,7 +33,7 @@ public interface UnMapSorted<K,V> extends UnMap<K,V>, SortedMap<K,V> {
         @Override public UnCollection<Object> values() { return UnSet.empty(); }
         @Override public int size() { return 0; }
         @Override public boolean isEmpty() { return true; }
-        @Override public UnIterator<UnEntry<Object,Object>> iterator() { return UnIterator.empty(); }
+        @Override public UnIteratorOrdered<UnEntry<Object,Object>> iterator() { return UnIteratorOrdered.empty(); }
         @Override public boolean containsKey(Object key) { return false; }
         @Override public boolean containsValue(Object value) { return false; }
         @Override public Object get(Object key) { return null; }
@@ -48,12 +48,15 @@ public interface UnMapSorted<K,V> extends UnMap<K,V>, SortedMap<K,V> {
     /**
      * Returns a view of the mappings contained in this map.  The set should actually contain UnMap.Entry items, but
      * that return signature is illegal in Java, so you'll just have to remember. */
-    @Override UnSet<Map.Entry<K,V>> entrySet();
+    @Override UnSetSorted<Entry<K,V>> entrySet();
 
 // public  K	firstKey()
 
     /** {@inheritDoc} */
     @Override default UnMapSorted<K,V> headMap(K toKey) { return subMap(firstKey(), toKey); }
+
+    /** {@inheritDoc} */
+    @Override default UnIteratorOrdered<UnEntry<K,V>> iterator() { return UnMap.UnEntry.wrap(entrySet().iterator()); }
 
     /** Returns a view of the keys contained in this map. */
     @Override UnSet<K> keySet();

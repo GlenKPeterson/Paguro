@@ -20,6 +20,18 @@ import java.util.function.Predicate;
 /** An unmodifiable set */
 public interface UnSet<E> extends UnCollection<E>, Set<E> {
 
+    // ==================================================== Static ====================================================
+    UnSet<Object> EMPTY = new UnSet<Object>() {
+        @Override public boolean contains(Object o) { return false; }
+        @Override public int size() { return 0; }
+        @Override public boolean isEmpty() { return true; }
+        @Override public UnIterator<Object> iterator() { return UnIterator.empty(); }
+    };
+    @SuppressWarnings("unchecked")
+    static <T> UnSet<T> empty() { return (UnSet<T>) EMPTY; }
+
+    // =================================================== Instance ===================================================
+
     /** Not allowed - this is supposed to be unmodifiable */
     @SuppressWarnings("deprecation")
     @Override @Deprecated default boolean add(E e) {
@@ -53,7 +65,10 @@ public interface UnSet<E> extends UnCollection<E>, Set<E> {
      */
     @Override boolean isEmpty();
 
-    /** {@inheritDoc} */
+    /**
+     Iterates over contents with no guarantees about their ordering.
+     {@inheritDoc}
+     */
     @Override UnIterator<E> iterator();
 
     /** Not allowed - this is supposed to be unmodifiable */
@@ -107,14 +122,4 @@ public interface UnSet<E> extends UnCollection<E>, Set<E> {
     }
 // Methods inherited from interface java.lang.Iterable
 // forEach
-
-    // ==================================================== Static ====================================================
-    static UnSet<Object> EMPTY = new UnSet<Object>() {
-        @Override public boolean contains(Object o) { return false; }
-        @Override public int size() { return 0; }
-        @Override public boolean isEmpty() { return true; }
-        @Override public UnIterator<Object> iterator() { return UnIterator.empty(); }
-    };
-    @SuppressWarnings("unchecked")
-    static <T> UnSet<T> empty() { return (UnSet<T>) EMPTY; }
 }

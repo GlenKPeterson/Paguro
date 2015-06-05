@@ -31,7 +31,7 @@ import static org.organicdesign.fp.StaticImports.un;
  *
  * {@inheritDoc}
  */
-public interface UnList<E> extends List<E>, UnCollection<E> {
+public interface UnList<E> extends List<E>, UnCollection<E>, UnIterableOrdered<E> {
 
     // ==================================================== Static ====================================================
 
@@ -124,7 +124,7 @@ public interface UnList<E> extends List<E>, UnCollection<E> {
     @Override default boolean isEmpty() { return size() == 0; }
 
     /** {@inheritDoc} */
-    @Override default UnIterator<E> iterator() { return listIterator(0); }
+    @Override default UnIteratorOrdered<E> iterator() { return listIterator(0); }
 
     /**
      * The default implementation of this method has O(this.size()) performance.

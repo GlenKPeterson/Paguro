@@ -24,6 +24,11 @@ public interface ImSetSorted<E> extends ImSet<E>, UnSetSorted<E> {
     /** Return the elements in this set up (but excluding) to the given element */
     @Override default ImSetSorted<E> headSet(E toElement) { return subSet(first(), toElement); }
 
+    /**
+     Iterates over contents in a guaranteed order. {@inheritDoc}
+     */
+    @Override UnIteratorOrdered<E> iterator();
+
     /** Return the elements in this set from the start element (inclusive) to the end element (exclusive) */
     @Override ImSetSorted<E> subSet(E fromElement, E toElement);
 

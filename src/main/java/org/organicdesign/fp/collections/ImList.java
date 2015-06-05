@@ -24,7 +24,7 @@ public interface ImList<E> extends UnList<E>, Sequence<E> {
     // Do we want to make an ImIterator that's truly immutable - a Sequence?
     // Kind of a moot point when this overrides the same method on Sequence.
     /** {@inheritDoc} */
-    @Override default UnIterator<E> iterator() { return listIterator(0); }
+    @Override default UnIteratorOrdered<E> iterator() { return listIterator(0); }
 //
 //    /** {@inheritDoc} */
 //    @Override default UnListIterator<E> listIterator() { return listIterator(0); }

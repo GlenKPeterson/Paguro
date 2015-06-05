@@ -351,7 +351,7 @@ public class PersistentTreeMapTest {
         m = m.assoc(20, "twenty again");
         assertArrayEquals(new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21},
                           m.keySet().toArray());
-        assertTrue(UnIterable.equals(
+        assertTrue(UnIterableOrdered.equals(
                 Sequence.of("one again", "two", "three", "four", "five", "six", "seven", "eight",
                             "nine again", "ten again", "eleven again", "twelve", "thirteen",
                             "fourteen",

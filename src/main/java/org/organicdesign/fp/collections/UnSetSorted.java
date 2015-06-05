@@ -13,12 +13,35 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
+import java.util.Comparator;
+import java.util.NoSuchElementException;
 import java.util.SortedSet;
 
 /** An unmodifiable SortedSet. */
-public interface UnSetSorted<E> extends UnSet<E>, SortedSet<E> {
+public interface UnSetSorted<E> extends UnSet<E>, SortedSet<E>, UnIterableOrdered<E> {
+    // ==================================================== Static ====================================================
+    UnSet<Object> EMPTY = new UnSetSorted<Object>() {
+        @Override public boolean contains(Object o) { return false; }
+        @Override public int size() { return 0; }
+        @Override public boolean isEmpty() { return true; }
+        @Override public UnIteratorOrdered<Object> iterator() { return UnIteratorOrdered.empty(); }
+        @Override public Comparator<? super Object> comparator() { return null; }
+        @Override public UnSetSorted<Object> subSet(Object fromElement, Object toElement) { return this; }
+        @Override public Object first() { throw new NoSuchElementException("Empty set"); }
+        @Override public Object last() { throw new NoSuchElementException("Empty set"); }
+    };
+    @SuppressWarnings("unchecked")
+    static <T> UnSetSorted<T> empty() { return (UnSetSorted<T>) EMPTY; }
+
+    // =================================================== Instance ===================================================
     /** {@inheritDoc} */
     @Override default UnSetSorted<E> headSet(E toElement) { return subSet(first(), toElement); }
+
+    /**
+     Iterates over contents in a guaranteed order.
+     {@inheritDoc}
+     */
+    @Override UnIteratorOrdered<E> iterator();
 
     /** {@inheritDoc} */
     @Override UnSetSorted<E> subSet(E fromElement, E toElement);
