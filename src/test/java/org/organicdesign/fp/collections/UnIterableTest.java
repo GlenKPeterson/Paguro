@@ -1,28 +1,28 @@
 package org.organicdesign.fp.collections;
 
-import java.util.Arrays;
-import java.util.Iterator;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.util.Arrays;
+import java.util.Iterator;
 
 import static org.junit.Assert.*;
 
 @RunWith(JUnit4.class)
 public class UnIterableTest {
     @Test public void emptyEqualsHashcode() {
-        UnIterable<Integer> a = () -> UnIterator.empty();
-        UnIterable<Integer> b = () -> UnIterator.empty();
-        UnIterable<Integer> c = () -> new UnIterator<Integer>() {
+        UnIterableOrdered<Integer> a = () -> UnIteratorOrdered.empty();
+        UnIterableOrdered<Integer> b = () -> UnIteratorOrdered.empty();
+        UnIterableOrdered<Integer> c = () -> new UnIteratorOrdered<Integer>() {
             private final Iterator<Integer> intern = Arrays.asList(1).iterator();
             @Override public boolean hasNext() { return intern.hasNext(); }
             @Override public Integer next() { return intern.next(); }
         };
 
-        assertEquals(UnIterableOrdered.hashCode(a), UnIterableOrdered.hashCode(a));
-        assertEquals(UnIterableOrdered.hashCode(a), UnIterableOrdered.hashCode(b));
-        assertNotEquals(UnIterableOrdered.hashCode(a), UnIterableOrdered.hashCode(c));
+        assertEquals(UnIterable.hashCode(a), UnIterable.hashCode(a));
+        assertEquals(UnIterable.hashCode(a), UnIterable.hashCode(b));
+        assertNotEquals(UnIterable.hashCode(a), UnIterable.hashCode(c));
 
         assertTrue(UnIterableOrdered.equals(a, a));
         assertTrue(UnIterableOrdered.equals(a, b));
@@ -35,31 +35,31 @@ public class UnIterableTest {
     }
 
     @Test public void equalsHashcode() {
-        UnIterable<Integer> a = () -> new UnIterator<Integer>() {
+        UnIterableOrdered<Integer> a = () -> new UnIteratorOrdered<Integer>() {
             private final Iterator<Integer> intern = Arrays.asList(1,2,3).iterator();
             @Override public boolean hasNext() { return intern.hasNext(); }
             @Override public Integer next() { return intern.next(); }
         };
-        UnIterable<Integer> b = () -> new UnIterator<Integer>() {
+        UnIterableOrdered<Integer> b = () -> new UnIteratorOrdered<Integer>() {
             private final Iterator<Integer> intern = Arrays.asList(1,2,3).iterator();
             @Override public boolean hasNext() { return intern.hasNext(); }
             @Override public Integer next() { return intern.next(); }
         };
-        UnIterable<Integer> c = () -> new UnIterator<Integer>() {
+        UnIterableOrdered<Integer> c = () -> new UnIteratorOrdered<Integer>() {
             private final Iterator<Integer> intern = Arrays.asList(1,2,3,4).iterator();
             @Override public boolean hasNext() { return intern.hasNext(); }
             @Override public Integer next() { return intern.next(); }
         };
-        UnIterable<Integer> d = () -> new UnIterator<Integer>() {
+        UnIterableOrdered<Integer> d = () -> new UnIteratorOrdered<Integer>() {
             private final Iterator<Integer> intern = Arrays.asList(1,2,2).iterator();
             @Override public boolean hasNext() { return intern.hasNext(); }
             @Override public Integer next() { return intern.next(); }
         };
 
-        assertEquals(UnIterableOrdered.hashCode(a), UnIterableOrdered.hashCode(a));
-        assertEquals(UnIterableOrdered.hashCode(a), UnIterableOrdered.hashCode(b));
-        assertNotEquals(UnIterableOrdered.hashCode(a), UnIterableOrdered.hashCode(c));
-        assertNotEquals(UnIterableOrdered.hashCode(b), UnIterableOrdered.hashCode(d));
+        assertEquals(UnIterable.hashCode(a), UnIterable.hashCode(a));
+        assertEquals(UnIterable.hashCode(a), UnIterable.hashCode(b));
+        assertNotEquals(UnIterable.hashCode(a), UnIterable.hashCode(c));
+        assertNotEquals(UnIterable.hashCode(b), UnIterable.hashCode(d));
 
         assertTrue(UnIterableOrdered.equals(a, a));
         assertTrue(UnIterableOrdered.equals(a, b));

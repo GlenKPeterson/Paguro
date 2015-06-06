@@ -22,7 +22,6 @@ import org.organicdesign.fp.function.Function2;
 import org.organicdesign.fp.permanent.Sequence;
 import org.organicdesign.fp.tuple.Tuple2;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.SortedMap;
@@ -94,7 +93,8 @@ public class PersistentTreeMapTest {
         assertArrayEquals(new String[]{"a", "b", "c"}, m1.keySet().toArray());
 
         // Values are a sorted set as well...
-        assertArrayEquals(new Integer[]{3, 2, 1}, m1.values().toArray());
+        assertArrayEquals(new Integer[]{3, 2, 1},
+                          m1.map(e -> e.getValue()).toTypedArray());
 
         assertArrayEquals(new String[]{"a", "b", "c"},
                           PersistentTreeMap.of("a", 3,
@@ -107,7 +107,7 @@ public class PersistentTreeMapTest {
             UnIterator<Integer> iter = PersistentTreeMap.of("b", 2)
                     .assoc("c", 1)
                     .assoc("a", 3)
-                    .values().iterator();
+                    .map(e -> e.getValue()).iterator();
 
             assertTrue(iter.hasNext());
             assertEquals(Integer.valueOf(3), iter.next());
@@ -357,7 +357,7 @@ public class PersistentTreeMapTest {
                             "fourteen",
                             "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty again",
                             "twenty one"),
-                m.values()));
+                m.map(e -> e.getValue())));
     }
 
     @Test public void entrySet() {
@@ -379,9 +379,9 @@ public class PersistentTreeMapTest {
                 PersistentTreeMap.of(4, "four").assoc(5, "five").assoc(2, "two").assoc(3, "three").assoc(1, "one");
 
         assertArrayEquals(new String[]{"one", "two", "three", "four", "five"},
-                          m.values().toArray(new String[5]));
+                          m.map(e -> e.getValue()).toTypedArray());
 
-        assertTrue(m.values().equals(Arrays.asList("one", "two", "three", "four", "five")));
+//        assertTrue(m.values().equals(Arrays.asList("one", "two", "three", "four", "five")));
         assertNotEquals(0, m.values().hashCode());
         assertNotEquals(m.values().hashCode(), PersistentTreeMap.of(4, "four").assoc(5, "five").hashCode());
         assertEquals(m.values().hashCode(),

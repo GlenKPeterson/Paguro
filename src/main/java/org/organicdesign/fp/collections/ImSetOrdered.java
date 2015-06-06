@@ -13,8 +13,10 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
+import org.organicdesign.fp.permanent.Sequence;
+
 /** An immutable sorted set interface */
-public interface ImSetOrdered<E> extends ImSet<E>, UnSetOrdered<E> {
+public interface ImSetOrdered<E> extends ImSet<E>, UnSetOrdered<E>, Sequence<E> {
     /** {@inheritDoc} */
     @Override
     ImSetOrdered<E> put(E e);
@@ -30,6 +32,9 @@ public interface ImSetOrdered<E> extends ImSet<E>, UnSetOrdered<E> {
      Iterates over contents in a guaranteed order. {@inheritDoc}
      */
     @Override UnIteratorOrdered<E> iterator();
+
+    /** A sequence of the items contained in this set in order.  Just returns this SetOrdered. */
+    @Override default Sequence<E> seq() { return this; }
 
     /** Return the elements in this set from the start element (inclusive) to the end element (exclusive) */
     @Override

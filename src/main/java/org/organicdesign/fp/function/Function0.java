@@ -14,6 +14,7 @@
 
 package org.organicdesign.fp.function;
 
+import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 
 /**
@@ -21,7 +22,7 @@ import java.util.function.Supplier;
  into unchecked ones.  It's also called a thunk when used to delay evaluation.
  */
 @FunctionalInterface
-public interface Function0<U> extends Supplier<U> {
+public interface Function0<U> extends Supplier<U>, Callable<U> {
     /** Implement this one method and you don't have to worry about checked exceptions. */
     U applyEx() throws Exception;
 
@@ -41,6 +42,9 @@ public interface Function0<U> extends Supplier<U> {
 
     /** {@inheritDoc} */
     @Override default U get() { return apply(); }
+
+    /** {@inheritDoc} */
+    @Override default U call() throws Exception { return applyEx(); }
 
     // ==================================================== Static ====================================================
     public static final Function0<Object> NULL = new Function0<Object>() {

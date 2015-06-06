@@ -2,9 +2,6 @@ package org.organicdesign.fp.collections;
 
 /** An unmodifiable Iterable, without any guarantee about order. */
 public interface UnIterable<T> extends Iterable<T> {
-    /** {@inheritDoc} */
-    @Override UnIterator<T> iterator();
-
     // ==================================================== Static ====================================================
 
     static <E> UnIterable<E> empty() { return () -> UnIterator.empty(); }
@@ -73,4 +70,25 @@ public interface UnIterable<T> extends Iterable<T> {
 //            }
 //        };
 //    }
+
+    /**
+     This is correct, but O(n).
+     It also works regardless of the order of the items because a + b = b + a, even when an overflow occurs.
+     */
+    static int hashCode(Iterable is) {
+        if (is == null) { throw new IllegalArgumentException("Can't have a null iteratable."); }
+//        System.out.println("hashCode for: " + is);
+        int ret = 0;
+        for (Object t : is) {
+            if (t != null) {
+//                System.out.println("\tt: " + t + " hashCode: " + t.hashCode());
+                ret = ret + t.hashCode();
+            }
+        }
+        return ret;
+    }
+
+    /** {@inheritDoc} */
+    @Override UnIterator<T> iterator();
+
 }

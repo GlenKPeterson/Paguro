@@ -50,6 +50,8 @@ public interface ImMapOrdered<K,V> extends UnMapOrdered<K,V>, Sequence<UnMap.UnE
     @Override
     ImMapOrdered<K,V> tailMap(K fromKey);
 
+    @Override default UnCollection<V> values() { return this.map(e -> e.getValue()).toImSet(); }
+
     /** Returns a new map with the given key/value added */
     ImMapOrdered<K,V> assoc(K key, V val);
 

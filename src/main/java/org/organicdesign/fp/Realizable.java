@@ -14,21 +14,21 @@
 
 package org.organicdesign.fp;
 
+import org.organicdesign.fp.collections.ImList;
+import org.organicdesign.fp.collections.ImMap;
+import org.organicdesign.fp.collections.ImMapOrdered;
+import org.organicdesign.fp.collections.ImSet;
+import org.organicdesign.fp.collections.ImSetOrdered;
+import org.organicdesign.fp.collections.UnIterable;
+import org.organicdesign.fp.collections.UnIterator;
+import org.organicdesign.fp.function.Function1;
+
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
-
-import org.organicdesign.fp.collections.ImList;
-import org.organicdesign.fp.collections.ImMapOrdered;
-import org.organicdesign.fp.collections.ImSetOrdered;
-import org.organicdesign.fp.collections.UnIterable;
-import org.organicdesign.fp.collections.UnIterator;
-import org.organicdesign.fp.collections.UnMap;
-import org.organicdesign.fp.collections.UnSet;
-import org.organicdesign.fp.function.Function1;
 
 import static org.organicdesign.fp.StaticImports.un;
 
@@ -117,7 +117,7 @@ public interface Realizable<T> extends UnIterable<T> {
      @param f1 Maps each item in this collection to a key/value pair.  If the collection is composed of Map.Entries,
      you can pass Function1.identity() here.
      */
-    default <U,V> UnMap<U,V> toUnMap(Function1<? super T,Map.Entry<U,V>> f1) { return un(toJavaMap(f1)); }
+    <U,V> ImMap<U,V> toImMap(Function1<? super T,Map.Entry<U,V>> f1);
 
     /**
      This method will be replaced with toImSet() once a PersistentHashSet is added to this project.
@@ -125,6 +125,6 @@ public interface Realizable<T> extends UnIterable<T> {
      tell whether the set contains various items, but don't care about ordering.
      @return An unmodifiable set
      */
-    default UnSet<T> toUnSet() { return un(toJavaSet()); }
+    ImSet<T> toImSet();
 
 }

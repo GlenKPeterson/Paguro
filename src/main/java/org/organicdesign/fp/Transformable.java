@@ -15,8 +15,11 @@
 package org.organicdesign.fp;
 
 import org.organicdesign.fp.collections.ImList;
+import org.organicdesign.fp.collections.ImMap;
 import org.organicdesign.fp.collections.ImMapOrdered;
+import org.organicdesign.fp.collections.ImSet;
 import org.organicdesign.fp.collections.ImSetOrdered;
+import org.organicdesign.fp.collections.PersistentHashMap;
 import org.organicdesign.fp.collections.PersistentTreeMap;
 import org.organicdesign.fp.collections.PersistentTreeSet;
 import org.organicdesign.fp.collections.PersistentVector;
@@ -199,7 +202,15 @@ public interface Transformable<T> extends Realizable<T> {
     }
 
 //    @Override
-//    default <U,V> UnMap<U,V> toUnMap(Function1<T,Map.Entry<U,V>> f1) { return un(toJavaHashMap(f1)); }
+//    default <U,V> ImMap<U,V> toImMap(Function1<T,Map.Entry<U,V>> f1) {
+//        return un(toJavaHashMap(f1));
+//    }
+    /** {@inheritDoc} */
+    @Override
+    default <U,V> ImMap<U,V> toImMap(Function1<? super T,Map.Entry<U,V>> f1) {
+        return foldLeft((ImMap<U, V>) PersistentHashMap.<U, V>empty(),
+                        (ts, t) -> ts.assoc(f1.apply(t)));
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -214,6 +225,11 @@ public interface Transformable<T> extends Realizable<T> {
             ts.add(t);
             return ts;
         });
+    }
+
+    /** {@inheritDoc} */
+    @Override default ImSet<T> toImSet() {
+        return foldLeft(PersistentTreeSet.empty(), (accum, t) -> accum.put(t));
     }
 
     /** {@inheritDoc} */

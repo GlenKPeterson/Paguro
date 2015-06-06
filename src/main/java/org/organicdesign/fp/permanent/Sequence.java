@@ -16,7 +16,8 @@ package org.organicdesign.fp.permanent;
 
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.Transformable;
-import org.organicdesign.fp.collections.UnIterator;
+import org.organicdesign.fp.collections.UnIterableOrdered;
+import org.organicdesign.fp.collections.UnIteratorOrdered;
 import org.organicdesign.fp.function.Function1;
 import org.organicdesign.fp.function.Function2;
 import org.organicdesign.fp.tuple.Tuple2;
@@ -27,7 +28,7 @@ import org.organicdesign.fp.tuple.Tuple2;
  that fit in memory (because those that don't cannot be memoized/cached).
  @param <T>
  */
-public interface Sequence<T> extends Transformable<T> {
+public interface Sequence<T> extends Transformable<T>, UnIterableOrdered<T> {
     Sequence<?> EMPTY_SEQUENCE = new Sequence<Object>() {
         /** @return USED_UP */
         @Override public Option<Object> head() { return Option.none(); }
@@ -229,14 +230,14 @@ public interface Sequence<T> extends Transformable<T> {
      @return an unsynchronized iterator
      */
     @Override
-    default UnIterator<T> iterator() { return toIterator(this); }
+    default UnIteratorOrdered<T> iterator() { return unIteratorOrdered(this); }
 
     /**
      This implementation is unsynchronized.
      @return an unsynchronized iterator
      */
-    static <T> UnIterator<T> toIterator(Sequence<T> seq) {
-        return new UnIterator<T>() {
+    static <T> UnIteratorOrdered<T> unIteratorOrdered(Sequence<T> seq) {
+        return new UnIteratorOrdered<T>() {
             private Sequence<T> inner = seq;
 
             @Override public boolean hasNext() { return inner.head().isSome(); }

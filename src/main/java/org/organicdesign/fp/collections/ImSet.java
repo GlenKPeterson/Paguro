@@ -16,15 +16,21 @@ package org.organicdesign.fp.collections;
 import org.organicdesign.fp.permanent.Sequence;
 
 /** An immutable set interface */
-public interface ImSet<E> extends UnSet<E>, Sequence<E> {
+public interface ImSet<E> extends UnSet<E> {
     /** Adds an item, returning a modified version of the set (leaving the original set unchanged). */
     ImSet<E> put(E e);
 
     /** Removes the given item, returning a modified version of the set (leaving the original set unchanged). */
     ImSet<E> disjoin(E key);
 
+    /**
+     A sequence of the items contained in this set.  Note that for some implementations, multiple calls to seq()
+     will yield sequences with different ordering of the same elements.
+     */
+    Sequence<E> seq();
+
     /** {@inheritDoc} */
-    @Override default UnIterator<E> iterator() { return Sequence.toIterator(this); }
+    @Override default UnIterator<E> iterator() { return seq().iterator(); }
 
     /**
      * This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for backwards

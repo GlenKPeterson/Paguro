@@ -61,5 +61,9 @@ public class ImListTest {
         assertArrayEquals(new String[]{"a", "b", "c", "d", "e", "f"},
                           PersistentVector.of("a", "b", "c")
                                   .append("d", "e", "f").toTypedArray());
+
+        PersistentVector<String> pv = PersistentVector.of("d", "e", "f");
+        assertArrayEquals(new String[]{"a", "b", "c", "d", "e", "f"},
+                          pv.prepend("a", "b", "c").toTypedArray());
     }
 }

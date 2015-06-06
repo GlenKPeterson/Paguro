@@ -63,7 +63,7 @@ public interface UnSet<E> extends UnCollection<E>, Set<E> {
      This is a convenience method inherited from Collection that returns true if size() == 0 (if this set contains no
      elements).
      */
-    @Override boolean isEmpty();
+    @Override default boolean isEmpty() { return size() == 0; }
 
     /**
      Iterates over contents with no guarantees about their ordering.

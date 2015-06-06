@@ -9,11 +9,9 @@
 package org.organicdesign.fp.collections;
 
 import org.organicdesign.fp.Option;
-import org.organicdesign.fp.function.Function0;
 import org.organicdesign.fp.function.Function2;
 import org.organicdesign.fp.permanent.Sequence;
 
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -32,6 +30,12 @@ import java.util.Stack;
  */
 
 public class PersistentTreeMap<K,V> implements ImMapOrdered<K,V> {
+
+    // TODO: Replace with Mutable.Ref, or make methods return Tuple2.
+    private class Box<E> {
+        public E val;
+        public Box(E val) { this.val = val; }
+    }
 
     private final Comparator<? super K> comp;
     private final Node<K,V> tree;
@@ -268,19 +272,71 @@ public class PersistentTreeMap<K,V> implements ImMapOrdered<K,V> {
     }
 
     /** This is correct, but O(n). */
-    @Override public int hashCode() { return (size() == 0) ? 0 : UnIterableOrdered.hashCode(entrySet()); }
+    @Override public int hashCode() { return (size() == 0) ? 0 : UnIterable.hashCode(entrySet()); }
 
-    /** This is correct, but definitely O(n), same as java.util.ArrayList. */
+    public static final Equator<SortedMap> EQUATOR = new Equator<SortedMap>() {
+        @Override
+        public int hash(SortedMap kvSortedMap) {
+            return UnIterable.hashCode(kvSortedMap.entrySet());
+        }
+
+        @Override
+        public boolean equalTo(SortedMap o1, SortedMap o2) {
+            if (o1 == o2) { return true; }
+            if ( o1.size() != o2.size() ) { return false; }
+            return UnIterableOrdered.equals(UnIterableOrdered.cast(o1), UnIterableOrdered.cast(o2));
+        }
+    };
+
+    /**
+     When comparing against a SortedMap, this is correct and O(n) fast, but BEWARE! It is also compatible with
+     java.util.Map which unfortunately means equality as defined by this method (and java.util.AbstractMap) is not
+     commutative when comparing ordered and unordered maps (it is also O(n log n) slow).  The Equator defined by this
+     class prevents comparison with unordered Maps.
+     */
     @Override public boolean equals(Object other) {
         if (this == other) { return true; }
-        if ( !(other instanceof SortedMap) ) { return false; }
-        SortedMap that = (SortedMap) other;
+        // Note: It does not make sense to compare an ordered map with an unordered map.
+        // This is a bug, but it's the *same* bug that java.util.AbstractMap has.
+        // there is a javaBug unit test.  When that fails, we can fix this to be correct instead of
+        // what it currently is (most politely called "compatible with existing API's").
+        if ( !(other instanceof Map) ) { return false; }
+
+        Map that = (Map) other;
+
+        if (size != that.size()) { return false; }
+
+        // Yay, this makes sense, and we can compare these with O(n) efficiency while still maintaining compatibility
+        // with java.util.Map.
+        if (other instanceof SortedMap) {
+            return UnIterableOrdered.equals(this, UnIterableOrdered.cast((SortedMap) other));
+        }
+
+        // This makes no sense and takes O(n log n) or something.
+        // It's here to be compatible with java.util.AbstractMap.
         // java.util.TreeMap doesn't involve the comparator, and its effect plays out in the order
         // of the values.  I'm uncomfortable with this, but for now I'm aiming for
         // Compatibility with TreeMap.
-//        return this.comp.equals(that.comparator()) &&
-        return this.size == that.size() &&
-               UnIterableOrdered.equals(this, that.entrySet());
+        try {
+            for (Entry<K,V> e : entrySet()) {
+                K key = e.getKey();
+                V value = e.getValue();
+                Object thatValue = that.get(key);
+                if (value == null) {
+                    if ( (thatValue != null) || !that.containsKey(key) )
+                        return false;
+                } else {
+                    if ( !value.equals(thatValue) )
+                        return false;
+                }
+            }
+        } catch (ClassCastException ignore) {
+            return false;
+        } catch (NullPointerException ignore) {
+            return false;
+        }
+
+        return true;
     }
 
     /** Returns a view of the keys contained in this map. */
@@ -344,31 +400,31 @@ public class PersistentTreeMap<K,V> implements ImMapOrdered<K,V> {
         return sB.append(")").toString();
     }
 
-    /** {@inheritDoc} */
-    @Override public UnCollection<V> values() {
-        class ValueColl<B,Z> implements UnCollection<B> {
-            private final Function0<UnIterator<UnEntry<Z,B>>> iterFactory;
-            private ValueColl(Function0<UnIterator<UnEntry<Z, B>>> f) { iterFactory = f; }
-
-            @Override public int size() { return size; }
-
-            @Override public UnIterator<B> iterator() {
-                final UnIterator<UnMap.UnEntry<Z,B>> iter = iterFactory.apply();
-                return new UnIterator<B>() {
-                    @Override public boolean hasNext() { return iter.hasNext(); }
-                    @Override public B next() { return iter.next().getValue(); }
-                };
-            }
-            @Override public int hashCode() { return UnIterableOrdered.hashCode(this); }
-            @Override public boolean equals(Object o) {
-                if (this == o) { return true; }
-                if ( !(o instanceof Collection) ) { return false; }
-                return UnIterableOrdered.equals(this, (Collection) o);
-            }
-            @Override public String toString() { return UnIterableOrdered.toString("ValueColl", this); }
-        }
-        return new ValueColl<>(() -> this.iterator());
-    }
+//    /** {@inheritDoc} */
+//    @Override public UnCollection<V> values() {
+//        class ValueColl<B,Z> implements UnCollection<B>, UnIterableOrdered<B> {
+//            private final Function0<UnIteratorOrdered<UnEntry<Z,B>>> iterFactory;
+//            private ValueColl(Function0<UnIteratorOrdered<UnEntry<Z, B>>> f) { iterFactory = f; }
+//
+//            @Override public int size() { return size; }
+//
+//            @Override public UnIteratorOrdered<B> iterator() {
+//                final UnIteratorOrdered<UnMap.UnEntry<Z,B>> iter = iterFactory.apply();
+//                return new UnIteratorOrdered<B>() {
+//                    @Override public boolean hasNext() { return iter.hasNext(); }
+//                    @Override public B next() { return iter.next().getValue(); }
+//                };
+//            }
+//            @Override public int hashCode() { return UnIterable.hashCode(this); }
+//            @Override public boolean equals(Object o) {
+//                if (this == o) { return true; }
+//                if ( !(o instanceof UnIterableOrdered) ) { return false; }
+//                return UnIterableOrdered.equals(this, (UnIterableOrdered) o);
+//            }
+//            @Override public String toString() { return UnIterableOrdered.toString("ValueColl", this); }
+//        }
+//        return new ValueColl<>(() -> this.iterator());
+//    }
 
     /** {@inheritDoc} */
     @Override public Option<UnEntry<K,V>> head() {
@@ -425,12 +481,6 @@ public class PersistentTreeMap<K,V> implements ImMapOrdered<K,V> {
 //            return tailMap(iter.next().getKey());
         }
         return Sequence.emptySequence();
-    }
-
-    // TODO: Replace with Mutable.Ref, or make methods return Tuple2.
-    private class Box<E> {
-        public E val;
-        public Box(E val) { this.val = val; }
     }
 
 //    @SuppressWarnings("unchecked")

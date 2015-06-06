@@ -135,7 +135,7 @@ public class PersistentTreeSet<E> implements ImSetOrdered<E> {
         SortedSet that = ((SortedSet) other);
 
         if (size() != that.size()) { return false; }
-        return UnIterableOrdered.equals(this, that);
+        return UnIterableOrdered.equals(this, UnIterableOrdered.cast(that));
     }
 
     /**
@@ -150,7 +150,7 @@ public class PersistentTreeSet<E> implements ImSetOrdered<E> {
     @Override public E first() { return impl.firstKey(); }
 
     /** {@inheritDoc} */
-    @Override public int hashCode() { return (size() == 0) ? 0 : UnIterableOrdered.hashCode(this); }
+    @Override public int hashCode() { return (size() == 0) ? 0 : UnIterable.hashCode(this); }
 
     /** {@inheritDoc} */
     @Override public Option<E> head() { return size() > 0 ? Option.of(impl.firstKey()) : Option.none(); }
@@ -180,7 +180,7 @@ public class PersistentTreeSet<E> implements ImSetOrdered<E> {
 
     // TODO: Ensure that KeySet is sorted.
     /** {@inheritDoc} */
-    @Override public Sequence<E> tail() { return impl.without(first()).keySet(); }
+    @Override public Sequence<E> tail() { return impl.without(first()).keySet().seq(); }
 
     /** Returns a string representation of this set. */
     @Override public String toString() { return UnIterableOrdered.toString("PersistentTreeSet", this); }

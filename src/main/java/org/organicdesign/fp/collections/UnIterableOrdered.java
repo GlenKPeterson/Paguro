@@ -1,7 +1,10 @@
 package org.organicdesign.fp.collections;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
+import java.util.SortedMap;
+import java.util.SortedSet;
 
 /**
  An unmodifiable Iterable, with guaranteed order.  The signature of this interface is nearly identical to UnIterable,
@@ -9,22 +12,9 @@ import java.util.Objects;
  */
 public interface UnIterableOrdered<T> extends UnIterable<T> {
     // ==================================================== Static ====================================================
-    /** This is correct, but O(n) */
-    static int hashCode(Iterable is) {
-        if (is == null) { throw new IllegalArgumentException("Can't have a null iteratable."); }
-//        System.out.println("hashCode for: " + is);
-        int ret = 0;
-        for (Object t : is) {
-            if (t != null) {
-//                System.out.println("\tt: " + t + " hashCode: " + t.hashCode());
-                ret = ret + t.hashCode();
-            }
-        }
-        return ret;
-    }
 
-    /** This is correct, but O(n) */
-    static boolean equals(Iterable a, Iterable b) {
+    /** This is correct, but O(n).  This only works with an ordered iterable. */
+    static boolean equals(UnIterableOrdered a, UnIterableOrdered b) {
         // Cheapest operation first...
         if (a == b) { return true; }
 
@@ -60,6 +50,54 @@ public interface UnIterableOrdered<T> extends UnIterable<T> {
             sB.append("...");
         }
         return sB.append(")").toString();
+    }
+
+//    static <E> UnIterableOrdered<E> cast(SortedSet<E> ss) {
+//        return () -> new UnIteratorOrdered<E>() {
+//            Iterator<E> iter = ss.iterator();
+//            @Override public boolean hasNext() { return iter.hasNext(); }
+//            @Override public E next() { return iter.next(); }
+//        };
+//    }
+
+    static UnIterableOrdered cast(SortedSet ss) {
+        return () -> new UnIteratorOrdered() {
+            Iterator iter = ss.iterator();
+            @Override public boolean hasNext() { return iter.hasNext(); }
+            @Override public Object next() { return iter.next(); }
+        };
+    }
+
+//    static <E> UnIterableOrdered<E> cast(List<E> ss) {
+//        return () -> new UnIteratorOrdered<E>() {
+//            Iterator<E> iter = ss.iterator();
+//            @Override public boolean hasNext() { return iter.hasNext(); }
+//            @Override public E next() { return iter.next(); }
+//        };
+//    }
+
+    static UnIterableOrdered cast(List ss) {
+        return () -> new UnIteratorOrdered() {
+            Iterator iter = ss.iterator();
+            @Override public boolean hasNext() { return iter.hasNext(); }
+            @Override public Object next() { return iter.next(); }
+        };
+    }
+
+//    static <K,V> UnIterableOrdered<Map.Entry<K,V>> cast(SortedMap<K,V> sm) {
+//        return () -> new UnIteratorOrdered<Map.Entry<K,V>>() {
+//            Iterator<Map.Entry<K,V>> iter = sm.entrySet().iterator();
+//            @Override public boolean hasNext() { return iter.hasNext(); }
+//            @Override public Map.Entry<K,V> next() { return iter.next(); }
+//        };
+//    }
+
+    static UnIterableOrdered cast(SortedMap sm) {
+        return () -> new UnIteratorOrdered() {
+            Iterator iter = sm.entrySet().iterator();
+            @Override public boolean hasNext() { return iter.hasNext(); }
+            @Override public Object next() { return iter.next(); }
+        };
     }
 
     // =================================================== Instance ===================================================
