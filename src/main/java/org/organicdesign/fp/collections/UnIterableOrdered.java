@@ -31,28 +31,7 @@ public interface UnIterableOrdered<T> extends UnIterable<T> {
         return !as.hasNext() && !bs.hasNext();
     }
 
-    /** Computes a reasonable to-string. */
-    static String toString(String name, Iterable iterable) {
-        if (name == null) { throw new IllegalArgumentException("Can't have a null name."); }
-        if (iterable == null) { throw new IllegalArgumentException("Can't have a null iteratable."); }
-        StringBuilder sB = new StringBuilder();
-        sB.append(name).append("(");
-        int i = 0;
-        Iterator iter = iterable.iterator();
-        while (iter.hasNext()) {
-            Object item = iter.next();
-            if (i > 0) { sB.append(","); }
-            if (i > 4) { break; }
-            sB.append(item);
-            i++;
-        }
-        if (iter.hasNext()) {
-            sB.append("...");
-        }
-        return sB.append(")").toString();
-    }
-
-//    static <E> UnIterableOrdered<E> cast(SortedSet<E> ss) {
+    //    static <E> UnIterableOrdered<E> cast(SortedSet<E> ss) {
 //        return () -> new UnIteratorOrdered<E>() {
 //            Iterator<E> iter = ss.iterator();
 //            @Override public boolean hasNext() { return iter.hasNext(); }

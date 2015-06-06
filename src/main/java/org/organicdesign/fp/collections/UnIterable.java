@@ -1,5 +1,7 @@
 package org.organicdesign.fp.collections;
 
+import java.util.Iterator;
+
 /** An unmodifiable Iterable, without any guarantee about order. */
 public interface UnIterable<T> extends Iterable<T> {
     // ==================================================== Static ====================================================
@@ -86,6 +88,27 @@ public interface UnIterable<T> extends Iterable<T> {
             }
         }
         return ret;
+    }
+
+    /** Computes a reasonable to-string. */
+    static String toString(String name, Iterable iterable) {
+        if (name == null) { throw new IllegalArgumentException("Can't have a null name."); }
+        if (iterable == null) { throw new IllegalArgumentException("Can't have a null iteratable."); }
+        StringBuilder sB = new StringBuilder();
+        sB.append(name).append("(");
+        int i = 0;
+        Iterator iter = iterable.iterator();
+        while (iter.hasNext()) {
+            Object item = iter.next();
+            if (i > 0) { sB.append(","); }
+            if (i > 4) { break; }
+            sB.append(item);
+            i++;
+        }
+        if (iter.hasNext()) {
+            sB.append("...");
+        }
+        return sB.append(")").toString();
     }
 
     /** {@inheritDoc} */

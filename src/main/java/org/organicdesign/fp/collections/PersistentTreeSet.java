@@ -183,7 +183,7 @@ public class PersistentTreeSet<E> implements ImSetOrdered<E> {
     @Override public Sequence<E> tail() { return impl.without(first()).keySet().seq(); }
 
     /** Returns a string representation of this set. */
-    @Override public String toString() { return UnIterableOrdered.toString("PersistentTreeSet", this); }
+    @Override public String toString() { return UnIterable.toString("PersistentTreeSet", this); }
 
 //    @Override
 //    public ISeq<E> rseq() {

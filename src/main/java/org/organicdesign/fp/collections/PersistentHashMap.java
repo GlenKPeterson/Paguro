@@ -10,6 +10,7 @@
 
 package org.organicdesign.fp.collections;
 
+import org.organicdesign.fp.LazyRef;
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.function.Function0;
 import org.organicdesign.fp.function.Function1;
@@ -53,6 +54,11 @@ public class PersistentHashMap<K,V> implements ImMap<K,V> {
     	return (r instanceof Reduced);
     }
 
+    private static int mask(int hash, int shift){
+        //return ((hash << shift) >>> 27);// & 0x01f;
+        return (hash >>> shift) & 0x01f;
+    }
+
     // A method call is slow, but it keeps the cast localized.
     @SuppressWarnings("unchecked")
     private static <K> K k(Object[] array, int i) { return (K) array[i]; }
@@ -73,16 +79,204 @@ public class PersistentHashMap<K,V> implements ImMap<K,V> {
     @SuppressWarnings("unchecked")
     public static <K,V> PersistentHashMap<K,V> empty() { return (PersistentHashMap<K,V>) EMPTY; }
 
-    final private static Object NOT_FOUND = new Object();
+//    final private static Object NOT_FOUND = new Object();
 
-    static public <K,V> PersistentHashMap<K,V> create(Map<K,V> other) {
+    /** Returns a new PersistentHashMap of the given comparable keys and their paired values. */
+    public static <K,V>
+    PersistentHashMap<K,V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7,
+                              K k8, V v8, K k9, V v9, K k10, V v10) {
         PersistentHashMap<K,V> empty = empty();
-        TransientHashMap<K,V> ret = empty.asTransient();
-        for(Entry<K,V> e : other.entrySet()) {
-            ret = ret.assoc(e.getKey(), e.getValue());
-        }
-        return ret.persistent();
+        return empty.assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).assoc(k5, v5)
+                .assoc(k6, v6).assoc(k7, v7).assoc(k8, v8).assoc(k9, v9).assoc(k10, v10);
     }
+
+    /** Returns a new PersistentHashMap of the given comparable keys and their paired values. */
+    public static <K,V>
+    PersistentHashMap<K,V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7,
+                              K k8, V v8, K k9, V v9) {
+        PersistentHashMap<K,V> empty = empty();
+        return empty.assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).assoc(k5, v5)
+                .assoc(k6, v6).assoc(k7, v7).assoc(k8, v8).assoc(k9, v9);
+    }
+
+    /** Returns a new PersistentHashMap of the given comparable keys and their paired values. */
+    public static <K,V>
+    PersistentHashMap<K,V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7,
+                              K k8, V v8) {
+        PersistentHashMap<K,V> empty = empty();
+        return empty.assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).assoc(k5, v5)
+                .assoc(k6, v6).assoc(k7, v7).assoc(k8, v8);
+    }
+
+    /** Returns a new PersistentHashMap of the given comparable keys and their paired values. */
+    public static <K,V>
+    PersistentHashMap<K,V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7) {
+        PersistentHashMap<K,V> empty = empty();
+        return empty.assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).assoc(k5, v5)
+                .assoc(k6, v6).assoc(k7, v7);
+    }
+
+    /** Returns a new PersistentHashMap of the given comparable keys and their paired values. */
+    public static <K,V>
+    PersistentHashMap<K,V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6) {
+        PersistentHashMap<K,V> empty = empty();
+        return empty.assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).assoc(k5, v5)
+                .assoc(k6, v6);
+    }
+
+    /** Returns a new PersistentHashMap of the given comparable keys and their paired values. */
+    public static <K,V>
+    PersistentHashMap<K,V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
+        PersistentHashMap<K,V> empty = empty();
+        return empty.assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).assoc(k5, v5);
+    }
+
+    /** Returns a new PersistentHashMap of the given comparable keys and their paired values. */
+    public static <K,V>
+    PersistentHashMap<K,V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
+        PersistentHashMap<K,V> empty = empty();
+        return empty.assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4);
+    }
+
+    /** Returns a new PersistentHashMap of the given comparable keys and their paired values. */
+    public static <K,V>
+    PersistentHashMap<K,V> of(K k1, V v1, K k2, V v2, K k3, V v3) {
+        PersistentHashMap<K,V> empty = empty();
+        return empty.assoc(k1, v1).assoc(k2, v2).assoc(k3, v3);
+    }
+
+    /** Returns a new PersistentHashMap of the given comparable keys and their paired values. */
+    public static <K,V>
+    PersistentHashMap<K,V> of(K k1, V v1, K k2, V v2) {
+        PersistentHashMap<K,V> empty = empty();
+        return empty.assoc(k1, v1).assoc(k2, v2);
+    }
+
+    /** Returns a new PersistentHashMap of the given comparable keys and their paired values. */
+    public static <K,V> PersistentHashMap<K,V> of(K k1, V v1) {
+        PersistentHashMap<K,V> empty = empty();
+        return empty.assoc(k1, v1);
+    }
+
+
+    /**
+     Returns a new PersistentHashMap of the given comparable keys and their paired values, skipping any null Entries.
+     */
+    @SafeVarargs
+    public static <K,V> PersistentHashMap<K,V>
+    ofSkipNull(Map.Entry<K,V>... es) {
+        if (es == null) { return empty(); }
+        PersistentHashMap<K,V> map = empty();
+        for (Map.Entry<K,V> entry : es) {
+            if (entry != null) {
+                map = map.assoc(entry.getKey(), entry.getValue());
+            }
+        }
+        return map;
+    }
+
+//    /** Returns a new PersistentHashMap of the specified comparator and the given key/value pairs. */
+//    public static <K,V> PersistentHashMap<K,V>
+//    ofComp(Equator<? super K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7,
+//           K k8, V v8, K k9, V v9, K k10, V v10) {
+//        return new PersistentHashMap<K,V>(c, null, 0)
+//                .assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).assoc(k5, v5)
+//                .assoc(k6, v6).assoc(k7, v7).assoc(k8, v8).assoc(k9, v9).assoc(k10, v10);
+//    }
+//
+//    /** Returns a new PersistentHashMap of the specified comparator and the given key/value pairs. */
+//    public static <K,V> PersistentHashMap<K,V>
+//    ofComp(Equator<? super K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7,
+//           K k8, V v8, K k9, V v9) {
+//        return new PersistentHashMap<K,V>(c, null, 0)
+//                .assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).assoc(k5, v5)
+//                .assoc(k6, v6).assoc(k7, v7).assoc(k8, v8).assoc(k9, v9);
+//    }
+//
+//    /** Returns a new PersistentHashMap of the specified Equator and the given key/value pairs. */
+//    public static <K,V> PersistentHashMap<K,V>
+//    ofComp(Equator<? super K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7,
+//           K k8, V v8) {
+//        return new PersistentHashMap<K,V>(c, null, 0)
+//                .assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).assoc(k5, v5)
+//                .assoc(k6, v6).assoc(k7, v7).assoc(k8, v8);
+//    }
+//
+//    /** Returns a new PersistentHashMap of the specified Equator and the given key/value pairs. */
+//    public static <K,V> PersistentHashMap<K,V>
+//    ofComp(Equator<? super K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7) {
+//        return new PersistentHashMap<K,V>(c, null, 0)
+//                .assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).assoc(k5, v5)
+//                .assoc(k6, v6).assoc(k7, v7);
+//    }
+//
+//    /** Returns a new PersistentHashMap of the specified Equator and the given key/value pairs. */
+//    public static <K,V> PersistentHashMap<K,V>
+//    ofComp(Equator<? super K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6) {
+//        return new PersistentHashMap<K,V>(c, null, 0)
+//                .assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).assoc(k5, v5)
+//                .assoc(k6, v6);
+//    }
+//
+//    /** Returns a new PersistentHashMap of the specified Equator and the given key/value pairs. */
+//    public static <K,V> PersistentHashMap<K,V>
+//    ofComp(Equator<? super K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
+//        return new PersistentHashMap<K,V>(c, null, 0)
+//                .assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).assoc(k5, v5);
+//    }
+//
+//    /** Returns a new PersistentHashMap of the specified Equator and the given key/value pairs. */
+//    public static <K,V> PersistentHashMap<K,V>
+//    ofComp(Equator<? super K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
+//        return new PersistentHashMap<K,V>(c, null, 0)
+//                .assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4);
+//    }
+//
+//    /** Returns a new PersistentHashMap of the specified Equator and the given key/value pairs. */
+//    public static <K,V> PersistentHashMap<K,V>
+//    ofComp(Equator<? super K> c, K k1, V v1, K k2, V v2, K k3, V v3) {
+//        return new PersistentHashMap<K,V>(c, null, 0)
+//                .assoc(k1, v1).assoc(k2, v2).assoc(k3, v3);
+//    }
+//
+//    /** Returns a new PersistentHashMap of the specified Equator and the given key/value pairs. */
+//    public static <K,V> PersistentHashMap<K,V>
+//    ofComp(Equator<? super K> c, K k1, V v1, K k2, V v2) {
+//        return new PersistentHashMap<K,V>(c, null, 0)
+//                .assoc(k1, v1).assoc(k2, v2);
+//    }
+//
+//    /** Returns a new PersistentHashMap of the specified Equator and the given key/value pairs. */
+//    public static <K,V> PersistentHashMap<K,V>
+//    ofComp(Equator<? super K> c, K k1, V v1) {
+//        return new PersistentHashMap<K,V>(c, null, 0)
+//                .assoc(k1, v1);
+//    }
+//
+//    /** Returns a new PersistentHashMap of the specified Equator and the given key/value pairs. */
+//    @SafeVarargs
+//    public static <K,V> PersistentHashMap<K,V>
+//    ofCompSkipNull(Equator<? super K> c, Map.Entry<K,V>... es) {
+//        if (es == null) { return empty(); }
+//        PersistentHashMap<K,V> map = new PersistentHashMap<>(c, null, 0);
+//        for (Map.Entry<K,V> entry : es) {
+//            if (entry != null) {
+//                map = map.assoc(entry.getKey(), entry.getValue());
+//            }
+//        }
+//        return map;
+//    }
+
+
+
+//    static public <K,V> PersistentHashMap<K,V> create(Map<K,V> other) {
+//        PersistentHashMap<K,V> empty = empty();
+//        TransientHashMap<K,V> ret = empty.asTransient();
+//        for(Entry<K,V> e : other.entrySet()) {
+//            ret = ret.assoc(e.getKey(), e.getValue());
+//        }
+//        return ret.persistent();
+//    }
 
 //    /*
 //     * @param init {key1,val1,key2,val2,...}
@@ -150,24 +344,13 @@ public class PersistentHashMap<K,V> implements ImMap<K,V> {
         this.nullValue = nullValue;
     }
 
-    /**
-     Returns the number of key-value mappings in this map.  If the map contains more than <tt>Integer.MAX_VALUE</tt>
-     elements, returns <tt>Integer.MAX_VALUE</tt>.
-
-     @return the number of key-value mappings in this map
-     */
-    @Override
-    public int size() {
-        return count;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override public boolean containsKey(Object key){
-        if (key == null) {
-            return hasNull;
-        }
-        return (root != null) ? root.findVal(0, Objects.hashCode(key), (K) key, (V) NOT_FOUND) != NOT_FOUND : false;
-    }
+//    @SuppressWarnings("unchecked")
+//    @Override public boolean containsKey(Object key){
+//        if (key == null) {
+//            return hasNull;
+//        }
+//        return (root != null) ? root.findVal(0, Objects.hashCode(key), (K) key, (V) NOT_FOUND) != NOT_FOUND : false;
+//    }
 
 //    /** {@inheritDoc} */
 //    @SuppressWarnings("unchecked")
@@ -193,17 +376,6 @@ public class PersistentHashMap<K,V> implements ImMap<K,V> {
 //        return seq().map(e -> e.getValue()).toUnSet();
 //    }
 
-    @Override public Option<UnMap.UnEntry<K,V>> entry(K key) {
-        if (key == null) {
-            return hasNull ? Option.of(Tuple2.of(null, nullValue)) : Option.none();
-        }
-        if (root == null) {
-            return Option.none();
-        }
-        UnEntry<K,V> entry = root.find(0, Objects.hashCode(key), key);
-        return Option.someOrNullNoneOf(entry);
-    }
-
     @Override public PersistentHashMap<K,V> assoc(K key, V val) {
         if(key == null) {
             if (hasNull && (val == nullValue)) { return this; }
@@ -216,6 +388,21 @@ public class PersistentHashMap<K,V> implements ImMap<K,V> {
             return this;
         }
         return new PersistentHashMap<>(addedLeaf.val == null ? count : count + 1, newroot, hasNull, nullValue);
+    }
+
+    TransientHashMap<K,V> asTransient() {
+        return new TransientHashMap<>(this);
+    }
+
+    @Override public Option<UnMap.UnEntry<K,V>> entry(K key) {
+        if (key == null) {
+            return hasNull ? Option.of(Tuple2.of(null, nullValue)) : Option.none();
+        }
+        if (root == null) {
+            return Option.none();
+        }
+        UnEntry<K,V> entry = root.find(0, Objects.hashCode(key), key);
+        return Option.someOrNullNoneOf(entry);
     }
 
 //    // Suppress unchecked warnings for the two places where we cast a map of T to a map of super T.
@@ -246,18 +433,44 @@ public class PersistentHashMap<K,V> implements ImMap<K,V> {
 //        return assoc(map, key, val);
 //    }
 
+    /**
+     This is compatible with java.util.Map but that means it wrongly allows comparisons with SortedMaps, which are
+     necessarily not commutative.
+     @param other the other (hopefully unsorted) map to compare to.
+     @return true if these maps contain the same elements, regardless of order.
+     */
+    @Override public boolean equals(Object other) {
+        if (other == this) { return true; }
+        if ( !(other instanceof Map) ) { return false; }
 
-    @SuppressWarnings("unchecked")
-    @Override public PersistentHashMap<K,V> without(K key){
-        if(key == null)
-            return hasNull ? new PersistentHashMap<>(count - 1, root, false, null) : this;
-        if(root == null)
-            return this;
-        INode<K,V> newroot = root.without(0, Objects.hashCode(key), key);
-        if(newroot == root)
-            return this;
-        return new PersistentHashMap<>(count - 1, newroot, hasNull, nullValue);
+        Map<?,?> that = (Map<?,?>) other;
+        if (that.size() != size()) { return false; }
+
+        try {
+            for (Entry<K,V> e : entrySet()) {
+                K key = e.getKey();
+                V value = e.getValue();
+                if (value == null) {
+                    if (!(that.get(key)==null && that.containsKey(key))) {
+                        return false;
+                    }
+                } else {
+                    if (!value.equals(that.get(key))) {
+                        return false;
+                    }
+                }
+            }
+        } catch (ClassCastException unused) {
+            return false;
+        } catch (NullPointerException unused) {
+            return false;
+        }
+
+        return true;
     }
+
+
+    @Override public int hashCode() { return UnIterable.hashCode(this); }
 
     @Override public UnIterator<UnMap.UnEntry<K,V>> iterator(){
         return seq().iterator();
@@ -298,13 +511,22 @@ public class PersistentHashMap<K,V> implements ImMap<K,V> {
         return hasNull ? s.prepend((UnMap.UnEntry<K,V>) Tuple2.of((K) null, nullValue)) : s;
     }
 
-    static int mask(int hash, int shift){
-        //return ((hash << shift) >>> 27);// & 0x01f;
-        return (hash >>> shift) & 0x01f;
-    }
+    /** {@inheritDoc} */
+    @Override public int size() { return count; }
 
-    public TransientHashMap<K,V> asTransient() {
-        return new TransientHashMap<>(this);
+    /** {@inheritDoc} */
+    @Override public String toString() { return UnIterable.toString("PersistentHashMap", this); }
+
+    @SuppressWarnings("unchecked")
+    @Override public PersistentHashMap<K,V> without(K key){
+        if(key == null)
+            return hasNull ? new PersistentHashMap<>(count - 1, root, false, null) : this;
+        if(root == null)
+            return this;
+        INode<K,V> newroot = root.without(0, Objects.hashCode(key), key);
+        if(newroot == root)
+            return this;
+        return new PersistentHashMap<>(count - 1, newroot, hasNull, nullValue);
     }
 
 //    static abstract class ATransientMap<K,V> implements ImMap {
@@ -1178,7 +1400,7 @@ public static void main(String[] args){
 			}
 		System.out.println("words: " + words.size());
 		ImMap map = PersistentHashMap.EMPTY;
-		//ImMap map = new PersistentTreeMap();
+		//ImMap map = new PersistentHashMap();
 		//Map ht = new Hashtable();
 		Map ht = new HashMap();
 		Random rand;
@@ -1303,17 +1525,69 @@ public static void main(String[] args){
     }
 
     static final class NodeSeq<K,V> implements Sequence<UnMap.UnEntry<K,V>> {
-        final Object[] array;
-        final int i;
-        final Sequence<UnMap.UnEntry<K,V>> s;
-
-//        NodeSeq(Object[] array, int i) {
-//            this(null, array, i, null);
+//        private final Object[] array;
+//        private final int i;
+//        private final Sequence<UnMap.UnEntry<K,V>> s;
+//
+////        NodeSeq(Object[] array, int i) {
+////            this(null, array, i, null);
+////        }
+//
+//        static <K,V> Sequence<UnMap.UnEntry<K,V>> create(Object[] array) {
+//            return create(array, 0, null);
 //        }
-
-        static <K,V> Sequence<UnMap.UnEntry<K,V>> create(Object[] array) {
-            return create(array, 0, null);
-        }
+//
+//        static public <K, V, R> R kvreduce(Object[] array, Function3<R,K,V,R> f, R init) {
+//            for (int i = 0; i < array.length; i += 2) {
+//                if (array[i] != null) {
+//                    init = f.apply(init, k(array, i), v(array, i + 1));
+//                } else {
+//                    INode<K,V> node = iNode(array, i + 1);
+//                    if (node != null)
+//                        init = node.kvreduce(f, init);
+//                }
+//                if (isReduced(init)) {
+//                    return init;
+//                }
+//            }
+//            return init;
+//        }
+//
+//        private static <K,V> NodeSeq<K,V> create(Object[] array, int i, Sequence<UnMap.UnEntry<K,V>> s) {
+//            if (s != null) { return new NodeSeq<>(array, i, s); }
+//
+//            for (int j = i; j < array.length; j += 2) {
+//                if (array[j] != null) { return new NodeSeq<>(array, j, null); }
+//
+//                INode<K,V> node = iNode(array, j + 1);
+//                if (node != null) {
+//                    Sequence<UnMap.UnEntry<K,V>> nodeSeq = node.nodeSeq();
+//
+//                    if (nodeSeq != null) { return new NodeSeq<>(array, j + 2, nodeSeq); }
+//                }
+//            }
+//            return null;
+//        }
+//
+//        private NodeSeq(Object[] array, int i, Sequence<UnMap.UnEntry<K,V>> s) {
+//            super();
+//            this.array = array;
+//            this.i = i;
+//            this.s = s;
+//        }
+//
+//        @Override public Option<UnMap.UnEntry<K,V>> head() {
+//            return (s != null) ? s.head() :
+//                   i < array.length - 1 ? Option.of(Tuple2.of(k(array, i), v(array, i+1))) :
+//                   Option.none();
+//        }
+//
+//        @Override public Sequence<UnMap.UnEntry<K,V>> tail() {
+//            if (s != null) {
+//                return create(array, i, s.tail());
+//            }
+//            return create(array, i + 2, null);
+//        }
 
         static public <K, V, R> R kvreduce(Object[] array, Function3<R,K,V,R> f, R init) {
             for (int i = 0; i < array.length; i += 2) {
@@ -1331,70 +1605,33 @@ public static void main(String[] args){
             return init;
         }
 
-        private static <K,V> NodeSeq<K,V> create(Object[] array, int i, Sequence<UnMap.UnEntry<K,V>> s) {
-            if (s != null) { return new NodeSeq<>(array, i, s); }
+        private final LazyRef<Tuple2<Option<UnEntry<K,V>>,Sequence<UnEntry<K,V>>>> laz;
 
-            for (int j = i; j < array.length; j += 2) {
-                if (array[j] != null) { return new NodeSeq<>(array, j, null); }
+        @SuppressWarnings("unchecked")
+        private NodeSeq(int i, Object[] array) {
+            laz = LazyRef.of(() -> Tuple2.of(Option.of(Tuple2.of(k(array, i), v(array, i+1))),
+                                             (i >= (array.length - 2))
+                                             ? Sequence.emptySequence()
+                                             : new NodeSeq<>(i + 2, array)));
+        }
 
-                INode<K,V> node = iNode(array, j + 1);
-                if (node != null) {
-                    Sequence<UnMap.UnEntry<K,V>> nodeSeq = node.nodeSeq();
-
-                    if (nodeSeq != null) { return new NodeSeq<>(array, j + 2, nodeSeq); }
-                }
+        @SuppressWarnings("unchecked")
+        static <K,V> Sequence<UnMap.UnEntry<K,V>> create(Object[] array, int startIdx, Sequence<UnMap.UnEntry<K,V>> s) {
+            if (startIdx < 0) { throw new IllegalArgumentException("Start index must be >= 0"); }
+            if ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) ) {
+                return s.concat(create(array, startIdx, null));
             }
-            return null;
+            if ( (array == null) || (array.length < 1) || (startIdx > (array.length - 2)) ) {
+                return Sequence.emptySequence();
+            }
+            return new NodeSeq<>(startIdx, array);
         }
 
-        NodeSeq(Object[] array, int i, Sequence<UnMap.UnEntry<K,V>> s) {
-            super();
-            this.array = array;
-            this.i = i;
-            this.s = s;
-        }
+        static <K,V> Sequence<UnMap.UnEntry<K,V>> create(Object[] array) { return create(array, 0, null); }
 
-        @Override public Option<UnMap.UnEntry<K,V>> head() {
-            return (s != null) ? s.head() :
-                   i < array.length - 1 ? Option.of(Tuple2.of(k(array, i), v(array, i+1))) :
-                   Option.none();
-        }
+        @Override public Option<UnMap.UnEntry<K,V>> head() { return laz.get()._1(); }
 
-        @Override public Sequence<UnMap.UnEntry<K,V>> tail() {
-            if(s != null)
-                return create(array, i, s.tail());
-            return create(array, i + 2, null);
-        }
+        @Override public Sequence<UnMap.UnEntry<K,V>> tail() { return laz.get()._2(); }
 
-//        private final LazyRef<Tuple2<Option<UnMap.UnEntry<K,V>>,Sequence<UnMap.UnEntry<K,V>>>> laz;
-//
-//        @SuppressWarnings("unchecked")
-//        private NodeSeq(int idx, Object[] ts) {
-//            laz = LazyRef.of(() -> Tuple2.of(Option.of(Tuple2.of((K) ts[idx*2], (V) ts[(idx*2)+ 1])),
-//                                             (idx == (ts.length - 2))
-//                                             ? Sequence.emptySequence()
-//                                             : new NodeSeq<>(idx + 2, ts)));
-//        }
-//
-////        @SafeVarargs
-////        static <T> Sequence<T> of(T... i) {
-////            if ((i == null) || (i.length < 2)) { return Sequence.emptySequence(); }
-////            return new NodeSeq<>(0, i);
-////        }
-//
-//        @SuppressWarnings("unchecked")
-//        static <K,V> Sequence<UnMap.UnEntry<K,V>> from(int startIdx, Object... i) {
-//            if (startIdx < 0) { throw new IllegalArgumentException("Start index must be >= 0"); }
-//            if ( (i == null) || (i.length < 1) || (startIdx >= i.length) ) {
-//                return Sequence.emptySequence();
-//            }
-//            return new NodeSeq<>(startIdx, i);
-//        }
-//
-//        @Override public Option<UnMap.UnEntry<K,V>> head() { return laz.get()._1(); }
-//
-//        @Override public Sequence<UnMap.UnEntry<K,V>> tail() { return laz.get()._2(); }
-//
     } // end class NodeSeq
-
 }

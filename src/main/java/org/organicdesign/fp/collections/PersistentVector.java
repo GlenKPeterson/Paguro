@@ -426,7 +426,7 @@ public class PersistentVector<E> implements ImList<E> {
     }
 
     @Override public String toString() {
-        return UnIterableOrdered.toString("PersistentVector", this);
+        return UnIterable.toString("PersistentVector", this);
     }
 
     private static Node doAssoc(int level, Node node, int i, Object val) {
