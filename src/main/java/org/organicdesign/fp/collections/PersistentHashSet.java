@@ -93,7 +93,7 @@ public class PersistentHashSet<E> implements ImSet<E> {
 //        }
 //        return (PersistentHashSet) ret.persistent();
 //    }
-    final ImMapTrans<E,E> impl;
+    private final ImMapTrans<E,E> impl;
 
     private PersistentHashSet(ImMapTrans<E,E> i) { impl = i; }
 
