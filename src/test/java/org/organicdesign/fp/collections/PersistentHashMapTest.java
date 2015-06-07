@@ -19,6 +19,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.StaticImportsTest;
+import org.organicdesign.fp.function.Function2;
 import org.organicdesign.fp.permanent.Sequence;
 import org.organicdesign.fp.tuple.Tuple2;
 
@@ -76,7 +77,7 @@ public class PersistentHashMapTest {
         assertFalse(m3 == m3.assoc("two", new Integer(2)));
     }
 
-    @Test public void seq() {
+    @Test public void seq3() {
         PersistentHashMap<String,Integer> m1 = PersistentHashMap.of("c", 1);
         assertEquals(Option.of(Tuple2.of("c", 1)),
                      m1.seq().head());
@@ -110,6 +111,107 @@ public class PersistentHashMapTest {
         assertEquals(Option.none(), o);
     }
 
+    @Test public void seqMore() {
+        PersistentHashMap<String,Integer> m1 = PersistentHashMap.of("g", 1, "f", 2, "e", 3, "d", 4, "c", 5, "b", 6, "a", 7);
+        // System.out.println("m1.toString(): " + m1.toString());
+
+        Set<UnMap.UnEntry<String,Integer>> s1 = new HashSet<>(Arrays.asList(Tuple2.of("g", 1),
+                                                                           Tuple2.of("f", 2),
+                                                                           Tuple2.of("e", 3),
+                                                                           Tuple2.of("d", 4),
+                                                                           Tuple2.of("c", 5),
+                                                                           Tuple2.of("b", 6),
+                                                                           Tuple2.of("a", 7)));
+
+        // System.out.println("s1: " + s1);
+
+        Sequence<UnMap.UnEntry<String,Integer>> seq1 = m1.seq();
+        Option<UnMap.UnEntry<String,Integer>> o1 = seq1.head();
+        while (o1.isSome()) {
+            UnMap.UnEntry<String,Integer> entry = o1.get();
+            // System.out.println("entry: " + entry);
+            assertTrue(s1.contains(entry));
+            s1.remove(entry);
+            seq1 = seq1.tail();
+            o1 = seq1.head();
+        }
+        assertEquals(0, s1.size());
+        assertTrue(s1.isEmpty());
+
+
+        Set<String> s2 = new HashSet<>(Arrays.asList("g", "f", "e", "d", "c", "b", "a"));
+        // System.out.println("s2: " + s2);
+
+        Sequence<String> seq2 = m1.seq().map(e -> e.getKey());
+        Option<String> o2 = seq2.head();
+        while (o2.isSome()) {
+            String str = o2.get();
+            // System.out.println("str: " + str);
+            assertTrue(s2.contains(str));
+            s2.remove(str);
+            seq2 = seq2.tail();
+            o2 = seq2.head();
+        }
+        assertEquals(0, s2.size());
+        assertTrue(s2.isEmpty());
+    }
+
+    // TODO: This is the root cause of issues.
+    @Test public void seqMore2() {
+        PersistentHashMap<String,String> s1 = PersistentHashMap.empty();
+        s1 = s1.assoc("one", "one");
+        assertEquals(1, s1.size());
+        assertTrue(s1.containsKey("one"));
+        assertFalse(s1.containsKey("two"));
+
+        showSeq(s1.seq());
+        // System.out.println("One: " + s1);
+
+        s1 = s1.assoc("two", "two");
+        assertEquals(2, s1.size());
+        assertTrue(s1.containsKey("one"));
+        assertTrue(s1.containsKey("two"));
+        assertFalse(s1.containsKey("three"));
+
+        showSeq(s1.seq());
+        // System.out.println("Two: " + s1);
+
+        s1 = s1.assoc("three", "three");
+        assertEquals(3, s1.size());
+        assertTrue(s1.containsKey("one"));
+        assertTrue(s1.containsKey("two"));
+        assertTrue(s1.containsKey("three"));
+        assertFalse(s1.containsKey("four"));
+
+        showSeq(s1.seq());
+        // System.out.println("Three: " + s1);
+
+        s1 = s1.assoc("four", "four");
+        assertEquals(4, s1.size());
+        assertTrue(s1.containsKey("one"));
+        assertTrue(s1.containsKey("two"));
+        assertTrue(s1.containsKey("three"));
+        assertTrue(s1.containsKey("four"));
+        assertFalse(s1.containsKey("five"));
+
+        // TODO: Right here!
+        showSeq(s1.seq());
+        // System.out.println("Four: " + s1);
+
+//        System.out.println("s1.seq().toJavaList()" + s1.seq().toJavaList());
+
+    }
+
+    void showSeq(Sequence<UnMap.UnEntry<String,String>> seq) {
+        // System.out.println("seq");
+        Option<UnMap.UnEntry<String,String>> opt = seq.head();
+        while (opt.isSome()) {
+            // System.out.println("\topt.get(): " + opt.get());
+            seq = seq.tail();
+            opt = seq.head();
+        }
+    }
+
     @Test public void unorderedOps() {
         PersistentHashMap<String,Integer> m1 = PersistentHashMap.of(
                 "c", 1,
@@ -123,7 +225,7 @@ public class PersistentHashMapTest {
         assertEquals(Integer.valueOf(3), m1.get("a"));
         assertNull(m1.get("d"));
 
-//        System.out.println(m1.keySet().toString());
+//        // System.out.println(m1.keySet().toString());
 
         // Values are an unsorted set as well...
         assertEquals(new HashSet<>(Arrays.asList(3, 2, 1)),
@@ -291,22 +393,48 @@ public class PersistentHashMapTest {
     }
 
     // TODO: Looks like values() is broken because toSet() of PersistentHashSet is broken - the seq looks OK.
-//    @Test public void values() {
-//        PersistentHashMap<Integer,String> m =
-//                PersistentHashMap.of(4, "four").assoc(5, "five").assoc(2, "two").assoc(3, "three").assoc(1, "one");
-//        Set<String> s = new HashSet<>(Arrays.asList("four", "one", "five", "two", "three"));
-//
-//        System.out.println("m: " + m);
-//        System.out.println("m.hasNull(): " + m.hasNull());
-//        System.out.println("m.seq(): " + m.seq());
-//        System.out.println("m.seq().map(e -> e.getValue()): " + m.seq().map(e -> e.getValue()).toJavaList());
-//
-//
-//        System.out.println("m.values(): " + m.values());
-//
-//
-//
-//        assertEquals(s, m.values());
+    @Test public void values() {
+        PersistentHashMap<Integer,String> m =
+                PersistentHashMap.of(4, "four").assoc(5, "five").assoc(2, "two").assoc(3, "three").assoc(1, "one");
+        Set<String> s = new HashSet<>(Arrays.asList("four", "one", "five", "two", "three"));
+
+        // System.out.println("m: " + m);
+        // System.out.println("m.hasNull(): " + m.hasNull());
+        // System.out.println("m.seq(): " + m.seq());
+        // System.out.println("m.seq().map(e -> e.getValue()).toJavaList(): " + m.seq().map(e -> e.getValue()).toJavaList());
+        // System.out.println("m.seq().map(e -> e.getValue()).toJavaSet(): " + m.seq().map(e -> e.getValue()).toJavaSet());
+        // System.out.println("m.seq().map(e -> e.getValue()).toImSetOrdered(): " + m.seq().map(e -> e.getValue()).toImSetOrdered(String.CASE_INSENSITIVE_ORDER));
+
+        Sequence<String> seq = m.seq().map(e -> e.getValue());
+        PersistentHashSet<String> u = PersistentHashSet.empty();
+        // System.out.println("Initial u: " + u);
+        Function2<PersistentHashSet<String>,? super String,PersistentHashSet<String>> fun = (accum, t) -> accum.put(t);
+        // System.out.println("seq: " + seq);
+        // System.out.println("===>item: " + item);
+        Option<String> item = seq.head();
+        while (item.isSome()) {
+            // System.out.println("item.get(): " + item.get());
+            // u = fun.apply(u, item.get());
+            u = u.put(item.get());
+            // System.out.println("u: " + u);
+            // repeat with next element
+            seq = seq.tail();
+            item = seq.head();
+        }
+        // System.out.println("Final u: " + u);
+
+
+
+        // System.out.println("m.seq().map(e -> e.getValue()).foldLeft(): " + m.seq().map(e -> e.getValue()).foldLeft(PersistentHashSet.empty(), (accum, t) -> accum.put(t)));
+
+        // System.out.println("m.seq().map(e -> e.getValue()).toImSet(): " + m.seq().map(e -> e.getValue()).toImSet());
+
+
+        // System.out.println("m.values(): " + m.values());
+
+
+
+        assertEquals(s, m.values());
 //
 //        equalsDistinctHashCode(m.values(),
 //                               PersistentHashMap.of(4, "four").assoc(2, "two").assoc(5, "five").assoc(1, "one").assoc(3, "three").values(),
@@ -321,7 +449,7 @@ public class PersistentHashMapTest {
 //                                      .values()
 //                                      .hashCode());
 //
-//    }
+    }
 
     @Test public void testImMap10() {
         int max = 10;

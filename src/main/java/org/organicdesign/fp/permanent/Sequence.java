@@ -33,6 +33,7 @@ public interface Sequence<T> extends Transformable<T>, UnIterableOrdered<T> {
         /** @return USED_UP */
         @Override public Option<Object> head() { return Option.none(); }
 
+        // TODO: Should we throw IllegalStateException("Can't tail emptySequence")?
         /** @return EMPTY_SEQUENCE (this) */
         @Override public Sequence<Object> tail() { return this; }
 

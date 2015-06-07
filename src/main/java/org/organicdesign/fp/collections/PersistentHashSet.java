@@ -53,33 +53,34 @@ public class PersistentHashSet<E> implements ImSet<E> {
 //        return ret.persistent();
 //    }
 
-    @SafeVarargs
-    public static <E> PersistentHashSet<E> createWithCheck(E... init) {
-        PersistentHashSet<E> empty = empty();
-        TransientHashSet<E> ret = empty.asTransient();
-        for (int i = 0; i < init.length; i++) {
-            ret = ret.put(init[i]);
-            if (ret.size() != i + 1)
-                throw new IllegalArgumentException("Duplicate key: " + init[i]);
-        }
-        return ret.persistent();
-    }
+//    @SafeVarargs
+//    public static <E> PersistentHashSet<E> createWithCheck(E... init) {
+//        PersistentHashSet<E> empty = empty();
+//        TransientHashSet<E> ret = empty.asTransient();
+//        for (int i = 0; i < init.length; i++) {
+//            ret = ret.put(init[i]);
+//            if (ret.size() != i + 1)
+//                throw new IllegalArgumentException("Duplicate key: " + init[i]);
+//        }
+//        return ret.persistent();
+//    }
+//
+//    public static <E> PersistentHashSet<E> createWithCheck(List<E> init) {
+//        PersistentHashSet<E> empty = empty();
+//        TransientHashSet<E> ret = empty.asTransient();
+//        int i = 0;
+//        for (E key : init) {
+//            ret = ret.put(key);
+//            if (ret.size() != i + 1)
+//                throw new IllegalArgumentException("Duplicate key: " + key);
+//            ++i;
+//        }
+//        return ret.persistent();
+//    }
 
-    public static <E> PersistentHashSet<E> createWithCheck(List<E> init) {
-        PersistentHashSet<E> empty = empty();
-        TransientHashSet<E> ret = empty.asTransient();
-        int i = 0;
-        for (E key : init) {
-            ret = ret.put(key);
-            if (ret.size() != i + 1)
-                throw new IllegalArgumentException("Duplicate key: " + key);
-            ++i;
-        }
-        return ret.persistent();
-    }
-
+    @SuppressWarnings("unchecked")
     public static <E> PersistentHashSet<E> ofMap(ImMapTrans<E,?> map) {
-        return new PersistentHashSet<>(map);
+        return new PersistentHashSet<>((ImMapTrans<E,E>) map);
     }
 
 //    static public PersistentHashSet<E> createWithCheck(ISeq items) {
@@ -92,14 +93,11 @@ public class PersistentHashSet<E> implements ImSet<E> {
 //        }
 //        return (PersistentHashSet) ret.persistent();
 //    }
-    private final ImMapTrans<E,?> impl;
+    final ImMapTrans<E,E> impl;
 
-    PersistentHashSet(ImMapTrans<E,?> i) { impl = i; }
+    private PersistentHashSet(ImMapTrans<E,E> i) { impl = i; }
 
-    @SuppressWarnings("unchecked")
-    @Override public boolean contains(Object key) {
-        return impl.entry((E) key).isSome();
-    }
+    @Override public boolean contains(Object key) { return impl.containsKey(key); }
 
     @Override public PersistentHashSet<E> disjoin(E key) {
         if (contains(key))
@@ -128,7 +126,7 @@ public class PersistentHashSet<E> implements ImSet<E> {
     @Override public PersistentHashSet<E> put(E o) {
         if (contains(o))
             return this;
-        return new PersistentHashSet<>(impl.assoc(o, null));
+        return new PersistentHashSet<>(impl.assoc(o, o));
     }
 
     @Override public Sequence<E> seq() { return impl.seq().map(e -> e.getKey()); }
@@ -140,16 +138,16 @@ public class PersistentHashSet<E> implements ImSet<E> {
     }
 
     static final class TransientHashSet<E> implements ImSet<E> {
-        ImMapTrans<E,?> impl;
+        ImMapTrans<E,E> impl;
 
-        TransientHashSet(ImMapTrans<E,?> impl) {
+        TransientHashSet(ImMapTrans<E,E> impl) {
             this.impl = impl;
         }
 
         @Override public int size() { return impl.size(); }
 
         @Override public TransientHashSet<E> put(E val) {
-            ImMapTrans<E,?> m = impl.assoc(val, null);
+            ImMapTrans<E,E> m = impl.assoc(val, val);
             if (m != impl) this.impl = m;
             return this;
         }
@@ -168,7 +166,7 @@ public class PersistentHashSet<E> implements ImSet<E> {
         @Override public boolean isEmpty() { return impl.isEmpty(); }
 
         @Override public TransientHashSet<E> disjoin(E key) {
-            ImMapTrans<E,?> m = impl.without(key);
+            ImMapTrans<E,E> m = impl.without(key);
             if (m != impl) this.impl = m;
             return this;
         }

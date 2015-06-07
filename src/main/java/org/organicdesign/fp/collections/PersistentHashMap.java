@@ -11,7 +11,6 @@
 package org.organicdesign.fp.collections;
 
 import org.organicdesign.fp.FunctionUtils;
-import org.organicdesign.fp.LazyRef;
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.function.Function0;
 import org.organicdesign.fp.function.Function1;
@@ -1534,69 +1533,17 @@ public static void main(String[] args){
     }
 
     static final class NodeSeq<K,V> implements Sequence<UnMap.UnEntry<K,V>> {
-//        private final Object[] array;
-//        private final int i;
-//        private final Sequence<UnMap.UnEntry<K,V>> s;
-//
-////        NodeSeq(Object[] array, int i) {
-////            this(null, array, i, null);
-////        }
-//
-//        static <K,V> Sequence<UnMap.UnEntry<K,V>> create(Object[] array) {
-//            return create(array, 0, null);
+        private final Object[] array;
+        private final int i;
+        private final Sequence<UnMap.UnEntry<K,V>> s;
+
+//        NodeSeq(Object[] array, int i) {
+//            this(null, array, i, null);
 //        }
-//
-//        static public <K, V, R> R kvreduce(Object[] array, Function3<R,K,V,R> f, R init) {
-//            for (int i = 0; i < array.length; i += 2) {
-//                if (array[i] != null) {
-//                    init = f.apply(init, k(array, i), v(array, i + 1));
-//                } else {
-//                    INode<K,V> node = iNode(array, i + 1);
-//                    if (node != null)
-//                        init = node.kvreduce(f, init);
-//                }
-//                if (isReduced(init)) {
-//                    return init;
-//                }
-//            }
-//            return init;
-//        }
-//
-//        private static <K,V> NodeSeq<K,V> create(Object[] array, int i, Sequence<UnMap.UnEntry<K,V>> s) {
-//            if (s != null) { return new NodeSeq<>(array, i, s); }
-//
-//            for (int j = i; j < array.length; j += 2) {
-//                if (array[j] != null) { return new NodeSeq<>(array, j, null); }
-//
-//                INode<K,V> node = iNode(array, j + 1);
-//                if (node != null) {
-//                    Sequence<UnMap.UnEntry<K,V>> nodeSeq = node.nodeSeq();
-//
-//                    if (nodeSeq != null) { return new NodeSeq<>(array, j + 2, nodeSeq); }
-//                }
-//            }
-//            return null;
-//        }
-//
-//        private NodeSeq(Object[] array, int i, Sequence<UnMap.UnEntry<K,V>> s) {
-//            super();
-//            this.array = array;
-//            this.i = i;
-//            this.s = s;
-//        }
-//
-//        @Override public Option<UnMap.UnEntry<K,V>> head() {
-//            return (s != null) ? s.head() :
-//                   i < array.length - 1 ? Option.of(Tuple2.of(k(array, i), v(array, i+1))) :
-//                   Option.none();
-//        }
-//
-//        @Override public Sequence<UnMap.UnEntry<K,V>> tail() {
-//            if (s != null) {
-//                return create(array, i, s.tail());
-//            }
-//            return create(array, i + 2, null);
-//        }
+
+        static <K,V> Sequence<UnMap.UnEntry<K,V>> create(Object[] array) {
+            return create(array, 0, null);
+        }
 
         static public <K, V, R> R kvreduce(Object[] array, Function3<R,K,V,R> f, R init) {
             for (int i = 0; i < array.length; i += 2) {
@@ -1614,34 +1561,86 @@ public static void main(String[] args){
             return init;
         }
 
-        private final LazyRef<Tuple2<Option<UnEntry<K,V>>,Sequence<UnEntry<K,V>>>> laz;
+        private static <K,V> Sequence<UnMap.UnEntry<K,V>> create(Object[] array, int i, Sequence<UnMap.UnEntry<K,V>> s) {
+            if ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) ) { return new NodeSeq<>(array, i, s); }
 
-        @SuppressWarnings("unchecked")
-        private NodeSeq(int i, Object[] array) {
-            laz = LazyRef.of(() -> Tuple2.of(Option.of(Tuple2.of(k(array, i), v(array, i+1))),
-                                             (i >= (array.length - 2))
-                                             ? Sequence.emptySequence()
-                                             : new NodeSeq<>(i + 2, array)));
+            for (int j = i; j < array.length; j += 2) {
+                if (array[j] != null) { return new NodeSeq<>(array, j, null); }
+
+                INode<K,V> node = iNode(array, j + 1);
+                if (node != null) {
+                    Sequence<UnMap.UnEntry<K,V>> nodeSeq = node.nodeSeq();
+
+                    if (nodeSeq != null) { return new NodeSeq<>(array, j + 2, nodeSeq); }
+                }
+            }
+            return Sequence.emptySequence();
         }
 
-        @SuppressWarnings("unchecked")
-        static <K,V> Sequence<UnMap.UnEntry<K,V>> create(Object[] array, int startIdx, Sequence<UnMap.UnEntry<K,V>> s) {
-            if (startIdx < 0) { throw new IllegalArgumentException("Start index must be >= 0"); }
+        private NodeSeq(Object[] array, int i, Sequence<UnMap.UnEntry<K,V>> s) {
+            super();
+            this.array = array;
+            this.i = i;
+            this.s = s;
+        }
+
+        @Override public Option<UnMap.UnEntry<K,V>> head() {
+            return ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) ) ? s.head() :
+                   i < array.length - 1 ? Option.of(Tuple2.of(k(array, i), v(array, i+1))) :
+                   Option.none();
+        }
+
+        @Override public Sequence<UnMap.UnEntry<K,V>> tail() {
             if ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) ) {
-                return s.concat(create(array, startIdx, null));
+                return create(array, i, s.tail());
             }
-            if ( (array == null) || (array.length < 1) || (startIdx > (array.length - 2)) ) {
-                return Sequence.emptySequence();
-            }
-            return new NodeSeq<>(startIdx, array);
+            return create(array, i + 2, null);
         }
 
-        static <K,V> Sequence<UnMap.UnEntry<K,V>> create(Object[] array) { return create(array, 0, null); }
+//        static public <K, V, R> R kvreduce(Object[] array, Function3<R,K,V,R> f, R init) {
+//            for (int i = 0; i < array.length; i += 2) {
+//                if (array[i] != null) {
+//                    init = f.apply(init, k(array, i), v(array, i + 1));
+//                } else {
+//                    INode<K,V> node = iNode(array, i + 1);
+//                    if (node != null)
+//                        init = node.kvreduce(f, init);
+//                }
+//                if (isReduced(init)) {
+//                    return init;
+//                }
+//            }
+//            return init;
+//        }
 
-        @Override public Option<UnMap.UnEntry<K,V>> head() { return laz.get()._1(); }
-
-        @Override public Sequence<UnMap.UnEntry<K,V>> tail() { return laz.get()._2(); }
-
+//        private final LazyRef<Tuple2<Option<UnEntry<K,V>>,Sequence<UnEntry<K,V>>>> laz;
+//
+//        @SuppressWarnings("unchecked")
+//        private NodeSeq(int i, Object[] array) {
+//            laz = LazyRef.of(() -> Tuple2.of(Option.of(Tuple2.of(k(array, i), v(array, i+1))),
+//                                             (i >= (array.length - 2))
+//                                             ? Sequence.emptySequence()
+//                                             : new NodeSeq<>(i + 2, array)));
+//        }
+//
+//        @SuppressWarnings("unchecked")
+//        static <K,V> Sequence<UnMap.UnEntry<K,V>> create(Object[] array, int startIdx, Sequence<UnMap.UnEntry<K,V>> s) {
+//            if (startIdx < 0) { throw new IllegalArgumentException("Start index must be >= 0"); }
+//            if ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) ) {
+//                return s.concat(create(array, startIdx, null));
+//            }
+//            if ( (array == null) || (array.length < 1) || (startIdx > (array.length - 2)) ) {
+//                return Sequence.emptySequence();
+//            }
+//            return new NodeSeq<>(startIdx, array);
+//        }
+//
+//        static <K,V> Sequence<UnMap.UnEntry<K,V>> create(Object[] array) { return create(array, 0, null); }
+//
+//        @Override public Option<UnMap.UnEntry<K,V>> head() { return laz.get()._1(); }
+//
+//        @Override public Sequence<UnMap.UnEntry<K,V>> tail() { return laz.get()._2(); }
+//
         @Override public String toString() { return UnIterable.toString("NodeSeq", this); }
 
     } // end class NodeSeq

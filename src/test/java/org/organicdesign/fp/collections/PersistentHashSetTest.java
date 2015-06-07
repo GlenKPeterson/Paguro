@@ -46,6 +46,104 @@ public class PersistentHashSetTest {
                           PersistentHashSet.<Integer>empty().put(3).put(2).put(1).toArray());
     }
 
+    @Test public void moreAssoc() {
+        PersistentHashSet<String> s1 = PersistentHashSet.empty();
+        s1 = s1.put("one");
+        assertEquals(1, s1.size());
+        assertTrue(s1.contains("one"));
+        assertFalse(s1.contains("two"));
+
+        s1 = s1.put("two");
+        assertEquals(2, s1.size());
+        assertTrue(s1.contains("one"));
+        assertTrue(s1.contains("two"));
+        assertFalse(s1.contains("three"));
+
+        // System.out.println("Two: " + s1);
+        // System.out.println("Two map:" + s1.impl);
+
+        s1 = s1.put("three");
+        assertEquals(3, s1.size());
+        assertTrue(s1.contains("one"));
+        assertTrue(s1.contains("two"));
+        assertTrue(s1.contains("three"));
+        assertFalse(s1.contains("four"));
+
+        // System.out.println("Three: " + s1);
+        // System.out.println("Three map:" + s1.impl);
+
+        s1 = s1.put("four");
+        assertEquals(4, s1.size());
+        assertTrue(s1.contains("one"));
+        assertTrue(s1.contains("two"));
+        assertTrue(s1.contains("three"));
+        assertTrue(s1.contains("four"));
+        assertFalse(s1.contains("five"));
+
+        // System.out.println("Four: " + s1);
+
+        // System.out.println("Four map:" + s1.impl);
+        // System.out.println("s1.seq().toJavaList()" + s1.seq().toJavaList());
+
+        s1 = s1.put("five");
+        assertEquals(5, s1.size());
+        assertTrue(s1.contains("one"));
+        assertTrue(s1.contains("two"));
+        assertTrue(s1.contains("three"));
+        assertTrue(s1.contains("four"));
+        assertTrue(s1.contains("five"));
+        assertFalse(s1.contains("six"));
+
+        s1 = s1.put("six");
+        assertEquals(6, s1.size());
+        assertTrue(s1.contains("one"));
+        assertTrue(s1.contains("two"));
+        assertTrue(s1.contains("three"));
+        assertTrue(s1.contains("four"));
+        assertTrue(s1.contains("five"));
+        assertTrue(s1.contains("six"));
+        assertFalse(s1.contains("seven"));
+
+        PersistentHashSet<String> u = PersistentHashSet.empty();
+        // System.out.println("Initial u: " + u);
+        for (String s : new String[] { "one", "two", "three", "four", "five" }) {
+            // System.out.println("item.get(): " + s);
+            u = u.put(s);
+            // System.out.println("u: " + u.toString());
+        }
+        // System.out.println("Final u: " + u);
+
+
+//        PersistentHashSet<String> u = PersistentHashSet.empty();
+//        System.out.println("Initial u: " + u);
+//        for (String s : new String[] { "one", "two", "three", "four", "five" }) {
+//            System.out.println("item.get(): " + s);
+//            u = u.put(s);
+//            System.out.println("u: " + u);
+//        }
+//        System.out.println("Final u: " + u);
+
+
+//        Sequence<String> seq = Sequence.of("one", "two", "three", "four", "five");
+//        PersistentHashSet<String> u = PersistentHashSet.empty();
+//        System.out.println("Initial u: " + u);
+//        Function2<PersistentHashSet<String>,? super String,PersistentHashSet<String>> fun = (accum, t) -> accum.put(t);
+//        // System.out.println("seq: " + seq);
+//        // System.out.println("===>item: " + item);
+//        Option<String> item = seq.head();
+//        while (item.isSome()) {
+//            System.out.println("item.get(): " + item.get());
+//            // u = fun.apply(u, item.get());
+//            u = u.put(item.get());
+//            System.out.println("u: " + u);
+//            // repeat with next element
+//            seq = seq.tail();
+//            item = seq.head();
+//        }
+//        System.out.println("Final u: " + u);
+
+    }
+
     @Test public void disjoin() {
         PersistentHashSet<String> s1 = PersistentHashSet.empty();
         assertTrue(s1.isEmpty());
