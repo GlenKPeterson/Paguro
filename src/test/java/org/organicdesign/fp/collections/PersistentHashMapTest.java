@@ -298,8 +298,10 @@ public class PersistentHashMapTest {
 //
 //        System.out.println("m: " + m);
 //        System.out.println("m.hasNull(): " + m.hasNull());
-//
 //        System.out.println("m.seq(): " + m.seq());
+//        System.out.println("m.seq().map(e -> e.getValue()): " + m.seq().map(e -> e.getValue()).toJavaList());
+//
+//
 //        System.out.println("m.values(): " + m.values());
 //
 //
@@ -320,7 +322,7 @@ public class PersistentHashMapTest {
 //                                      .hashCode());
 //
 //    }
-//
+
     @Test public void testImMap10() {
         int max = 10;
         Map<Integer,String> a = PersistentHashMap.of(1, "One", 2, "Two", 3, "Three", 4, "Four", 5, "Five", 6, "Six",

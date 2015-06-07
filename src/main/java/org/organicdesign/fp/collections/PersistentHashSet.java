@@ -26,7 +26,7 @@ public class PersistentHashSet<E> implements ImSet<E> {
     public static <E> PersistentHashSet<E> empty() { return (PersistentHashSet<E>) EMPTY; }
 
     @SafeVarargs
-    public static <E>  PersistentHashSet<E> create(E... init) {
+    public static <E>  PersistentHashSet<E> of(E... init) {
         PersistentHashSet<E> empty = empty();
         TransientHashSet<E> ret = empty.asTransient();
         for (int i = 0; i < init.length; i++) {
@@ -35,7 +35,7 @@ public class PersistentHashSet<E> implements ImSet<E> {
         return ret.persistent();
     }
 
-    public static <E>  PersistentHashSet<E> create(List<E> init) {
+    public static <E>  PersistentHashSet<E> of(List<E> init) {
         PersistentHashSet<E> empty = empty();
         TransientHashSet<E> ret = empty.asTransient();
         for (E key : init) {
