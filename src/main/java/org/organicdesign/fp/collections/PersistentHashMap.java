@@ -36,7 +36,7 @@ import java.util.concurrent.atomic.AtomicReference;
  No sub-tree pools or root-resizing.
  Any errors are my own (said Rich, but now says Glen 2015-06-06).
  */
-public class PersistentHashMap<K,V> implements ImMap<K,V> {
+public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 
     // TODO: Replace with Mutable.Ref, or make methods return Tuple2.
     private static class Box {
@@ -390,7 +390,7 @@ public class PersistentHashMap<K,V> implements ImMap<K,V> {
         return new PersistentHashMap<>(addedLeaf.val == null ? count : count + 1, newroot, hasNull, nullValue);
     }
 
-    TransientHashMap<K,V> asTransient() {
+    @Override public ImMapTrans<K,V> asTransient() {
         return new TransientHashMap<>(this);
     }
 
@@ -475,6 +475,8 @@ public class PersistentHashMap<K,V> implements ImMap<K,V> {
     @Override public UnIterator<UnMap.UnEntry<K,V>> iterator(){
         return seq().iterator();
     }
+
+    @Override public final PersistentHashMap<K,V> persistent() { return this; }
 
 //    public <R> R kvreduce(Function3<R,K,V,R> f, R init) {
 //        init = hasNull ? f.apply(init, null, nullValue) : init;
@@ -580,7 +582,7 @@ public class PersistentHashMap<K,V> implements ImMap<K,V> {
 //    	}
 //    }
 
-    static final class TransientHashMap<K,V> implements ImMap<K,V> {
+    static final class TransientHashMap<K,V> implements ImMapTrans<K,V> {
         AtomicReference<Thread> edit;
         INode<K,V> root;
         int count;
@@ -626,6 +628,8 @@ public class PersistentHashMap<K,V> implements ImMap<K,V> {
        		ensureEditable();
        		return doAssoc(key, val);
        	}
+
+        @Override public ImMapTrans<K,V> asTransient() { return this; }
 
         private TransientHashMap<K,V> doWithout(K key) {
             if (key == null) {
@@ -712,7 +716,7 @@ public class PersistentHashMap<K,V> implements ImMap<K,V> {
        		return doWithout(key);
        	}
 
-       	public final PersistentHashMap<K,V> persistent() {
+        @Override public final PersistentHashMap<K,V> persistent() {
        		ensureEditable();
        		return doPersistent();
        	}

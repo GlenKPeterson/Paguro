@@ -339,8 +339,8 @@ public class PersistentTreeMap<K,V> implements ImMapOrdered<K,V> {
         return true;
     }
 
-    /** Returns a view of the keys contained in this map. */
-    @Override public ImSet<K> keySet() { return PersistentTreeSet.ofMap(this); }
+//    /** Returns a view of the keys contained in this map. */
+//    @Override public ImSet<K> keySet() { return PersistentTreeSet.ofMap(this); }
 
     /** {@inheritDoc} */
     @Override public ImMapOrdered<K,V> subMap(K fromKey, K toKey) {
@@ -512,21 +512,21 @@ public class PersistentTreeMap<K,V> implements ImMapOrdered<K,V> {
      */
     @Override public Comparator<? super K> comparator() { return (comp == Function2.DEFAULT_COMPARATOR) ? null : comp; }
 
-    /** Returns true if the map contains the given key. */
-    @SuppressWarnings("unchecked")
-    @Override public boolean containsKey(Object key) {
-        return entryAt((K) key) != null;
-    }
+//    /** Returns true if the map contains the given key. */
+//    @SuppressWarnings("unchecked")
+//    @Override public boolean containsKey(Object key) {
+//        return entryAt((K) key) != null;
+//    }
 
-    /** Returns the value associated with the given key. */
-    @SuppressWarnings("unchecked")
-    @Override
-    public V get(Object key) {
-        if (key == null) { return null; }
-        Entry<K,V> entry = entryAt((K) key);
-        if (entry == null) { return null; }
-        return entry.getValue();
-    }
+//    /** Returns the value associated with the given key. */
+//    @SuppressWarnings("unchecked")
+//    @Override
+//    public V get(Object key) {
+//        if (key == null) { return null; }
+//        Entry<K,V> entry = entryAt((K) key);
+//        if (entry == null) { return null; }
+//        return entry.getValue();
+//    }
 
 // public PersistentTreeMap<K,V> assocEx(K key, V val) {
 // Inherits default implementation of assocEx from IPersistentMap
@@ -672,21 +672,36 @@ public class PersistentTreeMap<K,V> implements ImMapOrdered<K,V> {
     /** Returns the number of key/value mappings in this map. */
     @Override public int size() { return size; }
 
-    // In TreeMap, this is final Entry<K,V> getEntry(Object key)
-    /** Returns the key/value pair matching the given key, or null if the key is not found. */
-    public UnEntry<K,V> entryAt(K key) {
+    /** Returns an Option of the key/value pair matching the given key, or Option.none() if the key is not found. */
+    @Override public Option<UnMap.UnEntry<K,V>> entry(K key) {
         Node<K,V> t = tree;
         while (t != null) {
             int c = comp.compare(key, t.key);
             if (c == 0)
-                return t;
+                return Option.of(t);
             else if (c < 0)
                 t = t.left();
             else
                 t = t.right();
         }
-        return null; // t; // t is always null
+        return Option.none(); // t; // t is always null
     }
+
+//    // In TreeMap, this is final Entry<K,V> getEntry(Object key)
+//    /** Returns the key/value pair matching the given key, or null if the key is not found. */
+//    public UnEntry<K,V> entryAt(K key) {
+//        Node<K,V> t = tree;
+//        while (t != null) {
+//            int c = comp.compare(key, t.key);
+//            if (c == 0)
+//                return t;
+//            else if (c < 0)
+//                t = t.left();
+//            else
+//                t = t.right();
+//        }
+//        return null; // t; // t is always null
+//    }
 
     private Node<K,V> add(Node<K,V> t, K key, V val, Box<Node<K,V>> found) {
         if (t == null) {

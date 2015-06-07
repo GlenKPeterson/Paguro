@@ -14,6 +14,7 @@
 
 package org.organicdesign.fp.collections;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -22,10 +23,15 @@ import org.organicdesign.fp.permanent.Sequence;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.*;
+import static org.organicdesign.fp.StaticImports.un;
+import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
+import static org.organicdesign.fp.testUtils.EqualsContract.equalsSameHashCode;
 
 @RunWith(JUnit4.class)
 public class PersistentHashMapTest {
@@ -146,37 +152,53 @@ public class PersistentHashMapTest {
         assertEquals(Integer.valueOf(3), next.getValue());
     }
 
-//    @Test public void hashCodeAndEquals() {
-//        equalsDistinctHashCode(PersistentHashMap.of("one", 1).assoc("two", 2).assoc("three", 3),
-//                               PersistentHashMap.of("three", 3).assoc("two", 2).assoc("one", 1),
-//                               PersistentHashMap.of("two", 2, "three", 3, "one", 1),
-//                               PersistentHashMap.of("two", 2, "three", 3, "four", 4));
-//
-//        SortedMap<String,Integer> m = new TreeMap<>();
-//        m.put("one", 1);
-//        m.put("two", 2);
-//        m.put("three", 3);
-//
-//        equalsDistinctHashCode(PersistentHashMap.of("one", 1, "two", 2, "three", 3),
-//                               m,
-//                               un(m),
-//                               PersistentHashMap.of("two", 2, "three", 3, "four", 4));
-//
-//        equalsDistinctHashCode(PersistentHashMap.of("one", 1).assoc("two", 2).assoc("three", 3),
-//                               PersistentHashMap.of("three", 3).assoc("two", 2).assoc("one", 1),
-//                               PersistentHashMap.of("two", 2, "three", 3, "one", 1),
-//                               PersistentHashMap.of("zne", 1, "two", 2, "three", 3));
-//
-//        equalsDistinctHashCode(PersistentHashMap.of("one", 1).assoc("two", 2).assoc("three", 3),
-//                               PersistentHashMap.of("three", 3).assoc("two", 2).assoc("one", 1),
-//                               PersistentHashMap.of("two", 2, "three", 3, "one", 1),
-//                               PersistentHashMap.of("one", 1, "two", 2, "three", 2));
-//
-//        equalsSameHashCode(PersistentHashMap.of("one", 1).assoc("two", 2).assoc("three", 3),
-//                           PersistentHashMap.of("three", 3).assoc("two", 2).assoc("one", 1),
-//                           PersistentHashMap.of("two", 2, "three", 3, "one", 1),
-//                           PersistentHashMap.of(1, "one", 2, "two", 3, "three"));
-//    }
+    @Ignore
+    @Test public void hashCodeAndEquals() {
+        ImMap<String,Integer> a=PersistentHashMap.ofSkipNull(Tuple2.of("one", 1), Tuple2.of("two", 2), Tuple2.of("three", 3));
+        ImMap<String,Integer> b=PersistentHashMap.ofSkipNull(Tuple2.of("one", 1), Tuple2.of("two", 2), Tuple2.of("three", 3));
+
+        assertEquals(a.hashCode(), b.hashCode());
+        assertFalse(a == b);
+        assertTrue(a instanceof Map);
+        assertTrue(b instanceof Map);
+        assertEquals(a.size(), b.size());
+
+        System.out.println("a.entrySet(): " + a.entrySet());
+        System.out.println("b.entrySet(): " + b.entrySet());
+
+        assertEquals(a, b);
+        assertEquals(b, a);
+
+        equalsDistinctHashCode(PersistentHashMap.of("one", 1).assoc("two", 2).assoc("three", 3),
+                               PersistentHashMap.of("three", 3).assoc("two", 2).assoc("one", 1),
+                               PersistentHashMap.of("two", 2, "three", 3, "one", 1),
+                               PersistentHashMap.of("two", 2, "three", 3, "four", 4));
+
+        Map<String,Integer> m = new HashMap<>();
+        m.put("one", 1);
+        m.put("two", 2);
+        m.put("three", 3);
+
+        equalsDistinctHashCode(PersistentHashMap.of("one", 1, "two", 2, "three", 3),
+                               m,
+                               un(m),
+                               PersistentHashMap.of("two", 2, "three", 3, "four", 4));
+
+        equalsDistinctHashCode(PersistentHashMap.of("one", 1).assoc("two", 2).assoc("three", 3),
+                               PersistentHashMap.of("three", 3).assoc("two", 2).assoc("one", 1),
+                               PersistentHashMap.of("two", 2, "three", 3, "one", 1),
+                               PersistentHashMap.of("zne", 1, "two", 2, "three", 3));
+
+        equalsDistinctHashCode(PersistentHashMap.of("one", 1).assoc("two", 2).assoc("three", 3),
+                               PersistentHashMap.of("three", 3).assoc("two", 2).assoc("one", 1),
+                               PersistentHashMap.of("two", 2, "three", 3, "one", 1),
+                               PersistentHashMap.of("one", 1, "two", 2, "three", 2));
+
+        equalsSameHashCode(PersistentHashMap.of("one", 1).assoc("two", 2).assoc("three", 3),
+                           PersistentHashMap.of("three", 3).assoc("two", 2).assoc("one", 1),
+                           PersistentHashMap.of("two", 2, "three", 3, "one", 1),
+                           PersistentHashMap.of(1, "one", 2, "two", 3, "three"));
+    }
 
     public void friendlierArrayEq(Object[] a1, Object[] a2) {
         if (a1 == null) {

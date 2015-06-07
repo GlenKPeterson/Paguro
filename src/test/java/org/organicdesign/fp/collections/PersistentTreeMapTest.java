@@ -375,19 +375,22 @@ public class PersistentTreeMapTest {
     }
 
     @Test public void values() {
-        PersistentTreeMap<Integer,String> m =
+        PersistentTreeMap<Integer,String> m1 =
                 PersistentTreeMap.of(4, "four").assoc(5, "five").assoc(2, "two").assoc(3, "three").assoc(1, "one");
 
         assertArrayEquals(new String[]{"one", "two", "three", "four", "five"},
-                          m.map(e -> e.getValue()).toTypedArray());
+                          m1.map(e -> e.getValue()).toTypedArray());
 
 //        assertTrue(m.values().equals(Arrays.asList("one", "two", "three", "four", "five")));
-        assertNotEquals(0, m.values().hashCode());
-        assertNotEquals(m.values().hashCode(), PersistentTreeMap.of(4, "four").assoc(5, "five").hashCode());
-        assertEquals(m.values().hashCode(),
-                     PersistentTreeMap.of(4, "four").assoc(2, "two").assoc(5, "five").assoc(1, "one").assoc(3, "three")
-                                      .values()
-                                      .hashCode());
+        assertNotEquals(0, m1.values().hashCode());
+        assertNotEquals(m1.values().hashCode(), PersistentTreeMap.of(4, "four").assoc(5, "five").hashCode());
+
+        System.out.println("m1.values(): " + m1.values());
+        PersistentTreeMap<Integer,String> m2 = PersistentTreeMap.of(4, "four").assoc(2, "two").assoc(5, "five").assoc(1, "one").assoc(3, "three");
+        System.out.println("m2.values(): " + m2.values());
+
+        assertEquals(m1.values().hashCode(),
+                     m2.values().hashCode());
 
     }
 

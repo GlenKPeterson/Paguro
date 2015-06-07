@@ -18,7 +18,7 @@ import java.util.NoSuchElementException;
 import java.util.SortedSet;
 
 /** An unmodifiable SortedSet. */
-public interface UnSetOrdered<E> extends UnSet<E>, SortedSet<E>, UnIterableOrdered<E> {
+public interface UnSetOrdered<E> extends UnSet<E>, SortedSet<E>, UnCollectionOrdered<E> {
     // ==================================================== Static ====================================================
     UnSet<Object> EMPTY = new UnSetOrdered<Object>() {
         @Override public boolean contains(Object o) { return false; }

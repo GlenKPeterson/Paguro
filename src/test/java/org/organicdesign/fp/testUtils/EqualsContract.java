@@ -1,9 +1,9 @@
 package org.organicdesign.fp.testUtils;
 
+import org.organicdesign.fp.collections.UnList;
+
 import java.util.Arrays;
 import java.util.List;
-
-import org.organicdesign.fp.collections.UnList;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.FunctionUtils.ordinal;
@@ -79,7 +79,7 @@ public class EqualsContract {
         UnList.permutations(equivs, (a, b) -> {
             assertEquals("Found an unequal hashCode while inspecting permutations",
                          a.hashCode(), b.hashCode());
-            assertTrue("Failed equals while inspecting permutations",
+            assertTrue("Failed equals while inspecting permutations: a=" + a + " b=" + b,
                        a.equals(b));
             assertTrue("Failed reflexive equals while inspecting permutations",
                        b.equals(a));

@@ -20,11 +20,13 @@ public interface ImMap<K,V> extends UnMap<K,V> {
     /**
      * Returns a view of the mappings contained in this map.  The set should actually contain UnMap.Entry items, but
      * that return signature is illegal in Java, so you'll just have to remember. */
-    @Override default ImSet<Map.Entry<K,V>> entrySet() { return seq().map(e -> (Map.Entry<K,V>) e).toImSet(); }
+    @Override default ImSet<Map.Entry<K,V>> entrySet() {
+        return seq().map(e -> (Map.Entry<K,V>) e)
+                .toImSet();
+    }
 
     /** Returns a view of the keys contained in this map. */
-    @Override default ImSet<K> keySet() { return seq().map(e -> e.getKey()).toImSet(); }
-
+    @Override ImSet<K> keySet();
 
     @SuppressWarnings("unchecked")
     @Override default boolean containsKey(Object key) { return entry((K) key).isSome(); }
@@ -35,15 +37,15 @@ public interface ImMap<K,V> extends UnMap<K,V> {
         return entry.isSome() ? entry.get().getValue() : null;
     }
 
+    default V getOrElse(K key, V notFound) {
+        Option<UnEntry<K,V>> entry = entry(key);
+        return entry.isSome() ? entry.get().getValue() : notFound;
+    }
+
     @Override default UnCollection<V> values() { return seq().map(e -> e.getValue()).toImSet(); }
 
     @Override default UnIterator<UnEntry<K,V>> iterator() { return seq().iterator(); }
 
     /** Returns a new map with an immutable copy of the given entry added */
     default ImMap<K,V> assoc(Map.Entry<K,V> entry) { return assoc(entry.getKey(), entry.getValue()); }
-
-    default V getOrElse(K key, V notFound) {
-        Option<UnEntry<K,V>> entry = entry(key);
-        return entry.isSome() ? entry.get().getValue() : notFound;
-    }
 }

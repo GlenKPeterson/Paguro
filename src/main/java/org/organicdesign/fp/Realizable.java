@@ -57,7 +57,7 @@ public interface Realizable<T> extends UnIterable<T> {
      @param f1 Maps each item in this collection to a key/value pair.  If the collection is composed of Map.Entries,
      you can pass Function1.identity() here.
      */
-    <U,V> ImMapOrdered<U,V> toImMapSorted(Comparator<? super U> comp, Function1<? super T,Map.Entry<U,V>> f1);
+    <U,V> ImMapOrdered<U,V> toImMapOrdered(Comparator<? super U> comp, Function1<? super T,Map.Entry<U,V>> f1);
 
     /**
      The contents of this Realizable presented as an immutable, sorted (tree) set.  Use this when you want to quickly
@@ -65,13 +65,13 @@ public interface Realizable<T> extends UnIterable<T> {
      @return An immutable set
      @param comp Determines the ordering.  If T implements Comparable, you can pass Function2.defaultComparator() here.
      */
-    ImSetOrdered<T> toImSetSorted(Comparator<? super T> comp);
+    ImSetOrdered<T> toImSetOrdered(Comparator<? super T> comp);
 
     /** The contents copied to a mutable list.  Use toImList unless you need to modify the list in-place. */
     List<T> toJavaList();
 
     /**
-     Returns the contents of this Realizable copied to a mutable hash map.  Use toImMapSorted() unless you need to
+     Returns the contents of this Realizable copied to a mutable hash map.  Use toImMapOrdered() unless you need to
      modify the map in-place.  Use toUnMap if you just need the fastest O(1) access speed without modifying it in place.
      @return A map with the keys from the given set, mapped to values using the given function.
      @param f1 Maps keys to values
@@ -79,7 +79,7 @@ public interface Realizable<T> extends UnIterable<T> {
     <U,V> Map<U,V> toJavaMap(final Function1<? super T,Map.Entry<U,V>> f1);
 
     /**
-     Returns the contents of this Realizable copied to a mutable tree map.  Use toImMapSorted() unless you need to
+     Returns the contents of this Realizable copied to a mutable tree map.  Use toImMapOrdered() unless you need to
      modify the map in-place.
      @return A map with the keys from the given set, mapped to values using the given function.
      @param f1 Maps keys to values
@@ -87,14 +87,14 @@ public interface Realizable<T> extends UnIterable<T> {
     <U,V> SortedMap<U,V> toJavaMapSorted(final Function1<? super T,Map.Entry<U,V>> f1);
 
     /**
-     Returns the contents of this Realizable copied to a mutable hash set.  Use toImSetSorted() unless you need to
+     Returns the contents of this Realizable copied to a mutable hash set.  Use toImSetOrdered() unless you need to
      modify the set in-place.  Use toUnSet if you just need the fastest O(1) access speed without modifying it in place.
      @return A map with the keys from the given set, mapped to values using the given function.
      */
     Set<T> toJavaSet();
 
     /**
-     Returns the contents of this Realizable copied to a mutable tree set.  Use toImSetSorted unless you need to modify
+     Returns the contents of this Realizable copied to a mutable tree set.  Use toImSetOrdered unless you need to modify
      the set in-place.
      @param comp Determines the ordering.  If T implements Comparable, you can pass Function2.defaultComparator() here.
      */

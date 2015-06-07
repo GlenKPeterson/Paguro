@@ -13,7 +13,6 @@
 
 package org.organicdesign.fp.collections;
 
-import org.organicdesign.fp.collections.PersistentHashMap.TransientHashMap;
 import org.organicdesign.fp.permanent.Sequence;
 
 import java.util.List;
@@ -78,6 +77,10 @@ public class PersistentHashSet<E> implements ImSet<E> {
         return ret.persistent();
     }
 
+    public static <E> PersistentHashSet<E> ofMap(ImMapTrans<E,?> map) {
+        return new PersistentHashSet<>(map);
+    }
+
 //    static public PersistentHashSet<E> createWithCheck(ISeq items) {
 //        PersistentHashSet<E> empty = empty();
 //        TransientHashSet<E> ret = empty.asTransient();
@@ -88,9 +91,9 @@ public class PersistentHashSet<E> implements ImSet<E> {
 //        }
 //        return (PersistentHashSet) ret.persistent();
 //    }
-    private final PersistentHashMap<E,Object> impl;
+    private final ImMapTrans<E,?> impl;
 
-    PersistentHashSet(PersistentHashMap<E,Object> i) { impl = i; }
+    PersistentHashSet(ImMapTrans<E,?> i) { impl = i; }
 
     @SuppressWarnings("unchecked")
     @Override public boolean contains(Object key) {
@@ -106,10 +109,10 @@ public class PersistentHashSet<E> implements ImSet<E> {
     @Override public PersistentHashSet<E> put(E o) {
         if (contains(o))
             return this;
-        return new PersistentHashSet<>(impl.assoc(o, o));
+        return new PersistentHashSet<>(impl.assoc(o, null));
     }
 
-    @Override public Sequence<E> seq() { return impl.keySet().seq(); }
+    @Override public Sequence<E> seq() { return impl.seq().map(e -> e.getKey()); }
 
     @Override public int size() { return impl.size(); }
 
@@ -118,16 +121,16 @@ public class PersistentHashSet<E> implements ImSet<E> {
     }
 
     static final class TransientHashSet<E> implements ImSet<E> {
-        TransientHashMap<E,Object> impl;
+        ImMapTrans<E,?> impl;
 
-        TransientHashSet(TransientHashMap<E,Object> impl) {
+        TransientHashSet(ImMapTrans<E,?> impl) {
             this.impl = impl;
         }
 
         @Override public int size() { return impl.size(); }
 
         @Override public TransientHashSet<E> put(E val) {
-            TransientHashMap<E,Object> m = impl.assoc(val, val);
+            ImMapTrans<E,?> m = impl.assoc(val, null);
             if (m != impl) this.impl = m;
             return this;
         }
@@ -146,7 +149,7 @@ public class PersistentHashSet<E> implements ImSet<E> {
         @Override public boolean isEmpty() { return impl.isEmpty(); }
 
         @Override public TransientHashSet<E> disjoin(E key) {
-            TransientHashMap<E,Object> m = impl.without(key);
+            ImMapTrans<E,?> m = impl.without(key);
             if (m != impl) this.impl = m;
             return this;
         }
