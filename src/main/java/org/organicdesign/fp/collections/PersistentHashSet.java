@@ -16,6 +16,7 @@ package org.organicdesign.fp.collections;
 import org.organicdesign.fp.permanent.Sequence;
 
 import java.util.List;
+import java.util.Set;
 
 public class PersistentHashSet<E> implements ImSet<E> {
 
@@ -105,6 +106,24 @@ public class PersistentHashSet<E> implements ImSet<E> {
             return new PersistentHashSet<>(impl.without(key));
         return this;
     }
+
+    /**
+     This is compatible with java.util.Map but that means it wrongly allows comparisons with SortedMaps, which are
+     necessarily not commutative.
+     @param other the other (hopefully unsorted) map to compare to.
+     @return true if these maps contain the same elements, regardless of order.
+     */
+    @Override public boolean equals(Object other) {
+        if (other == this) { return true; }
+        if ( !(other instanceof Set) ) { return false; }
+        Set that = (Set) other;
+        if (that.size() != size()) { return false; }
+        return containsAll(that);
+    }
+
+    @Override public int hashCode() { return UnIterable.hashCode(this); }
+
+    @Override public String toString() { return UnIterable.toString("PersistentHashSet", this); }
 
     @Override public PersistentHashSet<E> put(E o) {
         if (contains(o))

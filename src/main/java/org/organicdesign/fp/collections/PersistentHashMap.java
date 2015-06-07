@@ -469,7 +469,6 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         return true;
     }
 
-
     @Override public int hashCode() { return UnIterable.hashCode(this); }
 
     @Override public UnIterator<UnMap.UnEntry<K,V>> iterator(){

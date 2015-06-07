@@ -14,7 +14,6 @@
 
 package org.organicdesign.fp.collections;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -152,19 +151,16 @@ public class PersistentHashMapTest {
         assertEquals(Integer.valueOf(3), next.getValue());
     }
 
-    @Ignore
     @Test public void hashCodeAndEquals() {
         ImMap<String,Integer> a=PersistentHashMap.ofSkipNull(Tuple2.of("one", 1), Tuple2.of("two", 2), Tuple2.of("three", 3));
         ImMap<String,Integer> b=PersistentHashMap.ofSkipNull(Tuple2.of("one", 1), Tuple2.of("two", 2), Tuple2.of("three", 3));
 
         assertEquals(a.hashCode(), b.hashCode());
         assertFalse(a == b);
-        assertTrue(a instanceof Map);
-        assertTrue(b instanceof Map);
         assertEquals(a.size(), b.size());
 
-        System.out.println("a.entrySet(): " + a.entrySet());
-        System.out.println("b.entrySet(): " + b.entrySet());
+//        System.out.println("a.entrySet(): " + a.entrySet());
+//        System.out.println("b.entrySet(): " + b.entrySet());
 
         assertEquals(a, b);
         assertEquals(b, a);
@@ -214,41 +210,41 @@ public class PersistentHashMapTest {
         }
     }
 
-//    @Test public void testToString() {
-//        assertEquals("PersistentHashMap()",
-//                     PersistentHashMap.empty().toString());
-//        assertEquals("PersistentHashMap(UnEntry(1,one))",
-//                     PersistentHashMap.of(1, "one").toString());
-//    }
-//
-//    @Test public void without() {
-//        PersistentHashMap<Integer,String> m = PersistentHashMap.of(1, "one").assoc(2, "two").assoc(3, "three");
-//
-//        assertEquals(m, m.without(0));
-//
-//        assertEquals(PersistentHashMap.of(2, "two").assoc(3, "three"),
-//                     m.without(1));
-//
-//        assertEquals(PersistentHashMap.of(1, "one").assoc(3, "three"),
-//                     m.without(2));
-//
-//        assertEquals(PersistentHashMap.of(1, "one").assoc(2, "two"),
-//                     m.without(3));
-//
-//        assertEquals(m, m.without(4));
-//
-//        assertEquals(PersistentHashMap.of(3, "three"),
-//                     m.without(1).without(2));
-//
-//        assertEquals(PersistentHashMap.of(1, "one").assoc(3, "three"),
-//                     m.without(2));
-//
-//        assertEquals(PersistentHashMap.of(1, "one").assoc(2, "two"),
-//                     m.without(3));
-//
-//        assertEquals(PersistentHashMap.EMPTY, PersistentHashMap.empty().without(4));
-//    }
-//
+    @Test public void testToString() {
+        assertEquals("PersistentHashMap()",
+                     PersistentHashMap.empty().toString());
+        assertEquals("PersistentHashMap(Tuple2(1,one))",
+                     PersistentHashMap.of(1, "one").toString());
+    }
+
+    @Test public void without() {
+        PersistentHashMap<Integer,String> m = PersistentHashMap.of(1, "one").assoc(2, "two").assoc(3, "three");
+
+        assertEquals(m, m.without(0));
+
+        assertEquals(PersistentHashMap.of(2, "two").assoc(3, "three"),
+                     m.without(1));
+
+        assertEquals(PersistentHashMap.of(1, "one").assoc(3, "three"),
+                     m.without(2));
+
+        assertEquals(PersistentHashMap.of(1, "one").assoc(2, "two"),
+                     m.without(3));
+
+        assertEquals(m, m.without(4));
+
+        assertEquals(PersistentHashMap.of(3, "three"),
+                     m.without(1).without(2));
+
+        assertEquals(PersistentHashMap.of(1, "one").assoc(3, "three"),
+                     m.without(2));
+
+        assertEquals(PersistentHashMap.of(1, "one").assoc(2, "two"),
+                     m.without(3));
+
+        assertEquals(PersistentHashMap.EMPTY, PersistentHashMap.empty().without(4));
+    }
+
 //    @Test public void largerMap() {
 //        PersistentHashMap<Integer,String> m =
 //                PersistentHashMap.of(1, "one").assoc(2, "two").assoc(3, "three").assoc(4, "four").assoc(5, "five")
@@ -290,7 +286,7 @@ public class PersistentHashMapTest {
 //        assertArrayEquals(s.toArray(),
 //                          m.entrySet().map((u) -> Tuple2.of(u.getKey(), u.getValue())).toTypedArray());
 //    }
-//
+
 //    @Test public void values() {
 //        PersistentHashMap<Integer,String> m =
 //                PersistentHashMap.of(4, "four").assoc(5, "five").assoc(2, "two").assoc(3, "three").assoc(1, "one");
