@@ -10,6 +10,7 @@
 
 package org.organicdesign.fp.collections;
 
+import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.LazyRef;
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.function.Function0;
@@ -343,6 +344,9 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         this.hasNull = hasNull;
         this.nullValue = nullValue;
     }
+
+    /** Not sure I like this - could disappear. */
+    boolean hasNull() { return hasNull; }
 
 //    @SuppressWarnings("unchecked")
 //    @Override public boolean containsKey(Object key){
@@ -986,9 +990,11 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         Object[] array;
         final AtomicReference<Thread> edit;
 
-        final int index(int bit){
-            return Integer.bitCount(bitmap & (bit - 1));
+        @Override public String toString() {
+            return "BitmapIndexedNode(" + bitmap + "," + FunctionUtils.toString(array) + "," + edit + ")";
         }
+
+        final int index(int bit) { return Integer.bitCount(bitmap & (bit - 1)); }
 
         BitmapIndexedNode(AtomicReference<Thread> edit, int bitmap, Object[] array){
             this.bitmap = bitmap;
@@ -1635,6 +1641,8 @@ public static void main(String[] args){
         @Override public Option<UnMap.UnEntry<K,V>> head() { return laz.get()._1(); }
 
         @Override public Sequence<UnMap.UnEntry<K,V>> tail() { return laz.get()._2(); }
+
+        @Override public String toString() { return UnIterable.toString("NodeSeq", this); }
 
     } // end class NodeSeq
 }
