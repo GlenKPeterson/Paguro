@@ -2,7 +2,12 @@ package org.organicdesign.fp.collections;
 
 import org.junit.Test;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import static org.junit.Assert.*;
+import static org.organicdesign.fp.StaticImports.un;
+import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class PersistentHashSetTest {
     @Test
@@ -235,67 +240,67 @@ public class PersistentHashSetTest {
 //        assertEquals(STR_LEN_COMP, s2.comparator());
 //    }
 
-//    @Test public void equality() {
-//        PersistentHashSet<String> s1 = PersistentHashSet.of("hello", "an", "work", "b", "the");
-//
-//        Set<String> ss1 = new HashSet<>();
-//        ss1.add("the");
-//        ss1.add("b");
-//        ss1.add("work");
-//        ss1.add("an");
-//        ss1.add("hello");
+    @Test public void equality() {
+        PersistentHashSet<String> s1 = PersistentHashSet.of("hello", "an", "work", "b", "the");
+
+        Set<String> ss1 = new HashSet<>();
+        ss1.add("the");
+        ss1.add("b");
+        ss1.add("work");
+        ss1.add("an");
+        ss1.add("hello");
+        equalsDistinctHashCode(s1, ss1, un(ss1),
+                               PersistentHashSet.of("hello", "an", "work", "the"));
+
+//        // Really, you need to read the JavaDoc for PersistentHashSet.equals() to understand the bizarre notion of
+//        // equality being checked here.
 //        equalsDistinctHashCode(s1, ss1, un(ss1),
-//                               PersistentHashSet.of("hello", "an", "work", "the"));
+//                               PersistentHashSet.ofComp(STR_LEN_COMP,
+//                                                        "helloz", "an", "work", "b", "the"));
 //
-////        // Really, you need to read the JavaDoc for PersistentHashSet.equals() to understand the bizarre notion of
-////        // equality being checked here.
-////        equalsDistinctHashCode(s1, ss1, un(ss1),
-////                               PersistentHashSet.ofComp(STR_LEN_COMP,
-////                                                        "helloz", "an", "work", "b", "the"));
-////
-////        PersistentHashSet<String> s2 = PersistentHashSet.ofComp(STR_LEN_COMP,
-////                                                                "hello", "an", "work", "b", "the");
-////
-////        // This illustrates the bug in java
-////        Set<String> ss = new HashSet<>();
-////        ss.add("the");
-////        ss.add("b");
-////        ss.add("work");
-////        ss.add("an");
-////        ss.add("hello");
-////
-////        Set<String> ss2 = new HashSet<>();
-////        ss2.add("the");
-////        ss2.add("b");
-////        ss2.add("work");
-////        ss2.add("an");
-////        ss2.add("Hello");
-////
-////        // Yeah, totally bizarre.  Doesn't care that the order is different.
-////        assertEquals(ss, ss2);
-////        assertEquals(ss2, ss);
-////
-////
-////        equalsDistinctHashCode(s2, ss, un(ss),
-////                               PersistentHashSet.ofComp(STR_LEN_COMP, "helloz", "an", "work", "the"));
-////
-//////        assertEquals(s2, yadda);
-//////        assertEquals(ss, yadda);
-//////        assertEquals(un(ss), yadda);
-//////
-//////        assertNotEquals(yadda, s2);
-//////        assertNotEquals(yadda, ss);
-//////        assertNotEquals(yadda, un(ss));
-////
-////        equalsDistinctHashCode(s2, ss, un(ss),
-////                               PersistentHashSet.of("an", "helloz", "work", "b", "the"));
-////
-////        equalsSameHashCode(s2,
-////                           PersistentHashSet.ofComp(STR_LEN_COMP, "an", "hello", "work", "the").put("b"),
-////                           PersistentHashSet.ofComp(STR_LEN_COMP, "an", "b", "work").put("hello").put("the"),
-////                           PersistentHashSet.of("an", "hello", "work", "b", "the"));
+//        PersistentHashSet<String> s2 = PersistentHashSet.ofComp(STR_LEN_COMP,
+//                                                                "hello", "an", "work", "b", "the");
 //
-//    }
+//        // This illustrates the bug in java
+//        Set<String> ss = new HashSet<>();
+//        ss.add("the");
+//        ss.add("b");
+//        ss.add("work");
+//        ss.add("an");
+//        ss.add("hello");
+//
+//        Set<String> ss2 = new HashSet<>();
+//        ss2.add("the");
+//        ss2.add("b");
+//        ss2.add("work");
+//        ss2.add("an");
+//        ss2.add("Hello");
+//
+//        // Yeah, totally bizarre.  Doesn't care that the order is different.
+//        assertEquals(ss, ss2);
+//        assertEquals(ss2, ss);
+//
+//
+//        equalsDistinctHashCode(s2, ss, un(ss),
+//                               PersistentHashSet.ofComp(STR_LEN_COMP, "helloz", "an", "work", "the"));
+//
+////        assertEquals(s2, yadda);
+////        assertEquals(ss, yadda);
+////        assertEquals(un(ss), yadda);
+////
+////        assertNotEquals(yadda, s2);
+////        assertNotEquals(yadda, ss);
+////        assertNotEquals(yadda, un(ss));
+//
+//        equalsDistinctHashCode(s2, ss, un(ss),
+//                               PersistentHashSet.of("an", "helloz", "work", "b", "the"));
+//
+//        equalsSameHashCode(s2,
+//                           PersistentHashSet.ofComp(STR_LEN_COMP, "an", "hello", "work", "the").put("b"),
+//                           PersistentHashSet.ofComp(STR_LEN_COMP, "an", "b", "work").put("hello").put("the"),
+//                           PersistentHashSet.of("an", "hello", "work", "b", "the"));
+
+    }
 
 //    // TODO: Finish this!
 //    @Test public void testToString() {
