@@ -26,15 +26,11 @@ dependency:tree
 	the names of Java-related products.
 	-->
 	<artifactId>UncleJim</artifactId>
-	<version>0.9.5-SNAPSHOT</version>
+	<version>0.9.6-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>UncleJim</name>
-	<description>Sequential collections for Java (formerly fp4java7).  Instead of changing data in place, a call to
-		a set(x) method returns a new instance with the item added to the collection.  The new instance shares as much
-		data as practical with the old instance.  The three collection implementations are currently taken from Clojure
-		(any bugs are Glen's).  A Sequence abstraction, reminiscent of Clojure's seq is provided as well.
-		A number of helper methods make it easy to use all this in Java, immutably, type-safely, and with good
+	<description>Clojure collections and a Sequence abstraction for Java 8+, immutably, type-safely, and with good
 		performance.
 	</description>
 	<url>https://github.com/GlenKPeterson/UncleJim</url>
