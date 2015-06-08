@@ -939,6 +939,10 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
             return editAndSet(edit, idx, n);
         }
 
+        @Override public String toString() {
+            return UnIterable.toString("ArrayNode", this.nodeSeq());
+        }
+
 //        static class Seq extends ASeq {
 //            final INode[] nodes;
 //            final int i;

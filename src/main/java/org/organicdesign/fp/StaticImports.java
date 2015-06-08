@@ -61,7 +61,7 @@ public class StaticImports {
     /** Returns an unmodifiable version of the given iterable. */
     // TODO: Test this.
     public static <T> UnIterable<T> un(Iterable<T> iterable) {
-        if (iterable == null) { return UnIterable.empty(); }
+        if (iterable == null) { return () -> UnIterator.empty(); }
         if (iterable instanceof UnIterable) { return (UnIterable<T>) iterable; }
         return () -> new UnIterator<T>() {
             private final Iterator<T> iter = iterable.iterator();

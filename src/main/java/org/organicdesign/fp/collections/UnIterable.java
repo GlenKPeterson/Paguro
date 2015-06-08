@@ -6,7 +6,8 @@ import java.util.Iterator;
 public interface UnIterable<T> extends Iterable<T> {
     // ==================================================== Static ====================================================
 
-    static <E> UnIterable<E> empty() { return () -> UnIterator.empty(); }
+    // This hides the same method on all sub-interfaces!
+//    static <E> UnIterable<E> empty() { return () -> UnIterator.empty(); }
 
     //    /**
 //     Caution: this is a convenient optimization for immutable data structures and a nightmare waiting to happen to
