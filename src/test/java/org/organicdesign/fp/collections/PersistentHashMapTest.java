@@ -212,6 +212,51 @@ public class PersistentHashMapTest {
         }
     }
 
+    public static void println(Object s) { System.out.println(String.valueOf(s)); }
+
+    @Test public void longerSeq() {
+        // This is an assumed to work mutable set - the "control" for this test.
+        Set<UnMap.UnEntry<String,Integer>> set = new HashSet<>();
+        // This is the map being tested.
+        ImMap<String,Integer> accum = PersistentHashMap.empty();
+
+        int MAX = 1000;
+
+        for (int i = 0; i < MAX; i++) {
+            String s = "Str" + i;
+            set.add(Tuple2.of(s, i));
+            accum = accum.assoc(s, accum.getOrElse(s, 0) + i);
+//            println("accum.size(): " + accum.size());
+//            println("accum: " + accum);
+
+            // This will blow up with an obvious non-seq so we know what size causes the real trouble.
+            Option<UnMap.UnEntry<String,Integer>> o = accum.seq().head();
+            assertTrue(o.isSome());
+            //noinspection ConstantConditions
+            assertTrue(o.get().getKey() instanceof String);
+            //noinspection ConstantConditions
+            assertTrue(o.get().getValue() instanceof Integer);
+        }
+        for (int i = 0; i < MAX; i++) {
+            assertEquals(Integer.valueOf(i), accum.get("Str" + i));
+        }
+
+        Sequence<UnMap.UnEntry<String,Integer>> seq = accum.seq();
+        for (int i = 0; i < MAX; i++) {
+            Option<UnMap.UnEntry<String,Integer>> o = seq.head();
+
+            assertTrue(set.contains(o.get()));
+            set.remove(o.get());
+
+            seq = seq.tail();
+        }
+//        System.out.println("seq: " + seq);
+        assertFalse(seq.head().isSome());
+        assertTrue(set.isEmpty());
+
+//        println("accum: " + accum);
+    }
+
     @Test public void unorderedOps() {
         PersistentHashMap<String,Integer> m1 = PersistentHashMap.of(
                 "c", 1,

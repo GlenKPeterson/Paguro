@@ -47,6 +47,8 @@ public interface Sequence<T> extends Transformable<T>, UnIterableOrdered<T> {
                     (other instanceof Sequence) &&
                     !((Sequence) other).head().isSome();
         }
+
+        @Override public String toString() { return "emptySequence()"; }
     };
 
     @SuppressWarnings("unchecked")

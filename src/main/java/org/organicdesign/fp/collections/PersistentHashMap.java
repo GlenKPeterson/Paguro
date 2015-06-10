@@ -511,6 +511,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
     // TODO: This suppression isn't right.  s.prepend() should be totally happy.
     @SuppressWarnings("unchecked")
     @Override public Sequence<UnMap.UnEntry<K,V>> seq() {
+//        System.out.println("root: " + root);
         Sequence<UnMap.UnEntry<K,V>> s = root != null ? root.nodeSeq() : Sequence.emptySequence();
         return hasNull ? s.prepend((UnMap.UnEntry<K,V>) Tuple2.of((K) null, nullValue)) : s;
     }
@@ -820,7 +821,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
             return node.findVal(shift + 5, hash, key, notFound);
         }
 
-        @Override public Sequence<UnMap.UnEntry<K,V>> nodeSeq(){ return NodeSeq.<K,V>create(array); }
+        @Override public Sequence<UnMap.UnEntry<K,V>> nodeSeq(){ return Seq.create(array); }
 
         @Override public <R> R kvreduce(Function3<R,K,V,R> f, R init){
             for(INode<K,V> node : array){
@@ -943,43 +944,50 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
             return UnIterable.toString("ArrayNode", this.nodeSeq());
         }
 
-//        static class Seq extends ASeq {
-//            final INode[] nodes;
-//            final int i;
-//            final ISeq s;
-//
-//            static ISeq create(INode[] nodes) {
-//                return create(null, nodes, 0, null);
-//            }
-//
-//            private static ISeq create(INode[] nodes, int i, ISeq s) {
-//                if (s != null)
-//                    return new Seq(nodes, i, s);
-//                for(int j = i; j < nodes.length; j++)
-//                    if (nodes[j] != null) {
-//                        Sequence<UnMap.UnEntry<K,V>> ns = nodes[j].nodeSeq();
-//                        if (ns != null)
-//                            return new Seq(nodes, j + 1, ns);
-//                    }
-//                return null;
-//            }
-//
-//            private Seq(INode[] nodes, int i, ISeq s) {
-//                super();
-//                this.nodes = nodes;
-//                this.i = i;
-//                this.s = s;
-//            }
-//
-//            public Object first() {
-//                return s.first();
-//            }
-//
-//            public ISeq next() {
-//                return create(null, nodes, i, s.next());
-//            }
-//
-//        }
+        static class Seq<K,V> implements Sequence<UnMap.UnEntry<K,V>> {
+            final INode<K,V>[] nodes;
+            final int i;
+            final Sequence<UnMap.UnEntry<K,V>> s;
+
+            static <K,V> Sequence<UnMap.UnEntry<K,V>> create(INode<K,V>[] nodes) {
+                return create(nodes, 0, null);
+            }
+
+            private static <K,V> Sequence<UnMap.UnEntry<K,V>> create(INode<K,V>[] nodes, int i, Sequence<UnMap.UnEntry<K,V>> s) {
+                if ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) ) { return new Seq<>(nodes, i, s); }
+
+                for(int j = i; j < nodes.length; j++) {
+                    if (nodes[j] != null) {
+                        Sequence<UnMap.UnEntry<K,V>> ns = nodes[j].nodeSeq();
+                        if (ns != null) {
+                            return new Seq<>(nodes, j + 1, ns);
+                        }
+                    }
+                }
+                return Sequence.emptySequence();
+            }
+
+            private Seq(INode<K,V>[] nodes, int i, Sequence<UnMap.UnEntry<K,V>> s) {
+                super();
+                this.nodes = nodes;
+                this.i = i;
+                this.s = s;
+            }
+
+            @Override public Option<UnMap.UnEntry<K,V>> head() {
+                return ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) )
+                       ? s.head()
+                       : Option.none();
+            }
+
+            @Override public Sequence<UnMap.UnEntry<K,V>> tail() {
+                if ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) ) {
+                    return create(nodes, i, s.tail());
+                }
+                return create(nodes, i, null);
+
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")
