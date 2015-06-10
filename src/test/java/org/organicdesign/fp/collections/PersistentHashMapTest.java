@@ -393,37 +393,36 @@ public class PersistentHashMapTest {
         assertEquals(PersistentHashMap.EMPTY, PersistentHashMap.empty().without(4));
     }
 
-//    // TODO: Enable this, but it's kind of a mess.
-//    @Test public void largerMap() {
-//        PersistentHashMap<Integer,String> m =
-//                PersistentHashMap.of(1, "one").assoc(2, "two").assoc(3, "three").assoc(4, "four").assoc(5, "five")
-//                        .assoc(6, "six").assoc(7, "seven").assoc(8, "eight").assoc(9, "nine").assoc(10, "ten")
-//                        .assoc(11, "eleven").assoc(12, "twelve").assoc(13, "thirteen").assoc(14, "fourteen")
-//                        .assoc(15, "fifteen").assoc(16, "sixteen").assoc(17, "seventeen").assoc(18, "eighteen")
-//                        .assoc(19, "nineteen").assoc(20, "twenty");
-//        m = m.without(10);
-//        m = m.without(9);
-//        m = m.without(11);
-//        m = m.assoc(11, "eleven again");
-//        m = m.assoc(10, "ten again");
-//        m = m.assoc(9, "nine again");
-//        m = m.without(1);
-//        m = m.assoc(1, "one again");
-//        m = m.assoc(21, "twenty one");
-//        m = m.without(20);
-//        m = m.assoc(20, "twenty again");
-//
-//        System.out.println("m.keySet(): " + m.keySet());
-//
-//        assertEquals(new HashSet<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21)),
-//                     m.keySet());
-//        assertEquals(new HashSet<>(Arrays.asList("one again", "two", "three", "four", "five", "six", "seven", "eight",
-//                                                 "nine again", "ten again", "eleven again", "twelve", "thirteen",
-//                                                 "fourteen",
-//                                                 "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty again",
-//                                                 "twenty one")),
-//                     m.values());
-//    }
+    @Test public void largerMap() {
+        PersistentHashMap<Integer,String> m =
+                PersistentHashMap.of(1, "one").assoc(2, "two").assoc(3, "three").assoc(4, "four").assoc(5, "five")
+                        .assoc(6, "six").assoc(7, "seven").assoc(8, "eight").assoc(9, "nine").assoc(10, "ten")
+                        .assoc(11, "eleven").assoc(12, "twelve").assoc(13, "thirteen").assoc(14, "fourteen")
+                        .assoc(15, "fifteen").assoc(16, "sixteen").assoc(17, "seventeen").assoc(18, "eighteen")
+                        .assoc(19, "nineteen").assoc(20, "twenty");
+        m = m.without(10);
+        m = m.without(9);
+        m = m.without(11);
+        m = m.assoc(11, "eleven again");
+        m = m.assoc(10, "ten again");
+        m = m.assoc(9, "nine again");
+        m = m.without(1);
+        m = m.assoc(1, "one again");
+        m = m.assoc(21, "twenty one");
+        m = m.without(20);
+        m = m.assoc(20, "twenty again");
+
+        System.out.println("m.keySet(): " + m.keySet());
+
+        assertEquals(new HashSet<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21)),
+                     m.keySet());
+        assertEquals(new HashSet<>(Arrays.asList("one again", "two", "three", "four", "five", "six", "seven", "eight",
+                                                 "nine again", "ten again", "eleven again", "twelve", "thirteen",
+                                                 "fourteen",
+                                                 "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty again",
+                                                 "twenty one")),
+                     m.values());
+    }
 
     @Test public void entrySet() {
         PersistentHashMap<Integer,String> m =
@@ -437,7 +436,6 @@ public class PersistentHashMapTest {
         assertEquals(s, m.entrySet());
     }
 
-    // TODO: Looks like values() is broken because toSet() of PersistentHashSet is broken - the seq looks OK.
     @Test public void values() {
         PersistentHashMap<Integer,String> m =
                 PersistentHashMap.of(4, "four").assoc(5, "five").assoc(2, "two").assoc(3, "three").assoc(1, "one");
@@ -467,33 +465,25 @@ public class PersistentHashMapTest {
             item = seq.head();
         }
         // System.out.println("Final u: " + u);
-
-
-
         // System.out.println("m.seq().map(e -> e.getValue()).foldLeft(): " + m.seq().map(e -> e.getValue()).foldLeft(PersistentHashSet.empty(), (accum, t) -> accum.put(t)));
-
         // System.out.println("m.seq().map(e -> e.getValue()).toImSet(): " + m.seq().map(e -> e.getValue()).toImSet());
-
-
         // System.out.println("m.values(): " + m.values());
 
-
-
         assertEquals(s, m.values());
-//
-//        equalsDistinctHashCode(m.values(),
-//                               PersistentHashMap.of(4, "four").assoc(2, "two").assoc(5, "five").assoc(1, "one").assoc(3, "three").values(),
-//                               s,
-//                               new HashSet<>(Arrays.asList("four", "one", "zippy", "two", "three")));
-//
-////        assertTrue(m.values().equals(Arrays.asList("one", "two", "three", "four", "five")));
-//                               assertNotEquals(0, m.values().hashCode());
-//        assertNotEquals(m.values().hashCode(), PersistentHashMap.of(4, "four").assoc(5, "five").hashCode());
-//        assertEquals(m.values().hashCode(),
-//                     PersistentHashMap.of(4, "four").assoc(2, "two").assoc(5, "five").assoc(1, "one").assoc(3, "three")
-//                                      .values()
-//                                      .hashCode());
-//
+
+        equalsDistinctHashCode(m.values(),
+                               PersistentHashMap.of(4, "four").assoc(2, "two").assoc(5, "five").assoc(1, "one").assoc(3, "three").values(),
+                               s,
+                               new HashSet<>(Arrays.asList("four", "one", "zippy", "two", "three")));
+
+//        assertTrue(m.values().equals(Arrays.asList("one", "two", "three", "four", "five")));
+        assertNotEquals(0, m.values().hashCode());
+        assertNotEquals(m.values().hashCode(), PersistentHashMap.of(4, "four").assoc(5, "five").hashCode());
+        assertEquals(m.values().hashCode(),
+                     PersistentHashMap.of(4, "four").assoc(2, "two").assoc(5, "five").assoc(1, "one").assoc(3, "three")
+                                      .values()
+                                      .hashCode());
+
     }
 
     @Test public void testImMap10() {
