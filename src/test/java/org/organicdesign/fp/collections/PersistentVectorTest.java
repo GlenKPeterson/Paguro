@@ -24,13 +24,13 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.un;
-import static org.organicdesign.fp.StaticImports.unMap;
 import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
 
 @RunWith(JUnit4.class)
@@ -213,14 +213,18 @@ public class PersistentVectorTest {
                                    "Better that, than set the limit too high and miss a performance drop.");
 
         // These are worst-case timings, indexed by number of items inserted in the test.
-        Map<Integer,Double> benchmarkRatios = unMap(
-                1, 1.4,
-                10, 2.7,
-                100, 6.5,
-                1000, 9.0,
-                10000, 18.0,
-                100000, 13.9,
-                1000000, 7.8);
+        final UnMap<Integer,Double> benchmarkRatios;
+        {
+            Map<Integer,Double> mm = new HashMap<>();
+            mm.put(1, 1.4);
+            mm.put(10, 2.7);
+            mm.put(100, 6.5);
+            mm.put(1000, 9.0);
+            mm.put(10000, 18.0);
+            mm.put(100000, 13.9);
+            mm.put(1000000, 7.8);
+            benchmarkRatios = un(mm);
+        }
 
         // Remember the results of each insertion test to average them later.
         List<Double> ratios = new ArrayList<>();

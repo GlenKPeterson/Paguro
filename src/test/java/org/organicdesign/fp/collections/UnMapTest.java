@@ -16,18 +16,24 @@ package org.organicdesign.fp.collections;
 
 import org.junit.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.organicdesign.fp.StaticImports.unMap;
+import static org.organicdesign.fp.StaticImports.un;
 
 public class UnMapTest {
     @Test public void containsValue() {
-        UnMap<String,Integer> m = unMap("Hello", 3,
-                                        "World", 2,
-                                        "This", 1,
-                                        "Is", 0,
-                                        "A", -1,
-                                        "test", -2);
+        Map<String,Integer> mm = new HashMap<>();
+        mm.put("Hello", 3);
+        mm.put("World", 2);
+        mm.put("This", 1);
+        mm.put("Is", 0);
+        mm.put("A", -1);
+        mm.put("test", -2);
+
+        UnMap<String,Integer> m = un(mm);
         assertFalse(m.containsValue(Integer.MAX_VALUE));
         assertFalse(m.containsValue(4));
         assertTrue(m.containsValue(3));

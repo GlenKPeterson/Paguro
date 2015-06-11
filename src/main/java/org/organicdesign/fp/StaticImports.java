@@ -26,11 +26,8 @@ import org.organicdesign.fp.collections.UnSet;
 import org.organicdesign.fp.collections.UnSetOrdered;
 import org.organicdesign.fp.tuple.Tuple2;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -271,109 +268,109 @@ public class StaticImports {
         };
     }
 
-    /** Returns an unmodifiable Map containing all passed pairs (including null keys/values). */
-    public static <K,V> UnMap<K,V> unMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5,
-                                         K k6, V v6, K k7, V v7, K k8, V v8, K k9, V v9,
-                                         K k10, V v10) {
-        Map<K,V> m = new HashMap<>(20);
-        m.put(k1, v1); m.put(k2, v2); m.put(k3, v3); m.put(k4, v4); m.put(k5, v5); m.put(k6, v6);
-        m.put(k7, v7); m.put(k8, v8); m.put(k9, v9); m.put(k10, v10);
-        return un(m);
-    }
-    /** Returns an unmodifiable Map containing all passed pairs (including null keys/values). */
-    public static <K,V> UnMap<K,V> unMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5,
-                                         K k6, V v6, K k7, V v7, K k8, V v8, K k9, V v9) {
-        Map<K,V> m = new HashMap<>(9);
-        m.put(k1, v1); m.put(k2, v2); m.put(k3, v3); m.put(k4, v4); m.put(k5, v5); m.put(k6, v6);
-        m.put(k7, v7); m.put(k8, v8); m.put(k9, v9);
-        return un(m);
-    }
-    /** Returns an unmodifiable Map containing all passed pairs (including null keys/values). */
-    public static <K,V> UnMap<K,V> unMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5,
-                                         K k6, V v6, K k7, V v7, K k8, V v8) {
-        Map<K,V> m = new HashMap<>(8);
-        m.put(k1, v1); m.put(k2, v2); m.put(k3, v3); m.put(k4, v4); m.put(k5, v5); m.put(k6, v6);
-        m.put(k7, v7); m.put(k8, v8);
-        return un(m);
-    }
-    /** Returns an unmodifiable Map containing all passed pairs (including null keys/values). */
-    public static <K,V> UnMap<K,V> unMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5,
-                                         K k6, V v6, K k7, V v7) {
-        Map<K,V> m = new HashMap<>(7);
-        m.put(k1, v1); m.put(k2, v2); m.put(k3, v3); m.put(k4, v4); m.put(k5, v5); m.put(k6, v6);
-        m.put(k7, v7);
-        return un(m);
-    }
-    /** Returns an unmodifiable Map containing all passed pairs (including null keys/values). */
-    public static <K,V> UnMap<K,V> unMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5,
-                                         K k6, V v6) {
-        Map<K,V> m = new HashMap<>(6);
-        m.put(k1, v1); m.put(k2, v2); m.put(k3, v3); m.put(k4, v4); m.put(k5, v5); m.put(k6, v6);
-        return un(m);
-    }
-    /** Returns an unmodifiable Map containing all passed pairs (including null keys/values). */
-    public static <K,V> UnMap<K,V> unMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
-        Map<K,V> m = new HashMap<>(5);
-        m.put(k1, v1); m.put(k2, v2); m.put(k3, v3); m.put(k4, v4); m.put(k5, v5);
-        return un(m);
-    }
-    /** Returns an unmodifiable Map containing all passed pairs (including null keys/values). */
-    public static <K,V> UnMap<K,V> unMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
-        Map<K,V> m = new HashMap<>(4); m.put(k1, v1); m.put(k2, v2); m.put(k3, v3); m.put(k4, v4);
-        return un(m);
-    }
-    /** Returns an unmodifiable Map containing all passed pairs (including null keys/values). */
-    public static <K,V> UnMap<K,V> unMap(K k1, V v1, K k2, V v2, K k3, V v3) {
-        Map<K,V> m = new HashMap<>(3); m.put(k1, v1); m.put(k2, v2); m.put(k3, v3);
-        return un(m);
-    }
-    /** Returns an unmodifiable Map containing all passed pairs (including null keys/values). */
-    public static <K,V> UnMap<K,V> unMap(K k1, V v1, K k2, V v2) {
-        Map<K,V> m = new HashMap<>(2); m.put(k1, v1); m.put(k2, v2);
-        return un(m);
-    }
-    /** Returns an unmodifiable Map containing all passed pairs (including null keys/values). */
-    public static <K,V> UnMap<K,V> unMap(K k1, V v1) {
-        Map<K,V> m = new HashMap<>(1); m.put(k1, v1); return un(m);
-    }
-
-    /** Returns an unmodifiable Map containing any non-null passed items. */
-    @SafeVarargs
-    public static <K,V> UnMap<K,V> unMapSkipNull(Map.Entry<K,V>... es) {
-        if (es == null) { return UnMap.empty(); }
-        Map<K,V> m = new HashMap<>();
-        for (Map.Entry<K,V> entry : es) {
-            if (entry != null) {
-                m.put(entry.getKey(), entry.getValue());
-            }
-        }
-        return un(m);
-    }
-
-    /** Returns an unmodifiable Set containing all passed items (including null items). */
-    @SuppressWarnings("unchecked")
-    @SafeVarargs
-    public static <T> UnSet<T> unSet(T... ts) {
-        return ( (ts == null) || (ts.length < 1) )
-                ? UnSet.empty()
-                : un(new HashSet<>(Arrays.asList(ts)));
-    }
-
-    /** Returns an unmodifiable Set containing any non-null passed items. */
-    @SuppressWarnings("unchecked")
-    @SafeVarargs
-    public static <T> UnSet<T> unSetSkipNull(T... ts) {
-        if ( (ts == null) || (ts.length < 1) ) {
-            return UnSet.empty();
-        }
-        Set<T> s = new HashSet<>();
-        for (T t : ts) {
-            if (t != null) {
-                s.add(t);
-            }
-        }
-        return (s.size() > 0) ? un(s) : UnSet.empty();
-    }
+//    /** Returns an unmodifiable Map containing all passed pairs (including null keys/values). */
+//    public static <K,V> UnMap<K,V> unMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5,
+//                                         K k6, V v6, K k7, V v7, K k8, V v8, K k9, V v9,
+//                                         K k10, V v10) {
+//        Map<K,V> m = new HashMap<>(20);
+//        m.put(k1, v1); m.put(k2, v2); m.put(k3, v3); m.put(k4, v4); m.put(k5, v5); m.put(k6, v6);
+//        m.put(k7, v7); m.put(k8, v8); m.put(k9, v9); m.put(k10, v10);
+//        return un(m);
+//    }
+//    /** Returns an unmodifiable Map containing all passed pairs (including null keys/values). */
+//    public static <K,V> UnMap<K,V> unMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5,
+//                                         K k6, V v6, K k7, V v7, K k8, V v8, K k9, V v9) {
+//        Map<K,V> m = new HashMap<>(9);
+//        m.put(k1, v1); m.put(k2, v2); m.put(k3, v3); m.put(k4, v4); m.put(k5, v5); m.put(k6, v6);
+//        m.put(k7, v7); m.put(k8, v8); m.put(k9, v9);
+//        return un(m);
+//    }
+//    /** Returns an unmodifiable Map containing all passed pairs (including null keys/values). */
+//    public static <K,V> UnMap<K,V> unMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5,
+//                                         K k6, V v6, K k7, V v7, K k8, V v8) {
+//        Map<K,V> m = new HashMap<>(8);
+//        m.put(k1, v1); m.put(k2, v2); m.put(k3, v3); m.put(k4, v4); m.put(k5, v5); m.put(k6, v6);
+//        m.put(k7, v7); m.put(k8, v8);
+//        return un(m);
+//    }
+//    /** Returns an unmodifiable Map containing all passed pairs (including null keys/values). */
+//    public static <K,V> UnMap<K,V> unMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5,
+//                                         K k6, V v6, K k7, V v7) {
+//        Map<K,V> m = new HashMap<>(7);
+//        m.put(k1, v1); m.put(k2, v2); m.put(k3, v3); m.put(k4, v4); m.put(k5, v5); m.put(k6, v6);
+//        m.put(k7, v7);
+//        return un(m);
+//    }
+//    /** Returns an unmodifiable Map containing all passed pairs (including null keys/values). */
+//    public static <K,V> UnMap<K,V> unMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5,
+//                                         K k6, V v6) {
+//        Map<K,V> m = new HashMap<>(6);
+//        m.put(k1, v1); m.put(k2, v2); m.put(k3, v3); m.put(k4, v4); m.put(k5, v5); m.put(k6, v6);
+//        return un(m);
+//    }
+//    /** Returns an unmodifiable Map containing all passed pairs (including null keys/values). */
+//    public static <K,V> UnMap<K,V> unMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
+//        Map<K,V> m = new HashMap<>(5);
+//        m.put(k1, v1); m.put(k2, v2); m.put(k3, v3); m.put(k4, v4); m.put(k5, v5);
+//        return un(m);
+//    }
+//    /** Returns an unmodifiable Map containing all passed pairs (including null keys/values). */
+//    public static <K,V> UnMap<K,V> unMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
+//        Map<K,V> m = new HashMap<>(4); m.put(k1, v1); m.put(k2, v2); m.put(k3, v3); m.put(k4, v4);
+//        return un(m);
+//    }
+//    /** Returns an unmodifiable Map containing all passed pairs (including null keys/values). */
+//    public static <K,V> UnMap<K,V> unMap(K k1, V v1, K k2, V v2, K k3, V v3) {
+//        Map<K,V> m = new HashMap<>(3); m.put(k1, v1); m.put(k2, v2); m.put(k3, v3);
+//        return un(m);
+//    }
+//    /** Returns an unmodifiable Map containing all passed pairs (including null keys/values). */
+//    public static <K,V> UnMap<K,V> unMap(K k1, V v1, K k2, V v2) {
+//        Map<K,V> m = new HashMap<>(2); m.put(k1, v1); m.put(k2, v2);
+//        return un(m);
+//    }
+//    /** Returns an unmodifiable Map containing all passed pairs (including null keys/values). */
+//    public static <K,V> UnMap<K,V> unMap(K k1, V v1) {
+//        Map<K,V> m = new HashMap<>(1); m.put(k1, v1); return un(m);
+//    }
+//
+//    /** Returns an unmodifiable Map containing any non-null passed items. */
+//    @SafeVarargs
+//    public static <K,V> UnMap<K,V> unMapSkipNull(Map.Entry<K,V>... es) {
+//        if (es == null) { return UnMap.empty(); }
+//        Map<K,V> m = new HashMap<>();
+//        for (Map.Entry<K,V> entry : es) {
+//            if (entry != null) {
+//                m.put(entry.getKey(), entry.getValue());
+//            }
+//        }
+//        return un(m);
+//    }
+//
+//    /** Returns an unmodifiable Set containing all passed items (including null items). */
+//    @SuppressWarnings("unchecked")
+//    @SafeVarargs
+//    public static <T> UnSet<T> unSet(T... ts) {
+//        return ( (ts == null) || (ts.length < 1) )
+//                ? UnSet.empty()
+//                : un(new HashSet<>(Arrays.asList(ts)));
+//    }
+//
+//    /** Returns an unmodifiable Set containing any non-null passed items. */
+//    @SuppressWarnings("unchecked")
+//    @SafeVarargs
+//    public static <T> UnSet<T> unSetSkipNull(T... ts) {
+//        if ( (ts == null) || (ts.length < 1) ) {
+//            return UnSet.empty();
+//        }
+//        Set<T> s = new HashSet<>();
+//        for (T t : ts) {
+//            if (t != null) {
+//                s.add(t);
+//            }
+//        }
+//        return (s.size() > 0) ? un(s) : UnSet.empty();
+//    }
 
 //    /**
 //     * Returns an int which is a unique and correct hash code for the objects passed.  This hashcode is recomputed on
