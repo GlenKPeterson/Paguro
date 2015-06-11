@@ -14,7 +14,6 @@
 
 package org.organicdesign.fp;
 
-import org.organicdesign.fp.collections.PersistentTreeSet;
 import org.organicdesign.fp.collections.UnCollection;
 import org.organicdesign.fp.collections.UnIterable;
 import org.organicdesign.fp.collections.UnIterator;
@@ -144,9 +143,9 @@ public class StaticImports {
 
     /** Returns an unmodifiable version of the given set. */
     public static <T> UnSetOrdered<T> un(SortedSet<T> set) {
-        if (set == null) { return PersistentTreeSet.empty(); }
+        if (set == null) { return UnSetOrdered.empty(); }
         if (set instanceof UnSetOrdered) { return (UnSetOrdered<T>) set; }
-        if (set.size() < 1) { return PersistentTreeSet.empty(); }
+        if (set.size() < 1) { return UnSetOrdered.empty(); }
         return new UnSetOrdered<T>() {
             @Override public Comparator<? super T> comparator() { return set.comparator(); }
             @Override public UnSetOrdered<T> subSet(T fromElement, T toElement) {

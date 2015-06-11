@@ -54,8 +54,13 @@ public class PersistentTreeMap<K,V> implements ImMapOrdered<K,V> {
      a withComparator() method will be added, or this will be removed.
      */
     @SuppressWarnings("unchecked")
-    public static <K, V> PersistentTreeMap<K,V> empty() {
+    public static <K extends Comparable<K>, V> PersistentTreeMap<K,V> empty() {
         return (PersistentTreeMap<K,V>) EMPTY;
+    }
+
+    /** Returns a new empty PersistentTreeMap that will use the specified comparator. */
+    public static <K,V> PersistentTreeMap<K,V> empty(Comparator<? super K> c) {
+        return new PersistentTreeMap<>(c, null, 0);
     }
 
     private PersistentTreeMap(Comparator<? super K> c, Node<K,V> t, int n) {
@@ -238,7 +243,7 @@ public class PersistentTreeMap<K,V> implements ImMapOrdered<K,V> {
     @SafeVarargs
     public static <K,V> PersistentTreeMap<K,V>
     ofCompSkipNull(Comparator<? super K> c, Map.Entry<K,V>... es) {
-        if (es == null) { return empty(); }
+        if (es == null) { return new PersistentTreeMap<>(c, null, 0); }
         PersistentTreeMap<K,V> map = new PersistentTreeMap<>(c, null, 0);
         for (Map.Entry<K,V> entry : es) {
             if (entry != null) {
@@ -246,11 +251,6 @@ public class PersistentTreeMap<K,V> implements ImMapOrdered<K,V> {
             }
         }
         return map;
-    }
-
-    /** Returns a new empty PersistentTreeMap that will use the specified comparator. */
-    public static <K,V> PersistentTreeMap<K,V> ofComp(Comparator<? super K> c) {
-        return new PersistentTreeMap<>(c, null, 0);
     }
 
     /**
@@ -356,7 +356,7 @@ public class PersistentTreeMap<K,V> implements ImMapOrdered<K,V> {
         // If no intersect, return empty. We aren't checking the toKey vs. the firstKey() because that's a single pass
         // through the iterator loop which is probably as cheap as checking here.
         if ( (diff == 0) || (compFromKeyLastKey > 0) )  {
-            return empty();
+            return new PersistentTreeMap<>(comp, null, 0);
         }
         // If map is entirely contained, just return it.
         if ( (comp.compare(fromKey, firstKey()) <= 0) &&
@@ -446,7 +446,7 @@ public class PersistentTreeMap<K,V> implements ImMapOrdered<K,V> {
         // If no intersect, return empty. We aren't checking the toKey vs. the firstKey() because that's a single pass
         // through the iterator loop which is probably as cheap as checking here.
         if (compFromKeyLastKey > 0) {
-            return empty();
+            return new PersistentTreeMap<>(comp, null, 0);
         }
         // If map is entirely contained, just return it.
         if (comp.compare(fromKey, firstKey()) <= 0) {
@@ -457,7 +457,7 @@ public class PersistentTreeMap<K,V> implements ImMapOrdered<K,V> {
             return ofComp(comp, last.getKey(), last.getValue());
         }
 
-        ImMapOrdered<K,V> ret = empty();
+        ImMapOrdered<K,V> ret = new PersistentTreeMap<>(comp, null, 0);
         UnIterator<UnEntry<K,V>> iter = this.iterator();
         while (iter.hasNext()) {
             UnEntry<K,V> next = iter.next();

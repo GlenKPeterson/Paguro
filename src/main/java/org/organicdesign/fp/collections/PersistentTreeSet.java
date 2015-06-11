@@ -35,7 +35,7 @@ public class PersistentTreeSet<E> implements ImSetOrdered<E> {
      a withComparator() method will be added, or this will be removed.
      */
     @SuppressWarnings("unchecked")
-    static public <T> PersistentTreeSet<T> empty() { return EMPTY; }
+    static public <T extends Comparable<T>> PersistentTreeSet<T> empty() { return EMPTY; }
 
     private final ImMapOrdered<E,?> impl;
 
@@ -62,13 +62,13 @@ public class PersistentTreeSet<E> implements ImSetOrdered<E> {
      there is no way to assign a comparator later on.
      */
     public static <T> PersistentTreeSet<T> ofComp(Comparator<? super T> comp) {
-        return new PersistentTreeSet<>(PersistentTreeMap.ofComp(comp));
+        return new PersistentTreeSet<>(PersistentTreeMap.empty(comp));
     }
 
     /** Returns a new PersistentTreeSet of the given comparator and items. */
     @SafeVarargs
     public static <T> PersistentTreeSet<T> ofComp(Comparator<? super T> comp, T... items) {
-        PersistentTreeSet<T> ret = new PersistentTreeSet<>(PersistentTreeMap.ofComp(comp));
+        PersistentTreeSet<T> ret = new PersistentTreeSet<>(PersistentTreeMap.empty(comp));
         if ( (items == null) || (items.length < 1) ) { return ret; }
         for (T item : items) {
             ret = ret.put(item);

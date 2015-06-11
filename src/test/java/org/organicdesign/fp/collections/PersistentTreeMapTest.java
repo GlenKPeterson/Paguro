@@ -237,7 +237,7 @@ public class PersistentTreeMapTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void subMapEx() {
-        PersistentTreeMap.empty().subMap(3, 2);
+        PersistentTreeMap.<Integer,Integer>empty().subMap(3, 2);
     }
 
     @Test public void subMap() {
@@ -318,7 +318,7 @@ public class PersistentTreeMapTest {
         assertEquals(PersistentTreeMap.of(1, "one").assoc(2, "two"),
                      m.without(3));
 
-        assertEquals(PersistentTreeMap.EMPTY, PersistentTreeMap.empty().without(4));
+        assertEquals(PersistentTreeMap.EMPTY, PersistentTreeMap.<Integer,String>empty().without(4));
     }
 
     @Test public void lastKey() {
@@ -657,7 +657,7 @@ public class PersistentTreeMapTest {
         int max = 0;
         Map<Integer,String> b = PersistentTreeMap.ofSkipNull();
         StaticImportsTest.mapHelper(b, max);
-        Map<Integer,String> c = PersistentTreeMap.ofComp(Function2.defaultComparator());
+        Map<Integer,String> c = PersistentTreeMap.empty(Function2.defaultComparator());
         assertEquals(b, c);
         assertEquals(c, b);
         assertEquals(b.hashCode(), c.hashCode());

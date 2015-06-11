@@ -216,7 +216,7 @@ public interface Transformable<T> extends Realizable<T> {
     /** {@inheritDoc} */
     @Override
     default <U,V> ImMapOrdered<U,V> toImMapOrdered(Comparator<? super U> comp, Function1<? super T,Map.Entry<U,V>> f1) {
-        return foldLeft((ImMapOrdered<U, V>) PersistentTreeMap.<U, V>ofComp(comp),
+        return foldLeft((ImMapOrdered<U, V>) PersistentTreeMap.<U, V>empty(comp),
                         (ts, t) -> ts.assoc(f1.apply(t)));
     }
 
