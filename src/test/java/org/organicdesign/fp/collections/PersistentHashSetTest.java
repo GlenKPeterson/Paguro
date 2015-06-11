@@ -1,7 +1,10 @@
 package org.organicdesign.fp.collections;
 
 import org.junit.Test;
+import org.organicdesign.fp.Option;
+import org.organicdesign.fp.permanent.Sequence;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -114,39 +117,10 @@ public class PersistentHashSetTest {
         for (String s : new String[] { "one", "two", "three", "four", "five" }) {
             // System.out.println("item.get(): " + s);
             u = u.put(s);
+            assertTrue(u.contains(s));
             // System.out.println("u: " + u.toString());
         }
         // System.out.println("Final u: " + u);
-
-
-//        PersistentHashSet<String> u = PersistentHashSet.empty();
-//        System.out.println("Initial u: " + u);
-//        for (String s : new String[] { "one", "two", "three", "four", "five" }) {
-//            System.out.println("item.get(): " + s);
-//            u = u.put(s);
-//            System.out.println("u: " + u);
-//        }
-//        System.out.println("Final u: " + u);
-
-
-//        Sequence<String> seq = Sequence.of("one", "two", "three", "four", "five");
-//        PersistentHashSet<String> u = PersistentHashSet.empty();
-//        System.out.println("Initial u: " + u);
-//        Function2<PersistentHashSet<String>,? super String,PersistentHashSet<String>> fun = (accum, t) -> accum.put(t);
-//        // System.out.println("seq: " + seq);
-//        // System.out.println("===>item: " + item);
-//        Option<String> item = seq.head();
-//        while (item.isSome()) {
-//            System.out.println("item.get(): " + item.get());
-//            // u = fun.apply(u, item.get());
-//            u = u.put(item.get());
-//            System.out.println("u: " + u);
-//            // repeat with next element
-//            seq = seq.tail();
-//            item = seq.head();
-//        }
-//        System.out.println("Final u: " + u);
-
     }
 
     @Test public void disjoin() {
@@ -168,6 +142,96 @@ public class PersistentHashSetTest {
         assertEquals(s2.hashCode(), s4.hashCode());
         assertTrue(s2.equals(s4));
         assertTrue(s4.equals(s2));
+    }
+
+    @Test public void seq3() {
+        PersistentHashSet<String> m1 = PersistentHashSet.of("c");
+        assertEquals(Option.of("c"),
+                     m1.seq().head());
+
+        PersistentHashSet<String> m2 = PersistentHashSet.of("c", "b", "a");
+
+        Set<Option<String>> s = new HashSet<>(Arrays.asList(Option.of("c"),
+                                                            Option.of("b"),
+                                                            Option.of("a")));
+
+        Sequence<String> seq = m2.seq();
+        Option o = seq.head();
+        assertTrue(s.contains(o));
+        s.remove(o);
+
+        seq = seq.tail();
+        o = seq.head();
+        assertTrue(s.contains(o));
+        s.remove(o);
+
+        seq = seq.tail();
+        o = seq.head();
+        assertTrue(s.contains(o));
+        s.remove(o);
+
+        seq = seq.tail();
+        o = seq.head();
+        assertEquals(Option.none(), o);
+    }
+
+    @Test public void seqMore() {
+        PersistentHashSet<String> m1 = PersistentHashSet.of("g", "f", "e", "d", "c", "b", "a");
+        // System.out.println("m1.toString(): " + m1.toString());
+
+        Set<String> s1 = new HashSet<>(Arrays.asList("a", "b", "c", "d", "e", "f", "g"));
+
+        // System.out.println("s1: " + s1);
+
+        Sequence<String> seq1 = m1.seq();
+        Option<String> o1 = seq1.head();
+        while (o1.isSome()) {
+            String entry = o1.get();
+            // System.out.println("entry: " + entry);
+            assertTrue(s1.contains(entry));
+            s1.remove(entry);
+            seq1 = seq1.tail();
+            o1 = seq1.head();
+        }
+        assertEquals(0, s1.size());
+        assertTrue(s1.isEmpty());
+    }
+
+    @Test public void longerSeq() {
+        // This is an assumed to work mutable set - the "control" for this test.
+        Set<Integer> set = new HashSet<>();
+        // This is the map being tested.
+        ImSet<Integer> accum = PersistentHashSet.empty();
+
+        int MAX = 1000;
+
+        for (int i = 0; i < MAX; i++) {
+            set.add(i);
+            accum = accum.put(i);
+
+            Option<Integer> o = accum.seq().head();
+            assertTrue(o.isSome());
+            //noinspection ConstantConditions
+            assertTrue(o.get() instanceof Integer);
+        }
+        for (int i = 0; i < MAX; i++) {
+            assertTrue(accum.contains(i));
+        }
+
+        Sequence<Integer> seq = accum.seq();
+        for (int i = 0; i < MAX; i++) {
+            Option<Integer> o = seq.head();
+
+            assertTrue(set.contains(o.get()));
+            set.remove(o.get());
+
+            seq = seq.tail();
+        }
+//        System.out.println("seq: " + seq);
+        assertFalse(seq.head().isSome());
+        assertTrue(set.isEmpty());
+
+//        println("accum: " + accum);
     }
 
 //    @Test public void ordering() {
@@ -251,55 +315,6 @@ public class PersistentHashSetTest {
         ss1.add("hello");
         equalsDistinctHashCode(s1, ss1, un(ss1),
                                PersistentHashSet.of("hello", "an", "work", "the"));
-
-//        // Really, you need to read the JavaDoc for PersistentHashSet.equals() to understand the bizarre notion of
-//        // equality being checked here.
-//        equalsDistinctHashCode(s1, ss1, un(ss1),
-//                               PersistentHashSet.ofComp(STR_LEN_COMP,
-//                                                        "helloz", "an", "work", "b", "the"));
-//
-//        PersistentHashSet<String> s2 = PersistentHashSet.ofComp(STR_LEN_COMP,
-//                                                                "hello", "an", "work", "b", "the");
-//
-//        // This illustrates the bug in java
-//        Set<String> ss = new HashSet<>();
-//        ss.add("the");
-//        ss.add("b");
-//        ss.add("work");
-//        ss.add("an");
-//        ss.add("hello");
-//
-//        Set<String> ss2 = new HashSet<>();
-//        ss2.add("the");
-//        ss2.add("b");
-//        ss2.add("work");
-//        ss2.add("an");
-//        ss2.add("Hello");
-//
-//        // Yeah, totally bizarre.  Doesn't care that the order is different.
-//        assertEquals(ss, ss2);
-//        assertEquals(ss2, ss);
-//
-//
-//        equalsDistinctHashCode(s2, ss, un(ss),
-//                               PersistentHashSet.ofComp(STR_LEN_COMP, "helloz", "an", "work", "the"));
-//
-////        assertEquals(s2, yadda);
-////        assertEquals(ss, yadda);
-////        assertEquals(un(ss), yadda);
-////
-////        assertNotEquals(yadda, s2);
-////        assertNotEquals(yadda, ss);
-////        assertNotEquals(yadda, un(ss));
-//
-//        equalsDistinctHashCode(s2, ss, un(ss),
-//                               PersistentHashSet.of("an", "helloz", "work", "b", "the"));
-//
-//        equalsSameHashCode(s2,
-//                           PersistentHashSet.ofComp(STR_LEN_COMP, "an", "hello", "work", "the").put("b"),
-//                           PersistentHashSet.ofComp(STR_LEN_COMP, "an", "b", "work").put("hello").put("the"),
-//                           PersistentHashSet.of("an", "hello", "work", "b", "the"));
-
     }
 
 //    // TODO: Finish this!

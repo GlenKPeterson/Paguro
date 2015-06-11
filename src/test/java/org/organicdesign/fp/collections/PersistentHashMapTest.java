@@ -156,7 +156,7 @@ public class PersistentHashMapTest {
         assertTrue(s2.isEmpty());
     }
 
-    // TODO: This is the root cause of issues.
+    // This is the root cause of issues.
     @Test public void seqMore2() {
         PersistentHashMap<String,String> s1 = PersistentHashMap.empty();
         s1 = s1.assoc("one", "one");
