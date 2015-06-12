@@ -20,8 +20,10 @@ public class EqualsContract {
      @param equiv1 First equivalent (but unique) object
      @param equiv2 Second equivalent (but unique) object (could be a different class)
      @param equiv3 Third equivalent (but unique) object (could be a different class)
-     @param different Non-equivalent object with a different hashCode (should be a compatible class)
-     @param <S> The super-class of all these objects - could be an interface that these should be equal within.
+     @param different Non-equivalent object with a (maybe) different hashCode (should be an otherwise compatible class)
+     @param requireDistinctHashes if true, require that the fourth object have a different hashCode.  Otherwise,
+                                  require that it have the same hashCode.
+     @param <S> The super-class of all these objects - an interface or super-class within which they should be equal.
      */
     public static <S, T1 extends S, T2 extends S, T3 extends S, T4 extends S>
     void equalsHashCode(T1 equiv1, T2 equiv2, T3 equiv3, T4 different, boolean requireDistinctHashes) {
