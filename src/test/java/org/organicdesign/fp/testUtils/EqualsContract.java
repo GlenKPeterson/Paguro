@@ -1,6 +1,6 @@
 package org.organicdesign.fp.testUtils;
 
-import org.organicdesign.fp.collections.UnList;
+import org.organicdesign.fp.collections.UnmodList;
 
 import java.util.Arrays;
 import java.util.List;
@@ -78,7 +78,7 @@ public class EqualsContract {
         };
 
         // Symmetric (effectively covers Transitive as well)
-        UnList.permutations(equivs, (a, b) -> {
+        UnmodList.permutations(equivs, (a, b) -> {
             assertEquals("Found an unequal hashCode while inspecting permutations: a=" + a + " b=" + b,
                          a.hashCode(), b.hashCode());
             assertTrue("Failed equals while inspecting permutations: a=" + a + " b=" + b,

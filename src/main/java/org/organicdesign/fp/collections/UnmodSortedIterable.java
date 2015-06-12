@@ -7,14 +7,14 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 
 /**
- An unmodifiable Iterable, with guaranteed order.  The signature of this interface is nearly identical to UnIterable,
+ An unmodifiable Iterable, with guaranteed order.  The signature of this interface is nearly identical to UnmodIterable,
  but implementing this interface represents a contract to always return iterators that have the same ordering.
  */
-public interface UnIterableOrdered<T> extends UnIterable<T> {
+public interface UnmodSortedIterable<T> extends UnmodIterable<T> {
     // ==================================================== Static ====================================================
 
     /** This is correct, but O(n).  This only works with an ordered iterable. */
-    static boolean equals(UnIterableOrdered a, UnIterableOrdered b) {
+    static boolean equals(UnmodSortedIterable a, UnmodSortedIterable b) {
         // Cheapest operation first...
         if (a == b) { return true; }
 
@@ -31,48 +31,48 @@ public interface UnIterableOrdered<T> extends UnIterable<T> {
         return !as.hasNext() && !bs.hasNext();
     }
 
-    //    static <E> UnIterableOrdered<E> cast(SortedSet<E> ss) {
-//        return () -> new UnIteratorOrdered<E>() {
+    //    static <E> UnmodSortedIterable<E> cast(SortedSet<E> ss) {
+//        return () -> new UnmodSortedIterator<E>() {
 //            Iterator<E> iter = ss.iterator();
 //            @Override public boolean hasNext() { return iter.hasNext(); }
 //            @Override public E next() { return iter.next(); }
 //        };
 //    }
 
-    static UnIterableOrdered cast(SortedSet ss) {
-        return () -> new UnIteratorOrdered() {
+    static UnmodSortedIterable cast(SortedSet ss) {
+        return () -> new UnmodSortedIterator() {
             Iterator iter = ss.iterator();
             @Override public boolean hasNext() { return iter.hasNext(); }
             @Override public Object next() { return iter.next(); }
         };
     }
 
-//    static <E> UnIterableOrdered<E> cast(List<E> ss) {
-//        return () -> new UnIteratorOrdered<E>() {
+//    static <E> UnmodSortedIterable<E> cast(List<E> ss) {
+//        return () -> new UnmodSortedIterator<E>() {
 //            Iterator<E> iter = ss.iterator();
 //            @Override public boolean hasNext() { return iter.hasNext(); }
 //            @Override public E next() { return iter.next(); }
 //        };
 //    }
 
-    static UnIterableOrdered cast(List ss) {
-        return () -> new UnIteratorOrdered() {
+    static UnmodSortedIterable cast(List ss) {
+        return () -> new UnmodSortedIterator() {
             Iterator iter = ss.iterator();
             @Override public boolean hasNext() { return iter.hasNext(); }
             @Override public Object next() { return iter.next(); }
         };
     }
 
-//    static <K,V> UnIterableOrdered<Map.Entry<K,V>> cast(SortedMap<K,V> sm) {
-//        return () -> new UnIteratorOrdered<Map.Entry<K,V>>() {
+//    static <K,V> UnmodSortedIterable<Map.Entry<K,V>> cast(SortedMap<K,V> sm) {
+//        return () -> new UnmodSortedIterator<Map.Entry<K,V>>() {
 //            Iterator<Map.Entry<K,V>> iter = sm.entrySet().iterator();
 //            @Override public boolean hasNext() { return iter.hasNext(); }
 //            @Override public Map.Entry<K,V> next() { return iter.next(); }
 //        };
 //    }
 
-    static UnIterableOrdered cast(SortedMap sm) {
-        return () -> new UnIteratorOrdered() {
+    static UnmodSortedIterable cast(SortedMap sm) {
+        return () -> new UnmodSortedIterator() {
             Iterator iter = sm.entrySet().iterator();
             @Override public boolean hasNext() { return iter.hasNext(); }
             @Override public Object next() { return iter.next(); }
@@ -81,5 +81,6 @@ public interface UnIterableOrdered<T> extends UnIterable<T> {
 
     // =================================================== Instance ===================================================
     /** Returns items in a guaranteed order. */
-    @Override UnIteratorOrdered<T> iterator();
+    @Override
+    UnmodSortedIterator<T> iterator();
 }

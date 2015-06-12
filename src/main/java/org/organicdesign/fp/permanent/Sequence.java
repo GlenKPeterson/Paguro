@@ -16,8 +16,8 @@ package org.organicdesign.fp.permanent;
 
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.Transformable;
-import org.organicdesign.fp.collections.UnIterableOrdered;
-import org.organicdesign.fp.collections.UnIteratorOrdered;
+import org.organicdesign.fp.collections.UnmodSortedIterable;
+import org.organicdesign.fp.collections.UnmodSortedIterator;
 import org.organicdesign.fp.function.Function1;
 import org.organicdesign.fp.function.Function2;
 import org.organicdesign.fp.tuple.Tuple2;
@@ -28,7 +28,7 @@ import org.organicdesign.fp.tuple.Tuple2;
  that fit in memory (because those that don't cannot be memoized/cached).
  @param <T>
  */
-public interface Sequence<T> extends Transformable<T>, UnIterableOrdered<T> {
+public interface Sequence<T> extends Transformable<T>, UnmodSortedIterable<T> {
     Sequence<?> EMPTY_SEQUENCE = new Sequence<Object>() {
         /** @return USED_UP */
         @Override public Option<Object> head() { return Option.none(); }
@@ -233,14 +233,14 @@ public interface Sequence<T> extends Transformable<T>, UnIterableOrdered<T> {
      @return an unsynchronized iterator
      */
     @Override
-    default UnIteratorOrdered<T> iterator() { return unIteratorOrdered(this); }
+    default UnmodSortedIterator<T> iterator() { return unIteratorOrdered(this); }
 
     /**
      This implementation is unsynchronized.
      @return an unsynchronized iterator
      */
-    static <T> UnIteratorOrdered<T> unIteratorOrdered(Sequence<T> seq) {
-        return new UnIteratorOrdered<T>() {
+    static <T> UnmodSortedIterator<T> unIteratorOrdered(Sequence<T> seq) {
+        return new UnmodSortedIterator<T>() {
             private Sequence<T> inner = seq;
 
             @Override public boolean hasNext() { return inner.head().isSome(); }
@@ -253,7 +253,7 @@ public interface Sequence<T> extends Transformable<T>, UnIterableOrdered<T> {
         };
     }
 
-    // Use these methods on UnIterable instead.
+    // Use these methods on UnmodIterable instead.
 //    // ==================================================== Static ====================================================
 //
 //    /** This is correct, but realizes the entire sequence (which may not terminate) and it's O(n) */
@@ -288,10 +288,10 @@ public interface Sequence<T> extends Transformable<T>, UnIterableOrdered<T> {
 //        return !oa.isSome() && !ob.isSome();
 //    }
 
-// Don't want this - call UnIterable.toString instead.
+// Don't want this - call UnmodIterable.toString instead.
 //    /** This is correct, but realizes some of the sequence, and it's O(n) */
 //    static String toString(Sequence seq) {
-//        return UnIterable.toString("Sequence", seq);
+//        return UnmodIterable.toString("Sequence", seq);
 //    }
 
 //    public class LazySequence<T> implements Sequence<T> {

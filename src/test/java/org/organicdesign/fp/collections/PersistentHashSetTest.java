@@ -2,6 +2,7 @@ package org.organicdesign.fp.collections;
 
 import org.junit.Test;
 import org.organicdesign.fp.Option;
+import org.organicdesign.fp.StaticImports;
 import org.organicdesign.fp.permanent.Sequence;
 
 import java.util.Arrays;
@@ -9,7 +10,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.Assert.*;
-import static org.organicdesign.fp.StaticImports.un;
 import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class PersistentHashSetTest {
@@ -91,7 +91,7 @@ public class PersistentHashSetTest {
         // System.out.println("Four: " + s1);
 
         // System.out.println("Four map:" + s1.impl);
-        // System.out.println("s1.seq().toJavaList()" + s1.seq().toJavaList());
+        // System.out.println("s1.seq().toMutableList()" + s1.seq().toMutableList());
 
         s1 = s1.put("five");
         assertEquals(5, s1.size());
@@ -313,7 +313,7 @@ public class PersistentHashSetTest {
         ss1.add("work");
         ss1.add("an");
         ss1.add("hello");
-        equalsDistinctHashCode(s1, ss1, un(ss1),
+        equalsDistinctHashCode(s1, ss1, StaticImports.unmod(ss1),
                                PersistentHashSet.of("hello", "an", "work", "the"));
     }
 

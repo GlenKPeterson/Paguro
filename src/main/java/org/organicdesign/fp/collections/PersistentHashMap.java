@@ -362,7 +362,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 //    }
 //
 //    /**
-//     Returns a view of the mappings contained in this map.  The set should actually contain UnMap.Entry items, but that
+//     Returns a view of the mappings contained in this map.  The set should actually contain UnmodMap.Entry items, but that
 //     return signature is illegal in Java, so you'll just have to remember.
 //     */
 //    @Override public ImSet<Entry<K,V>> entrySet() {
@@ -375,7 +375,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 //    }
 //
 //    /** Returns a view of the values contained in this map. */
-//    @Override public UnCollection<V> values() {
+//    @Override public UnmodCollection<V> values() {
 //        return seq().map(e -> e.getValue()).toUnSet();
 //    }
 
@@ -397,7 +397,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         return new TransientHashMap<>(this);
     }
 
-    @Override public Option<UnMap.UnEntry<K,V>> entry(K key) {
+    @Override public Option<UnmodMap.UnEntry<K,V>> entry(K key) {
         if (key == null) {
             return hasNull ? Option.of(Tuple2.of(null, nullValue)) : Option.none();
         }
@@ -472,9 +472,9 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         return true;
     }
 
-    @Override public int hashCode() { return UnIterable.hashCode(this); }
+    @Override public int hashCode() { return UnmodIterable.hashCode(this); }
 
-    @Override public UnIterator<UnMap.UnEntry<K,V>> iterator(){
+    @Override public UnmodIterator<UnEntry<K,V>> iterator(){
         return seq().iterator();
     }
 
@@ -510,17 +510,17 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 
     // TODO: This suppression isn't right.  s.prepend() should be totally happy.
     @SuppressWarnings("unchecked")
-    @Override public Sequence<UnMap.UnEntry<K,V>> seq() {
+    @Override public Sequence<UnmodMap.UnEntry<K,V>> seq() {
 //        System.out.println("root: " + root);
-        Sequence<UnMap.UnEntry<K,V>> s = root != null ? root.nodeSeq() : Sequence.emptySequence();
-        return hasNull ? s.prepend((UnMap.UnEntry<K,V>) Tuple2.of((K) null, nullValue)) : s;
+        Sequence<UnmodMap.UnEntry<K,V>> s = root != null ? root.nodeSeq() : Sequence.emptySequence();
+        return hasNull ? s.prepend((UnmodMap.UnEntry<K,V>) Tuple2.of((K) null, nullValue)) : s;
     }
 
     /** {@inheritDoc} */
     @Override public int size() { return count; }
 
     /** {@inheritDoc} */
-    @Override public String toString() { return UnIterable.toString("PersistentHashMap", this); }
+    @Override public String toString() { return UnmodIterable.toString("PersistentHashMap", this); }
 
     @SuppressWarnings("unchecked")
     @Override public PersistentHashMap<K,V> without(K key){
@@ -709,9 +709,9 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         @Override
         // TODO: This suppression isn't right.  s.prepend() should be totally happy.
         @SuppressWarnings("unchecked")
-        public Sequence<UnMap.UnEntry<K,V>> seq() {
-            Sequence<UnMap.UnEntry<K,V>> s = root != null ? root.nodeSeq() : Sequence.emptySequence();
-            return hasNull ? s.prepend((UnMap.UnEntry<K,V>) Tuple2.of((K) null, nullValue)) : s;
+        public Sequence<UnmodMap.UnEntry<K,V>> seq() {
+            Sequence<UnmodMap.UnEntry<K,V>> s = root != null ? root.nodeSeq() : Sequence.emptySequence();
+            return hasNull ? s.prepend((UnmodMap.UnEntry<K,V>) Tuple2.of((K) null, nullValue)) : s;
         }
 
        	@Override public final TransientHashMap<K,V> without(K key) {
@@ -749,7 +749,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 
         V findVal(int shift, int hash, K key, V notFound);
 
-        Sequence<UnMap.UnEntry<K,V>> nodeSeq();
+        Sequence<UnmodMap.UnEntry<K,V>> nodeSeq();
 
         INode<K,V> assoc(AtomicReference<Thread> edit, int shift, int hash, K key, V val, Box addedLeaf);
 
@@ -805,7 +805,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
                 return new ArrayNode<>(null, count, cloneAndSet(array, idx, n));
         }
 
-        @Override public UnMap.UnEntry<K,V> find(int shift, int hash, K key) {
+        @Override public UnmodMap.UnEntry<K,V> find(int shift, int hash, K key) {
             int idx = mask(hash, shift);
             INode<K,V> node = array[idx];
             if(node == null)
@@ -821,7 +821,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
             return node.findVal(shift + 5, hash, key, notFound);
         }
 
-        @Override public Sequence<UnMap.UnEntry<K,V>> nodeSeq(){ return Seq.create(array); }
+        @Override public Sequence<UnmodMap.UnEntry<K,V>> nodeSeq(){ return Seq.create(array); }
 
         @Override public <R> R kvreduce(Function3<R,K,V,R> f, R init){
             for(INode<K,V> node : array){
@@ -941,24 +941,24 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         }
 
         @Override public String toString() {
-            return UnIterable.toString("ArrayNode", this.nodeSeq());
+            return UnmodIterable.toString("ArrayNode", this.nodeSeq());
         }
 
-        static class Seq<K,V> implements Sequence<UnMap.UnEntry<K,V>> {
+        static class Seq<K,V> implements Sequence<UnmodMap.UnEntry<K,V>> {
             final INode<K,V>[] nodes;
             final int i;
-            final Sequence<UnMap.UnEntry<K,V>> s;
+            final Sequence<UnmodMap.UnEntry<K,V>> s;
 
-            static <K,V> Sequence<UnMap.UnEntry<K,V>> create(INode<K,V>[] nodes) {
+            static <K,V> Sequence<UnmodMap.UnEntry<K,V>> create(INode<K,V>[] nodes) {
                 return create(nodes, 0, null);
             }
 
-            private static <K,V> Sequence<UnMap.UnEntry<K,V>> create(INode<K,V>[] nodes, int i, Sequence<UnMap.UnEntry<K,V>> s) {
+            private static <K,V> Sequence<UnmodMap.UnEntry<K,V>> create(INode<K,V>[] nodes, int i, Sequence<UnmodMap.UnEntry<K,V>> s) {
                 if ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) ) { return new Seq<>(nodes, i, s); }
 
                 for(int j = i; j < nodes.length; j++) {
                     if (nodes[j] != null) {
-                        Sequence<UnMap.UnEntry<K,V>> ns = nodes[j].nodeSeq();
+                        Sequence<UnmodMap.UnEntry<K,V>> ns = nodes[j].nodeSeq();
                         if (ns != null) {
                             return new Seq<>(nodes, j + 1, ns);
                         }
@@ -967,20 +967,20 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
                 return Sequence.emptySequence();
             }
 
-            private Seq(INode<K,V>[] nodes, int i, Sequence<UnMap.UnEntry<K,V>> s) {
+            private Seq(INode<K,V>[] nodes, int i, Sequence<UnmodMap.UnEntry<K,V>> s) {
                 super();
                 this.nodes = nodes;
                 this.i = i;
                 this.s = s;
             }
 
-            @Override public Option<UnMap.UnEntry<K,V>> head() {
+            @Override public Option<UnmodMap.UnEntry<K,V>> head() {
                 return ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) )
                        ? s.head()
                        : Option.none();
             }
 
-            @Override public Sequence<UnMap.UnEntry<K,V>> tail() {
+            @Override public Sequence<UnmodMap.UnEntry<K,V>> tail() {
                 if ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) ) {
                     return create(nodes, i, s.tail());
                 }
@@ -1117,7 +1117,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
             return notFound;
         }
 
-        @Override public Sequence<UnMap.UnEntry<K,V>> nodeSeq() { return NodeSeq.create(array); }
+        @Override public Sequence<UnmodMap.UnEntry<K,V>> nodeSeq() { return NodeSeq.create(array); }
 
         @Override public <R> R kvreduce(Function3<R,K,V,R> f, R init){
             return NodeSeq.kvreduce(array,f,init);
@@ -1292,12 +1292,12 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         }
 
         @SuppressWarnings("unchecked")
-        @Override public UnMap.UnEntry<K,V> find(int shift, int hash, Object key){
+        @Override public UnmodMap.UnEntry<K,V> find(int shift, int hash, Object key){
             int idx = findIndex(key);
             if(idx < 0)
                 return null;
             if(Objects.equals(key, array[idx]))
-                return (UnMap.UnEntry<K,V>) Tuple2.of(array[idx], array[idx + 1]);
+                return (UnmodMap.UnEntry<K,V>) Tuple2.of(array[idx], array[idx + 1]);
             return null;
         }
 
@@ -1312,7 +1312,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
             return notFound;
         }
 
-        @Override public Sequence<UnMap.UnEntry<K,V>> nodeSeq() { return NodeSeq.create(array); }
+        @Override public Sequence<UnmodMap.UnEntry<K,V>> nodeSeq() { return NodeSeq.create(array); }
 
         @Override public <R> R kvreduce(Function3<R,K,V,R> f, R init){
             return NodeSeq.kvreduce(array,f,init);
@@ -1544,16 +1544,16 @@ public static void main(String[] args){
         return 1 << mask(hash, shift);
     }
 
-    static final class NodeSeq<K,V> implements Sequence<UnMap.UnEntry<K,V>> {
+    static final class NodeSeq<K,V> implements Sequence<UnmodMap.UnEntry<K,V>> {
         private final Object[] array;
         private final int i;
-        private final Sequence<UnMap.UnEntry<K,V>> s;
+        private final Sequence<UnmodMap.UnEntry<K,V>> s;
 
 //        NodeSeq(Object[] array, int i) {
 //            this(null, array, i, null);
 //        }
 
-        static <K,V> Sequence<UnMap.UnEntry<K,V>> create(Object[] array) {
+        static <K,V> Sequence<UnmodMap.UnEntry<K,V>> create(Object[] array) {
             return create(array, 0, null);
         }
 
@@ -1573,7 +1573,7 @@ public static void main(String[] args){
             return init;
         }
 
-        private static <K,V> Sequence<UnMap.UnEntry<K,V>> create(Object[] array, int i, Sequence<UnMap.UnEntry<K,V>> s) {
+        private static <K,V> Sequence<UnmodMap.UnEntry<K,V>> create(Object[] array, int i, Sequence<UnmodMap.UnEntry<K,V>> s) {
             if ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) ) { return new NodeSeq<>(array, i, s); }
 
             for (int j = i; j < array.length; j += 2) {
@@ -1581,7 +1581,7 @@ public static void main(String[] args){
 
                 INode<K,V> node = iNode(array, j + 1);
                 if (node != null) {
-                    Sequence<UnMap.UnEntry<K,V>> nodeSeq = node.nodeSeq();
+                    Sequence<UnmodMap.UnEntry<K,V>> nodeSeq = node.nodeSeq();
 
                     if (nodeSeq != null) { return new NodeSeq<>(array, j + 2, nodeSeq); }
                 }
@@ -1589,20 +1589,20 @@ public static void main(String[] args){
             return Sequence.emptySequence();
         }
 
-        private NodeSeq(Object[] array, int i, Sequence<UnMap.UnEntry<K,V>> s) {
+        private NodeSeq(Object[] array, int i, Sequence<UnmodMap.UnEntry<K,V>> s) {
             super();
             this.array = array;
             this.i = i;
             this.s = s;
         }
 
-        @Override public Option<UnMap.UnEntry<K,V>> head() {
+        @Override public Option<UnmodMap.UnEntry<K,V>> head() {
             return ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) ) ? s.head() :
                    i < array.length - 1 ? Option.of(Tuple2.of(k(array, i), v(array, i+1))) :
                    Option.none();
         }
 
-        @Override public Sequence<UnMap.UnEntry<K,V>> tail() {
+        @Override public Sequence<UnmodMap.UnEntry<K,V>> tail() {
             if ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) ) {
                 return create(array, i, s.tail());
             }
@@ -1636,7 +1636,7 @@ public static void main(String[] args){
 //        }
 //
 //        @SuppressWarnings("unchecked")
-//        static <K,V> Sequence<UnMap.UnEntry<K,V>> create(Object[] array, int startIdx, Sequence<UnMap.UnEntry<K,V>> s) {
+//        static <K,V> Sequence<UnmodMap.UnEntry<K,V>> create(Object[] array, int startIdx, Sequence<UnmodMap.UnEntry<K,V>> s) {
 //            if (startIdx < 0) { throw new IllegalArgumentException("Start index must be >= 0"); }
 //            if ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) ) {
 //                return s.concat(create(array, startIdx, null));
@@ -1647,13 +1647,13 @@ public static void main(String[] args){
 //            return new NodeSeq<>(startIdx, array);
 //        }
 //
-//        static <K,V> Sequence<UnMap.UnEntry<K,V>> create(Object[] array) { return create(array, 0, null); }
+//        static <K,V> Sequence<UnmodMap.UnEntry<K,V>> create(Object[] array) { return create(array, 0, null); }
 //
-//        @Override public Option<UnMap.UnEntry<K,V>> head() { return laz.get()._1(); }
+//        @Override public Option<UnmodMap.UnEntry<K,V>> head() { return laz.get()._1(); }
 //
-//        @Override public Sequence<UnMap.UnEntry<K,V>> tail() { return laz.get()._2(); }
+//        @Override public Sequence<UnmodMap.UnEntry<K,V>> tail() { return laz.get()._2(); }
 //
-        @Override public String toString() { return UnIterable.toString("NodeSeq", this); }
+        @Override public String toString() { return UnmodIterable.toString("NodeSeq", this); }
 
     } // end class NodeSeq
 }

@@ -3,14 +3,14 @@ package org.organicdesign.fp.collections;
 import java.util.NoSuchElementException;
 
 /** This represents an iterator with a guaranteed ordering. */
-public interface UnIteratorOrdered<E> extends UnIterator<E> {
+public interface UnmodSortedIterator<E> extends UnmodIterator<E> {
     // ==================================================== Static ====================================================
-    UnIteratorOrdered<Object> EMPTY = new UnIteratorOrdered<Object>() {
+    UnmodSortedIterator<Object> EMPTY = new UnmodSortedIterator<Object>() {
         @Override public boolean hasNext() { return false; }
         @Override public Object next() { throw new NoSuchElementException(); }
     };
     @SuppressWarnings("unchecked")
-    static <T> UnIteratorOrdered<T> empty() { return (UnIteratorOrdered<T>) EMPTY; }
+    static <T> UnmodSortedIterator<T> empty() { return (UnmodSortedIterator<T>) EMPTY; }
 
     // =================================================== Instance ===================================================
 }

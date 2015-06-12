@@ -22,15 +22,15 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /** An unmodifiable map */
-public interface UnMap<K,V> extends Map<K,V>, UnIterable<UnMap.UnEntry<K,V>> {
+public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<K,V>> {
     // ==================================================== Static ====================================================
     /**
-     * A map entry (key-value pair).  The <tt>UnMap.entrySet</tt> method returns
+     * A map entry (key-value pair).  The <tt>UnmodMap.entrySet</tt> method returns
      * a collection-view of the map, whose elements are of this class.  The
      * <i>only</i> way to obtain a reference to a map entry is from the
      * iterator of this collection-view.
      *
-     * @see UnMap#entrySet()
+     * @see UnmodMap#entrySet()
      */
     interface UnEntry<K,V> extends Map.Entry<K,V> {
         /** Not allowed - this is supposed to be unmodifiable */
@@ -43,17 +43,17 @@ public interface UnMap<K,V> extends Map<K,V>, UnIterable<UnMap.UnEntry<K,V>> {
             return Tuple2.of(entry.getKey(), entry.getValue());
         }
 
-        static <K,V> UnIterator<UnEntry<K,V>> wrap(Iterator<Entry<K,V>> innerIter) {
-            return new UnIterator<UnEntry<K, V>>() {
+        static <K,V> UnmodIterator<UnEntry<K,V>> wrap(Iterator<Entry<K,V>> innerIter) {
+            return new UnmodIterator<UnEntry<K, V>>() {
                 @Override public boolean hasNext() { return innerIter.hasNext(); }
-                @Override public UnEntry<K, V> next() { return UnMap.UnEntry.wrap(innerIter.next()); }
+                @Override public UnEntry<K, V> next() { return UnmodMap.UnEntry.wrap(innerIter.next()); }
             };
         }
 
-        static <K,V> UnIteratorOrdered<UnEntry<K,V>> wrap(UnIteratorOrdered<Map.Entry<K,V>> innerIter) {
-            return new UnIteratorOrdered<UnEntry<K, V>>() {
+        static <K,V> UnmodSortedIterator<UnEntry<K,V>> wrap(UnmodSortedIterator<Entry<K,V>> innerIter) {
+            return new UnmodSortedIterator<UnEntry<K, V>>() {
                 @Override public boolean hasNext() { return innerIter.hasNext(); }
-                @Override public UnEntry<K, V> next() { return UnMap.UnEntry.wrap(innerIter.next()); }
+                @Override public UnEntry<K, V> next() { return UnmodMap.UnEntry.wrap(innerIter.next()); }
             };
         }
 
@@ -89,19 +89,19 @@ public interface UnMap<K,V> extends Map<K,V>, UnIterable<UnMap.UnEntry<K,V>> {
 //        };
     }
 
-    UnMap<Object,Object> EMPTY = new UnMap<Object,Object>() {
-        @Override public UnSet<Map.Entry<Object,Object>> entrySet() { return UnSet.empty(); }
-        @Override public UnSet<Object> keySet() { return UnSet.empty(); }
-        @Override public UnCollection<Object> values() { return UnSet.empty(); }
+    UnmodMap<Object,Object> EMPTY = new UnmodMap<Object,Object>() {
+        @Override public UnmodSet<Entry<Object,Object>> entrySet() { return UnmodSet.empty(); }
+        @Override public UnmodSet<Object> keySet() { return UnmodSet.empty(); }
+        @Override public UnmodCollection<Object> values() { return UnmodSet.empty(); }
         @Override public int size() { return 0; }
         @Override public boolean isEmpty() { return true; }
-        @Override public UnIterator<UnEntry<Object,Object>> iterator() { return UnIterator.empty(); }
+        @Override public UnmodIterator<UnEntry<Object,Object>> iterator() { return UnmodIterator.empty(); }
         @Override public boolean containsKey(Object key) { return false; }
         @Override public boolean containsValue(Object value) { return false; }
         @Override public Object get(Object key) { return null; }
     };
     @SuppressWarnings("unchecked")
-    static <T,U> UnMap<T,U> empty() { return (UnMap<T,U>) EMPTY; }
+    static <T,U> UnmodMap<T,U> empty() { return (UnmodMap<T,U>) EMPTY; }
 
     // =================================================== Instance ===================================================
 
@@ -138,9 +138,10 @@ public interface UnMap<K,V> extends Map<K,V>, UnIterable<UnMap.UnEntry<K,V>> {
     }
 
     /**
-     * Returns a view of the mappings contained in this map.  The set should actually contain UnMap.Entry items, but
+     * Returns a view of the mappings contained in this map.  The set should actually contain UnmodMap.Entry items, but
      * that return signature is illegal in Java, so you'll just have to remember. */
-    @Override UnSet<Map.Entry<K,V>> entrySet();
+    @Override
+    UnmodSet<Entry<K,V>> entrySet();
 
 // boolean	equals(Object o)
 
@@ -174,7 +175,8 @@ public interface UnMap<K,V> extends Map<K,V>, UnIterable<UnMap.UnEntry<K,V>> {
     @Override default boolean isEmpty() { return size() == 0; }
 
     /** Returns a view of the keys contained in this map. */
-    @Override UnSet<K> keySet();
+    @Override
+    UnmodSet<K> keySet();
 
     /** Not allowed - this is supposed to be unmodifiable */
     @Override @Deprecated default V merge(K key, V value, BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
@@ -216,5 +218,6 @@ public interface UnMap<K,V> extends Map<K,V>, UnIterable<UnMap.UnEntry<K,V>> {
 // int	size()
 
     /** Returns a view of the values contained in this map. */
-    @Override UnCollection<V> values();
+    @Override
+    UnmodCollection<V> values();
 }

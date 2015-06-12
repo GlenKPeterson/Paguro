@@ -4,14 +4,14 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /** An unmodifiable iterator.  Order is not guaranteed. */
-public interface UnIterator<E> extends Iterator<E> {
+public interface UnmodIterator<E> extends Iterator<E> {
     // ==================================================== Static ====================================================
-    UnIterator<Object> EMPTY = new UnIterator<Object>() {
+    UnmodIterator<Object> EMPTY = new UnmodIterator<Object>() {
         @Override public boolean hasNext() { return false; }
         @Override public Object next() { throw new NoSuchElementException(); }
     };
     @SuppressWarnings("unchecked")
-    static <T> UnIterator<T> empty() { return (UnIterator<T>) EMPTY; }
+    static <T> UnmodIterator<T> empty() { return (UnmodIterator<T>) EMPTY; }
 
     // =================================================== Instance ===================================================
 //default void forEachRemaining(Consumer<? super E> action)

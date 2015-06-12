@@ -24,7 +24,7 @@ import java.util.function.Predicate;
  *
  * {@inheritDoc}
  */
-public interface UnCollection<E> extends Collection<E>, UnIterable<E> {
+public interface UnmodCollection<E> extends Collection<E>, UnmodIterable<E> {
 
     // Methods are listed in the same order as the javadocs.
 
@@ -64,7 +64,8 @@ public interface UnCollection<E> extends Collection<E>, UnIterable<E> {
     @Override default boolean isEmpty() { return size() == 0; }
 
     /** An unmodifiable iterator {@inheritDoc} */
-    @Override UnIterator<E> iterator();
+    @Override
+    UnmodIterator<E> iterator();
 
 //default Stream<E> parallelStream()
 
@@ -182,13 +183,13 @@ public interface UnCollection<E> extends Collection<E>, UnIterable<E> {
         return as;
     }
 
-    static UnCollection<Object> EMPTY = new UnCollection<Object>() {
+    static UnmodCollection<Object> EMPTY = new UnmodCollection<Object>() {
         @Override public boolean contains(Object o) { return false; }
         @Override public int size() { return 0; }
         @Override public boolean isEmpty() { return true; }
-        @Override public UnIterator<Object> iterator() { return UnIterator.empty(); }
+        @Override public UnmodIterator<Object> iterator() { return UnmodIterator.empty(); }
     };
     @SuppressWarnings("unchecked")
-    static <T> UnCollection<T> empty() { return (UnCollection<T>) EMPTY; }
+    static <T> UnmodCollection<T> empty() { return (UnmodCollection<T>) EMPTY; }
 
 }

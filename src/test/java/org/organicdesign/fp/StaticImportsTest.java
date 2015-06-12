@@ -15,12 +15,12 @@
 package org.organicdesign.fp;
 
 import org.junit.Test;
-import org.organicdesign.fp.collections.UnCollection;
-import org.organicdesign.fp.collections.UnListIterator;
-import org.organicdesign.fp.collections.UnMap;
-import org.organicdesign.fp.collections.UnMapOrdered;
-import org.organicdesign.fp.collections.UnSet;
-import org.organicdesign.fp.collections.UnSetOrdered;
+import org.organicdesign.fp.collections.UnmodCollection;
+import org.organicdesign.fp.collections.UnmodListIterator;
+import org.organicdesign.fp.collections.UnmodMap;
+import org.organicdesign.fp.collections.UnmodSortedMap;
+import org.organicdesign.fp.collections.UnmodSet;
+import org.organicdesign.fp.collections.UnmodSortedSet;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import static org.junit.Assert.*;
-import static org.organicdesign.fp.StaticImports.un;
+import static org.organicdesign.fp.StaticImports.unmod;
 import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class StaticImportsTest {
@@ -162,7 +162,7 @@ public class StaticImportsTest {
 //
 //        // Little extra here for equals.  I'm really not sure what to do about this, but we should know when it breaks
 //        // so we can make a good decision at that time.
-//        // There is an implementation of equals and hashCode commented out in UnMap.
+//        // There is an implementation of equals and hashCode commented out in UnmodMap.
 //        Map<Integer,String> c = new HashMap<>();
 //        c.put(1, "One");
 //        c.put(2, "Two");
@@ -246,13 +246,13 @@ public class StaticImportsTest {
 //        mapHelperEven(unMapSkipNull(null, null, null, null, null, null, null, null), max);
 //    }
 //    @Test public void testUnMap0() {
-//        Map<Integer,String> a = UnMap.empty();
+//        Map<Integer,String> a = UnmodMap.empty();
 //        int max = 0;
 //        mapHelper(a, max);
 //    }
 //
 //    @Test public void testUnSet3() {
-//        UnSet<Integer> a = unSet(1, 2, 3);
+//        UnmodSet<Integer> a = unSet(1, 2, 3);
 //        assertEquals(3, a.size());
 //
 //        Set<Integer> b = new HashSet<>();
@@ -264,21 +264,21 @@ public class StaticImportsTest {
 //        assertEquals(b, a);
 //        assertEquals(a.hashCode(), b.hashCode());
 //
-//        UnSet<Integer> c = unSetSkipNull(null, 1, null, 2, null, 3);
+//        UnmodSet<Integer> c = unSetSkipNull(null, 1, null, 2, null, 3);
 //        assertEquals(c, a);
 //        assertEquals(a, c);
 //        assertEquals(c, b);
 //        assertEquals(b, c);
 //        assertEquals(a.hashCode(), c.hashCode());
 //
-//        assertEquals(UnSet.empty(), unSet());
+//        assertEquals(UnmodSet.empty(), unSet());
 //
-//        assertEquals(UnSet.empty(), unSetSkipNull(null, null));
-//        assertEquals(UnSet.empty(), unSetSkipNull());
+//        assertEquals(UnmodSet.empty(), unSetSkipNull(null, null));
+//        assertEquals(UnmodSet.empty(), unSetSkipNull());
 //    }
 
     @Test public void unListIterator() {
-        UnListIterator<Integer> uli = un(Arrays.asList(5, 4, 3).listIterator());
+        UnmodListIterator<Integer> uli = StaticImports.unmod(Arrays.asList(5, 4, 3).listIterator());
         assertFalse(uli.hasPrevious());
         assertTrue(uli.hasNext());
 
@@ -323,29 +323,29 @@ public class StaticImportsTest {
     }
 
     @Test public void unListTest() {
-        equalsDistinctHashCode(un(Arrays.asList(3, 4, 5)),
-                               un(new ArrayList<>(Arrays.asList(3, 4, 5))),
+        equalsDistinctHashCode(StaticImports.unmod(Arrays.asList(3, 4, 5)),
+                               StaticImports.unmod(new ArrayList<>(Arrays.asList(3, 4, 5))),
                                new LinkedList<>(Arrays.asList(3, 4, 5)),
                                new ArrayList<>(Arrays.asList(4, 5, 3)));
     }
 
     @Test public void unSetTest() {
-        UnSet<Integer> s = un(new HashSet<>(Arrays.asList(5, 4, 3)));
+        UnmodSet<Integer> s = StaticImports.unmod(new HashSet<>(Arrays.asList(5, 4, 3)));
 
         assertTrue(s.contains(3));
         assertFalse(s.contains(-1));
         assertFalse(s.isEmpty());
-        assertTrue(un(Collections.emptySet()).isEmpty());
+        assertTrue(StaticImports.unmod(Collections.emptySet()).isEmpty());
 
         equalsDistinctHashCode(s,
-                               un(new HashSet<>(Arrays.asList(3, 4, 5))),
+                               StaticImports.unmod(new HashSet<>(Arrays.asList(3, 4, 5))),
                                new HashSet<>(Arrays.asList(4, 3, 5)),
-                               un(new HashSet<>(Arrays.asList(4, 5, 6)))
+                               StaticImports.unmod(new HashSet<>(Arrays.asList(4, 5, 6)))
         );
     }
 
     @Test public void unSetSorted() {
-        UnSetOrdered<Integer> ts = un(new TreeSet<>(Arrays.asList(5, 4, 3)));
+        UnmodSortedSet<Integer> ts = StaticImports.unmod(new TreeSet<>(Arrays.asList(5, 4, 3)));
         assertNull(ts.comparator());
         // headSet is exclusive.
         assertTrue(ts.headSet(4).contains(3));
@@ -373,23 +373,23 @@ public class StaticImportsTest {
 
         assertFalse(ts.isEmpty());
 
-        assertEquals(ts.hashCode(), un(new TreeSet<>(Arrays.asList(5, 4, 3))).hashCode());
-        assertEquals(ts, un(new TreeSet<>(Arrays.asList(5, 4, 3))));
+        assertEquals(ts.hashCode(), StaticImports.unmod(new TreeSet<>(Arrays.asList(5, 4, 3))).hashCode());
+        assertEquals(ts, StaticImports.unmod(new TreeSet<>(Arrays.asList(5, 4, 3))));
 
-        equalsDistinctHashCode(un(new TreeSet<>(Arrays.asList(5, 4, 3))),
-                               un(new TreeSet<>(Arrays.asList(3, 4, 5))),
+        equalsDistinctHashCode(StaticImports.unmod(new TreeSet<>(Arrays.asList(5, 4, 3))),
+                               StaticImports.unmod(new TreeSet<>(Arrays.asList(3, 4, 5))),
                                new TreeSet<>(Arrays.asList(4, 3, 5)),
-                               un(new TreeSet<>(Arrays.asList(4, 5, 6)))
+                               StaticImports.unmod(new TreeSet<>(Arrays.asList(4, 5, 6)))
         );
     }
 
     @Test public void unMapTest() {
-        final UnMap<Integer,String> ts;
+        final UnmodMap<Integer,String> ts;
         Map<Integer,String> sm = new HashMap<>();
         sm.put(5, "five");
         sm.put(4, "four");
         sm.put(3, "three");
-        ts = un(sm);
+        ts = StaticImports.unmod(sm);
 
         assertEquals(3, ts.size());
         assertFalse(ts.isEmpty());
@@ -408,22 +408,22 @@ public class StaticImportsTest {
 
         assertFalse(ts.isEmpty());
 
-        final UnMap<Integer,String> m2;
+        final UnmodMap<Integer,String> m2;
         {
             Map<Integer,String> sm2 = new HashMap<>();
             sm2.put(3, "three");
             sm2.put(4, "four");
             sm2.put(5, "five");
-            m2 = un(sm2);
+            m2 = StaticImports.unmod(sm2);
         }
 
-        final UnMap<Integer,String> m3;
+        final UnmodMap<Integer,String> m3;
         {
             Map<Integer,String> sm3 = new HashMap<>();
             sm3.put(4, "four");
             sm3.put(5, "five");
             sm3.put(6, "six");
-            m3 = un(sm3);
+            m3 = StaticImports.unmod(sm3);
         }
 
         equalsDistinctHashCode(ts, m2, sm, m3);
@@ -451,12 +451,12 @@ public class StaticImportsTest {
     }
 
     @Test public void unMapSorted() {
-        final UnMapOrdered<Integer,String> ts;
+        final UnmodSortedMap<Integer,String> ts;
         SortedMap<Integer,String> sm = new TreeMap<>();
         sm.put(5, "five");
         sm.put(4, "four");
         sm.put(3, "three");
-        ts = un(sm);
+        ts = StaticImports.unmod(sm);
 
         assertEquals(3, ts.size());
         assertFalse(ts.isEmpty());
@@ -502,22 +502,22 @@ public class StaticImportsTest {
 
         assertFalse(ts.isEmpty());
 
-        final UnMapOrdered<Integer,String> m2;
+        final UnmodSortedMap<Integer,String> m2;
         {
             SortedMap<Integer,String> sm2 = new TreeMap<>();
             sm2.put(3, "three");
             sm2.put(4, "four");
             sm2.put(5, "five");
-            m2 = un(sm2);
+            m2 = StaticImports.unmod(sm2);
         }
 
-        final UnMapOrdered<Integer,String> m3;
+        final UnmodSortedMap<Integer,String> m3;
         {
             SortedMap<Integer,String> sm3 = new TreeMap<>();
             sm3.put(4, "four");
             sm3.put(5, "five");
             sm3.put(6, "six");
-            m3 = un(sm3);
+            m3 = StaticImports.unmod(sm3);
         }
 
         equalsDistinctHashCode(ts, m2, sm, m3);
@@ -544,20 +544,20 @@ public class StaticImportsTest {
                                new ArrayList<>(sm.values()), new ArrayList<>(m3.values()));
 
         // Looks like this has the same issue as TreeSet.
-//        final UnMap<Integer,String> m4;
+//        final UnmodMap<Integer,String> m4;
 //        {
 //            // This is a reverse integer comparator.
 //            SortedMap<Integer,String> sm2 = new TreeMap<>((a, b) -> b - a);
 //            sm2.put(3, "three");
 //            sm2.put(4, "four");
 //            sm2.put(5, "five");
-//            m4 = un(sm2);
+//            m4 = unmod(sm2);
 //        }
 //
-//        System.out.println(UnIterable.toString("ts", ts));
-//        System.out.println(UnIterable.toString("m2", m2));
-//        System.out.println(UnIterable.toString("sm", sm.entrySet()));
-//        System.out.println(UnIterable.toString("m4", m4));
+//        System.out.println(UnmodIterable.toString("ts", ts));
+//        System.out.println(UnmodIterable.toString("m2", m2));
+//        System.out.println(UnmodIterable.toString("sm", sm.entrySet()));
+//        System.out.println(UnmodIterable.toString("m4", m4));
 //
 //        // These will have the same hashcodes, but different comparators.
 //        equalsHashCode(ts, m2, sm, m4);
@@ -565,7 +565,7 @@ public class StaticImportsTest {
 
     @Test public void unCollection() {
         ArrayDeque<Integer> ad = new ArrayDeque<>(Arrays.asList(1, 2, 3));
-        UnCollection<Integer> a = un(new ArrayDeque<>(Arrays.asList(1, 2, 3)));
+        UnmodCollection<Integer> a = unmod(new ArrayDeque<>(Arrays.asList(1, 2, 3)));
         assertEquals(3, a.size());
         assertTrue(a.contains(2));
         assertFalse(a.isEmpty());
@@ -574,7 +574,7 @@ public class StaticImportsTest {
         assertTrue(a.contains(2));
         assertFalse(a.isEmpty());
 
-//        UnCollection<Integer> b = un(new ArrayDeque<>(Arrays.asList(1, 2, 3)));
+//        UnmodCollection<Integer> b = unmod(new ArrayDeque<>(Arrays.asList(1, 2, 3)));
 //        assertEquals(a.hashCode(), b.hashCode());
 //        assertEquals(a, b);
 //        assertTrue(a.equals(b));

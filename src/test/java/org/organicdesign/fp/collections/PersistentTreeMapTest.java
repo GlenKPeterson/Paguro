@@ -17,6 +17,7 @@ package org.organicdesign.fp.collections;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.organicdesign.fp.StaticImports;
 import org.organicdesign.fp.StaticImportsTest;
 import org.organicdesign.fp.function.Function2;
 import org.organicdesign.fp.permanent.Sequence;
@@ -28,7 +29,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import static org.junit.Assert.*;
-import static org.organicdesign.fp.StaticImports.un;
+import static org.organicdesign.fp.StaticImports.unmod;
 import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
 import static org.organicdesign.fp.testUtils.EqualsContract.equalsSameHashCode;
 
@@ -104,7 +105,7 @@ public class PersistentTreeMapTest {
 
 
         {
-            UnIterator<Integer> iter = PersistentTreeMap.of("b", 2)
+            UnmodIterator<Integer> iter = PersistentTreeMap.of("b", 2)
                     .assoc("c", 1)
                     .assoc("a", 3)
                     .map(e -> e.getValue()).iterator();
@@ -124,8 +125,8 @@ public class PersistentTreeMapTest {
         PersistentTreeMap<String,Integer> m2 = PersistentTreeMap.of("c", 3)
                         .assoc("b", 2)
                         .assoc("a", 1);
-        UnIterator<UnMap.UnEntry<String,Integer>> iter = m2.iterator();
-        UnMap.UnEntry<String,Integer> next = iter.next();
+        UnmodIterator<UnmodMap.UnEntry<String,Integer>> iter = m2.iterator();
+        UnmodMap.UnEntry<String,Integer> next = iter.next();
         assertEquals("a", next.getKey());
         assertEquals(Integer.valueOf(1), next.getValue());
 
@@ -145,7 +146,7 @@ public class PersistentTreeMapTest {
                                                  Tuple2.of("a", 1),
                                                  Tuple2.of("b", 2),
                                                  Tuple2.of("c", 3));
-        UnIterator<UnMap.UnEntry<String,Integer>> iter2 = m3.iterator();
+        UnmodIterator<UnmodMap.UnEntry<String,Integer>> iter2 = m3.iterator();
 
         next = iter2.next();
         assertEquals("c", next.getKey());
@@ -176,7 +177,7 @@ public class PersistentTreeMapTest {
 
         equalsDistinctHashCode(PersistentTreeMap.of("one", 1, "two", 2, "three", 3),
                                m,
-                               un(m),
+                               StaticImports.unmod(m),
                                PersistentTreeMap.of("two", 2, "three", 3, "four", 4));
 
         equalsDistinctHashCode(PersistentTreeMap.of("one", 1).assoc("two", 2).assoc("three", 3),
@@ -214,7 +215,7 @@ public class PersistentTreeMapTest {
         assertEquals(PersistentTreeMap.empty(),
                      PersistentTreeMap.of(1, "one").assoc(2, "two").assoc(3, "three").tailMap(999999999));
 
-        assertArrayEquals(new UnMap.UnEntry[]{Tuple2.of(2, "two"), Tuple2.of(3, "three")},
+        assertArrayEquals(new UnmodMap.UnEntry[]{Tuple2.of(2, "two"), Tuple2.of(3, "three")},
                           PersistentTreeMap.of(1, "one").assoc(2, "two").assoc(3, "three").tail()
                                            .map((u) -> Tuple2.of(u.getKey(), u.getValue())).toTypedArray());
 
@@ -351,7 +352,7 @@ public class PersistentTreeMapTest {
         m = m.assoc(20, "twenty again");
         assertArrayEquals(new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21},
                           m.keySet().toArray());
-        assertTrue(UnIterableOrdered.equals(
+        assertTrue(UnmodSortedIterable.equals(
                 Sequence.of("one again", "two", "three", "four", "five", "six", "seven", "eight",
                             "nine again", "ten again", "eleven again", "twelve", "thirteen",
                             "fourteen",
@@ -365,11 +366,11 @@ public class PersistentTreeMapTest {
                 PersistentTreeMap.of(1, "one").assoc(2, "two").assoc(3, "three").assoc(4, "four").assoc(5, "five");
         ImSet<Map.Entry<Integer,String>> s =
                 PersistentTreeSet.ofComp((a, b) -> a.getKey() - b.getKey(),
-                                         UnMap.UnEntry.of(1, "one"),
-                                         UnMap.UnEntry.of(2, "two"),
-                                         UnMap.UnEntry.of(3, "three"),
-                                         UnMap.UnEntry.of(4, "four"),
-                                         UnMap.UnEntry.of(5, "five"));
+                                         UnmodMap.UnEntry.of(1, "one"),
+                                         UnmodMap.UnEntry.of(2, "two"),
+                                         UnmodMap.UnEntry.of(3, "three"),
+                                         UnmodMap.UnEntry.of(4, "four"),
+                                         UnmodMap.UnEntry.of(5, "five"));
         assertArrayEquals(s.toArray(),
                           m.entrySet().map((u) -> Tuple2.of(u.getKey(), u.getValue())).toTypedArray());
     }

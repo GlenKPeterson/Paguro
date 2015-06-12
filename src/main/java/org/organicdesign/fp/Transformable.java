@@ -16,9 +16,9 @@ package org.organicdesign.fp;
 
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.ImMap;
-import org.organicdesign.fp.collections.ImMapOrdered;
+import org.organicdesign.fp.collections.ImSortedMap;
 import org.organicdesign.fp.collections.ImSet;
-import org.organicdesign.fp.collections.ImSetOrdered;
+import org.organicdesign.fp.collections.ImSortedSet;
 import org.organicdesign.fp.collections.PersistentHashMap;
 import org.organicdesign.fp.collections.PersistentHashSet;
 import org.organicdesign.fp.collections.PersistentTreeMap;
@@ -99,7 +99,7 @@ public interface Transformable<T> extends Realizable<T> {
     /**
      Shorten this transformable to contain all items from the beginning so long as they satisfy the
      predicate.
-     @return a lazy transformable containing the longest un-interrupted run of items, from the
+     @return a lazy transformable containing the longest unmod-interrupted run of items, from the
      beginning of the transformable, that satisfy the given predicate.  This could be 0 items to
      the entire transformable.
       * @param predicate the test.
@@ -174,7 +174,7 @@ public interface Transformable<T> extends Realizable<T> {
 //    <U> Transformable<U> flatMap(Function<T,? extends Transformable<U>> func);
 
     /** {@inheritDoc} */
-    @Override default List<T> toJavaList() {
+    @Override default List<T> toMutableList() {
         return foldLeft(new ArrayList<>(), (ts, t) -> {
             ts.add(t);
             return ts;
@@ -185,7 +185,7 @@ public interface Transformable<T> extends Realizable<T> {
     @Override default ImList<T> toImList() { return foldLeft(PersistentVector.empty(), (ts, t) -> ts.appendOne(t)); }
 
     /** {@inheritDoc} */
-    @Override default <U,V> Map<U,V> toJavaMap(final Function1<? super T,Map.Entry<U,V>> f1) {
+    @Override default <U,V> Map<U,V> toMutableMap(final Function1<? super T,Map.Entry<U,V>> f1) {
         return foldLeft(new HashMap<>(), (ts, t) -> {
             Map.Entry<U,V> entry = f1.apply(t);
             ts.put(entry.getKey(), entry.getValue());
@@ -194,7 +194,7 @@ public interface Transformable<T> extends Realizable<T> {
     }
 
     /** {@inheritDoc} */
-    @Override default <U,V> SortedMap<U,V> toJavaMapSorted(final Function1<? super T,Map.Entry<U,V>> f1) {
+    @Override default <U,V> SortedMap<U,V> toMutableSortedMap(final Function1<? super T,Map.Entry<U,V>> f1) {
         return foldLeft(new TreeMap<>(), (ts, t) -> {
             Map.Entry<U,V> entry = f1.apply(t);
             ts.put(entry.getKey(), entry.getValue());
@@ -204,7 +204,7 @@ public interface Transformable<T> extends Realizable<T> {
 
 //    @Override
 //    default <U,V> ImMap<U,V> toImMap(Function1<T,Map.Entry<U,V>> f1) {
-//        return un(toJavaHashMap(f1));
+//        return unmod(toJavaHashMap(f1));
 //    }
     /** {@inheritDoc} */
     @Override
@@ -215,13 +215,13 @@ public interface Transformable<T> extends Realizable<T> {
 
     /** {@inheritDoc} */
     @Override
-    default <U,V> ImMapOrdered<U,V> toImMapOrdered(Comparator<? super U> comp, Function1<? super T,Map.Entry<U,V>> f1) {
-        return foldLeft((ImMapOrdered<U, V>) PersistentTreeMap.<U, V>empty(comp),
+    default <U,V> ImSortedMap<U,V> toImSortedMap(Comparator<? super U> comp, Function1<? super T,Map.Entry<U,V>> f1) {
+        return foldLeft((ImSortedMap<U, V>) PersistentTreeMap.<U, V>empty(comp),
                         (ts, t) -> ts.assoc(f1.apply(t)));
     }
 
     /** {@inheritDoc} */
-    @Override default SortedSet<T> toJavaSetSorted(Comparator<? super T> comparator) {
+    @Override default SortedSet<T> toMutableSortedSet(Comparator<? super T> comparator) {
         return foldLeft(new TreeSet<>(comparator), (ts, t) -> {
             ts.add(t);
             return ts;
@@ -234,12 +234,12 @@ public interface Transformable<T> extends Realizable<T> {
     }
 
     /** {@inheritDoc} */
-    @Override default ImSetOrdered<T> toImSetOrdered(Comparator<? super T> comparator) {
+    @Override default ImSortedSet<T> toImSortedSet(Comparator<? super T> comparator) {
         return foldLeft(PersistentTreeSet.ofComp(comparator), (accum, t) -> accum.put(t));
     }
 
     /** {@inheritDoc} */
-    @Override default Set<T> toJavaSet() {
+    @Override default Set<T> toMutableSet() {
         return foldLeft(new HashSet<>(), (ts, t) -> {
             ts.add(t);
             return ts;

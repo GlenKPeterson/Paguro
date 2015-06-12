@@ -15,15 +15,15 @@
 package org.organicdesign.fp.collections;
 
 import org.junit.Test;
+import org.organicdesign.fp.StaticImports;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.organicdesign.fp.StaticImports.un;
 
-public class UnMapTest {
+public class UnmodMapTest {
     @Test public void containsValue() {
         Map<String,Integer> mm = new HashMap<>();
         mm.put("Hello", 3);
@@ -33,7 +33,7 @@ public class UnMapTest {
         mm.put("A", -1);
         mm.put("test", -2);
 
-        UnMap<String,Integer> m = un(mm);
+        UnmodMap<String,Integer> m = StaticImports.unmod(mm);
         assertFalse(m.containsValue(Integer.MAX_VALUE));
         assertFalse(m.containsValue(4));
         assertTrue(m.containsValue(3));

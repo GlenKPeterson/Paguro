@@ -18,17 +18,17 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 /** An unmodifiable set */
-public interface UnSet<E> extends UnCollection<E>, Set<E> {
+public interface UnmodSet<E> extends UnmodCollection<E>, Set<E> {
 
     // ==================================================== Static ====================================================
-    UnSet<Object> EMPTY = new UnSet<Object>() {
+    UnmodSet<Object> EMPTY = new UnmodSet<Object>() {
         @Override public boolean contains(Object o) { return false; }
         @Override public int size() { return 0; }
         @Override public boolean isEmpty() { return true; }
-        @Override public UnIterator<Object> iterator() { return UnIterator.empty(); }
+        @Override public UnmodIterator<Object> iterator() { return UnmodIterator.empty(); }
     };
     @SuppressWarnings("unchecked")
-    static <T> UnSet<T> empty() { return (UnSet<T>) EMPTY; }
+    static <T> UnmodSet<T> empty() { return (UnmodSet<T>) EMPTY; }
 
     // =================================================== Instance ===================================================
 
@@ -50,12 +50,12 @@ public interface UnSet<E> extends UnCollection<E>, Set<E> {
 
     /**
      Returns true if the set contains the given item.  This is the defining method of a set.
-     Sets have to override this because the default implementation in UnCollection is O(n) whereas a sorted set
+     Sets have to override this because the default implementation in UnmodCollection is O(n) whereas a sorted set
      should be O(log n) or O(1).
      */
     @Override boolean contains(Object o);
     /** {@inheritDoc} */
-    @Override default boolean containsAll(Collection<?> c) { return UnCollection.containsAll(this, c); }
+    @Override default boolean containsAll(Collection<?> c) { return UnmodCollection.containsAll(this, c); }
 // boolean	equals(Object o)
 // int	hashCode()
 
@@ -69,7 +69,8 @@ public interface UnSet<E> extends UnCollection<E>, Set<E> {
      Iterates over contents with no guarantees about their ordering.
      {@inheritDoc}
      */
-    @Override UnIterator<E> iterator();
+    @Override
+    UnmodIterator<E> iterator();
 
     /** Not allowed - this is supposed to be unmodifiable */
     @SuppressWarnings("deprecation")
@@ -96,7 +97,7 @@ public interface UnSet<E> extends UnCollection<E>, Set<E> {
      * type-safe version of this method instead, but read the caveats first.
      * {@inheritDoc}
      */
-    @Override default Object[] toArray() { return UnCollection.toArray(this); }
+    @Override default Object[] toArray() { return UnmodCollection.toArray(this); }
 
     /**
      * This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for backwards
@@ -111,7 +112,7 @@ public interface UnSet<E> extends UnCollection<E>, Set<E> {
      *
      * {@inheritDoc}
      */
-    @Override default <T> T[] toArray(T[] as) { return UnCollection.toArray(this, as); }
+    @Override default <T> T[] toArray(T[] as) { return UnmodCollection.toArray(this, as); }
 
 // Methods inherited from interface java.util.Collection
 // parallelStream, removeIf, stream

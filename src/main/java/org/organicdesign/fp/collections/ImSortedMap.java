@@ -20,15 +20,15 @@ import java.util.Collection;
 import java.util.Map;
 
 /** An immutable sorted map. */
-public interface ImMapOrdered<K,V> extends UnMapOrdered<K,V>, Sequence<UnMap.UnEntry<K,V>> {
+public interface ImSortedMap<K,V> extends UnmodSortedMap<K,V>, Sequence<UnmodMap.UnEntry<K,V>> {
 
-    Option<UnMap.UnEntry<K,V>> entry(K key);
+    Option<UnmodMap.UnEntry<K,V>> entry(K key);
 
     /**
-     * Returns a view of the mappings contained in this map.  The set should actually contain UnMap.Entry items, but
+     * Returns a view of the mappings contained in this map.  The set should actually contain UnmodMap.Entry items, but
      * that return signature is illegal in Java, so you'll just have to remember. */
     @Override
-    ImSetOrdered<Entry<K,V>> entrySet();
+    ImSortedSet<Entry<K,V>> entrySet();
 
 // public  K	firstKey()
 
@@ -47,38 +47,39 @@ public interface ImMapOrdered<K,V> extends UnMapOrdered<K,V>, Sequence<UnMap.UnE
     }
 
     /** Return the elements in this map up (but excluding) to the given element */
-    @Override default ImMapOrdered<K,V> headMap(K toKey) { return subMap(firstKey(), toKey); }
+    @Override default ImSortedMap<K,V> headMap(K toKey) { return subMap(firstKey(), toKey); }
 
     /**
      Returns an iterator over the UnEntries of this map in order.
      @return an Iterator.
      */
-    @Override UnIteratorOrdered<UnEntry<K, V>> iterator();
+    @Override
+    UnmodSortedIterator<UnEntry<K, V>> iterator();
 
     /** Returns a view of the keys contained in this map. */
-    @Override default ImSetOrdered<K> keySet() { return PersistentTreeSet.ofMap(this); }
+    @Override default ImSortedSet<K> keySet() { return PersistentTreeSet.ofMap(this); }
 
 // public  K	lastKey()
 
     /** Return the elements in this map from the start element (inclusive) to the end element (exclusive) */
     @Override
-    ImMapOrdered<K,V> subMap(K fromKey, K toKey);
+    ImSortedMap<K,V> subMap(K fromKey, K toKey);
 
     /** Return the elements in this from the given element to the end */
     @Override
-    ImMapOrdered<K,V> tailMap(K fromKey);
+    ImSortedMap<K,V> tailMap(K fromKey);
 
     /** {@inheritDoc} */
-    @Override default UnCollectionOrdered<V> values() {
+    @Override default UnmodSortedCollection<V> values() {
         // We need values, but still ordered by their keys.
-        final ImMapOrdered<K,V> inner = this;
-        return new UnCollectionOrdered<V>() {
-            @Override public UnIteratorOrdered<V> iterator() {
+        final ImSortedMap<K,V> inner = this;
+        return new UnmodSortedCollection<V>() {
+            @Override public UnmodSortedIterator<V> iterator() {
                 return inner.entrySet().map(e -> e.getValue()).iterator();
             }
             @Override public int size() { return inner.size(); }
 
-            @Override public int hashCode() { return UnIterable.hashCode(this); }
+            @Override public int hashCode() { return UnmodIterable.hashCode(this); }
 
             @Override public boolean equals(Object o) {
                 if (this == o) { return true; }
@@ -88,16 +89,16 @@ public interface ImMapOrdered<K,V> extends UnMapOrdered<K,V>, Sequence<UnMap.UnE
                 return containsAll(that);
             }
 
-            @Override public String toString() { return UnIterable.toString("ImMapOrd.values.UnCollectionOrd", this); }
+            @Override public String toString() { return UnmodIterable.toString("ImMapOrd.values.UnCollectionOrd", this); }
         };
     }
 
     /** Returns a new map with the given key/value added */
-    ImMapOrdered<K,V> assoc(K key, V val);
+    ImSortedMap<K,V> assoc(K key, V val);
 
     /** Returns a new map with an immutable copy of the given entry added */
-    default ImMapOrdered<K,V> assoc(Map.Entry<K,V> entry) { return assoc(entry.getKey(), entry.getValue()); }
+    default ImSortedMap<K,V> assoc(Map.Entry<K,V> entry) { return assoc(entry.getKey(), entry.getValue()); }
 
     /** Returns a new map with the given key/value removed */
-    ImMapOrdered<K,V> without(K key);
+    ImSortedMap<K,V> without(K key);
 }

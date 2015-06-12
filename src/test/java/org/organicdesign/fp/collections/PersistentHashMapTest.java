@@ -18,6 +18,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.organicdesign.fp.Option;
+import org.organicdesign.fp.StaticImports;
 import org.organicdesign.fp.StaticImportsTest;
 import org.organicdesign.fp.function.Function2;
 import org.organicdesign.fp.permanent.Sequence;
@@ -30,7 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.*;
-import static org.organicdesign.fp.StaticImports.un;
+import static org.organicdesign.fp.StaticImports.unmod;
 import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
 import static org.organicdesign.fp.testUtils.EqualsContract.equalsSameHashCode;
 
@@ -91,7 +92,7 @@ public class PersistentHashMapTest {
                                                                             Option.of(Tuple2.of("b", 2)),
                                                                             Option.of(Tuple2.of("a", 3))));
 
-        Sequence<UnMap.UnEntry<String,Integer>> seq = m2.seq();
+        Sequence<UnmodMap.UnEntry<String,Integer>> seq = m2.seq();
         Option o = seq.head();
         assertTrue(s.contains(o));
         s.remove(o);
@@ -115,7 +116,7 @@ public class PersistentHashMapTest {
         PersistentHashMap<String,Integer> m1 = PersistentHashMap.of("g", 1, "f", 2, "e", 3, "d", 4, "c", 5, "b", 6, "a", 7);
         // System.out.println("m1.toString(): " + m1.toString());
 
-        Set<UnMap.UnEntry<String,Integer>> s1 = new HashSet<>(Arrays.asList(Tuple2.of("g", 1),
+        Set<UnmodMap.UnEntry<String,Integer>> s1 = new HashSet<>(Arrays.asList(Tuple2.of("g", 1),
                                                                            Tuple2.of("f", 2),
                                                                            Tuple2.of("e", 3),
                                                                            Tuple2.of("d", 4),
@@ -125,10 +126,10 @@ public class PersistentHashMapTest {
 
         // System.out.println("s1: " + s1);
 
-        Sequence<UnMap.UnEntry<String,Integer>> seq1 = m1.seq();
-        Option<UnMap.UnEntry<String,Integer>> o1 = seq1.head();
+        Sequence<UnmodMap.UnEntry<String,Integer>> seq1 = m1.seq();
+        Option<UnmodMap.UnEntry<String,Integer>> o1 = seq1.head();
         while (o1.isSome()) {
-            UnMap.UnEntry<String,Integer> entry = o1.get();
+            UnmodMap.UnEntry<String,Integer> entry = o1.get();
             // System.out.println("entry: " + entry);
             assertTrue(s1.contains(entry));
             s1.remove(entry);
@@ -198,13 +199,13 @@ public class PersistentHashMapTest {
         showSeq(s1.seq());
         // System.out.println("Four: " + s1);
 
-//        System.out.println("s1.seq().toJavaList()" + s1.seq().toJavaList());
+//        System.out.println("s1.seq().toMutableList()" + s1.seq().toMutableList());
 
     }
 
-    void showSeq(Sequence<UnMap.UnEntry<String,String>> seq) {
+    void showSeq(Sequence<UnmodMap.UnEntry<String,String>> seq) {
         // System.out.println("seq");
-        Option<UnMap.UnEntry<String,String>> opt = seq.head();
+        Option<UnmodMap.UnEntry<String,String>> opt = seq.head();
         while (opt.isSome()) {
             // System.out.println("\topt.get(): " + opt.get());
             seq = seq.tail();
@@ -216,7 +217,7 @@ public class PersistentHashMapTest {
 
     @Test public void longerSeq() {
         // This is an assumed to work mutable set - the "control" for this test.
-        Set<UnMap.UnEntry<String,Integer>> set = new HashSet<>();
+        Set<UnmodMap.UnEntry<String,Integer>> set = new HashSet<>();
         // This is the map being tested.
         ImMap<String,Integer> accum = PersistentHashMap.empty();
 
@@ -230,7 +231,7 @@ public class PersistentHashMapTest {
 //            println("accum: " + accum);
 
             // This will blow up with an obvious non-seq so we know what size causes the real trouble.
-            Option<UnMap.UnEntry<String,Integer>> o = accum.seq().head();
+            Option<UnmodMap.UnEntry<String,Integer>> o = accum.seq().head();
             assertTrue(o.isSome());
             //noinspection ConstantConditions
             assertTrue(o.get().getKey() instanceof String);
@@ -241,9 +242,9 @@ public class PersistentHashMapTest {
             assertEquals(Integer.valueOf(i), accum.get("Str" + i));
         }
 
-        Sequence<UnMap.UnEntry<String,Integer>> seq = accum.seq();
+        Sequence<UnmodMap.UnEntry<String,Integer>> seq = accum.seq();
         for (int i = 0; i < MAX; i++) {
-            Option<UnMap.UnEntry<String,Integer>> o = seq.head();
+            Option<UnmodMap.UnEntry<String,Integer>> o = seq.head();
 
             assertTrue(set.contains(o.get()));
             set.remove(o.get());
@@ -285,8 +286,8 @@ public class PersistentHashMapTest {
         PersistentHashMap<String,Integer> m2 = PersistentHashMap.of("c", 3)
                         .assoc("b", 2)
                         .assoc("a", 1);
-        UnIterator<UnMap.UnEntry<String,Integer>> iter = m2.iterator();
-        UnMap.UnEntry<String,Integer> next = iter.next();
+        UnmodIterator<UnmodMap.UnEntry<String,Integer>> iter = m2.iterator();
+        UnmodMap.UnEntry<String,Integer> next = iter.next();
         assertEquals("a", next.getKey());
         assertEquals(Integer.valueOf(1), next.getValue());
 
@@ -325,7 +326,7 @@ public class PersistentHashMapTest {
 
         equalsDistinctHashCode(PersistentHashMap.of("one", 1, "two", 2, "three", 3),
                                m,
-                               un(m),
+                               StaticImports.unmod(m),
                                PersistentHashMap.of("two", 2, "three", 3, "four", 4));
 
         equalsDistinctHashCode(PersistentHashMap.of("one", 1).assoc("two", 2).assoc("three", 3),
@@ -428,11 +429,11 @@ public class PersistentHashMapTest {
         PersistentHashMap<Integer,String> m =
                 PersistentHashMap.of(1, "one").assoc(2, "two").assoc(3, "three").assoc(4, "four").assoc(5, "five");
         Set<Map.Entry<Integer,String>> s = new HashSet<>();
-        s.add(UnMap.UnEntry.of(3, "three"));
-        s.add(UnMap.UnEntry.of(5, "five"));
-        s.add(UnMap.UnEntry.of(2, "two"));
-        s.add(UnMap.UnEntry.of(1, "one"));
-        s.add(UnMap.UnEntry.of(4, "four"));
+        s.add(UnmodMap.UnEntry.of(3, "three"));
+        s.add(UnmodMap.UnEntry.of(5, "five"));
+        s.add(UnmodMap.UnEntry.of(2, "two"));
+        s.add(UnmodMap.UnEntry.of(1, "one"));
+        s.add(UnmodMap.UnEntry.of(4, "four"));
         assertEquals(s, m.entrySet());
     }
 
@@ -444,9 +445,9 @@ public class PersistentHashMapTest {
         // System.out.println("m: " + m);
         // System.out.println("m.hasNull(): " + m.hasNull());
         // System.out.println("m.seq(): " + m.seq());
-        // System.out.println("m.seq().map(e -> e.getValue()).toJavaList(): " + m.seq().map(e -> e.getValue()).toJavaList());
-        // System.out.println("m.seq().map(e -> e.getValue()).toJavaSet(): " + m.seq().map(e -> e.getValue()).toJavaSet());
-        // System.out.println("m.seq().map(e -> e.getValue()).toImSetOrdered(): " + m.seq().map(e -> e.getValue()).toImSetOrdered(String.CASE_INSENSITIVE_ORDER));
+        // System.out.println("m.seq().map(e -> e.getValue()).toMutableList(): " + m.seq().map(e -> e.getValue()).toMutableList());
+        // System.out.println("m.seq().map(e -> e.getValue()).toMutableSet(): " + m.seq().map(e -> e.getValue()).toMutableSet());
+        // System.out.println("m.seq().map(e -> e.getValue()).toImSortedSet(): " + m.seq().map(e -> e.getValue()).toImSortedSet(String.CASE_INSENSITIVE_ORDER));
 
         Sequence<String> seq = m.seq().map(e -> e.getValue());
         PersistentHashSet<String> u = PersistentHashSet.empty();

@@ -5,7 +5,7 @@ import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 
 /** An unmodifiable ListIterator */
-public interface UnListIterator<E> extends ListIterator<E>, UnIteratorOrdered<E> {
+public interface UnmodListIterator<E> extends ListIterator<E>, UnmodSortedIterator<E> {
 
     /** Not allowed - this is supposed to be unmodifiable */
     @Override @Deprecated default void add(E element) {
@@ -29,7 +29,7 @@ public interface UnListIterator<E> extends ListIterator<E>, UnIteratorOrdered<E>
     }
 
     // ==================================================== Static ====================================================
-    UnListIterator<Object> EMPTY = new UnListIterator<Object>() {
+    UnmodListIterator<Object> EMPTY = new UnmodListIterator<Object>() {
         @Override public boolean hasNext() { return false; }
         @Override public Object next() { throw new NoSuchElementException(); }
         @Override public void forEachRemaining(Consumer<? super Object> action) { }
@@ -39,7 +39,7 @@ public interface UnListIterator<E> extends ListIterator<E>, UnIteratorOrdered<E>
         @Override public int previousIndex() { return -1; }
     };
     @SuppressWarnings("unchecked")
-    static <T> UnListIterator<T> empty() { return (UnListIterator<T>) EMPTY; }
+    static <T> UnmodListIterator<T> empty() { return (UnmodListIterator<T>) EMPTY; }
 
 // Methods inherited from interface java.util.Iterator
 // forEachRemaining

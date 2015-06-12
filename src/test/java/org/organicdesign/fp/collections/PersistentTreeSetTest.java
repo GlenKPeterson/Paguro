@@ -17,13 +17,13 @@ package org.organicdesign.fp.collections;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.organicdesign.fp.StaticImports;
 
 import java.util.Comparator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import static org.junit.Assert.*;
-import static org.organicdesign.fp.StaticImports.un;
 import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
 import static org.organicdesign.fp.testUtils.EqualsContract.equalsSameHashCode;
 
@@ -201,12 +201,12 @@ public class PersistentTreeSetTest {
         ss1.add("work");
         ss1.add("an");
         ss1.add("hello");
-        equalsDistinctHashCode(s1, ss1, un(ss1),
+        equalsDistinctHashCode(s1, ss1, StaticImports.unmod(ss1),
                                PersistentTreeSet.of("hello", "an", "work", "the"));
 
         // Really, you need to read the JavaDoc for PersistentTreeSet.equals() to understand the bizarre notion of
         // equality being checked here.
-        equalsDistinctHashCode(s1, ss1, un(ss1),
+        equalsDistinctHashCode(s1, ss1, StaticImports.unmod(ss1),
                                PersistentTreeSet.ofComp(STR_LEN_COMP,
                                                         "helloz", "an", "work", "b", "the"));
 
@@ -233,18 +233,18 @@ public class PersistentTreeSetTest {
 //        assertEquals(ss2, ss);
 //
 //
-        equalsDistinctHashCode(s2, ss, un(ss),
+        equalsDistinctHashCode(s2, ss, StaticImports.unmod(ss),
                                PersistentTreeSet.ofComp(STR_LEN_COMP, "helloz", "an", "work", "the"));
 
 //        assertEquals(s2, yadda);
 //        assertEquals(ss, yadda);
-//        assertEquals(un(ss), yadda);
+//        assertEquals(unmod(ss), yadda);
 //
 //        assertNotEquals(yadda, s2);
 //        assertNotEquals(yadda, ss);
-//        assertNotEquals(yadda, un(ss));
+//        assertNotEquals(yadda, unmod(ss));
 
-        equalsDistinctHashCode(s2, ss, un(ss),
+        equalsDistinctHashCode(s2, ss, StaticImports.unmod(ss),
                                PersistentTreeSet.of("an", "helloz", "work", "b", "the"));
 
         equalsSameHashCode(s2,

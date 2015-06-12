@@ -267,8 +267,8 @@ public class PersistentVector<E> implements ImList<E> {
     }
 
     /** {@inheritDoc} */
-    @Override public UnListIterator<E> listIterator(int index) {
-        return new UnListIterator<E>() {
+    @Override public UnmodListIterator<E> listIterator(int index) {
+        return new UnmodListIterator<E>() {
             private int i = index;
             private int base = i - (i % MAX_NODE_LENGTH);
             private E[] array = (index < size()) ? leafNodeArrayFor(i) : null;
@@ -329,7 +329,7 @@ public class PersistentVector<E> implements ImList<E> {
 //        };
 //    }
 
-//    public UnIterator<E> iterator() {
+//    public UnmodIterator<E> iterator() {
 //        return rangedIterator(0, size());
 //    }
 
@@ -422,11 +422,11 @@ public class PersistentVector<E> implements ImList<E> {
         if ( !(other instanceof List) ) { return false; }
         List that = (List) other;
         return (this.size() == that.size()) &&
-                UnIterableOrdered.equals(this, UnIterableOrdered.cast(that));
+                UnmodSortedIterable.equals(this, UnmodSortedIterable.cast(that));
     }
 
     @Override public String toString() {
-        return UnIterable.toString("PersistentVector", this);
+        return UnmodIterable.toString("PersistentVector", this);
     }
 
     private static Node doAssoc(int level, Node node, int i, Object val) {

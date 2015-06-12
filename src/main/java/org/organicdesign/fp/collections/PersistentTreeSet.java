@@ -18,7 +18,7 @@ import java.util.SortedSet;
 /**
  A wrapper that turns a PersistentTreeMap into a set.
  */
-public class PersistentTreeSet<E> implements ImSetOrdered<E> {
+public class PersistentTreeSet<E> implements ImSortedSet<E> {
 
     /**
      Be extremely careful with this because it uses the default comparator, which only works for items that implement
@@ -37,7 +37,7 @@ public class PersistentTreeSet<E> implements ImSetOrdered<E> {
     @SuppressWarnings("unchecked")
     static public <T extends Comparable<T>> PersistentTreeSet<T> empty() { return EMPTY; }
 
-    private final ImMapOrdered<E,?> impl;
+    private final ImSortedMap<E,?> impl;
 
 //    static public <T> PersistentTreeSet<T> create(ISeq<T> items) {
 //        PersistentTreeSet<T> ret = emptyTreeSet();
@@ -55,7 +55,7 @@ public class PersistentTreeSet<E> implements ImSetOrdered<E> {
 //        return ret;
 //    }
 
-    private PersistentTreeSet(ImMapOrdered<E,?> i) { impl = i; }
+    private PersistentTreeSet(ImSortedMap<E,?> i) { impl = i; }
 
     /**
      Returns a new PersistentTreeSet of the given comparator.  Always use this instead of starting with empty() because
@@ -92,7 +92,7 @@ public class PersistentTreeSet<E> implements ImSetOrdered<E> {
      Returns a new PersistentTreeSet of the keys and comparator in the given map.  Since PersistentTreeSet is just a
      wrapper for a PersistentTreeMap, this can be a very cheap operation.
      */
-    public static <T> PersistentTreeSet<T> ofMap(ImMapOrdered<T,?> i) { return new PersistentTreeSet<>(i); }
+    public static <T> PersistentTreeSet<T> ofMap(ImSortedMap<T,?> i) { return new PersistentTreeSet<>(i); }
 
     /**
      Returns the comparator used to order the items in this set, or null if it uses Function2.DEFAULT_COMPARATOR
@@ -112,12 +112,12 @@ public class PersistentTreeSet<E> implements ImSetOrdered<E> {
 
     /** {@inheritDoc} */
     @Override
-    public UnIteratorOrdered<E> iterator() {
-        return new UnIteratorOrdered<E>() {
-            UnIteratorOrdered<? extends UnMap.UnEntry<E,?>> iter = impl.iterator();
+    public UnmodSortedIterator<E> iterator() {
+        return new UnmodSortedIterator<E>() {
+            UnmodSortedIterator<? extends UnmodMap.UnEntry<E,?>> iter = impl.iterator();
             @Override public boolean hasNext() { return iter.hasNext(); }
             @Override public E next() {
-                UnMap.UnEntry<E,?> e = iter.next();
+                UnmodMap.UnEntry<E,?> e = iter.next();
                 return e == null ? null : e.getKey();
             }
         };
@@ -135,7 +135,7 @@ public class PersistentTreeSet<E> implements ImSetOrdered<E> {
         SortedSet that = ((SortedSet) other);
 
         if (size() != that.size()) { return false; }
-        return UnIterableOrdered.equals(this, UnIterableOrdered.cast(that));
+        return UnmodSortedIterable.equals(this, UnmodSortedIterable.cast(that));
     }
 
     /**
@@ -150,7 +150,7 @@ public class PersistentTreeSet<E> implements ImSetOrdered<E> {
     @Override public E first() { return impl.firstKey(); }
 
     /** {@inheritDoc} */
-    @Override public int hashCode() { return (size() == 0) ? 0 : UnIterable.hashCode(this); }
+    @Override public int hashCode() { return (size() == 0) ? 0 : UnmodIterable.hashCode(this); }
 
     /** {@inheritDoc} */
     @Override public Option<E> head() { return size() > 0 ? Option.of(impl.firstKey()) : Option.none(); }
@@ -174,7 +174,7 @@ public class PersistentTreeSet<E> implements ImSetOrdered<E> {
     @Override public int size() { return impl.size(); }
 
     /** {@inheritDoc} */
-    @Override public ImSetOrdered<E> subSet(E fromElement, E toElement) {
+    @Override public ImSortedSet<E> subSet(E fromElement, E toElement) {
         return PersistentTreeSet.ofMap(impl.subMap(fromElement, toElement));
     }
 
@@ -183,7 +183,7 @@ public class PersistentTreeSet<E> implements ImSetOrdered<E> {
     @Override public Sequence<E> tail() { return impl.without(first()).keySet().seq(); }
 
     /** Returns a string representation of this set. */
-    @Override public String toString() { return UnIterable.toString("PersistentTreeSet", this); }
+    @Override public String toString() { return UnmodIterable.toString("PersistentTreeSet", this); }
 
 //    @Override
 //    public ISeq<E> rseq() {

@@ -6,8 +6,8 @@ import org.organicdesign.fp.permanent.Sequence;
 import java.util.Map;
 
 /** An immutable map with no guarantees about its ordering. */
-public interface ImMap<K,V> extends UnMap<K,V> {
-    Option<UnMap.UnEntry<K,V>> entry(K key);
+public interface ImMap<K,V> extends UnmodMap<K,V> {
+    Option<UnmodMap.UnEntry<K,V>> entry(K key);
 
     Sequence<UnEntry<K,V>> seq();
 
@@ -18,7 +18,7 @@ public interface ImMap<K,V> extends UnMap<K,V> {
     ImMap<K,V> without(K key);
 
     /**
-     * Returns a view of the mappings contained in this map.  The set should actually contain UnMap.Entry items, but
+     * Returns a view of the mappings contained in this map.  The set should actually contain UnmodMap.Entry items, but
      * that return signature is illegal in Java, so you'll just have to remember. */
     @Override default ImSet<Map.Entry<K,V>> entrySet() {
         return seq().map(e -> (Map.Entry<K,V>) e)
@@ -42,9 +42,9 @@ public interface ImMap<K,V> extends UnMap<K,V> {
         return entry.isSome() ? entry.get().getValue() : notFound;
     }
 
-    @Override default UnCollection<V> values() { return seq().map(e -> e.getValue()).toImSet(); }
+    @Override default UnmodCollection<V> values() { return seq().map(e -> e.getValue()).toImSet(); }
 
-    @Override default UnIterator<UnEntry<K,V>> iterator() { return seq().iterator(); }
+    @Override default UnmodIterator<UnEntry<K,V>> iterator() { return seq().iterator(); }
 
     /** Returns a new map with an immutable copy of the given entry added */
     default ImMap<K,V> assoc(Map.Entry<K,V> entry) { return assoc(entry.getKey(), entry.getValue()); }

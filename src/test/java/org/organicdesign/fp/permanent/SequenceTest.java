@@ -16,8 +16,8 @@ package org.organicdesign.fp.permanent;
 
 import org.junit.Test;
 import org.organicdesign.fp.Option;
-import org.organicdesign.fp.collections.UnIterable;
-import org.organicdesign.fp.collections.UnIterableOrdered;
+import org.organicdesign.fp.collections.UnmodIterable;
+import org.organicdesign.fp.collections.UnmodSortedIterable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -84,25 +84,25 @@ public class SequenceTest {
         Sequence<Integer> seq1 = Sequence.of(ints).drop(3).take(4);
         Sequence<Integer> seq2 = Sequence.of(4, 5, 6, 7);
 
-        assertEquals(UnIterable.hashCode(seq1), UnIterable.hashCode(seq2));
+        assertEquals(UnmodIterable.hashCode(seq1), UnmodIterable.hashCode(seq2));
 
-        assertTrue(UnIterableOrdered.equals(seq1, seq1));
-        assertTrue(UnIterableOrdered.equals(seq2, seq2));
+        assertTrue(UnmodSortedIterable.equals(seq1, seq1));
+        assertTrue(UnmodSortedIterable.equals(seq2, seq2));
 
-        assertTrue(UnIterableOrdered.equals(seq1, seq2));
-        assertTrue(UnIterableOrdered.equals(seq2, seq1));
+        assertTrue(UnmodSortedIterable.equals(seq1, seq2));
+        assertTrue(UnmodSortedIterable.equals(seq2, seq1));
 
-        assertEquals(UnIterable.hashCode(seq1.tail()), UnIterable.hashCode(seq2.tail()));
-        assertTrue(UnIterableOrdered.equals(seq1.tail(), seq2.tail()));
-        assertTrue(UnIterableOrdered.equals(seq2.tail(), seq1.tail()));
+        assertEquals(UnmodIterable.hashCode(seq1.tail()), UnmodIterable.hashCode(seq2.tail()));
+        assertTrue(UnmodSortedIterable.equals(seq1.tail(), seq2.tail()));
+        assertTrue(UnmodSortedIterable.equals(seq2.tail(), seq1.tail()));
 
-        assertNotEquals(UnIterable.hashCode(seq1.tail()), UnIterable.hashCode(seq2));
-        assertNotEquals(UnIterable.hashCode(seq1), UnIterable.hashCode(seq2.tail()));
-        assertFalse(UnIterableOrdered.equals(seq1.tail(), seq2));
-        assertFalse(UnIterableOrdered.equals(seq1, seq2.tail()));
+        assertNotEquals(UnmodIterable.hashCode(seq1.tail()), UnmodIterable.hashCode(seq2));
+        assertNotEquals(UnmodIterable.hashCode(seq1), UnmodIterable.hashCode(seq2.tail()));
+        assertFalse(UnmodSortedIterable.equals(seq1.tail(), seq2));
+        assertFalse(UnmodSortedIterable.equals(seq1, seq2.tail()));
 
-        assertFalse(UnIterableOrdered.equals(seq2.tail(), seq1));
-        assertFalse(UnIterableOrdered.equals(seq2, seq1.tail()));
+        assertFalse(UnmodSortedIterable.equals(seq2.tail(), seq1));
+        assertFalse(UnmodSortedIterable.equals(seq2, seq1.tail()));
     }
 
     @Test public void forEach() {

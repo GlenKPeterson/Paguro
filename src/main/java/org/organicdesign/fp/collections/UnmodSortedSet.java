@@ -18,35 +18,36 @@ import java.util.NoSuchElementException;
 import java.util.SortedSet;
 
 /** An unmodifiable SortedSet. */
-public interface UnSetOrdered<E> extends UnSet<E>, SortedSet<E>, UnCollectionOrdered<E> {
+public interface UnmodSortedSet<E> extends UnmodSet<E>, SortedSet<E>, UnmodSortedCollection<E> {
     // ==================================================== Static ====================================================
-    UnSet<Object> EMPTY = new UnSetOrdered<Object>() {
+    UnmodSet<Object> EMPTY = new UnmodSortedSet<Object>() {
         @Override public boolean contains(Object o) { return false; }
         @Override public int size() { return 0; }
         @Override public boolean isEmpty() { return true; }
-        @Override public UnIteratorOrdered<Object> iterator() { return UnIteratorOrdered.empty(); }
+        @Override public UnmodSortedIterator<Object> iterator() { return UnmodSortedIterator.empty(); }
         @Override public Comparator<? super Object> comparator() { return null; }
-        @Override public UnSetOrdered<Object> subSet(Object fromElement, Object toElement) { return this; }
+        @Override public UnmodSortedSet<Object> subSet(Object fromElement, Object toElement) { return this; }
         @Override public Object first() { throw new NoSuchElementException("Empty set"); }
         @Override public Object last() { throw new NoSuchElementException("Empty set"); }
     };
     @SuppressWarnings("unchecked")
-    static <T> UnSetOrdered<T> empty() { return (UnSetOrdered<T>) EMPTY; }
+    static <T> UnmodSortedSet<T> empty() { return (UnmodSortedSet<T>) EMPTY; }
 
     // =================================================== Instance ===================================================
     /** {@inheritDoc} */
-    @Override default UnSetOrdered<E> headSet(E toElement) { return subSet(first(), toElement); }
+    @Override default UnmodSortedSet<E> headSet(E toElement) { return subSet(first(), toElement); }
 
     /**
      Iterates over contents in a guaranteed order.
      {@inheritDoc}
      */
-    @Override UnIteratorOrdered<E> iterator();
+    @Override
+    UnmodSortedIterator<E> iterator();
 
     /** {@inheritDoc} */
     @Override
-    UnSetOrdered<E> subSet(E fromElement, E toElement);
+    UnmodSortedSet<E> subSet(E fromElement, E toElement);
 
     /** {@inheritDoc} */
-    @Override default UnSetOrdered<E> tailSet(E fromElement) { return subSet(fromElement, last()); }
+    @Override default UnmodSortedSet<E> tailSet(E fromElement) { return subSet(fromElement, last()); }
 }

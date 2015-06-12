@@ -119,9 +119,9 @@ public class PersistentHashSet<E> implements ImSet<E> {
         return containsAll(that);
     }
 
-    @Override public int hashCode() { return UnIterable.hashCode(this); }
+    @Override public int hashCode() { return UnmodIterable.hashCode(this); }
 
-    @Override public String toString() { return UnIterable.toString("PersistentHashSet", this); }
+    @Override public String toString() { return UnmodIterable.toString("PersistentHashSet", this); }
 
     @Override public PersistentHashSet<E> put(E o) {
         if (contains(o))

@@ -18,6 +18,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.organicdesign.fp.StaticImports;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -30,7 +31,6 @@ import java.util.ListIterator;
 import java.util.Map;
 
 import static org.junit.Assert.*;
-import static org.organicdesign.fp.StaticImports.un;
 import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
 
 @RunWith(JUnit4.class)
@@ -199,7 +199,7 @@ public class PersistentVectorTest {
         List<Integer> different = Arrays.asList(1,2,3,4,5,6,7,8,9,0,11,12,13,14,15,16,17,18,19,20,
                                                  21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,41);
 
-        equalsDistinctHashCode(list, l2, un(l2), different);
+        equalsDistinctHashCode(list, l2, StaticImports.unmod(l2), different);
     }
 
     // Time ImVectorImplementation vs. java.util.ArrayList to prove that performance does not degrade
@@ -213,7 +213,7 @@ public class PersistentVectorTest {
                                    "Better that, than set the limit too high and miss a performance drop.");
 
         // These are worst-case timings, indexed by number of items inserted in the test.
-        final UnMap<Integer,Double> benchmarkRatios;
+        final UnmodMap<Integer,Double> benchmarkRatios;
         {
             Map<Integer,Double> mm = new HashMap<>();
             mm.put(1, 1.4);
@@ -223,7 +223,7 @@ public class PersistentVectorTest {
             mm.put(10000, 18.0);
             mm.put(100000, 13.9);
             mm.put(1000000, 7.8);
-            benchmarkRatios = un(mm);
+            benchmarkRatios = StaticImports.unmod(mm);
         }
 
         // Remember the results of each insertion test to average them later.

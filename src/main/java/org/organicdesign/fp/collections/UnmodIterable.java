@@ -3,11 +3,11 @@ package org.organicdesign.fp.collections;
 import java.util.Iterator;
 
 /** An unmodifiable Iterable, without any guarantee about order. */
-public interface UnIterable<T> extends Iterable<T> {
+public interface UnmodIterable<T> extends Iterable<T> {
     // ==================================================== Static ====================================================
 
     // This hides the same method on all sub-interfaces!
-//    static <E> UnIterable<E> empty() { return () -> UnIterator.empty(); }
+//    static <E> UnmodIterable<E> empty() { return () -> UnmodIterator.empty(); }
 
     //    /**
 //     Caution: this is a convenient optimization for immutable data structures and a nightmare waiting to happen to
@@ -16,9 +16,9 @@ public interface UnIterable<T> extends Iterable<T> {
 //     that same code without re-computing it again.  It's the internal version of a memoizer.  Also, use this only
 //     for decent sized collections.  If you only have 2 or 3 fields, this isn't buying you anything.
 //     */
-//    static Lazy.Int lazyHashCode(UnIterable iter) {
+//    static Lazy.Int lazyHashCode(UnmodIterable iter) {
 //        if (iter == null) { throw new IllegalArgumentException("Can't have a null iterable."); }
-//        return Lazy.Int.of(() -> UnIterable.hashCode(iter));
+//        return Lazy.Int.of(() -> UnmodIterable.hashCode(iter));
 //    }
 //
 //    /**
@@ -27,10 +27,10 @@ public interface UnIterable<T> extends Iterable<T> {
 //     data is truly immutable, this allows you to compute a reasonable toString() the first time it is needed, then
 //     return that same String without re-computing it again.  It's the internal version of a memoizer.
 //     */
-//    static LazyRef<String> lazyToString(String name, UnIterable iter) {
+//    static LazyRef<String> lazyToString(String name, UnmodIterable iter) {
 //        if (name == null) { throw new IllegalArgumentException("Can't have a null name."); }
 //        if (iter == null) { throw new IllegalArgumentException("Can't have a null iterable."); }
-//        return LazyRef.of(() -> UnIterable.toString(name, iter));
+//        return LazyRef.of(() -> UnmodIterable.toString(name, iter));
 //    }
 
 //    /** Lets underlying compareTo method handle comparing nulls to non-null values. */
@@ -44,7 +44,7 @@ public interface UnIterable<T> extends Iterable<T> {
 //    }
 //
 //    /** A default comparator for UnIterables comparable */
-//    static <F extends Comparable<F>,E extends UnIterable<F>> Comparator<E> iterableComparator() {
+//    static <F extends Comparable<F>,E extends UnmodIterable<F>> Comparator<E> iterableComparator() {
 //        return new Comparator<E>() {
 //            @Override
 //            public int compare(E o1, E o2) {
@@ -56,8 +56,8 @@ public interface UnIterable<T> extends Iterable<T> {
 //                        return -compare(o2, o1);
 //                    }
 //                }
-//                UnIterator<F> as = o1.iterator();
-//                UnIterator<F> bs = o2.iterator();
+//                UnmodIterator<F> as = o1.iterator();
+//                UnmodIterator<F> bs = o2.iterator();
 //                while (as.hasNext() && bs.hasNext()) {
 //                    int ret = compareHelper(as.next(), bs.next());
 //                    if (ret != 0) {
@@ -113,6 +113,7 @@ public interface UnIterable<T> extends Iterable<T> {
     }
 
     /** {@inheritDoc} */
-    @Override UnIterator<T> iterator();
+    @Override
+    UnmodIterator<T> iterator();
 
 }

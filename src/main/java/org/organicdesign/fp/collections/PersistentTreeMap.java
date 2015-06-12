@@ -29,7 +29,7 @@ import java.util.Stack;
  @author Glen Peterson (Java-centric editor)
  */
 
-public class PersistentTreeMap<K,V> implements ImMapOrdered<K,V> {
+public class PersistentTreeMap<K,V> implements ImSortedMap<K,V> {
 
     // TODO: Replace with Mutable.Ref, or make methods return Tuple2.
     private class Box<E> {
@@ -254,37 +254,37 @@ public class PersistentTreeMap<K,V> implements ImMapOrdered<K,V> {
     }
 
     /**
-     Returns a view of the mappings contained in this map.  The set should actually contain UnMap.Entry items, but that
+     Returns a view of the mappings contained in this map.  The set should actually contain UnmodMap.Entry items, but that
      return signature is illegal in Java, so you'll just have to remember.
      */
-    @Override public ImSetOrdered<Entry<K,V>> entrySet() {
+    @Override public ImSortedSet<Entry<K,V>> entrySet() {
         // This is the pretty way to do it.
 //        return this.foldLeft(ImSet.empty(), (accum, entry) -> accum.put(entry));
 
         // This may be faster, but I haven't timed it.
 
         // Preserve comparator!
-        ImSetOrdered<Entry<K,V>> ret = PersistentTreeSet.ofComp((a, b) -> comp.compare(a.getKey(), b.getKey()));
+        ImSortedSet<Entry<K,V>> ret = PersistentTreeSet.ofComp((a, b) -> comp.compare(a.getKey(), b.getKey()));
 
-        UnIterator<UnEntry<K,V>> iter = this.iterator();
+        UnmodIterator<UnEntry<K,V>> iter = this.iterator();
         while (iter.hasNext()) { ret = ret.put(iter.next()); }
         return ret;
     }
 
     /** This is correct, but O(n). */
-    @Override public int hashCode() { return (size() == 0) ? 0 : UnIterable.hashCode(entrySet()); }
+    @Override public int hashCode() { return (size() == 0) ? 0 : UnmodIterable.hashCode(entrySet()); }
 
     public static final Equator<SortedMap> EQUATOR = new Equator<SortedMap>() {
         @Override
         public int hash(SortedMap kvSortedMap) {
-            return UnIterable.hashCode(kvSortedMap.entrySet());
+            return UnmodIterable.hashCode(kvSortedMap.entrySet());
         }
 
         @Override
         public boolean equalTo(SortedMap o1, SortedMap o2) {
             if (o1 == o2) { return true; }
             if ( o1.size() != o2.size() ) { return false; }
-            return UnIterableOrdered.equals(UnIterableOrdered.cast(o1), UnIterableOrdered.cast(o2));
+            return UnmodSortedIterable.equals(UnmodSortedIterable.cast(o1), UnmodSortedIterable.cast(o2));
         }
     };
 
@@ -309,7 +309,7 @@ public class PersistentTreeMap<K,V> implements ImMapOrdered<K,V> {
         // Yay, this makes sense, and we can compare these with O(n) efficiency while still maintaining compatibility
         // with java.util.Map.
         if (other instanceof SortedMap) {
-            return UnIterableOrdered.equals(this, UnIterableOrdered.cast((SortedMap) other));
+            return UnmodSortedIterable.equals(this, UnmodSortedIterable.cast((SortedMap) other));
         }
 
         // This makes no sense and takes O(n log n) or something.
@@ -343,7 +343,7 @@ public class PersistentTreeMap<K,V> implements ImMapOrdered<K,V> {
 //    @Override public ImSet<K> keySet() { return PersistentTreeSet.ofMap(this); }
 
     /** {@inheritDoc} */
-    @Override public ImMapOrdered<K,V> subMap(K fromKey, K toKey) {
+    @Override public ImSortedMap<K,V> subMap(K fromKey, K toKey) {
         int diff = comp.compare(fromKey, toKey);
 
         if (diff > 0) {
@@ -368,8 +368,8 @@ public class PersistentTreeMap<K,V> implements ImMapOrdered<K,V> {
             return ofComp(comp, last.getKey(), last.getValue());
         }
 
-        ImMapOrdered<K,V> ret = new PersistentTreeMap<>(comp, null, 0);
-        UnIterator<UnEntry<K,V>> iter = this.iterator();
+        ImSortedMap<K,V> ret = new PersistentTreeMap<>(comp, null, 0);
+        UnmodIterator<UnEntry<K,V>> iter = this.iterator();
         while (iter.hasNext()) {
             UnEntry<K,V> next = iter.next();
             K key = next.getKey();
@@ -401,27 +401,27 @@ public class PersistentTreeMap<K,V> implements ImMapOrdered<K,V> {
     }
 
 //    /** {@inheritDoc} */
-//    @Override public UnCollection<V> values() {
-//        class ValueColl<B,Z> implements UnCollection<B>, UnIterableOrdered<B> {
-//            private final Function0<UnIteratorOrdered<UnEntry<Z,B>>> iterFactory;
-//            private ValueColl(Function0<UnIteratorOrdered<UnEntry<Z, B>>> f) { iterFactory = f; }
+//    @Override public UnmodCollection<V> values() {
+//        class ValueColl<B,Z> implements UnmodCollection<B>, UnmodSortedIterable<B> {
+//            private final Function0<UnmodSortedIterator<UnEntry<Z,B>>> iterFactory;
+//            private ValueColl(Function0<UnmodSortedIterator<UnEntry<Z, B>>> f) { iterFactory = f; }
 //
 //            @Override public int size() { return size; }
 //
-//            @Override public UnIteratorOrdered<B> iterator() {
-//                final UnIteratorOrdered<UnMap.UnEntry<Z,B>> iter = iterFactory.apply();
-//                return new UnIteratorOrdered<B>() {
+//            @Override public UnmodSortedIterator<B> iterator() {
+//                final UnmodSortedIterator<UnmodMap.UnEntry<Z,B>> iter = iterFactory.apply();
+//                return new UnmodSortedIterator<B>() {
 //                    @Override public boolean hasNext() { return iter.hasNext(); }
 //                    @Override public B next() { return iter.next().getValue(); }
 //                };
 //            }
-//            @Override public int hashCode() { return UnIterable.hashCode(this); }
+//            @Override public int hashCode() { return UnmodIterable.hashCode(this); }
 //            @Override public boolean equals(Object o) {
 //                if (this == o) { return true; }
-//                if ( !(o instanceof UnIterableOrdered) ) { return false; }
-//                return UnIterableOrdered.equals(this, (UnIterableOrdered) o);
+//                if ( !(o instanceof UnmodSortedIterable) ) { return false; }
+//                return UnmodSortedIterable.equals(this, (UnmodSortedIterable) o);
 //            }
-//            @Override public String toString() { return UnIterableOrdered.toString("ValueColl", this); }
+//            @Override public String toString() { return UnmodSortedIterable.toString("ValueColl", this); }
 //        }
 //        return new ValueColl<>(() -> this.iterator());
 //    }
@@ -438,7 +438,7 @@ public class PersistentTreeMap<K,V> implements ImMapOrdered<K,V> {
     }
 
     /** {@inheritDoc} */
-    @Override public ImMapOrdered<K,V> tailMap(K fromKey) {
+    @Override public ImSortedMap<K,V> tailMap(K fromKey) {
         UnEntry<K,V> last = last();
         K lastKey = last.getKey();
         int compFromKeyLastKey = comp.compare(fromKey, lastKey);
@@ -457,8 +457,8 @@ public class PersistentTreeMap<K,V> implements ImMapOrdered<K,V> {
             return ofComp(comp, last.getKey(), last.getValue());
         }
 
-        ImMapOrdered<K,V> ret = new PersistentTreeMap<>(comp, null, 0);
-        UnIterator<UnEntry<K,V>> iter = this.iterator();
+        ImSortedMap<K,V> ret = new PersistentTreeMap<>(comp, null, 0);
+        UnmodIterator<UnEntry<K,V>> iter = this.iterator();
         while (iter.hasNext()) {
             UnEntry<K,V> next = iter.next();
             K key = next.getKey();
@@ -475,7 +475,7 @@ public class PersistentTreeMap<K,V> implements ImMapOrdered<K,V> {
         if (size() > 1) {
             return without(firstKey());
 //            // The iterator is designed to do this quickly.  It also prevents an infinite loop here.
-//            UnIterator<UnEntry<K,V>> iter = this.iterator();
+//            UnmodIterator<UnEntry<K,V>> iter = this.iterator();
 //            // Drop the head
 //            iter.next();
 //            return tailMap(iter.next().getKey());
@@ -627,7 +627,7 @@ public class PersistentTreeMap<K,V> implements ImMapOrdered<K,V> {
 
     /** {@inheritDoc} */
     @Override
-    public UnIteratorOrdered<UnMap.UnEntry<K,V>> iterator() { return new NodeIterator<>(tree, true); }
+    public UnmodSortedIterator<UnEntry<K,V>> iterator() { return new NodeIterator<>(tree, true); }
 
 //    public NodeIterator<K,V> reverseIterator() { return new NodeIterator<>(tree, false); }
 
@@ -673,7 +673,7 @@ public class PersistentTreeMap<K,V> implements ImMapOrdered<K,V> {
     @Override public int size() { return size; }
 
     /** Returns an Option of the key/value pair matching the given key, or Option.none() if the key is not found. */
-    @Override public Option<UnMap.UnEntry<K,V>> entry(K key) {
+    @Override public Option<UnmodMap.UnEntry<K,V>> entry(K key) {
         Node<K,V> t = tree;
         while (t != null) {
             int c = comp.compare(key, t.key);
@@ -1249,7 +1249,7 @@ public class PersistentTreeMap<K,V> implements ImMapOrdered<K,V> {
 //        }
 //    }
 
-    private static class NodeIterator<K, V> implements UnIteratorOrdered<UnMap.UnEntry<K,V>> {
+    private static class NodeIterator<K, V> implements UnmodSortedIterator<UnEntry<K,V>> {
         private Stack<Node<K,V>> stack = new Stack<>();
         private final boolean asc;
 
@@ -1269,7 +1269,7 @@ public class PersistentTreeMap<K,V> implements ImMapOrdered<K,V> {
             return !stack.isEmpty();
         }
 
-        @Override public UnMap.UnEntry<K,V> next() {
+        @Override public UnmodMap.UnEntry<K,V> next() {
             Node<K,V> t = stack.pop();
             push(asc ? t.right() : t.left());
             return t;

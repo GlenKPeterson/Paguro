@@ -18,7 +18,7 @@ import java.util.Map;
 
 /**
  A couple utilities that aren't supplied in Java.  Most of these have been moved to other classes.  For instance,
- toString(Iterable) has been moved to UnIterable.  All the functions for composing predicates are now on Function1.
+ toString(Iterable) has been moved to UnmodIterable.  All the functions for composing predicates are now on Function1.
  */
 public class FunctionUtils {
 

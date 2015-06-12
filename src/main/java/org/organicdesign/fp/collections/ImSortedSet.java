@@ -16,31 +16,32 @@ package org.organicdesign.fp.collections;
 import org.organicdesign.fp.permanent.Sequence;
 
 /** An immutable sorted set interface */
-public interface ImSetOrdered<E> extends ImSet<E>, UnSetOrdered<E>, Sequence<E> {
+public interface ImSortedSet<E> extends ImSet<E>, UnmodSortedSet<E>, Sequence<E> {
     /** {@inheritDoc} */
     @Override
-    ImSetOrdered<E> put(E e);
+    ImSortedSet<E> put(E e);
 
     /** {@inheritDoc} */
     @Override
-    ImSetOrdered<E> disjoin(E key);
+    ImSortedSet<E> disjoin(E key);
 
     /** Return the elements in this set up (but excluding) to the given element */
-    @Override default ImSetOrdered<E> headSet(E toElement) { return subSet(first(), toElement); }
+    @Override default ImSortedSet<E> headSet(E toElement) { return subSet(first(), toElement); }
 
     /**
      Iterates over contents in a guaranteed order. {@inheritDoc}
      */
-    @Override UnIteratorOrdered<E> iterator();
+    @Override
+    UnmodSortedIterator<E> iterator();
 
     /** A sequence of the items contained in this set in order.  Just returns this SetOrdered. */
     @Override default Sequence<E> seq() { return this; }
 
     /** Return the elements in this set from the start element (inclusive) to the end element (exclusive) */
     @Override
-    ImSetOrdered<E> subSet(E fromElement, E toElement);
+    ImSortedSet<E> subSet(E fromElement, E toElement);
 
     /** Return the elements in this from the given element to the end */
-    @Override default ImSetOrdered<E> tailSet(E fromElement) { return subSet(fromElement, last()); }
+    @Override default ImSortedSet<E> tailSet(E fromElement) { return subSet(fromElement, last()); }
 
 }

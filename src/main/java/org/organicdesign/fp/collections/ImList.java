@@ -20,17 +20,17 @@ import org.organicdesign.fp.permanent.Sequence;
  Holds Immutable "modification" methods that return a new ImList reflecting the modification while sharing as much data
  structure with the previous ImList as possible (for performance).
  */
-public interface ImList<E> extends UnList<E>, Sequence<E> {
+public interface ImList<E> extends UnmodList<E>, Sequence<E> {
     // Do we want to make an ImIterator that's truly immutable - a Sequence?
     // Kind of a moot point when this overrides the same method on Sequence.
     /** {@inheritDoc} */
-    @Override default UnIteratorOrdered<E> iterator() { return listIterator(0); }
+    @Override default UnmodSortedIterator<E> iterator() { return listIterator(0); }
 //
 //    /** {@inheritDoc} */
-//    @Override default UnListIterator<E> listIterator() { return listIterator(0); }
+//    @Override default UnmodListIterator<E> listIterator() { return listIterator(0); }
 
 // Inherited correctly - there is no ImIterator.
-// UnListIterator<E> listIterator(int index) {
+// UnmodListIterator<E> listIterator(int index) {
 
 // Inherited correctly and need to be implemented by the implementing class
 // int size() {
@@ -52,7 +52,7 @@ public interface ImList<E> extends UnList<E>, Sequence<E> {
             throw new IllegalArgumentException("Can't insert outside the possible bounds");
         }
 
-        UnIterator<E> iter = iterator();
+        UnmodIterator<E> iter = iterator();
         ImList<E> v = PersistentVector.empty();
         int j = 0;
         for (; j < i; j++) {
@@ -154,7 +154,7 @@ public interface ImList<E> extends UnList<E>, Sequence<E> {
 //            throw new IllegalArgumentException("Can't insert outside the possible bounds");
 //        }
 //
-//        UnIterator<E> uli = list.iterator();
+//        UnmodIterator<E> uli = list.iterator();
 //        ImList<E> v = PersistentVector.empty();
 //        for (int j = 0; j < i; j++) {
 //            v = v.concat(uli.next());

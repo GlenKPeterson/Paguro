@@ -147,14 +147,14 @@ public class Function1Test {
         assertArrayEquals(View.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
                         .filter(Function1.<Integer>andArray((i) -> i > 2,
                                 (i) -> i < 6))
-                        .toJavaList()
+                        .toMutableList()
                         .toArray(),
                 new Integer[]{3, 4, 5});
 
         assertArrayEquals(View.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
                         .filter(Function1.orArray(i -> i < 3,
                                 i -> i > 5))
-                        .toJavaList()
+                        .toMutableList()
                         .toArray(),
                 new Integer[]{1, 2, 6, 7, 8, 9});
 
@@ -162,7 +162,7 @@ public class Function1Test {
                         .filter(Function1.orArray(i -> i < 3,
                                 i -> i == 4,
                                 i -> i > 5))
-                        .toJavaList()
+                        .toMutableList()
                         .toArray(),
                 new Integer[]{1, 2, 4, 6, 7, 8, 9});
     }
