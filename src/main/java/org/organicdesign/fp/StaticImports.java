@@ -14,15 +14,25 @@
 
 package org.organicdesign.fp;
 
+import org.organicdesign.fp.collections.ImList;
+import org.organicdesign.fp.collections.ImMap;
+import org.organicdesign.fp.collections.ImSet;
+import org.organicdesign.fp.collections.ImSortedMap;
+import org.organicdesign.fp.collections.ImSortedSet;
+import org.organicdesign.fp.collections.PersistentHashMap;
+import org.organicdesign.fp.collections.PersistentHashSet;
+import org.organicdesign.fp.collections.PersistentTreeMap;
+import org.organicdesign.fp.collections.PersistentTreeSet;
+import org.organicdesign.fp.collections.PersistentVector;
 import org.organicdesign.fp.collections.UnmodCollection;
 import org.organicdesign.fp.collections.UnmodIterable;
 import org.organicdesign.fp.collections.UnmodIterator;
-import org.organicdesign.fp.collections.UnmodListIterator;
-import org.organicdesign.fp.collections.UnmodSortedIterator;
 import org.organicdesign.fp.collections.UnmodList;
+import org.organicdesign.fp.collections.UnmodListIterator;
 import org.organicdesign.fp.collections.UnmodMap;
-import org.organicdesign.fp.collections.UnmodSortedMap;
 import org.organicdesign.fp.collections.UnmodSet;
+import org.organicdesign.fp.collections.UnmodSortedIterator;
+import org.organicdesign.fp.collections.UnmodSortedMap;
 import org.organicdesign.fp.collections.UnmodSortedSet;
 import org.organicdesign.fp.tuple.Tuple2;
 
@@ -37,10 +47,14 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 
 /**
+ Statically importing the functions in this file is like building a mini language in Java.  Whether that is a good or
+ bad idea remains to be seen.  As with any usage of import *, there will probably be issues if you import 2 different
+ versions of this file in your classpath.
+
  Contains methods for building immutable collections.  These will never return null, the closest they get is to return
  an empty immutable collection (the same one is reused).  The skipNull versions aid immutable programming since
  you can build a map of unknown size as follows:
- <pre><code>unMapSkipNull(Tuple2.of("hello", 33),
+ <pre><code>imMapSkipNull(Tuple2.of("hello", 33),
              Tuple2.of("there", 44),
              currUser.isFred ? Tuple2.of("Fred", 55) : null);</code></pre>
  */
@@ -72,7 +86,7 @@ public class StaticImports {
     }
 
     /** Returns an unmodifiable version of the given iterator. */
-    // TODO: Never make this public.  We can't trust an iterator that we didn't get
+    // Never make this public.  We can't trust an iterator that we didn't get
     // brand new ourselves, because iterators are inherently unsafe to share.
     private static <T> UnmodIterator<T> unmod(Iterator<T> iter) {
         if (iter == null) { return UnmodIterator.empty(); }
@@ -268,109 +282,253 @@ public class StaticImports {
         };
     }
 
-//    /** Returns an unmodifiable Map containing all passed pairs (including null keys/values). */
-//    public static <K,V> UnmodMap<K,V> unMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5,
-//                                         K k6, V v6, K k7, V v7, K k8, V v8, K k9, V v9,
-//                                         K k10, V v10) {
-//        Map<K,V> m = new HashMap<>(20);
-//        m.put(k1, v1); m.put(k2, v2); m.put(k3, v3); m.put(k4, v4); m.put(k5, v5); m.put(k6, v6);
-//        m.put(k7, v7); m.put(k8, v8); m.put(k9, v9); m.put(k10, v10);
-//        return unmod(m);
-//    }
-//    /** Returns an unmodifiable Map containing all passed pairs (including null keys/values). */
-//    public static <K,V> UnmodMap<K,V> unMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5,
-//                                         K k6, V v6, K k7, V v7, K k8, V v8, K k9, V v9) {
-//        Map<K,V> m = new HashMap<>(9);
-//        m.put(k1, v1); m.put(k2, v2); m.put(k3, v3); m.put(k4, v4); m.put(k5, v5); m.put(k6, v6);
-//        m.put(k7, v7); m.put(k8, v8); m.put(k9, v9);
-//        return unmod(m);
-//    }
-//    /** Returns an unmodifiable Map containing all passed pairs (including null keys/values). */
-//    public static <K,V> UnmodMap<K,V> unMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5,
-//                                         K k6, V v6, K k7, V v7, K k8, V v8) {
-//        Map<K,V> m = new HashMap<>(8);
-//        m.put(k1, v1); m.put(k2, v2); m.put(k3, v3); m.put(k4, v4); m.put(k5, v5); m.put(k6, v6);
-//        m.put(k7, v7); m.put(k8, v8);
-//        return unmod(m);
-//    }
-//    /** Returns an unmodifiable Map containing all passed pairs (including null keys/values). */
-//    public static <K,V> UnmodMap<K,V> unMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5,
-//                                         K k6, V v6, K k7, V v7) {
-//        Map<K,V> m = new HashMap<>(7);
-//        m.put(k1, v1); m.put(k2, v2); m.put(k3, v3); m.put(k4, v4); m.put(k5, v5); m.put(k6, v6);
-//        m.put(k7, v7);
-//        return unmod(m);
-//    }
-//    /** Returns an unmodifiable Map containing all passed pairs (including null keys/values). */
-//    public static <K,V> UnmodMap<K,V> unMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5,
-//                                         K k6, V v6) {
-//        Map<K,V> m = new HashMap<>(6);
-//        m.put(k1, v1); m.put(k2, v2); m.put(k3, v3); m.put(k4, v4); m.put(k5, v5); m.put(k6, v6);
-//        return unmod(m);
-//    }
-//    /** Returns an unmodifiable Map containing all passed pairs (including null keys/values). */
-//    public static <K,V> UnmodMap<K,V> unMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
-//        Map<K,V> m = new HashMap<>(5);
-//        m.put(k1, v1); m.put(k2, v2); m.put(k3, v3); m.put(k4, v4); m.put(k5, v5);
-//        return unmod(m);
-//    }
-//    /** Returns an unmodifiable Map containing all passed pairs (including null keys/values). */
-//    public static <K,V> UnmodMap<K,V> unMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
-//        Map<K,V> m = new HashMap<>(4); m.put(k1, v1); m.put(k2, v2); m.put(k3, v3); m.put(k4, v4);
-//        return unmod(m);
-//    }
-//    /** Returns an unmodifiable Map containing all passed pairs (including null keys/values). */
-//    public static <K,V> UnmodMap<K,V> unMap(K k1, V v1, K k2, V v2, K k3, V v3) {
-//        Map<K,V> m = new HashMap<>(3); m.put(k1, v1); m.put(k2, v2); m.put(k3, v3);
-//        return unmod(m);
-//    }
-//    /** Returns an unmodifiable Map containing all passed pairs (including null keys/values). */
-//    public static <K,V> UnmodMap<K,V> unMap(K k1, V v1, K k2, V v2) {
-//        Map<K,V> m = new HashMap<>(2); m.put(k1, v1); m.put(k2, v2);
-//        return unmod(m);
-//    }
-//    /** Returns an unmodifiable Map containing all passed pairs (including null keys/values). */
-//    public static <K,V> UnmodMap<K,V> unMap(K k1, V v1) {
-//        Map<K,V> m = new HashMap<>(1); m.put(k1, v1); return unmod(m);
-//    }
-//
-//    /** Returns an unmodifiable Map containing any non-null passed items. */
-//    @SafeVarargs
-//    public static <K,V> UnmodMap<K,V> unMapSkipNull(Map.Entry<K,V>... es) {
-//        if (es == null) { return UnmodMap.empty(); }
-//        Map<K,V> m = new HashMap<>();
-//        for (Map.Entry<K,V> entry : es) {
-//            if (entry != null) {
-//                m.put(entry.getKey(), entry.getValue());
-//            }
-//        }
-//        return unmod(m);
-//    }
-//
-//    /** Returns an unmodifiable Set containing all passed items (including null items). */
-//    @SuppressWarnings("unchecked")
-//    @SafeVarargs
-//    public static <T> UnmodSet<T> unSet(T... ts) {
-//        return ( (ts == null) || (ts.length < 1) )
-//                ? UnmodSet.empty()
-//                : unmod(new HashSet<>(Arrays.asList(ts)));
-//    }
-//
-//    /** Returns an unmodifiable Set containing any non-null passed items. */
-//    @SuppressWarnings("unchecked")
-//    @SafeVarargs
-//    public static <T> UnmodSet<T> unSetSkipNull(T... ts) {
-//        if ( (ts == null) || (ts.length < 1) ) {
-//            return UnmodSet.empty();
-//        }
-//        Set<T> s = new HashSet<>();
-//        for (T t : ts) {
-//            if (t != null) {
-//                s.add(t);
-//            }
-//        }
-//        return (s.size() > 0) ? unmod(s) : UnmodSet.empty();
-//    }
+    /** Returns a new PersistentVector of the given items. */
+    @SafeVarargs
+    static public <T> ImList<T> imList(T... items) { return PersistentVector.of(items); }
+
+    /** Returns a new PersistentVector of the given items, omitting any nulls. */
+    @SafeVarargs
+    public static <T> ImList<T> imListSkipNull(T... items) { return PersistentVector.ofSkipNull(items); }
+
+    /** Returns a new PersistentHashSet of the given items. */
+    @SafeVarargs
+    public static <T> ImSet<T> imSet(T... items) {
+        return PersistentHashSet.of(items);
+    }
+
+    /**
+     Returns a new PersistentTreeSet of the given comparator.  Always use this instead of starting with empty() because
+     there is no way to assign a comparator later on.
+     */
+    public static <T> ImSortedSet<T> imSortedSetComp(Comparator<? super T> comp) {
+        return PersistentTreeSet.ofComp(comp);
+    }
+
+    /** Returns a new PersistentTreeSet of the given comparator and items. */
+    @SafeVarargs
+    public static <T> ImSortedSet<T> imSortedSetComp(Comparator<? super T> comp, T... items) {
+        return PersistentTreeSet.ofComp(comp, items);
+    }
+
+    /** Returns a new PersistentTreeSet of the given comparable items. */
+    @SafeVarargs
+    public static <T extends Comparable<T>> ImSortedSet<T> imSortedSet(T... items) {
+        return PersistentTreeSet.of(items);
+    }
+
+    /** Returns a new PersistentHashMap of the given keys and their paired values. */
+    public static <K,V>
+    ImMap<K,V> imMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7,
+                              K k8, V v8, K k9, V v9, K k10, V v10) {
+        return PersistentHashMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5,
+                                    k6, v6, k7, v7, k8, v8, k9, v9, k10, v10);
+    }
+
+    /** Returns a new PersistentHashMap of the given keys and their paired values. */
+    public static <K,V>
+    ImMap<K,V> imMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7,
+                              K k8, V v8, K k9, V v9) {
+        return PersistentHashMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5,
+                                    k6, v6, k7, v7, k8, v8, k9, v9);
+    }
+
+    /** Returns a new PersistentHashMap of the given keys and their paired values. */
+    public static <K,V>
+    ImMap<K,V> imMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7,
+                              K k8, V v8) {
+        return PersistentHashMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7, k8, v8);
+    }
+
+    /** Returns a new PersistentHashMap of the given keys and their paired values. */
+    public static <K,V>
+    ImMap<K,V> imMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7) {
+        return PersistentHashMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7);
+    }
+
+    /** Returns a new PersistentHashMap of the given keys and their paired values. */
+    public static <K,V>
+    ImMap<K,V> imMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6) {
+        return PersistentHashMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6);
+    }
+
+    /** Returns a new PersistentHashMap of the given keys and their paired values. */
+    public static <K,V>
+    ImMap<K,V> imMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
+        return PersistentHashMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5);
+    }
+
+    /** Returns a new PersistentHashMap of the given keys and their paired values. */
+    public static <K,V>
+    ImMap<K,V> imMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
+        return PersistentHashMap.of(k1, v1, k2, v2, k3, v3, k4, v4);
+    }
+
+    /** Returns a new PersistentHashMap of the given keys and their paired values. */
+    public static <K,V>
+    ImMap<K,V> imMap(K k1, V v1, K k2, V v2, K k3, V v3) {
+        return PersistentHashMap.of(k1, v1, k2, v2, k3, v3);
+    }
+
+    /** Returns a new PersistentHashMap of the given keys and their paired values. */
+    public static <K,V>
+    ImMap<K,V> imMap(K k1, V v1, K k2, V v2) {
+        return PersistentHashMap.of(k1, v1, k2, v2);
+    }
+
+    /** Returns a new PersistentHashMap of the given keys and their paired values. */
+    public static <K,V> ImMap<K,V> imMap(K k1, V v1) {
+        return PersistentHashMap.of(k1, v1);
+    }
+
+    /**
+     Returns a new PersistentHashMap of the given keys and their paired values, skipping any null Entries.
+     */
+    @SafeVarargs
+    public static <K,V> ImMap<K,V> imMapSkipNull(Map.Entry<K,V>... es) {
+        return PersistentHashMap.ofSkipNull(es);
+    }
+
+    /** Returns a new PersistentTreeMap of the given comparable keys and their paired values. */
+    public static <K extends Comparable<K>,V>
+    ImSortedMap<K,V> imSortedMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5,
+                                       K k6, V v6, K k7, V v7, K k8, V v8, K k9, V v9, K k10, V v10) {
+        return PersistentTreeMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7, k8, v8, k9, v9, k10, v10);
+    }
+
+    /** Returns a new PersistentTreeMap of the given comparable keys and their paired values. */
+    public static <K extends Comparable<K>,V>
+    ImSortedMap<K,V> imSortedMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5,
+                              K k6, V v6, K k7, V v7, K k8, V v8, K k9, V v9) {
+        return PersistentTreeMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7, k8, v8, k9, v9);
+    }
+
+    /** Returns a new PersistentTreeMap of the given comparable keys and their paired values. */
+    public static <K extends Comparable<K>,V>
+    ImSortedMap<K,V> imSortedMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7,
+                              K k8, V v8) {
+        return PersistentTreeMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7, k8, v8);
+    }
+
+    /** Returns a new PersistentTreeMap of the given comparable keys and their paired values. */
+    public static <K extends Comparable<K>,V>
+    ImSortedMap<K,V> imSortedMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7) {
+        return PersistentTreeMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7);
+    }
+
+    /** Returns a new PersistentTreeMap of the given comparable keys and their paired values. */
+    public static <K extends Comparable<K>,V>
+    ImSortedMap<K,V> imSortedMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6) {
+        return PersistentTreeMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6);
+    }
+
+    /** Returns a new PersistentTreeMap of the given comparable keys and their paired values. */
+    public static <K extends Comparable<K>,V>
+    ImSortedMap<K,V> imSortedMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
+        return PersistentTreeMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5);
+    }
+
+    /** Returns a new PersistentTreeMap of the given comparable keys and their paired values. */
+    public static <K extends Comparable<K>,V>
+    ImSortedMap<K,V> imSortedMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
+        return PersistentTreeMap.of(k1, v1, k2, v2, k3, v3, k4, v4);
+    }
+
+    /** Returns a new PersistentTreeMap of the given comparable keys and their paired values. */
+    public static <K extends Comparable<K>,V>
+    ImSortedMap<K,V> imSortedMap(K k1, V v1, K k2, V v2, K k3, V v3) {
+        return PersistentTreeMap.of(k1, v1, k2, v2, k3, v3);
+    }
+
+    /** Returns a new PersistentTreeMap of the given comparable keys and their paired values. */
+    public static <K extends Comparable<K>,V>
+    ImSortedMap<K,V> imSortedMap(K k1, V v1, K k2, V v2) {
+        return PersistentTreeMap.of(k1, v1, k2, v2);
+    }
+
+    /** Returns a new PersistentTreeMap of the given comparable keys and their paired values. */
+    public static <K extends Comparable<K>,V> ImSortedMap<K,V> imSortedMap(K k1, V v1) {
+        return PersistentTreeMap.of(k1, v1);
+    }
+
+    /**
+     Returns a new PersistentTreeMap of the given comparable keys and their paired values, skipping any null Entries.
+     */
+    @SafeVarargs
+    public static <K extends Comparable<K>,V> ImSortedMap<K,V> imSortedMapSkipNull(Map.Entry<K,V>... es) {
+        return PersistentTreeMap.ofSkipNull(es);
+    }
+
+    /** Returns a new PersistentTreeMap of the specified comparator and the given key/value pairs. */
+    public static <K,V> ImSortedMap<K,V>
+    imSortedMapComp(Comparator<? super K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5,
+                    K k6, V v6, K k7, V v7, K k8, V v8, K k9, V v9, K k10, V v10) {
+        return PersistentTreeMap.ofComp(c, k1, v1, k2, v2, k3, v3, k4, v4, k5, v5,
+                                        k6, v6, k7, v7, k8, v8, k9, v9, k10, v10);
+    }
+
+    /** Returns a new PersistentTreeMap of the specified comparator and the given key/value pairs. */
+    public static <K,V> ImSortedMap<K,V>
+    imSortedMapComp(Comparator<? super K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5,
+                    K k6, V v6, K k7, V v7, K k8, V v8, K k9, V v9) {
+        return PersistentTreeMap.ofComp(c, k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7, k8, v8, k9, v9);
+    }
+
+    /** Returns a new PersistentTreeMap of the specified comparator and the given key/value pairs. */
+        public static <K,V> ImSortedMap<K,V>
+    imSortedMapComp(Comparator<? super K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5,
+                    K k6, V v6, K k7, V v7, K k8, V v8) {
+            return PersistentTreeMap.ofComp(c, k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7, k8, v8);
+    }
+
+    /** Returns a new PersistentTreeMap of the specified comparator and the given key/value pairs. */
+    public static <K,V> ImSortedMap<K,V>
+    imSortedMapComp(Comparator<? super K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5,
+                    K k6, V v6, K k7, V v7) {
+        return PersistentTreeMap.ofComp(c, k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7);
+    }
+
+    /** Returns a new PersistentTreeMap of the specified comparator and the given key/value pairs. */
+    public static <K,V> ImSortedMap<K,V>
+    imSortedMapComp(Comparator<? super K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6) {
+        return PersistentTreeMap.ofComp(c, k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6);
+    }
+
+    /** Returns a new PersistentTreeMap of the specified comparator and the given key/value pairs. */
+    public static <K,V> ImSortedMap<K,V>
+    imSortedMapComp(Comparator<? super K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
+        return PersistentTreeMap.ofComp(c, k1, v1, k2, v2, k3, v3, k4, v4, k5, v5);
+    }
+
+    /** Returns a new PersistentTreeMap of the specified comparator and the given key/value pairs. */
+    public static <K,V> ImSortedMap<K,V>
+    imSortedMapComp(Comparator<? super K> c, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
+        return PersistentTreeMap.ofComp(c, k1, v1, k2, v2, k3, v3, k4, v4);
+    }
+
+    /** Returns a new PersistentTreeMap of the specified comparator and the given key/value pairs. */
+    public static <K,V> ImSortedMap<K,V>
+    imSortedMapComp(Comparator<? super K> c, K k1, V v1, K k2, V v2, K k3, V v3) {
+        return PersistentTreeMap.ofComp(c, k1, v1, k2, v2, k3, v3);
+    }
+
+    /** Returns a new PersistentTreeMap of the specified comparator and the given key/value pairs. */
+    public static <K,V> ImSortedMap<K,V>
+    imSortedMapComp(Comparator<? super K> c, K k1, V v1, K k2, V v2) {
+        return PersistentTreeMap.ofComp(c, k1, v1, k2, v2);
+    }
+
+    /** Returns a new PersistentTreeMap of the specified comparator and the given key/value pairs. */
+    public static <K,V> ImSortedMap<K,V>
+    imSortedMapComp(Comparator<? super K> c, K k1, V v1) {
+        return PersistentTreeMap.ofComp(c, k1, v1);
+    }
+
+    /** Returns a new PersistentTreeMap of the specified comparator and the given key/value pairs. */
+    @SafeVarargs
+    public static <K,V> ImSortedMap<K,V>
+    imSortedMapCompSkipNull(Comparator<? super K> c, Map.Entry<K,V>... es) {
+        return PersistentTreeMap.ofCompSkipNull(c, es);
+    }
 
 //    /**
 //     * Returns an int which is a unique and correct hash code for the objects passed.  This hashcode is recomputed on

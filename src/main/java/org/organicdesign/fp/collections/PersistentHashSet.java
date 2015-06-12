@@ -15,7 +15,6 @@ package org.organicdesign.fp.collections;
 
 import org.organicdesign.fp.permanent.Sequence;
 
-import java.util.List;
 import java.util.Set;
 
 public class PersistentHashSet<E> implements ImSet<E> {
@@ -35,14 +34,14 @@ public class PersistentHashSet<E> implements ImSet<E> {
         return ret.persistent();
     }
 
-    public static <E>  PersistentHashSet<E> of(List<E> init) {
-        PersistentHashSet<E> empty = empty();
-        TransientHashSet<E> ret = empty.asTransient();
-        for (E key : init) {
-            ret = ret.put(key);
-        }
-        return ret.persistent();
-    }
+//    public static <E>  PersistentHashSet<E> of(List<E> init) {
+//        PersistentHashSet<E> empty = empty();
+//        TransientHashSet<E> ret = empty.asTransient();
+//        for (E key : init) {
+//            ret = ret.put(key);
+//        }
+//        return ret.persistent();
+//    }
 
 //    static public <E>  PersistentHashSet<E> create(ISeq items) {
 //        PersistentHashSet<E> empty = empty();
