@@ -34,6 +34,19 @@ public class PersistentHashSet<E> implements ImSet<E> {
         return ret.persistent();
     }
 
+    @SafeVarargs
+    public static <E>  PersistentHashSet<E> ofSkipNull(E... init) {
+        PersistentHashSet<E> empty = empty();
+        TransientHashSet<E> ret = empty.asTransient();
+        for (int i = 0; i < init.length; i++) {
+            E e = init[i];
+            if (e != null) {
+                ret = ret.put(init[i]);
+            }
+        }
+        return ret.persistent();
+    }
+
 //    public static <E>  PersistentHashSet<E> of(List<E> init) {
 //        PersistentHashSet<E> empty = empty();
 //        TransientHashSet<E> ret = empty.asTransient();
