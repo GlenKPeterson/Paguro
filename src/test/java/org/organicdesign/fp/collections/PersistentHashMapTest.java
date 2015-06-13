@@ -958,27 +958,28 @@ public class PersistentHashMapTest {
         assertEquals("four", m.get(4));
     }
 
+    public static void testNadaOneTwo(PersistentHashMap<Integer,String> m) {
+        assertTrue(m.hasNull());
+        assertEquals(3, m.size());
+        assertTrue(m.containsKey(1));
+        assertTrue(m.containsKey(2));
+        assertTrue(m.containsKey(null));
+        assertFalse(m.containsKey(3));
+        assertEquals("one", m.get(1));
+        assertEquals("two", m.get(2));
+        assertEquals("nada", m.get(null));
+        assertNull(m.get(3));
+        m = m.without(null);
+        assertEquals(2, m.size());
+    }
+
     @Test public void withNull() {
-        PersistentHashMap<Integer,String> m = PersistentHashMap.of(null, "nada", 1, "one", 2, "two");
-        assertTrue(m.hasNull());
-        assertEquals(3, m.size());
-        assertEquals("nada", m.get(null));
-        m = m.without(null);
-        assertEquals(2, m.size());
+        testNadaOneTwo(PersistentHashMap.of(null, "nada", 1, "one", 2, "two"));
 
-        m = PersistentHashMap.of(1, "one", 2, "two", null, "nada");
-        assertTrue(m.hasNull());
-        assertEquals(3, m.size());
-        assertEquals("nada", m.get(null));
-        m = m.without(null);
-        assertEquals(2, m.size());
 
-        m = PersistentHashMap.empty(Equator.defaultEquator());
-        m = m.assoc(1, "one").assoc(null, "nada").assoc(2, "two");
-        assertTrue(m.hasNull());
-        assertEquals(3, m.size());
-        assertEquals("nada", m.get(null));
-        m = m.without(null);
-        assertEquals(2, m.size());
+        testNadaOneTwo(PersistentHashMap.of(1, "one", 2, "two", null, "nada"));
+
+        testNadaOneTwo(PersistentHashMap.<Integer,String>empty(Equator.defaultEquator())
+                               .assoc(1, "one").assoc(null, "nada").assoc(2, "two"));
     }
 }
