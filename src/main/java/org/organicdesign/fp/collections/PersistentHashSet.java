@@ -19,10 +19,12 @@ import java.util.Set;
 
 public class PersistentHashSet<E> implements ImSet<E> {
 
-    public static final PersistentHashSet<Object> EMPTY = new PersistentHashSet<>(PersistentHashMap.EMPTY);
+//    public static final PersistentHashSet<Object> EMPTY = new PersistentHashSet<>(PersistentHashMap.EMPTY);
 
     @SuppressWarnings("unchecked")
-    public static <E> PersistentHashSet<E> empty() { return (PersistentHashSet<E>) EMPTY; }
+    public static <E> PersistentHashSet<E> empty() { return (PersistentHashSet<E>) new PersistentHashSet<>(PersistentHashMap.empty()); }
+
+    public static <E> PersistentHashSet<E> empty(Equator<E> eq) { return new PersistentHashSet<>(PersistentHashMap.empty(eq)); }
 
     @SafeVarargs
     public static <E>  PersistentHashSet<E> of(E... init) {
@@ -30,6 +32,29 @@ public class PersistentHashSet<E> implements ImSet<E> {
         TransientHashSet<E> ret = empty.asTransient();
         for (int i = 0; i < init.length; i++) {
             ret = ret.put(init[i]);
+        }
+        return ret.persistent();
+    }
+
+    @SafeVarargs
+    public static <E>  PersistentHashSet<E> ofEq(Equator<E> eq, E... init) {
+        PersistentHashSet<E> empty = empty(eq);
+        TransientHashSet<E> ret = empty.asTransient();
+        for (int i = 0; i < init.length; i++) {
+            ret = ret.put(init[i]);
+        }
+        return ret.persistent();
+    }
+
+    @SafeVarargs
+    public static <E>  PersistentHashSet<E> ofEqSkipNull(Equator<E> eq, E... init) {
+        PersistentHashSet<E> empty = empty(eq);
+        TransientHashSet<E> ret = empty.asTransient();
+        for (int i = 0; i < init.length; i++) {
+            E e = init[i];
+            if (e != null) {
+                ret = ret.put(init[i]);
+            }
         }
         return ret.persistent();
     }
@@ -47,69 +72,19 @@ public class PersistentHashSet<E> implements ImSet<E> {
         return ret.persistent();
     }
 
-//    public static <E>  PersistentHashSet<E> of(List<E> init) {
-//        PersistentHashSet<E> empty = empty();
-//        TransientHashSet<E> ret = empty.asTransient();
-//        for (E key : init) {
-//            ret = ret.put(key);
-//        }
-//        return ret.persistent();
-//    }
-
-//    static public <E>  PersistentHashSet<E> create(ISeq items) {
-//        PersistentHashSet<E> empty = empty();
-//        TransientHashSet<E> ret = empty.asTransient();
-//        for (; items != null; items = items.next()) {
-//            ret = ret.conj(items.first());
-//        }
-//        return ret.persistent();
-//    }
-
-//    @SafeVarargs
-//    public static <E> PersistentHashSet<E> createWithCheck(E... init) {
-//        PersistentHashSet<E> empty = empty();
-//        TransientHashSet<E> ret = empty.asTransient();
-//        for (int i = 0; i < init.length; i++) {
-//            ret = ret.put(init[i]);
-//            if (ret.size() != i + 1)
-//                throw new IllegalArgumentException("Duplicate key: " + init[i]);
-//        }
-//        return ret.persistent();
-//    }
-//
-//    public static <E> PersistentHashSet<E> createWithCheck(List<E> init) {
-//        PersistentHashSet<E> empty = empty();
-//        TransientHashSet<E> ret = empty.asTransient();
-//        int i = 0;
-//        for (E key : init) {
-//            ret = ret.put(key);
-//            if (ret.size() != i + 1)
-//                throw new IllegalArgumentException("Duplicate key: " + key);
-//            ++i;
-//        }
-//        return ret.persistent();
-//    }
-
     @SuppressWarnings("unchecked")
     public static <E> PersistentHashSet<E> ofMap(ImMapTrans<E,?> map) {
         return new PersistentHashSet<>((ImMapTrans<E,E>) map);
     }
 
-//    static public PersistentHashSet<E> createWithCheck(ISeq items) {
-//        PersistentHashSet<E> empty = empty();
-//        TransientHashSet<E> ret = empty.asTransient();
-//        for (int i = 0; items != null; items = items.next(), ++i) {
-//            ret = (TransientHashSet<E>) ret.conj(items.first());
-//            if (ret.count() != i + 1)
-//                throw new IllegalArgumentException("Duplicate key: " + items.first());
-//        }
-//        return (PersistentHashSet) ret.persistent();
-//    }
     private final ImMapTrans<E,E> impl;
 
     private PersistentHashSet(ImMapTrans<E,E> i) { impl = i; }
 
-    @Override public boolean contains(Object key) { return impl.containsKey(key); }
+    @Override public boolean contains(Object key) {
+        //noinspection SuspiciousMethodCalls
+        return impl.containsKey(key);
+    }
 
     @Override public PersistentHashSet<E> disjoin(E key) {
         if (contains(key))
@@ -182,18 +157,6 @@ public class PersistentHashSet<E> implements ImSet<E> {
             if (m != impl) this.impl = m;
             return this;
         }
-
-//        public E get(E key) {
-//            return impl.valAt(key);
-//        }
-
-//        public Object invoke(Object key, Object notFound) {
-//            return impl.valAt(key, notFound);
-//        }
-//
-//        public Object invoke(Object key) {
-//            return impl.valAt(key);
-//        }
 
         public PersistentHashSet<E> persistent() {
             return new PersistentHashSet<>(impl.persistent());

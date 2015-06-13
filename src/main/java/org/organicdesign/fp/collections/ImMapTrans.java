@@ -8,6 +8,10 @@ package org.organicdesign.fp.collections;
  */
 public interface ImMapTrans<K,V> extends ImMap<K,V> {
     ImMapTrans<K,V> asTransient();
+
+    /** Returns the Equator used by this map for equals comparisons and hashCodes */
+    Equator<K> equator();
+
     ImMapTrans<K,V> persistent();
 
     /** {@inheritDoc} */

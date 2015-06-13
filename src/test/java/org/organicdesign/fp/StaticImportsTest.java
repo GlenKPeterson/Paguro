@@ -278,7 +278,7 @@ public class StaticImportsTest {
 //    }
 
     @Test public void unListIterator() {
-        UnmodListIterator<Integer> uli = StaticImports.unmod(Arrays.asList(5, 4, 3).listIterator());
+        UnmodListIterator<Integer> uli = StaticImports.unmod(Arrays.asList(5, 4, 3)).listIterator();
         assertFalse(uli.hasPrevious());
         assertTrue(uli.hasNext());
 

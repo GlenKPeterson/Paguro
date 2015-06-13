@@ -12,7 +12,8 @@ public interface Equator<T> {
     // ==================================================== Static ====================================================
 
     Equator<Object> DEFAULT_EQUATOR = new Equator<Object>() {
-        @Override public int hash(Object o) { return (o == null) ? 0 : o.hashCode(); }
+        @Override public int hash(Object o) { return (o == null) ? Integer.MIN_VALUE : o.hashCode(); }
+
         @Override public boolean equalTo(Object o1, Object o2) {
             if (o1 == null) { return (o2 == null); }
             return o1.equals(o2);
