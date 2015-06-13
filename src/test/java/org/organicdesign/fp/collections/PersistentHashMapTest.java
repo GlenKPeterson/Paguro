@@ -24,6 +24,7 @@ import org.organicdesign.fp.function.Function2;
 import org.organicdesign.fp.permanent.Sequence;
 import org.organicdesign.fp.tuple.Tuple2;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,7 +32,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.*;
-import static org.organicdesign.fp.StaticImports.unmod;
+import static org.organicdesign.fp.FunctionUtils.ordinal;
 import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
 import static org.organicdesign.fp.testUtils.EqualsContract.equalsSameHashCode;
 
@@ -113,7 +114,8 @@ public class PersistentHashMapTest {
     }
 
     @Test public void seqMore() {
-        PersistentHashMap<String,Integer> m1 = PersistentHashMap.of("g", 1, "f", 2, "e", 3, "d", 4, "c", 5, "b", 6, "a", 7);
+        PersistentHashMap<String,Integer> m1 = PersistentHashMap.of("g", 1, "f", 2, "e", 3, "d", 4, "c", 5,
+                                                                    "b", 6, "a", 7);
         // System.out.println("m1.toString(): " + m1.toString());
 
         Set<UnmodMap.UnEntry<String,Integer>> s1 = new HashSet<>(Arrays.asList(Tuple2.of("g", 1),
@@ -394,6 +396,32 @@ public class PersistentHashMapTest {
         assertEquals(PersistentHashMap.EMPTY, PersistentHashMap.empty().without(4));
     }
 
+    @Test public void without2() {
+        Set<Integer> control = new HashSet<>();
+        PersistentHashMap<Integer,String> m = PersistentHashMap.empty();
+        int MAX = 20000;
+        for (int i = 0; i < MAX; i++) {
+            m = m.assoc(i, ordinal(i));
+            control.add(i);
+        }
+        assertEquals(control.size(), m.size());
+
+        while (control.size() > 0) {
+            assertEquals(control.size(), m.size());
+
+            // This yields a somewhat random integer from those that are left.
+            int r = control.iterator().next();
+
+            // Make sure we get out what we put in.
+            assertEquals(ordinal(r), m.get(r));
+
+            // Remove r from each.
+            control.remove(r);
+            m = m.without(r);
+        }
+        assertEquals(0, m.size());
+    }
+
     @Test public void largerMap() {
         PersistentHashMap<Integer,String> m =
                 PersistentHashMap.of(1, "one").assoc(2, "two").assoc(3, "three").assoc(4, "four").assoc(5, "five")
@@ -484,6 +512,113 @@ public class PersistentHashMapTest {
                      PersistentHashMap.of(4, "four").assoc(2, "two").assoc(5, "five").assoc(1, "one").assoc(3, "three")
                                       .values()
                                       .hashCode());
+
+    }
+
+    public static class Z {
+        public final LocalDateTime date;
+        public final Integer integer;
+        private Z(LocalDateTime d, Integer i) { date = d; integer = i; }
+        public static Z of(LocalDateTime d, Integer i) { return new Z(d, i); }
+    }
+
+    public static Equator.ComparisonContext<Z> BY_DATE = new Equator.ComparisonContext<Z>() {
+        @Override public int hash(Z z) { return z.date.hashCode(); }
+        @Override public int compare(Z z1, Z z2) { return z1.date.compareTo(z2.date); }
+    };
+
+    public static Equator.ComparisonContext<Z> BY_INT = new Equator.ComparisonContext<Z>() {
+        @Override public int hash(Z z) { return z.integer.hashCode(); }
+        @Override public int compare(Z z1, Z z2) {
+            return (z1.integer > z2.integer) ? 1 :
+                   (z1.integer < z2.integer) ? -1 :
+                    0;
+        }
+    };
+
+    @Test public void testEquator() {
+        Z z1 = Z.of(LocalDateTime.of(2015, 6, 13, 18, 38), 6);
+        Z z2 = Z.of(LocalDateTime.of(2015, 6, 13, 18, 39), 5);
+        Z z3 = Z.of(LocalDateTime.of(2015, 6, 13, 19, 38), 4);
+        Z z4 = Z.of(LocalDateTime.of(2015, 6, 14, 18, 38), 3);
+        Z z5 = Z.of(LocalDateTime.of(2015, 7, 13, 18, 38), 2);
+        Z z6 = Z.of(LocalDateTime.of(2016, 6, 13, 18, 38), 1);
+
+        ImMap<Z,String> a = PersistentHashMap.ofEq(
+                BY_DATE,
+                z1, ordinal(z1.integer),
+                z3, ordinal(z3.integer),
+                z5, ordinal(z5.integer),
+                z6, ordinal(z6.integer));
+
+        assertTrue(a.containsKey(z1));
+        assertFalse(a.containsKey(z2));
+        assertTrue(a.containsKey(z3));
+        assertFalse(a.containsKey(z4));
+        assertTrue(a.containsKey(z5));
+        assertTrue(a.containsKey(z6));
+
+        assertEquals(a, a.assoc(z1, ordinal(z1.integer)));
+        assertEquals(a, a.assoc(z3, ordinal(z3.integer)));
+        assertEquals(a, a.assoc(z5, ordinal(z5.integer)));
+        assertEquals(a, a.assoc(z6, ordinal(z6.integer)));
+        assertEquals(4, a.size());
+
+        assertNotEquals(a, a.assoc(z1, "replaced"));
+        assertEquals(4, a.size());
+        assertNotEquals(a, a.assoc(z3, "replaced"));
+        assertEquals(4, a.size());
+        assertNotEquals(a, a.assoc(z5, "replaced"));
+        assertEquals(4, a.size());
+        assertNotEquals(a, a.assoc(z6, "replaced"));
+        assertEquals(4, a.size());
+
+        assertEquals(a, a.assoc(Z.of(z1.date, Integer.MAX_VALUE), ordinal(z1.integer)));
+        assertEquals(4, a.size());
+        assertEquals(a, a.assoc(Z.of(z3.date, Integer.MIN_VALUE), ordinal(z3.integer)));
+        assertEquals(4, a.size());
+        assertEquals(a, a.assoc(Z.of(z5.date, 0), ordinal(z5.integer)));
+        assertEquals(4, a.size());
+        assertEquals(a, a.assoc(Z.of(z6.date, 99999), ordinal(z6.integer)));
+        assertEquals(4, a.size());
+
+        a = a.assoc(z2, "added later");
+        assertEquals(5, a.size());
+
+        ImMap<Z,String> b = PersistentHashMap.ofEq(
+                BY_INT,
+                z2, ordinal(z2.integer),
+                z4, ordinal(z4.integer),
+                z6, ordinal(z6.integer));
+
+        assertFalse(b.containsKey(z1));
+        assertTrue(b.containsKey(z2));
+        assertFalse(b.containsKey(z3));
+        assertTrue(b.containsKey(z4));
+        assertFalse(b.containsKey(z5));
+        assertTrue(b.containsKey(z6));
+
+        assertEquals(b, b.assoc(z2, ordinal(z2.integer)));
+        assertEquals(b, b.assoc(z4, ordinal(z4.integer)));
+        assertEquals(b, b.assoc(z6, ordinal(z6.integer)));
+        assertEquals(3, b.size());
+
+        assertNotEquals(b, b.assoc(z2, "replaced"));
+        assertEquals(3, b.size());
+        assertNotEquals(b, b.assoc(z4, "replaced"));
+        assertEquals(3, b.size());
+        assertNotEquals(b, b.assoc(z6, "replaced"));
+        assertEquals(3, b.size());
+
+        assertEquals(b, b.assoc(Z.of(LocalDateTime.MAX, z2.integer), ordinal(z2.integer)));
+        assertEquals(3, b.size());
+        assertEquals(b, b.assoc(Z.of(LocalDateTime.MIN, z4.integer), ordinal(z4.integer)));
+        assertEquals(3, b.size());
+        assertEquals(b, b.assoc(Z.of(LocalDateTime.now(), z6.integer), ordinal(z6.integer)));
+        assertEquals(3, b.size());
+
+        b = b.assoc(z3, "added later");
+        assertEquals(4, b.size());
 
     }
 

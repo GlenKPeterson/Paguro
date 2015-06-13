@@ -43,6 +43,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         public Box(Object val) { this.val = val; }
     }
 
+    // TODO: Consider getting rid of this.
     private static final class Reduced {
         Object val;
         public Reduced(Object val) { this.val = val; }
@@ -328,7 +329,9 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 
     /**
      This is compatible with java.util.Map but that means it wrongly allows comparisons with SortedMaps, which are
-     necessarily not commutative.
+     necessarily not commutative.  It also ignores the Equator.  As always, for meaningful equals,
+     define an equator.
+
      @param other the other (hopefully unsorted) map to compare to.
      @return true if these maps contain the same elements, regardless of order.
      */
