@@ -818,7 +818,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
                         return this;
                     return new BitmapIndexedNode<>(equator, null, bitmap, cloneAndSet(array, 2*idx+1, n));
                 }
-                if(equator.equalTo(key, keyOrNull)) {
+                if(equator.eq(key, keyOrNull)) {
                     if(val == valOrNode)
                         return this;
                     return new BitmapIndexedNode<>(equator, null, bitmap, cloneAndSet(array, 2*idx+1, val));
@@ -873,7 +873,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
                     return null;
                 return new BitmapIndexedNode<>(equator, null, bitmap ^ bit, removePair(array, idx));
             }
-            if(equator.equalTo(key, keyOrNull))
+            if(equator.eq(key, keyOrNull))
                 // TODO: collapse
                 return new BitmapIndexedNode<>(equator, null, bitmap ^ bit, removePair(array, idx));
             return this;
@@ -888,7 +888,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
             Object valOrNode = array[2*idx+1];
             if(keyOrNull == null)
                 return ((INode) valOrNode).find(shift + 5, hash, key);
-            if(equator.equalTo(key, keyOrNull))
+            if(equator.eq(key, keyOrNull))
                 return Tuple2.of(keyOrNull, (V) valOrNode);
             return null;
         }
@@ -904,7 +904,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
                 INode<K,V> n = iNode(array, 2 * idx + 1);
                 return n.findVal(shift + 5, hash, key, notFound);
             }
-            if (equator.equalTo(key, keyOrNull)) {
+            if (equator.eq(key, keyOrNull)) {
                 return v(array, 2 * idx + 1);
             }
             return notFound;
@@ -967,7 +967,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
                         return this;
                     return editAndSet(edit, 2*idx+1, n);
                 }
-                if(equator.equalTo(key, keyOrNull)) {
+                if(equator.eq(key, keyOrNull)) {
                     if(val == valOrNode)
                         return this;
                     return editAndSet(edit, 2*idx+1, val);
@@ -1032,7 +1032,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
                     return null;
                 return editAndRemovePair(edit, bit, idx);
             }
-            if(equator.equalTo(key, keyOrNull)) {
+            if(equator.eq(key, keyOrNull)) {
                 removedLeaf.val = removedLeaf;
                 // TODO: collapse
                 return editAndRemovePair(edit, bit, idx);
@@ -1089,7 +1089,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
             int idx = findIndex(key);
             if(idx < 0)
                 return null;
-            if(equator.equalTo(key, k(array, idx)))
+            if(equator.eq(key, k(array, idx)))
                 return Tuple2.of(k(array, idx), v(array, idx + 1));
             return null;
         }
@@ -1098,7 +1098,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
             int idx = findIndex(key);
             if(idx < 0)
                 return notFound;
-            if (equator.equalTo(key, k(array, idx))) {
+            if (equator.eq(key, k(array, idx))) {
                 return v(array, idx + 1);
             }
             return notFound;
@@ -1118,7 +1118,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 
         public int findIndex(K key){
             for (int i = 0; i < 2*count; i+=2) {
-                if (equator.equalTo(key, k(array, i))) { return i; }
+                if (equator.eq(key, k(array, i))) { return i; }
             }
             return -1;
         }
