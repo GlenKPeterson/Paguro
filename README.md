@@ -34,7 +34,7 @@ public enum ColorVal {
     // This can be used to look up enum values by their character codes:
     public static final ImMap<Character,ColorVal> charToColorMap =
             Sequence.of(values())
-            .toImMap(v -> Tuple2.of(v.ch(), v));
+                    .toImMap(v -> Tuple2.of(v.ch(), v));
 }
 ```
 
