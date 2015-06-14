@@ -38,14 +38,14 @@ public enum ColorVal {
 }
 ```
 
-That map is "immutable" in a way that's safe for other code to make their own extremely lightweight modified copy.  Here, we add last-letter lookup:
+That map is "immutable" in a way that's safe for other code to make their own extremely lightweight modified copy.  Maybe a somewere, you want to refer to just the RED and GREEN values, sometimes by number instead of letter:
 
 ```java
 // Original map is unchanged.
 ImMap<Character,ColorVal> betterMap = ColorVal.charToColorMap
-        .assoc('D', ColorVal.RED)
-        .assoc('N', ColorVal.GREEN)
-        .assoc('E', ColorVal.BLUE);
+        .assoc('1', ColorVal.RED)
+        .assoc('2', ColorVal.GREEN)
+        .without('B');
 ```
 
 Create an UnmodifiableMap of 0, 1, 2, or 3 items (no nulls) depending on the values of showFirst, showSecond, and showThird:
