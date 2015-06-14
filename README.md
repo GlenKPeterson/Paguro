@@ -1,15 +1,18 @@
-UncleJim ("**Un**modifiable **Coll**ections for **J**ava&trade; **Imm**utability") brings Clojure's immutable collections, a Sequence abstraction, and other Functional Programming benefits to Java.
+UncleJim ("**Un**modifiable **Coll**ections for **J**ava&trade; **Imm**utability") brings Clojure's [immutable collections](src/main/java/org/organicdesign/fp/collections) and a [Sequence abstraction](src/main/java/org/organicdesign/fp/permanent/Sequence.java) to Java.  Also:
+
+* An [Equator](src/main/java/org/organicdesign/fp/collections/Equator.java) and [ComparisonContext](src/main/java/org/organicdesign/fp/collections/Equator.java#L45) which work like Comparator, but for hash-based collections.
+* Simplified [functional interfaces](src/main/java/org/organicdesign/fp/function) that wrap checked exceptions
+* [Memoization](src/main/java/org/organicdesign/fp/function/Function2.java#L59) for functions
+* Unmodifiable interfaces deprecate mutator methods and throw exceptions to help you retrofit legacy code.
+* [Unmodifiable wrappers](src/main/java/org/organicdesign/fp/StaticImports.java#L327) for existing Java collections
+
 Fluent interfaces encourage you to write expressions (that evaluate) instead of statements (that produce void).
-Immutable collections are fast enough to make it unnecessary to modify data in place.  Unmodifiable wrappers for existing Java collections help you retrofit legacy code.  UncleJim pushes Java toward Clojure, but keeps the type saftey, objects, classes, and C-like syntax that Java programmers are accustomed to.
+Immutable collections are fast enough to make it unnecessary to modify data in place.  UncleJim pushes Java toward Clojure, but keeps the type saftey, objects, classes, and C-like syntax that Java programmers are accustomed to.
 
 Migrating large code bases to another language is not always practical.
 This project lets you think about your code the way that Clojure and to some degree Scala programmers do, but still write Java.
-Java may not have the terseness or regularity of Clojure.
-Its type system is not as advanced as Scala's.
-But it can still provide many of the best aspects of both these languages if used carefully.
-This project encourages that kind of use.
 
-Currently an *** Alpha Release ***.  The API is subject to minor changes, but test coverage was above 85% before adding PersistentHashMap and PersistentHashSet (currently 73%):
+Currently an *** Alpha Release ***.  The API is subject to minor changes, but test coverage is currently at 73%:
 
 ![Test Coverage](testCoverage.png)
 
