@@ -217,6 +217,7 @@ In short, Clojure doesn't have static types.  Scala has an TMTOWTDI attitude tha
 #Change Log
 2015-06-12 version 0.9.7: Renamed classes and methods so that the unmodifiable prefix is now "unmod" instead of "un".
 Changed XxxxOrdered to SortedXxxx to be more compatible with Java naming conventions.
+Added Equator to HashMap and HashSet so you can define your own ComparisonContext now.
 
 2015-06-07 version 0.9.6: Added PersistentHashMap and PersistentHashSet from Clojure with some tests for the same.
 

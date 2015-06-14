@@ -20,7 +20,6 @@ import org.junit.runners.JUnit4;
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.StaticImports;
 import org.organicdesign.fp.StaticImportsTest;
-import org.organicdesign.fp.function.Function2;
 import org.organicdesign.fp.permanent.Sequence;
 import org.organicdesign.fp.tuple.Tuple2;
 
