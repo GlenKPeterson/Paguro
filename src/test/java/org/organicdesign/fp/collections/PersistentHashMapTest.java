@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -480,7 +481,7 @@ public class PersistentHashMapTest {
         Sequence<String> seq = m.seq().map(e -> e.getValue());
         PersistentHashSet<String> u = PersistentHashSet.empty();
         // System.out.println("Initial u: " + u);
-        Function2<PersistentHashSet<String>,? super String,PersistentHashSet<String>> fun = (accum, t) -> accum.put(t);
+//        Function2<PersistentHashSet<String>,? super String,PersistentHashSet<String>> fun = (accum, t) -> accum.put(t);
         // System.out.println("seq: " + seq);
         // System.out.println("===>item: " + item);
         Option<String> item = seq.head();
@@ -894,92 +895,110 @@ public class PersistentHashMapTest {
         StaticImportsTest.mapHelperEven(PersistentHashMap.ofSkipNull(), max);
     }
 
-    @Test public void testSkipNull() {
-        ImMap<Integer,String> m = PersistentHashMap.ofSkipNull(
-                Tuple2.of(1, "one"),
-                null,
-                Tuple2.of(2, "two"),
-                null,
-                Tuple2.of(3, "three"),
-                null,
-                Tuple2.of(4, "four"));
-        assertEquals(4, m.size());
-        assertEquals("one", m.get(1));
-        assertEquals("two", m.get(2));
-        assertEquals("three", m.get(3));
-        assertEquals("four", m.get(4));
-
-        m = PersistentHashMap.ofSkipNull(
-                null,
-                Tuple2.of(1, "one"),
-                null,
-                Tuple2.of(2, "two"),
-                null,
-                Tuple2.of(3, "three"),
-                null,
-                Tuple2.of(4, "four"),
-                null);
-        assertEquals(4, m.size());
-        assertEquals("one", m.get(1));
-        assertEquals("two", m.get(2));
-        assertEquals("three", m.get(3));
-        assertEquals("four", m.get(4));
-
-        m = PersistentHashMap.ofEqSkipNull(
-                Equator.defaultEquator(),
-                null,
-                Tuple2.of(1, "one"),
-                null,
-                Tuple2.of(2, "two"),
-                null,
-                Tuple2.of(3, "three"),
-                null,
-                Tuple2.of(4, "four"),
-                null);
-        assertEquals(4, m.size());
-        assertEquals("one", m.get(1));
-        assertEquals("two", m.get(2));
-        assertEquals("three", m.get(3));
-        assertEquals("four", m.get(4));
-
-        m = PersistentHashMap.ofEqSkipNull(
-                Equator.defaultEquator(),
-                Tuple2.of(1, "one"),
-                null,
-                Tuple2.of(2, "two"),
-                null,
-                Tuple2.of(3, "three"),
-                null,
-                Tuple2.of(4, "four"));
-        assertEquals(4, m.size());
-        assertEquals("one", m.get(1));
-        assertEquals("two", m.get(2));
-        assertEquals("three", m.get(3));
-        assertEquals("four", m.get(4));
+    public static class Result<A,B> {
+        List<Tuple2<A,B>> goodies;
+        List<A> baddies;
+        boolean hasNull;
     }
 
-    public static void testNadaOneTwo(PersistentHashMap<Integer,String> m) {
-        assertTrue(m.hasNull());
-        assertEquals(3, m.size());
-        assertTrue(m.containsKey(1));
-        assertTrue(m.containsKey(2));
-        assertTrue(m.containsKey(null));
-        assertFalse(m.containsKey(3));
-        assertEquals("one", m.get(1));
-        assertEquals("two", m.get(2));
-        assertEquals("nada", m.get(null));
-        assertNull(m.get(3));
-        m = m.without(null);
-        assertEquals(2, m.size());
+    public static <A,B> void verify(Result<A,B> result, PersistentHashMap<A,B> m) {
+        assertEquals(result.hasNull, m.hasNull());
+        assertEquals(result.hasNull, m.containsKey(null));
+
+        assertEquals(result.goodies.size(), m.size());
+
+        for (Tuple2<A,B> t : result.goodies) {
+            assertTrue(m.containsKey(t.getKey()));
+            assertEquals(t.getValue(), m.get(t.getKey()));
+            assertTrue(m.entry(t.getKey()).isSome());
+            assertEquals(t, m.entry(t.getKey()).get());
+        }
+
+        for (A a : result.baddies) {
+            assertFalse(m.containsKey(a));
+            assertNull(m.get(a));
+            assertFalse(m.entry(a).isSome());
+        }
+
+        int s = m.size();
+        for (Tuple2<A,B> t : result.goodies) {
+            --s;
+            m = m.without(t.getKey());
+            assertFalse(m.containsKey(t.getKey()));
+            assertFalse(m.entry(t.getKey()).isSome());
+            assertEquals(null, m.get(t.getKey()));
+            assertEquals(s, m.size());
+        }
+        assertEquals(0, m.size());
+
+        for (Tuple2<A,B> t : result.goodies) {
+            assertFalse(m.containsKey(t.getKey()));
+            assertNull(m.get(t.getKey()));
+        }
+    }
+
+    @Test public void testSkipNull() {
+        Result<Integer,String> result = new Result<>();
+        result.goodies = Arrays.asList(Tuple2.of(1, "one"), Tuple2.of(2, "two"), Tuple2.of(3, "three"),
+                                       Tuple2.of(4, "four"));
+        result.baddies = Arrays.asList(0, 5, Integer.MAX_VALUE, Integer.MIN_VALUE, null);
+        result.hasNull = false;
+
+        verify(result, PersistentHashMap.ofSkipNull(
+                Tuple2.of(1, "one"),
+                null,
+                Tuple2.of(2, "two"),
+                null,
+                Tuple2.of(3, "three"),
+                null,
+                Tuple2.of(4, "four")));
+
+        verify(result, PersistentHashMap.ofSkipNull(
+                null,
+                Tuple2.of(1, "one"),
+                null,
+                Tuple2.of(2, "two"),
+                null,
+                Tuple2.of(3, "three"),
+                null,
+                Tuple2.of(4, "four"),
+                null));
+
+        verify(result, PersistentHashMap.ofEqSkipNull(
+                Equator.defaultEquator(),
+                null,
+                Tuple2.of(1, "one"),
+                null,
+                Tuple2.of(2, "two"),
+                null,
+                Tuple2.of(3, "three"),
+                null,
+                Tuple2.of(4, "four"),
+                null));
+
+        verify(result, PersistentHashMap.ofEqSkipNull(
+                Equator.defaultEquator(),
+                Tuple2.of(1, "one"),
+                null,
+                Tuple2.of(2, "two"),
+                null,
+                Tuple2.of(3, "three"),
+                null,
+                Tuple2.of(4, "four")));
     }
 
     @Test public void withNull() {
-        testNadaOneTwo(PersistentHashMap.of(null, "nada", 1, "one", 2, "two"));
+        Result<Integer,String> result = new Result<>();
+        result.goodies = Arrays.asList(Tuple2.of(null, "nada"), Tuple2.of(2, "two"), Tuple2.of(1, "one"));
+        result.baddies = Arrays.asList(0, 3, Integer.MAX_VALUE, Integer.MIN_VALUE);
+        result.hasNull = true;
+
+        verify(result, PersistentHashMap.of(null, "nada", 1, "one", 2, "two"));
 
 
-        testNadaOneTwo(PersistentHashMap.of(1, "one", 2, "two", null, "nada"));
+        verify(result, PersistentHashMap.of(1, "one", 2, "two", null, "nada"));
 
-        testNadaOneTwo(PersistentHashMap.<Integer,String>empty(Equator.defaultEquator())
-                               .assoc(1, "one").assoc(null, "nada").assoc(2, "two"));
+        verify(result, PersistentHashMap.<Integer,String>empty(Equator.defaultEquator())
+                .assoc(1, "one").assoc(null, "nada").assoc(2, "two"));
     }
 }
