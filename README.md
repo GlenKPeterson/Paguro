@@ -19,7 +19,7 @@ Currently an *** Alpha Release ***.  The API is subject to minor changes, but te
 For complete API documentation, please build the javadoc:
 `mvn javadoc:javadoc`
 
-#Usage
+#Usage Examples
 Create an immutable, type safe map from an enum:
 ```java
 public enum ColorVal {
