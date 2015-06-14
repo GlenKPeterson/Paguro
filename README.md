@@ -41,7 +41,7 @@ public enum ColorVal {
 That map is "immutable" in a way that's safe for other code to make their own extremely lightweight modified copy.  Someone else can build off that collection to refer to just the RED and GREEN values, sometimes by number-characters instead of by letter-characters:
 
 ```java
-// Original map is unchanged.
+// Original charToColorMap is unchanged by this
 ImMap<Character,ColorVal> betterMap = ColorVal.charToColorMap
         .assoc('1', ColorVal.RED)
         .assoc('2', ColorVal.GREEN)
