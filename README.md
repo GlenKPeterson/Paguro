@@ -20,12 +20,32 @@ For complete API documentation, please build the javadoc:
 `mvn javadoc:javadoc`
 
 #Usage
-Create an immutable, type safe map:
+Create an immutable, type safe map from an enum:
 ```java
-ImMap<String,Integer> itemMap = PersistentMapSorted.of(
-        "One", 1,
-        "Two", 2,
-        "Three", 3);
+public enum ColorVal {
+    RED('R'),
+    GREEN('G'),
+    BLUE('B');
+    private final Character ch;
+    ColorVal(Character c) { ch = c; }
+    public Character ch() { return ch; }
+
+    // Convert the values() array of this enum to a map of key/value pairs
+    // This can be used to look up enum values by their character codes:
+    public static final ImMap<Character,ColorVal> charToColorMap =
+            Sequence.of(values())
+            .toImMap(v -> Tuple2.of(v.ch(), v));
+}
+```
+
+That map is "immutable" in a way that's safe for other code to make their own extremely lightweight modified copy.  Here, we add last-letter lookup:
+
+```java
+// Original map is unchanged.
+ImMap<Character,ColorVal> betterMap = ColorVal.charToColorMap
+        .assoc('D', ColorVal.RED)
+        .assoc('N', ColorVal.GREEN)
+        .assoc('E', ColorVal.BLUE);
 ```
 
 Create an UnmodifiableMap of 0, 1, 2, or 3 items (no nulls) depending on the values of showFirst, showSecond, and showThird:
