@@ -38,7 +38,7 @@ public enum ColorVal {
 }
 ```
 
-That map is "immutable" in a way that's safe for other code to make their own extremely lightweight modified copy.  Maybe a somewere, you want to refer to just the RED and GREEN values, sometimes by number instead of letter:
+That map is "immutable" in a way that's safe for other code to make their own extremely lightweight modified copy.  Someone else can build off that collection to refer to just the RED and GREEN values, sometimes by number-characters instead of by letter-characters:
 
 ```java
 // Original map is unchanged.
