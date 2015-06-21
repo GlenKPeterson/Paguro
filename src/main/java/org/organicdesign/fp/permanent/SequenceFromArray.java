@@ -14,48 +14,44 @@
 
 package org.organicdesign.fp.permanent;
 
-import org.organicdesign.fp.LazyRef;
 import org.organicdesign.fp.Option;
-import org.organicdesign.fp.tuple.Tuple2;
 
 public class SequenceFromArray<T> implements Sequence<T> {
-    private final LazyRef<Tuple2<Option<T>,Sequence<T>>> laz;
+    private T[] theArray;
+    private int idx;
+    private Sequence<T> next;
 
-    // TODO: Develop tests for this and test for what happens when idx > ts.length or idx < 0;
-    private SequenceFromArray(int idx, T[] ts) {
-        laz = LazyRef.of(() -> Tuple2.of(Option.of(ts[idx]), (idx == (ts.length - 1))
-                                                              ? Sequence.emptySequence()
-                                                              : new SequenceFromArray<>(idx + 1, ts)));
+    private SequenceFromArray(int i, T[] ts) {
+        theArray = ts; idx = i;
     }
 
     @SafeVarargs
-    static <T> Sequence<T> of(T... i) {
-        if ((i == null) || (i.length < 1)) { return Sequence.emptySequence(); }
-        return new SequenceFromArray<>(0, i);
+    static <T> Sequence<T> of(T... ts) {
+        if ((ts == null) || (ts.length < 1)) { return Sequence.emptySequence(); }
+        return new SequenceFromArray<>(0, ts);
     }
 
     @SafeVarargs
-    static <T> Sequence<T> from(int startIdx, T... i) {
+    static <T> Sequence<T> from(int startIdx, T... ts) {
         if (startIdx < 0) { throw new IllegalArgumentException("Start index must be >= 0"); }
-        if ( (i == null) || (i.length < 1) || (startIdx >= i.length) ) {
+        if ( (ts == null) || (ts.length < 1) || (startIdx >= ts.length) ) {
             return Sequence.emptySequence();
         }
-        return new SequenceFromArray<>(startIdx, i);
+        return new SequenceFromArray<>(startIdx, ts);
     }
 
-    @Override public Option<T> head() { return laz.get()._1(); }
+    @Override public Option<T> head() { return Option.of(theArray[idx]); }
 
-    @Override public Sequence<T> tail() { return laz.get()._2(); }
-
-//    @Override public int hashCode() { return Sequence.hashCode(this); }
-//
-//    @Override public boolean equals(Object o) {
-//        if (this == o) { return true; }
-//        if ( (o == null) || !(o instanceof Sequence) ) { return false; }
-//        return Sequence.equals(this, (Sequence) o);
-//    }
-//
-//    @Override public String toString() {
-//        return "SequenceFromArray(" + (laz.isRealizedYet() ? laz.get()._1() : "*lazy*") + ",...)";
-//    }
+    // This whole method is synchronized on the advice of Goetz2006 p. 347
+    @Override public synchronized Sequence<T> tail() {
+        if (next == null) {
+            int nextIdx = idx + 1;
+            if (nextIdx < theArray.length) {
+                next = new SequenceFromArray<>(nextIdx, theArray);
+            } else {
+                next = Sequence.emptySequence();
+            }
+        }
+        return next;
+    }
 }

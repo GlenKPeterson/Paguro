@@ -14,11 +14,11 @@
 
 package org.organicdesign.fp.permanent;
 
-import java.util.Arrays;
-
 import org.junit.Test;
 import org.organicdesign.fp.Mutable;
 import org.organicdesign.fp.function.Function0;
+
+import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
@@ -127,4 +127,46 @@ public class SequenceFromArrayTest {
         assertEquals(Sequence.emptySequence(), SequenceFromArray.from(5));
         assertEquals(Sequence.emptySequence(), SequenceFromArray.from(0));
     }
+
+//    @Test public void speedTest() {
+//        int MAX = 10000000;
+//        Long[] ls = new Long[MAX];
+//        for (int i = 0; i < MAX; i++) {
+//            ls[i] = Long.valueOf(i);
+//        }
+//
+//        long startTime;
+//
+//        startTime = System.nanoTime();
+//        {
+//            Sequence<Long> s1 = SequenceFromArray.of(ls);
+//            while (s1.head().isSome()) {
+//                if (s1.head().get() < -1) { break; }
+//                s1 = s1.tail();
+//            }
+//        }
+//        System.out.println("SeqFromArray1: " + (System.nanoTime() - startTime));
+//
+//        startTime = System.nanoTime();
+//        {
+//            Sequence<Long> s1 = SequenceFromArray2.of(ls);
+//            while (s1.head().isSome()) {
+//                if (s1.head().get() < -1) { break; }
+//                s1 = s1.tail();
+//            }
+//        }
+//        System.out.println("SeqFromArray2: " + (System.nanoTime() - startTime));
+//
+//        startTime = System.nanoTime();
+//        {
+//            Iterator<Long> iter = Arrays.asList(ls).iterator();
+//            Long l = null;
+//            while (iter.hasNext()) {
+//                l = iter.next();
+//                if (l < -1) { break; }
+//            }
+//        }
+//        System.out.println("Iterator:      " + (System.nanoTime() - startTime));
+//
+//    }
 }

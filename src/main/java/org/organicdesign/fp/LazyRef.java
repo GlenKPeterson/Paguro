@@ -32,19 +32,14 @@ public class LazyRef<T> {
      Subsequent calls return the precomputed value.
      @return the same value every time it is called.
      */
-    public T get() {
-        // Have we produced our value yet (cheap, but not thread-safe check)?
+    // This whole method is synchronized on the advice of Goetz2006 p. 347
+    public synchronized T get() {
+        // Have we produced our value yet?
         if (producer != null) {
-            // One thread comes in here at a time, but this can be expensive.
-            synchronized (this) {
-                // Checking again inside the sync block ensures only one thread can produce the value.
-                if (producer != null) {
-                    // Here, a single thread has earned the right to produce our value.
-                    value = producer.apply();
-                    // Delete the producer to 1. mark the work done and 2. free resources.
-                    producer = null;
-                }
-            }
+            // produce our value.
+            value = producer.apply();
+            // Delete the producer to 1. mark the work done and 2. free resources.
+            producer = null;
         }
         // We're clear to return the lazily computed value.
         return value;
