@@ -307,6 +307,7 @@ Added unit tests for the above.
 #To Do
  - Bring unit test coverage back above 80%, or 85% if sensible.
  - Update JavaDoc, esp. Im vs. Unmod
+ - Add `Either` (I have a working implementation) - it's like `Or` without the attitude.
  - Make visio drawig of interface diagram.
  - Clarify/Simplify/Improve Readme.md
  - Update learnFPJava project
