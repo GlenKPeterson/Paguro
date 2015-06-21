@@ -385,7 +385,7 @@ UncleJim is not part of Clojure.  Rich Hickey and the Clojure team are in no way
 
 The Clojure collections are licensed under the Eclipse Public License.  Versions of them have been included in this project and modified to add type safety and implement different interfaces.  These files are still derivative works under the EPL.
 
-Unless otherwise stated, the rest of this work is licensed under the Apache 2.0 license.  New contributions should be made under the Apache 2.0 license with the above modification whenever practical.
+Unless otherwise stated, the rest of this work is licensed under the Apache 2.0 license.  New contributions should be made under the Apache 2.0 license whenever practical.  I believe it is more popular, clearer, and has been better tested in courts of law.
 
 As of 2015-03-24, the following statements made me think the Apache and EPL licenses were compatible.
 
