@@ -14,9 +14,7 @@
 
 package org.organicdesign.fp.permanent;
 
-import org.organicdesign.fp.LazyRef;
 import org.organicdesign.fp.Option;
-import org.organicdesign.fp.tuple.Tuple2;
 
 import java.util.Iterator;
 
@@ -31,15 +29,13 @@ import java.util.Iterator;
  object will present and immutable, lazy, memoized, thread-safe view of the underlying iterator.
  */
 class SequenceFromIterable<T> implements Sequence<T> {
-    private final LazyRef<Tuple2<Option<T>,Sequence<T>>> laz;
+    private Iterator<T> iter;
+    private Option<T> head;
+    private Sequence<T> tail;
 
     // This must always be private because it wraps an iterator
-    // And we cannot accept an iterator from anyone but oursleves.
-    private SequenceFromIterable(Iterator<T> iter) {
-        laz = LazyRef.of(() -> iter.hasNext()
-                                ? Tuple2.of(Option.of(iter.next()), new SequenceFromIterable<>(iter))
-                                : Sequence.emptySeqTuple());
-    }
+    // And we cannot accept an iterator from anyone but ourselves.
+    private SequenceFromIterable(Iterator<T> i) { iter = i; }
 
     // Just wrong.  You can't share an iterator with anyone else,
     // So only accept an Iterable, to guarantee that we can grab our own,
@@ -52,25 +48,32 @@ class SequenceFromIterable<T> implements Sequence<T> {
     public static <T> Sequence<T> of(Iterable<T> i) {
         if (i == null) { return Sequence.emptySequence(); }
         Iterator<T> iter = i.iterator();
-        if (iter == null) { return Sequence.emptySequence(); }
+        if ( (iter == null) || !iter.hasNext() ) { return Sequence.emptySequence(); }
         return new SequenceFromIterable<>(iter);
     }
 
-    @Override public Option<T> head() { return laz.get()._1(); }
+    // This is faster than wrapping a LazyRef (almost 2x), or a separate private synchrnoized
+    // init() method (about 10%).
+    @Override public synchronized Option<T> head() {
+        if (tail == null) {
+            head = Option.of(iter.next());
+            if (iter.hasNext()) {
+                tail = new SequenceFromIterable<>(iter);
+            } else {
+                tail = Sequence.emptySequence();
+            }
+            // Release resources.
+            iter = null;
+        }
+        return head;
+    }
 
-    @Override public Sequence<T> tail() { return laz.get()._2(); }
+    @Override public Sequence<T> tail() {
+        // This does all the initialization.
+        head();
+        return tail;
+    }
 
-    // You can't get a hashcode or equals for something backed by an iterator because doing so is eager (not lazy)
-    // and also changes the state of the iterator
-//    @Override public int hashCode() { return Sequence.hashCode(this); }
-//
-//    @Override public boolean equals(Object o) {
-//        if (this == o) { return true; }
-//        if ( (o == null) || !(o instanceof Sequence) ) { return false; }
-//        return Sequence.equals(this, (Sequence) o);
-//    }
-//
-//    @Override public String toString() {
-//        return "SequenceFromIterable(" + (laz.isRealizedYet() ? laz.get()._1() : "*lazy*") + ",...)";
-//    }
+    // You can't get a hashcode or equals for something backed by an iterator because doing so is
+    // eager (not lazy) and also changes the state of the iterator
 }
