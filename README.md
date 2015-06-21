@@ -383,9 +383,15 @@ Java&trade; is a registered trademark of the Oracle Corporation in the US and ot
 
 UncleJim is not part of Clojure.  Rich Hickey and the Clojure team are in no way affiliated with the UncleJim project, though it borrows heavily from their thoughts and even some of their open-source code.
 
-Most of this work is licensed under the Apache 2.0 license.  However, the persistent collections (PersistentVector, PersistentSortedMap, PersistentSortedSet in the collections folder as of 2015-05-13) are originally copied from, and still based on, the Clojure source code by Rich Hickey which is released under the Eclipse Public License (as of fall 2014).  Those files are derivative works and must remain under the EPL license unless the original authors give permission to change it, or chooses a new license.  New contributions should be made under the Apache 2.0 license whenever practical.
+Most of this work is licensed under the Apache 2.0 license, with the following modification: It must comply with Section 7 paragraphs 2 and 3 of the Eclipse Public License, which I paraphrase as follows:
 
-I am not a lawyer and this is not legal advice.  Both the EPL and Apache projects list each other's license as being compatible.  I am not aware of a clear difference between them, or a reason why works written under the two licenses cannot be combined.
+> You lose your right to use this software if either:
+> A. you institute patent litigation against any entity alleging that this software infringes any of your patents, or
+> B. you fail to comply with the terms or conditions of this Agreement and do not cure such failure in a  reasonable period of time after becoming aware of such noncompliance."
+
+As far as I understand the Apache and Eclipse licenses, adding the above to Apache 2.0 makes them equivalent.  Adding this clause should prevent ambiguity when some files are under one license and some are under the other.
+
+The persistent collections (PersistentVector, PersistentSortedMap, PersistentSortedSet in the collections folder as of 2015-05-13) are originally copied from, and still based on, the Clojure source code by Rich Hickey which is released under the Eclipse Public License (as of fall 2014).  Those files are derivative works and must remain under the EPL license unless the original authors give permission to change it, or they choose a new license.  New contributions should be made under the Apache 2.0 license with the above modification whenever practical.
 
 As of 2015-03-24, the following statements made me think the Apache and EPL licenses were compatible.
 
