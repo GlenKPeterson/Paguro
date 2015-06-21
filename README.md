@@ -1,9 +1,11 @@
-UncleJim ("**Un**modifiable **Coll**ections for **J**ava&trade; **Imm**utability") brings Clojure's [immutable collections](src/main/java/org/organicdesign/fp/collections) and a [Sequence abstraction](src/main/java/org/organicdesign/fp/permanent/Sequence.java) to Java.  Also:
+UncleJim ("**Un**modifiable **Coll**ections for **J**ava&trade; **Imm**utability") brings the following to Java:
 
-* An [Equator](src/main/java/org/organicdesign/fp/collections/Equator.java) and [ComparisonContext](src/main/java/org/organicdesign/fp/collections/Equator.java#L45) which work like Comparator, but for hash-based collections.
+* Clojure's [immutable collections](src/main/java/org/organicdesign/fp/collections)
+* A [Sequence abstraction](src/main/java/org/organicdesign/fp/permanent/Sequence.java)
+* An [Equator](src/main/java/org/organicdesign/fp/collections/Equator.java) and [ComparisonContext](src/main/java/org/organicdesign/fp/collections/Equator.java#L45) which work like `java.util.Comparator`, but for hash-based collections.
 * Simplified [functional interfaces](src/main/java/org/organicdesign/fp/function) that wrap checked exceptions
 * [Memoization](src/main/java/org/organicdesign/fp/function/Function2.java#L59) for functions
-* Unmodifiable interfaces deprecate mutator methods and throw exceptions to help you retrofit legacy code.
+* Unmodifiable interfaces which deprecate mutator methods and throw exceptions to help you retrofit legacy code.
 * [Unmodifiable wrappers](src/main/java/org/organicdesign/fp/StaticImports.java#L327) for existing Java collections
 
 Fluent interfaces encourage you to write expressions (that evaluate) instead of statements (that produce void).
