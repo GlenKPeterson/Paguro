@@ -91,9 +91,10 @@ public class SequenceFromArrayTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void subArrayEx() {
-        SequenceFromArray.from(-1, 5,4,3,2,1);
-    }
+    public void subArrayEx() { SequenceFromArray.from(-1, 5,4,3,2,1); }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subArrayEx2() { SequenceFromArray.from(5, 5,4,3,2,1); }
 
     @Test public void subArray() {
         Integer[] ints = new Integer[] { 5,4,3,2,1 };
@@ -113,9 +114,9 @@ public class SequenceFromArrayTest {
         three.tail().tail().tail().tail().tail().tail().tail().tail().tail().tail().tail().tail().tail().tail().tail();
         assertEquals(Integer.valueOf(3), three.head().get());
 
-        assertEquals(Sequence.emptySequence(), SequenceFromArray.from(5, ints));
+//        assertEquals(Sequence.emptySequence(), SequenceFromArray.from(4, ints));
         Integer[] noInts = new Integer[0];
-        assertEquals(Sequence.emptySequence(), SequenceFromArray.from(5, noInts));
+//        assertEquals(Sequence.emptySequence(), SequenceFromArray.from(5, noInts));
         assertEquals(Sequence.emptySequence(), SequenceFromArray.from(0, noInts));
 
         Integer[] nullInts = null;

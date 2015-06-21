@@ -34,8 +34,11 @@ public class SequenceFromArray<T> implements Sequence<T> {
     @SafeVarargs
     static <T> Sequence<T> from(int startIdx, T... ts) {
         if (startIdx < 0) { throw new IllegalArgumentException("Start index must be >= 0"); }
-        if ( (ts == null) || (ts.length < 1) || (startIdx >= ts.length) ) {
+        if ( (ts == null) || (ts.length < 1) ) {
             return Sequence.emptySequence();
+        }
+        if (startIdx >= ts.length) {
+            throw new IllegalArgumentException("Start index must be < array length");
         }
         return new SequenceFromArray<>(startIdx, ts);
     }
