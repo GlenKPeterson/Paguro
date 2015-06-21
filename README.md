@@ -209,7 +209,7 @@ default UnSet<T>	toUnSet()
 ```
 #Learn
 
-There is an outdated problem-set for learning this tool-kit: https://github.com/GlenKPeterson/LearnFpJava
+There is a (possibly outdated) problem-set for learning this tool-kit: https://github.com/GlenKPeterson/LearnFpJava
 
 #Details
  - Like Guava, we want to be as compatible with the java.util... collections as possible, while preventing mutation-in-place.
@@ -305,10 +305,55 @@ Added unit tests for the above.
  safe if the producer and the values it produces are free from outside influences.
 
 #To Do
- - Pick a better name for this project!
- - Add PersistentHashMap and PersistentHashSet implementations from Clojure.  OTOH, I'd like to see how long I can live without hashCode() or equals().
- - Change the two "Un" methods in Realizable to "Im" methods, using these collections (see note on previous item).
+ - Bring unit test coverage back above 80%, or 85% if sensible.
+ - Update JavaDoc, esp. Im vs. Unmod
+ - Make visio drawig of interface diagram.
+ - Clarify/Simplify/Improve Readme.md
+ - Update learnFPJava project
+ - Make sure Sequence is constructed efficiently (as it is in Clojure) in all collections (HashMap done already).
+ - Make sure to make use of asTransient() in all constructors (done for HashMap and maybe others).
  - Add a [Persistent RRB Tree](http://infoscience.epfl.ch/record/169879/files/RMTrees.pdf) and compare its performance to the PersistentVector.
+
+NOTE: Maybe this goes in the presentation, not in this ReadMe?
+
+Why are fluent interfaces superior to void methods?  Answer: find the bug in the following code:
+
+```java
+Thing t = new Thing();
+t.setOne(1);
+t.setTwo(2);
+t.doStuff();
+if (t.didStuff()) {
+    System.out.println("did some stuff");
+}
+ 
+Thing t2 = new Thing();
+t2.setOne(55);
+t2.setTwo(23);
+t2.doStuff();
+if (t.didStuff()) {
+    System.out.println("did more stuff");
+}
+```
+
+Did you see that t.didStuff() is checked twice and t2.didStuff() is never checked?
+With a fluent interface, this kind of bug is not possible.
+
+```java
+if (new Thing().setOne(1)
+               .setTwo(2)
+               .doStuff()
+               .didStuff()) {
+     System.out.println("did some stuff");
+}
+
+if (new Thing().setOne(55)
+               .setTwo(23)
+               .doStuff()
+               .didStuff()) {
+     System.out.println("did more stuff");
+}
+```
 
 #Out of Scope
 
