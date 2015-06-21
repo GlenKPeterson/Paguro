@@ -387,7 +387,7 @@ Most of this work is licensed under the Apache 2.0 license, with the following m
 
 > You lose your right to use this software if either:
 > A. you institute patent litigation against any entity alleging that this software infringes any of your patents, or
-> B. you fail to comply with the terms or conditions of this Agreement and do not cure such failure in a  reasonable period of time after becoming aware of such noncompliance."
+> B. you fail to comply with the terms or conditions of this Agreement and do not cure such failure in a  reasonable period of time after becoming aware of such noncompliance.
 
 As far as I understand the Apache and Eclipse licenses, adding the above to Apache 2.0 makes them equivalent.  Adding this clause should prevent ambiguity when some files are under one license and some are under the other.
 
