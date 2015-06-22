@@ -61,15 +61,15 @@ public interface Transformable<T> extends Realizable<T> {
      a Transformable with one item for each result.
      @return a Transformable of the same size as the input (may contain duplicates) containing the
      return values of the given function in the same order as the input values.
-      * @param func a function that returns a new value for any value in the input
+     @param func a function that returns a new value for any value in the input
      */
     <U> Transformable<U> map(Function1<? super T,? extends U> func);
 
     /**
-     Lazily applies the filter function to the underlying data source and returns a new Transformable
-     containing only the items for which the filter returned true
+     Lazily applies the filter function to the underlying data source and returns a new
+     Transformable containing only the items for which the filter returned true
      @return a Transformable of only the filtered items.
-      * @param predicate a function that returns true for items to keep, false for items to drop
+     @param predicate a function that returns true for items to keep, false for items to drop
      */
     Transformable<T> filter(Function1<? super T,Boolean> predicate);
 
@@ -106,12 +106,13 @@ public interface Transformable<T> extends Realizable<T> {
      */
     Transformable<T> takeWhile(Function1<? super T,Boolean> predicate);
 
-// View and Sequence cannot inherit from these because because function arguments are contravariant.  It's OK for
-// View to return a View and Sequence to return a Sequence because they are subclasses of Transformable and if
-// a method returns a T, then sub-classes can return a T or "? extends T".
-// But if a method takes an argument of T, then a sub-class can only take an argument of T or "? super T".
-// Transformable does not provide a way to get to the first argument or the "rest".  It seems kind of a useless
-// interface if the persistent Sequence is fast enough to get rid of the View.
+// View and Sequence cannot inherit from these because because function arguments are contravariant.
+// It's OK for View to return a View and Sequence to return a Sequence because they are subclasses
+// of Transformable and if a method returns a T, then sub-classes can return a T or "? extends T".
+// But if a method takes an argument of T, then a sub-class can only take an argument of T or
+// "? super T". Transformable does not provide a way to get to the first argument or the "rest".  It
+// seems kind of a useless interface if the persistent Sequence is fast enough to get rid of the
+// View.
 //    /** Add the given Transformable after the end of this one. */
 //    Transformable<T> concat(Transformable<T> other);
 //
@@ -125,7 +126,8 @@ public interface Transformable<T> extends Realizable<T> {
 //     that currently can produce more output items than input items (flatMap would do that too
 //     if implemented).
 //     @return
-//     @param fun Starting with the first two elements of the list, combines each value in the list with the result so far.  The initial result is u.
+//     @param fun Starting with the first two elements of the list, combines each value in the list
+//     with the result so far.  The initial result is u.
 //     */
 //    T reduceLeft(BiFunction<T, T, T> fun);
 
@@ -135,11 +137,11 @@ public interface Transformable<T> extends Realizable<T> {
      FoldLeft can also produce a single (scalar) value.  In that form, it is often called reduce().
 
      @return an eagerly evaluated result which could be a single value like a sum, or a collection.
-      * @param u the accumulator and starting value.  This will be passed to the function on the
-      first iteration to be combined with the first member of the underlying data source.  For some
-      operations you'll need to pass an identity, e.g. for a sum, pass 0, for a product, pass 1 as
-      this parameter.
-     * @param fun combines each value in the list with the result so far.  The initial result is u.
+     @param u the accumulator and starting value.  This will be passed to the function on the
+     first iteration to be combined with the first member of the underlying data source.  For some
+     operations you'll need to pass an identity, e.g. for a sum, pass 0, for a product, pass 1 as
+     this parameter.
+     @param fun combines each value in the list with the result so far.  The initial result is u.
      */
     <U> U foldLeft(U u, Function2<U,? super T,U> fun);
 
@@ -161,8 +163,8 @@ public interface Transformable<T> extends Realizable<T> {
      */
     <U> U foldLeft(U u, Function2<U,? super T,U> fun, Function1<? super U,Boolean> terminateWhen);
 
-    // Sub-classes cannot inherit from this because the function that you pass in has to know the actal return type.
-    // Have to implement this independently on sub-classes.
+    // Sub-classes cannot inherit from this because the function that you pass in has to know the
+    // actual return type.  Have to implement this independently on sub-classes.
 //    /**
 //     One of the two higher-order functions that can produce more output items than input items.
 //     foldLeft is the other, but flatMap is lazy while foldLeft is eager.
@@ -182,7 +184,9 @@ public interface Transformable<T> extends Realizable<T> {
     }
 
     /** {@inheritDoc} */
-    @Override default ImList<T> toImList() { return foldLeft(PersistentVector.empty(), (ts, t) -> ts.appendOne(t)); }
+    @Override default ImList<T> toImList() {
+        return foldLeft(PersistentVector.empty(), (ts, t) -> ts.appendOne(t));
+    }
 
     /** {@inheritDoc} */
     @Override default <U,V> Map<U,V> toMutableMap(final Function1<? super T,Map.Entry<U,V>> f1) {
@@ -194,7 +198,8 @@ public interface Transformable<T> extends Realizable<T> {
     }
 
     /** {@inheritDoc} */
-    @Override default <U,V> SortedMap<U,V> toMutableSortedMap(final Function1<? super T,Map.Entry<U,V>> f1) {
+    @Override default <U,V> SortedMap<U,V>
+    toMutableSortedMap(final Function1<? super T,Map.Entry<U,V>> f1) {
         return foldLeft(new TreeMap<>(), (ts, t) -> {
             Map.Entry<U,V> entry = f1.apply(t);
             ts.put(entry.getKey(), entry.getValue());
@@ -215,7 +220,8 @@ public interface Transformable<T> extends Realizable<T> {
 
     /** {@inheritDoc} */
     @Override
-    default <U,V> ImSortedMap<U,V> toImSortedMap(Comparator<? super U> comp, Function1<? super T,Map.Entry<U,V>> f1) {
+    default <U,V> ImSortedMap<U,V> toImSortedMap(Comparator<? super U> comp,
+                                                 Function1<? super T,Map.Entry<U,V>> f1) {
         return foldLeft((ImSortedMap<U, V>) PersistentTreeMap.<U, V>empty(comp),
                         (ts, t) -> ts.assoc(f1.apply(t)));
     }
