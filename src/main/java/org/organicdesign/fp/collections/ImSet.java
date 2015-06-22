@@ -21,7 +21,7 @@ public interface ImSet<E> extends UnmodSet<E> {
     ImSet<E> put(E e);
 
     /** Removes the given item, returning a modified version of the set (leaving the original set unchanged). */
-    ImSet<E> disjoin(E key);
+    ImSet<E> without(E key);
 
     /**
      A sequence of the items contained in this set.  Note that for some implementations, multiple calls to seq()

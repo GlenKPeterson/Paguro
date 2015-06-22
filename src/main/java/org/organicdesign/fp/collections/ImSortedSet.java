@@ -23,7 +23,7 @@ public interface ImSortedSet<E> extends ImSet<E>, UnmodSortedSet<E>, Sequence<E>
 
     /** {@inheritDoc} */
     @Override
-    ImSortedSet<E> disjoin(E key);
+    ImSortedSet<E> without(E key);
 
     /** Return the elements in this set up (but excluding) to the given element */
     @Override default ImSortedSet<E> headSet(E toElement) { return subSet(first(), toElement); }

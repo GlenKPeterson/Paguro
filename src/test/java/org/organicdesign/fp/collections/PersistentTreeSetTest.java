@@ -108,14 +108,14 @@ public class PersistentTreeSetTest {
         PersistentTreeSet<String> s2 = s1.put("one");
         assertFalse(s2.isEmpty());
 
-        PersistentTreeSet<String> s3 = s1.disjoin("one");
+        PersistentTreeSet<String> s3 = s1.without("one");
         assertEquals(0, s3.size());
         assertTrue(s3.isEmpty());
         assertEquals(s1.hashCode(), s3.hashCode());
         assertTrue(s1.equals(s3));
         assertTrue(s3.equals(s1));
 
-        PersistentTreeSet<String> s4 = s2.disjoin("two");
+        PersistentTreeSet<String> s4 = s2.without("two");
         assertEquals(1, s4.size());
         assertEquals(s2.hashCode(), s4.hashCode());
         assertTrue(s2.equals(s4));

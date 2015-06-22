@@ -105,7 +105,7 @@ public class PersistentTreeSet<E> implements ImSortedSet<E> {
     @Override public boolean contains(Object o) { return impl.containsKey(o); }
 
     /** {@inheritDoc} */
-    @Override public PersistentTreeSet<E> disjoin(E key) {
+    @Override public PersistentTreeSet<E> without(E key) {
         return (impl.containsKey(key)) ? new PersistentTreeSet<>(impl.without(key))
                                        : this;
     }

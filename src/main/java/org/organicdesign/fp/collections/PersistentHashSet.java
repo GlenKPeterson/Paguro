@@ -86,7 +86,7 @@ public class PersistentHashSet<E> implements ImSet<E> {
         return impl.containsKey(key);
     }
 
-    @Override public PersistentHashSet<E> disjoin(E key) {
+    @Override public PersistentHashSet<E> without(E key) {
         if (contains(key))
             return new PersistentHashSet<>(impl.without(key));
         return this;
@@ -152,7 +152,7 @@ public class PersistentHashSet<E> implements ImSet<E> {
          */
         @Override public boolean isEmpty() { return impl.isEmpty(); }
 
-        @Override public TransientHashSet<E> disjoin(E key) {
+        @Override public TransientHashSet<E> without(E key) {
             ImMapTrans<E,E> m = impl.without(key);
             if (m != impl) this.impl = m;
             return this;
