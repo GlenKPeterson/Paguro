@@ -215,7 +215,7 @@ public class PersistentHashMapTest {
         }
     }
 
-    public static void println(Object s) { System.out.println(String.valueOf(s)); }
+//    public static void println(Object s) { System.out.println(String.valueOf(s)); }
 
     @Test public void longerSeq() {
         // This is an assumed to work mutable set - the "control" for this test.
@@ -441,7 +441,7 @@ public class PersistentHashMapTest {
         m = m.without(20);
         m = m.assoc(20, "twenty again");
 
-        System.out.println("m.keySet(): " + m.keySet());
+//        System.out.println("m.keySet(): " + m.keySet());
 
         assertEquals(new HashSet<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21)),
                      m.keySet());

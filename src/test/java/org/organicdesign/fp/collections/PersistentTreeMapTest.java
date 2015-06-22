@@ -28,7 +28,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import static org.junit.Assert.*;
-import static org.organicdesign.fp.StaticImports.unmod;
 import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
 import static org.organicdesign.fp.testUtils.EqualsContract.equalsSameHashCode;
 
@@ -385,9 +384,9 @@ public class PersistentTreeMapTest {
         assertNotEquals(0, m1.values().hashCode());
         assertNotEquals(m1.values().hashCode(), PersistentTreeMap.of(4, "four").assoc(5, "five").hashCode());
 
-        System.out.println("m1.values(): " + m1.values());
+//        System.out.println("m1.values(): " + m1.values());
         PersistentTreeMap<Integer,String> m2 = PersistentTreeMap.of(4, "four").assoc(2, "two").assoc(5, "five").assoc(1, "one").assoc(3, "three");
-        System.out.println("m2.values(): " + m2.values());
+//        System.out.println("m2.values(): " + m2.values());
 
         assertEquals(m1.values().hashCode(),
                      m2.values().hashCode());

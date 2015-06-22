@@ -75,7 +75,7 @@ public class SequenceFlatMappedTest {
                                              ? Sequence.of("a" + a, "b" + a)
                                              : Sequence.emptySequence();
                                   }).forEach((item) -> {
-                              System.out.println("Item " + item);
+//                              System.out.println("Item " + item);
                               return null;
                           })
                                   .toTypedArray());
