@@ -234,75 +234,47 @@ public class PersistentHashSetTest {
 //        println("accum: " + accum);
     }
 
-//    @Test public void ordering() {
-//        PersistentHashSet<Integer> s1 = PersistentHashSet.of(5, 2, 4, 1, 3);
-//        assertEquals(5, s1.size());
-//        assertEquals(Integer.valueOf(1), s1.first());
-//        assertEquals(Integer.valueOf(5), s1.last());
-//        assertArrayEquals(new Integer[]{1, 2, 3, 4, 5},
-//                          s1.toTypedArray());
-//
-//        assertArrayEquals(new Integer[] {1,2,3,4,5},
-//                          s1.subSet(Integer.MIN_VALUE, Integer.MAX_VALUE).toTypedArray());
-//
-//        assertArrayEquals(new Integer[] {1,2,3,4,5},
-//                          s1.subSet(-99, 99).toTypedArray());
-//
-//        assertArrayEquals(new Integer[]{1, 2, 3, 4, 5},
-//                          s1.subSet(1, 6).toTypedArray());
-//
-//        assertArrayEquals(new Integer[]{1, 2, 3, 4},
-//                          s1.subSet(1, 5).toTypedArray());
-//
-//        assertArrayEquals(new Integer[]{2, 3, 4, 5},
-//                          s1.subSet(2, 6).toTypedArray());
-//
-//        assertArrayEquals(new Integer[]{3},
-//                          s1.subSet(3, 4).toTypedArray());
-//
-//        assertArrayEquals(new Integer[0],
-//                          s1.subSet(3, 3).toTypedArray());
-//
-//        assertNull(s1.comparator());
-//
-//
-//        PersistentHashSet<String> s2 = PersistentHashSet.ofComp(STR_LEN_COMP,
-//                                                                "hello", "an", "work", "b", "the");
-//        assertEquals(STR_LEN_COMP, s2.comparator());
-//        assertEquals(5, s2.size());
-//        assertEquals("b", s2.first());
-//        assertEquals("hello", s2.last());
-//
-//        assertEquals(STR_LEN_COMP, s2.subSet("", "                 ").comparator());
-//
-//        assertArrayEquals(new String[]{"b", "an", "the", "work", "hello"},
-//                          s2.toTypedArray());
-//
-//        assertArrayEquals(new String[]{"b", "an", "the", "work", "hello"},
-//                          s2.subSet("", "                 ").toTypedArray());
-//
-//        assertArrayEquals(new String[] {"b", "an", "the", "work", "hello"},
-//                          s2.subSet("", "._._._").toTypedArray());
-//
-//        assertArrayEquals(new String[]{"b", "an", "the", "work", "hello"},
-//                          s2.subSet("z", "aaaaaa").toTypedArray());
-//
-//        assertEquals(STR_LEN_COMP, s2.subSet("a", "four").comparator());
-//
-//        assertArrayEquals(new String[]{"b", "an", "the"},
-//                          s2.subSet("a", "four").toTypedArray());
-//
-//        assertArrayEquals(new String[] {"an", "the", "work", "hello"},
-//                          s2.subSet("UH", "SLDFKJS").toTypedArray());
-//
-//        assertArrayEquals(new String[] {"the"},
-//                          s2.subSet("THE", "JUNK").toTypedArray());
-//
-//        assertArrayEquals(new String[0],
-//                          s2.subSet("the", "the").toTypedArray());
-//
-//        assertEquals(STR_LEN_COMP, s2.comparator());
-//    }
+    @Test public void equator() {
+        Equator.ComparisonContext<Integer> mod3Eq = new Equator.ComparisonContext<Integer>() {
+            @Override public int compare(Integer o1, Integer o2) { return (o1 % 3) - (o2 % 3); }
+            @Override public int hash(Integer integer) { return integer % 3; }
+        };
+        PersistentHashSet<Integer> s1 = PersistentHashSet.ofEq(mod3Eq, 5, 2, 4, 1, 3);
+//        System.out.println("s1: " + s1);
+        assertEquals(3, s1.size());
+        Set<Integer> hs = new HashSet<>();
+        hs.add(3);
+        hs.add(4);
+        hs.add(5);
+        assertEquals(hs.size(), s1.size());
+
+        Sequence<Integer> seq = s1.seq();
+        Integer item = seq.head().get();
+        assertTrue(hs.contains(item));
+
+        hs.remove(item);
+        s1 = s1.without(item);
+        seq = seq.tail();
+        item = seq.head().get();
+        assertEquals(hs.size(), s1.size());
+        assertTrue(hs.contains(item));
+
+        hs.remove(item);
+        s1 = s1.without(item);
+        seq = seq.tail();
+        item = seq.head().get();
+        assertEquals(hs.size(), s1.size());
+        assertTrue(hs.contains(item));
+
+        hs.remove(item);
+        s1 = s1.without(item);
+        seq = seq.tail();
+        assertEquals(Sequence.EMPTY_SEQUENCE, seq);
+        assertEquals(0, hs.size());
+        assertEquals(0, s1.size());
+
+        assertEquals(mod3Eq, s1.equator());
+    }
 
     @Test public void equality() {
         PersistentHashSet<String> s1 = PersistentHashSet.of("hello", "an", "work", "b", "the");

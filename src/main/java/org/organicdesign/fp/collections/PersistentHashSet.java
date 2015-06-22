@@ -86,6 +86,9 @@ public class PersistentHashSet<E> implements ImSet<E> {
         return impl.containsKey(key);
     }
 
+    /** Returns the Equator used by this set for equals comparisons and hashCodes */
+    public Equator<E> equator() { return impl.equator(); }
+
     @Override public PersistentHashSet<E> without(E key) {
         if (contains(key))
             return new PersistentHashSet<>(impl.without(key));
