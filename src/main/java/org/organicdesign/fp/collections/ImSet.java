@@ -29,7 +29,7 @@ public interface ImSet<E> extends UnmodSet<E> {
      */
     Sequence<E> seq();
 
-    default ImSet<E> union(Iterable<E> iter) {
+    default ImSet<E> union(Iterable<? extends E> iter) {
         ImSet<E> ret = this;
         for (E e : iter) { ret = ret.put(e); }
         return ret;

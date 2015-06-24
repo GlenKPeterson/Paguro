@@ -44,4 +44,9 @@ public interface ImSortedSet<E> extends ImSet<E>, UnmodSortedSet<E>, Sequence<E>
     /** Return the elements in this from the given element to the end */
     @Override default ImSortedSet<E> tailSet(E fromElement) { return subSet(fromElement, last()); }
 
+    @Override default ImSortedSet<E> union(Iterable<? extends E> iter) {
+        ImSortedSet<E> ret = this;
+        for (E e : iter) { ret = ret.put(e); }
+        return ret;
+    }
 }
