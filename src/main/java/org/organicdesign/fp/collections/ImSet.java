@@ -29,6 +29,12 @@ public interface ImSet<E> extends UnmodSet<E> {
      */
     Sequence<E> seq();
 
+    default ImSet<E> union(Iterable<E> iter) {
+        ImSet<E> ret = this;
+        for (E e : iter) { ret = ret.put(e); }
+        return ret;
+    }
+
     /** {@inheritDoc} */
     @Override default UnmodIterator<E> iterator() { return seq().iterator(); }
 

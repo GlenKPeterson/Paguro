@@ -240,6 +240,8 @@ In short, Clojure doesn't have static types.  Scala has an TMTOWTDI attitude tha
 - As of 2014-03-08, all major areas of functionality were covered by unit tests.
 
 #Change Log
+2015-06-23 version 0.9.8: Added union(Iterable i) method to ImSet.
+
 2015-06-12 version 0.9.7: Renamed classes and methods so that the unmodifiable prefix is now "unmod" instead of "un".
 Changed XxxxOrdered to SortedXxxx to be more compatible with Java naming conventions.
 Added Equator to HashMap and HashSet so you can define your own ComparisonContext now.
@@ -307,6 +309,8 @@ Added unit tests for the above.
  safe if the producer and the values it produces are free from outside influences.
 
 #To Do
+ - Compare speed of View vs. Iterator vs. Sequence.  If view is much faster than Sequence,
+   don't have collections implement Sequence.  Have .seq() and .view() methods instead.
  - Bring unit test coverage back above 80%, or 85% if sensible.
  - Update JavaDoc, esp. Im vs. Unmod
  - Add `Either` (I have a working implementation) - it's like `Or` without the attitude.
