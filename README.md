@@ -1,12 +1,12 @@
 UncleJim ("**Un**modifiable **Coll**ections for **J**ava&trade; **Imm**utability") brings the following to Java:
 
 * Clojure's [immutable collections](src/main/java/org/organicdesign/fp/collections)
-* A [Sequence abstraction](src/main/java/org/organicdesign/fp/permanent/Sequence.java) NOTE: Probably to be replaced with [Transformation Description](https://github.com/GlenKPeterson/One-off_Examples/blob/master/src/main/java/org/organicdesign/fp/experiments/TransDesc.java) which is like a Clojure transducer or Paul Philips-style data transformation.
+* Note: Sequence Abstraction will probably be entirely replaced with [Transformation Description](https://github.com/GlenKPeterson/One-off_Examples/blob/master/src/main/java/org/organicdesign/fp/experiments/TransDesc.java) which is like a Clojure transducer or Paul Philips-style "View" of a data transformation.
 * An [Equator](src/main/java/org/organicdesign/fp/collections/Equator.java) and [ComparisonContext](src/main/java/org/organicdesign/fp/collections/Equator.java#L45) which work like `java.util.Comparator`, but for hash-based collections.
 * Simplified [functional interfaces](src/main/java/org/organicdesign/fp/function) that wrap checked exceptions
 * [Memoization](src/main/java/org/organicdesign/fp/function/Function2.java#L59) for functions
 * Unmodifiable interfaces which deprecate mutator methods and throw exceptions to help you retrofit legacy code.
-* [Unmodifiable wrappers](src/main/java/org/organicdesign/fp/StaticImports.java#L327) for existing Java collections
+* Better [unmodifiable wrappers](src/main/java/org/organicdesign/fp/StaticImports.java#L327) for existing Java collections that deprecate the methods that throw Unimplemented exceptions so that you can catch errors in your IDE instead of at runtime.
 
 Fluent interfaces encourage you to write expressions (that evaluate) instead of statements (that produce void).
 Immutable collections are fast enough to make it unnecessary to modify data in place.  UncleJim pushes Java toward Clojure, but keeps the type saftey, objects, classes, and C-like syntax that Java programmers are accustomed to.
@@ -316,7 +316,8 @@ Note: Statistics for iterating through 30 million items:
 120ms: Transform
 
  - Therefore: Replace View and Sequence with Transform.  It seems in every way superior.
- - Have an Ordered version of Transform as well as the (default) unreliable order.  Only the ordered version can be used for implementing things like equals() and hashCode()
+ - Complete [Transformation Description](https://github.com/GlenKPeterson/One-off_Examples/blob/master/src/main/java/org/organicdesign/fp/experiments/TransDesc.java) (currently in the One-off Examples project until it's ready for prime time).
+- Have an Ordered version of Transform as well as the (default) unreliable order.  Only the ordered version can be used for implementing things like equals() and hashCode()
  - Change/add brief StaticImports methods for most used collections: vec() for PersistentVector can then replace all other varargs arguments with List's.  Also t2() for Tuple2, t3() for Tuple3, etc. makes constructing immutable data a snap.
  - Bring unit test coverage back above 80%, or 85% if sensible.
  - Update JavaDoc, esp. Im vs. Unmod
