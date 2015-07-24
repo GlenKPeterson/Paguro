@@ -1,12 +1,12 @@
 UncleJim ("**Un**modifiable **Coll**ections for **J**ava&trade; **Imm**utability") brings the following to Java:
 
 * Clojure's [immutable collections](src/main/java/org/organicdesign/fp/collections)
-* A [Sequence abstraction](src/main/java/org/organicdesign/fp/permanent/Sequence.java)
+* Note: Sequence Abstraction will probably be entirely replaced with [Transformation Description](https://github.com/GlenKPeterson/One-off_Examples/blob/master/src/main/java/org/organicdesign/fp/experiments/TransDesc.java) which is like a Clojure transducer or Paul Philips-style "View" of a data transformation.
 * An [Equator](src/main/java/org/organicdesign/fp/collections/Equator.java) and [ComparisonContext](src/main/java/org/organicdesign/fp/collections/Equator.java#L45) which work like `java.util.Comparator`, but for hash-based collections.
 * Simplified [functional interfaces](src/main/java/org/organicdesign/fp/function) that wrap checked exceptions
 * [Memoization](src/main/java/org/organicdesign/fp/function/Function2.java#L59) for functions
 * Unmodifiable interfaces which deprecate mutator methods and throw exceptions to help you retrofit legacy code.
-* [Unmodifiable wrappers](src/main/java/org/organicdesign/fp/StaticImports.java#L327) for existing Java collections
+* Better [unmodifiable wrappers](src/main/java/org/organicdesign/fp/StaticImports.java#L327) for existing Java collections that deprecate the methods that throw Unimplemented exceptions so that you can catch errors in your IDE instead of at runtime.
 
 Fluent interfaces encourage you to write expressions (that evaluate) instead of statements (that produce void).
 Immutable collections are fast enough to make it unnecessary to modify data in place.  UncleJim pushes Java toward Clojure, but keeps the type saftey, objects, classes, and C-like syntax that Java programmers are accustomed to.
@@ -14,7 +14,7 @@ Immutable collections are fast enough to make it unnecessary to modify data in p
 Migrating large code bases to another language is not always practical.
 This project lets you think about your code the way that Clojure and to some degree Scala programmers do, but still write Java.
 
-Currently an *** Alpha Release ***.  The API is subject to minor changes, but test coverage is currently at 73%:
+Currently an *** Alpha Release ***.  The Sequence abstraction will likely be replaced with a [Transformation Description](https://github.com/GlenKPeterson/One-off_Examples/blob/master/src/main/java/org/organicdesign/fp/experiments/TransDesc.java) because the lazily evaluated and cached Sequence proved to be slow.  For now, use [View](src/main/java/org/organicdesign/fp/ephemeral/View.java) instead. The API is subject to other minor changes, but test coverage is currently at 73%:
 
 ![Test Coverage](testCoverage.png)
 
@@ -317,15 +317,23 @@ Added unit tests for the above.
  safe if the producer and the values it produces are free from outside influences.
 
 #To Do
- - Compare speed of View vs. Iterator vs. Sequence.  If view is much faster than Sequence,
-   don't have collections implement Sequence.  Have .seq() and .view() methods instead.
+Note: Statistics for iterating through 30 million items:
+120ms: for-each loop or similar
+350ms: View
+1.2 seconds: Sequence (12 seconds the first time, 1.2 seconds on subsequent runs).
+120ms: Transform
+
+ - Therefore: Replace View and Sequence with Transform.  It seems in every way superior.
+ - Complete [Transformation Description](https://github.com/GlenKPeterson/One-off_Examples/blob/master/src/main/java/org/organicdesign/fp/experiments/TransDesc.java) (currently in the One-off Examples project until it's ready for prime time).
+- Have an Ordered version of Transform as well as the (default) unreliable order.  Only the ordered version can be used for implementing things like equals() and hashCode()
+ - Change/add brief StaticImports methods for most used collections: vec() for PersistentVector can then replace all other varargs arguments with List's.  Also t2() for Tuple2, t3() for Tuple3, etc. makes constructing immutable data a snap.
  - Bring unit test coverage back above 80%, or 85% if sensible.
  - Update JavaDoc, esp. Im vs. Unmod
  - Add `Either` (I have a working implementation) - it's like `Or` without the attitude.
  - Make visio drawig of interface diagram.
  - Clarify/Simplify/Improve Readme.md
  - Update learnFPJava project
- - Make sure Sequence is constructed efficiently (as it is in Clojure) in all collections (HashMap done already).
+ - Make sure Iterable (and List when appropriate) is implemented efficiently in all collections
  - Make sure to make use of asTransient() in all constructors (done for HashMap and maybe others).
  - Add a [Persistent RRB Tree](http://infoscience.epfl.ch/record/169879/files/RMTrees.pdf) and compare its performance to the PersistentVector.
 
@@ -391,6 +399,13 @@ a, b, c, and d.
 a,b,c...
 
 None of those are simple uses of interpose.
+
+#Thank You
+Nathan Williams: for many lengthy email conversations about this project, encouragement to separate state from the transformation, and occasional light code review.
+
+GreenJUG: for bearing with talks on early versions of this code two years in a row.
+
+Everyone whose ideas are collected in this project.
 
 #Licenses
 Java&trade; is a registered trademark of the Oracle Corporation in the US and other countries.  UncleJim is not part of Java.  Oracle is in no way affiliated with the UncleJim project.
