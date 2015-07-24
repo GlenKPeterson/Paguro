@@ -27,65 +27,65 @@ public class ViewFilteredTest {
     @Test(expected = IllegalArgumentException.class)
     public void nullException() {
         assertArrayEquals(new Integer[] {1,2,3,4,5,6,7,8,9},
-                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9).filter(null).toTypedArray());
+                          View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).filter(null).toTypedArray());
     }
 
     @Test
     public void singleFilter() {
         assertArrayEquals(new Integer[] {1, 2, 3, 4, 5, 6, 7, 8, 9},
-                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9).filter(accept()).toTypedArray());
+                          View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).filter(accept()).toTypedArray());
 
         assertArrayEquals(new Integer[] {},
-                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9).filter(reject()).toTypedArray());
+                          View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).filter(reject()).toTypedArray());
 
         assertArrayEquals(new Integer[] {5,6,7,8,9},
-                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9).filter(i -> i > 4).toTypedArray());
+                          View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).filter(i -> i > 4).toTypedArray());
 
         assertArrayEquals(new Integer[] {},
-                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9).filter(i -> i < 1).toTypedArray());
+                          View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).filter(i -> i < 1).toTypedArray());
 
         assertArrayEquals(new Integer[] {3},
-                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9).filter(i -> i == 3).toTypedArray());
+                          View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).filter(i -> i == 3).toTypedArray());
 
         assertArrayEquals(new Integer[] {1},
-                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9).filter(i -> i == 1).toTypedArray());
+                          View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).filter(i -> i == 1).toTypedArray());
 
         assertArrayEquals(new Integer[] {9},
-                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9).filter(i -> i == 9).toTypedArray());
+                          View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).filter(i -> i == 9).toTypedArray());
 
         assertArrayEquals(new Integer[] {1,2,3,4,5,6},
-                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9).filter(i -> i < 7).toTypedArray());
+                          View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).filter(i -> i < 7).toTypedArray());
 
     }
 
     @Test
     public void chainedFilters() {
         assertArrayEquals(new Integer[] {1, 2, 3, 4, 5, 6, 7, 8, 9},
-                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                          View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
                                   .filter(accept()).filter(accept()).filter(accept())
                                   .filter(accept()).filter(accept()).filter(accept())
                                   .filter(accept()).filter(accept()).toTypedArray());
 
         assertArrayEquals(new Integer[] {},
-                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                          View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
                                   .filter(reject()).filter(accept()).filter(accept())
                                   .filter(accept()).filter(accept()).filter(accept())
                                   .filter(accept()).filter(accept()).toTypedArray());
 
         assertArrayEquals(new Integer[] {},
-                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                          View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
                                   .filter(accept()).filter(accept()).filter(accept())
                                   .filter(accept()).filter(reject()).filter(accept())
                                   .filter(accept()).filter(accept()).toTypedArray());
 
         assertArrayEquals(new Integer[] {},
-                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                          View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
                                   .filter(accept()).filter(accept()).filter(accept())
                                   .filter(accept()).filter(accept()).filter(accept())
                                   .filter(accept()).filter(reject()).toTypedArray());
 
         assertArrayEquals(new Integer[] {3, 4, 6},
-                          View.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                          View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
                                   .filter(i -> i > 2)
                                   .filter(i -> i < 7)
                                   .filter(i -> i != 5).toTypedArray());

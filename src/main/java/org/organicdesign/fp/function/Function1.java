@@ -14,15 +14,15 @@
 
 package org.organicdesign.fp.function;
 
+import org.organicdesign.fp.Option;
+import org.organicdesign.fp.ephemeral.View;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import org.organicdesign.fp.Option;
-import org.organicdesign.fp.ephemeral.View;
 
 /**
  This is like Java 8's java.util.function.Function, but retrofitted to turn checked exceptions
@@ -122,9 +122,8 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
 
      @return a function which applies all the given functions in order.
      */
-    @SafeVarargs
-    public static <V> Function1<V,V> compose(Function1<V,V>... in) {
-        if ( (in == null) || (in.length < 1) ) {
+    static <V> Function1<V,V> compose(Iterable<Function1<V,V>> in) {
+        if (in == null) {
             return identity();
         }
         final List<Function1<V,V>> out = new ArrayList<>();
@@ -204,12 +203,12 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
     }
 
     /** A predicate that always returns true.  Use accept() for a type-safe version of this predicate. */
-    public static final Function1<Object,Boolean> ACCEPT = new Function1<Object,Boolean>() {
+    Function1<Object,Boolean> ACCEPT = new Function1<Object,Boolean>() {
         @Override public Boolean applyEx(Object t) { return Boolean.TRUE; }
     };
 
     /** A predicate that always returns false. Use reject() for a type-safe version of this predicate. */
-    public static final Function1<Object,Boolean> REJECT = new Function1<Object,Boolean>() {
+    Function1<Object,Boolean> REJECT = new Function1<Object,Boolean>() {
         @Override public Boolean applyEx(Object t) { return Boolean.FALSE; }
     };
 
@@ -236,23 +235,18 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
 
      @return a predicate which returns true if all the input predicates return true, false otherwise.
      */
-    public static <T> Function1<T,Boolean> and(View<Function1<T,Boolean>> in) {
+    static <T> Function1<T,Boolean> and(Iterable<Function1<T,Boolean>> in) {
         if (in == null) { return accept(); }
 
-        return in
-                .filter(p -> (p != null) && (p != ACCEPT))
+        View<Function1<T,Boolean>> v = (in instanceof View) ? (View<Function1<T,Boolean>>) in
+                : View.ofIter(in);
+
+        return v.filter(p -> (p != null) && (p != ACCEPT))
                 .foldLeft(accept(),
                           (accum, p) -> (p == REJECT)
-                                        ? p
-                                        : and(accum, p),
+                                  ? p
+                                  : and(accum, p),
                           accum -> accum == REJECT);
-
-    }
-
-    /** A convenience wrapper for and().  This may be a bad idea.  Not sure yet. */
-    @SafeVarargs // Not really sure how safe these varargs are...
-    public static <T> Function1<T,Boolean> andArray(Function1<T,Boolean>... in) {
-        return and(View.of(in));
     }
 
     /**
@@ -271,51 +265,34 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
      @return a predicate which returns true if any of the input predicates return true,
      false otherwise.
      */
-    public static <T> Function1<T,Boolean> or(View<Function1<T,Boolean>> in) {
+    static <T> Function1<T,Boolean> or(Iterable<Function1<T,Boolean>> in) {
         if (in == null) { return reject(); }
 
-        return in
-                .filter(p -> (p != null) && (p != REJECT))
+        View<Function1<T,Boolean>> v = (in instanceof View) ? (View<Function1<T,Boolean>>) in
+                : View.ofIter(in);
+
+        return v.filter(p -> (p != null) && (p != REJECT))
                 .foldLeft(reject(),
                           (accum, p) -> (p == ACCEPT)
-                                        ? p
-                                        : or(accum, p),
+                                  ? p
+                                  : or(accum, p),
                           accum -> accum == ACCEPT);
-    }
-
-    /** A convenience wrapper for of().  This may be a bad idea.  Not sure yet. */
-    @SafeVarargs
-    public static <T> Function1<T,Boolean> orArray(Function1<T,Boolean>... in) {
-        return or(View.of(in));
     }
 
     enum BooleanCombiner {
         AND {
             @Override
-            public <T> Function1<T,Boolean> combine(View<Function1<T,Boolean>> in) {
+            public <T> Function1<T,Boolean> combine(Iterable<Function1<T,Boolean>> in) {
                 return and(in);
-            }
-            @Override
-            @SafeVarargs
-            public final <T> Function1<T,Boolean> combineArray(Function1<T,Boolean>... in) {
-                return andArray(in);
             }
         },
         OR {
             @Override
-            public <T> Function1<T,Boolean> combine(View<Function1<T,Boolean>> in) {
+            public <T> Function1<T,Boolean> combine(Iterable<Function1<T,Boolean>> in) {
                 return or(in);
             }
-            @Override
-            @SafeVarargs
-            public final <T> Function1<T,Boolean> combineArray(Function1<T,Boolean>... in) {
-                return orArray(in);
-            }
         };
-        public abstract <T> Function1<T,Boolean> combine(View<Function1<T,Boolean>> in);
-
-        @SuppressWarnings("unchecked")
-        public abstract <T> Function1<T,Boolean> combineArray(Function1<T,Boolean>... in);
+        public abstract <T> Function1<T,Boolean> combine(Iterable<Function1<T,Boolean>> in);
     }
 
     /**

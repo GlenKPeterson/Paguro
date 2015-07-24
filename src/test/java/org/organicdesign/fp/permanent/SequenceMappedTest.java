@@ -29,7 +29,7 @@ public class SequenceMappedTest {
 
     @Test public void mapInOneBatch() {
         Integer[] ints = new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9};
-        Sequence<Integer> seq = Sequence.of(ints);
+        Sequence<Integer> seq = Sequence.ofArray(ints);
         assertArrayEquals(ints,
                           seq.map(Function1.identity()).toTypedArray());
 
@@ -52,13 +52,13 @@ public class SequenceMappedTest {
     @Test
     public void mapInMultipleBatches() {
 
-        assertArrayEquals(Sequence.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
+        assertArrayEquals(Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
                                   .map(plusOne).map(plusOne).map(plusOne).map(plusOne).map(plusOne)
                                   .map(plusOne).map(plusOne).map(plusOne).map(plusOne).map(plusOne)
                                   .toTypedArray(),
                           new Integer[] { 11,12,13,14,15,16,17,18,19 });
 
-        assertArrayEquals(Sequence.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
+        assertArrayEquals(Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
                                   .map(minusOne).map(minusOne).map(minusOne).map(minusOne)
                                   .map(minusOne).map(minusOne).map(minusOne).map(minusOne)
                                   .map(minusOne).map(minusOne)

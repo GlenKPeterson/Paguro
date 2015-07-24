@@ -26,48 +26,20 @@ public class PersistentHashSet<E> implements ImSet<E> {
 
     public static <E> PersistentHashSet<E> empty(Equator<E> eq) { return new PersistentHashSet<>(PersistentHashMap.empty(eq)); }
 
-    @SafeVarargs
-    public static <E>  PersistentHashSet<E> of(E... init) {
+    public static <E>  PersistentHashSet<E> of(Iterable<E> init) {
         PersistentHashSet<E> empty = empty();
         TransientHashSet<E> ret = empty.asTransient();
-        for (int i = 0; i < init.length; i++) {
-            ret = ret.put(init[i]);
+        for (E e : init) {
+            ret = ret.put(e);
         }
         return ret.persistent();
     }
 
-    @SafeVarargs
-    public static <E>  PersistentHashSet<E> ofEq(Equator<E> eq, E... init) {
+    public static <E>  PersistentHashSet<E> ofEq(Equator<E> eq, Iterable<E> init) {
         PersistentHashSet<E> empty = empty(eq);
         TransientHashSet<E> ret = empty.asTransient();
-        for (int i = 0; i < init.length; i++) {
-            ret = ret.put(init[i]);
-        }
-        return ret.persistent();
-    }
-
-    @SafeVarargs
-    public static <E>  PersistentHashSet<E> ofEqSkipNull(Equator<E> eq, E... init) {
-        PersistentHashSet<E> empty = empty(eq);
-        TransientHashSet<E> ret = empty.asTransient();
-        for (int i = 0; i < init.length; i++) {
-            E e = init[i];
-            if (e != null) {
-                ret = ret.put(init[i]);
-            }
-        }
-        return ret.persistent();
-    }
-
-    @SafeVarargs
-    public static <E>  PersistentHashSet<E> ofSkipNull(E... init) {
-        PersistentHashSet<E> empty = empty();
-        TransientHashSet<E> ret = empty.asTransient();
-        for (int i = 0; i < init.length; i++) {
-            E e = init[i];
-            if (e != null) {
-                ret = ret.put(init[i]);
-            }
+        for (E e : init) {
+            ret = ret.put(e);
         }
         return ret.persistent();
     }

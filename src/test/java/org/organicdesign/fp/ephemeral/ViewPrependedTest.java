@@ -25,91 +25,91 @@ public class ViewPrependedTest {
     @Test
     public void prepend() {
         assertArrayEquals(new Integer[] { 5, 6, 7, 8, 9 },
-                          View.of(5, 6, 7, 8, 9)
+                          View.ofArray(5, 6, 7, 8, 9)
                               .prepend(null).toTypedArray());
 
         assertArrayEquals(new Integer[] { 5, 6, 7, 8, 9 },
-                          View.of(5, 6, 7, 8, 9)
+                          View.ofArray(5, 6, 7, 8, 9)
                               .prepend(View.emptyView()).toTypedArray());
 
         assertArrayEquals(new Integer[] { 4, 5, 6, 7, 8, 9 },
-                          View.of(5, 6, 7, 8, 9)
-                              .prepend(View.of(4)).toTypedArray());
+                          View.ofArray(5, 6, 7, 8, 9)
+                              .prepend(View.ofArray(4)).toTypedArray());
 
         assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
-                          View.of(5, 6, 7, 8, 9)
-                              .prepend(View.of(1, 2, 3, 4)).toTypedArray());
+                          View.ofArray(5, 6, 7, 8, 9)
+                              .prepend(View.ofArray(1, 2, 3, 4)).toTypedArray());
     }
 
     @Test
     public void append() {
         assertArrayEquals(new Integer[] { 1, 2, 3, 4 },
-                          View.of(1, 2, 3, 4)
+                          View.ofArray(1, 2, 3, 4)
                               .append(null).toTypedArray());
 
         assertArrayEquals(new Integer[] { 1, 2, 3, 4 },
-                          View.of(1, 2, 3, 4)
+                          View.ofArray(1, 2, 3, 4)
                               .append(View.emptyView()).toTypedArray());
 
         assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5 },
-                          View.of(1, 2, 3, 4)
-                              .append(View.of(5)).toTypedArray());
+                          View.ofArray(1, 2, 3, 4)
+                              .append(View.ofArray(5)).toTypedArray());
 
         assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
-                          View.of(1, 2, 3, 4)
-                              .append(View.of(5, 6, 7, 8, 9)).toTypedArray());
+                          View.ofArray(1, 2, 3, 4)
+                              .append(View.ofArray(5, 6, 7, 8, 9)).toTypedArray());
     }
 
     @Test
     public void chainedPrependAppend() {
         assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
-                          View.of(5)                     //         5
-                                  .prepend(View.of(4))   //       4,5
-                                  .append(View.of(6))    //       4,5,6
-                                  .prepend(View.of(2, 3)) //   2,3,4,5,6
-                                  .append(View.of(7, 8))  //   2,3,4,5,6,7,8
-                                  .prepend(View.of(1))   // 1,2,3,4,5,6,7,8
-                                  .append(View.of(9))    // 1,2,3,4,5,6,7,8,9
+                          View.ofArray(5)                     //         5
+                                  .prepend(View.ofArray(4))   //       4,5
+                                  .append(View.ofArray(6))    //       4,5,6
+                                  .prepend(View.ofArray(2, 3)) //   2,3,4,5,6
+                                  .append(View.ofArray(7, 8))  //   2,3,4,5,6,7,8
+                                  .prepend(View.ofArray(1))   // 1,2,3,4,5,6,7,8
+                                  .append(View.ofArray(9))    // 1,2,3,4,5,6,7,8,9
                                   .toTypedArray());
 
         assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
-                          View.of(5)
+                          View.ofArray(5)
                               .prepend(null).prepend(null).prepend(null).prepend(null)
                               .prepend(View.emptyView()).prepend(View.emptyView())
                               .prepend(null)
                               .append(View.emptyView()).append(View.emptyView())
                               .append(null).append(null).append(null).append(null).append(null)
-                              .prepend(View.of(4))
+                              .prepend(View.ofArray(4))
                               .prepend(null).prepend(null).prepend(null).prepend(null)
                               .prepend(View.emptyView()).prepend(View.emptyView())
                               .prepend(null)
                               .append(View.emptyView()).append(View.emptyView())
                               .append(null).append(null).append(null).append(null).append(null)
-                              .append(View.of(6))
+                              .append(View.ofArray(6))
                               .prepend(null).prepend(null).prepend(null).prepend(null)
                               .prepend(View.emptyView()).prepend(View.emptyView())
                               .prepend(null)
                               .append(View.emptyView()).append(View.emptyView())
                               .append(null).append(null).append(null).append(null).append(null)
-                              .prepend(View.of(2, 3))
+                              .prepend(View.ofArray(2, 3))
                               .prepend(null).prepend(null).prepend(null).prepend(null)
                               .prepend(View.emptyView()).prepend(View.emptyView())
                               .prepend(null)
                               .append(View.emptyView()).append(View.emptyView())
                               .append(null).append(null).append(null).append(null).append(null)
-                              .append(View.of(7, 8))
+                              .append(View.ofArray(7, 8))
                               .prepend(null).prepend(null).prepend(null).prepend(null)
                               .prepend(View.emptyView()).prepend(View.emptyView())
                               .prepend(null)
                               .append(View.emptyView()).append(View.emptyView())
                               .append(null).append(null).append(null).append(null).append(null)
-                              .prepend(View.of(1))
+                              .prepend(View.ofArray(1))
                               .prepend(null).prepend(null).prepend(null).prepend(null)
                               .prepend(View.emptyView()).prepend(View.emptyView())
                               .prepend(null)
                               .append(View.emptyView()).append(View.emptyView())
                               .append(null).append(null).append(null).append(null).append(null)
-                              .append(View.of(9))
+                              .append(View.ofArray(9))
                               .prepend(null).prepend(null).prepend(null).prepend(null)
                               .prepend(View.emptyView()).prepend(View.emptyView())
                               .prepend(null)

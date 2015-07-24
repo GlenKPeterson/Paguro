@@ -1,15 +1,16 @@
 package org.organicdesign.fp.function;
 
-import java.io.IOException;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.organicdesign.fp.ephemeral.View;
 
+import java.io.IOException;
+
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.organicdesign.fp.StaticImports.vec;
 
 @RunWith(JUnit4.class)
 public class Function1Test {
@@ -39,61 +40,61 @@ public class Function1Test {
 
     @Test
     public void composePredicatesWithAnd() {
-        assertTrue(Function1.andArray() == Function1.accept());
+//        assertTrue(Function1.andArray() == Function1.accept());
         assertTrue(Function1.and(null) == Function1.accept());
         assertTrue(Function1.and(View.emptyView()) == Function1.accept());
 
-        assertTrue(Function1.andArray(Function1.accept()) == Function1.accept());
-        assertTrue(Function1.and(View.of(Function1.accept())) ==
+//        assertTrue(Function1.andArray(Function1.accept()) == Function1.accept());
+        assertTrue(Function1.and(View.ofArray(Function1.accept())) ==
                    Function1.accept());
 
-        assertTrue(Function1.<Object>andArray(Function1.accept(),
-                                                  Function1.accept(),
-                                                  Function1.accept()) ==
-                   Function1.accept());
-        assertTrue(Function1.<Object>and(View.of(Function1.accept(),
-                                                 Function1.accept(),
-                                                 Function1.accept())) ==
+//        assertTrue(Function1.<Object>andArray(Function1.accept(),
+//                                                  Function1.accept(),
+//                                                  Function1.accept()) ==
+//                   Function1.accept());
+        assertTrue(Function1.<Object>and(View.ofArray(Function1.accept(),
+                                                      Function1.accept(),
+                                                      Function1.accept())) ==
                    Function1.accept());
 
-        assertTrue(Function1.andArray(Function1.reject()) == Function1.reject());
-        assertTrue(Function1.and(View.of(Function1.reject())) ==
+//        assertTrue(Function1.andArray(Function1.reject()) == Function1.reject());
+        assertTrue(Function1.and(View.ofArray(Function1.reject())) ==
                    Function1.reject());
     }
 
     @Test
     public void composePredicatesWithOr() {
-        assertTrue(Function1.orArray() == Function1.reject());
+//        assertTrue(Function1.orArray() == Function1.reject());
         assertTrue(Function1.or(null) == Function1.reject());
 
-        assertTrue(Function1.orArray(Function1.accept()) == Function1.accept());
-        assertTrue(Function1.or(View.of(Function1.accept())) ==
+//        assertTrue(Function1.orArray(Function1.accept()) == Function1.accept());
+        assertTrue(Function1.or(View.ofArray(Function1.accept())) ==
                    Function1.accept());
 
-        assertTrue(Function1.<Object>orArray(Function1.reject(),
-                                             Function1.reject(),
-                                             Function1.reject(),
-                                             Function1.accept()) ==
-                   Function1.accept());
-        assertTrue(Function1.<Object>or(View.of(Function1.reject(),
-                                                Function1.reject(),
-                                                Function1.reject(),
-                                                Function1.accept())) ==
-                   Function1.accept());
-
-        assertTrue(Function1.<Object>orArray(Function1.accept(),
-                                             Function1.reject(),
-                                             Function1.reject(),
-                                             Function1.reject()) ==
-                   Function1.accept());
-        assertTrue(Function1.<Object>or(View.of(Function1.accept(),
-                                                Function1.reject(),
-                                                Function1.reject(),
-                                                Function1.reject())) ==
+//        assertTrue(Function1.<Object>orArray(Function1.reject(),
+//                                             Function1.reject(),
+//                                             Function1.reject(),
+//                                             Function1.accept()) ==
+//                   Function1.accept());
+        assertTrue(Function1.<Object>or(View.ofArray(Function1.reject(),
+                                                     Function1.reject(),
+                                                     Function1.reject(),
+                                                     Function1.accept())) ==
                    Function1.accept());
 
-        assertTrue(Function1.orArray(Function1.reject()) == Function1.reject());
-        assertTrue(Function1.or(View.of(Function1.reject())) ==
+//        assertTrue(Function1.<Object>orArray(Function1.accept(),
+//                                             Function1.reject(),
+//                                             Function1.reject(),
+//                                             Function1.reject()) ==
+//                   Function1.accept());
+        assertTrue(Function1.<Object>or(View.ofArray(Function1.accept(),
+                                                     Function1.reject(),
+                                                     Function1.reject(),
+                                                     Function1.reject())) ==
+                   Function1.accept());
+
+//        assertTrue(Function1.orArray(Function1.reject()) == Function1.reject());
+        assertTrue(Function1.or(View.ofArray(Function1.reject())) ==
                 Function1.reject());
     }
 
@@ -134,7 +135,8 @@ public class Function1Test {
         assertEquals("two", h.apply(2));
         assertEquals("unknown", h.apply(3));
 
-        Function1<String,String> i = Function1.compose((s) -> s.substring(0, s.indexOf(" hundred")), wordToOrdinal);
+        Function1<String,String> i = Function1.compose(vec(s -> s.substring(0, s.indexOf(" hundred")),
+                                                           wordToOrdinal));
         assertEquals("zillion", i.apply("zillion hundred"));
         assertEquals("zero", i.apply("zero hundred"));
         assertEquals("first", i.apply("one hundred"));
@@ -144,24 +146,24 @@ public class Function1Test {
 
     @Test
     public void filtersOfPredicates() {
-        assertArrayEquals(View.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
-                        .filter(Function1.<Integer>andArray((i) -> i > 2,
+        assertArrayEquals(View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                        .filter(Function1.<Integer>and((i) -> i > 2,
                                 (i) -> i < 6))
                         .toMutableList()
                         .toArray(),
                 new Integer[]{3, 4, 5});
 
-        assertArrayEquals(View.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
-                        .filter(Function1.orArray(i -> i < 3,
+        assertArrayEquals(View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                        .filter(Function1.or(i -> i < 3,
                                 i -> i > 5))
                         .toMutableList()
                         .toArray(),
                 new Integer[]{1, 2, 6, 7, 8, 9});
 
-        assertArrayEquals(View.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
-                        .filter(Function1.orArray(i -> i < 3,
+        assertArrayEquals(View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                        .filter(Function1.or(vec(i -> i < 3,
                                 i -> i == 4,
-                                i -> i > 5))
+                                i -> i > 5)))
                         .toMutableList()
                         .toArray(),
                 new Integer[]{1, 2, 4, 6, 7, 8, 9});

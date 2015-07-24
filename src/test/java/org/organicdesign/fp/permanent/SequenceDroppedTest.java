@@ -23,21 +23,21 @@ import static org.junit.Assert.assertArrayEquals;
 public class SequenceDroppedTest {
 
     @Test public void emptiness() {
-        Sequence<Integer> seq = Sequence.of();
+        Sequence<Integer> seq = Sequence.ofArray();
         assertArrayEquals(new Integer[0], seq.drop(0).toTypedArray());
         assertArrayEquals(new Integer[0], seq.drop(1).toTypedArray());
         assertArrayEquals(new Integer[0], seq.drop(2).toTypedArray());
     }
 
     @Test public void singleElement() {
-        Sequence<Integer> seq = Sequence.of(1);
+        Sequence<Integer> seq = Sequence.ofArray(1);
         assertArrayEquals(new Integer[] {1}, seq.drop(0).toTypedArray());
         assertArrayEquals(new Integer[0], seq.drop(1).toTypedArray());
         assertArrayEquals(new Integer[0], seq.drop(2).toTypedArray());
     }
 
     @Test public void twoElement() {
-        Sequence<Integer> seq = Sequence.of(1, 2);
+        Sequence<Integer> seq = Sequence.ofArray(1, 2);
         assertArrayEquals(new Integer[] {1,2}, seq.drop(0).toTypedArray());
         assertArrayEquals(new Integer[] {2}, seq.drop(1).toTypedArray());
         assertArrayEquals(new Integer[0], seq.drop(2).toTypedArray());
@@ -46,7 +46,7 @@ public class SequenceDroppedTest {
     @Test
     public void singleDrops() {
         Integer[] ints = new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9};
-        Sequence<Integer> seq = Sequence.of(ints);
+        Sequence<Integer> seq = Sequence.ofArray(ints);
         assertArrayEquals(ints, seq.drop(0).toTypedArray());
         assertArrayEquals(new Integer[] {2,3,4,5,6,7,8,9}, seq.drop(1).toTypedArray());
         assertArrayEquals(new Integer[] {3,4,5,6,7,8,9}, seq.drop(2).toTypedArray());
@@ -59,14 +59,14 @@ public class SequenceDroppedTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void exception1() { Sequence.of(1, 2, 3, 4, 5, 6, 7, 8, 9).drop(-1); }
+    public void exception1() { Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).drop(-1); }
     @Test(expected = IllegalArgumentException.class)
-    public void exception2() { Sequence.of(1, 2, 3, 4, 5, 6, 7, 8, 9).drop(-99); }
+    public void exception2() { Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).drop(-99); }
 
     @Test
     public void multiDrops() {
         Integer[] ints = new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9};
-        Sequence<Integer> seq = Sequence.of(ints);
+        Sequence<Integer> seq = Sequence.ofArray(ints);
         assertArrayEquals(new Integer[] {3,4,5,6,7,8,9},
                 seq.drop(1).drop(1).toTypedArray());
         assertArrayEquals(new Integer[] {4,5,6,7,8,9},

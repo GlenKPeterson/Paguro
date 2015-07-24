@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.Assert.*;
+import static org.organicdesign.fp.StaticImports.vec;
 import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class PersistentHashSetTest {
@@ -145,11 +146,11 @@ public class PersistentHashSetTest {
     }
 
     @Test public void seq3() {
-        PersistentHashSet<String> m1 = PersistentHashSet.of("c");
+        PersistentHashSet<String> m1 = PersistentHashSet.of(vec("c"));
         assertEquals(Option.of("c"),
                      m1.seq().head());
 
-        PersistentHashSet<String> m2 = PersistentHashSet.of("c", "b", "a");
+        PersistentHashSet<String> m2 = PersistentHashSet.of(vec("c", "b", "a"));
 
         Set<Option<String>> s = new HashSet<>(Arrays.asList(Option.of("c"),
                                                             Option.of("b"),
@@ -176,7 +177,7 @@ public class PersistentHashSetTest {
     }
 
     @Test public void seqMore() {
-        PersistentHashSet<String> m1 = PersistentHashSet.of("g", "f", "e", "d", "c", "b", "a");
+        PersistentHashSet<String> m1 = PersistentHashSet.of(vec("g", "f", "e", "d", "c", "b", "a"));
         // System.out.println("m1.toString(): " + m1.toString());
 
         Set<String> s1 = new HashSet<>(Arrays.asList("a", "b", "c", "d", "e", "f", "g"));
@@ -239,7 +240,7 @@ public class PersistentHashSetTest {
             @Override public int compare(Integer o1, Integer o2) { return (o1 % 3) - (o2 % 3); }
             @Override public int hash(Integer integer) { return integer % 3; }
         };
-        PersistentHashSet<Integer> s1 = PersistentHashSet.ofEq(mod3Eq, 5, 2, 4, 1, 3);
+        PersistentHashSet<Integer> s1 = PersistentHashSet.ofEq(mod3Eq, vec(5, 2, 4, 1, 3));
 //        System.out.println("s1: " + s1);
         assertEquals(3, s1.size());
         Set<Integer> hs = new HashSet<>();
@@ -277,7 +278,7 @@ public class PersistentHashSetTest {
     }
 
     @Test public void equality() {
-        PersistentHashSet<String> s1 = PersistentHashSet.of("hello", "an", "work", "b", "the");
+        PersistentHashSet<String> s1 = PersistentHashSet.of(vec("hello", "an", "work", "b", "the"));
 
         Set<String> ss1 = new HashSet<>();
         ss1.add("the");
@@ -286,7 +287,7 @@ public class PersistentHashSetTest {
         ss1.add("an");
         ss1.add("hello");
         equalsDistinctHashCode(s1, ss1, StaticImports.unmod(ss1),
-                               PersistentHashSet.of("hello", "an", "work", "the"));
+                               PersistentHashSet.of(vec("hello", "an", "work", "the")));
     }
 
 //    // TODO: Finish this!

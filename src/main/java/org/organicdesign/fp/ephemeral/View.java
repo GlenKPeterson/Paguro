@@ -37,7 +37,7 @@ public interface View<T> extends Transformable<T> {
     static <T> View<T> ofIter(Iterable<T> i) { return ViewFromIterable.of(i); }
 
     @SafeVarargs
-    static <T> View<T> of(T... i) { return ViewFromArray.of(i); }
+    static <T> View<T> ofArray(T... i) { return ViewFromArray.of(i); }
 
     /**
       This is the distinguishing method of the view interface.

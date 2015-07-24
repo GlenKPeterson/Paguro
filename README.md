@@ -35,7 +35,7 @@ public enum ColorVal {
     // Convert the values() array of this enum to a map of key/value pairs
     // This can be used to look up enum values by their character codes:
     public static final ImMap<Character,ColorVal> charToColorMap =
-            Sequence.of(values())
+            Sequence.ofArray(values())
                     .toImMap(v -> Tuple2.of(v.ch(), v));
 }
 ```
@@ -133,8 +133,8 @@ Functions available in <code>Sequence</code> (as of 2015-03-15):
 ###Starting Points:
 ```java
 Sequence<T> Sequence.ofArray(T... i)
-Sequence<T> Sequence.of(Iterator<T> i)
-Sequence<T> Sequence.of(Iterable<T> i)
+Sequence<T> Sequence.ofArray(Iterator<T> i)
+Sequence<T> Sequence.ofArray(Iterable<T> i)
 ```
 ###Transformations:
 ```java
@@ -240,6 +240,14 @@ In short, Clojure doesn't have static types.  Scala has an TMTOWTDI attitude tha
 - As of 2014-03-08, all major areas of functionality were covered by unit tests.
 
 #Change Log
+2015-07-25 version 0.9.9: Renamed methods in staticImports imList() to vec(), imSet() to hSet() (think: "hashSet()"),
+imSortedSet to tSet() (think: "treeSet()"), imSortedMap to tMap(), etc.  Also removed the telescoping
+methods in favor of just passing vec(tup(1, "one"), tup(2, "two"), tup(3, "three"));  It's maybe a little more work,
+but a little less cognitive load and a lot less testing!  Also added Mutable.intRef.decrement().
+Renamed Sequence.of() to .ofArray() and similarly with View.  I may rename Sequence/View.ofIter() to
+just .of() in a future version, but then, I'm probably going to remove Sequence and replace View
+with Transform too.  The interface to Transform is not like View without head() and tail() and it's immutable and faster.
+
 2015-06-23 version 0.9.8: Added union(Iterable i) method to ImSet.
 
 2015-06-12 version 0.9.7: Renamed classes and methods so that the unmodifiable prefix is now "unmod" instead of "un".

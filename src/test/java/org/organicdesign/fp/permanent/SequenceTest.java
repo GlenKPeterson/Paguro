@@ -30,7 +30,7 @@ public class SequenceTest {
 
     @Test public void construction() {
         Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-        assertArrayEquals(ints, Sequence.of(ints).toTypedArray());
+        assertArrayEquals(ints, Sequence.ofArray(ints).toTypedArray());
         assertArrayEquals(ints, Sequence.ofIter(Arrays.asList(ints)).toTypedArray());
     }
 
@@ -51,7 +51,7 @@ public class SequenceTest {
     @Test public void foldLeftTerm() {
         Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         assertArrayEquals(new Integer[]{2, 3, 4},
-                          Sequence.of(ints)
+                          Sequence.ofArray(ints)
                                   .foldLeft(new ArrayList<>(),
                                             (accum, i) -> {
                                                 accum.add(i + 1);
@@ -59,7 +59,7 @@ public class SequenceTest {
                                             },
                                             (accum) -> accum.size() == 3).toArray());
         assertArrayEquals(new Integer[]{2, 3, 4, 5, 6, 7, 8, 9, 10},
-                          Sequence.of(ints)
+                          Sequence.ofArray(ints)
                                   .foldLeft(new ArrayList<>(),
                                             (accum, i) -> {
                                                 accum.add(i + 1);
@@ -70,7 +70,7 @@ public class SequenceTest {
 
     @Test public void toIterator() {
         Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-        Iterator<Integer> seqIter = Sequence.of(ints).iterator();
+        Iterator<Integer> seqIter = Sequence.ofArray(ints).iterator();
         Iterator<Integer> listIter = Arrays.asList(ints).iterator();
         while (seqIter.hasNext() && listIter.hasNext()) {
             assertEquals(seqIter.next(), listIter.next());
@@ -81,8 +81,8 @@ public class SequenceTest {
 
     @Test public void objectMethods() {
         Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-        Sequence<Integer> seq1 = Sequence.of(ints).drop(3).take(4);
-        Sequence<Integer> seq2 = Sequence.of(4, 5, 6, 7);
+        Sequence<Integer> seq1 = Sequence.ofArray(ints).drop(3).take(4);
+        Sequence<Integer> seq2 = Sequence.ofArray(4, 5, 6, 7);
 
         assertEquals(UnmodIterable.hashCode(seq1), UnmodIterable.hashCode(seq2));
 
@@ -107,7 +107,7 @@ public class SequenceTest {
 
     @Test public void forEach() {
         Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-        Sequence<Integer> seq = Sequence.of(ints);
+        Sequence<Integer> seq = Sequence.ofArray(ints);
         final List<Integer> output = new ArrayList<>();
         seq.forEach(i -> output.add(i));
         assertArrayEquals(ints, output.toArray());
@@ -116,7 +116,7 @@ public class SequenceTest {
     @Test
     public void firstMatching() {
         Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-        Sequence<Integer> seq = Sequence.of(ints);
+        Sequence<Integer> seq = Sequence.ofArray(ints);
 
         assertEquals(Integer.valueOf(1), seq.filter(i -> i == 1).head().get());
         assertEquals(Integer.valueOf(3), seq.filter(i -> i > 2).head().get());
@@ -125,34 +125,34 @@ public class SequenceTest {
 
     @Test
     public void takeAndDrop() {
-        assertArrayEquals(Sequence.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
+        assertArrayEquals(Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
                                   .drop(0).take(8888).toTypedArray(),
                           new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 });
-        assertArrayEquals(Sequence.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
+        assertArrayEquals(Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
                                   .drop(1).take(1).toTypedArray(),
                    new Integer[] { 2 });
-        assertArrayEquals(Sequence.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
+        assertArrayEquals(Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
                                   .drop(2).take(2).toTypedArray(),
                    new Integer[] { 3,4 });
-        assertArrayEquals(Sequence.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
+        assertArrayEquals(Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
                                   .drop(3).take(3).toTypedArray(),
                    new Integer[] { 4,5,6 });
-        assertArrayEquals(Sequence.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
+        assertArrayEquals(Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
                                   .drop(9999).take(3).toTypedArray(),
                           new Integer[]{});
-        assertArrayEquals(Sequence.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
+        assertArrayEquals(Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
                                   .drop(3).take(0).toTypedArray(),
                    new Integer[] { });
     }
 
     @Test public void chain1() {
-        assertArrayEquals(Sequence.of(5)                      //         5
-                                  .precat(Sequence.of(4))    //       4,5
-                                  .concat(Sequence.of(6))     //       4,5,6
-                                  .precat(Sequence.of(2, 3)) //   2,3,4,5,6
-                                  .concat(Sequence.of(7, 8))  //   2,3,4,5,6,7,8
-                                  .precat(Sequence.of(1))    // 1,2,3,4,5,6,7,8
-                                  .concat(Sequence.of(9))     // 1,2,3,4,5,6,7,8,9
+        assertArrayEquals(Sequence.ofArray(5)                      //         5
+                                  .precat(Sequence.ofArray(4))    //       4,5
+                                  .concat(Sequence.ofArray(6))     //       4,5,6
+                                  .precat(Sequence.ofArray(2, 3)) //   2,3,4,5,6
+                                  .concat(Sequence.ofArray(7, 8))  //   2,3,4,5,6,7,8
+                                  .precat(Sequence.ofArray(1))    // 1,2,3,4,5,6,7,8
+                                  .concat(Sequence.ofArray(9))     // 1,2,3,4,5,6,7,8,9
                                   .filter(i -> i > 3)              //       4,5,6,7,8,9
                                   .map(i -> i - 2)                 //   2,3,4,5,6,7
                                   .take(5)                         //   2,3,4,5,6

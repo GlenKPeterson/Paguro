@@ -28,26 +28,26 @@ public class BooleanCombinerTest {
     @Test
     @SuppressWarnings("unchecked")
     public void combineAnd() {
-        assertTrue(Function1.BooleanCombiner.AND.combineArray() == ACCEPT);
+//        assertTrue(Function1.BooleanCombiner.AND.combineArray() == ACCEPT);
         assertTrue(Function1.BooleanCombiner.AND.combine(null) == ACCEPT);
 
-        assertTrue(Function1.BooleanCombiner.AND.combineArray(accept()) == ACCEPT);
-        assertTrue(Function1.BooleanCombiner.AND.combine(View.of(accept())) == ACCEPT);
+//        assertTrue(Function1.BooleanCombiner.AND.combineArray(accept()) == ACCEPT);
+        assertTrue(Function1.BooleanCombiner.AND.combine(View.ofArray(accept())) == ACCEPT);
 
-        assertTrue(Function1.BooleanCombiner.AND.combineArray(reject()) == REJECT);
-        assertTrue(Function1.BooleanCombiner.AND.combine(View.of(reject())) == REJECT);
+//        assertTrue(Function1.BooleanCombiner.AND.combineArray(reject()) == REJECT);
+        assertTrue(Function1.BooleanCombiner.AND.combine(View.ofArray(reject())) == REJECT);
     }
 
     @Test
     @SuppressWarnings("unchecked")
     public void combineOr() {
-        assertTrue(Function1.BooleanCombiner.OR.combineArray() == REJECT);
+//        assertTrue(Function1.BooleanCombiner.OR.combineArray() == REJECT);
         assertTrue(Function1.BooleanCombiner.OR.combine(null) == REJECT);
 
-        assertTrue(Function1.BooleanCombiner.OR.combineArray(accept()) == ACCEPT);
-        assertTrue(Function1.BooleanCombiner.OR.combine(View.of(accept())) == ACCEPT);
+//        assertTrue(Function1.BooleanCombiner.OR.combineArray(accept()) == ACCEPT);
+        assertTrue(Function1.BooleanCombiner.OR.combine(View.ofArray(accept())) == ACCEPT);
 
-        assertTrue(Function1.BooleanCombiner.OR.combineArray(reject()) == REJECT);
-        assertTrue(Function1.BooleanCombiner.OR.combine(View.of(reject())) == REJECT);
+//        assertTrue(Function1.BooleanCombiner.OR.combineArray(reject()) == REJECT);
+        assertTrue(Function1.BooleanCombiner.OR.combine(View.ofArray(reject())) == REJECT);
     }
 }

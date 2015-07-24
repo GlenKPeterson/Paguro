@@ -72,7 +72,7 @@ public interface Sequence<T> extends Transformable<T>, UnmodSortedIterable<T> {
     }
 
     @SafeVarargs
-    static <T> Sequence<T> of(T... i) { return SequenceFromArray.of(i); }
+    static <T> Sequence<T> ofArray(T... i) { return SequenceFromArray.of(i); }
 
     // ======================================= Base methods =======================================
     /**

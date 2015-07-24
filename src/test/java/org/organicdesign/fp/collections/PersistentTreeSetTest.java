@@ -19,11 +19,13 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.organicdesign.fp.StaticImports;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import static org.junit.Assert.*;
+import static org.organicdesign.fp.StaticImports.vec;
 import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
 import static org.organicdesign.fp.testUtils.EqualsContract.equalsSameHashCode;
 
@@ -123,7 +125,7 @@ public class PersistentTreeSetTest {
     }
 
     @Test public void ordering() {
-        PersistentTreeSet<Integer> s1 = PersistentTreeSet.of(5, 2, 4, 1, 3);
+        PersistentTreeSet<Integer> s1 = PersistentTreeSet.of(Arrays.asList(5, 2, 4, 1, 3));
         assertEquals(5, s1.size());
         assertEquals(Integer.valueOf(1), s1.first());
         assertEquals(Integer.valueOf(5), s1.last());
@@ -155,7 +157,7 @@ public class PersistentTreeSetTest {
 
 
         PersistentTreeSet<String> s2 = PersistentTreeSet.ofComp(STR_LEN_COMP,
-                                                                "hello", "an", "work", "b", "the");
+                                                                Arrays.asList("hello", "an", "work", "b", "the"));
         assertEquals(STR_LEN_COMP, s2.comparator());
         assertEquals(5, s2.size());
         assertEquals("b", s2.first());
@@ -193,7 +195,7 @@ public class PersistentTreeSetTest {
     }
 
     @Test public void equality() {
-        PersistentTreeSet<String> s1 = PersistentTreeSet.of("hello", "an", "work", "b", "the");
+        PersistentTreeSet<String> s1 = PersistentTreeSet.of(Arrays.asList("hello", "an", "work", "b", "the"));
 
         SortedSet<String> ss1 = new TreeSet<>();
         ss1.add("the");
@@ -202,16 +204,16 @@ public class PersistentTreeSetTest {
         ss1.add("an");
         ss1.add("hello");
         equalsDistinctHashCode(s1, ss1, StaticImports.unmod(ss1),
-                               PersistentTreeSet.of("hello", "an", "work", "the"));
+                               PersistentTreeSet.of(Arrays.asList("hello", "an", "work", "the")));
 
         // Really, you need to read the JavaDoc for PersistentTreeSet.equals() to understand the bizarre notion of
         // equality being checked here.
         equalsDistinctHashCode(s1, ss1, StaticImports.unmod(ss1),
                                PersistentTreeSet.ofComp(STR_LEN_COMP,
-                                                        "helloz", "an", "work", "b", "the"));
+                                                        Arrays.asList("helloz", "an", "work", "b", "the")));
 
         PersistentTreeSet<String> s2 = PersistentTreeSet.ofComp(STR_LEN_COMP,
-                                                                "hello", "an", "work", "b", "the");
+                                                                Arrays.asList("hello", "an", "work", "b", "the"));
 
         // This illustrates the bug in java
         SortedSet<String> ss = new TreeSet<>(STR_LEN_COMP);
@@ -234,7 +236,8 @@ public class PersistentTreeSetTest {
 //
 //
         equalsDistinctHashCode(s2, ss, StaticImports.unmod(ss),
-                               PersistentTreeSet.ofComp(STR_LEN_COMP, "helloz", "an", "work", "the"));
+                               PersistentTreeSet.ofComp(STR_LEN_COMP,
+                                                        Arrays.asList("helloz", "an", "work", "the")));
 
 //        assertEquals(s2, yadda);
 //        assertEquals(ss, yadda);
@@ -245,12 +248,14 @@ public class PersistentTreeSetTest {
 //        assertNotEquals(yadda, unmod(ss));
 
         equalsDistinctHashCode(s2, ss, StaticImports.unmod(ss),
-                               PersistentTreeSet.of("an", "helloz", "work", "b", "the"));
+                               PersistentTreeSet.of(Arrays.asList("an", "helloz", "work", "b", "the")));
 
         equalsSameHashCode(s2,
-                           PersistentTreeSet.ofComp(STR_LEN_COMP, "an", "hello", "work", "the").put("b"),
-                           PersistentTreeSet.ofComp(STR_LEN_COMP, "an", "b", "work").put("hello").put("the"),
-                           PersistentTreeSet.of("an", "hello", "work", "b", "the"));
+                           PersistentTreeSet.ofComp(STR_LEN_COMP,
+                                                    vec("an", "hello", "work", "the")).put("b"),
+                           PersistentTreeSet.ofComp(STR_LEN_COMP,
+                                                    vec("an", "b", "work")).put("hello").put("the"),
+                           PersistentTreeSet.of(vec("an", "hello", "work", "b", "the")));
 
     }
 

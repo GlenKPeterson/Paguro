@@ -42,7 +42,8 @@ public class Mutable {
         private IntRef(int in) { i = in; }
         public static IntRef of(int in) { return new IntRef(in); }
         public int value() { return i; }
-        public IntRef increment() { i++; return this; }
+        public IntRef decrement() { i = i - 1; return this; }
+        public IntRef increment() { i = i + 1; return this; }
         public IntRef set(int x) { i = x; return this; }
     }
 

@@ -87,168 +87,15 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 //    final private static Object NOT_FOUND = new Object();
 
     /** Returns a new PersistentHashMap of the given keys and their paired values. */
-    public static <K,V> PersistentHashMap<K,V> of(K k1, V v1) {
-        PersistentHashMap<K,V> empty = empty();
-        return empty.asTransient().assoc(k1, v1).persistent();
-    }
-
-    /** Returns a new PersistentHashMap of the given keys and their paired values. */
-    public static <K,V>
-    PersistentHashMap<K,V> of(K k1, V v1, K k2, V v2) {
-        PersistentHashMap<K,V> empty = empty();
-        return empty.asTransient().assoc(k1, v1).assoc(k2, v2).persistent();
-    }
-
-    /** Returns a new PersistentHashMap of the given keys and their paired values. */
-    public static <K,V>
-    PersistentHashMap<K,V> of(K k1, V v1, K k2, V v2, K k3, V v3) {
-        PersistentHashMap<K,V> empty = empty();
-        return empty.asTransient().assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).persistent();
-    }
-
-    /** Returns a new PersistentHashMap of the given keys and their paired values. */
-    public static <K,V>
-    PersistentHashMap<K,V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
-        PersistentHashMap<K,V> empty = empty();
-        return empty.asTransient().assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).persistent();
-    }
-
-    /** Returns a new PersistentHashMap of the given keys and their paired values. */
-    public static <K,V>
-    PersistentHashMap<K,V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
-        PersistentHashMap<K,V> empty = empty();
-        return empty.asTransient().assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).assoc(k5, v5).persistent();
-    }
-
-    /** Returns a new PersistentHashMap of the given keys and their paired values. */
-    public static <K,V>
-    PersistentHashMap<K,V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6) {
-        PersistentHashMap<K,V> empty = empty();
-        return empty.asTransient().assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).assoc(k5, v5)
-                .assoc(k6, v6).persistent();
-    }
-
-    /** Returns a new PersistentHashMap of the given keys and their paired values. */
-    public static <K,V>
-    PersistentHashMap<K,V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7) {
-        PersistentHashMap<K,V> empty = empty();
-        return empty.asTransient().assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).assoc(k5, v5)
-                .assoc(k6, v6).assoc(k7, v7).persistent();
-    }
-
-    /** Returns a new PersistentHashMap of the given keys and their paired values. */
-    public static <K,V>
-    PersistentHashMap<K,V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7,
-                              K k8, V v8) {
-        PersistentHashMap<K,V> empty = empty();
-        return empty.asTransient().assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).assoc(k5, v5)
-                .assoc(k6, v6).assoc(k7, v7).assoc(k8, v8).persistent();
-    }
-
-    /** Returns a new PersistentHashMap of the given keys and their paired values. */
-    public static <K,V>
-    PersistentHashMap<K,V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7,
-                              K k8, V v8, K k9, V v9) {
-        PersistentHashMap<K,V> empty = empty();
-        return empty.asTransient().assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).assoc(k5, v5)
-                .assoc(k6, v6).assoc(k7, v7).assoc(k8, v8).assoc(k9, v9).persistent();
-    }
-
-    /** Returns a new PersistentHashMap of the given keys and their paired values. */
-    public static <K,V>
-    PersistentHashMap<K,V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7,
-                              K k8, V v8, K k9, V v9, K k10, V v10) {
-        PersistentHashMap<K,V> empty = empty();
-        return empty.asTransient().assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).assoc(k5, v5)
-                .assoc(k6, v6).assoc(k7, v7).assoc(k8, v8).assoc(k9, v9).assoc(k10, v10).persistent();
-    }
-
-    /** Returns a new PersistentHashMap of the given Equator, keys and their paired values. */
-    public static <K,V>
-    PersistentHashMap<K,V> ofEq(Equator<K> eq, K k1, V v1) {
-        PersistentHashMap<K,V> empty = empty(eq);
-        return empty.asTransient().assoc(k1, v1).persistent();
-    }
-
-    /** Returns a new PersistentHashMap of the given Equator, keys and their paired values. */
-    public static <K,V>
-    PersistentHashMap<K,V> ofEq(Equator<K> eq, K k1, V v1, K k2, V v2) {
-        PersistentHashMap<K,V> empty = empty(eq);
-        return empty.asTransient().assoc(k1, v1).assoc(k2, v2).persistent();
-    }
-
-    /** Returns a new PersistentHashMap of the given Equator, keys and their paired values. */
-    public static <K,V>
-    PersistentHashMap<K,V> ofEq(Equator<K> eq, K k1, V v1, K k2, V v2, K k3, V v3) {
-        PersistentHashMap<K,V> empty = empty(eq);
-        return empty.asTransient().assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).persistent();
-    }
-
-    /** Returns a new PersistentHashMap of the given Equator, keys and their paired values. */
-    public static <K,V>
-    PersistentHashMap<K,V> ofEq(Equator<K> eq, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
-        PersistentHashMap<K,V> empty = empty(eq);
-        return empty.asTransient().assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).persistent();
-    }
-
-    /** Returns a new PersistentHashMap of the given Equator, keys and their paired values. */
-    public static <K,V>
-    PersistentHashMap<K,V> ofEq(Equator<K> eq, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
-        PersistentHashMap<K,V> empty = empty(eq);
-        return empty.asTransient().assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).assoc(k5, v5).persistent();
-    }
-
-    /** Returns a new PersistentHashMap of the given Equator, keys and their paired values. */
-    public static <K,V>
-    PersistentHashMap<K,V> ofEq(Equator<K> eq, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5,
-                                K k6, V v6) {
-        PersistentHashMap<K,V> empty = empty(eq);
-        return empty.asTransient().assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).assoc(k5, v5)
-                .assoc(k6, v6).persistent();
-    }
-
-    /** Returns a new PersistentHashMap of the given Equator, keys and their paired values. */
-    public static <K,V>
-    PersistentHashMap<K,V> ofEq(Equator<K> eq, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5,
-                                K k6, V v6, K k7, V v7) {
-        PersistentHashMap<K,V> empty = empty(eq);
-        return empty.asTransient().assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).assoc(k5, v5)
-                .assoc(k6, v6).assoc(k7, v7).persistent();
-    }
-
-    /** Returns a new PersistentHashMap of the given Equator, keys and their paired values. */
-    public static <K,V>
-    PersistentHashMap<K,V> ofEq(Equator<K> eq, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5,
-                                K k6, V v6, K k7, V v7, K k8, V v8) {
-        PersistentHashMap<K,V> empty = empty(eq);
-        return empty.asTransient().assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).assoc(k5, v5)
-                .assoc(k6, v6).assoc(k7, v7).assoc(k8, v8).persistent();
-    }
-
-    /** Returns a new PersistentHashMap of the given Equator, keys and their paired values. */
-    public static <K,V>
-    PersistentHashMap<K,V> ofEq(Equator<K> eq, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5,
-                                K k6, V v6, K k7, V v7, K k8, V v8, K k9, V v9) {
-        PersistentHashMap<K,V> empty = empty(eq);
-        return empty.asTransient().assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).assoc(k5, v5)
-                .assoc(k6, v6).assoc(k7, v7).assoc(k8, v8).assoc(k9, v9).persistent();
-    }
-
-    /** Returns a new PersistentHashMap of the given Equator, keys and their paired values. */
-    public static <K,V>
-    PersistentHashMap<K,V> ofEq(Equator<K> eq, K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5,
-                                K k6, V v6, K k7, V v7, K k8, V v8, K k9, V v9, K k10, V v10) {
-        PersistentHashMap<K,V> empty = empty(eq);
-        return empty.asTransient().assoc(k1, v1).assoc(k2, v2).assoc(k3, v3).assoc(k4, v4).assoc(k5, v5)
-                .assoc(k6, v6).assoc(k7, v7).assoc(k8, v8).assoc(k9, v9).assoc(k10, v10).persistent();
+    public static <K,V> PersistentHashMap<K,V> of() {
+        return empty();
     }
 
     /**
      Returns a new PersistentHashMap of the given keys and their paired values, skipping any null Entries.
      */
-    @SafeVarargs
     public static <K,V> PersistentHashMap<K,V>
-    ofEqSkipNull(Equator<K> eq, Map.Entry<K,V>... es) {
+    ofEq(Equator<K> eq, Iterable<Map.Entry<K,V>> es) {
         if (es == null) { return empty(eq); }
         PersistentHashMap<K,V> m = empty(eq);
         TransientHashMap<K,V> map = m.asTransient();
@@ -263,9 +110,8 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
     /**
      Returns a new PersistentHashMap of the given keys and their paired values, skipping any null Entries.
      */
-    @SafeVarargs
     public static <K,V> PersistentHashMap<K,V>
-    ofSkipNull(Map.Entry<K,V>... es) {
+    of(Iterable<Map.Entry<K,V>> es) {
         if (es == null) { return empty(); }
         PersistentHashMap<K,V> m = empty();
         TransientHashMap<K,V> map = m.asTransient();

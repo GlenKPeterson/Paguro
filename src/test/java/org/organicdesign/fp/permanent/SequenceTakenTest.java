@@ -23,7 +23,7 @@ public class SequenceTakenTest {
     @Test
     public void takeItemsInOneBatch() {
         Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-        Sequence<Integer> seq = Sequence.of(ints);
+        Sequence<Integer> seq = Sequence.ofArray(ints);
         assertArrayEquals(ints, seq.take(9999).toTypedArray());
         assertArrayEquals(ints, seq.take(10).toTypedArray());
         assertArrayEquals(ints, seq.take(9).toTypedArray());
@@ -36,14 +36,14 @@ public class SequenceTakenTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void exception1() { Sequence.of(1, 2, 3, 4, 5, 6, 7, 8, 9).take(-1); }
+    public void exception1() { Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).take(-1); }
     @Test(expected = IllegalArgumentException.class)
-    public void exception2() { Sequence.of(1, 2, 3, 4, 5, 6, 7, 8, 9).take(-99); }
+    public void exception2() { Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).take(-99); }
 
     @Test
     public void takeItemsInMultiBatches() {
         Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-        Sequence<Integer> seq = Sequence.of(ints);
+        Sequence<Integer> seq = Sequence.ofArray(ints);
         assertArrayEquals(ints, seq.take(10).take(9999).take(10).toTypedArray());
         assertArrayEquals(ints, seq.take(9).take(9).take(9).toTypedArray());
         assertArrayEquals(new Integer[] { 1,2,3,4,5,6 }, seq.take(8).take(7).take(6).toTypedArray());

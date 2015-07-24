@@ -27,14 +27,14 @@ public class SequenceFromArrayTest {
     @Test public void basic() {
         Integer[] ints = new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9};
         assertEquals(Arrays.asList(ints),
-                     Sequence.of(ints).toMutableList());
+                     Sequence.ofArray(ints).toMutableList());
         assertArrayEquals(ints,
-                          Sequence.of(ints).toTypedArray());
+                          Sequence.ofArray(ints).toTypedArray());
     }
 
     @Test public void construction() {
         Integer[] ints = new Integer[] { 5,4,3,2,1 };
-        Sequence<Integer> five = Sequence.of(ints);
+        Sequence<Integer> five = Sequence.ofArray(ints);
         Sequence<Integer> four = five.tail();
         Sequence<Integer> three = four.tail();
         Sequence<Integer> two = three.tail();
@@ -62,7 +62,7 @@ public class SequenceFromArrayTest {
                 () -> { i.set(i.value() + 1); return 3; },
                 () -> { i.set(i.value() + 1); return 2; },
                 () -> { i.set(i.value() + 1); return 1; } };
-        Sequence<Function0<Integer>> three = Sequence.of(ints);
+        Sequence<Function0<Integer>> three = Sequence.ofArray(ints);
         Sequence<Function0<Integer>> two = three.tail();
         Sequence<Function0<Integer>> one = two.tail();
         Sequence<Function0<Integer>> zero = one.tail();

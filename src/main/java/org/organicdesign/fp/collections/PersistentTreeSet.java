@@ -66,10 +66,9 @@ public class PersistentTreeSet<E> implements ImSortedSet<E> {
     }
 
     /** Returns a new PersistentTreeSet of the given comparator and items. */
-    @SafeVarargs
-    public static <T> PersistentTreeSet<T> ofComp(Comparator<? super T> comp, T... items) {
+    public static <T> PersistentTreeSet<T> ofComp(Comparator<? super T> comp, Iterable<T> items) {
         PersistentTreeSet<T> ret = new PersistentTreeSet<>(PersistentTreeMap.empty(comp));
-        if ( (items == null) || (items.length < 1) ) { return ret; }
+        if (items == null) { return ret; }
         for (T item : items) {
             ret = ret.put(item);
         }
@@ -77,10 +76,9 @@ public class PersistentTreeSet<E> implements ImSortedSet<E> {
     }
 
     /** Returns a new PersistentTreeSet of the given comparable items. */
-    @SafeVarargs
-    public static <T extends Comparable<T>> PersistentTreeSet<T> of(T... items) {
+    public static <T extends Comparable<T>> PersistentTreeSet<T> of(Iterable<T> items) {
         // empty() uses default comparator
-        if ( (items == null) || (items.length < 1) ) { return empty(); }
+        if (items == null) { return empty(); }
         PersistentTreeSet<T> ret = empty();
         for (T item : items) {
             ret = ret.put(item);
