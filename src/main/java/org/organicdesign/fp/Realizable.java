@@ -99,12 +99,12 @@ public interface Realizable<T> extends UnmodIterable<T> {
     SortedSet<T> toMutableSortedSet(Comparator<? super T> comp);
 
     /**
-     Returns a type-safe version of toArray() that doesn't require that you pass an array of the proper type and size.
+     Returns an Object[] that doesn't require that you pass an array of the proper type and size.
      */
     @SuppressWarnings("unchecked")
-    default T[] toTypedArray() {
-        List<T> al = toMutableList();
-        return al.toArray((T[]) new Object[al.size()]);
+    default Object[] toArray() {
+        return toMutableList().toArray();
+//        return al.toArray((T[]) new Object[al.size()]);
     }
 
     /**

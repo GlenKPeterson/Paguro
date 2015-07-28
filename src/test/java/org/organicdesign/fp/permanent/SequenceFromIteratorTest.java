@@ -31,7 +31,7 @@ public class SequenceFromIteratorTest {
         assertEquals(ints,
                      Sequence.ofIter(ints).toMutableList());
         assertArrayEquals(ints.toArray(),
-                          Sequence.ofIter(ints).toTypedArray());
+                          Sequence.ofIter(ints).toArray());
     }
 
 

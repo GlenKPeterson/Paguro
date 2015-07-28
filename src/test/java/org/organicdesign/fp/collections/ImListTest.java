@@ -60,10 +60,10 @@ public class ImListTest {
     @Test public void append() {
         assertArrayEquals(new String[]{"a", "b", "c", "d", "e", "f"},
                           PersistentVector.of("a", "b", "c")
-                                  .append("d", "e", "f").toTypedArray());
+                                  .append("d", "e", "f").toArray());
 
         PersistentVector<String> pv = PersistentVector.of("d", "e", "f");
         assertArrayEquals(new String[]{"a", "b", "c", "d", "e", "f"},
-                          pv.prepend("a", "b", "c").toTypedArray());
+                          pv.prepend("a", "b", "c").toArray());
     }
 }

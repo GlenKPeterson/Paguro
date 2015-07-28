@@ -29,7 +29,7 @@ public class SequenceFromArrayTest {
         assertEquals(Arrays.asList(ints),
                      Sequence.ofArray(ints).toMutableList());
         assertArrayEquals(ints,
-                          Sequence.ofArray(ints).toTypedArray());
+                          Sequence.ofArray(ints).toArray());
     }
 
     @Test public void construction() {

@@ -34,6 +34,13 @@ public interface ImSortedSet<E> extends ImSet<E>, UnmodSortedSet<E>, Sequence<E>
     @Override
     UnmodSortedIterator<E> iterator();
 
+    /**
+     * This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for
+     * backwards compatibility in some performance-critical situations.
+     * {@inheritDoc}
+     */
+    @Override default Object[] toArray() { return UnmodCollection.toArray(this); }
+
     /** A sequence of the items contained in this set in order.  Just returns this SetOrdered. */
     @Override default Sequence<E> seq() { return this; }
 

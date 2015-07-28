@@ -20,6 +20,7 @@ import org.junit.runners.JUnit4;
 import org.organicdesign.fp.StaticImports;
 import org.organicdesign.fp.StaticImportsTest;
 import org.organicdesign.fp.permanent.Sequence;
+import org.organicdesign.fp.tuple.Tuple2;
 
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -93,7 +94,7 @@ public class PersistentTreeMapTest {
 
         // Values are a sorted set as well...
         assertArrayEquals(new Integer[]{3, 2, 1},
-                          m1.map(e -> e.getValue()).toTypedArray());
+                          m1.map(e -> e.getValue()).toArray());
 
         assertArrayEquals(new String[]{"a", "b", "c"},
                           PersistentTreeMap.of(vec(tup("a", 3),
@@ -249,7 +250,7 @@ public class PersistentTreeMapTest {
         assertArrayEquals(new UnmodMap.UnEntry[]{tup(2, "two"), tup(3, "three")},
                           PersistentTreeMap.of(vec(tup(1, "one"))).assoc(2, "two").assoc(3, "three")
                                            .tail()
-                                           .map((u) -> tup(u.getKey(), u.getValue())).toTypedArray());
+                                           .map((u) -> tup(u.getKey(), u.getValue())).toArray());
 
         assertTrue(Sequence.emptySequence().equals(PersistentTreeMap.of(vec(tup(1, "one"))).tail()));
     }
@@ -406,7 +407,7 @@ public class PersistentTreeMapTest {
                                              UnmodMap.UnEntry.of(4, "four"),
                                              UnmodMap.UnEntry.of(5, "five")));
         assertArrayEquals(s.toArray(),
-                          m.entrySet().map((u) -> tup(u.getKey(), u.getValue())).toTypedArray());
+                          m.entrySet().map((u) -> tup(u.getKey(), u.getValue())).toArray());
     }
 
     @Test public void values() {
@@ -415,7 +416,7 @@ public class PersistentTreeMapTest {
                                  .assoc(5, "five").assoc(2, "two").assoc(3, "three").assoc(1, "one");
 
         assertArrayEquals(new String[]{"one", "two", "three", "four", "five"},
-                          m1.map(e -> e.getValue()).toTypedArray());
+                          m1.map(e -> e.getValue()).toArray());
 
 //        assertTrue(m.values().equals(Arrays.asList("one", "two", "three", "four", "five")));
         assertNotEquals(0, m1.values().hashCode());
@@ -491,13 +492,13 @@ public class PersistentTreeMapTest {
 
     @Test public void testImMap0() {
         int max = 0;
-        Map<Integer,String> b = PersistentTreeMap.of(vecSkipNull(null));
+        Map<Integer,String> b = PersistentTreeMap.of(vecSkipNull((Tuple2<Integer,String>) null));
         StaticImportsTest.mapHelper(b, max);
         Map<Integer,String> c = PersistentTreeMap.empty(Equator.defaultComparator());
         assertEquals(b, c);
         assertEquals(c, b);
         assertEquals(b.hashCode(), c.hashCode());
-        StaticImportsTest.mapHelperOdd(PersistentTreeMap.of(vecSkipNull(null)), max);
-        StaticImportsTest.mapHelperEven(PersistentTreeMap.of(vecSkipNull(null)), max);
+        StaticImportsTest.mapHelperOdd(PersistentTreeMap.of(vecSkipNull((Tuple2<Integer,String>) null)), max);
+        StaticImportsTest.mapHelperEven(PersistentTreeMap.of(vecSkipNull((Tuple2<Integer,String>) null)), max);
     }
 }

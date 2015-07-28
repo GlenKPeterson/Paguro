@@ -24,15 +24,15 @@ public class SequenceTakenTest {
     public void takeItemsInOneBatch() {
         Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         Sequence<Integer> seq = Sequence.ofArray(ints);
-        assertArrayEquals(ints, seq.take(9999).toTypedArray());
-        assertArrayEquals(ints, seq.take(10).toTypedArray());
-        assertArrayEquals(ints, seq.take(9).toTypedArray());
-        assertArrayEquals(new Integer[] { 1,2,3,4,5,6,7,8 }, seq.take(8).toTypedArray());
-        assertArrayEquals(new Integer[] { 1,2,3,4,5,6,7 }, seq.take(7).toTypedArray());
-        assertArrayEquals(new Integer[] { 1,2,3 }, seq.take(3).toTypedArray());
-        assertArrayEquals(new Integer[] { 1,2 }, seq.take(2).toTypedArray());
-        assertArrayEquals(new Integer[] { 1 }, seq.take(1).toTypedArray());
-        assertArrayEquals(new Integer[0], seq.take(0).toTypedArray());
+        assertArrayEquals(ints, seq.take(9999).toArray());
+        assertArrayEquals(ints, seq.take(10).toArray());
+        assertArrayEquals(ints, seq.take(9).toArray());
+        assertArrayEquals(new Integer[] { 1,2,3,4,5,6,7,8 }, seq.take(8).toArray());
+        assertArrayEquals(new Integer[] { 1,2,3,4,5,6,7 }, seq.take(7).toArray());
+        assertArrayEquals(new Integer[] { 1,2,3 }, seq.take(3).toArray());
+        assertArrayEquals(new Integer[] { 1,2 }, seq.take(2).toArray());
+        assertArrayEquals(new Integer[] { 1 }, seq.take(1).toArray());
+        assertArrayEquals(new Integer[0], seq.take(0).toArray());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -44,15 +44,15 @@ public class SequenceTakenTest {
     public void takeItemsInMultiBatches() {
         Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         Sequence<Integer> seq = Sequence.ofArray(ints);
-        assertArrayEquals(ints, seq.take(10).take(9999).take(10).toTypedArray());
-        assertArrayEquals(ints, seq.take(9).take(9).take(9).toTypedArray());
-        assertArrayEquals(new Integer[] { 1,2,3,4,5,6 }, seq.take(8).take(7).take(6).toTypedArray());
-        assertArrayEquals(new Integer[] { 1,2,3,4,5,6 }, seq.take(6).take(7).take(8).toTypedArray());
-        assertArrayEquals(new Integer[] { 1 }, seq.take(999).take(1).take(9999999).toTypedArray());
-        assertArrayEquals(new Integer[] { 1 }, seq.take(9999).take(1).take(3).toTypedArray());
-        assertArrayEquals(new Integer[0], seq.take(0).take(0).toTypedArray());
-        assertArrayEquals(new Integer[0], seq.take(0).take(1).toTypedArray());
-        assertArrayEquals(new Integer[0], seq.take(0).take(99999999).take(9999999).toTypedArray());
-        assertArrayEquals(new Integer[0], seq.take(99).take(9999).take(0).toTypedArray());
+        assertArrayEquals(ints, seq.take(10).take(9999).take(10).toArray());
+        assertArrayEquals(ints, seq.take(9).take(9).take(9).toArray());
+        assertArrayEquals(new Integer[] { 1,2,3,4,5,6 }, seq.take(8).take(7).take(6).toArray());
+        assertArrayEquals(new Integer[] { 1,2,3,4,5,6 }, seq.take(6).take(7).take(8).toArray());
+        assertArrayEquals(new Integer[] { 1 }, seq.take(999).take(1).take(9999999).toArray());
+        assertArrayEquals(new Integer[] { 1 }, seq.take(9999).take(1).take(3).toArray());
+        assertArrayEquals(new Integer[0], seq.take(0).take(0).toArray());
+        assertArrayEquals(new Integer[0], seq.take(0).take(1).toArray());
+        assertArrayEquals(new Integer[0], seq.take(0).take(99999999).take(9999999).toArray());
+        assertArrayEquals(new Integer[0], seq.take(99).take(9999).take(0).toArray());
     }
 }

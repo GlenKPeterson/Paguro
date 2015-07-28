@@ -106,6 +106,12 @@ public interface ImList<E> extends UnmodList<E>, Sequence<E> {
         return Sequence.ofIter(this).tail();
     }
 
+    /**
+     * This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for
+     * backwards compatibility in some performance-critical situations.
+     * {@inheritDoc}
+     */
+    @Override default Object[] toArray() { return UnmodCollection.toArray(this); }
 
 // I don't know if this is a good idea or not and I don't want to have to support it if not.
 //    /**

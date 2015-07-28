@@ -27,25 +27,25 @@ public class SequenceTakenWhileTest {
     public void takeItemsInOneBatch() {
         Sequence<Integer> seq = Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9);
         assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
-                          seq.takeWhile(Function1.accept()).toTypedArray());
+                          seq.takeWhile(Function1.accept()).toArray());
         assertArrayEquals(new Integer[] { 1,2,3,4,5,6,7,8,9 },
-                          seq.takeWhile(i -> i < 10).toTypedArray());
+                          seq.takeWhile(i -> i < 10).toArray());
         assertArrayEquals(new Integer[] { 1,2,3,4,5,6,7,8,9 },
-                          seq.takeWhile(i -> i <= 9).toTypedArray());
+                          seq.takeWhile(i -> i <= 9).toArray());
         assertArrayEquals(new Integer[] { 1,2,3,4,5,6,7,8 },
-                          seq.takeWhile(i -> i <= 8).toTypedArray());
+                          seq.takeWhile(i -> i <= 8).toArray());
         assertArrayEquals(new Integer[] { 1,2,3,4,5,6,7 },
-                          seq.takeWhile(i -> i <= 7).toTypedArray());
+                          seq.takeWhile(i -> i <= 7).toArray());
         assertArrayEquals(new Integer[] { 1,2,3 },
-                          seq.takeWhile(i -> i <= 3).toTypedArray());
+                          seq.takeWhile(i -> i <= 3).toArray());
         assertArrayEquals(new Integer[] { 1,2 },
-                          seq.takeWhile(i -> i <= 2).toTypedArray());
+                          seq.takeWhile(i -> i <= 2).toArray());
         assertArrayEquals(new Integer[] { 1 },
-                          seq.takeWhile(i -> i <= 1).toTypedArray());
+                          seq.takeWhile(i -> i <= 1).toArray());
         assertArrayEquals(new Integer[] {  },
-                          seq.takeWhile(Function1.reject()).toTypedArray());
+                          seq.takeWhile(Function1.reject()).toArray());
         assertArrayEquals(new Integer[] {  },
-                          seq.takeWhile(i -> i > 10).toTypedArray());
+                          seq.takeWhile(i -> i > 10).toArray());
     }
 
     @Test(expected = IllegalArgumentException.class)

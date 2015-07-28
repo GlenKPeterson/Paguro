@@ -30,8 +30,8 @@ public class SequenceTest {
 
     @Test public void construction() {
         Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-        assertArrayEquals(ints, Sequence.ofArray(ints).toTypedArray());
-        assertArrayEquals(ints, Sequence.ofIter(Arrays.asList(ints)).toTypedArray());
+        assertArrayEquals(ints, Sequence.ofArray(ints).toArray());
+        assertArrayEquals(ints, Sequence.ofIter(Arrays.asList(ints)).toArray());
     }
 
     @Test public void emptySequence() {
@@ -126,22 +126,22 @@ public class SequenceTest {
     @Test
     public void takeAndDrop() {
         assertArrayEquals(Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
-                                  .drop(0).take(8888).toTypedArray(),
+                                  .drop(0).take(8888).toArray(),
                           new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 });
         assertArrayEquals(Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
-                                  .drop(1).take(1).toTypedArray(),
+                                  .drop(1).take(1).toArray(),
                    new Integer[] { 2 });
         assertArrayEquals(Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
-                                  .drop(2).take(2).toTypedArray(),
+                                  .drop(2).take(2).toArray(),
                    new Integer[] { 3,4 });
         assertArrayEquals(Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
-                                  .drop(3).take(3).toTypedArray(),
+                                  .drop(3).take(3).toArray(),
                    new Integer[] { 4,5,6 });
         assertArrayEquals(Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
-                                  .drop(9999).take(3).toTypedArray(),
+                                  .drop(9999).take(3).toArray(),
                           new Integer[]{});
         assertArrayEquals(Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
-                                  .drop(3).take(0).toTypedArray(),
+                                  .drop(3).take(0).toArray(),
                    new Integer[] { });
     }
 
@@ -157,7 +157,7 @@ public class SequenceTest {
                                   .map(i -> i - 2)                 //   2,3,4,5,6,7
                                   .take(5)                         //   2,3,4,5,6
                                   .drop(2)                         //       4,5,6
-                                  .toTypedArray(),
+                                  .toArray(),
                           new Integer[]{4, 5, 6});
     }
 }

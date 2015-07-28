@@ -130,28 +130,28 @@ public class PersistentTreeSetTest {
         assertEquals(Integer.valueOf(1), s1.first());
         assertEquals(Integer.valueOf(5), s1.last());
         assertArrayEquals(new Integer[]{1, 2, 3, 4, 5},
-                          s1.toTypedArray());
+                          s1.toArray());
 
         assertArrayEquals(new Integer[] {1,2,3,4,5},
-                          s1.subSet(Integer.MIN_VALUE, Integer.MAX_VALUE).toTypedArray());
+                          s1.subSet(Integer.MIN_VALUE, Integer.MAX_VALUE).toArray());
 
         assertArrayEquals(new Integer[] {1,2,3,4,5},
-                          s1.subSet(-99, 99).toTypedArray());
+                          s1.subSet(-99, 99).toArray());
 
         assertArrayEquals(new Integer[]{1, 2, 3, 4, 5},
-                          s1.subSet(1, 6).toTypedArray());
+                          s1.subSet(1, 6).toArray());
 
         assertArrayEquals(new Integer[]{1, 2, 3, 4},
-                          s1.subSet(1, 5).toTypedArray());
+                          s1.subSet(1, 5).toArray());
 
         assertArrayEquals(new Integer[]{2, 3, 4, 5},
-                          s1.subSet(2, 6).toTypedArray());
+                          s1.subSet(2, 6).toArray());
 
         assertArrayEquals(new Integer[]{3},
-                          s1.subSet(3, 4).toTypedArray());
+                          s1.subSet(3, 4).toArray());
 
         assertArrayEquals(new Integer[0],
-                          s1.subSet(3, 3).toTypedArray());
+                          s1.subSet(3, 3).toArray());
 
         assertNull(s1.comparator());
 
@@ -166,30 +166,30 @@ public class PersistentTreeSetTest {
         assertEquals(STR_LEN_COMP, s2.subSet("", "                 ").comparator());
 
         assertArrayEquals(new String[]{"b", "an", "the", "work", "hello"},
-                          s2.toTypedArray());
+                          s2.toArray());
 
         assertArrayEquals(new String[]{"b", "an", "the", "work", "hello"},
-                          s2.subSet("", "                 ").toTypedArray());
+                          s2.subSet("", "                 ").toArray());
 
         assertArrayEquals(new String[] {"b", "an", "the", "work", "hello"},
-                          s2.subSet("", "._._._").toTypedArray());
+                          s2.subSet("", "._._._").toArray());
 
         assertArrayEquals(new String[]{"b", "an", "the", "work", "hello"},
-                          s2.subSet("z", "aaaaaa").toTypedArray());
+                          s2.subSet("z", "aaaaaa").toArray());
 
         assertEquals(STR_LEN_COMP, s2.subSet("a", "four").comparator());
 
         assertArrayEquals(new String[]{"b", "an", "the"},
-                          s2.subSet("a", "four").toTypedArray());
+                          s2.subSet("a", "four").toArray());
 
         assertArrayEquals(new String[] {"an", "the", "work", "hello"},
-                          s2.subSet("UH", "SLDFKJS").toTypedArray());
+                          s2.subSet("UH", "SLDFKJS").toArray());
 
         assertArrayEquals(new String[] {"the"},
-                          s2.subSet("THE", "JUNK").toTypedArray());
+                          s2.subSet("THE", "JUNK").toArray());
 
         assertArrayEquals(new String[0],
-                          s2.subSet("the", "the").toTypedArray());
+                          s2.subSet("the", "the").toArray());
 
         assertEquals(STR_LEN_COMP, s2.comparator());
     }

@@ -24,53 +24,53 @@ public class SequenceConcatenatedTest {
 
     @Test public void doubleNull() {
         assertArrayEquals(new Integer[0],
-                          Sequence.ofArray().concat(null).toTypedArray());
+                          Sequence.ofArray().concat(null).toArray());
 
         assertArrayEquals(new Integer[0],
-                          Sequence.ofArray().concat(Sequence.emptySequence()).toTypedArray());
+                          Sequence.ofArray().concat(Sequence.emptySequence()).toArray());
 
         assertArrayEquals(new Integer[0],
-                          Sequence.ofArray().precat(null).toTypedArray());
+                          Sequence.ofArray().precat(null).toArray());
 
         assertArrayEquals(new Integer[0],
-                          Sequence.ofArray().precat(Sequence.emptySequence()).toTypedArray());
+                          Sequence.ofArray().precat(Sequence.emptySequence()).toArray());
     }
 
     @Test public void prepend() {
         assertArrayEquals(new Integer[] { 5, 6, 7, 8, 9 },
                           Sequence.ofArray(5, 6, 7, 8, 9)
-                                  .precat(null).toTypedArray());
+                                  .precat(null).toArray());
 
         assertArrayEquals(new Integer[] { 5, 6, 7, 8, 9 },
                           Sequence.ofArray(5, 6, 7, 8, 9)
-                                  .precat(Sequence.emptySequence()).toTypedArray());
+                                  .precat(Sequence.emptySequence()).toArray());
 
         assertArrayEquals(new Integer[] { 4, 5, 6, 7, 8, 9 },
                           Sequence.ofArray(5, 6, 7, 8, 9)
-                                  .precat(Sequence.ofArray(4)).toTypedArray());
+                                  .precat(Sequence.ofArray(4)).toArray());
 
         assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
                           Sequence.ofArray(5, 6, 7, 8, 9)
-                                  .precat(Sequence.ofArray(1, 2, 3, 4)).toTypedArray());
+                                  .precat(Sequence.ofArray(1, 2, 3, 4)).toArray());
     }
 
     @Test
     public void append() {
         assertArrayEquals(new Integer[] { 1, 2, 3, 4 },
                           Sequence.ofArray(1, 2, 3, 4)
-                                  .concat(null).toTypedArray());
+                                  .concat(null).toArray());
 
         assertArrayEquals(new Integer[] { 1, 2, 3, 4 },
                           Sequence.ofArray(1, 2, 3, 4)
-                                  .concat(Sequence.emptySequence()).toTypedArray());
+                                  .concat(Sequence.emptySequence()).toArray());
 
         assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5 },
                           Sequence.ofArray(1, 2, 3, 4)
-                                  .concat(Sequence.ofArray(5)).toTypedArray());
+                                  .concat(Sequence.ofArray(5)).toArray());
 
         assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
                           Sequence.ofArray(1, 2, 3, 4)
-                                  .concat(Sequence.ofArray(5, 6, 7, 8, 9)).toTypedArray());
+                                  .concat(Sequence.ofArray(5, 6, 7, 8, 9)).toArray());
     }
 
     @Test
@@ -83,7 +83,7 @@ public class SequenceConcatenatedTest {
                                   .concat(Sequence.ofArray(7, 8))  //   2,3,4,5,6,7,8
                                   .precat(Sequence.ofArray(1))   // 1,2,3,4,5,6,7,8
                                   .concat(Sequence.ofArray(9))    // 1,2,3,4,5,6,7,8,9
-                                  .toTypedArray());
+                                  .toArray());
 
         assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
                           Sequence.ofArray(5)
@@ -128,6 +128,6 @@ public class SequenceConcatenatedTest {
                                   .precat(null)
                                   .concat(Sequence.emptySequence()).concat(Sequence.emptySequence())
                                   .concat(null).concat(null).concat(null).concat(null).concat(null)
-                                  .toTypedArray());
+                                  .toArray());
     }
 }

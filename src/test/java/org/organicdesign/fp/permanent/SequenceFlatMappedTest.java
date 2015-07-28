@@ -43,17 +43,17 @@ public class SequenceFlatMappedTest {
 
         assertArrayEquals(new Integer[] {},
                           Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
-                                  .flatMap(emptySeqFunc).toTypedArray());
+                                  .flatMap(emptySeqFunc).toArray());
 
         assertArrayEquals(new Integer[] { 1,2,3, 2,4,6, 3,6,9, 4,8,12, 5,10,15, 6,12,18,
                                   7,14,21, 8,16,24, 9,18,27},
                           Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
-                                  .flatMap(i -> Sequence.ofArray(i, i * 2, i * 3)).toTypedArray());
+                                  .flatMap(i -> Sequence.ofArray(i, i * 2, i * 3)).toArray());
 
         assertArrayEquals(new String[]{"1", "2", "2", "3", "3", "4"},
                           Sequence.ofArray(1, 2, 3)
                                   .flatMap(i -> Sequence.ofArray(String.valueOf(i),
-                                                            String.valueOf(i + 1))).toTypedArray());
+                                                            String.valueOf(i + 1))).toArray());
 
     }
 
@@ -78,7 +78,7 @@ public class SequenceFlatMappedTest {
 //                              System.out.println("Item " + item);
                               return null;
                           })
-                                  .toTypedArray());
+                                  .toArray());
 
         count.set(0);
         assertArrayEquals(new String[]{"c8", "d8", "c9", "d9"},
@@ -93,7 +93,7 @@ public class SequenceFlatMappedTest {
 //                              System.out.println("Item " + item);
 //                              return null;
 //                          })
-                                  .toTypedArray());
+                                  .toArray());
 
         count.set(0);
         assertArrayEquals(new String[]{"e1", "f1", "e2", "f2"},
@@ -108,7 +108,7 @@ public class SequenceFlatMappedTest {
 //                              System.out.println("count: " + count.value() + " Item " + item);
 //                              return null;
 //                          })
-                                  .toTypedArray());
+                                  .toArray());
 
         Mutable.Ref<Sequence<Integer>> shrinkSeq = Mutable.Ref.of(Sequence.ofArray(1, 2, 3));
         assertArrayEquals(new Integer[]{2, 3, 3},
@@ -118,7 +118,7 @@ public class SequenceFlatMappedTest {
 //                                      System.out.print("seq val: " + shrinkSeq.value());
                                       return shrinkSeq.value();
                                   })
-                                  .toTypedArray());
+                                  .toArray());
 
         // Now start by returning an emptySequence, then a seq of length 1, then length 2, etc.
         // The first emptySequence should not end the processing.
@@ -133,7 +133,7 @@ public class SequenceFlatMappedTest {
                                       incInt.set(incInt.value() + 1);
                                       return growSeq.value();
                                   })
-                                  .toTypedArray());
+                                  .toArray());
 
     }
 
@@ -148,12 +148,12 @@ public class SequenceFlatMappedTest {
 
         assertArrayEquals(new Integer[] {},
                           Sequence.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
-                                  .flatMap(emptySeqFunc).flatMap(emptySeqFunc).flatMap(emptySeqFunc).toTypedArray());
+                                  .flatMap(emptySeqFunc).flatMap(emptySeqFunc).flatMap(emptySeqFunc).toArray());
 
         assertArrayEquals(new Integer[] { 1,2, 2,3, 3,4, 10,11, 20,21, 30,31},
                           Sequence.ofArray(1, 10)
                                   .flatMap(i -> Sequence.ofArray(i, i * 2, i * 3))
                                   .flatMap(i -> Sequence.ofArray(i, i + 1))
-                                  .toTypedArray());
+                                  .toArray());
     }
 }
