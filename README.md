@@ -1,7 +1,7 @@
 UncleJim ("**Un**modifiable **Coll**ections for **J**ava&trade; **Imm**utability") brings the following to Java:
 
 * Clojure's [immutable collections](src/main/java/org/organicdesign/fp/collections)
-* Note: Sequence Abstraction will probably be entirely replaced with [Transformation Description](https://github.com/GlenKPeterson/One-off_Examples/blob/master/src/main/java/org/organicdesign/fp/experiments/TransDesc.java) which is like a Clojure transducer or Paul Philips-style "View" of a data transformation.
+* Note: Sequence Abstraction will soon be replaced with [Transformation Description](https://github.com/GlenKPeterson/One-off_Examples/blob/master/src/main/java/org/organicdesign/fp/experiments/TransDesc.java) which is like a Clojure transducer or Paul Philips-style "View" of a data transformation.
 * An [Equator](src/main/java/org/organicdesign/fp/collections/Equator.java) and [ComparisonContext](src/main/java/org/organicdesign/fp/collections/Equator.java#L45) which work like `java.util.Comparator`, but for hash-based collections.
 * Simplified [functional interfaces](src/main/java/org/organicdesign/fp/function) that wrap checked exceptions
 * [Memoization](src/main/java/org/organicdesign/fp/function/Function2.java#L59) for functions
@@ -14,7 +14,7 @@ Immutable collections are fast enough to make it unnecessary to modify data in p
 Migrating large code bases to another language is not always practical.
 This project lets you think about your code the way that Clojure and to some degree Scala programmers do, but still write Java.
 
-Currently an *** Alpha Release ***.  The Sequence abstraction will likely be replaced with a [Transformation Description](https://github.com/GlenKPeterson/One-off_Examples/blob/master/src/main/java/org/organicdesign/fp/experiments/TransDesc.java) because the lazily evaluated and cached Sequence proved to be slow.  For now, use [View](src/main/java/org/organicdesign/fp/ephemeral/View.java) instead. The API is subject to other minor changes, but test coverage is currently at 73%:
+Currently an *** Alpha Release ***.  The Sequence abstraction will soon be replaced with a [Transformation Description](https://github.com/GlenKPeterson/One-off_Examples/blob/master/src/main/java/org/organicdesign/fp/experiments/TransDesc.java) because the lazily evaluated and cached Sequence proved to be slow.  For now, use [View](src/main/java/org/organicdesign/fp/ephemeral/View.java) instead. The API is subject to other minor changes, but test coverage is currently at 73%:
 
 ![Test Coverage](testCoverage.png)
 
@@ -99,7 +99,7 @@ The goals of this project are to make it easy to use Java:
  - Returning empty collections instead of <code>null</code> (Josh Bloch Item 43)
  - "Throw exceptions at people, not at code" (says Bill Venners, but also Josh Bloch Item 59)
  - Concurrency friendly (Josh Bloch Item 66, 67)
- - Context-sensitive equality: prefer Comparators to <code>equals()</code>, <code>hashcode()</code> and <code>compareTo()</code> ([Daniel Spiewak, Viktor Klang, Rúnar Óli Bjarnason, Hughes Chabot](http://glenpeterson.blogspot.com/2013/09/object-equality-is-context-relative.html), java.util.TreeSet, java.util.TreeMap)
+ - Context-sensitive equality: prefer Equator and Comparator to <code>equals()</code>, <code>hashcode()</code> and <code>compareTo()</code> ([Daniel Spiewak, Viktor Klang, Rúnar Óli Bjarnason, Hughes Chabot](http://glenpeterson.blogspot.com/2013/09/object-equality-is-context-relative.html), java.util.TreeSet, java.util.TreeMap)
  - Sensible toString() implementations (like Scala)
  - Compatibly with existing/legacy Java code
 
