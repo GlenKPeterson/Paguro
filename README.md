@@ -15,7 +15,7 @@ Immutable collections are fast enough to make it unnecessary to modify data in p
 Migrating large code bases to another language is not always practical.
 This project lets you think about your code the way that Clojure and to some degree Scala programmers do, but still write Java.
 
-Currently an *** Alpha Release ***.  The Sequence abstraction will soon be replaced with a [Transformation Description](https://github.com/GlenKPeterson/One-off_Examples/blob/master/src/main/java/org/organicdesign/fp/experiments/TransDesc.java) because the lazily evaluated and cached Sequence proved to be slow.  For now, use [View](src/main/java/org/organicdesign/fp/ephemeral/View.java) instead. The API is subject to other minor changes, but test coverage is currently at 73%:
+Currently an *** Alpha Release ***.  The Sequence abstraction will soon be replaced with a [Transformation Description](https://github.com/GlenKPeterson/One-off_Examples/blob/master/src/main/java/org/organicdesign/fp/experiments/TransDesc.java) because the lazily evaluated and cached Sequence proved to be slow.  Until then, please use [View](src/main/java/org/organicdesign/fp/ephemeral/View.java) instead. The API is subject to other (hopefully minor) changes, but test coverage is currently at 73%:
 
 ![Test Coverage](testCoverage.png)
 
