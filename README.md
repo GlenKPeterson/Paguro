@@ -174,41 +174,54 @@ Sequence<U> flatMap(Function<T,Sequence<U>> func)
 ###Endpoints
 ```java
 // A one-time use, not-thread-safe way to get each value of this Realizable in turn.
-UnIterator<T> iterator()
+UnmodIterator<T> iterator();
 
 // The contents of this Realizable as a thread-safe immutable list.
-ImList<T> toImList()
+// Use this when you want to access items quickly O(log32 n) by index.
+ImList<T> toImList();
 
 // The contents of this Realizable as an thread-safe, immutable, sorted (tree) map.
-<U,V> ImMapSorted<U,V>	toImMapSorted(Comparator<? super U> comp, Function1<? super T,Map.Entry<U,V>> f1)
+// Use this when you want to quickly O(log n) look up values by key, but still be
+// able to retrieve Entries in key order.
+ImSortedMap<U,V> toImSortedMap(Comparator<? super U> comp,
+                               Function1<? super T,Map.Entry<U,V>> f1);
 
 // The contents of this Realizable presented as an immutable, sorted (tree) set.
-ImSetSorted<T>	toImSetSorted(Comparator<? super T> comp)
+// Use this when you want to quickly O(log n) tell whether the set contains various items.
+ImSortedSet<T> toImSortedSet(Comparator<? super T> comp);
 
-// The contents copied to a mutable list.
-List<T>	toJavaList()
+// The contents copied to a mutable list.  Use toImList unless you need to modify the list in-place.
+List<T> toMutableList();
 
 // Returns the contents of this Realizable copied to a mutable hash map.
-<U,V> Map<U,V>	toJavaMap(Function1<? super T,Map.Entry<U,V>> f1)
+// Use toImMap() unless you need to modify the map in-place.
+Map<U,V> toMutableMap(Function1<? super T,Map.Entry<U,V>> f1);
 
 // Returns the contents of this Realizable copied to a mutable tree map.
-<U,V> SortedMap<U,V>	toJavaMapSorted(Function1<? super T,Map.Entry<U,V>> f1)
+// Use toImSortedMap() unless you need to modify the map in-place.
+SortedMap<U,V> toMutableSortedMap(Function1<? super T,Map.Entry<U,V>> f1);
 
 // Returns the contents of this Realizable copied to a mutable hash set.
-Set<T>	toJavaSet()
+// Use toImSet() unless you need to modify the set in-place.
+Set<T> toMutableSet();
 
 // Returns the contents of this Realizable copied to a mutable tree set.
-SortedSet<T>	toJavaSetSorted(Comparator<? super T> comp)
+// Use toImSortedSet unless you need to modify the set in-place.
+SortedSet<T> toMutableSortedSet(Comparator<? super T> comp);
 
-// Returns a type-safe version of toArray() that doesn't require that you pass an array of the proper type and size.
-default T[]	toTypedArray()
+// Returns an Object[] for backward compatibility
+Object[] toArray();
 
-// This method will be replaced with toImMap() once a PersistentHashMap is added to this project.
-default <U,V> UnMap<U,V>	toUnMap(Function1<? super T,Map.Entry<U,V>> f1)
+// The contents of this Realizable as an unmodifiable hash map.  Use this when
+// you want to very quickly O(1) look up values by key, and don't care about ordering.
+ImMap<U,V> toImMap(Function1<? super T,Map.Entry<U,V>> f1);
 
-// This method will be replaced with toImSet() once a PersistentHashMap is added to this project.
-default UnSet<T>	toUnSet()
+// The contents of this Realizable presented as an unmodifiable hash set.
+// Use this when you want to very quickly O(1) tell whether the set contains
+// various items, but don't care about ordering.
+ImSet<T> toImSet();
 ```
+
 #Learn
 
 There is a (possibly outdated) problem-set for learning this tool-kit: https://github.com/GlenKPeterson/LearnFpJava
@@ -240,6 +253,8 @@ In short, Clojure doesn't have static types.  Scala has an TMTOWTDI attitude tha
 - As of 2014-03-08, all major areas of functionality were covered by unit tests.
 
 #Change Log
+2015-07-28 version 0.9.10: Changed toTypedArray() to toArray() because the former was not type safe in a way that would blow up only at runtime.  The latter is still provided for backwards compatibility (particularly useful in jUnit tests).
+
 2015-07-25 version 0.9.9: Renamed methods in staticImports imList() to vec(), imSet() to hSet() (think: "hashSet()"),
 imSortedSet to tSet() (think: "treeSet()"), imSortedMap to tMap(), etc.  Also removed the telescoping
 methods in favor of just passing vec(tup(1, "one"), tup(2, "two"), tup(3, "three"));  It's maybe a little more work,
