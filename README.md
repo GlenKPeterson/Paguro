@@ -7,6 +7,7 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava&trade; **Imm**utability
 * [Memoization](src/main/java/org/organicdesign/fp/function/Function2.java#L59) for functions
 * Unmodifiable interfaces which deprecate mutator methods and throw exceptions to help you retrofit legacy code.
 * Better [unmodifiable wrappers](src/main/java/org/organicdesign/fp/StaticImports.java#L327) for existing Java collections that deprecate the methods that throw Unimplemented exceptions so that you can catch errors in your IDE instead of at runtime.
+* A tiny language of brief helper functions: vec(), vecSkipNull(), tup(), hMap(), tMap(), hSet(), tSet(), etc. in the [StaticImports file](src/main/java/org/organicdesign/fp/StaticImports.java).
 
 Fluent interfaces encourage you to write expressions (that evaluate) instead of statements (that produce void).
 Immutable collections are fast enough to make it unnecessary to modify data in place.  UncleJim pushes Java toward Clojure, but keeps the type saftey, objects, classes, and C-like syntax that Java programmers are accustomed to.
@@ -141,16 +142,19 @@ Sequence<T> Sequence.ofArray(Iterable<T> i)
 // Run a function against each item for side effects (e.g. writing output)
 void forEach(Consumer<T> se)
 
-// Apply the function to each item in the list, accumulating the result in u.
-// You could perform many other transformations with just this one function, but
+// Apply the function to each item, accumulating the result in u.  Other
+// transformations could be implemented with just this one function, but
 // it is clearer to use the most specific transformations that meets your needs.
-// Still, sometimes you need the flexibility foldLeft provides, so here it is:
+// Still, sometimes you need the flexibility foldLeft provides.
+// This implementation follows the convention that foldLeft processes items
+// *in order* unless those items are a linked list, and in this case,
+// they are not a linked list.
 U foldLeft(U u, BiFunction<U, T, U> fun)
 
 // Return only the items for which the given predicate returns true
 Sequence<T> filter(Predicate<T> pred)
 
-// Return items from the beginning of the list until the given predicate returns false
+// Return items from the beginning until the given predicate returns false
 Sequence<T> takeWhile(Predicate<T> p)
 
 // Return only the first n items
@@ -163,10 +167,7 @@ Sequence<T> drop(long numItems)
 Sequence<U> map(Function<T,U> func)
 
 // Add items to the end of this Sequence
-Sequence<T> append(Sequence<T> pv)
-
-// Add items to the beginning of this Sequence
-Sequence<T> prepend(Sequence<T> pv)
+Sequence<T> concat(Sequence<T> pv)
 
 // Transform each item into zero or more new items using the given function
 Sequence<U> flatMap(Function<T,Sequence<U>> func)
