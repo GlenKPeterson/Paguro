@@ -3,16 +3,27 @@ package org.organicdesign.fp.collections;
 import java.util.Comparator;
 
 /**
- An Equator represents an equality context in a way that is analgous to the java.util.Comparator interface.
+ An Equator represents an equality context in a way that is analgous to the java.util.Comparator
+ interface.
  <a href="http://glenpeterson.blogspot.com/2013/09/object-equality-is-context-relative.html" target="_blank">Comparing Objects is Relative</a>
- This will need to be passed to Hash-based collections the way a Comparator is passed to tree-based ones.
+ This will need to be passed to Hash-based collections the way a Comparator is passed to tree-based
+ ones.
+
+ The method names hash() and eq() are intentionally elisions of hashCode() and equals() so that your
+ IDE will suggest the shorter name as you start typing which is almost always what you want.
+ You want the hash() and eq() methods because that's how Equators compare things.  You don't want
+ an equator's .hashCode() or .equals() methods because those are for comparing *Equators* and are
+ inherited from java.lang.Object.  I'd deprecate those methods, but you can't do that on an
+ interface.
  */
 public interface Equator<T> {
 
-    // ==================================================== Static ====================================================
+    // ============================================= Static ========================================
 
     Equator<Object> DEFAULT_EQUATOR = new Equator<Object>() {
-        @Override public int hash(Object o) { return (o == null) ? Integer.MIN_VALUE : o.hashCode(); }
+        @Override public int hash(Object o) {
+            return (o == null) ? Integer.MIN_VALUE : o.hashCode();
+        }
 
         @Override public boolean eq(Object o1, Object o2) {
             if (o1 == null) { return (o2 == null); }
@@ -57,8 +68,11 @@ public interface Equator<T> {
 
         @Override default boolean eq(T o1, T o2) { return compare(o1, o2) == 0; }
 
-        ComparisonContext<Comparable<Object>> DEFAULT_CONTEXT = new ComparisonContext<Comparable<Object>>() {
-            @Override public int hash(Comparable<Object> o) { return (o == null) ? Integer.MIN_VALUE : o.hashCode(); }
+        ComparisonContext<Comparable<Object>> DEFAULT_CONTEXT =
+                new ComparisonContext<Comparable<Object>>() {
+            @Override public int hash(Comparable<Object> o) {
+                return (o == null) ? Integer.MIN_VALUE : o.hashCode();
+            }
             @SuppressWarnings("ConstantConditions")
             @Override public int compare(Comparable<Object> o1, Comparable<Object> o2) {
                 if (o1 == o2) { return 0; }
@@ -78,21 +92,21 @@ public interface Equator<T> {
         }
     }
 
-    // =================================================== Instance ===================================================
+    // ========================================= Instance =========================================
     /**
      An integer digest used for very quick "can-equal" testing.
      This method MUST return equal hash codes for equal objects.
      It should USUALLY return unequal hash codes for unequal objects.
      You should not change mutable objects while you rely on their hash codes.
-     That said, if a mutable object's internal state changes, the hash code generally must change to reflect the
-     new state.
-     The name of this method is short, but maybe auto-complete will ofer it before hashCode().
+     That said, if a mutable object's internal state changes, the hash code generally must change to
+     reflect the new state.
+     The name of this method is short so that auto-complete can offer it before hashCode().
      */
     int hash(T t);
 
     /**
-     Determines whether two objects are equal.  The name of this method is short, but then, maybe auto-complete will
-     offer it before equals().
+     Determines whether two objects are equal.  The name of this method is short so that
+     auto-complete can offer it before equals().
      @return true if this Equator considers the two objects to be equal.
      */
     boolean eq(T o1, T o2);

@@ -132,7 +132,7 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V> {
         public boolean eq(SortedMap o1, SortedMap o2) {
             if (o1 == o2) { return true; }
             if ( o1.size() != o2.size() ) { return false; }
-            return UnmodSortedIterable.equals(UnmodSortedIterable.cast(o1), UnmodSortedIterable.cast(o2));
+            return UnmodSortedIterable.equals(UnmodSortedIterable.castFromSortedMap(o1), UnmodSortedIterable.castFromSortedMap(o2));
         }
     };
 
@@ -157,7 +157,7 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V> {
         // Yay, this makes sense, and we can compare these with O(n) efficiency while still maintaining compatibility
         // with java.util.Map.
         if (other instanceof SortedMap) {
-            return UnmodSortedIterable.equals(this, UnmodSortedIterable.cast((SortedMap) other));
+            return UnmodSortedIterable.equals(this, UnmodSortedIterable.castFromSortedMap((SortedMap) other));
         }
 
         // This makes no sense and takes O(n log n) or something.

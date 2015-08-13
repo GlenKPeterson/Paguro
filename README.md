@@ -254,8 +254,9 @@ In short, Clojure doesn't have static types.  Scala has an TMTOWTDI attitude tha
 - As of 2014-03-08, all major areas of functionality were covered by unit tests.
 
 #Change Log
-2015-08-13 version 0.9.11: Added RangeOfLong class as an efficient and convenient way to iterate
-through a range of numbers.  Maybe it should implement UnmodList instead of just UnmodSortedIterable?
+2015-08-13 version 0.9.11: Added `RangeOfInt` class as an efficient (in both time and memory)
+implementation of `List<Integer>`.  If you want to compare a `RangeOfInt` to generic `List<Integer>`, use
+`RangeOfInt.LIST_EQUATOR` so that the hashCodes will be compatible.
 
 2015-07-28 version 0.9.10: Changed toTypedArray() to toArray() because the former was not type safe in a way that would blow up only at runtime.  The latter is still provided for backwards compatibility (particularly useful in jUnit tests).
 

@@ -422,7 +422,7 @@ public class PersistentVector<E> implements ImList<E> {
         if ( !(other instanceof List) ) { return false; }
         List that = (List) other;
         return (this.size() == that.size()) &&
-                UnmodSortedIterable.equals(this, UnmodSortedIterable.cast(that));
+                UnmodSortedIterable.equals(this, UnmodSortedIterable.castFromList(that));
     }
 
     @Override public String toString() {

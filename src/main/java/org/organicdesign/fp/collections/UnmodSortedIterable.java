@@ -31,7 +31,7 @@ public interface UnmodSortedIterable<T> extends UnmodIterable<T> {
         return !as.hasNext() && !bs.hasNext();
     }
 
-    //    static <E> UnmodSortedIterable<E> cast(SortedSet<E> ss) {
+    //    static <E> UnmodSortedIterable<E> castFromSortedSet(SortedSet<E> ss) {
 //        return () -> new UnmodSortedIterator<E>() {
 //            Iterator<E> iter = ss.iterator();
 //            @Override public boolean hasNext() { return iter.hasNext(); }
@@ -39,7 +39,7 @@ public interface UnmodSortedIterable<T> extends UnmodIterable<T> {
 //        };
 //    }
 
-    static UnmodSortedIterable cast(SortedSet ss) {
+    static UnmodSortedIterable castFromSortedSet(SortedSet ss) {
         return () -> new UnmodSortedIterator() {
             Iterator iter = ss.iterator();
             @Override public boolean hasNext() { return iter.hasNext(); }
@@ -47,7 +47,7 @@ public interface UnmodSortedIterable<T> extends UnmodIterable<T> {
         };
     }
 
-//    static <E> UnmodSortedIterable<E> cast(List<E> ss) {
+//    static <E> UnmodSortedIterable<E> castFromList(List<E> ss) {
 //        return () -> new UnmodSortedIterator<E>() {
 //            Iterator<E> iter = ss.iterator();
 //            @Override public boolean hasNext() { return iter.hasNext(); }
@@ -55,7 +55,7 @@ public interface UnmodSortedIterable<T> extends UnmodIterable<T> {
 //        };
 //    }
 
-    static UnmodSortedIterable cast(List ss) {
+    static UnmodSortedIterable castFromList(List ss) {
         return () -> new UnmodSortedIterator() {
             Iterator iter = ss.iterator();
             @Override public boolean hasNext() { return iter.hasNext(); }
@@ -63,7 +63,7 @@ public interface UnmodSortedIterable<T> extends UnmodIterable<T> {
         };
     }
 
-//    static <K,V> UnmodSortedIterable<Map.Entry<K,V>> cast(SortedMap<K,V> sm) {
+//    static <K,V> UnmodSortedIterable<Map.Entry<K,V>> castFromSortedMap(SortedMap<K,V> sm) {
 //        return () -> new UnmodSortedIterator<Map.Entry<K,V>>() {
 //            Iterator<Map.Entry<K,V>> iter = sm.entrySet().iterator();
 //            @Override public boolean hasNext() { return iter.hasNext(); }
@@ -71,7 +71,7 @@ public interface UnmodSortedIterable<T> extends UnmodIterable<T> {
 //        };
 //    }
 
-    static UnmodSortedIterable cast(SortedMap sm) {
+    static UnmodSortedIterable castFromSortedMap(SortedMap sm) {
         return () -> new UnmodSortedIterator() {
             Iterator iter = sm.entrySet().iterator();
             @Override public boolean hasNext() { return iter.hasNext(); }

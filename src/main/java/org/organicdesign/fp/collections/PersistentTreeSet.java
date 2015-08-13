@@ -133,7 +133,7 @@ public class PersistentTreeSet<E> implements ImSortedSet<E> {
         SortedSet that = ((SortedSet) other);
 
         if (size() != that.size()) { return false; }
-        return UnmodSortedIterable.equals(this, UnmodSortedIterable.cast(that));
+        return UnmodSortedIterable.equals(this, UnmodSortedIterable.castFromSortedSet(that));
     }
 
     /**
