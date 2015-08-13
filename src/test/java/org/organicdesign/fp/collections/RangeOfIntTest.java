@@ -61,17 +61,10 @@ public class RangeOfIntTest {
         assertFalse(ir1.contains(BigInteger.valueOf(Integer.MAX_VALUE)));
 
         assertTrue(ir1.contains(new Number() {
-            @Override
-            public int intValue() { return Integer.MIN_VALUE; }
-
-            @Override
-            public long longValue() { return Integer.MIN_VALUE; }
-
-            @Override
-            public float floatValue() { return Integer.MIN_VALUE; }
-
-            @Override
-            public double doubleValue() { return Integer.MIN_VALUE; }
+            @Override public int intValue() { return Integer.MIN_VALUE; }
+            @Override public long longValue() { return Integer.MIN_VALUE; }
+            @Override public float floatValue() { return Integer.MIN_VALUE; }
+            @Override public double doubleValue() { return Integer.MIN_VALUE; }
         }));
         assertTrue(ir1.contains(new Number() {
             @Override public int intValue() { return Integer.MAX_VALUE - 1; }
@@ -80,17 +73,10 @@ public class RangeOfIntTest {
             @Override public double doubleValue() { return Integer.MAX_VALUE - 1; }
         }));
         assertFalse(ir1.contains(new Number() {
-            @Override
-            public int intValue() { return Integer.MAX_VALUE; }
-
-            @Override
-            public long longValue() { return Integer.MAX_VALUE; }
-
-            @Override
-            public float floatValue() { return Integer.MAX_VALUE; }
-
-            @Override
-            public double doubleValue() { return Integer.MAX_VALUE; }
+            @Override public int intValue() { return Integer.MAX_VALUE; }
+            @Override public long longValue() { return Integer.MAX_VALUE; }
+            @Override public float floatValue() { return Integer.MAX_VALUE; }
+            @Override public double doubleValue() { return Integer.MAX_VALUE; }
         }));
         assertFalse(ir1.contains("I wish they changed this to T"));
     }

@@ -80,6 +80,7 @@ public class RangeOfInt implements UnmodList<Integer> {
 //    public int start() { return start; }
 //    public int end() { return end; }
 
+    // An efficient method for when the compiler can see that it's being passed a primitive int.
     public boolean contains(int i) {
         return (i >= start) && (i < end);
     }
