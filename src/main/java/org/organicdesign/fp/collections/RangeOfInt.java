@@ -80,14 +80,41 @@ public class RangeOfInt implements UnmodList<Integer> {
 //    public int start() { return start; }
 //    public int end() { return end; }
 
-    // An efficient method for when the compiler can see that it's being passed a primitive int.
+    /**
+     Returns true if the number is within the bounds of this range (low end incluive, high end
+     exclusive).  In math terms, returns true if the argument is [low, high).  False
+     otherwise.  This is an efficient method when the compiler can see that it's being passed a
+     primitive int, but contains(Object o) delegates to this method when it's passed a reasonable
+     and unambiguous argument.
+     */
     public boolean contains(int i) {
         return (i >= start) && (i < end);
     }
 
+    /**
+     Though this overrides List.contains(Object o), it is effectively a convenience method for
+     calling contains(int i).  Therefore, it only accepts Integers, Longs, BigIntegers, and
+     Strings that parse as signed decimal Integers.  It does not accept Numbers since they can't
+     easily be checked for truncation and floating-point might not round properly with respect to
+     bounds, or might not make sense if you are using your range to define a set of integers.
+     Handles truncation (returns false) for the types it accepts.  Throws exceptions for types it
+     does not accept.
+
+     Thanks for all the help from codereview.stackexchange:
+     http://codereview.stackexchange.com/questions/100846/rounding-and-truncation-in-intrange-containsobject-o
+
+     @param o an Integer, Long, BigInteger, or String that parses as a signed decimal Integer.
+     @return true if the number is within the bounds of this range (high end is exclusive).  False
+     otherwise.
+     @throws IllegalArgumentException if the argument is not an Integer, Long, BigInteger, or
+     String.
+     @throws NumberFormatException if a String argument cannot be parsed using Integer.valueOf().
+     */
     @Override public boolean contains(Object o) {
-        // Yuck.  Why couldn't we just have to deal with an Integer here?
-        // As it stands, we attempt to prevent overflow/underflow.
+        // Only accept classes where we can convert to an integer while preventing
+        // overflow/underflow.  If there were a way to reliably test for overflow/underflow in
+        // Numbers, we could accept them too, but with the rounding errors of floats and doubles
+        // that's impractical.
         if (o instanceof Integer) {
             return contains(((Integer) o).intValue());
         } else if (o instanceof Long) {
@@ -102,11 +129,14 @@ public class RangeOfInt implements UnmodList<Integer> {
             } catch (ArithmeticException ignore) {
                 return false;
             }
-        } else if (o instanceof Number) {
-            // No way to check this one.  Does that mean the above are misleading?
-            return contains(((Number) o).intValue());
+        } else if (o instanceof String) {
+            return contains(Integer.valueOf((String) o));
+        } else {
+            throw new IllegalArgumentException("Don't know how to convert to a primitive int" +
+                                               " without risking accidental truncation.  Pass an" +
+                                               " Integer, Long, BigInteger, or String that parses" +
+                                               " within Integer bounds instead.");
         }
-        return false;
     }
 
     @Override public Integer get(int idx) {

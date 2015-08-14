@@ -60,25 +60,69 @@ public class RangeOfIntTest {
         assertFalse(ir1.contains(BigInteger.valueOf(Integer.MIN_VALUE - 1L)));
         assertFalse(ir1.contains(BigInteger.valueOf(Integer.MAX_VALUE)));
 
-        assertTrue(ir1.contains(new Number() {
-            @Override public int intValue() { return Integer.MIN_VALUE; }
-            @Override public long longValue() { return Integer.MIN_VALUE; }
-            @Override public float floatValue() { return Integer.MIN_VALUE; }
-            @Override public double doubleValue() { return Integer.MIN_VALUE; }
-        }));
-        assertTrue(ir1.contains(new Number() {
-            @Override public int intValue() { return Integer.MAX_VALUE - 1; }
-            @Override public long longValue() { return Integer.MAX_VALUE - 1; }
-            @Override public float floatValue() { return Integer.MAX_VALUE - 1; }
-            @Override public double doubleValue() { return Integer.MAX_VALUE - 1; }
-        }));
-        assertFalse(ir1.contains(new Number() {
-            @Override public int intValue() { return Integer.MAX_VALUE; }
-            @Override public long longValue() { return Integer.MAX_VALUE; }
-            @Override public float floatValue() { return Integer.MAX_VALUE; }
-            @Override public double doubleValue() { return Integer.MAX_VALUE; }
-        }));
-        assertFalse(ir1.contains("I wish they changed this to T"));
+        assertTrue(ir1.contains("33"));
+        assertTrue(ir1.contains("-21"));
+        assertTrue(ir1.contains(String.valueOf(Integer.MIN_VALUE)));
+        assertTrue(ir1.contains(String.valueOf(Integer.MAX_VALUE - 1L)));
+        assertFalse(ir1.contains(String.valueOf(Integer.MAX_VALUE)));
+    }
+
+    @SuppressWarnings("SuspiciousMethodCalls")
+    @Test(expected = IllegalArgumentException.class)
+    public void containsEx01() {
+        RangeOfInt.of(Integer.MIN_VALUE, Integer.MAX_VALUE)
+                  .contains(new Number() {
+                      @Override public int intValue() { return 0; }
+                      @Override public long longValue() { return 0L; }
+                      @Override public float floatValue() { return 0.0f; }
+                      @Override public double doubleValue() { return 0.0; }
+                  });
+    }
+    @SuppressWarnings("SuspiciousMethodCalls")
+    @Test(expected = IllegalArgumentException.class)
+    public void containsEx02() {
+        RangeOfInt.of(Integer.MIN_VALUE, Integer.MAX_VALUE).contains(Float.valueOf(0.0f));
+    }
+    @SuppressWarnings("SuspiciousMethodCalls")
+    @Test(expected = IllegalArgumentException.class)
+    public void containsEx03() {
+        RangeOfInt.of(Integer.MIN_VALUE, Integer.MAX_VALUE).contains(Double.valueOf(0.0d));
+    }
+    @SuppressWarnings("SuspiciousMethodCalls")
+    @Test(expected = NumberFormatException.class)
+    public void containsEx04() {
+        RangeOfInt.of(Integer.MIN_VALUE, Integer.MAX_VALUE)
+                  .contains("I wish they changed this to T");
+    }
+    @SuppressWarnings("SuspiciousMethodCalls")
+    @Test(expected = NumberFormatException.class)
+    public void containsEx05() {
+        RangeOfInt.of(Integer.MIN_VALUE, Integer.MAX_VALUE)
+                  .contains("12.5"); // float
+    }
+    @SuppressWarnings("SuspiciousMethodCalls")
+    @Test(expected = NumberFormatException.class)
+    public void containsEx06() {
+        RangeOfInt.of(Integer.MIN_VALUE, Integer.MAX_VALUE)
+                  .contains("-0.6"); // float
+    }
+    @SuppressWarnings("SuspiciousMethodCalls")
+    @Test(expected = NumberFormatException.class)
+    public void containsEx07() {
+        RangeOfInt.of(Integer.MIN_VALUE, Integer.MAX_VALUE)
+                  .contains("0x7"); // Hexidecimal
+    }
+    @SuppressWarnings("SuspiciousMethodCalls")
+    @Test(expected = NumberFormatException.class)
+    public void containsEx08() {
+        RangeOfInt.of(Integer.MIN_VALUE, Integer.MAX_VALUE)
+                  .contains(String.valueOf(Integer.MAX_VALUE + 1L));
+    }
+    @SuppressWarnings("SuspiciousMethodCalls")
+    @Test(expected = NumberFormatException.class)
+    public void containsEx09() {
+        RangeOfInt.of(Integer.MIN_VALUE, Integer.MAX_VALUE)
+                  .contains(String.valueOf(Integer.MIN_VALUE - 1L));
     }
 
     @Test(expected = IndexOutOfBoundsException.class)
