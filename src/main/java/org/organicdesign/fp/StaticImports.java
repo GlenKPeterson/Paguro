@@ -89,10 +89,12 @@ public class StaticImports {
     /**
      Returns a new PersistentHashMap of the given keys and their paired values, skipping any null Entries.
      */
+    // TODO: Consider changing signature to Map.Entry<K,V>... if that won't cause issues with type inference
     public static <K,V> ImMap<K,V> hMap(Iterable<Map.Entry<K,V>> es) {
         return PersistentHashMap.of(es);
     }
 
+    // TODO: Consider changing signature to T... if that won't cause issues with type inference
     /** Returns a new PersistentHashSet of the given items. */
     public static <T> ImSet<T> hSet(Iterable<T> items) {
         return PersistentHashSet.of(items);
@@ -141,6 +143,7 @@ public class StaticImports {
 
     /** Returns an unmodifiable version of the given iterable. */
     // TODO: Test this.
+    // TODO: Change name to unmodIterable to avoid overloading.
     public static <T> UnmodIterable<T> unmod(Iterable<T> iterable) {
         if (iterable == null) { return () -> UnmodIterator.empty(); }
         if (iterable instanceof UnmodIterable) { return (UnmodIterable<T>) iterable; }
@@ -156,6 +159,7 @@ public class StaticImports {
         };
     }
 
+    // TODO: Change name to unmodIterator to avoid overloading.
     /** Returns an unmodifiable version of the given iterator. */
     // Never make this public.  We can't trust an iterator that we didn't get
     // brand new ourselves, because iterators are inherently unsafe to share.
@@ -173,6 +177,7 @@ public class StaticImports {
         };
     }
 
+    // TODO: Change name to unmodListIterator to avoid overloading.
     /** Returns an unmodifiable version of the given listIterator.  This is private because sharing iterators is bad. */
     private static <T> UnmodListIterator<T> unmod(ListIterator<T> iter) {
         if (iter == null) { return UnmodListIterator.empty(); }
@@ -192,6 +197,7 @@ public class StaticImports {
         };
     }
 
+    // TODO: Change name to unmodList to avoid overloading.
     /** Returns an unmodifiable version of the given list. */
     public static <T> UnmodList<T> unmod(List<T> inner) {
         if (inner == null) { return UnmodList.empty(); }
@@ -207,6 +213,7 @@ public class StaticImports {
         };
     }
 
+    // TODO: Change name to unmodSet to avoid overloading.
     /** Returns an unmodifiable version of the given set. */
     public static <T> UnmodSet<T> unmod(Set<T> set) {
         if (set == null) { return UnmodSet.empty(); }
@@ -223,6 +230,7 @@ public class StaticImports {
         };
     }
 
+    // TODO: Change name to unmodSortedSet to avoid overloading.
     /** Returns an unmodifiable version of the given set. */
     public static <T> UnmodSortedSet<T> unmod(SortedSet<T> set) {
         if (set == null) { return UnmodSortedSet.empty(); }
@@ -253,6 +261,7 @@ public class StaticImports {
         };
     }
 
+    // TODO: Change name to unmodMap to avoid overloading.
     /** Returns an unmodifiable version of the given map. */
     public static <K,V> UnmodMap<K,V> unmod(Map<K,V> map) {
         if (map == null) { return UnmodMap.empty(); }
@@ -277,6 +286,7 @@ public class StaticImports {
         };
     }
 
+    // TODO: Change name to unmodSortedMap to avoid overloading.
     /** Returns an unmodifiable version of the given sorted map. */
     public static <K,V> UnmodSortedMap<K,V> unmod(SortedMap<K,V> map) {
         if (map == null) { return UnmodSortedMap.empty(); }
@@ -337,6 +347,7 @@ public class StaticImports {
         };
     }
 
+    // TODO: Change name to unmodCollection to avoid overloading.
     /** Returns an unmodifiable version of the given collection. */
     public static <T> UnmodCollection<T> unmod(Collection<T> coll) {
         if (coll == null) { return UnmodCollection.empty(); }
