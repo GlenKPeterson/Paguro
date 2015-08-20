@@ -432,9 +432,9 @@ Java&trade; is a registered trademark of the Oracle Corporation in the US and ot
 
 UncleJim is not part of Clojure.  Rich Hickey and the Clojure team are in no way affiliated with the UncleJim project, though it borrows heavily from their thoughts and even some of their open-source code.
 
-The Clojure collections are licensed under the Eclipse Public License.  Versions of them have been included in this project and modified to add type safety and implement different interfaces.  These files are still derivative works under the EPL.
+The Clojure collections are licensed under the Eclipse Public License.  Versions of them have been included in this project and modified to add type safety and implement different interfaces.  These files are still derivative works under the EPL.  The [EPL is not compatable with the GPL version 2 or 3](https://eclipse.org/legal/eplfaq.php#GPLCOMPATIBLE).  You can [add an exception to the GPL to allow you to release EPL code under this modified GPL](http://www.gnu.org/licenses/gpl-faq.html#GPLIncompatibleLibs), but not the other way around.
 
-Unless otherwise stated, the rest of this work is licensed under the Apache 2.0 license.  New contributions should be made under the Apache 2.0 license whenever practical.  I believe it is more popular, clearer, and has been better tested in courts of law.
+Unless otherwise stated, the rest of this work is licensed under the Apache 2.0 license.  New contributions should be made under the Apache 2.0 license whenever practical.  I believe it is more popular, clearer, and has been better tested in courts of law.  [The Apache 2.0 license is also one-way compatible with the GPL version 3](http://www.apache.org/licenses/GPL-compatibility.html), so that everything *except* the Clojure collections can be combined and re-distributed with GPLv3 code.  Apache is not compatible with GPLv2, though you might try the GPL modification mentioned in the previous paragraph.
 
 As of 2015-03-24, the following statements made me think the Apache and EPL licenses were compatible.
 
