@@ -99,18 +99,19 @@ public interface Sequence<T> extends Transformable<T>, UnmodSortedIterable<T> {
         return SequenceFiltered.of(this, predicate);
     }
 
-    @Override
-    default Sequence<T> forEach(Function1<? super T,?> consumer) {
-        Sequence<T> seq = this;
-        Option<T> item = seq.head();
-        while (item.isSome()) {
-            consumer.apply(item.get());
-            // repeat with next element
-            seq = seq.tail();
-            item = seq.head();
-        }
-        return this;
-    }
+//    Deprecated: Instead use filter(x -> { doStuff(x); return Boolean.TRUE; })
+//    @Override
+//    default Sequence<T> forEach(Function1<? super T,?> consumer) {
+//        Sequence<T> seq = this;
+//        Option<T> item = seq.head();
+//        while (item.isSome()) {
+//            consumer.apply(item.get());
+//            // repeat with next element
+//            seq = seq.tail();
+//            item = seq.head();
+//        }
+//        return this;
+//    }
 
 
     // Use filter(...).head() instead!

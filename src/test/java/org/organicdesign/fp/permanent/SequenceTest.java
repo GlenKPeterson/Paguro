@@ -105,6 +105,13 @@ public class SequenceTest {
         assertFalse(UnmodSortedIterable.equals(seq2, seq1.tail()));
     }
 
+    /**
+     Note that this tests the forEach() implementation on java.util.Iterable.  There used to be a
+     forEach() on Transformable too, but when I realized that it overloaded (but did not override)
+     the same method on Iterable and Stream, *and* when I read Josh Bloch Item 41 "Use Overloading
+     Judiciously" and realized what a bad idea it was, I just removed the method.  Maybe this test
+     should be deleted?  I guess it's good to prove that the caching works.
+     */
     @Test public void forEach() {
         Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         Sequence<Integer> seq = Sequence.ofArray(ints);

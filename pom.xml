@@ -20,12 +20,12 @@ http://maven.apache.org/plugins/maven-dependency-plugin/examples/resolving-confl
 dependency:tree
 	-->
 	<artifactId>UncleJim</artifactId>
-	<version>0.9.11-SNAPSHOT</version>
+	<version>0.9.12-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>UncleJim</name>
-	<description>Clojure collections and a Sequence abstraction for Java 8+, immutably, type-safely, and with good
-		performance.
+	<description>Immutable Clojure collections and a Transformation abstraction for Java 8+,
+		immutably, type-safely, and with good performance.
 	</description>
 	<url>https://github.com/GlenKPeterson/UncleJim</url>
 

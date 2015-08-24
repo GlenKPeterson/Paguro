@@ -74,11 +74,7 @@ public class SequenceFlatMappedTest {
                                       return (count.value() > 8)
                                              ? Sequence.ofArray("a" + a, "b" + a)
                                              : Sequence.emptySequence();
-                                  }).forEach((item) -> {
-//                              System.out.println("Item " + item);
-                              return null;
-                          })
-                                  .toArray());
+                                  }).toArray());
 
         count.set(0);
         assertArrayEquals(new String[]{"c8", "d8", "c9", "d9"},

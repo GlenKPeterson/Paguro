@@ -16,8 +16,8 @@ package org.organicdesign.fp;
 
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.ImMap;
-import org.organicdesign.fp.collections.ImSortedMap;
 import org.organicdesign.fp.collections.ImSet;
+import org.organicdesign.fp.collections.ImSortedMap;
 import org.organicdesign.fp.collections.ImSortedSet;
 import org.organicdesign.fp.collections.PersistentHashMap;
 import org.organicdesign.fp.collections.PersistentHashSet;
@@ -72,13 +72,6 @@ public interface Transformable<T> extends Realizable<T> {
      @param predicate a function that returns true for items to keep, false for items to drop
      */
     Transformable<T> filter(Function1<? super T,Boolean> predicate);
-
-    /**
-     Eagerly processes the entire data source for side effects.
-     @param consumer the function to do the processing
-     @return the unmodified sequence you started with (for chaining).
-     */
-    Transformable<T> forEach(Function1<? super T,?> consumer);
 
 //    /**
 //     Deprecated: use filter(...).head() instead.

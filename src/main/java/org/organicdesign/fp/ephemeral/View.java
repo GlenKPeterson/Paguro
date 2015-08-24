@@ -51,16 +51,17 @@ public interface View<T> extends Transformable<T> {
     @Override
     default View<T> filter(Function1<? super T,Boolean> pred) { return ViewFiltered.of(this, pred); }
 
-    /** Returning an unmodified view is impossible here - just returns null. */
-    @Override
-    default View<T> forEach(Function1<? super T,?> consumer) {
-        Option<T> item = next();
-        while (item.isSome()) {
-            consumer.apply(item.get());
-            item = next();
-        }
-        return null;
-    }
+//    Deprecated: Instead use filter(x -> { doStuff(x); return Boolean.TRUE; })
+//    /** Returning an unmodified view is impossible here - just returns null. */
+//    @Override
+//    default View<T> forEach(Function1<? super T,?> consumer) {
+//        Option<T> item = next();
+//        while (item.isSome()) {
+//            consumer.apply(item.get());
+//            item = next();
+//        }
+//        return null;
+//    }
 
 //    /**
 //     Deprecated: use filter(...).head() instead.

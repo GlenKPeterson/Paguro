@@ -254,6 +254,9 @@ In short, Clojure doesn't have static types.  Scala has an TMTOWTDI attitude tha
 - As of 2014-03-08, all major areas of functionality were covered by unit tests.
 
 #Change Log
+2015-08-23 version 0.9.12 Removed `Transformable<T> filter(Function1<? super T,Boolean> predicate)`.
+See reasons in the "Out of Scope" section below.
+
 2015-08-13 version 0.9.11: Added `RangeOfInt` class as an efficient (in both time and memory)
 implementation of `List<Integer>`.  If you want to compare a `RangeOfInt` to generic `List<Integer>`, use
 `RangeOfInt.LIST_EQUATOR` so that the hashCodes will be compatible.
@@ -407,6 +410,14 @@ I didn't think it improved readability or ease of use to have both methods.
 How hard is it to pass a 0 or 1 to foldLeft?
 It's easy enough to implement if there is a compelling use case where it's significantly better than foldLeft.
 Otherwise, fewer methods means a simpler interface to learn.
+
+###Transformable<T> forEach(Function1<? super T,?> consumer)
+Java 8 has `void forEach(Consumer<? super T> action)` on both Iterable and Stream that does what
+Transformable.forEach() used to do.  The old Transformable method overloaded (but did not override)
+this method which is problematic for the reasons Josh Bloch gives in his Item 41.  Either make
+use of the Java 8 `void forEach(i -> log(i))` or pass a constant function like
+`i -> { print(i); return Boolean.TRUE; }` to
+`Transformable<T> filter(Function1<? super T,Boolean> predicate)` instead. 
 
 ###View<T> interpose(T item)
 I also implemented interpose(), but took it out because my only use case was to add commas to a list to display
