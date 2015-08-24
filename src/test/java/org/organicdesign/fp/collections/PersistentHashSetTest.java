@@ -286,7 +286,7 @@ public class PersistentHashSetTest {
         ss1.add("work");
         ss1.add("an");
         ss1.add("hello");
-        equalsDistinctHashCode(s1, ss1, StaticImports.unmod(ss1),
+        equalsDistinctHashCode(s1, ss1, StaticImports.unmodSet(ss1),
                                PersistentHashSet.of(vec("hello", "an", "work", "the")));
     }
 

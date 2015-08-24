@@ -38,6 +38,7 @@ import org.organicdesign.fp.ephemeral.View;
 import org.organicdesign.fp.tuple.Tuple2;
 import org.organicdesign.fp.tuple.Tuple3;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -49,16 +50,20 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 
 /**
- Statically importing the functions in this file is like building a mini language in Java.  Whether that is a good or
- bad idea remains to be seen.  As with any usage of import *, there will probably be issues if you import 2 different
- versions of this file in your classpath.
+ The four methods map(), set(), tup(), and vec() comprise a mini data-definition language.  It's
+ wordier than JSON, but still brief for Java and fairly brief over-all.  Of those four methods, only
+ tup() uses overloading to take heterogeneous arguments. The other three are the only places in this
+ project that use varargs.
 
- Contains methods for building immutable collections.  These will never return null, the closest they get is to return
- an empty immutable collection (the same one is reused).  The skipNull versions aid immutable programming since
- you can build a map of unknown size as follows:
- <pre><code>imMapSkipNull(Tuple2.of("hello", 33),
-              Tuple2.of("there", 44),
-              currUser.isFred ? Tuple2.of("Fred", 55) : null);</code></pre>
+ Statically importing the functions in this file is like building a mini language in Java.  As with
+ any usage of import *, there will probably be issues if you import 2 different versions of this
+ file in your classpath.  Let me know if you find that the convenience is not worth the danger.
+
+ The unmod___() methods are an alternative to Collections.unmodifiable____() for building immutable
+ collections.  These will never return null, the closest they get is to return an empty immutable
+ collection (the same one is reused).  Also, the unmodifiable interfaces they return have deprecated
+ the modification methods so that any attempt to use those methods causes a warning in your IDE and
+ compiler.
  */
 @SuppressWarnings("UnusedDeclaration")
 public class StaticImports {
@@ -73,113 +78,111 @@ public class StaticImports {
     @SafeVarargs
     static public <T> ImList<T> vec(T... items) { return PersistentVector.of(items); }
 
-    /** Returns a new PersistentVector of the given items, omitting any nulls. */
-    @SafeVarargs
-    public static <T> ImList<T> vecSkipNull(T... items) { return PersistentVector.ofSkipNull(items); }
-
-    public static <T> ImSortedSet<T> sSet(Comparator<? super T> comp, Iterable<T> items) {
-        return View.ofIter(items).toImSortedSet(comp);
-    }
-
-//    /** Returns a new PersistentHashMap of the given keys and their paired values. */
-//    public static <K,V> ImMap<K,V> hMap(K k1, V v1) {
-//        return PersistentHashMap.of(k1, v1);
+    // I don't know whether this is a worthwhile convenience, or a crutch.
+    // See the last two examples in PersistentHashMapTest.testSkipNull() to see how this saves
+    // a cast due to the (otherwise slightly evil) varargs.
+//    /** Returns a new PersistentVector of the given items, omitting any nulls. */
+//    @SafeVarargs
+//    public static <T> ImList<T> vecSkipNull(T... items) {
+//        return PersistentVector.ofSkipNull(items);
 //    }
 
     /**
-     Returns a new PersistentHashMap of the given keys and their paired values, skipping any null Entries.
+     Returns a new PersistentHashMap of the given keys and their paired values, skipping any null
+     Entries.
      */
-    // TODO: Consider changing signature to Map.Entry<K,V>... if that won't cause issues with type inference
-    public static <K,V> ImMap<K,V> hMap(Iterable<Map.Entry<K,V>> es) {
-        return PersistentHashMap.of(es);
-    }
-
-    // TODO: Consider changing signature to T... if that won't cause issues with type inference
-    /** Returns a new PersistentHashSet of the given items. */
-    public static <T> ImSet<T> hSet(Iterable<T> items) {
-        return PersistentHashSet.of(items);
-    }
-
-    /** Returns a new PersistentTreeMap of the given comparable keys and their paired values. */
-    public static <K extends Comparable<K>,V> ImSortedMap<K,V> tMap() {
-        return PersistentTreeMap.empty();
+    @SafeVarargs
+    public static <K,V> ImMap<K,V> map(Map.Entry<K,V>... es) {
+        return PersistentHashMap.of(Arrays.asList(es));
     }
 
     /**
-     Returns a new PersistentTreeMap of the given comparable keys and their paired values, skipping any null Entries.
+     Returns a new PersistentHashMap of the given keys and their paired values, skipping any null
+     Entries.
      */
-    public static <K extends Comparable<K>,V> ImSortedMap<K,V> tMap(Iterable<Map.Entry<K,V>> es) {
+    @SafeVarargs
+    public static <T> ImSet<T> set(T... items) {
+        return PersistentHashSet.of(Arrays.asList(items));
+    }
+
+//    /** Returns a new PersistentTreeMap of the given comparable keys and their paired values. */
+//    public static <K extends Comparable<K>,V> ImSortedMap<K,V> sortedMap() {
+//        return PersistentTreeMap.empty();
+//    }
+
+    /**
+     Returns a new PersistentTreeMap of the given comparable keys and their paired values, skipping
+     any null Entries.
+     */
+    public static <K extends Comparable<K>,V> ImSortedMap<K,V>
+    sortedMap(Iterable<Map.Entry<K,V>> es) {
         return PersistentTreeMap.of(es);
     }
 
-    /** Returns a new PersistentTreeMap of the specified comparator and the given key/value pairs. */
+    /**
+     Returns a new PersistentTreeMap of the specified comparator and the given key/value pairs.
+     */
     public static <K,V> ImSortedMap<K,V>
-    tMapComp(Comparator<? super K> c, Iterable<Map.Entry<K,V>> es) {
+    sortedMap(Comparator<? super K> c, Iterable<Map.Entry<K,V>> es) {
         return PersistentTreeMap.ofComp(c, es);
     }
 
     /** Returns a new PersistentTreeSet of the given comparable items. */
-    public static <T extends Comparable<T>> ImSortedSet<T> tSet(Iterable<T> items) {
+    public static <T extends Comparable<T>> ImSortedSet<T> sortedSet(Iterable<T> items) {
         return PersistentTreeSet.of(items);
     }
 
-    /**
-     Returns a new PersistentTreeSet of the given comparator.  Always use this instead of starting with empty() because
-     there is no way to assign a comparator later on.
-     */
-    public static <T> ImSortedSet<T> tSetComp(Comparator<? super T> comp) {
-        return PersistentTreeSet.ofComp(comp);
-    }
-
     /** Returns a new PersistentTreeSet of the given comparator and items. */
-    public static <T> ImSortedSet<T> tSetComp(Comparator<? super T> comp, Iterable<T> items) {
-        return PersistentTreeSet.ofComp(comp, items);
+    public static <T> ImSortedSet<T> sortedSet(Comparator<? super T> comp, Iterable<T> items) {
+        return View.ofIter(items).toImSortedSet(comp);
     }
-
     // EqualsWhichDoesntCheckParameterClass Note:
     // http://codereview.stackexchange.com/questions/88333/is-one-sided-equality-more-helpful-or-more-confusing-than-quick-failure
-    // "There is no one-sided equality. If it is one-sided, that is it's asymmetric, then it's just wrong."
-    // Which is a little ironic because with inheritance, there are many cases in Java where equality is one-sided.
+    // "There is no one-sided equality. If it is one-sided, that is it's asymmetric, then it's just
+    // wrong."  Which is a little ironic because with inheritance, there are many cases in Java
+    // where equality is one-sided.
 
     /** Returns an unmodifiable version of the given iterable. */
     // TODO: Test this.
-    // TODO: Change name to unmodIterable to avoid overloading.
-    public static <T> UnmodIterable<T> unmod(Iterable<T> iterable) {
+    public static <T> UnmodIterable<T> unmodIterable(Iterable<T> iterable) {
         if (iterable == null) { return () -> UnmodIterator.empty(); }
         if (iterable instanceof UnmodIterable) { return (UnmodIterable<T>) iterable; }
         return () -> new UnmodIterator<T>() {
             private final Iterator<T> iter = iterable.iterator();
             @Override public boolean hasNext() { return iter.hasNext(); }
             @Override public T next() { return iter.next(); }
-            // Defining equals and hashcode makes no sense because can't call them without changing the iterator
-            // which both makes it useless, and changes the equals and hashcode results.
+            // Defining equals and hashcode makes no sense because can't call them without changing
+            // the iterator which both makes it useless, and changes the equals and hashcode
+            // results.
 //            @Override public int hashCode() { return iter.hashCode(); }
 //            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
 //            @Override public boolean equals(Object o) { return iter.equals(o); }
         };
     }
 
-    // TODO: Change name to unmodIterator to avoid overloading.
     /** Returns an unmodifiable version of the given iterator. */
     // Never make this public.  We can't trust an iterator that we didn't get
     // brand new ourselves, because iterators are inherently unsafe to share.
-    private static <T> UnmodIterator<T> unmod(Iterator<T> iter) {
+    private static <T> UnmodIterator<T> unmodIterator(Iterator<T> iter) {
         if (iter == null) { return UnmodIterator.empty(); }
         if (iter instanceof UnmodIterator) { return (UnmodIterator<T>) iter; }
         return new UnmodIterator<T>() {
             @Override public boolean hasNext() { return iter.hasNext(); }
             @Override public T next() { return iter.next(); }
-            // Defining equals and hashcode makes no sense because can't call them without changing the iterator
-            // which both makes it useless, and changes the equals and hashcode results.
+            // Defining equals and hashcode makes no sense because can't call them without changing
+            // the iterator which both makes it useless, and changes the equals and hashcode
+            // results.
 //            @Override public int hashCode() { return iter.hashCode(); }
 //            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
 //            @Override public boolean equals(Object o) { return iter.equals(o); }
         };
     }
 
-    // TODO: Change name to unmodListIterator to avoid overloading.
-    /** Returns an unmodifiable version of the given listIterator.  This is private because sharing iterators is bad. */
-    private static <T> UnmodListIterator<T> unmod(ListIterator<T> iter) {
+    /**
+     Returns an unmodifiable version of the given listIterator.  This is private because sharing
+     iterators is bad.
+     */
+    private static <T> UnmodListIterator<T> unmodListIterator(ListIterator<T> iter) {
         if (iter == null) { return UnmodListIterator.empty(); }
         if (iter instanceof UnmodListIterator) { return (UnmodListIterator<T>) iter; }
         return new UnmodListIterator<T>() {
@@ -189,22 +192,24 @@ public class StaticImports {
             @Override public T previous() { return iter.previous(); }
             @Override public int nextIndex() { return iter.nextIndex(); }
             @Override public int previousIndex() { return iter.previousIndex(); }
-            // Defining equals and hashcode makes no sense because can't call them without changing the iterator
-            // which both makes it useless, and changes the equals and hashcode results.
+            // Defining equals and hashcode makes no sense because can't call them without changing
+            // the iterator which both makes it useless, and changes the equals and hashcode
+            // results.
 //            @Override public int hashCode() { return iter.hashCode(); }
 //            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
 //            @Override public boolean equals(Object o) { return iter.equals(o); }
         };
     }
 
-    // TODO: Change name to unmodList to avoid overloading.
     /** Returns an unmodifiable version of the given list. */
-    public static <T> UnmodList<T> unmod(List<T> inner) {
+    public static <T> UnmodList<T> unmodList(List<T> inner) {
         if (inner == null) { return UnmodList.empty(); }
         if (inner instanceof UnmodList) { return (UnmodList<T>) inner; }
         if (inner.size() < 1) { return UnmodList.empty(); }
         return new UnmodList<T>() {
-            @Override public UnmodListIterator<T> listIterator(int index) { return unmod(inner.listIterator(index)); }
+            @Override public UnmodListIterator<T> listIterator(int index) {
+                return unmodListIterator(inner.listIterator(index));
+            }
             @Override public int size() { return inner.size(); }
             @Override public T get(int index) { return inner.get(index); }
             @Override public int hashCode() { return inner.hashCode(); }
@@ -213,9 +218,8 @@ public class StaticImports {
         };
     }
 
-    // TODO: Change name to unmodSet to avoid overloading.
     /** Returns an unmodifiable version of the given set. */
-    public static <T> UnmodSet<T> unmod(Set<T> set) {
+    public static <T> UnmodSet<T> unmodSet(Set<T> set) {
         if (set == null) { return UnmodSet.empty(); }
         if (set instanceof UnmodSet) { return (UnmodSet<T>) set; }
         if (set.size() < 1) { return UnmodSet.empty(); }
@@ -223,26 +227,29 @@ public class StaticImports {
             @Override public boolean contains(Object o) { return set.contains(o); }
             @Override public int size() { return set.size(); }
             @Override public boolean isEmpty() { return set.isEmpty(); }
-            @Override public UnmodIterator<T> iterator() { return unmod(set.iterator()); }
+            @Override public UnmodIterator<T> iterator() { return unmodIterator(set.iterator()); }
             @Override public int hashCode() { return set.hashCode(); }
             @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
             @Override public boolean equals(Object o) { return set.equals(o); }
         };
     }
 
-    // TODO: Change name to unmodSortedSet to avoid overloading.
     /** Returns an unmodifiable version of the given set. */
-    public static <T> UnmodSortedSet<T> unmod(SortedSet<T> set) {
+    public static <T> UnmodSortedSet<T> unmodSortedSet(SortedSet<T> set) {
         if (set == null) { return UnmodSortedSet.empty(); }
         if (set instanceof UnmodSortedSet) { return (UnmodSortedSet<T>) set; }
         if (set.size() < 1) { return UnmodSortedSet.empty(); }
         return new UnmodSortedSet<T>() {
             @Override public Comparator<? super T> comparator() { return set.comparator(); }
             @Override public UnmodSortedSet<T> subSet(T fromElement, T toElement) {
-                return unmod(set.subSet(fromElement, toElement));
+                return unmodSortedSet(set.subSet(fromElement, toElement));
             }
-            @Override public UnmodSortedSet<T> headSet(T toElement) { return unmod(set.headSet(toElement)); }
-            @Override public UnmodSortedSet<T> tailSet(T fromElement) { return unmod(set.tailSet(fromElement)); }
+            @Override public UnmodSortedSet<T> headSet(T toElement) {
+                return unmodSortedSet(set.headSet(toElement));
+            }
+            @Override public UnmodSortedSet<T> tailSet(T fromElement) {
+                return unmodSortedSet(set.tailSet(fromElement));
+            }
             @Override public T first() { return set.first(); }
             @Override public T last() { return set.last(); }
             @Override public boolean contains(Object o) { return set.contains(o); }
@@ -261,34 +268,36 @@ public class StaticImports {
         };
     }
 
-    // TODO: Change name to unmodMap to avoid overloading.
     /** Returns an unmodifiable version of the given map. */
-    public static <K,V> UnmodMap<K,V> unmod(Map<K,V> map) {
+    public static <K,V> UnmodMap<K,V> unmodMap(Map<K,V> map) {
         if (map == null) { return UnmodMap.empty(); }
         if (map instanceof UnmodMap) { return (UnmodMap<K,V>) map; }
         if (map.size() < 1) { return UnmodMap.empty(); }
         return new UnmodMap<K,V>() {
             /** {@inheritDoc} */
             @Override
-            public UnmodIterator<UnEntry<K,V>> iterator() { return UnmodMap.UnEntry.wrap(map.entrySet().iterator()); }
+            public UnmodIterator<UnEntry<K,V>> iterator() {
+                return UnmodMap.UnEntry.wrap(map.entrySet().iterator());
+            }
 
-            @Override public UnmodSet<Entry<K,V>> entrySet() { return unmod(map.entrySet()); }
+            @Override public UnmodSet<Entry<K,V>> entrySet() { return unmodSet(map.entrySet()); }
             @Override public int size() { return map.size(); }
             @Override public boolean isEmpty() { return map.isEmpty(); }
             @Override public boolean containsKey(Object key) { return map.containsKey(key); }
-            @Override public boolean containsValue(Object value) { return map.containsValue(value); }
+            @Override public boolean containsValue(Object value) {
+                return map.containsValue(value);
+            }
             @Override public V get(Object key) { return map.get(key); }
-            @Override public UnmodSet<K> keySet() { return unmod(map.keySet()); }
-            @Override public UnmodCollection<V> values() { return unmod(map.values()); }
+            @Override public UnmodSet<K> keySet() { return unmodSet(map.keySet()); }
+            @Override public UnmodCollection<V> values() { return unmodCollection(map.values()); }
             @Override public int hashCode() { return map.hashCode(); }
             @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
             @Override public boolean equals(Object o) { return map.equals(o); }
         };
     }
 
-    // TODO: Change name to unmodSortedMap to avoid overloading.
     /** Returns an unmodifiable version of the given sorted map. */
-    public static <K,V> UnmodSortedMap<K,V> unmod(SortedMap<K,V> map) {
+    public static <K,V> UnmodSortedMap<K,V> unmodSortedMap(SortedMap<K,V> map) {
         if (map == null) { return UnmodSortedMap.empty(); }
         if (map instanceof UnmodSortedMap) { return (UnmodSortedMap<K,V>) map; }
         if (map.size() < 1) { return UnmodSortedMap.empty(); }
@@ -304,10 +313,12 @@ public class StaticImports {
                             @Override public Entry<K,V> next() { return iter.next(); }
                         };
                     }
-                    @Override public UnmodSortedSet<Entry<K,V>> subSet(Entry<K,V> fromElement, Entry<K,V> toElement) {
-                        // This is recursive.  I hope it's not an infinite loop 'cause I don't want to write this
-                        // all out again.
-                        return unmod(map.subMap(fromElement.getKey(), toElement.getKey())).entrySet();
+                    @Override public UnmodSortedSet<Entry<K,V>> subSet(Entry<K,V> fromElement,
+                                                                       Entry<K,V> toElement) {
+                        // This is recursive.  I hope it's not an infinite loop 'cause I don't want
+                        // to write this all out again.
+                        return unmodSortedMap(map.subMap(fromElement.getKey(), toElement.getKey()))
+                                .entrySet();
                     }
                     @Override public Comparator<? super Entry<K,V>> comparator() {
                         return (o1, o2) -> map.comparator().compare(o1.getKey(), o2.getKey());
@@ -334,22 +345,25 @@ public class StaticImports {
             @Override public boolean containsKey(Object key) { return map.containsKey(key); }
             @Override public boolean containsValue(Object value) { return map.containsValue(value); }
             @Override public V get(Object key) { return map.get(key); }
-            @Override public UnmodSet<K> keySet() { return unmod(map.keySet()); }
+            @Override public UnmodSet<K> keySet() { return unmodSet(map.keySet()); }
             @Override public Comparator<? super K> comparator() { return map.comparator(); }
-            @Override public UnmodSortedMap<K,V> subMap(K fromKey, K toKey) { return unmod(map.subMap(fromKey, toKey)); }
-            @Override public UnmodSortedMap<K,V> tailMap(K fromKey) { return unmod(map.tailMap(fromKey)); }
+            @Override public UnmodSortedMap<K,V> subMap(K fromKey, K toKey) {
+                return unmodSortedMap(map.subMap(fromKey, toKey));
+            }
+            @Override public UnmodSortedMap<K,V> tailMap(K fromKey) {
+                return unmodSortedMap(map.tailMap(fromKey));
+            }
             @Override public K firstKey() { return map.firstKey(); }
             @Override public K lastKey() { return map.lastKey(); }
-            @Override public UnmodCollection<V> values() { return unmod(map.values()); }
+            @Override public UnmodCollection<V> values() { return unmodCollection(map.values()); }
             @Override public int hashCode() { return map.hashCode(); }
             @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
             @Override public boolean equals(Object o) { return map.equals(o); }
         };
     }
 
-    // TODO: Change name to unmodCollection to avoid overloading.
     /** Returns an unmodifiable version of the given collection. */
-    public static <T> UnmodCollection<T> unmod(Collection<T> coll) {
+    public static <T> UnmodCollection<T> unmodCollection(Collection<T> coll) {
         if (coll == null) { return UnmodCollection.empty(); }
         if (coll instanceof UnmodCollection) { return (UnmodCollection<T>) coll; }
         if (coll.size() < 1) { return UnmodCollection.empty(); }
@@ -357,17 +371,17 @@ public class StaticImports {
             @Override public boolean contains(Object o) { return coll.contains(o); }
             @Override public int size() { return coll.size(); }
             @Override public boolean isEmpty() { return coll.isEmpty(); }
-            @Override public UnmodIterator<T> iterator() { return unmod(coll.iterator()); }
+            @Override public UnmodIterator<T> iterator() { return unmodIterator(coll.iterator()); }
             @Override public int hashCode() { return coll.hashCode(); }
             @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
             @Override public boolean equals(Object o) { return coll.equals(o); }
         };
     }
 //    /**
-//     * Returns an int which is a unique and correct hash code for the objects passed.  This hashcode is recomputed on
-//     * every call, so that if any of these objects change their hashCodes, this will always return the latest value.
-//     * Of course, if you add something to a collection that uses a hashCode, then that hashCode changes, you're going
-//     * to have problems!
+//     Returns an int which is a unique and correct hash code for the objects passed.  This
+//     hashcode is recomputed on every call, so that if any of these objects change their hashCodes,
+//     this will always return the latest value.  Of course, if you add something to a collection
+//     that uses a hashCode, then that hashCode changes, you're going to have problems!
 //     */
 //    public static int hashCoder(Object... ts) {
 //        if (ts == null) {
@@ -383,12 +397,13 @@ public class StaticImports {
 //    }
 //
 //    /**
-//     * Use this only if you can guarantee to pass it immutable objects only!  Returns a LazyInt that will compute a
-//     * unique and correct hash code on the first time it is called, then return that primitive int very quickly for all
-//     * future calls.  If any of the hashCodes for the objects passed in change after that time, it will not affect the
-//     * output of this function.  Of course, if you add something to a collection that uses a hashCode and then change
-//     * its hashCode, the behavior is undefined, so changing things after that time is a bad idea anyway.  Still,
-//     * correct is more important than fast, so make good decisions about when to use this.
+//     Use this only if you can guarantee to pass it immutable objects only!  Returns a LazyInt that
+//     will compute a unique and correct hash code on the first time it is called, then return that
+//     primitive int very quickly for all future calls.  If any of the hashCodes for the objects
+//     passed in change after that time, it will not affect the output of this function.  Of course,
+//     if you add something to a collection that uses a hashCode and then change its hashCode, the
+//     behavior is undefined, so changing things after that time is a bad idea anyway.  Still,
+//     correct is more important than fast, so make good decisions about when to use this.
 //     */
 //    public static Lazy.Int lazyHashCoder(Object... ts) {
 //        if ( (ts == null) || (ts.length < 1) ) {

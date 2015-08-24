@@ -254,6 +254,16 @@ In short, Clojure doesn't have static types.  Scala has an TMTOWTDI attitude tha
 - As of 2014-03-08, all major areas of functionality were covered by unit tests.
 
 #Change Log
+2015-08-23 version 0.9.13 Renamed most methods in StaticImports.  This is why I've been calling this
+*alpha*-quality code.  The four methods map(), set(), tup(), and vec() comprise a mini
+data-definition language.  It's wordier than JSON, but still brief for Java and fairly brief
+over-all.  Of those four methods, only tup() uses overloading to take heterogeneous arguments.
+The other three are the only places in this project that use varargs.  The unmod() methods
+have all been renamed to unmodSortedSet() or whatever to avoid overloading with the same number
+of arguments and bring it in line with Josh Bloch's Item 41.  This project will be *alpha* still,
+at least until the new TransDesc code from the One-Off-Examples project is merged into here.
+That code should replace Sequence and View.
+
 2015-08-23 version 0.9.12 Removed `Transformable<T> filter(Function1<? super T,Boolean> predicate)`.
 See reasons in the "Out of Scope" section below.
 

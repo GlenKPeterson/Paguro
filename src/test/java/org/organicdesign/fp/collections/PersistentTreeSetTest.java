@@ -203,12 +203,12 @@ public class PersistentTreeSetTest {
         ss1.add("work");
         ss1.add("an");
         ss1.add("hello");
-        equalsDistinctHashCode(s1, ss1, StaticImports.unmod(ss1),
+        equalsDistinctHashCode(s1, ss1, StaticImports.unmodSortedSet(ss1),
                                PersistentTreeSet.of(Arrays.asList("hello", "an", "work", "the")));
 
         // Really, you need to read the JavaDoc for PersistentTreeSet.equals() to understand the bizarre notion of
         // equality being checked here.
-        equalsDistinctHashCode(s1, ss1, StaticImports.unmod(ss1),
+        equalsDistinctHashCode(s1, ss1, StaticImports.unmodSortedSet(ss1),
                                PersistentTreeSet.ofComp(STR_LEN_COMP,
                                                         Arrays.asList("helloz", "an", "work", "b", "the")));
 
@@ -235,19 +235,19 @@ public class PersistentTreeSetTest {
 //        assertEquals(ss2, ss);
 //
 //
-        equalsDistinctHashCode(s2, ss, StaticImports.unmod(ss),
+        equalsDistinctHashCode(s2, ss, StaticImports.unmodSortedSet(ss),
                                PersistentTreeSet.ofComp(STR_LEN_COMP,
                                                         Arrays.asList("helloz", "an", "work", "the")));
 
 //        assertEquals(s2, yadda);
 //        assertEquals(ss, yadda);
-//        assertEquals(unmod(ss), yadda);
+//        assertEquals(unmodSortedSet(ss), yadda);
 //
 //        assertNotEquals(yadda, s2);
 //        assertNotEquals(yadda, ss);
-//        assertNotEquals(yadda, unmod(ss));
+//        assertNotEquals(yadda, unmodSortedSet(ss));
 
-        equalsDistinctHashCode(s2, ss, StaticImports.unmod(ss),
+        equalsDistinctHashCode(s2, ss, StaticImports.unmodSortedSet(ss),
                                PersistentTreeSet.of(Arrays.asList("an", "helloz", "work", "b", "the")));
 
         equalsSameHashCode(s2,

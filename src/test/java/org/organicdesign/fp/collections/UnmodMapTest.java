@@ -33,7 +33,7 @@ public class UnmodMapTest {
         mm.put("A", -1);
         mm.put("test", -2);
 
-        UnmodMap<String,Integer> m = StaticImports.unmod(mm);
+        UnmodMap<String,Integer> m = StaticImports.unmodMap(mm);
         assertFalse(m.containsValue(Integer.MAX_VALUE));
         assertFalse(m.containsValue(4));
         assertTrue(m.containsValue(3));

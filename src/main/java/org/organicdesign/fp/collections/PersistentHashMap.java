@@ -138,8 +138,8 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         this.nullValue = nullValue;
     }
 
-    /** Not sure I like this - could disappear. */
-    boolean hasNull() { return hasNull; }
+//    /** Not sure I like this - could disappear. */
+//    boolean hasNull() { return hasNull; }
 
     /** {@inheritDoc} */
     @Override public Equator<K> equator() { return equator; }

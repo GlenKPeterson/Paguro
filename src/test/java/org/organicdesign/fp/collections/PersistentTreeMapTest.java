@@ -19,6 +19,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.organicdesign.fp.StaticImports;
 import org.organicdesign.fp.StaticImportsTest;
+import org.organicdesign.fp.function.Function1;
 import org.organicdesign.fp.permanent.Sequence;
 import org.organicdesign.fp.tuple.Tuple2;
 
@@ -184,7 +185,7 @@ public class PersistentTreeMapTest {
                                                         tup("two", 2),
                                                         tup("three", 3))),
                                m,
-                               StaticImports.unmod(m),
+                               StaticImports.unmodSortedMap(m),
                                PersistentTreeMap.of(vec(tup("two", 2),
                                                         tup("three", 3),
                                                         tup("four", 4))));
@@ -442,7 +443,7 @@ public class PersistentTreeMapTest {
                                                          tup(7, "Seven"), tup(8, "Eight"),
                                                          tup(9, "Nine"), tup(10, "Ten")));
         StaticImportsTest.mapHelper(a, max);
-        Map<Integer,String> b = PersistentTreeMap.of(vecSkipNull(
+        Map<Integer,String> b = PersistentTreeMap.of(vec(
                 tup(1, "One"), tup(2, "Two"), tup(3, "Three"),
                 tup(4, "Four"), tup(5, "Five"), tup(6, "Six"),
                 tup(7, "Seven"), tup(8, "Eight"), tup(9, "Nine"),
@@ -462,19 +463,26 @@ public class PersistentTreeMapTest {
         assertEquals(c, b);
         assertEquals(a.hashCode(), b.hashCode());
         assertEquals(a.hashCode(), c.hashCode());
-        StaticImportsTest.mapHelperOdd(PersistentTreeMap.of(vecSkipNull(
-                tup(1, "One"), null, tup(3, "Three"), null, tup(5, "Five"), null,
-                tup(7, "Seven"), null, tup(9, "Nine"), null)), max);
-        StaticImportsTest.mapHelperEven(PersistentTreeMap.of(vecSkipNull(
-                null, tup(2, "Two"), null, tup(4, "Four"), null,
-                tup(6, "Six"), null, tup(8, "Eight"), null, tup(10, "Ten"))), max);
+        StaticImportsTest.mapHelperOdd(
+                vec(tup(1, "One"), null, tup(3, "Three"), null, tup(5, "Five"), null,
+                    tup(7, "Seven"), null, tup(9, "Nine"), null)
+                        .filter(t -> t != null)
+                        .toImSortedMap(Equator.defaultComparator(), Function1.identity()),
+                max);
+        StaticImportsTest.mapHelperEven(
+                vec(null, tup(2, "Two"), null, tup(4, "Four"), null,
+                    tup(6, "Six"), null, tup(8, "Eight"), null, tup(10, "Ten"))
+                        .filter(t -> t != null)
+                        .toImSortedMap(Equator.defaultComparator(), Function1.identity()),
+                max);
     }
 
     @Test public void testImMap1() {
         int max = 1;
         Map<Integer,String> a = PersistentTreeMap.of(vec(tup(1, "One")));
         StaticImportsTest.mapHelper(a, max);
-        Map<Integer,String> b = PersistentTreeMap.of(vecSkipNull(tup(1, "One")));
+        Map<Integer,String> b = vec(tup(1, "One"))
+                .toImSortedMap(Equator.defaultComparator(), Function1.identity());
         StaticImportsTest.mapHelper(b, max);
         Map<Integer,String> c = PersistentTreeMap.ofComp(Equator.defaultComparator(),
                                                          vec(tup(1, "One")));
@@ -486,19 +494,36 @@ public class PersistentTreeMapTest {
         assertEquals(c, b);
         assertEquals(a.hashCode(), b.hashCode());
         assertEquals(a.hashCode(), c.hashCode());
-        StaticImportsTest.mapHelperOdd(PersistentTreeMap.of(vecSkipNull(tup(1, "One"))), max);
-        StaticImportsTest.mapHelperEven(PersistentTreeMap.of(vecSkipNull((Map.Entry<Integer,String>) null)), max);
+        StaticImportsTest.mapHelperOdd(vec(tup(1, "One"))
+                                               .toImSortedMap(Equator.defaultComparator(),
+                                                              Function1.identity()),
+                                       max);
+        StaticImportsTest.mapHelperEven(vec((Map.Entry<Integer,String>) null)
+                                                .filter(t -> t != null)
+                                                .toImSortedMap(Equator.defaultComparator(),
+                                                               Function1.identity()),
+                                        max);
     }
 
     @Test public void testImMap0() {
         int max = 0;
-        Map<Integer,String> b = PersistentTreeMap.of(vecSkipNull((Tuple2<Integer,String>) null));
+        Map<Integer,String> b = vec((Tuple2<Integer,String>) null)
+                .filter(t -> t != null)
+                .toImSortedMap(Equator.defaultComparator(), Function1.identity());
         StaticImportsTest.mapHelper(b, max);
         Map<Integer,String> c = PersistentTreeMap.empty(Equator.defaultComparator());
         assertEquals(b, c);
         assertEquals(c, b);
         assertEquals(b.hashCode(), c.hashCode());
-        StaticImportsTest.mapHelperOdd(PersistentTreeMap.of(vecSkipNull((Tuple2<Integer,String>) null)), max);
-        StaticImportsTest.mapHelperEven(PersistentTreeMap.of(vecSkipNull((Tuple2<Integer,String>) null)), max);
+        StaticImportsTest.mapHelperOdd(vec((Tuple2<Integer,String>) null)
+                                               .filter(t -> t != null)
+                                               .toImSortedMap(Equator.defaultComparator(),
+                                                              Function1.identity()),
+                                       max);
+        StaticImportsTest.mapHelperEven(vec((Tuple2<Integer,String>) null)
+                                                .filter(t -> t != null)
+                                                .toImSortedMap(Equator.defaultComparator(),
+                                                               Function1.identity()),
+                                        max);
     }
 }

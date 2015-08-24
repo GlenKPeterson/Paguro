@@ -204,7 +204,7 @@ public interface UnmodList<E> extends List<E>, UnmodCollection<E>, UnmodSortedIt
         for (int i = fromIndex; i < toIndex; i++) {
             ls.add(this.get(i));
         }
-        return StaticImports.unmod(ls);
+        return StaticImports.unmodList(ls);
     }
 
     /**

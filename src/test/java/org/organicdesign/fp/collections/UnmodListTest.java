@@ -24,19 +24,19 @@ import static org.junit.Assert.assertEquals;
 
 public class UnmodListTest {
     @Test public void indexOf() {
-        assertEquals(-1, StaticImports.unmod(Arrays.asList("Along", "came", "a", "spider")).indexOf("hamster"));
-        assertEquals(0, StaticImports.unmod(Arrays.asList("Along", "came", "a", "spider")).indexOf("Along"));
-        assertEquals(2, StaticImports.unmod(Arrays.asList("Along", "came", "a", "spider")).indexOf("a"));
-        assertEquals(3, StaticImports.unmod(Arrays.asList("Along", "came", "a", "spider")).indexOf("spider"));
+        assertEquals(-1, StaticImports.unmodList(Arrays.asList("Along", "came", "a", "spider")).indexOf("hamster"));
+        assertEquals(0, StaticImports.unmodList(Arrays.asList("Along", "came", "a", "spider")).indexOf("Along"));
+        assertEquals(2, StaticImports.unmodList(Arrays.asList("Along", "came", "a", "spider")).indexOf("a"));
+        assertEquals(3, StaticImports.unmodList(Arrays.asList("Along", "came", "a", "spider")).indexOf("spider"));
 
-        assertEquals(-1, StaticImports.unmod(Arrays.asList("Along", "came", "a", "spider")).lastIndexOf("hamster"));
-        assertEquals(0, StaticImports.unmod(Arrays.asList("Along", "came", "a", "spider")).lastIndexOf("Along"));
-        assertEquals(2, StaticImports.unmod(Arrays.asList("Along", "came", "a", "spider")).lastIndexOf("a"));
-        assertEquals(3, StaticImports.unmod(Arrays.asList("Along", "came", "a", "spider")).lastIndexOf("spider"));
+        assertEquals(-1, StaticImports.unmodList(Arrays.asList("Along", "came", "a", "spider")).lastIndexOf("hamster"));
+        assertEquals(0, StaticImports.unmodList(Arrays.asList("Along", "came", "a", "spider")).lastIndexOf("Along"));
+        assertEquals(2, StaticImports.unmodList(Arrays.asList("Along", "came", "a", "spider")).lastIndexOf("a"));
+        assertEquals(3, StaticImports.unmodList(Arrays.asList("Along", "came", "a", "spider")).lastIndexOf("spider"));
 
-        assertEquals(5, StaticImports.unmod(Arrays.asList("Along", "came", "a", "spider", "and", "a", "poodle")).lastIndexOf("a"));
-        assertEquals(5, StaticImports.unmod(Arrays.asList("Along", "came", "a", "spider", "and", "a")).lastIndexOf("a"));
-        assertEquals(6, StaticImports.unmod(Arrays.asList("Along", "came", "a", "spider", "and", "a", "Along")).lastIndexOf("Along"));
+        assertEquals(5, StaticImports.unmodList(Arrays.asList("Along", "came", "a", "spider", "and", "a", "poodle")).lastIndexOf("a"));
+        assertEquals(5, StaticImports.unmodList(Arrays.asList("Along", "came", "a", "spider", "and", "a")).lastIndexOf("a"));
+        assertEquals(6, StaticImports.unmodList(Arrays.asList("Along", "came", "a", "spider", "and", "a", "Along")).lastIndexOf("Along"));
 
         assertEquals(-1, UnmodList.empty().indexOf("hamster"));
         assertEquals(-1, UnmodList.empty().indexOf(39));
@@ -46,14 +46,14 @@ public class UnmodListTest {
 
     @Test public void subList() {
         assertEquals(Arrays.asList("stones", "will", "break"),
-                     StaticImports.unmod(Arrays.asList("Sticks", "and", "stones", "will", "break", "my", "bones", "but", "tests", "will", "never", "hurt", "me."))
+                     StaticImports.unmodList(Arrays.asList("Sticks", "and", "stones", "will", "break", "my", "bones", "but", "tests", "will", "never", "hurt", "me."))
                              .subList(2,5));
         assertEquals(Arrays.asList("Sticks", "and", "stones", "will", "break", "my", "bones", "but", "tests", "will", "never", "hurt", "me."),
-                     StaticImports.unmod(Arrays.asList("Sticks", "and", "stones", "will", "break", "my", "bones", "but", "tests", "will", "never", "hurt", "me."))
+                     StaticImports.unmodList(Arrays.asList("Sticks", "and", "stones", "will", "break", "my", "bones", "but", "tests", "will", "never", "hurt", "me."))
                              .subList(0,13));
         assertEquals(Collections.emptyList(),
-                     StaticImports.unmod(Arrays.asList("Sticks", "and", "stones", "will", "break", "my", "bones", "but", "tests",
-                                                       "will", "never", "hurt", "me."))
+                     StaticImports.unmodList(Arrays.asList("Sticks", "and", "stones", "will", "break", "my", "bones", "but", "tests",
+                                                           "will", "never", "hurt", "me."))
                              .subList(2, 2));
     }
 }

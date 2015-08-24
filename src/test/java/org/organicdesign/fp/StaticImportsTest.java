@@ -35,7 +35,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import static org.junit.Assert.*;
-import static org.organicdesign.fp.StaticImports.unmod;
+import static org.organicdesign.fp.StaticImports.unmodCollection;
 import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class StaticImportsTest {
@@ -278,7 +278,7 @@ public class StaticImportsTest {
 //    }
 
     @Test public void unListIterator() {
-        UnmodListIterator<Integer> uli = StaticImports.unmod(Arrays.asList(5, 4, 3)).listIterator();
+        UnmodListIterator<Integer> uli = StaticImports.unmodList(Arrays.asList(5, 4, 3)).listIterator();
         assertFalse(uli.hasPrevious());
         assertTrue(uli.hasNext());
 
@@ -323,29 +323,29 @@ public class StaticImportsTest {
     }
 
     @Test public void unListTest() {
-        equalsDistinctHashCode(StaticImports.unmod(Arrays.asList(3, 4, 5)),
-                               StaticImports.unmod(new ArrayList<>(Arrays.asList(3, 4, 5))),
+        equalsDistinctHashCode(StaticImports.unmodList(Arrays.asList(3, 4, 5)),
+                               StaticImports.unmodList(new ArrayList<>(Arrays.asList(3, 4, 5))),
                                new LinkedList<>(Arrays.asList(3, 4, 5)),
                                new ArrayList<>(Arrays.asList(4, 5, 3)));
     }
 
     @Test public void unSetTest() {
-        UnmodSet<Integer> s = StaticImports.unmod(new HashSet<>(Arrays.asList(5, 4, 3)));
+        UnmodSet<Integer> s = StaticImports.unmodSet(new HashSet<>(Arrays.asList(5, 4, 3)));
 
         assertTrue(s.contains(3));
         assertFalse(s.contains(-1));
         assertFalse(s.isEmpty());
-        assertTrue(StaticImports.unmod(Collections.emptySet()).isEmpty());
+        assertTrue(StaticImports.unmodSet(Collections.emptySet()).isEmpty());
 
         equalsDistinctHashCode(s,
-                               StaticImports.unmod(new HashSet<>(Arrays.asList(3, 4, 5))),
+                               StaticImports.unmodSet(new HashSet<>(Arrays.asList(3, 4, 5))),
                                new HashSet<>(Arrays.asList(4, 3, 5)),
-                               StaticImports.unmod(new HashSet<>(Arrays.asList(4, 5, 6)))
+                               StaticImports.unmodSet(new HashSet<>(Arrays.asList(4, 5, 6)))
         );
     }
 
     @Test public void unSetSorted() {
-        UnmodSortedSet<Integer> ts = StaticImports.unmod(new TreeSet<>(Arrays.asList(5, 4, 3)));
+        UnmodSortedSet<Integer> ts = StaticImports.unmodSortedSet(new TreeSet<>(Arrays.asList(5, 4, 3)));
         assertNull(ts.comparator());
         // headSet is exclusive.
         assertTrue(ts.headSet(4).contains(3));
@@ -373,13 +373,13 @@ public class StaticImportsTest {
 
         assertFalse(ts.isEmpty());
 
-        assertEquals(ts.hashCode(), StaticImports.unmod(new TreeSet<>(Arrays.asList(5, 4, 3))).hashCode());
-        assertEquals(ts, StaticImports.unmod(new TreeSet<>(Arrays.asList(5, 4, 3))));
+        assertEquals(ts.hashCode(), StaticImports.unmodSortedSet(new TreeSet<>(Arrays.asList(5, 4, 3))).hashCode());
+        assertEquals(ts, StaticImports.unmodSortedSet(new TreeSet<>(Arrays.asList(5, 4, 3))));
 
-        equalsDistinctHashCode(StaticImports.unmod(new TreeSet<>(Arrays.asList(5, 4, 3))),
-                               StaticImports.unmod(new TreeSet<>(Arrays.asList(3, 4, 5))),
+        equalsDistinctHashCode(StaticImports.unmodSortedSet(new TreeSet<>(Arrays.asList(5, 4, 3))),
+                               StaticImports.unmodSortedSet(new TreeSet<>(Arrays.asList(3, 4, 5))),
                                new TreeSet<>(Arrays.asList(4, 3, 5)),
-                               StaticImports.unmod(new TreeSet<>(Arrays.asList(4, 5, 6)))
+                               StaticImports.unmodSortedSet(new TreeSet<>(Arrays.asList(4, 5, 6)))
         );
     }
 
@@ -389,7 +389,7 @@ public class StaticImportsTest {
         sm.put(5, "five");
         sm.put(4, "four");
         sm.put(3, "three");
-        ts = StaticImports.unmod(sm);
+        ts = StaticImports.unmodMap(sm);
 
         assertEquals(3, ts.size());
         assertFalse(ts.isEmpty());
@@ -414,7 +414,7 @@ public class StaticImportsTest {
             sm2.put(3, "three");
             sm2.put(4, "four");
             sm2.put(5, "five");
-            m2 = StaticImports.unmod(sm2);
+            m2 = StaticImports.unmodMap(sm2);
         }
 
         final UnmodMap<Integer,String> m3;
@@ -423,7 +423,7 @@ public class StaticImportsTest {
             sm3.put(4, "four");
             sm3.put(5, "five");
             sm3.put(6, "six");
-            m3 = StaticImports.unmod(sm3);
+            m3 = StaticImports.unmodMap(sm3);
         }
 
         equalsDistinctHashCode(ts, m2, sm, m3);
@@ -456,7 +456,7 @@ public class StaticImportsTest {
         sm.put(5, "five");
         sm.put(4, "four");
         sm.put(3, "three");
-        ts = StaticImports.unmod(sm);
+        ts = StaticImports.unmodSortedMap(sm);
 
         assertEquals(3, ts.size());
         assertFalse(ts.isEmpty());
@@ -508,7 +508,7 @@ public class StaticImportsTest {
             sm2.put(3, "three");
             sm2.put(4, "four");
             sm2.put(5, "five");
-            m2 = StaticImports.unmod(sm2);
+            m2 = StaticImports.unmodSortedMap(sm2);
         }
 
         final UnmodSortedMap<Integer,String> m3;
@@ -517,7 +517,7 @@ public class StaticImportsTest {
             sm3.put(4, "four");
             sm3.put(5, "five");
             sm3.put(6, "six");
-            m3 = StaticImports.unmod(sm3);
+            m3 = StaticImports.unmodSortedMap(sm3);
         }
 
         equalsDistinctHashCode(ts, m2, sm, m3);
@@ -551,7 +551,7 @@ public class StaticImportsTest {
 //            sm2.put(3, "three");
 //            sm2.put(4, "four");
 //            sm2.put(5, "five");
-//            m4 = unmod(sm2);
+//            m4 = unmodSortedMap(sm2);
 //        }
 //
 //        System.out.println(UnmodIterable.toString("ts", ts));
@@ -565,7 +565,7 @@ public class StaticImportsTest {
 
     @Test public void unCollection() {
         ArrayDeque<Integer> ad = new ArrayDeque<>(Arrays.asList(1, 2, 3));
-        UnmodCollection<Integer> a = unmod(new ArrayDeque<>(Arrays.asList(1, 2, 3)));
+        UnmodCollection<Integer> a = unmodCollection(new ArrayDeque<>(Arrays.asList(1, 2, 3)));
         assertEquals(3, a.size());
         assertTrue(a.contains(2));
         assertFalse(a.isEmpty());

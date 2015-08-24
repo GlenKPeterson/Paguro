@@ -202,7 +202,7 @@ public interface Transformable<T> extends Realizable<T> {
 
 //    @Override
 //    default <U,V> ImMap<U,V> toImMap(Function1<T,Map.Entry<U,V>> f1) {
-//        return unmod(toJavaHashMap(f1));
+//        return unmodMap(toJavaHashMap(f1));
 //    }
     /** {@inheritDoc} */
     @Override
