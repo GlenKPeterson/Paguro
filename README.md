@@ -254,7 +254,10 @@ In short, Clojure doesn't have static types.  Scala has an TMTOWTDI attitude tha
 - As of 2014-03-08, all major areas of functionality were covered by unit tests.
 
 #Change Log
-2015-08-23 version 0.9.12 Removed `Transformable<T> filter(Function1<? super T,Boolean> predicate)`.
+2015-08-24 version 0.9.14 Made Tuple2 and Tuple3 non-final and made constructors public for extra
+and easy inheritance.
+
+2015-08-23 version 0.9.12 Removed `Transformable<T> forEach(Function1<? super T,?> consumer)`.
 See reasons in the "Out of Scope" section below.
 
 2015-08-13 version 0.9.11: Added `RangeOfInt` class as an efficient (in both time and memory)

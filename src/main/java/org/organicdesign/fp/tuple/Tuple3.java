@@ -19,11 +19,13 @@ import java.util.Objects;
 /**
  Holds 3 items of potentially different types.
  */
-public final class Tuple3<T,U,V> {
+public class Tuple3<T,U,V> {
     private final T _1;
     private final U _2;
     private final V _3;
-    private Tuple3(T t, U u, V v) { _1 = t; _2 = u; _3 = v; }
+
+    /** Constructor is public for easier inheritance. */
+    public Tuple3(T t, U u, V v) { _1 = t; _2 = u; _3 = v; }
 
     /** Public static factory method */
     public static <T,U,V> Tuple3<T,U,V> of(T first, U second, V third) { return new Tuple3<>(first, second, third); }

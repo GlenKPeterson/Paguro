@@ -14,18 +14,20 @@
 
 package org.organicdesign.fp.tuple;
 
+import org.organicdesign.fp.collections.UnmodMap;
+
 import java.util.Map.Entry;
 import java.util.Objects;
-
-import org.organicdesign.fp.collections.UnmodMap;
 
 /**
 Holds 2 items of potentially different types, and implements Map.Entry (and UnmodMap.UnEntry (there is no ImMap.ImEntry)).
  */
-public final class Tuple2<T,U> implements Entry<T,U>, UnmodMap.UnEntry<T,U> {
+public class Tuple2<T,U> implements Entry<T,U>, UnmodMap.UnEntry<T,U> {
     private final T _1;
     private final U _2;
-    private Tuple2(T t, U u) { _1 = t; _2 = u; }
+
+    /** Constructor is public for easier inheritance. */
+    public Tuple2(T t, U u) { _1 = t; _2 = u; }
 
     /** Public static factory method */
     public static <T,U> Tuple2<T,U> of(T first, U second) {
