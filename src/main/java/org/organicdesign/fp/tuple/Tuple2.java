@@ -26,8 +26,8 @@ public class Tuple2<T,U> implements Entry<T,U>, UnmodMap.UnEntry<T,U> {
     private final T _1;
     private final U _2;
 
-    /** Constructor is public for easier inheritance. */
-    public Tuple2(T t, U u) { _1 = t; _2 = u; }
+    /** Constructor is protected for easy inheritance. */
+    protected Tuple2(T t, U u) { _1 = t; _2 = u; }
 
     /** Public static factory method */
     public static <T,U> Tuple2<T,U> of(T first, U second) {

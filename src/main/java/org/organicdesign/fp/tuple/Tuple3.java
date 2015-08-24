@@ -24,8 +24,8 @@ public class Tuple3<T,U,V> {
     private final U _2;
     private final V _3;
 
-    /** Constructor is public for easier inheritance. */
-    public Tuple3(T t, U u, V v) { _1 = t; _2 = u; _3 = v; }
+    /** Constructor is protected for easy inheritance. */
+    protected Tuple3(T t, U u, V v) { _1 = t; _2 = u; _3 = v; }
 
     /** Public static factory method */
     public static <T,U,V> Tuple3<T,U,V> of(T first, U second, V third) { return new Tuple3<>(first, second, third); }
