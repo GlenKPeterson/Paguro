@@ -50,10 +50,6 @@ public abstract class Xform<A> implements Transformable<A> {
     @SuppressWarnings("unchecked")
     private A terminate() { return (A) TERMINATE; }
 
-//    interface MutableSourceProvider<T> extends UnmodIterable<T> {
-//        @Override UnmodSortedIterator<T> iterator();
-//    }
-
     /**
      These are mutable operations that the transform carries out when it is run.  This is like the
      compiled "op codes" in contrast to the Xform is like the immutable "source code" of the
@@ -65,7 +61,6 @@ public abstract class Xform<A> implements Transformable<A> {
         Function1<Object,Boolean> filter = null;
         Function1 map = null;
         Function1<Object,Iterable> flatMap = null;
-//        Function1<Object,Boolean> keepGoing = null;
 
         /**
          Drops as many items as the source can handle.
@@ -85,8 +80,6 @@ public abstract class Xform<A> implements Transformable<A> {
          do either.
          */
         public OpStrategy take(long num) { return OpStrategy.CANNOT_HANDLE; }
-
-//        public OpStrategy concatList(Iterator nextSrc) { return OpStrategy.CANNOT_HANDLE; }
 
         /**
          We need to model this as a separate op for when the previous op is CANNOT_HANDLE.  It is
@@ -163,60 +156,6 @@ public abstract class Xform<A> implements Transformable<A> {
             }
         }
     } // end class Operation
-
-    /**
-     Like Iterator, this interface is inherently not thread-safe, so wrap it in something
-     thread-safe before sharing across threads.
-     */
-//    private static class MutableSource<T> extends Operation implements UnmodSortedIterator<T> {
-////        public static final MutableSource<?> EMPTY = new MutableSource<Object>() {
-////            @Override public boolean hasNext() { return false; }
-////            @Override public Object next() { throw new NoSuchElementException("No more elements"); }
-////            @Override public OpStrategy drop(long i) { return OpStrategy.HANDLE_INTERNALLY; }
-////            @Override public int take(long i) { return i; }
-////        };
-////        @SuppressWarnings("unchecked")
-////        static <X> MutableListSource<X> empty() { return (MutableListSource<X>) EMPTY; }
-//
-//        // TODO: Mutable sources should record all drops, appends, (and takes?) then in a separate step right before processing, combine them together as appropriate.
-//        private static final long IGNORE_TAKE = -1;
-//        final Iterator<T> items;
-//        long numToTake = IGNORE_TAKE;
-//
-//        MutableSource(Iterable<T> ls) { items = ls.iterator(); }
-//
-//        /** {@inheritDoc} */
-//        @Override public boolean hasNext() {
-//            if (numToTake == 0) { return false; }
-//            return items.hasNext();
-//        }
-//
-//        /** {@inheritDoc} */
-//        @Override public T next() {
-//            if (numToTake > IGNORE_TAKE) {
-//                if (numToTake == 0) {
-//                    throw new NoSuchElementException("Called next() without calling hasNext." +
-//                                                     " Completed specified take - no more" +
-//                                                     " elements left.");
-//                }
-//                numToTake = numToTake - 1;
-//            }
-//            return items.next();
-//        }
-//
-//        /** {@inheritDoc} */
-//        @Override public OpStrategy take(long take) {
-//            if (take < 0) {
-//                throw new IllegalArgumentException("Can't take less than zero items.");
-//            }
-//            if (numToTake == IGNORE_TAKE) {
-//                numToTake = take;
-//            } else if (take < numToTake) {
-//                numToTake = take;
-//            }
-//            return OpStrategy.HANDLE_INTERNALLY;
-//        }
-//    } // end class MutableSource
 
     /**
      A RunList is a list of Operations "complied" from an Xform.  It contains an Iterable data
@@ -576,17 +515,22 @@ public abstract class Xform<A> implements Transformable<A> {
         return _foldLeft(runList, runList.opArray(), 0, ident, reducer);
     }
 
-    // TODO: Test.
+    // TODO: Is this worth keeping over takeWhile(f).foldLeft(...)?
+    /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     @Override
-    public <B> B foldLeft(B ident, Function2<B,? super A,B> f,
+    public <B> B foldLeft(B ident, Function2<B,? super A,B> f2,
                           Function1<? super B,Boolean> function1) {
-        if (f == null) {
-            throw new IllegalArgumentException("Can't foldLeft with a null function.");
+        if (f2 == null) {
+            throw new IllegalArgumentException("Can't foldLeft with a null reduction function.");
+        }
+
+        if (function1 == null) {
+            throw new IllegalArgumentException("Can't foldLeft with a null terminateWhen function");
         }
         // I'm coding this as a map operation that either returns the source, or a TERMINATE
         // sentinel value.
-        return takeWhile((Function1<? super A,Boolean>) function1).foldLeft(ident, f);
+        return takeWhile((Function1<? super A,Boolean>) function1).foldLeft(ident, f2);
     }
 
     @Override public Xform<A> filter(Function1<? super A,Boolean> f) {
