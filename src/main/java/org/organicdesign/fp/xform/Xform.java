@@ -383,14 +383,6 @@ public abstract class Xform<A> implements Transformable<A> {
         }
     }
 
-    // This is just a sample usage to be sure it compiles.
-//    Integer total = from(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
-//            .drop(1)
-//            .filter(i -> i < 7)
-//            .map(String::valueOf)
-//            .flatMap(s -> Arrays.asList(s, s, s))
-//            .foldLeft(0, (count, s) -> count + 1);
-
     static class SourceProviderIterableDesc<T> extends Xform<T> {
         private final Iterable<? extends T> list;
         SourceProviderIterableDesc(Iterable<? extends T> l) { super(null); list = l; }
