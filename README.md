@@ -254,6 +254,9 @@ In short, Clojure doesn't have static types.  Scala has an TMTOWTDI attitude tha
 - As of 2014-03-08, all major areas of functionality were covered by unit tests.
 
 #Change Log
+2015-08-30 version 0.10.1 Added Xform and moved Transformable and Realizable into the new xform
+package.  Xform should replace Sequence and View altogether.
+
 2015-08-25 version 0.10.0 Renamed most methods in StaticImports.  This is why I've been calling this
 *alpha*-quality code.  The four methods map(), set(), tup(), and vec() comprise a mini
 data-definition language.  It's wordier than JSON, but still brief for Java and fairly brief
