@@ -15,7 +15,7 @@
 package org.organicdesign.fp.permanent;
 
 import org.organicdesign.fp.Option;
-import org.organicdesign.fp.Transformable;
+import org.organicdesign.fp.xform.Transformable;
 import org.organicdesign.fp.collections.UnmodSortedIterable;
 import org.organicdesign.fp.collections.UnmodSortedIterator;
 import org.organicdesign.fp.function.Function1;

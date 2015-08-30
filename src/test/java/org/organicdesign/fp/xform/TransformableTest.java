@@ -1,10 +1,15 @@
-package org.organicdesign.fp;
+package org.organicdesign.fp.xform;
 
 import org.junit.Test;
 import org.organicdesign.fp.collections.UnmodSortedIterable;
 import org.organicdesign.fp.permanent.Sequence;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

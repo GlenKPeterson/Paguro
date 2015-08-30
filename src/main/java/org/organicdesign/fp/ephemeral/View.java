@@ -15,7 +15,7 @@
 package org.organicdesign.fp.ephemeral;
 
 import org.organicdesign.fp.Option;
-import org.organicdesign.fp.Transformable;
+import org.organicdesign.fp.xform.Transformable;
 import org.organicdesign.fp.collections.UnmodIterator;
 import org.organicdesign.fp.function.Function1;
 import org.organicdesign.fp.function.Function2;
