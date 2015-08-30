@@ -295,9 +295,9 @@ public abstract class Xform<A> implements Transformable<A> {
 
     /** Describes an append() operation, but does not perform it. */
     private static class AppendIterDesc<T> extends Xform<T> {
-        final SourceProviderIterableDesc<T> src;
+        final Xform<T> src;
 
-        AppendIterDesc(Xform<T> prev, SourceProviderIterableDesc<T> s) { super(prev); src = s; }
+        AppendIterDesc(Xform<T> prev, Xform<T> s) { super(prev); src = s; }
 
         @SuppressWarnings("unchecked")
         @Override RunList toRunList() {
@@ -467,7 +467,7 @@ public abstract class Xform<A> implements Transformable<A> {
     }
 
     /** Static factory methods */
-    public static <T> Xform<T> of(Iterable<T> list) {
+    public static <T> Xform<T> of(Iterable<? extends T> list) {
         return new SourceProviderIterableDesc<>(list);
     }
 
@@ -529,16 +529,35 @@ public abstract class Xform<A> implements Transformable<A> {
     // These will come from Transformable, but (will be) overridden to have a different return type.
 
     public Xform<A> concatList(List<? extends A> list) {
-        return concatIterable(list);
+        if ( (list == null) || (list.size() < 1) ) { return this; }
+        return concat(list);
     }
 
-    public Xform<A> concatIterable(Iterable<? extends A> list) {
+    public Xform<A> concat(Iterable<? extends A> list) {
+        if (list == null) { throw new IllegalArgumentException("Can't concat a null iterable"); }
         return new AppendIterDesc<>(this, new SourceProviderIterableDesc<>(list));
     }
 
     @SafeVarargs
     public final Xform<A> concatArray(A... list) {
-        return concatIterable(Arrays.asList(list));
+        if ( (list == null) || (list.length < 1) ) { return this; }
+        return concat(Arrays.asList(list));
+    }
+
+    public Xform<A> precatList(List<? extends A> list) {
+        if ( (list == null) || (list.size() < 1) ) { return this; }
+        return precat(list);
+    }
+
+    public Xform<A> precat(Iterable<? extends A> list) {
+        if (list == null) { throw new IllegalArgumentException("Can't precat a null iterable"); }
+        return new AppendIterDesc<>(of(list), this);
+    }
+
+    @SafeVarargs
+    public final Xform<A> precatArray(A... list) {
+        if ( (list == null) || (list.length < 1) ) { return this; }
+        return precat(Arrays.asList(list));
     }
 
     /** The number of items to drop from the beginning of the output. */

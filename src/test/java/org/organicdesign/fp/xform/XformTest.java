@@ -118,7 +118,7 @@ public class XformTest extends TestCase {
                            return accum;
                        }));
         assertEquals(Arrays.asList(1, 2, 3, 4, 5, 6),
-                     td.concatIterable(Xform.ofArray(4, 5, 6).toImSortedSet((a, b) -> a - b))
+                     td.concat(Xform.ofArray(4, 5, 6).toImSortedSet((a, b) -> a - b))
                        .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                            accum.add(i);
             return accum;
@@ -253,23 +253,33 @@ public class XformTest extends TestCase {
         longerCombinations(Xform.ofArray(src));
     }
 
-//    @Test public void prepend() {
-//        assertArrayEquals(new Integer[] { 5, 6, 7, 8, 9 },
-//                          Xform.ofArray(5, 6, 7, 8, 9)
-//                                  .precat(null).toArray());
-//
-//        assertArrayEquals(new Integer[]{5, 6, 7, 8, 9},
-//                          Xform.ofArray(5, 6, 7, 8, 9)
-//                                  .precat(Xform.emptyXform()).toArray());
-//
-//        assertArrayEquals(new Integer[]{4, 5, 6, 7, 8, 9},
-//                          Xform.ofArray(5, 6, 7, 8, 9)
-//                                  .precat(Xform.ofArray(4)).toArray());
-//
-//        assertArrayEquals(new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9},
-//                          Xform.ofArray(5, 6, 7, 8, 9)
-//                                  .precat(Xform.ofArray(1, 2, 3, 4)).toArray());
-//    }
+    @Test (expected = IllegalArgumentException.class)
+    public void concatEx() {
+        Xform.ofArray().concat(null);
+    }
+    @Test (expected = IllegalArgumentException.class)
+    public void precatEx() {
+        Xform.ofArray().precat(null);
+    }
+
+    @Test public void doubleNull() {
+        assertArrayEquals(new Integer[0],
+                          Xform.ofArray().concatArray().toArray());
+        assertArrayEquals(new Integer[0],
+                          Xform.ofArray().precatArray().toArray());
+    }
+
+    @Test public void precat() {
+        assertArrayEquals(new Integer[] { 5, 6, 7, 8, 9 },
+                          Xform.ofArray(5, 6, 7, 8, 9)
+                                  .precatArray().toArray());
+        assertArrayEquals(new Integer[]{4, 5, 6, 7, 8, 9},
+                          Xform.ofArray(5, 6, 7, 8, 9)
+                                  .precat(Xform.ofArray(4)).toArray());
+        assertArrayEquals(new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9},
+                          Xform.ofArray(5, 6, 7, 8, 9)
+                                  .precat(Xform.ofArray(1, 2, 3, 4)).toArray());
+    }
 
     @Test
     public void concat() {
@@ -283,12 +293,15 @@ public class XformTest extends TestCase {
 
         assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5 },
                           Xform.ofArray(1, 2, 3, 4)
-                                  .concatIterable(Xform.ofArray(5)).toArray());
+                                  .concat(Xform.ofArray(5)).toArray());
 
         assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
                           Xform.ofArray(1, 2, 3, 4)
-                                  .concatIterable(Xform.ofArray(5, 6, 7, 8, 9)).toArray());
+                                  .concat(Xform.ofArray(5, 6, 7, 8, 9)).toArray());
     }
+
+    // TODO: Continue using unit tests from Sequence (those from below are from View and are likely not as good).
+
 
     @Test
     public void singleDrops() {
