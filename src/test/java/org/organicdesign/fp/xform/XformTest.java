@@ -21,6 +21,7 @@ import org.junit.runners.JUnit4;
 import org.organicdesign.fp.Mutable;
 import org.organicdesign.fp.collections.PersistentVector;
 import org.organicdesign.fp.collections.UnmodIterator;
+import org.organicdesign.fp.function.Function1;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -682,8 +683,27 @@ public class XformTest extends TestCase {
 //        assertTrue(Xform.EMPTY_SEQUENCE.tail().equals(Xform.EMPTY_SEQUENCE));
 //    }
 
+    @Test public void foldLeft() {
+        Integer[] ints = new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+        assertEquals(Integer.valueOf(45),
+                     Xform.ofArray(ints).foldLeft(0, (accum, i) -> accum + i));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void foldLeftEx() {
+        assertEquals(Integer.valueOf(45),
+                     Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                          .foldLeft(0, null));
+    }
+
     @Test public void foldLeftTerm() {
         Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+
+        assertEquals(Integer.valueOf(45),
+                     Xform.ofArray(ints)
+                          .foldLeft(0, (accum, i) -> accum + i, Function1.reject()));
+
         assertArrayEquals(new Integer[]{2, 3, 4},
                           Xform.ofArray(ints)
                                   .foldLeft(new ArrayList<>(),

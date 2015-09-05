@@ -508,14 +508,6 @@ public abstract class Xform<A> implements Transformable<A> {
 
     // Do we need a dropWhile???
 
-    /** Provides a way to collect the results of the transformation. */
-    @Override public <B> B foldLeft(B ident, Function2<B,? super A,B> reducer) {
-
-        // Construct an optimized array of OpRuns (mutable operations for this run)
-        RunList runList = toRunList();
-        return _foldLeft(runList, runList.opArray(), 0, ident, reducer, null);
-    }
-
     // TODO: Is this worth keeping over takeWhile(f).foldLeft(...)?
     /** {@inheritDoc} */
     @Override
@@ -525,12 +517,15 @@ public abstract class Xform<A> implements Transformable<A> {
             throw new IllegalArgumentException("Can't foldLeft with a null reduction function.");
         }
 
-        if (terminateWhen == null) {
-            throw new IllegalArgumentException("Can't foldLeft with a null terminateWhen function");
-        }
         // Construct an optimized array of OpRuns (mutable operations for this run)
         RunList runList = toRunList();
-        return _foldLeft(runList, runList.opArray(), 0, ident, reducer, terminateWhen);
+        return _foldLeft(runList, runList.opArray(), 0, ident, reducer,
+                         (terminateWhen == Function1.reject()) ? null : terminateWhen);
+    }
+
+    /** {@inheritDoc} */
+    @Override public <B> B foldLeft(B ident, Function2<B,? super A,B> reducer) {
+        return foldLeft(ident, reducer, null);
     }
 
     @Override public Xform<A> filter(Function1<? super A,Boolean> f) {
