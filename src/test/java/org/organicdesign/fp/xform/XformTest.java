@@ -283,6 +283,9 @@ public class XformTest extends TestCase {
         assertArrayEquals(new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9},
                           Xform.ofArray(5, 6, 7, 8, 9)
                                   .precat(Xform.ofArray(1, 2, 3, 4)).toArray());
+        assertArrayEquals(new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9},
+                          Xform.ofArray(5, 6, 7, 8, 9)
+                                  .precatArray(1, 2, 3, 4).toArray());
     }
 
     @Test
