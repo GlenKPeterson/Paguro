@@ -659,7 +659,4 @@ public class XformTest extends TestCase {
                                   .flatMap(i -> Xform.ofArray(i, i + 1))
                                   .toArray());
     }
-     // TODO: Continue using unit tests from Sequence (those from below are from View and are likely not as good).
-
-
 }
