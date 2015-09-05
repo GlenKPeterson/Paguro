@@ -208,9 +208,7 @@ public abstract class Xform<A> implements Transformable<A> {
                                                   res.add(item);
                                                   return res;
                                               }
-                                          }
-
-            );
+                                          }, null);
             //noinspection unchecked
             return new Iterator() {
                 Iterator innerIter = prevSrc.iterator();
@@ -422,7 +420,8 @@ public abstract class Xform<A> implements Transformable<A> {
     // is 2.6 times faster than wrapping items type-safely in Options and 10 to 100 times faster
     // than lazily evaluated and cached linked-list, Sequence model.
     @SuppressWarnings("unchecked")
-    private static <H> H _foldLeft(Iterable source, Operation[] ops, int opIdx, H ident, Function2 reducer) {
+    private static <H> H _foldLeft(Iterable source, Operation[] ops, int opIdx, H ident,
+                                   Function2 reducer, Function1 termWhen) {
         Object ret = ident;
 
         // This is a label - the first one I have used in Java in years, or maybe ever.
@@ -444,7 +443,11 @@ public abstract class Xform<A> implements Transformable<A> {
                         return (H) ret;
                     }
                 } else if (op.flatMap != null) {
-                    ret = _foldLeft(op.flatMap.apply(o), ops, j + 1, (H) ret, reducer);
+                    ret = _foldLeft(op.flatMap.apply(o), ops, j + 1, (H) ret, reducer, null);
+                    if ( (termWhen != null) &&
+                         Boolean.TRUE.equals(termWhen.apply(ret)) ) {
+                        return (H) ret;
+                    }
                     // stop processing this source item and go to the next one.
                     continue sourceLoop;
                 }
@@ -454,6 +457,10 @@ public abstract class Xform<A> implements Transformable<A> {
             }
             // Here, the item made it through all the operations.  Combine it with the result.
             ret = reducer.apply(ret, o);
+            if ( (termWhen != null) &&
+                 Boolean.TRUE.equals(termWhen.apply(ret)) ) {
+                return (H) ret;
+            }
         }
         return (H) ret;
     } // end _foldLeft();
@@ -506,12 +513,11 @@ public abstract class Xform<A> implements Transformable<A> {
 
         // Construct an optimized array of OpRuns (mutable operations for this run)
         RunList runList = toRunList();
-        return _foldLeft(runList, runList.opArray(), 0, ident, reducer);
+        return _foldLeft(runList, runList.opArray(), 0, ident, reducer, null);
     }
 
     // TODO: Is this worth keeping over takeWhile(f).foldLeft(...)?
     /** {@inheritDoc} */
-    @SuppressWarnings("unchecked")
     @Override
     public <B> B foldLeft(B ident, Function2<B,? super A,B> reducer,
                           Function1<? super B,Boolean> terminateWhen) {
@@ -522,9 +528,9 @@ public abstract class Xform<A> implements Transformable<A> {
         if (terminateWhen == null) {
             throw new IllegalArgumentException("Can't foldLeft with a null terminateWhen function");
         }
-        // I'm coding this as a map operation that either returns the source, or a TERMINATE
-        // sentinel value.
-        return takeWhile((Function1<? super A,Boolean>) terminateWhen).foldLeft(ident, reducer);
+        // Construct an optimized array of OpRuns (mutable operations for this run)
+        RunList runList = toRunList();
+        return _foldLeft(runList, runList.opArray(), 0, ident, reducer, terminateWhen);
     }
 
     @Override public Xform<A> filter(Function1<? super A,Boolean> f) {

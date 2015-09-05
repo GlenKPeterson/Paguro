@@ -682,26 +682,25 @@ public class XformTest extends TestCase {
 //        assertTrue(Xform.EMPTY_SEQUENCE.tail().equals(Xform.EMPTY_SEQUENCE));
 //    }
 
-    // TODO: Enable!!!
-//    @Test public void foldLeftTerm() {
-//        Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-//        assertArrayEquals(new Integer[]{2, 3, 4},
-//                          Xform.ofArray(ints)
-//                                  .foldLeft(new ArrayList<>(),
-//                                            (accum, i) -> {
-//                                                accum.add(i + 1);
-//                                                return accum;
-//                                            },
-//                                            (accum) -> accum.size() == 3).toArray());
-//        assertArrayEquals(new Integer[]{2, 3, 4, 5, 6, 7, 8, 9, 10},
-//                          Xform.ofArray(ints)
-//                                  .foldLeft(new ArrayList<>(),
-//                                            (accum, i) -> {
-//                                                accum.add(i + 1);
-//                                                return accum;
-//                                            },
-//                                            (accum) -> accum.size() == 20).toArray());
-//    }
+    @Test public void foldLeftTerm() {
+        Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        assertArrayEquals(new Integer[]{2, 3, 4},
+                          Xform.ofArray(ints)
+                                  .foldLeft(new ArrayList<>(),
+                                            (accum, i) -> {
+                                                accum.add(i + 1);
+                                                return accum;
+                                            },
+                                            (accum) -> accum.size() == 3).toArray());
+        assertArrayEquals(new Integer[]{2, 3, 4, 5, 6, 7, 8, 9, 10},
+                          Xform.ofArray(ints)
+                                  .foldLeft(new ArrayList<>(),
+                                            (accum, i) -> {
+                                                accum.add(i + 1);
+                                                return accum;
+                                            },
+                                            (accum) -> accum.size() == 20).toArray());
+    }
 
     @Test public void toIterator() {
         Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
