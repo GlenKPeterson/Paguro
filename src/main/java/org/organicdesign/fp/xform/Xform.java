@@ -158,7 +158,7 @@ public abstract class Xform<A> implements Transformable<A> {
     } // end class Operation
 
     /**
-     A RunList is a list of Operations "complied" from an Xform.  It contains an Iterable data
+     A RunList is a list of Operations "compiled" from an Xform.  It contains an Iterable data
      source (or some day and array source or List source) and a List of Operation op-codes.
 
      A RunList is also a SourceProvider, since the output of one transform can be the input to
