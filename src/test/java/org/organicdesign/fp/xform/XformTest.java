@@ -291,13 +291,13 @@ public class XformTest extends TestCase {
 //                          Xform.ofArray(1, 2, 3, 4)
 //                                  .concat(Xform.emptyXform()).toArray());
 
-        assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5 },
+        assertArrayEquals(new Integer[]{1, 2, 3, 4, 5},
                           Xform.ofArray(1, 2, 3, 4)
-                                  .concat(Xform.ofArray(5)).toArray());
+                               .concat(Xform.ofArray(5)).toArray());
 
-        assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
+        assertArrayEquals(new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9},
                           Xform.ofArray(1, 2, 3, 4)
-                                  .concat(Xform.ofArray(5, 6, 7, 8, 9)).toArray());
+                               .concat(Xform.ofArray(5, 6, 7, 8, 9)).toArray());
     }
 
     @Test
@@ -337,11 +337,40 @@ public class XformTest extends TestCase {
                                   .toArray());
     }
 
-    // TODO: Continue using unit tests from Sequence (those from below are from View and are likely not as good).
+    @Test public void emptiness() {
+        Xform<Integer> seq = Xform.ofArray();
+        assertArrayEquals(new Integer[0], seq.drop(0).toArray());
+        assertArrayEquals(new Integer[0], seq.drop(1).toArray());
+        assertArrayEquals(new Integer[0], seq.drop(2).toArray());
+    }
 
+    @Test public void singleElement() {
+        Xform<Integer> seq = Xform.ofArray(1);
+        assertArrayEquals(new Integer[] {1}, seq.drop(0).toArray());
+        assertArrayEquals(new Integer[0], seq.drop(1).toArray());
+        assertArrayEquals(new Integer[0], seq.drop(2).toArray());
+    }
+
+    @Test public void twoElement() {
+        Xform<Integer> seq = Xform.ofArray(1, 2);
+        assertArrayEquals(new Integer[] {1,2}, seq.drop(0).toArray());
+        assertArrayEquals(new Integer[] {2}, seq.drop(1).toArray());
+        assertArrayEquals(new Integer[0], seq.drop(2).toArray());
+    }
 
     @Test
     public void singleDrops() {
+        Integer[] ints = new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9};
+        Xform<Integer> xform = Xform.ofArray(ints);
+        assertArrayEquals(ints, xform.drop(0).toArray());
+        assertArrayEquals(new Integer[]{2, 3, 4, 5, 6, 7, 8, 9}, xform.drop(1).toArray());
+        assertArrayEquals(new Integer[]{3, 4, 5, 6, 7, 8, 9}, xform.drop(2).toArray());
+        assertArrayEquals(new Integer[]{4, 5, 6, 7, 8, 9}, xform.drop(3).toArray());
+        assertArrayEquals(new Integer[]{9}, xform.drop(8).toArray());
+        assertArrayEquals(new Integer[0], Xform.ofArray().toArray());
+        assertArrayEquals(new Integer[0], xform.drop(9).toArray());
+        assertArrayEquals(new Integer[0], xform.drop(10).toArray());
+        assertArrayEquals(new Integer[0], xform.drop(10000).toArray());
         assertArrayEquals(new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9},
                           Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).drop(0).toArray());
         assertArrayEquals(new Integer[]{2, 3, 4, 5, 6, 7, 8, 9},
@@ -360,17 +389,39 @@ public class XformTest extends TestCase {
                           Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).drop(10000).toArray());
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void exception1() {
-        Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).drop(-1);
-    }
-    @Test(expected = IllegalArgumentException.class)
-    public void exception2() {
-        Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).drop(-99);
-    }
-
     @Test
     public void multiDrops() {
+        Integer[] ints = new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9};
+        Xform<Integer> seq = Xform.ofArray(ints);
+        assertArrayEquals(new Integer[] {3,4,5,6,7,8,9},
+                seq.drop(1).drop(1).toArray());
+        assertArrayEquals(new Integer[] {4,5,6,7,8,9},
+                seq.drop(1).drop(1).drop(1).toArray());
+        assertArrayEquals(new Integer[] {9},
+                seq
+                                  .drop(1).drop(1).drop(1).drop(1).drop(1)
+                                  .drop(1).drop(1).drop(1).toArray());
+        assertArrayEquals(new Integer[] {},
+                seq
+                                  .drop(1).drop(1).drop(1).drop(1).drop(1)
+                                  .drop(1).drop(1).drop(1).drop(1).toArray());
+        assertArrayEquals(new Integer[] {},
+                seq
+                                  .drop(1).drop(1).drop(1).drop(1).drop(1)
+                                  .drop(1).drop(1).drop(1).drop(1).drop(1).toArray());
+        assertArrayEquals(new Integer[] {},
+                seq
+                                  .drop(1).drop(1).drop(1).drop(1).drop(1)
+                                  .drop(1).drop(1).drop(1).drop(1).drop(1)
+                                  .drop(1).drop(1).drop(1).drop(1).drop(1).toArray());
+
+        assertArrayEquals(new Integer[] {7,8,9},
+                seq
+                                  .drop(0).drop(1).drop(2).drop(3).toArray());
+        assertArrayEquals(new Integer[] {7,8,9},
+                seq
+                                  .drop(3).drop(2).drop(1).drop(0).toArray());
+
         assertArrayEquals(new Integer[] {3,4,5,6,7,8,9},
                           Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).drop(1).drop(1).toArray());
         assertArrayEquals(new Integer[] {4,5,6,7,8,9},
@@ -400,6 +451,17 @@ public class XformTest extends TestCase {
                           Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
                                .drop(3).drop(2).drop(1).drop(0).toArray());
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void exception1() {
+        Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).drop(-1);
+    }
+    @Test(expected = IllegalArgumentException.class)
+    public void exception2() {
+        Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).drop(-99);
+    }
+
+    // TODO: Continue using unit tests from Sequence (those from below are from View and are likely not as good).
 
     @Test(expected = IllegalArgumentException.class)
     public void nullException() {
