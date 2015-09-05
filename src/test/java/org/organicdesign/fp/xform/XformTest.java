@@ -300,6 +300,43 @@ public class XformTest extends TestCase {
                                   .concat(Xform.ofArray(5, 6, 7, 8, 9)).toArray());
     }
 
+    @Test
+    public void chainedPrependAppend() {
+        assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
+                          Xform.ofArray(5)                     //         5
+                                  .precat(Xform.ofArray(4))   //       4,5
+                                  .concat(Xform.ofArray(6))    //       4,5,6
+                                  .precat(Xform.ofArray(2, 3)) //   2,3,4,5,6
+                                  .concat(Xform.ofArray(7, 8))  //   2,3,4,5,6,7,8
+                                  .precat(Xform.ofArray(1))   // 1,2,3,4,5,6,7,8
+                                  .concat(Xform.ofArray(9))    // 1,2,3,4,5,6,7,8,9
+                                  .toArray());
+
+        assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
+                          Xform.ofArray(5)
+                                  .precat(Xform.ofArray()).precat(Xform.ofArray())
+                                  .concat(Xform.ofArray()).concat(Xform.ofArray())
+                                  .precat(Xform.ofArray(4))
+                                  .precat(Xform.ofArray()).precat(Xform.ofArray())
+                                  .concat(Xform.ofArray()).concat(Xform.ofArray())
+                                  .concat(Xform.ofArray(6))
+                                  .precat(Xform.ofArray()).precat(Xform.ofArray())
+                                  .concat(Xform.ofArray()).concat(Xform.ofArray())
+                                  .precat(Xform.ofArray(2, 3))
+                                  .precat(Xform.ofArray()).precat(Xform.ofArray())
+                                  .concat(Xform.ofArray()).concat(Xform.ofArray())
+                                  .concat(Xform.ofArray(7, 8))
+                                  .precat(Xform.ofArray()).precat(Xform.ofArray())
+                                  .concat(Xform.ofArray()).concat(Xform.ofArray())
+                                  .precat(Xform.ofArray(1))
+                                  .precat(Xform.ofArray()).precat(Xform.ofArray())
+                                  .concat(Xform.ofArray()).concat(Xform.ofArray())
+                                  .concat(Xform.ofArray(9))
+                                  .precat(Xform.ofArray()).precat(Xform.ofArray())
+                                  .concat(Xform.ofArray()).concat(Xform.ofArray())
+                                  .toArray());
+    }
+
     // TODO: Continue using unit tests from Sequence (those from below are from View and are likely not as good).
 
 
