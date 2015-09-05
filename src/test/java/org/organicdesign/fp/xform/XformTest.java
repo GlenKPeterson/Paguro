@@ -18,7 +18,9 @@ import junit.framework.TestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.organicdesign.fp.Mutable;
 import org.organicdesign.fp.collections.PersistentVector;
+import org.organicdesign.fp.collections.UnmodIterator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -461,8 +463,6 @@ public class XformTest extends TestCase {
         Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).drop(-99);
     }
 
-    // TODO: Continue using unit tests from Sequence (those from below are from View and are likely not as good).
-
     @Test(expected = IllegalArgumentException.class)
     public void nullException() {
         assertArrayEquals(new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9},
@@ -531,17 +531,16 @@ public class XformTest extends TestCase {
 
     }
 
-    @Test
-    public void singleFlatMap() {
-//        assertEquals(Xform.EMPTY_VIEW,
-//                     Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).flatMap(null));
-//
-//        assertEquals(Xform.EMPTY_VIEW,
-//                     Xform.EMPTY_VIEW.flatMap(null));
+    @Test public void singleFlatMap() {
+        assertEquals(0, Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                             .flatMap((i) -> () -> UnmodIterator.empty())
+                             .toImList()
+                             .size());
 
-//        assertArrayEquals(new Integer[] {},
-//                          Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
-//                              .flatMap(null).toArray());
+        assertEquals(0, Xform.ofArray()
+                             .flatMap((i) -> () -> UnmodIterator.empty())
+                             .toImList()
+                             .size());
 
         assertArrayEquals(new Integer[] { 1,2,3, 2,4,6, 3,6,9, 4,8,12, 5,10,15, 6,12,18,
                                           7,14,21, 8,16,24, 9,18,27},
@@ -552,21 +551,107 @@ public class XformTest extends TestCase {
                           Xform.ofArray(1, 2, 3)
                               .flatMap(i -> Xform.ofArray(String.valueOf(i),
                                                          String.valueOf(i + 1))).toArray());
+    }
+
+    @Test public void flatEmpty() {
+        assertEquals(0, Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                             .flatMap((a) -> () -> UnmodIterator.empty())
+                             .toImList()
+                             .size());
+
+        assertEquals(0, Xform.ofArray()
+                             .flatMap((a) -> Xform.ofArray())
+                             .toImList()
+                             .size());
+
+        // This tests that I didn't just look ahead 2 or 3 times.  That the look-ahead is sufficient.
+        Mutable.Ref<Integer> count = Mutable.Ref.of(0);
+        assertArrayEquals(new String[]{"a9", "b9"},
+                          Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                                  .flatMap((a) -> {
+                                      count.set(count.value() + 1);
+                                      return (count.value() > 8)
+                                             ? Xform.ofArray("a" + a, "b" + a)
+                                             : Xform.ofArray();
+                                  }).toArray());
+
+        count.set(0);
+        assertArrayEquals(new String[]{"c8", "d8", "c9", "d9"},
+                          Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                                  .flatMap((a) -> {
+                                      count.set(count.value() + 1);
+                                      return (count.value() > 7)
+                                             ? Xform.ofArray("c" + a, "d" + a)
+                                             : Xform.ofArray();
+                                  })
+//                                  .forEach((item) -> {
+//                              System.out.println("Item " + item);
+//                              return null;
+//                          })
+                                  .toArray());
+
+        count.set(0);
+        assertArrayEquals(new String[]{"e1", "f1", "e2", "f2"},
+                          Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                                  .flatMap((a) -> {
+                                      count.set(count.value() + 1);
+                                      return (count.value() < 3)
+                                             ? Xform.ofArray("e" + a, "f" + a)
+                                             : Xform.ofArray();
+                                  })
+//                                  .forEach((item) -> {
+//                              System.out.println("count: " + count.value() + " Item " + item);
+//                              return null;
+//                          })
+                                  .toArray());
+
+        Mutable.Ref<Xform<Integer>> shrinkSeq = Mutable.Ref.of(Xform.ofArray(1, 2, 3));
+        assertArrayEquals(new Integer[]{2, 3, 3},
+                          Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                                  .flatMap((a) -> {
+                                      shrinkSeq.set(shrinkSeq.value().drop(1));
+//                                      System.out.print("seq val: " + shrinkSeq.value());
+                                      return shrinkSeq.value();
+                                  })
+                                  .toArray());
+
+        // Now start by returning an ofArray, then a seq of length 1, then length 2, etc.
+        // The first ofArray should not end the processing.
+        Mutable.Ref<Xform<Integer>> growSeq = Mutable.Ref.of(Xform.ofArray());
+        Mutable.Ref<Integer> incInt = Mutable.Ref.of(0);
+        assertArrayEquals(new Integer[]{1, 1,2},
+                          Xform.ofArray(1, 2, 3)
+                                  .flatMap((a) -> {
+                                      if (incInt.value() > 0) {
+                                          growSeq.set(growSeq.value().concat(Xform.ofArray(incInt.value())));
+                                      }
+                                      incInt.set(incInt.value() + 1);
+                                      return growSeq.value();
+                                  })
+                                  .toArray());
 
     }
 
-    @Test
-    public void flatMapChain() {
-//        assertEquals(Xform.EMPTY_VIEW,
-//                     Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
-//                         .flatMap(null).flatMap(null).flatMap(null));
-//
-//        assertEquals(Xform.EMPTY_VIEW,
-//                     Xform.EMPTY_VIEW.flatMap(null).flatMap(null).flatMap(null));
+    @Test public void flatMapChain() {
+        assertEquals(0, Xform.of(vec(1, 2, 3, 4, 5, 6, 7, 8, 9))
+                             .flatMap((i) -> () -> UnmodIterator.empty())
+                             .flatMap((i) -> () -> UnmodIterator.empty())
+                             .flatMap((i) -> () -> UnmodIterator.empty())
+                             .toImList()
+                             .size());
 
-//        assertArrayEquals(new Integer[] {},
-//                          Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
-//                                  .flatMap(null).flatMap(null).flatMap(null).toArray());
+        assertEquals(0, Xform.ofArray()
+                             .flatMap((i) -> Xform.ofArray(i))
+                             .flatMap((i) -> Xform.ofArray(i))
+                             .flatMap((i) -> Xform.ofArray(i))
+                             .toImList()
+                             .size());
+
+        assertArrayEquals(new Integer[] {},
+                          Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                               .flatMap((i) -> () -> UnmodIterator.empty())
+                               .flatMap((i) -> () -> UnmodIterator.empty())
+                               .flatMap((i) -> () -> UnmodIterator.empty()).toArray());
 
         assertArrayEquals(new Integer[] { 1,2, 2,3, 3,4, 10,11, 20,21, 30,31},
                           Xform.ofArray(1, 10)
@@ -574,5 +659,7 @@ public class XformTest extends TestCase {
                                   .flatMap(i -> Xform.ofArray(i, i + 1))
                                   .toArray());
     }
+     // TODO: Continue using unit tests from Sequence (those from below are from View and are likely not as good).
+
 
 }

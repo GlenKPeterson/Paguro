@@ -397,6 +397,7 @@ public abstract class Xform<A> implements Transformable<A> {
         return new SourceProviderIterableDesc<>(Arrays.asList(list));
     }
 
+    // TODO: Rename to ofIter() to make people think instead of using ofArray().
     /** Static factory methods */
     public static <T> Xform<T> of(Iterable<? extends T> list) {
         return new SourceProviderIterableDesc<>(list);
