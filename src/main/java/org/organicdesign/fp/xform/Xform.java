@@ -513,18 +513,18 @@ public abstract class Xform<A> implements Transformable<A> {
     /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     @Override
-    public <B> B foldLeft(B ident, Function2<B,? super A,B> f2,
-                          Function1<? super B,Boolean> function1) {
-        if (f2 == null) {
+    public <B> B foldLeft(B ident, Function2<B,? super A,B> reducer,
+                          Function1<? super B,Boolean> terminateWhen) {
+        if (reducer == null) {
             throw new IllegalArgumentException("Can't foldLeft with a null reduction function.");
         }
 
-        if (function1 == null) {
+        if (terminateWhen == null) {
             throw new IllegalArgumentException("Can't foldLeft with a null terminateWhen function");
         }
         // I'm coding this as a map operation that either returns the source, or a TERMINATE
         // sentinel value.
-        return takeWhile((Function1<? super A,Boolean>) function1).foldLeft(ident, f2);
+        return takeWhile((Function1<? super A,Boolean>) terminateWhen).foldLeft(ident, reducer);
     }
 
     @Override public Xform<A> filter(Function1<? super A,Boolean> f) {
