@@ -25,6 +25,7 @@ import org.organicdesign.fp.collections.UnmodIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -348,15 +349,15 @@ public class XformTest extends TestCase {
 
     @Test public void singleElement() {
         Xform<Integer> seq = Xform.ofArray(1);
-        assertArrayEquals(new Integer[] {1}, seq.drop(0).toArray());
+        assertArrayEquals(new Integer[]{1}, seq.drop(0).toArray());
         assertArrayEquals(new Integer[0], seq.drop(1).toArray());
         assertArrayEquals(new Integer[0], seq.drop(2).toArray());
     }
 
     @Test public void twoElement() {
         Xform<Integer> seq = Xform.ofArray(1, 2);
-        assertArrayEquals(new Integer[] {1,2}, seq.drop(0).toArray());
-        assertArrayEquals(new Integer[] {2}, seq.drop(1).toArray());
+        assertArrayEquals(new Integer[]{1, 2}, seq.drop(0).toArray());
+        assertArrayEquals(new Integer[]{2}, seq.drop(1).toArray());
         assertArrayEquals(new Integer[0], seq.drop(2).toArray());
     }
 
@@ -550,7 +551,7 @@ public class XformTest extends TestCase {
         assertArrayEquals(new String[] { "1","2", "2","3", "3","4"},
                           Xform.ofArray(1, 2, 3)
                               .flatMap(i -> Xform.ofArray(String.valueOf(i),
-                                                         String.valueOf(i + 1))).toArray());
+                                                          String.valueOf(i + 1))).toArray());
     }
 
     @Test public void flatEmpty() {
@@ -659,4 +660,148 @@ public class XformTest extends TestCase {
                                   .flatMap(i -> Xform.ofArray(i, i + 1))
                                   .toArray());
     }
+
+    // Below here taken from SequenceTest
+    @Test public void construction() {
+        Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        assertArrayEquals(ints, Xform.ofArray(ints).toArray());
+        assertArrayEquals(ints, Xform.of(Arrays.asList(ints)).toArray());
+    }
+
+//    @Test public void emptyXform() {
+//        assertEquals(0, Xform.EMPTY_SEQUENCE.hashCode());
+//        assertEquals(0, Xform.EMPTY_SEQUENCE.tail().hashCode());
+//        assertEquals(0, Xform.EMPTY_SEQUENCE.tail().tail().tail().hashCode());
+//
+//        assertEquals(Option.none(), Xform.EMPTY_SEQUENCE.head());
+//
+//        assertEquals(Xform.EMPTY_SEQUENCE, Xform.EMPTY_SEQUENCE);
+//        assertEquals(Xform.EMPTY_SEQUENCE, Xform.EMPTY_SEQUENCE.tail());
+//        assertEquals(Xform.EMPTY_SEQUENCE, Xform.EMPTY_SEQUENCE.tail().tail());
+//        assertTrue(Xform.EMPTY_SEQUENCE.equals(Xform.EMPTY_SEQUENCE.tail()));
+//        assertTrue(Xform.EMPTY_SEQUENCE.tail().equals(Xform.EMPTY_SEQUENCE));
+//    }
+
+    // TODO: Enable!!!
+//    @Test public void foldLeftTerm() {
+//        Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+//        assertArrayEquals(new Integer[]{2, 3, 4},
+//                          Xform.ofArray(ints)
+//                                  .foldLeft(new ArrayList<>(),
+//                                            (accum, i) -> {
+//                                                accum.add(i + 1);
+//                                                return accum;
+//                                            },
+//                                            (accum) -> accum.size() == 3).toArray());
+//        assertArrayEquals(new Integer[]{2, 3, 4, 5, 6, 7, 8, 9, 10},
+//                          Xform.ofArray(ints)
+//                                  .foldLeft(new ArrayList<>(),
+//                                            (accum, i) -> {
+//                                                accum.add(i + 1);
+//                                                return accum;
+//                                            },
+//                                            (accum) -> accum.size() == 20).toArray());
+//    }
+
+    @Test public void toIterator() {
+        Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        Iterator<Integer> seqIter = Xform.ofArray(ints).iterator();
+        Iterator<Integer> listIter = Arrays.asList(ints).iterator();
+        while (seqIter.hasNext() && listIter.hasNext()) {
+            assertEquals(seqIter.next(), listIter.next());
+        }
+        assertFalse(seqIter.hasNext());
+        assertFalse(listIter.hasNext());
+    }
+
+//    @Test public void objectMethods() {
+//        Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+//        Xform<Integer> seq1 = Xform.ofArray(ints).drop(3).take(4);
+//        Xform<Integer> seq2 = Xform.ofArray(4, 5, 6, 7);
+//
+//        assertEquals(UnmodIterable.hashCode(seq1), UnmodIterable.hashCode(seq2));
+//
+//        assertTrue(UnmodSortedIterable.equals(seq1, seq1));
+//        assertTrue(UnmodSortedIterable.equals(seq2, seq2));
+//
+//        assertTrue(UnmodSortedIterable.equals(seq1, seq2));
+//        assertTrue(UnmodSortedIterable.equals(seq2, seq1));
+//
+//        assertEquals(UnmodIterable.hashCode(seq1.tail()), UnmodIterable.hashCode(seq2.tail()));
+//        assertTrue(UnmodSortedIterable.equals(seq1.tail(), seq2.tail()));
+//        assertTrue(UnmodSortedIterable.equals(seq2.tail(), seq1.tail()));
+//
+//        assertNotEquals(UnmodIterable.hashCode(seq1.tail()), UnmodIterable.hashCode(seq2));
+//        assertNotEquals(UnmodIterable.hashCode(seq1), UnmodIterable.hashCode(seq2.tail()));
+//        assertFalse(UnmodSortedIterable.equals(seq1.tail(), seq2));
+//        assertFalse(UnmodSortedIterable.equals(seq1, seq2.tail()));
+//
+//        assertFalse(UnmodSortedIterable.equals(seq2.tail(), seq1));
+//        assertFalse(UnmodSortedIterable.equals(seq2, seq1.tail()));
+//    }
+
+    /**
+     Note that this tests the forEach() implementation on java.util.Iterable.  There used to be a
+     forEach() on Transformable too, but when I realized that it overloaded (but did not override)
+     the same method on Iterable and Stream, *and* when I read Josh Bloch Item 41 "Use Overloading
+     Judiciously" and realized what a bad idea it was, I just removed the method.  Maybe this test
+     should be deleted?  I guess it's good to prove that the caching works.
+     */
+    @Test public void forEach() {
+        Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        Xform<Integer> seq = Xform.ofArray(ints);
+        final List<Integer> output = new ArrayList<>();
+        seq.forEach(i -> output.add(i));
+        assertArrayEquals(ints, output.toArray());
+    }
+
+    @Test
+    public void firstMatching() {
+        Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        Xform<Integer> seq = Xform.ofArray(ints);
+
+        // TODO: We may want a head() method that returns an option because this gets ugly.
+        assertEquals(Integer.valueOf(1), seq.filter(i -> i == 1).take(1).toImList().head().get());
+        assertEquals(Integer.valueOf(3), seq.filter(i -> i > 2).take(1).toImList().head().get());
+        assertFalse(seq.filter(i -> i > 10).take(1).toImList().head().isSome());
+    }
+
+    @Test
+    public void takeAndDrop() {
+        assertArrayEquals(Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                                  .drop(0).take(8888).toArray(),
+                          new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9});
+        assertArrayEquals(Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                                  .drop(1).take(1).toArray(),
+                          new Integer[]{2});
+        assertArrayEquals(Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                                  .drop(2).take(2).toArray(),
+                   new Integer[] { 3,4 });
+        assertArrayEquals(Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                                  .drop(3).take(3).toArray(),
+                   new Integer[] { 4,5,6 });
+        assertArrayEquals(Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                                  .drop(9999).take(3).toArray(),
+                          new Integer[]{});
+        assertArrayEquals(Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                                  .drop(3).take(0).toArray(),
+                   new Integer[] { });
+    }
+
+    @Test public void chain1() {
+        assertArrayEquals(Xform.ofArray(5)                      //         5
+                                  .precat(Xform.ofArray(4))    //       4,5
+                                  .concat(Xform.ofArray(6))     //       4,5,6
+                                  .precat(Xform.ofArray(2, 3)) //   2,3,4,5,6
+                                  .concat(Xform.ofArray(7, 8))  //   2,3,4,5,6,7,8
+                                  .precat(Xform.ofArray(1))    // 1,2,3,4,5,6,7,8
+                                  .concat(Xform.ofArray(9))     // 1,2,3,4,5,6,7,8,9
+                                  .filter(i -> i > 3)              //       4,5,6,7,8,9
+                                  .map(i -> i - 2)                 //   2,3,4,5,6,7
+                                  .take(5)                         //   2,3,4,5,6
+                                  .drop(2)                         //       4,5,6
+                                  .toArray(),
+                          new Integer[]{4, 5, 6});
+    }
+    // Above here taken from SequenceTest.
 }
