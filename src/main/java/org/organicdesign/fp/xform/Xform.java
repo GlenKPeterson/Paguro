@@ -208,7 +208,9 @@ public abstract class Xform<A> implements Transformable<A> {
                                                   res.add(item);
                                                   return res;
                                               }
-                                          }, null);
+                                          }
+
+            );
             //noinspection unchecked
             return new Iterator() {
                 Iterator innerIter = prevSrc.iterator();
@@ -420,8 +422,7 @@ public abstract class Xform<A> implements Transformable<A> {
     // is 2.6 times faster than wrapping items type-safely in Options and 10 to 100 times faster
     // than lazily evaluated and cached linked-list, Sequence model.
     @SuppressWarnings("unchecked")
-    private static <H> H _foldLeft(Iterable source, Operation[] ops, int opIdx, H ident,
-                                   Function2 reducer, Function1 termWhen) {
+    private static <H> H _foldLeft(Iterable source, Operation[] ops, int opIdx, H ident, Function2 reducer) {
         Object ret = ident;
 
         // This is a label - the first one I have used in Java in years, or maybe ever.
@@ -443,11 +444,7 @@ public abstract class Xform<A> implements Transformable<A> {
                         return (H) ret;
                     }
                 } else if (op.flatMap != null) {
-                    ret = _foldLeft(op.flatMap.apply(o), ops, j + 1, (H) ret, reducer, null);
-                    if ( (termWhen != null) &&
-                         Boolean.TRUE.equals(termWhen.apply(ret)) ) {
-                        return (H) ret;
-                    }
+                    ret = _foldLeft(op.flatMap.apply(o), ops, j + 1, (H) ret, reducer);
                     // stop processing this source item and go to the next one.
                     continue sourceLoop;
                 }
@@ -457,10 +454,6 @@ public abstract class Xform<A> implements Transformable<A> {
             }
             // Here, the item made it through all the operations.  Combine it with the result.
             ret = reducer.apply(ret, o);
-            if ( (termWhen != null) &&
-                 Boolean.TRUE.equals(termWhen.apply(ret)) ) {
-                return (H) ret;
-            }
         }
         return (H) ret;
     } // end _foldLeft();
@@ -508,8 +501,30 @@ public abstract class Xform<A> implements Transformable<A> {
 
     // Do we need a dropWhile???
 
+    /** Provides a way to collect the results of the transformation. */
+    @Override public <B> B foldLeft(B ident, Function2<B,? super A,B> reducer) {
+        if (reducer == null) {
+            throw new IllegalArgumentException("Can't foldLeft with a null reduction function.");
+        }
+
+        // Construct an optimized array of OpRuns (mutable operations for this run)
+        RunList runList = toRunList();
+        return _foldLeft(runList, runList.opArray(), 0, ident, reducer);
+    }
+
     // TODO: Is this worth keeping over takeWhile(f).foldLeft(...)?
-    /** {@inheritDoc} */
+    /**
+     Thit implementation should be correct, but could be slow in the case where previous operations
+     are slow and the terminateWhen operation is fast and terminates early.  It actually renders
+     items to a mutable List, then runs through the list performing the requested reduction,
+     checking for early termination on the result.  If you can to a takeWhile() or take() earlier
+     in the transform chain instead of doing it here, always do that.  If you really need early
+     termination based on the *result* of a fold, and the operations are expensive or the input
+     is huge, try using a View instead.  If you don't care about those things, then this method is
+     perfect for you.
+
+     {@inheritDoc}
+     */
     @Override
     public <B> B foldLeft(B ident, Function2<B,? super A,B> reducer,
                           Function1<? super B,Boolean> terminateWhen) {
@@ -517,15 +532,26 @@ public abstract class Xform<A> implements Transformable<A> {
             throw new IllegalArgumentException("Can't foldLeft with a null reduction function.");
         }
 
-        // Construct an optimized array of OpRuns (mutable operations for this run)
-        RunList runList = toRunList();
-        return _foldLeft(runList, runList.opArray(), 0, ident, reducer,
-                         (terminateWhen == Function1.reject()) ? null : terminateWhen);
-    }
+        if ( (terminateWhen == null) || (Function1.reject() == terminateWhen) ) {
+            return foldLeft(ident, reducer);
+        }
 
-    /** {@inheritDoc} */
-    @Override public <B> B foldLeft(B ident, Function2<B,? super A,B> reducer) {
-        return foldLeft(ident, reducer, null);
+        // Yes, this is a cheap plastic imitation of what you'd hope for if you really need this
+        // method.  The trouble is that when I implemented it correctly in _foldLeft, I found
+        // it was going to be incredibly difficult, or more likely impossible to implement
+        // when the previous operation was flatMap, since you don't have the right result type to
+        // check against when you recurse in to the flat mapping function, and if you check the
+        // return from the recursion, it may have too many elements already.
+        // In XformTest.java, there's something marked "Early termination test" that illustrates
+        // this exact problem.
+        List<A> as = this.toMutableList();
+        for (A a : as) {
+            ident = reducer.apply(ident, a);
+            if (terminateWhen.apply(ident)) {
+                return ident;
+            }
+        }
+        return ident;
     }
 
     @Override public Xform<A> filter(Function1<? super A,Boolean> f) {

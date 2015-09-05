@@ -697,6 +697,13 @@ public class XformTest extends TestCase {
                           .foldLeft(0, null));
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void foldLeftEx2() {
+        assertEquals(Integer.valueOf(45),
+                     Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                          .foldLeft(0, null, Function1.reject()));
+    }
+
     @Test public void foldLeftTerm() {
         Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
@@ -706,12 +713,12 @@ public class XformTest extends TestCase {
 
         assertArrayEquals(new Integer[]{2, 3, 4},
                           Xform.ofArray(ints)
-                                  .foldLeft(new ArrayList<>(),
-                                            (accum, i) -> {
-                                                accum.add(i + 1);
-                                                return accum;
-                                            },
-                                            (accum) -> accum.size() == 3).toArray());
+                               .foldLeft(new ArrayList<>(),
+                                         (accum, i) -> {
+                                             accum.add(i + 1);
+                                             return accum;
+                                         },
+                                         (accum) -> accum.size() == 3).toArray());
         assertArrayEquals(new Integer[]{2, 3, 4, 5, 6, 7, 8, 9, 10},
                           Xform.ofArray(ints)
                                   .foldLeft(new ArrayList<>(),
@@ -720,6 +727,27 @@ public class XformTest extends TestCase {
                                                 return accum;
                                             },
                                             (accum) -> accum.size() == 20).toArray());
+
+        // This is fun and it should work.  But it really sets up for the early-termination test
+        // next.
+        assertEquals(Arrays.asList(1, 2, 3, 2, 4, 6, 3, 6, 9, 4, 8, 12, 5, 10, 15, 6, 12, 18,
+                                   7, 14, 21, 8, 16, 24, 9, 18, 27),
+                     Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                          .flatMap(i -> Xform.ofArray(i, i * 2, i * 3))
+                          .foldLeft(new ArrayList<>(),
+                                    (alist, item) -> {
+                                        alist.add(item);
+                                        return alist;
+                                    }));
+
+        // Early termination test
+        assertEquals(Arrays.asList(1,2,3, 2,4,6, 3,6,9, 4,8,12, 5,10,15, 6,12,18,
+                                   7,14,21, 8,16),
+                     Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+                          .flatMap(i -> Xform.ofArray(i, i * 2, i * 3))
+                          .foldLeft(new ArrayList<>(),
+                                    (alist, item) -> { alist.add(item); return alist; },
+                                    (items) -> items.contains(16)));
     }
 
     @Test public void toIterator() {
