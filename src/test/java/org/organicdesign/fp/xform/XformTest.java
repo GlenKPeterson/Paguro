@@ -114,7 +114,7 @@ public class XformTest extends TestCase {
                            return accum;
                        }));
         assertEquals(Arrays.asList(1, 2, 3, 4, 5, 6),
-                     td.concatList(Arrays.asList(4, 5, 6))
+                     td.concat(Arrays.asList(4, 5, 6))
                        .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                            accum.add(i);
                            return accum;
@@ -132,7 +132,7 @@ public class XformTest extends TestCase {
                            return accum;
                        }));
         assertEquals(Arrays.asList(2, 3, 4, 5, 6, 7),
-                     td.concatList(Arrays.asList(4, 5, 6))
+                     td.concat(Arrays.asList(4, 5, 6))
                        .map(i -> i + 1)
                        .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                            accum.add(i);
@@ -241,7 +241,7 @@ public class XformTest extends TestCase {
                        .flatMap(i -> PersistentVector.of(i, i * 10, i * 100))
                        .drop(5)
                        .take(6)
-                       .concatList(Arrays.asList(91, 92, 93))
+                       .concat(Arrays.asList(91, 92, 93))
                        .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                            accum.add(i);
                            return accum;

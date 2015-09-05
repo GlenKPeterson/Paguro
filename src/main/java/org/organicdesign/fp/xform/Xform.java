@@ -146,9 +146,10 @@ public abstract class Xform<A> implements Transformable<A> {
             }
 
             @Override public OpStrategy take(long num) {
-                if (num < 0) {
-                    throw new IllegalArgumentException("Can't take less than 0 items.");
-                }
+                // This data condition is prevented in Xform.take()
+//                if (num < 0) {
+//                    throw new IllegalArgumentException("Can't take less than 0 items.");
+//                }
                 if (num < numToTake) {
                     numToTake = num;
                 }
@@ -460,10 +461,10 @@ public abstract class Xform<A> implements Transformable<A> {
     // =============================================================================================
     // These will come from Transformable, but (will be) overridden to have a different return type.
 
-    public Xform<A> concatList(List<? extends A> list) {
-        if ( (list == null) || (list.size() < 1) ) { return this; }
-        return concat(list);
-    }
+//    public Xform<A> concatList(List<? extends A> list) {
+//        if ( (list == null) || (list.size() < 1) ) { return this; }
+//        return concat(list);
+//    }
 
     public Xform<A> concat(Iterable<? extends A> list) {
         if (list == null) { throw new IllegalArgumentException("Can't concat a null iterable"); }
@@ -476,10 +477,10 @@ public abstract class Xform<A> implements Transformable<A> {
         return concat(Arrays.asList(list));
     }
 
-    public Xform<A> precatList(List<? extends A> list) {
-        if ( (list == null) || (list.size() < 1) ) { return this; }
-        return precat(list);
-    }
+//    public Xform<A> precatList(List<? extends A> list) {
+//        if ( (list == null) || (list.size() < 1) ) { return this; }
+//        return precat(list);
+//    }
 
     public Xform<A> precat(Iterable<? extends A> list) {
         if (list == null) { throw new IllegalArgumentException("Can't precat a null iterable"); }
@@ -549,7 +550,6 @@ public abstract class Xform<A> implements Transformable<A> {
         return new TakeDesc<>(this, numItems);
     }
 
-    // TODO: Test.
     @Override
     public Xform<A> takeWhile(Function1<? super A,Boolean> f) {
         if (f == null) {
