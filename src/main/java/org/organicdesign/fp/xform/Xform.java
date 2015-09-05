@@ -543,9 +543,11 @@ public abstract class Xform<A> implements Transformable<A> {
 
     abstract RunList toRunList();
 
-    // TODO: Test.
     @Override
-    public Xform<A> take(long l) { return new TakeDesc<>(this, l); }
+    public Xform<A> take(long numItems) {
+        if (numItems < 0) { throw new IllegalArgumentException("Num items must be >= 0"); }
+        return new TakeDesc<>(this, numItems);
+    }
 
     // TODO: Test.
     @Override
