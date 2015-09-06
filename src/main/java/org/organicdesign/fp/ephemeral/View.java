@@ -24,7 +24,7 @@ import org.organicdesign.fp.function.Function2;
  A lightweight, one-time view that lazy, thread-safe operations can be built from.  Because there
  is no caching/memoization, this may be useful for data sources that do not fit in memory.
  */
-
+@FunctionalInterface
 public interface View<T> extends Transformable<T> {
     static final View<?> EMPTY_VIEW = Option::none;
 
@@ -34,7 +34,7 @@ public interface View<T> extends Transformable<T> {
     // Just wrong.  You can't trust an iterator that you didn't get yourself.
 //    static <T> View<T> of(Iterator<T> i) { return ViewFromIterable.of(i); }
 
-    static <T> View<T> ofIter(Iterable<T> i) { return ViewFromIterable.of(i); }
+    static <T> View<T> ofIter(Iterable<? extends T> i) { return ViewFromIterable.of(i); }
 
     @SafeVarargs
     static <T> View<T> ofArray(T... i) { return ViewFromArray.of(i); }
@@ -142,22 +142,17 @@ public interface View<T> extends Transformable<T> {
     /** {@inheritDoc} */
     @Override default View<T> drop(long numItems) { return ViewDropped.of(this, numItems); }
 
-    // I don't see how I can legally declare this on Transformable!
-    /**
-     One of the two higher-order functions that can produce more output items than input items.
-     foldLeft is the other, but flatMap is lazy while foldLeft is eager.
-     @return a lazily evaluated collection which is expected to be larger than the input
-     collection.  For a collection that's the same size, map() is more efficient.  If the expected
-     return is smaller, use filter followed by map if possible, or vice versa if not.
-     @param func yields a Transformable of 0 or more results for each input item.
-     */
-    default <U> View<U> flatMap(Function1<? super T,View<U>> func) { return ViewFlatMapped.of(this, func); }
+    /** {@inheritDoc} */
+    @Override default <U> View<U> flatMap(Function1<? super T,Iterable<U>> func) { return ViewFlatMapped.of(this, func); }
 
-    /** Add the given View after the end of this one. */
-    default View<T> append(View<T> pv) { return ViewPrepended.of(pv, this); }
-
-    /** Add the given View before the beginning of this one. */
-    default View<T> prepend(View<T> pv) { return ViewPrepended.of(this, pv); }
+    /** {@InheritDoc} */
+    @Override default View<T> concat(Iterable<? extends T> list) {
+        return ViewPrepended.of(this, list);
+    }
+    /** {@InheritDoc} */
+    @Override default View<T> precat(Iterable<? extends T> list) {
+        return ViewPrepended.of(list, this);
+    }
 
     @Override default UnmodIterator<T> iterator() {
         final View<T> v = this;

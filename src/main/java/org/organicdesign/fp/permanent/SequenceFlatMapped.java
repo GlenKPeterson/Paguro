@@ -22,17 +22,17 @@ class SequenceFlatMapped<T,U> implements Sequence<U> {
     private final LazyRef<Sequence<U>> laz;
 
     @SuppressWarnings("unchecked")
-    private SequenceFlatMapped(Sequence<T> seq, Function1<? super T,Sequence<U>> f) {
+    private SequenceFlatMapped(Sequence<T> seq, Function1<? super T,Iterable<U>> f) {
         laz = LazyRef.of(() -> {
             final Option<T> first = seq.head();
             return first.isSome()
-                    ? new SequenceConcatenated<>(f.apply(first.get()), new SequenceFlatMapped(seq.tail(), f))
+                    ? SequenceConcatenated.of(f.apply(first.get()), new SequenceFlatMapped(seq.tail(), f))
                     : Sequence.emptySequence();
         });
     }
 
     @SuppressWarnings("unchecked")
-    public static <T,U> Sequence<U> of(Sequence<T> seq, Function1<? super T,Sequence<U>> f) {
+    public static <T,U> Sequence<U> of(Sequence<T> seq, Function1<? super T,Iterable<U>> f) {
         if (f == null) { throw new IllegalArgumentException("Can't flatmap with a null function."); }
         // You can put nulls in, but you don't get nulls out.
         if ( (seq == null) || (EMPTY_SEQUENCE == seq) ) { return Sequence.emptySequence(); }

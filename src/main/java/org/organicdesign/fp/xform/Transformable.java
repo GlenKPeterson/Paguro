@@ -106,12 +106,11 @@ public interface Transformable<T> extends Realizable<T> {
 // "? super T". Transformable does not provide a way to get to the first argument or the "rest".  It
 // seems kind of a useless interface if the persistent Sequence is fast enough to get rid of the
 // View.
-//    /** Add the given Transformable after the end of this one. */
-//    Transformable<T> concat(Transformable<T> other);
-//
-//    /** Add the given Transformable before the beginning of this one. */
-//    Transformable<T> precat(Transformable<T> other);
+    /** Add the given Transformable after the end of this one. */
+    Transformable<T> concat(Iterable<? extends T> list);
 
+    /** Add the given Transformable before the beginning of this one. */
+    Transformable<T> precat(Iterable<? extends T> list);
 
     // TODO: You can always use foldLeft for this operation.  Does having reduceLeft add more clarity to the underlying code, or does it provide some useful additional functionality?
 //    /**
@@ -158,15 +157,15 @@ public interface Transformable<T> extends Realizable<T> {
 
     // Sub-classes cannot inherit from this because the function that you pass in has to know the
     // actual return type.  Have to implement this independently on sub-classes.
-//    /**
-//     One of the two higher-order functions that can produce more output items than input items.
-//     foldLeft is the other, but flatMap is lazy while foldLeft is eager.
-//     @return a lazily evaluated collection which is expected to be larger than the input
-//     collection.  For a collection that's the same size, map() is more efficient.  If the expected
-//     return is smaller, use filter followed by map if possible, or vice versa if not.
-//     @param fun yields a Transformable of 0 or more results for each input item.
-//     */
-//    <U> Transformable<U> flatMap(Function<T,? extends Transformable<U>> func);
+    /**
+     One of the two higher-order functions that can produce more output items than input items.
+     foldLeft is the other, but flatMap is lazy while foldLeft is eager.
+     @return a lazily evaluated collection which is expected to be larger than the input
+     collection.  For a collection that's the same size, map() is more efficient.  If the expected
+     return is smaller, use filter followed by map if possible, or vice versa if not.
+     @param fun yields a Transformable of 0 or more results for each input item.
+     */
+    <U> Transformable<U> flatMap(Function1<? super T,Iterable<U>> f);
 
     /** {@inheritDoc} */
     @Override default List<T> toMutableList() {

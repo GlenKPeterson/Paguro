@@ -15,36 +15,43 @@ package org.organicdesign.fp.ephemeral;
 
 import org.organicdesign.fp.Option;
 
+// TODO: Rename to ViewConcatenated
 class ViewPrepended<T> implements View<T> {
-    private final View<T> originalView;
+    private View<T> firstView;
+    private final View<T> secondView;
 
-    private View<T> prependedView;
-
-    private ViewPrepended(View<T> v, View<T> pv) {
-        originalView = v; prependedView = pv;
+    private ViewPrepended(View<T> pre, View<T> post) {
+        firstView = pre; secondView = post;
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> View<T> of(View<T> v, View<T> pv) {
+    public static <T> View<T> of(Iterable<? extends T> pre, Iterable<? extends T> post) {
         // You can put nulls in, but you don't get nulls out.
-        if ( (pv == null) || (pv == EMPTY_VIEW)) {
-            if (v == null) { return View.emptyView(); }
-            return v;
-        } else if ((v == null) || (v == EMPTY_VIEW)) {
-            return pv;
+        if ( (pre == null) || (pre == EMPTY_VIEW)) {
+            if (post == null) { return View.emptyView(); }
+
+            return (post instanceof View) ? (View<T>) post
+                                          : View.ofIter(post);
+        } else if ((post == null) || (post == EMPTY_VIEW)) {
+
+            return (pre instanceof View) ? (View<T>) pre
+                                         : View.ofIter(pre);
         }
-        return new ViewPrepended<>(v, pv);
+        return new ViewPrepended<>((pre instanceof View) ? (View<T>) pre
+                                                         : View.ofIter(pre),
+                                   (post instanceof View) ? (View<T>) post
+                                                          : View.ofIter(post));
     }
 
     @Override
     public Option<T> next() {
-        if (prependedView == EMPTY_VIEW) {
-            return originalView.next();
+        if (firstView == EMPTY_VIEW) {
+            return secondView.next();
         }
-        Option<T> innerNext = prependedView.next();
+        Option<T> innerNext = firstView.next();
         if (!innerNext.isSome()) {
-            prependedView = View.emptyView();
-            return originalView.next();
+            firstView = View.emptyView();
+            return secondView.next();
         }
         return innerNext;
     }

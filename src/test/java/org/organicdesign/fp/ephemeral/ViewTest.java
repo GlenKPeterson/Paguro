@@ -55,12 +55,12 @@ public class ViewTest {
     public void chain1() {
         assertArrayEquals(new Integer[] { 4, 5, 6 },
                           View.ofArray(5)                     //         5
-                                  .prepend(View.ofArray(4))   //       4,5
-                                  .append(View.ofArray(6))    //       4,5,6
-                                  .prepend(View.ofArray(2, 3)) //   2,3,4,5,6
-                                  .append(View.ofArray(7, 8))  //   2,3,4,5,6,7,8
-                                  .prepend(View.ofArray(1))   // 1,2,3,4,5,6,7,8
-                                  .append(View.ofArray(9))    // 1,2,3,4,5,6,7,8,9
+                                  .precat(View.ofArray(4))   //       4,5
+                                  .concat(View.ofArray(6))    //       4,5,6
+                                  .precat(View.ofArray(2, 3)) //   2,3,4,5,6
+                                  .concat(View.ofArray(7, 8))  //   2,3,4,5,6,7,8
+                                  .precat(View.ofArray(1))   // 1,2,3,4,5,6,7,8
+                                  .concat(View.ofArray(9))    // 1,2,3,4,5,6,7,8,9
                                   .filter(i -> i > 3)         //       4,5,6,7,8,9
                                   .map(i -> i - 2)            //   2,3,4,5,6,7
                                   .take(5)                    //   2,3,4,5,6

@@ -67,7 +67,7 @@ public interface Sequence<T> extends Transformable<T>, UnmodSortedIterable<T> {
 //        return SequenceFromIterable.of(i);
 //    }
 
-    static <T> Sequence<T> ofIter(Iterable<T> i) {
+    static <T> Sequence<T> ofIter(Iterable<? extends T> i) {
         return SequenceFromIterable.of(i);
     }
 
@@ -183,15 +183,15 @@ public interface Sequence<T> extends Transformable<T>, UnmodSortedIterable<T> {
      return is smaller, use filter followed by map if possible, or vice versa if not.
      @param func yields a Transformable of 0 or more results for each input item.
      */
-    default <U> Sequence<U> flatMap(Function1<? super T,Sequence<U>> func) {
+    @Override default <U> Sequence<U> flatMap(Function1<? super T,Iterable<U>> func) {
         return SequenceFlatMapped.of(this, func);
     }
 
     /** Add the given Sequence after the end of this one. */
-    default Sequence<T> concat(Sequence<T> other) { return SequenceConcatenated.of(this, other); }
+    @Override default Sequence<T> concat(Iterable<? extends T> other) { return SequenceConcatenated.of(this, other); }
 
     /** Add the given Sequence before the beginning of this one. */
-    default Sequence<T> precat(Sequence<T> other) { return SequenceConcatenated.of(other, this); }
+    @Override default Sequence<T> precat(Iterable<? extends T> other) { return SequenceConcatenated.of(other, this); }
 
     /** Add the given items at the end of this sequence. */
     @SuppressWarnings("unchecked")
@@ -212,21 +212,6 @@ public interface Sequence<T> extends Transformable<T>, UnmodSortedIterable<T> {
 //            accum = fun.apply(accum, item);
 //        }
 //        return accum;
-//    }
-
-//    // I don't see how I can legally declare this on Transformable!
-      // When implementing, the innerSequence needs to call tail() on the parent sequence instead
-      // of returning USED_UP.  Otherwise, it's a pretty clean copy of SequenceFlatMapped.
-//    /**
-//     One of the two higher-order functions that can produce more output items than input items.
-//     foldLeft is the other, but flatMap is lazy while foldLeft is eager.
-//     @return a lazily evaluated collection which is expected to be larger than the input
-//     collection.  For a collection that's the same size, map() is more efficient.  If the expected
-//     return is smaller, use filter followed by map if possible, or vice versa if not.
-//     @param fun yields a Transformable of 0 or more results for each input item.
-//     */
-//    <U> Sequence<U> flatMap(Function<T,Sequence<U>> func) {
-//        return SequenceFlatMapped.of(this, func);
 //    }
 
     /**

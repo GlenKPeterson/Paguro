@@ -29,13 +29,13 @@ import java.util.Iterator;
  object will present and immutable, lazy, memoized, thread-safe view of the underlying iterator.
  */
 class SequenceFromIterable<T> implements Sequence<T> {
-    private Iterator<T> iter;
+    private Iterator<? extends T> iter;
     private Option<T> head;
     private Sequence<T> tail;
 
     // This must always be private because it wraps an iterator
     // And we cannot accept an iterator from anyone but ourselves.
-    private SequenceFromIterable(Iterator<T> i) { iter = i; }
+    private SequenceFromIterable(Iterator<? extends T> i) { iter = i; }
 
     // Just wrong.  You can't share an iterator with anyone else,
     // So only accept an Iterable, to guarantee that we can grab our own,
@@ -45,9 +45,9 @@ class SequenceFromIterable<T> implements Sequence<T> {
 //        return new SequenceFromIterable<>(i);
 //    }
 
-    public static <T> Sequence<T> of(Iterable<T> i) {
+    public static <T> Sequence<T> of(Iterable<? extends T> i) {
         if (i == null) { return Sequence.emptySequence(); }
-        Iterator<T> iter = i.iterator();
+        Iterator<? extends T> iter = i.iterator();
         if ( (iter == null) || !iter.hasNext() ) { return Sequence.emptySequence(); }
         return new SequenceFromIterable<>(iter);
     }

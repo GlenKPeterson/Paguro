@@ -21,9 +21,9 @@ import java.util.Iterator;
 /** A single-pass transformer backed by a Java Iterator. */
 public class ViewFromIterable<T> implements View<T> {
 
-    private final Iterator<T> iter;
+    private final Iterator<? extends T> iter;
 
-    private ViewFromIterable(Iterator<T> i) { iter = i; }
+    private ViewFromIterable(Iterator<? extends T> i) { iter = i; }
 
     // Just wrong - you can't trust an iterator that you didn't get yourself.
 //    public static <T> View<T> of(Iterator<T> i) {
@@ -31,9 +31,9 @@ public class ViewFromIterable<T> implements View<T> {
 //        return new ViewFromIterable<>(i);
 //    }
 
-    public static <T> View<T> of(Iterable<T> i) {
+    public static <T> View<T> of(Iterable<? extends T> i) {
         if (i == null) { return View.emptyView(); }
-        Iterator<T> iiter = i.iterator();
+        Iterator<? extends T> iiter = i.iterator();
         if (iiter == null) { return View.emptyView(); }
         return new ViewFromIterable<>(iiter);
     }

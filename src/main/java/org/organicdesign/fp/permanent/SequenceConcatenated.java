@@ -31,15 +31,23 @@ class SequenceConcatenated<T> implements Sequence<T> {
         });
     }
 
-    public static <T> Sequence<T> of(Sequence<T> pre, Sequence<T> post) {
+    @SuppressWarnings("unchecked")
+    public static <T> Sequence<T> of(Iterable<? extends T> pre, Iterable<? extends T> post) {
         // You can put nulls in, but you don't get nulls out.
         if ( (pre == null) || (EMPTY_SEQUENCE == pre)) {
             if (post == null) { return Sequence.emptySequence(); }
-            return post;
+
+            return (post instanceof Sequence) ? (Sequence<T>) post
+                                              : Sequence.ofIter(post);
         } else if ((post == null) || (EMPTY_SEQUENCE == post)) {
-            return pre;
+
+            return (pre instanceof Sequence) ? (Sequence<T>) pre
+                                             : Sequence.ofIter(pre);
         }
-        return new SequenceConcatenated<>(pre, post);
+        return new SequenceConcatenated<>((pre instanceof Sequence) ? (Sequence<T>) pre
+                                                                    : Sequence.ofIter(pre),
+                                          (post instanceof Sequence) ? (Sequence<T>) post
+                                                                     : Sequence.ofIter(post));
     }
 
     @Override public Option<T> head() { return laz.get().head(); }

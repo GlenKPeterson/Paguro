@@ -24,8 +24,8 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(JUnit4.class)
 public class SequenceFlatMappedTest {
-    public static final Function1<Integer,Sequence<Integer>> emptySeqFunc = (i) -> Sequence.emptySequence();
-    public static final Function1<Object,Sequence<Object>> identSeqFunc = (i) -> Sequence.ofArray(i);
+    public static final Function1<Integer,Iterable<Integer>> emptySeqFunc = (i) -> Sequence.emptySequence();
+    public static final Function1<Object,Iterable<Object>> identSeqFunc = (i) -> Sequence.ofArray(i);
 
     @Test(expected = IllegalArgumentException.class)
     public void testNullFunction() {

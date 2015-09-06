@@ -247,7 +247,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 //        return fjinvoke.apply(top);
 //    }
 
-    // TODO: This suppression isn't right.  s.prepend() should be totally happy.
+    // TODO: This suppression isn't right.  s.precat() should be totally happy.
     @SuppressWarnings("unchecked")
     @Override public Sequence<UnmodMap.UnEntry<K,V>> seq() {
 //        System.out.println("root: " + root);
@@ -333,7 +333,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         }
 
         @Override
-        // TODO: This suppression isn't right.  s.prepend() should be totally happy.
+        // TODO: This suppression isn't right.  s.precat() should be totally happy.
         @SuppressWarnings("unchecked")
         public Sequence<UnmodMap.UnEntry<K,V>> seq() {
             Sequence<UnmodMap.UnEntry<K,V>> s = root != null ? root.nodeSeq() : Sequence.emptySequence();

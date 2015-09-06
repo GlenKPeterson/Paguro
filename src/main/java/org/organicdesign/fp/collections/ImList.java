@@ -78,7 +78,7 @@ public interface ImList<E> extends UnmodList<E>, Sequence<E> {
      * @return a new ImList with the additional items at the end.
      */
     @SuppressWarnings("unchecked")
-    @Override default ImList<E> append(E... es) {
+    @Override default ImList<E> concat(Iterable<? extends E> es) {
         ImList<E> result = this;
         for (E e : es) {
             result = result.appendOne(e);
@@ -196,7 +196,7 @@ public interface ImList<E> extends UnmodList<E>, Sequence<E> {
 //     * @param es the values to insert
 //     * @return a new ImList beginning with the additional items.
 //     */
-//    static <E> ImList<E> prepend(ImList<E> l, E e) {
+//    static <E> ImList<E> precat(ImList<E> l, E e) {
 //        return l.insert(0, e);
 //    }
 //

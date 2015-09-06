@@ -170,7 +170,7 @@ public abstract class Xform<A> implements Transformable<A> {
      For speed, we ignore all that in the "compiled" version and just use Objects and avoid any
      wrapping or casting.
      */
-    private static class RunList implements Iterable {
+    protected static class RunList implements Iterable {
         Iterable source;
         List<Operation> list = new ArrayList<>();
         RunList next = null;
@@ -233,14 +233,14 @@ public abstract class Xform<A> implements Transformable<A> {
         } // end iterator()
     }
 
-    /** Describes an append() operation, but does not perform it. */
+    /** Describes an concat() operation, but does not perform it. */
     private static class AppendIterDesc<T> extends Xform<T> {
         final Xform<T> src;
 
         AppendIterDesc(Xform<T> prev, Xform<T> s) { super(prev); src = s; }
 
         @SuppressWarnings("unchecked")
-        @Override RunList toRunList() {
+        @Override protected RunList toRunList() {
             return new AppendOp(prevOp.toRunList(), src);
         }
     }
@@ -262,7 +262,7 @@ public abstract class Xform<A> implements Transformable<A> {
         DropDesc(Xform<T> prev, long d) { super(prev); dropAmt = d; }
 
         @SuppressWarnings("unchecked")
-        @Override RunList toRunList() {
+        @Override protected RunList toRunList() {
 //                System.out.println("in toRunList() for drop");
             RunList ret = prevOp.toRunList();
             int i = ret.list.size() - 1;
@@ -305,7 +305,7 @@ public abstract class Xform<A> implements Transformable<A> {
         FilterDesc(Xform<T> prev, Function1<? super T,Boolean> func) { super(prev); f = func; }
 
         @SuppressWarnings("unchecked")
-        @Override RunList toRunList() {
+        @Override protected RunList toRunList() {
             RunList ret = prevOp.toRunList();
             ret.list.add(new Operation.FilterOp((Function1<Object,Boolean>) f));
             return ret;
@@ -319,7 +319,7 @@ public abstract class Xform<A> implements Transformable<A> {
         MapDesc(Xform<T> prev, Function1<? super T,? extends U> func) { super(prev); f = func; }
 
         @SuppressWarnings("unchecked")
-        @Override RunList toRunList() {
+        @Override protected RunList toRunList() {
             RunList ret = prevOp.toRunList();
             ret.list.add(new Operation.MapOp(f));
             return ret;
@@ -334,7 +334,7 @@ public abstract class Xform<A> implements Transformable<A> {
         }
 
         @SuppressWarnings("unchecked")
-        @Override RunList toRunList() {
+        @Override protected RunList toRunList() {
             RunList ret = prevOp.toRunList();
             ret.list.add(new Operation.FlatMapOp((Function1) f));
             return ret;
@@ -353,7 +353,7 @@ public abstract class Xform<A> implements Transformable<A> {
         TakeDesc(Xform<T> prev, long t) { super(prev); take = t; }
 
         @SuppressWarnings("unchecked")
-        @Override RunList toRunList() {
+        @Override protected RunList toRunList() {
 //                System.out.println("in toRunList() for take");
             RunList ret = prevOp.toRunList();
             int i = ret.list.size() - 1;
@@ -387,7 +387,7 @@ public abstract class Xform<A> implements Transformable<A> {
     static class SourceProviderIterableDesc<T> extends Xform<T> {
         private final Iterable<? extends T> list;
         SourceProviderIterableDesc(Iterable<? extends T> l) { super(null); list = l; }
-        @Override RunList toRunList() {
+        @Override protected RunList toRunList() {
             return RunList.of(null, list);
         }
     }
@@ -466,7 +466,7 @@ public abstract class Xform<A> implements Transformable<A> {
 //        return concat(list);
 //    }
 
-    public Xform<A> concat(Iterable<? extends A> list) {
+    @Override public Xform<A> concat(Iterable<? extends A> list) {
         if (list == null) { throw new IllegalArgumentException("Can't concat a null iterable"); }
         return new AppendIterDesc<>(this, new SourceProviderIterableDesc<>(list));
     }
@@ -482,7 +482,7 @@ public abstract class Xform<A> implements Transformable<A> {
 //        return precat(list);
 //    }
 
-    public Xform<A> precat(Iterable<? extends A> list) {
+    @Override public Xform<A> precat(Iterable<? extends A> list) {
         if (list == null) { throw new IllegalArgumentException("Can't precat a null iterable"); }
         return new AppendIterDesc<>(of(list), this);
     }
@@ -525,9 +525,8 @@ public abstract class Xform<A> implements Transformable<A> {
 
      {@inheritDoc}
      */
-    @Override
-    public <B> B foldLeft(B ident, Function2<B,? super A,B> reducer,
-                          Function1<? super B,Boolean> terminateWhen) {
+    @Override public <B> B foldLeft(B ident, Function2<B,? super A,B> reducer,
+                                    Function1<? super B,Boolean> terminateWhen) {
         if (reducer == null) {
             throw new IllegalArgumentException("Can't foldLeft with a null reduction function.");
         }
@@ -559,7 +558,7 @@ public abstract class Xform<A> implements Transformable<A> {
         return new FilterDesc<>(this, f);
     }
 
-    public <B> Xform<B> flatMap(Function1<? super A,Iterable<B>> f) {
+    @Override public <B> Xform<B> flatMap(Function1<? super A,Iterable<B>> f) {
         if (f == null) { throw new IllegalArgumentException("Can't flatmap with a null function."); }
         return new FlatMapDesc<>(this, f);
     }
@@ -569,16 +568,14 @@ public abstract class Xform<A> implements Transformable<A> {
         return new MapDesc<>(this, f);
     }
 
-    abstract RunList toRunList();
+    protected abstract RunList toRunList();
 
-    @Override
-    public Xform<A> take(long numItems) {
+    @Override public Xform<A> take(long numItems) {
         if (numItems < 0) { throw new IllegalArgumentException("Num items must be >= 0"); }
         return new TakeDesc<>(this, numItems);
     }
 
-    @Override
-    public Xform<A> takeWhile(Function1<? super A,Boolean> f) {
+    @Override public Xform<A> takeWhile(Function1<? super A,Boolean> f) {
         if (f == null) {
             throw new IllegalArgumentException("Can't takeWhile with a null function.");
         }

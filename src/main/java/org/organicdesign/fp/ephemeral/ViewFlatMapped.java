@@ -17,17 +17,19 @@ package org.organicdesign.fp.ephemeral;
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.function.Function1;
 
+import java.util.Iterator;
+
 class ViewFlatMapped<T,U> implements View<U> {
     private final View<T> outerView;
 
-    private View<U> innerView = View.emptyView();
+    private Iterator<U> innerIter = null;
 
-    private final Function1<? super T,View<U>> func;
+    private final Function1<? super T,Iterable<U>> func;
 
-    ViewFlatMapped(View<T> v, Function1<? super T,View<U>> f) { outerView = v; func = f; }
+    ViewFlatMapped(View<T> v, Function1<? super T,Iterable<U>> f) { outerView = v; func = f; }
 
     @SuppressWarnings("unchecked")
-    public static <T,U> View<U> of(View<T> v, Function1<? super T,View<U>> f) {
+    public static <T,U> View<U> of(View<T> v, Function1<? super T,Iterable<U>> f) {
         // You can put nulls in, but you don't get nulls out.
         if (f == null) { return View.emptyView(); }
         // TODO: Is this comparison possible?
@@ -38,16 +40,15 @@ class ViewFlatMapped<T,U> implements View<U> {
 
     @Override
     public Option<U> next() {
-        if (innerView == EMPTY_VIEW) {
+        if (innerIter == null) {
             Option<T> item = outerView.next();
             if (!item.isSome()) { return Option.none(); }
-            innerView = func.apply(item.get());
+            innerIter = func.apply(item.get()).iterator();
         }
-        Option<U> innerNext = innerView.next();
-        if (!innerNext.isSome()) {
-            innerView = View.emptyView();
+        if (!innerIter.hasNext()) {
+            innerIter = null;
             return next();
         }
-        return innerNext;
+        return Option.of(innerIter.next());
     }
 }
