@@ -16,10 +16,10 @@ package org.organicdesign.fp;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.organicdesign.fp.ephemeral.View;
 import org.organicdesign.fp.function.Function1;
 
 import static junit.framework.TestCase.assertTrue;
+import static org.organicdesign.fp.StaticImports.vec;
 import static org.organicdesign.fp.function.Function1.*;
 
 @RunWith(JUnit4.class)
@@ -32,10 +32,10 @@ public class BooleanCombinerTest {
         assertTrue(Function1.BooleanCombiner.AND.combine(null) == ACCEPT);
 
 //        assertTrue(Function1.BooleanCombiner.AND.combineArray(accept()) == ACCEPT);
-        assertTrue(Function1.BooleanCombiner.AND.combine(View.ofArray(accept())) == ACCEPT);
+        assertTrue(Function1.BooleanCombiner.AND.combine(vec(accept())) == ACCEPT);
 
 //        assertTrue(Function1.BooleanCombiner.AND.combineArray(reject()) == REJECT);
-        assertTrue(Function1.BooleanCombiner.AND.combine(View.ofArray(reject())) == REJECT);
+        assertTrue(Function1.BooleanCombiner.AND.combine(vec(reject())) == REJECT);
     }
 
     @Test
@@ -45,9 +45,9 @@ public class BooleanCombinerTest {
         assertTrue(Function1.BooleanCombiner.OR.combine(null) == REJECT);
 
 //        assertTrue(Function1.BooleanCombiner.OR.combineArray(accept()) == ACCEPT);
-        assertTrue(Function1.BooleanCombiner.OR.combine(View.ofArray(accept())) == ACCEPT);
+        assertTrue(Function1.BooleanCombiner.OR.combine(vec(accept())) == ACCEPT);
 
 //        assertTrue(Function1.BooleanCombiner.OR.combineArray(reject()) == REJECT);
-        assertTrue(Function1.BooleanCombiner.OR.combine(View.ofArray(reject())) == REJECT);
+        assertTrue(Function1.BooleanCombiner.OR.combine(vec(reject())) == REJECT);
     }
 }

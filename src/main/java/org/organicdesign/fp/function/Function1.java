@@ -15,7 +15,8 @@
 package org.organicdesign.fp.function;
 
 import org.organicdesign.fp.Option;
-import org.organicdesign.fp.ephemeral.View;
+import org.organicdesign.fp.StaticImports;
+import org.organicdesign.fp.collections.UnmodIterable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -238,8 +239,9 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
     static <T> Function1<T,Boolean> and(Iterable<Function1<T,Boolean>> in) {
         if (in == null) { return accept(); }
 
-        View<Function1<T,Boolean>> v = (in instanceof View) ? (View<Function1<T,Boolean>>) in
-                : View.ofIter(in);
+        UnmodIterable<Function1<T,Boolean>> v =
+                (in instanceof UnmodIterable) ? (UnmodIterable<Function1<T,Boolean>>) in
+                                     : StaticImports.unmodIterable(in);
 
         return v.filter(p -> (p != null) && (p != ACCEPT))
                 .foldLeft(accept(),
@@ -268,8 +270,9 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
     static <T> Function1<T,Boolean> or(Iterable<Function1<T,Boolean>> in) {
         if (in == null) { return reject(); }
 
-        View<Function1<T,Boolean>> v = (in instanceof View) ? (View<Function1<T,Boolean>>) in
-                : View.ofIter(in);
+        UnmodIterable<Function1<T,Boolean>> v =
+                (in instanceof UnmodIterable) ? (UnmodIterable<Function1<T,Boolean>>) in
+                                     : StaticImports.unmodIterable(in);
 
         return v.filter(p -> (p != null) && (p != REJECT))
                 .foldLeft(reject(),

@@ -34,7 +34,6 @@ import org.organicdesign.fp.collections.UnmodSet;
 import org.organicdesign.fp.collections.UnmodSortedIterator;
 import org.organicdesign.fp.collections.UnmodSortedMap;
 import org.organicdesign.fp.collections.UnmodSortedSet;
-import org.organicdesign.fp.ephemeral.View;
 import org.organicdesign.fp.tuple.Tuple2;
 import org.organicdesign.fp.tuple.Tuple3;
 
@@ -134,7 +133,7 @@ public class StaticImports {
 
     /** Returns a new PersistentTreeSet of the given comparator and items. */
     public static <T> ImSortedSet<T> sortedSet(Comparator<? super T> comp, Iterable<T> items) {
-        return View.ofIter(items).toImSortedSet(comp);
+        return StaticImports.unmodIterable(items).toImSortedSet(comp);
     }
     // EqualsWhichDoesntCheckParameterClass Note:
     // http://codereview.stackexchange.com/questions/88333/is-one-sided-equality-more-helpful-or-more-confusing-than-quick-failure

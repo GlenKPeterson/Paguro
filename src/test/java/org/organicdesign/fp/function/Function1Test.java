@@ -3,7 +3,6 @@ package org.organicdesign.fp.function;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.organicdesign.fp.ephemeral.View;
 
 import java.io.IOException;
 
@@ -42,23 +41,23 @@ public class Function1Test {
     public void composePredicatesWithAnd() {
 //        assertTrue(Function1.andArray() == Function1.accept());
         assertTrue(Function1.and(null) == Function1.accept());
-        assertTrue(Function1.and(View.emptyView()) == Function1.accept());
+        assertTrue(Function1.and(vec()) == Function1.accept());
 
 //        assertTrue(Function1.andArray(Function1.accept()) == Function1.accept());
-        assertTrue(Function1.and(View.ofArray(Function1.accept())) ==
+        assertTrue(Function1.and(vec(Function1.accept())) ==
                    Function1.accept());
 
 //        assertTrue(Function1.<Object>andArray(Function1.accept(),
 //                                                  Function1.accept(),
 //                                                  Function1.accept()) ==
 //                   Function1.accept());
-        assertTrue(Function1.<Object>and(View.ofArray(Function1.accept(),
-                                                      Function1.accept(),
-                                                      Function1.accept())) ==
+        assertTrue(Function1.<Object>and(vec(Function1.accept(),
+                                             Function1.accept(),
+                                             Function1.accept())) ==
                    Function1.accept());
 
 //        assertTrue(Function1.andArray(Function1.reject()) == Function1.reject());
-        assertTrue(Function1.and(View.ofArray(Function1.reject())) ==
+        assertTrue(Function1.and(vec(Function1.reject())) ==
                    Function1.reject());
     }
 
@@ -68,7 +67,7 @@ public class Function1Test {
         assertTrue(Function1.or(null) == Function1.reject());
 
 //        assertTrue(Function1.orArray(Function1.accept()) == Function1.accept());
-        assertTrue(Function1.or(View.ofArray(Function1.accept())) ==
+        assertTrue(Function1.or(vec(Function1.accept())) ==
                    Function1.accept());
 
 //        assertTrue(Function1.<Object>orArray(Function1.reject(),
@@ -76,7 +75,7 @@ public class Function1Test {
 //                                             Function1.reject(),
 //                                             Function1.accept()) ==
 //                   Function1.accept());
-        assertTrue(Function1.<Object>or(View.ofArray(Function1.reject(),
+        assertTrue(Function1.<Object>or(vec(Function1.reject(),
                                                      Function1.reject(),
                                                      Function1.reject(),
                                                      Function1.accept())) ==
@@ -87,14 +86,14 @@ public class Function1Test {
 //                                             Function1.reject(),
 //                                             Function1.reject()) ==
 //                   Function1.accept());
-        assertTrue(Function1.<Object>or(View.ofArray(Function1.accept(),
+        assertTrue(Function1.<Object>or(vec(Function1.accept(),
                                                      Function1.reject(),
                                                      Function1.reject(),
                                                      Function1.reject())) ==
                    Function1.accept());
 
 //        assertTrue(Function1.orArray(Function1.reject()) == Function1.reject());
-        assertTrue(Function1.or(View.ofArray(Function1.reject())) ==
+        assertTrue(Function1.or(vec(Function1.reject())) ==
                 Function1.reject());
     }
 
@@ -146,21 +145,21 @@ public class Function1Test {
 
     @Test
     public void filtersOfPredicates() {
-        assertArrayEquals(View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+        assertArrayEquals(vec(1, 2, 3, 4, 5, 6, 7, 8, 9)
                         .filter(Function1.<Integer>and((i) -> i > 2,
                                 (i) -> i < 6))
                         .toMutableList()
                         .toArray(),
                 new Integer[]{3, 4, 5});
 
-        assertArrayEquals(View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+        assertArrayEquals(vec(1, 2, 3, 4, 5, 6, 7, 8, 9)
                         .filter(Function1.or(i -> i < 3,
                                 i -> i > 5))
                         .toMutableList()
                         .toArray(),
                 new Integer[]{1, 2, 6, 7, 8, 9});
 
-        assertArrayEquals(View.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9)
+        assertArrayEquals(vec(1, 2, 3, 4, 5, 6, 7, 8, 9)
                         .filter(Function1.or(vec(i -> i < 3,
                                 i -> i == 4,
                                 i -> i > 5)))
