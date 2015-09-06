@@ -2,7 +2,6 @@ package org.organicdesign.fp.xform;
 
 import org.junit.Test;
 import org.organicdesign.fp.collections.UnmodSortedIterable;
-import org.organicdesign.fp.permanent.Sequence;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -18,13 +17,13 @@ public class TransformableTest {
 
     @Test public void testToMutableList() throws Exception {
         List<Integer> control = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9);
-        Transformable<Integer> trans = Sequence.ofIter(control);
+        Transformable<Integer> trans = Xform.of(control);
         assertEquals(control, trans.toMutableList());
     }
 
     @Test public void testToImList() throws Exception {
         List<Integer> control = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9);
-        Transformable<Integer> trans = Sequence.ofIter(control);
+        Transformable<Integer> trans = Xform.of(control);
         assertEquals(control, trans.toImList());
     }
 
@@ -47,7 +46,7 @@ public class TransformableTest {
 
     @Test public void testToMutableSortedSet() throws Exception {
         SortedSet<Integer> control = new TreeSet<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9));
-        Transformable<Integer> trans = Sequence.ofIter(control);
+        Transformable<Integer> trans = Xform.of(control);
         assertTrue(UnmodSortedIterable.equals(UnmodSortedIterable.castFromSortedSet(control),
                                               UnmodSortedIterable.castFromSortedSet(trans.toMutableSortedSet((a, b) -> a - b))));
     }
@@ -55,20 +54,20 @@ public class TransformableTest {
     // TODO: Major Failure, probably due to PersistentHashMap.iterator() implementation.
     @Test public void testToImSet() throws Exception {
         Set<Integer> control = new HashSet<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9));
-        Transformable<Integer> trans = Sequence.ofIter(control);
+        Transformable<Integer> trans = Xform.of(control);
         assertEquals(control, trans.toImSet());
     }
 
     @Test public void testToImSortedSet() throws Exception {
         SortedSet<Integer> control = new TreeSet<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9));
-        Transformable<Integer> trans = Sequence.ofIter(control);
+        Transformable<Integer> trans = Xform.of(control);
         assertTrue(UnmodSortedIterable.equals(UnmodSortedIterable.castFromSortedSet(control),
                                               trans.toImSortedSet((a, b) -> a - b)));
     }
 
     @Test public void testToMutableSet() throws Exception {
         Set<Integer> control = new HashSet<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9));
-        Transformable<Integer> trans = Sequence.ofIter(control);
+        Transformable<Integer> trans = Xform.of(control);
         assertEquals(control, trans.toMutableSet());
     }
 }
