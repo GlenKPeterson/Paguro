@@ -1,7 +1,7 @@
 UncleJim ("**Un**modifiable **Coll**ections for **J**ava&trade; **Imm**utability") brings the following to Java:
 
 * Clojure's [immutable collections](src/main/java/org/organicdesign/fp/collections)
-* An immutable [Transformation Builder](https://github.com/GlenKPeterson/One-off_Examples/blob/master/src/main/java/org/organicdesign/fp/Xform.java) which is baked into every collection and collection wrapper.
+* An immutable [Transformation Builder](https://github.com/GlenKPeterson/UncleJim/blob/master/src/main/java/org/organicdesign/fp/xform/Transformable.java) which is baked into every collection and collection wrapper.
 * An [Equator](src/main/java/org/organicdesign/fp/collections/Equator.java) and [ComparisonContext](src/main/java/org/organicdesign/fp/collections/Equator.java#L45) which work like `java.util.Comparator`, but for hash-based collections.
 * Simplified [functional interfaces](src/main/java/org/organicdesign/fp/function) that wrap checked exceptions
 * [Memoization](src/main/java/org/organicdesign/fp/function/Function2.java#L59) for functions
