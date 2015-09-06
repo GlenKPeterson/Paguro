@@ -13,14 +13,11 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
-import org.organicdesign.fp.Option;
-import org.organicdesign.fp.permanent.Sequence;
-
 /**
  Holds Immutable "modification" methods that return a new ImList reflecting the modification while sharing as much data
  structure with the previous ImList as possible (for performance).
  */
-public interface ImList<E> extends UnmodList<E>, Sequence<E> {
+public interface ImList<E> extends UnmodList<E> {
     // Do we want to make an ImIterator that's truly immutable - a Sequence?
     // Kind of a moot point when this overrides the same method on Sequence.
     /** {@inheritDoc} */
@@ -90,22 +87,22 @@ public interface ImList<E> extends UnmodList<E>, Sequence<E> {
 //    @Override ImList<E> concat(Sequence<E> other);
 
 
-    /**
-     The first item in this sequence.  This was originally called first() but that conflicted with SortedSet.first()
-     which did not return an Option and threw an exception when the set was empty.
-     */
-    @Override default Option<E> head() {
-        return size() > 0 ? Option.of(get(0)) : Option.none();
-    }
-
-    /**
-     The rest of this sequnce (all the items after its head).  This was originally called rest(), but when I renamed
-     first() to head(), I renamed rest() to tail() so that it wouldn't mix metaphors.
-     */
-    @Override default Sequence<E> tail() {
-        return Sequence.ofIter(this).tail();
-    }
-
+//    /**
+//     The first item in this sequence.  This was originally called first() but that conflicted with SortedSet.first()
+//     which did not return an Option and threw an exception when the set was empty.
+//     */
+//    @Override default Option<E> head() {
+//        return size() > 0 ? Option.of(get(0)) : Option.none();
+//    }
+//
+//    /**
+//     The rest of this sequnce (all the items after its head).  This was originally called rest(), but when I renamed
+//     first() to head(), I renamed rest() to tail() so that it wouldn't mix metaphors.
+//     */
+//    @Override default Sequence<E> tail() {
+//        return Sequence.ofIter(this).tail();
+//    }
+//
     /**
      * This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for
      * backwards compatibility in some performance-critical situations.

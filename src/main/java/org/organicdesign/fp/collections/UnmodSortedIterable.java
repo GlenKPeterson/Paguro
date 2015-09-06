@@ -63,6 +63,14 @@ public interface UnmodSortedIterable<T> extends UnmodIterable<T> {
         };
     }
 
+    static <U> UnmodSortedIterable<U> castFromTypedList(List<U> ss) {
+        return () -> new UnmodSortedIterator<U>() {
+            Iterator<U> iter = ss.iterator();
+            @Override public boolean hasNext() { return iter.hasNext(); }
+            @Override public U next() { return iter.next(); }
+        };
+    }
+
 //    static <K,V> UnmodSortedIterable<Map.Entry<K,V>> castFromSortedMap(SortedMap<K,V> sm) {
 //        return () -> new UnmodSortedIterator<Map.Entry<K,V>>() {
 //            Iterator<Map.Entry<K,V>> iter = sm.entrySet().iterator();

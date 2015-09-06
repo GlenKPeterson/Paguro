@@ -250,10 +250,11 @@ public class PersistentTreeMapTest {
 
         assertArrayEquals(new UnmodMap.UnEntry[]{tup(2, "two"), tup(3, "three")},
                           PersistentTreeMap.of(vec(tup(1, "one"))).assoc(2, "two").assoc(3, "three")
-                                           .tail()
+                                           .drop(1)
                                            .map((u) -> tup(u.getKey(), u.getValue())).toArray());
 
-        assertTrue(Sequence.emptySequence().equals(PersistentTreeMap.of(vec(tup(1, "one"))).tail()));
+        assertTrue(Sequence.emptySequence().equals(PersistentTreeMap.of(vec(tup(1, "one")))
+                                                                    .drop(1)));
     }
 
     public void friendlierArrayEq(Object[] a1, Object[] a2) {
@@ -389,12 +390,12 @@ public class PersistentTreeMapTest {
         assertArrayEquals(new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21},
                           m.keySet().toArray());
         assertTrue(UnmodSortedIterable.equals(
-                Sequence.ofArray("one again", "two", "three", "four", "five", "six", "seven", "eight",
-                                 "nine again", "ten again", "eleven again", "twelve", "thirteen",
-                                 "fourteen",
-                                 "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty again",
-                                 "twenty one"),
-                m.map(e -> e.getValue())));
+                vec("one again", "two", "three", "four", "five", "six", "seven", "eight",
+                    "nine again", "ten again", "eleven again", "twelve", "thirteen",
+                    "fourteen",
+                    "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty again",
+                    "twenty one"),
+                vec(m.map(e -> e.getValue()))));
     }
 
     @Test public void entrySet() {

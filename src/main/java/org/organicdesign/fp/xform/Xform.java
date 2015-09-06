@@ -15,6 +15,9 @@
 package org.organicdesign.fp.xform;
 
 import org.organicdesign.fp.Or;
+import org.organicdesign.fp.StaticImports;
+import org.organicdesign.fp.collections.UnmodIterable;
+import org.organicdesign.fp.collections.UnmodIterator;
 import org.organicdesign.fp.function.Function1;
 import org.organicdesign.fp.function.Function2;
 
@@ -42,7 +45,7 @@ import java.util.List;
  an outline for what was ideal and also what was important.  All errors are my own.
  -Glen 2015-08-30
  */
-public abstract class Xform<A> implements Transformable<A>, Iterable<A> {
+public abstract class Xform<A> implements UnmodIterable<A> {
 
     enum OpStrategy { HANDLE_INTERNALLY, ASK_SUPPLIER, CANNOT_HANDLE; }
 
@@ -458,9 +461,10 @@ public abstract class Xform<A> implements Transformable<A>, Iterable<A> {
         return (H) ret;
     } // end _foldLeft();
 
-    // I'm unsure of whether to make this an UnmodIterable or not since that would be nice, but it
-    // would also be circular inheritance.
-    @Override public Iterator<A> iterator() { return toMutableList().iterator(); }
+    @Override public UnmodIterator<A> iterator() {
+        // TODO: I had a really fast array-list implementation that I could probably hack into this for performance (assuming it actually works).
+        return StaticImports.unmodIterable(toMutableList()).iterator();
+    }
 
     // =============================================================================================
     // These will come from Transformable, but (will be) overridden to have a different return type.

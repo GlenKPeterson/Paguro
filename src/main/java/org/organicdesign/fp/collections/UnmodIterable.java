@@ -1,5 +1,6 @@
 package org.organicdesign.fp.collections;
 
+import org.organicdesign.fp.Option;
 import org.organicdesign.fp.function.Function1;
 import org.organicdesign.fp.function.Function2;
 import org.organicdesign.fp.xform.Transformable;
@@ -11,8 +12,10 @@ import java.util.Iterator;
 public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
     // ==================================================== Static ====================================================
 
-    // This hides the same method on all sub-interfaces!
-//    static <E> UnmodIterable<E> empty() { return () -> UnmodIterator.empty(); }
+    static UnmodIterable<Object> EMPTY = () -> UnmodIterator.empty();
+
+    @SuppressWarnings("unchecked")
+    static <E> UnmodIterable<E> emptyUnmodIterable() { return (UnmodIterable<E>) EMPTY; }
 
     //    /**
 //     Caution: this is a convenient optimization for immutable data structures and a nightmare waiting to happen to
@@ -124,17 +127,17 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
     // =============================== Inherited from Transformable ===============================
 
     /** {@inheritDoc} */
-    @Override default Transformable<T> concat(Iterable<? extends T> list) {
+    @Override default UnmodIterable<T> concat(Iterable<? extends T> list) {
         return Xform.of(this).concat(list);
     }
 
     /** {@inheritDoc} */
-    @Override default Transformable<T> precat(Iterable<? extends T> list) {
+    @Override default UnmodIterable<T> precat(Iterable<? extends T> list) {
         return Xform.of(this).precat(list);
     }
 
     /** {@inheritDoc} */
-    @Override default Transformable<T> drop(long n) {
+    @Override default UnmodIterable<T> drop(long n) {
         return Xform.of(this).drop(n);
     }
 
@@ -150,27 +153,47 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
     }
 
     /** {@inheritDoc} */
-    @Override default Transformable<T> filter(Function1<? super T,Boolean> f) {
+    @Override default UnmodIterable<T> filter(Function1<? super T,Boolean> f) {
         return Xform.of(this).filter(f);
     }
 
     /** {@inheritDoc} */
-    @Override default <B> Transformable<B> flatMap(Function1<? super T,Iterable<B>> f) {
+    @Override default <B> UnmodIterable<B> flatMap(Function1<? super T,Iterable<B>> f) {
         return Xform.of(this).flatMap(f);
     }
 
     /** {@inheritDoc} */
-    @Override default <B> Transformable<B> map(Function1<? super T, ? extends B> f) {
+    @Override default <B> UnmodIterable<B> map(Function1<? super T, ? extends B> f) {
         return Xform.of(this).map(f);
     }
 
     /** {@inheritDoc} */
-    @Override default Transformable<T> take(long numItems) {
+    @Override default UnmodIterable<T> take(long numItems) {
         return Xform.of(this).take(numItems);
     }
 
     /** {@inheritDoc} */
-    @Override default Transformable<T> takeWhile(Function1<? super T,Boolean> f) {
+    @Override default UnmodIterable<T> takeWhile(Function1<? super T,Boolean> f) {
         return Xform.of(this).takeWhile(f);
     }
+
+    // TODO: This is for temporary Sequence backward-compatibility.  Remove once Sequence is deleted.
+    /**
+     The first item in this sequence.  This was originally called first() but that conflicted with SortedSet.first()
+     which did not return an Option and threw an exception when the set was empty.
+     */
+    default Option<T> head() {
+        Iterator<T> iter = iterator();
+        return iter.hasNext() ? Option.of(iter.next())
+                              : Option.none();
+    }
+
+//    /**
+//     The rest of this sequnce (all the items after its head).  This was originally called rest(), but when I renamed
+//     first() to head(), I renamed rest() to tail() so that it wouldn't mix metaphors.
+//     */
+//    @Deprecated
+//    default Transformable<T> tail() {
+//        return Xform.of(this).drop(1);
+//    }
 }

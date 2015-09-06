@@ -16,6 +16,8 @@ package org.organicdesign.fp.collections;
 
 import org.junit.Test;
 
+import java.util.Arrays;
+
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -64,6 +66,6 @@ public class ImListTest {
 
         PersistentVector<String> pv = PersistentVector.of("d", "e", "f");
         assertArrayEquals(new String[]{"a", "b", "c", "d", "e", "f"},
-                          pv.prepend("a", "b", "c").toArray());
+                          pv.precat(Arrays.asList("a", "b", "c")).toArray());
     }
 }

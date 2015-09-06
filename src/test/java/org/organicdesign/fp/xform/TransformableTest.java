@@ -52,6 +52,7 @@ public class TransformableTest {
                                               UnmodSortedIterable.castFromSortedSet(trans.toMutableSortedSet((a, b) -> a - b))));
     }
 
+    // TODO: Major Failure, probably due to PersistentHashMap.iterator() implementation.
     @Test public void testToImSet() throws Exception {
         Set<Integer> control = new HashSet<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9));
         Transformable<Integer> trans = Sequence.ofIter(control);

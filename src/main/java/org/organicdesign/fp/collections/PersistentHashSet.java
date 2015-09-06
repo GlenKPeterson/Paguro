@@ -13,8 +13,6 @@
 
 package org.organicdesign.fp.collections;
 
-import org.organicdesign.fp.permanent.Sequence;
-
 import java.util.Set;
 
 public class PersistentHashSet<E> implements ImSet<E> {
@@ -91,7 +89,9 @@ public class PersistentHashSet<E> implements ImSet<E> {
         return new PersistentHashSet<>(impl.assoc(o, o));
     }
 
-    @Override public Sequence<E> seq() { return impl.seq().map(e -> e.getKey()); }
+//    @Override public Sequence<E> seq() { return impl.seq().map(e -> e.getKey()); }
+
+    @Override public UnmodIterator<E> iterator() { return impl.map(e -> e.getKey()).iterator(); }
 
     @Override public int size() { return impl.size(); }
 
@@ -114,7 +114,11 @@ public class PersistentHashSet<E> implements ImSet<E> {
             return this;
         }
 
-        @Override public Sequence<E> seq() { return impl.keySet().seq(); }
+//        @Deprecated
+//        @Override public Sequence<E> seq() { return impl.keySet().seq(); }
+
+        @Override
+        public UnmodIterator<E> iterator() { return impl.map(e -> e.getKey()).iterator(); }
 
         @SuppressWarnings("unchecked")
         @Override public boolean contains(Object key) {

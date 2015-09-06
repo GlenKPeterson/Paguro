@@ -21,8 +21,11 @@ import org.organicdesign.fp.tuple.Tuple2;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -213,8 +216,32 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 
     @Override public int hashCode() { return UnmodIterable.hashCode(this); }
 
-    @Override public UnmodIterator<UnEntry<K,V>> iterator(){
-        return seq().iterator();
+    @Override public UnmodIterator<UnEntry<K,V>> iterator() {
+        final UnmodIterator<UnEntry<K,V>> rootIter = (root == null) ? UnmodIterator.empty()
+                                                                    : root.iterator();
+        if (hasNull) {
+            return new UnmodIterator<UnEntry<K,V>>() {
+                private boolean seen = false;
+                @Override public boolean hasNext() {
+                    if (!seen) {
+                        return true;
+                    } else {
+                        return rootIter.hasNext();
+                    }
+                }
+
+                @Override public UnEntry<K,V> next(){
+                    if (!seen) {
+                        seen = true;
+                        return Tuple2.of(null, nullValue);
+                    } else {
+                        return rootIter.next();
+                    }
+                }
+            };
+        } else {
+            return rootIter;
+        }
     }
 
     @Override public final PersistentHashMap<K,V> persistent() { return this; }
@@ -247,13 +274,12 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 //        return fjinvoke.apply(top);
 //    }
 
-    // TODO: This suppression isn't right.  s.precat() should be totally happy.
-    @SuppressWarnings("unchecked")
-    @Override public Sequence<UnmodMap.UnEntry<K,V>> seq() {
-//        System.out.println("root: " + root);
-        Sequence<UnmodMap.UnEntry<K,V>> s = root != null ? root.nodeSeq() : Sequence.emptySequence();
-        return hasNull ? s.prepend((UnmodMap.UnEntry<K,V>) Tuple2.of((K) null, nullValue)) : s;
-    }
+//    @SuppressWarnings("unchecked")
+//    @Override public Sequence<UnEntry<K,V>> seq() {
+////        System.out.println("root: " + root);
+//        Sequence<UnEntry<K,V>> s = root != null ? root.nodeSeq() : Sequence.emptySequence();
+//        return hasNull ? s.prepend((UnEntry<K,V>) Tuple2.of((K) null, nullValue)) : s;
+//    }
 
     /** {@inheritDoc} */
     @Override public int size() { return count; }
@@ -332,12 +358,18 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
             return Option.someOrNullNoneOf(entry);
         }
 
-        @Override
-        // TODO: This suppression isn't right.  s.precat() should be totally happy.
-        @SuppressWarnings("unchecked")
-        public Sequence<UnmodMap.UnEntry<K,V>> seq() {
-            Sequence<UnmodMap.UnEntry<K,V>> s = root != null ? root.nodeSeq() : Sequence.emptySequence();
-            return hasNull ? s.prepend((UnmodMap.UnEntry<K,V>) Tuple2.of((K) null, nullValue)) : s;
+//        @Override
+//        @SuppressWarnings("unchecked")
+//        public Sequence<UnEntry<K,V>> seq() {
+//            Sequence<UnEntry<K,V>> s = root != null ? root.nodeSeq() : Sequence.emptySequence();
+//            return hasNull ? s.prepend((UnEntry<K,V>) Tuple2.of((K) null, nullValue)) : s;
+//        }
+
+        @Override public UnmodIterator<UnEntry<K,V>> iterator() {
+            UnmodIterable<UnEntry<K,V>> s = root != null ? root.nodeSeq()
+                                                                  : UnmodIterable.emptyUnmodIterable();
+            return hasNull ? s.precat(Collections.singletonList((UnEntry<K,V>) Tuple2.of((K) null, nullValue))).iterator()
+                           : s.iterator();
         }
 
         @Override public final TransientHashMap<K,V> without(K key) {
@@ -395,6 +427,8 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 
         <R> R fold(Function2<R,R,R> combinef, Function3<R,K,V,R> reducef, final Function1<Function0,R> fjtask,
                    final Function1<R,Object> fjfork, final Function1<Object,R> fjjoin);
+
+        UnmodIterator<UnEntry<K,V>> iterator();
     }
 
     final static class ArrayNode<K,V> implements INode<K,V> {
@@ -460,6 +494,10 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         }
 
         @Override public Sequence<UnmodMap.UnEntry<K,V>> nodeSeq(){ return Seq.create(array); }
+
+        @Override public UnmodIterator<UnEntry<K,V>> iterator() {
+            return new Iter<>(array);
+        }
 
         @Override public <R> R kvreduce(Function3<R,K,V,R> f, R init){
             for(INode<K,V> node : array){
@@ -582,21 +620,21 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
             return UnmodIterable.toString("ArrayNode", this.nodeSeq());
         }
 
-        static class Seq<K,V> implements Sequence<UnmodMap.UnEntry<K,V>> {
+        static class Seq<K,V> implements Sequence<UnEntry<K,V>> {
             final INode<K,V>[] nodes;
             final int i;
-            final Sequence<UnmodMap.UnEntry<K,V>> s;
+            final Sequence<UnEntry<K,V>> s;
 
-            static <K,V> Sequence<UnmodMap.UnEntry<K,V>> create(INode<K,V>[] nodes) {
+            static <K,V> Sequence<UnEntry<K,V>> create(INode<K,V>[] nodes) {
                 return create(nodes, 0, null);
             }
 
-            private static <K,V> Sequence<UnmodMap.UnEntry<K,V>> create(INode<K,V>[] nodes, int i, Sequence<UnmodMap.UnEntry<K,V>> s) {
+            private static <K,V> Sequence<UnEntry<K,V>> create(INode<K,V>[] nodes, int i, Sequence<UnEntry<K,V>> s) {
                 if ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) ) { return new Seq<>(nodes, i, s); }
 
                 for(int j = i; j < nodes.length; j++) {
                     if (nodes[j] != null) {
-                        Sequence<UnmodMap.UnEntry<K,V>> ns = nodes[j].nodeSeq();
+                        Sequence<UnEntry<K,V>> ns = nodes[j].nodeSeq();
                         if (ns != null) {
                             return new Seq<>(nodes, j + 1, ns);
                         }
@@ -605,20 +643,20 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
                 return Sequence.emptySequence();
             }
 
-            private Seq(INode<K,V>[] nodes, int i, Sequence<UnmodMap.UnEntry<K,V>> s) {
+            private Seq(INode<K,V>[] nodes, int i, Sequence<UnEntry<K,V>> s) {
                 super();
                 this.nodes = nodes;
                 this.i = i;
                 this.s = s;
             }
 
-            @Override public Option<UnmodMap.UnEntry<K,V>> head() {
+            @Override public Option<UnEntry<K,V>> head() {
                 return ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) )
                        ? s.head()
                        : Option.none();
             }
 
-            @Override public Sequence<UnmodMap.UnEntry<K,V>> tail() {
+            @Override public Sequence<UnEntry<K,V>> tail() {
                 if ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) ) {
                     return create(nodes, i, s.tail());
                 }
@@ -626,7 +664,45 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 
             }
         }
-    }
+
+        static class Iter<K,V> implements UnmodIterator<UnEntry<K,V>> {
+            private final INode<K,V>[] array;
+            private int i = 0;
+            private UnmodIterator<UnEntry<K,V>> nestedIter;
+
+            private Iter(INode<K,V>[] array){
+                this.array = array;
+            }
+
+            @Override public boolean hasNext(){
+                while(true) {
+                    if (nestedIter != null) {
+                        if (nestedIter.hasNext()) {
+                            return true;
+                        } else {
+                            nestedIter = null;
+                        }
+                    }
+                    if (i < array.length) {
+                        INode<K,V> node = array[i++];
+                        if (node != null) {
+                            nestedIter = node.iterator();
+                        }
+                    } else {
+                        return false;
+                    }
+                }
+            }
+
+            @Override public UnEntry<K,V> next(){
+                if (hasNext()) {
+                    return nestedIter.next();
+                } else {
+                    throw new NoSuchElementException();
+                }
+            }
+        }
+    } // end class ArrayNode<K,V>
 
     @SuppressWarnings("unchecked")
     final static class BitmapIndexedNode<K,V> implements INode<K,V> {
@@ -760,6 +836,10 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         }
 
         @Override public Sequence<UnmodMap.UnEntry<K,V>> nodeSeq() { return NodeSeq.create(array); }
+
+        @Override public UnmodIterator<UnEntry<K,V>> iterator(){
+            return new NodeIter<>(array);
+        }
 
         @Override public <R> R kvreduce(Function3<R,K,V,R> f, R init){
             return NodeSeq.kvreduce(array,f,init);
@@ -954,6 +1034,10 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         }
 
         @Override public Sequence<UnmodMap.UnEntry<K,V>> nodeSeq() { return NodeSeq.create(array); }
+
+        @Override public UnmodIterator<UnEntry<K,V>> iterator(){
+            return new NodeIter<>(array);
+        }
 
         @Override public <R> R kvreduce(Function3<R,K,V,R> f, R init){
             return NodeSeq.kvreduce(array,f,init);
@@ -1181,6 +1265,86 @@ public static void main(String[] args){
 
     private static int bitpos(int hash, int shift){
         return 1 << mask(hash, shift);
+    }
+
+    static final class NodeIter<K,V> implements UnmodIterator<UnEntry<K,V>> {
+        private static final UnEntry ABSENCE = new UnEntry() {
+            @Override public Object getKey() {
+                throw new UnsupportedOperationException("This class is a sentinel value.  If you can see this, something is terribly wrong.");
+            }
+            @Override public Object getValue() {
+                throw new UnsupportedOperationException("This class is a sentinel value.  If you can see this, something is terribly wrong.");
+            }
+        };
+        @SuppressWarnings("unchecked")
+        private static <K,V> UnEntry<K,V> absence() { return (UnEntry<K,V>) ABSENCE; }
+
+        final Object[] array;
+        private int i = 0;
+        private UnEntry<K,V> nextEntry = absence();
+        private Iterator<UnEntry<K,V>> nextIter;
+
+        NodeIter(Object[] array){
+            this.array = array;
+        }
+
+        private boolean advance(){
+//            while (i < array.length) {
+//                K key = k(array, i);
+//                Object nodeOrVal = array[i+1];
+//                i += 2;
+//                if (key != null) {
+//                    nextEntry = Tuple2.of(key, (V) nodeOrVal);
+//                    return true;
+//                } else if(nodeOrVal != null) {
+//                    Iterator<UnEntry<K,V>> iter = ((INode<K,V>) nodeOrVal).iterator();
+//                    if (iter != null && iter.hasNext()) {
+//                        nextIter = iter;
+//                        return true;
+//                    }
+//                }
+//            }
+            for (; i < array.length; i += 2) {
+                if (array[i] != null) {
+                    nextEntry = Tuple2.of(k(array, i), v(array, i+1));
+                    return true;
+                } else {
+                    INode<K,V> node = iNode(array, i + 1);
+                    if (node != null) {
+                        Iterator<UnEntry<K,V>> iter = node.iterator();
+                        if (iter != null && iter.hasNext()) {
+                            nextIter = iter;
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        @Override public boolean hasNext(){
+            if (nextEntry != ABSENCE || nextIter != null) {
+                return true;
+            }
+            return advance();
+        }
+
+        @Override public UnEntry<K,V> next(){
+            UnEntry<K,V> ret = nextEntry;
+            if(ret != ABSENCE) {
+                nextEntry = absence();
+                return ret;
+            } else if(nextIter != null) {
+                ret = nextIter.next();
+                if ( !nextIter.hasNext()) {
+                    nextIter = null;
+                }
+                return ret;
+            } else if(advance()) {
+                return next();
+            }
+            throw new NoSuchElementException();
+        }
     }
 
     static final class NodeSeq<K,V> implements Sequence<UnmodMap.UnEntry<K,V>> {

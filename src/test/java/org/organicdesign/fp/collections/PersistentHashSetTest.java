@@ -148,7 +148,7 @@ public class PersistentHashSetTest {
     @Test public void seq3() {
         PersistentHashSet<String> m1 = PersistentHashSet.of(vec("c"));
         assertEquals(Option.of("c"),
-                     m1.seq().head());
+                     m1.head());
 
         PersistentHashSet<String> m2 = PersistentHashSet.of(vec("c", "b", "a"));
 
@@ -156,22 +156,22 @@ public class PersistentHashSetTest {
                                                             Option.of("b"),
                                                             Option.of("a")));
 
-        Sequence<String> seq = m2.seq();
+        UnmodIterable<String> seq = m2;
         Option o = seq.head();
         assertTrue(s.contains(o));
         s.remove(o);
 
-        seq = seq.tail();
+        seq = seq.drop(1);
         o = seq.head();
         assertTrue(s.contains(o));
         s.remove(o);
 
-        seq = seq.tail();
+        seq = seq.drop(1);
         o = seq.head();
         assertTrue(s.contains(o));
         s.remove(o);
 
-        seq = seq.tail();
+        seq = seq.drop(1);
         o = seq.head();
         assertEquals(Option.none(), o);
     }
@@ -184,14 +184,14 @@ public class PersistentHashSetTest {
 
         // System.out.println("s1: " + s1);
 
-        Sequence<String> seq1 = m1.seq();
+        UnmodIterable<String> seq1 = m1;
         Option<String> o1 = seq1.head();
         while (o1.isSome()) {
             String entry = o1.get();
             // System.out.println("entry: " + entry);
             assertTrue(s1.contains(entry));
             s1.remove(entry);
-            seq1 = seq1.tail();
+            seq1 = seq1.drop(1);
             o1 = seq1.head();
         }
         assertEquals(0, s1.size());
@@ -210,7 +210,7 @@ public class PersistentHashSetTest {
             set.add(i);
             accum = accum.put(i);
 
-            Option<Integer> o = accum.seq().head();
+            Option<Integer> o = accum.head();
             assertTrue(o.isSome());
             //noinspection ConstantConditions
             assertTrue(o.get() instanceof Integer);
@@ -219,14 +219,14 @@ public class PersistentHashSetTest {
             assertTrue(accum.contains(i));
         }
 
-        Sequence<Integer> seq = accum.seq();
+        UnmodIterable<Integer> seq = accum;
         for (int i = 0; i < MAX; i++) {
             Option<Integer> o = seq.head();
 
             assertTrue(set.contains(o.get()));
             set.remove(o.get());
 
-            seq = seq.tail();
+            seq = seq.drop(1);
         }
 //        System.out.println("seq: " + seq);
         assertFalse(seq.head().isSome());
@@ -249,27 +249,27 @@ public class PersistentHashSetTest {
         hs.add(5);
         assertEquals(hs.size(), s1.size());
 
-        Sequence<Integer> seq = s1.seq();
+        UnmodIterable<Integer> seq = s1;
         Integer item = seq.head().get();
         assertTrue(hs.contains(item));
 
         hs.remove(item);
         s1 = s1.without(item);
-        seq = seq.tail();
+        seq = seq.drop(1);
         item = seq.head().get();
         assertEquals(hs.size(), s1.size());
         assertTrue(hs.contains(item));
 
         hs.remove(item);
         s1 = s1.without(item);
-        seq = seq.tail();
+        seq = seq.drop(1);
         item = seq.head().get();
         assertEquals(hs.size(), s1.size());
         assertTrue(hs.contains(item));
 
         hs.remove(item);
         s1 = s1.without(item);
-        seq = seq.tail();
+        seq = seq.drop(1);
         assertEquals(Sequence.EMPTY_SEQUENCE, seq);
         assertEquals(0, hs.size());
         assertEquals(0, s1.size());

@@ -10,7 +10,6 @@
 package org.organicdesign.fp.collections;
 
 import org.organicdesign.fp.Option;
-import org.organicdesign.fp.permanent.Sequence;
 
 import java.util.Comparator;
 import java.util.SortedSet;
@@ -176,9 +175,9 @@ public class PersistentTreeSet<E> implements ImSortedSet<E> {
         return PersistentTreeSet.ofMap(impl.subMap(fromElement, toElement));
     }
 
-    // TODO: Ensure that KeySet is sorted.
-    /** {@inheritDoc} */
-    @Override public Sequence<E> tail() { return impl.without(first()).keySet().seq(); }
+//    // TODO: Ensure that KeySet is sorted.
+//    /** {@inheritDoc} */
+//    @Override public Sequence<E> tail() { return impl.without(first()).keySet().seq(); }
 
     /** Returns a string representation of this set. */
     @Override public String toString() { return UnmodIterable.toString("PersistentTreeSet", this); }

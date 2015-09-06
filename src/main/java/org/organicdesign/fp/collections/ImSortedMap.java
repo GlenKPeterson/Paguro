@@ -14,13 +14,12 @@
 package org.organicdesign.fp.collections;
 
 import org.organicdesign.fp.Option;
-import org.organicdesign.fp.permanent.Sequence;
 
 import java.util.Collection;
 import java.util.Map;
 
 /** An immutable sorted map. */
-public interface ImSortedMap<K,V> extends UnmodSortedMap<K,V>, Sequence<UnmodMap.UnEntry<K,V>> {
+public interface ImSortedMap<K,V> extends UnmodSortedMap<K,V> {
 
     Option<UnmodMap.UnEntry<K,V>> entry(K key);
 
@@ -75,7 +74,10 @@ public interface ImSortedMap<K,V> extends UnmodSortedMap<K,V>, Sequence<UnmodMap
         final ImSortedMap<K,V> inner = this;
         return new UnmodSortedCollection<V>() {
             @Override public UnmodSortedIterator<V> iterator() {
-                return inner.entrySet().map(e -> e.getValue()).iterator();
+                return UnmodSortedIterable.castFromTypedList(inner.entrySet()
+                                                                  .map(e -> e.getValue())
+                                                                  .toMutableList())
+                                          .iterator();
             }
             @Override public int size() { return inner.size(); }
 

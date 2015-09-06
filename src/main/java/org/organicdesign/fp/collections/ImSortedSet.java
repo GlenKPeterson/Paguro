@@ -13,10 +13,8 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
-import org.organicdesign.fp.permanent.Sequence;
-
 /** An immutable sorted set interface */
-public interface ImSortedSet<E> extends ImSet<E>, UnmodSortedSet<E>, Sequence<E> {
+public interface ImSortedSet<E> extends ImSet<E>, UnmodSortedSet<E> {
     /** {@inheritDoc} */
     @Override
     ImSortedSet<E> put(E e);
@@ -41,8 +39,8 @@ public interface ImSortedSet<E> extends ImSet<E>, UnmodSortedSet<E>, Sequence<E>
      */
     @Override default Object[] toArray() { return UnmodCollection.toArray(this); }
 
-    /** A sequence of the items contained in this set in order.  Just returns this SetOrdered. */
-    @Override default Sequence<E> seq() { return this; }
+//    /** A sequence of the items contained in this set in order.  Just returns this SetOrdered. */
+//    @Override default Sequence<E> seq() { return this; }
 
     /** Return the elements in this set from the start element (inclusive) to the end element (exclusive) */
     @Override

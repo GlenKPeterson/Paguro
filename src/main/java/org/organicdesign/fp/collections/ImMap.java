@@ -1,7 +1,6 @@
 package org.organicdesign.fp.collections;
 
 import org.organicdesign.fp.Option;
-import org.organicdesign.fp.permanent.Sequence;
 
 import java.util.Map;
 
@@ -9,7 +8,7 @@ import java.util.Map;
 public interface ImMap<K,V> extends UnmodMap<K,V> {
     Option<UnmodMap.UnEntry<K,V>> entry(K key);
 
-    Sequence<UnEntry<K,V>> seq();
+//    Sequence<UnEntry<K,V>> seq();
 
     /** Returns a new map with the given key/value added */
     ImMap<K,V> assoc(K key, V val);
@@ -21,7 +20,7 @@ public interface ImMap<K,V> extends UnmodMap<K,V> {
      * Returns a view of the mappings contained in this map.  The set should actually contain UnmodMap.Entry items, but
      * that return signature is illegal in Java, so you'll just have to remember. */
     @Override default ImSet<Map.Entry<K,V>> entrySet() {
-        return seq().map(e -> (Map.Entry<K,V>) e)
+        return map(e -> (Map.Entry<K,V>) e)
                 .toImSet();
     }
 
@@ -42,9 +41,9 @@ public interface ImMap<K,V> extends UnmodMap<K,V> {
         return entry.isSome() ? entry.get().getValue() : notFound;
     }
 
-    @Override default UnmodCollection<V> values() { return seq().map(e -> e.getValue()).toImSet(); }
+    @Override default UnmodCollection<V> values() { return map(e -> e.getValue()).toImSet(); }
 
-    @Override default UnmodIterator<UnEntry<K,V>> iterator() { return seq().iterator(); }
+//    @Override default UnmodIterator<UnEntry<K,V>> iterator() { return seq().iterator(); }
 
     /** Returns a new map with an immutable copy of the given entry added */
     default ImMap<K,V> assoc(Map.Entry<K,V> entry) { return assoc(entry.getKey(), entry.getValue()); }

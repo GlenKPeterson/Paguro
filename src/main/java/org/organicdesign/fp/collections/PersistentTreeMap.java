@@ -9,7 +9,6 @@
 package org.organicdesign.fp.collections;
 
 import org.organicdesign.fp.Option;
-import org.organicdesign.fp.permanent.Sequence;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -318,18 +317,18 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V> {
         return ret;
     }
 
-    /** {@inheritDoc} */
-    @Override public Sequence<UnEntry<K,V>> tail() {
-        if (size() > 1) {
-            return without(firstKey());
-//            // The iterator is designed to do this quickly.  It also prevents an infinite loop here.
-//            UnmodIterator<UnEntry<K,V>> iter = this.iterator();
-//            // Drop the head
-//            iter.next();
-//            return tailMap(iter.next().getKey());
-        }
-        return Sequence.emptySequence();
-    }
+//    /** {@inheritDoc} */
+//    @Override public Sequence<UnEntry<K,V>> tail() {
+//        if (size() > 1) {
+//            return without(firstKey());
+////            // The iterator is designed to do this quickly.  It also prevents an infinite loop here.
+////            UnmodIterator<UnEntry<K,V>> iter = this.iterator();
+////            // Drop the head
+////            iter.next();
+////            return tailMap(iter.next().getKey());
+//        }
+//        return Sequence.emptySequence();
+//    }
 
 //    @SuppressWarnings("unchecked")
 //    static public <S, K extends S, V extends S> PersistentTreeMap<K,V> create(ISeq<S> items) {
@@ -414,14 +413,14 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V> {
 //    @Override
 //    public ISeq<Map.Entry<K,V>> seq() {
 //        if (size > 0)
-//            return Seq.create(tree, true, size);
+//            return Iter.create(tree, true, size);
 //        return null;
 //    }
 //
 //    @Override
 //    public ISeq<Map.Entry<K,V>> rseq() {
 //        if (size > 0)
-//            return Seq.create(tree, false, size);
+//            return Iter.create(tree, false, size);
 //        return null;
 //    }
 
@@ -438,7 +437,7 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V> {
 //    @Override
 //    public ISeq<Map.Entry<K,V>> seq(boolean ascending) {
 //        if (size > 0)
-//            return Seq.create(tree, ascending, size);
+//            return Iter.create(tree, ascending, size);
 //        return null;
 //    }
 
@@ -452,7 +451,7 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V> {
 //                int c = doCompare((K) key, t.key);
 //                if (c == 0) {
 //                    stack = RT.cons(t, stack);
-//                    return new Seq<>(stack, ascending);
+//                    return new Iter<>(stack, ascending);
 //                } else if (ascending) {
 //                    if (c < 0) {
 //                        stack = RT.cons(t, stack);
@@ -468,7 +467,7 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V> {
 //                }
 //            }
 //            if (stack != null)
-//                return new Seq<>(stack, ascending);
+//                return new Iter<>(stack, ascending);
 //        }
 //        return null;
 //    }
@@ -1038,32 +1037,32 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V> {
     }
 
 
-//    static public class Seq<K, V> extends ASeq<Map.Entry<K,V>> {
+//    static public class Iter<K, V> extends ASeq<Map.Entry<K,V>> {
 //        final ISeq<Node<K,V>> stack;
 //        final boolean asc;
 //        final int cnt;
 //
-//        public Seq(ISeq<Node<K,V>> stack, boolean asc) {
+//        public Iter(ISeq<Node<K,V>> stack, boolean asc) {
 //            this.stack = stack;
 //            this.asc = asc;
 //            this.cnt = -1;
 //        }
 //
-//        public Seq(ISeq<Node<K,V>> stack, boolean asc, int cnt) {
+//        public Iter(ISeq<Node<K,V>> stack, boolean asc, int cnt) {
 //            this.stack = stack;
 //            this.asc = asc;
 //            this.cnt = cnt;
 //        }
 //
-//        Seq(ISeq<Node<K,V>> stack, boolean asc, int cnt) {
+//        Iter(ISeq<Node<K,V>> stack, boolean asc, int cnt) {
 //            super();
 //            this.stack = stack;
 //            this.asc = asc;
 //            this.cnt = cnt;
 //        }
 //
-//        static <K, V> Seq<K,V> create(Node<K,V> t, boolean asc, int cnt) {
-//            return new Seq<>(push(t, null, asc), asc, cnt);
+//        static <K, V> Iter<K,V> create(Node<K,V> t, boolean asc, int cnt) {
+//            return new Iter<>(push(t, null, asc), asc, cnt);
 //        }
 //
 //        static <K, V> ISeq<Node<K,V>> push(Node<K,V> t, ISeq<Node<K,V>> stack, boolean asc) {
@@ -1084,7 +1083,7 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V> {
 //            Node<K,V> t = stack.head();
 //            ISeq<Node<K,V>> nextstack = push(asc ? t.right() : t.left(), stack.next(), asc);
 //            if (nextstack != null) {
-//                return new Seq<>(nextstack, asc, cnt - 1);
+//                return new Iter<>(nextstack, asc, cnt - 1);
 //            }
 //            return null;
 //        }

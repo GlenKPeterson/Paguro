@@ -21,7 +21,6 @@ import org.organicdesign.fp.Option;
 import org.organicdesign.fp.StaticImports;
 import org.organicdesign.fp.StaticImportsTest;
 import org.organicdesign.fp.function.Function1;
-import org.organicdesign.fp.permanent.Sequence;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import java.time.LocalDateTime;
@@ -84,7 +83,7 @@ public class PersistentHashMapTest {
     @Test public void seq3() {
         PersistentHashMap<String,Integer> m1 = PersistentHashMap.of(vec(tup("c", 1)));
         assertEquals(Option.of(tup("c", 1)),
-                     m1.seq().head());
+                     m1.head());
 
         ImMap<String,Integer> m2 = map(tup("c", 1), tup("b", 2), tup("a", 3));
 
@@ -92,22 +91,22 @@ public class PersistentHashMapTest {
                                                                             Option.of(tup("b", 2)),
                                                                             Option.of(tup("a", 3))));
 
-        Sequence<UnmodMap.UnEntry<String,Integer>> seq = m2.seq();
+        UnmodIterable<UnmodMap.UnEntry<String,Integer>> seq = m2;
         Option o = seq.head();
         assertTrue(s.contains(o));
         s.remove(o);
 
-        seq = seq.tail();
+        seq = seq.drop(1);
         o = seq.head();
         assertTrue(s.contains(o));
         s.remove(o);
 
-        seq = seq.tail();
+        seq = seq.drop(1);
         o = seq.head();
         assertTrue(s.contains(o));
         s.remove(o);
 
-        seq = seq.tail();
+        seq = seq.drop(1);
         o = seq.head();
         assertEquals(Option.none(), o);
     }
@@ -128,14 +127,14 @@ public class PersistentHashMapTest {
 
         // System.out.println("s1: " + s1);
 
-        Sequence<UnmodMap.UnEntry<String,Integer>> seq1 = m1.seq();
+        UnmodIterable<UnmodMap.UnEntry<String,Integer>> seq1 = m1;
         Option<UnmodMap.UnEntry<String,Integer>> o1 = seq1.head();
         while (o1.isSome()) {
             UnmodMap.UnEntry<String,Integer> entry = o1.get();
             // System.out.println("entry: " + entry);
             assertTrue(s1.contains(entry));
             s1.remove(entry);
-            seq1 = seq1.tail();
+            seq1 = seq1.drop(1);
             o1 = seq1.head();
         }
         assertEquals(0, s1.size());
@@ -145,14 +144,14 @@ public class PersistentHashMapTest {
         Set<String> s2 = new HashSet<>(Arrays.asList("g", "f", "e", "d", "c", "b", "a"));
         // System.out.println("s2: " + s2);
 
-        Sequence<String> seq2 = m1.seq().map(e -> e.getKey());
+        UnmodIterable<String> seq2 = m1.map(e -> e.getKey());
         Option<String> o2 = seq2.head();
         while (o2.isSome()) {
             String str = o2.get();
             // System.out.println("str: " + str);
             assertTrue(s2.contains(str));
             s2.remove(str);
-            seq2 = seq2.tail();
+            seq2 = seq2.drop(1);
             o2 = seq2.head();
         }
         assertEquals(0, s2.size());
@@ -167,7 +166,7 @@ public class PersistentHashMapTest {
         assertTrue(s1.containsKey("one"));
         assertFalse(s1.containsKey("two"));
 
-        showSeq(s1.seq());
+        showSeq(s1);
         // System.out.println("One: " + s1);
 
         s1 = s1.assoc("two", "two");
@@ -176,7 +175,7 @@ public class PersistentHashMapTest {
         assertTrue(s1.containsKey("two"));
         assertFalse(s1.containsKey("three"));
 
-        showSeq(s1.seq());
+        showSeq(s1);
         // System.out.println("Two: " + s1);
 
         s1 = s1.assoc("three", "three");
@@ -186,7 +185,7 @@ public class PersistentHashMapTest {
         assertTrue(s1.containsKey("three"));
         assertFalse(s1.containsKey("four"));
 
-        showSeq(s1.seq());
+        showSeq(s1);
         // System.out.println("Three: " + s1);
 
         s1 = s1.assoc("four", "four");
@@ -198,19 +197,19 @@ public class PersistentHashMapTest {
         assertFalse(s1.containsKey("five"));
 
         // TODO: Right here!
-        showSeq(s1.seq());
+        showSeq(s1);
         // System.out.println("Four: " + s1);
 
 //        System.out.println("s1.seq().toMutableList()" + s1.seq().toMutableList());
 
     }
 
-    void showSeq(Sequence<UnmodMap.UnEntry<String,String>> seq) {
+    void showSeq(UnmodIterable<UnmodMap.UnEntry<String,String>> seq) {
         // System.out.println("seq");
         Option<UnmodMap.UnEntry<String,String>> opt = seq.head();
         while (opt.isSome()) {
             // System.out.println("\topt.get(): " + opt.get());
-            seq = seq.tail();
+            seq = seq.drop(1);
             opt = seq.head();
         }
     }
@@ -233,7 +232,7 @@ public class PersistentHashMapTest {
 //            println("accum: " + accum);
 
             // This will blow up with an obvious non-seq so we know what size causes the real trouble.
-            Option<UnmodMap.UnEntry<String,Integer>> o = accum.seq().head();
+            Option<UnmodMap.UnEntry<String,Integer>> o = accum.head();
             assertTrue(o.isSome());
             //noinspection ConstantConditions
             assertTrue(o.get().getKey() instanceof String);
@@ -244,14 +243,14 @@ public class PersistentHashMapTest {
             assertEquals(Integer.valueOf(i), accum.get("Str" + i));
         }
 
-        Sequence<UnmodMap.UnEntry<String,Integer>> seq = accum.seq();
+        UnmodIterable<UnmodMap.UnEntry<String,Integer>> seq = accum;
         for (int i = 0; i < MAX; i++) {
             Option<UnmodMap.UnEntry<String,Integer>> o = seq.head();
 
             assertTrue(set.contains(o.get()));
             set.remove(o.get());
 
-            seq = seq.tail();
+            seq = seq.drop(1);
         }
 //        System.out.println("seq: " + seq);
         assertFalse(seq.head().isSome());
@@ -488,7 +487,7 @@ public class PersistentHashMapTest {
         // System.out.println("m.seq().map(e -> e.getValue()).toMutableSet(): " + m.seq().map(e -> e.getValue()).toMutableSet());
         // System.out.println("m.seq().map(e -> e.getValue()).toImSortedSet(): " + m.seq().map(e -> e.getValue()).toImSortedSet(String.CASE_INSENSITIVE_ORDER));
 
-        Sequence<String> seq = m.seq().map(e -> e.getValue());
+        UnmodIterable<String> seq = m.map(e -> e.getValue());
         PersistentHashSet<String> u = PersistentHashSet.empty();
         // System.out.println("Initial u: " + u);
 //        Function2<PersistentHashSet<String>,? super String,PersistentHashSet<String>> fun = (accum, t) -> accum.put(t);
@@ -501,7 +500,7 @@ public class PersistentHashMapTest {
             u = u.put(item.get());
             // System.out.println("u: " + u);
             // repeat with next element
-            seq = seq.tail();
+            seq = seq.drop(1);
             item = seq.head();
         }
         // System.out.println("Final u: " + u);

@@ -121,17 +121,17 @@ public class PersistentVector<E> implements ImList<E> {
         return ret.persistent();
     }
 
-    @SafeVarargs
-    public static <T> PersistentVector<T> ofSkipNull(T... items) {
-        if (items == null) { return empty(); }
-        PersistentVector<T> ret = empty();
-        for (T item : items) {
-            if (item != null) {
-                ret = ret.appendOne(item);
-            }
-        }
-        return ret;
-    }
+//    @SafeVarargs
+//    public static <T> PersistentVector<T> ofSkipNull(T... items) {
+//        if (items == null) { return empty(); }
+//        PersistentVector<T> ret = empty();
+//        for (T item : items) {
+//            if (item != null) {
+//                ret = ret.appendOne(item);
+//            }
+//        }
+//        return ret;
+//    }
 
     // IEditableCollection has this return ITransientCollection<E>,
     // not TransientVector<E> as this originally returned.
@@ -238,7 +238,7 @@ public class PersistentVector<E> implements ImList<E> {
      * @return a new PersistentVector with the additional items at the end.
      */
     @SuppressWarnings("unchecked")
-    @Override public PersistentVector<E> append(E... es) {
+    public PersistentVector<E> append(E... es) {
         PersistentVector<E> result = this;
         for (E e : es) {
             result = result.appendOne(e);
