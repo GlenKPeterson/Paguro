@@ -27,6 +27,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,6 +40,19 @@ import static org.organicdesign.fp.testUtils.EqualsContract.equalsSameHashCode;
 
 @RunWith(JUnit4.class)
 public class PersistentHashMapTest {
+    @Test public void iter() {
+        assertFalse(PersistentHashMap.empty().iterator().hasNext());
+
+        PersistentHashMap<String,Integer> m1 = PersistentHashMap.of(Arrays.asList(tup("one", 1)));
+        UnmodIterator<UnmodMap.UnEntry<String,Integer>> iter = m1.iterator();
+        assertTrue(iter.hasNext());
+
+        assertEquals(tup("one", 1), iter.next());
+
+//        System.out.println("class: " + iter.getClass());
+        assertFalse(iter.hasNext());
+    }
+
     @Test public void assocAndGet() {
         PersistentHashMap<String,Integer> m1 = PersistentHashMap.empty();
         PersistentHashMap<String,Integer> m2 = m1.assoc("one", 1);

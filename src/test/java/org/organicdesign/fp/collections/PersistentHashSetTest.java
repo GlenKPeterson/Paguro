@@ -3,7 +3,6 @@ package org.organicdesign.fp.collections;
 import org.junit.Test;
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.StaticImports;
-import org.organicdesign.fp.permanent.Sequence;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -270,7 +269,7 @@ public class PersistentHashSetTest {
         hs.remove(item);
         s1 = s1.without(item);
         seq = seq.drop(1);
-        assertEquals(Sequence.EMPTY_SEQUENCE, seq);
+        assertFalse(seq.iterator().hasNext());
         assertEquals(0, hs.size());
         assertEquals(0, s1.size());
 

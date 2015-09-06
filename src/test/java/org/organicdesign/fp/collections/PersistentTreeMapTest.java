@@ -20,7 +20,6 @@ import org.junit.runners.JUnit4;
 import org.organicdesign.fp.StaticImports;
 import org.organicdesign.fp.StaticImportsTest;
 import org.organicdesign.fp.function.Function1;
-import org.organicdesign.fp.permanent.Sequence;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import java.util.Map;
@@ -29,7 +28,8 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import static org.junit.Assert.*;
-import static org.organicdesign.fp.StaticImports.*;
+import static org.organicdesign.fp.StaticImports.tup;
+import static org.organicdesign.fp.StaticImports.vec;
 import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
 import static org.organicdesign.fp.testUtils.EqualsContract.equalsSameHashCode;
 
@@ -253,8 +253,7 @@ public class PersistentTreeMapTest {
                                            .drop(1)
                                            .map((u) -> tup(u.getKey(), u.getValue())).toArray());
 
-        assertTrue(Sequence.emptySequence().equals(PersistentTreeMap.of(vec(tup(1, "one")))
-                                                                    .drop(1)));
+        assertFalse(PersistentTreeMap.of(vec(tup(1, "one"))).drop(1).iterator().hasNext());
     }
 
     public void friendlierArrayEq(Object[] a1, Object[] a2) {
@@ -389,13 +388,14 @@ public class PersistentTreeMapTest {
         m = m.assoc(20, "twenty again");
         assertArrayEquals(new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21},
                           m.keySet().toArray());
-        assertTrue(UnmodSortedIterable.equals(
-                vec("one again", "two", "three", "four", "five", "six", "seven", "eight",
-                    "nine again", "ten again", "eleven again", "twelve", "thirteen",
-                    "fourteen",
-                    "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty again",
-                    "twenty one"),
-                vec(m.map(e -> e.getValue()))));
+
+        ImList v = vec("one again", "two", "three", "four", "five", "six", "seven", "eight",
+                       "nine again", "ten again", "eleven again", "twelve", "thirteen",
+                       "fourteen",
+                       "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty again",
+                       "twenty one");
+
+        assertEquals(v, m.map(e -> e.getValue()).toImList());
     }
 
     @Test public void entrySet() {

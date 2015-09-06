@@ -1280,7 +1280,7 @@ public static void main(String[] args){
         private static <K,V> UnEntry<K,V> absence() { return (UnEntry<K,V>) ABSENCE; }
 
         final Object[] array;
-        private int i = 0;
+        private int mutableIndex = 0;
         private UnEntry<K,V> nextEntry = absence();
         private Iterator<UnEntry<K,V>> nextIter;
 
@@ -1304,7 +1304,9 @@ public static void main(String[] args){
 //                    }
 //                }
 //            }
-            for (; i < array.length; i += 2) {
+            while (mutableIndex < array.length) {
+                int i = mutableIndex;
+                mutableIndex = i + 2;
                 if (array[i] != null) {
                     nextEntry = Tuple2.of(k(array, i), v(array, i+1));
                     return true;
