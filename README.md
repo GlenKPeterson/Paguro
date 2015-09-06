@@ -1,7 +1,7 @@
 UncleJim ("**Un**modifiable **Coll**ections for **J**ava&trade; **Imm**utability") brings the following to Java:
 
 * Clojure's [immutable collections](src/main/java/org/organicdesign/fp/collections)
-* Note: Sequence Abstraction will soon be replaced with [Transformation Description](https://github.com/GlenKPeterson/One-off_Examples/blob/master/src/main/java/org/organicdesign/fp/experiments/TransDesc.java) which is like a Clojure transducer or Paul Philips-style "View" of a data transformation.
+* An immutable [Transformation Builder](https://github.com/GlenKPeterson/One-off_Examples/blob/master/src/main/java/org/organicdesign/fp/Xform.java) which is baked into every collection and collection wrapper.
 * An [Equator](src/main/java/org/organicdesign/fp/collections/Equator.java) and [ComparisonContext](src/main/java/org/organicdesign/fp/collections/Equator.java#L45) which work like `java.util.Comparator`, but for hash-based collections.
 * Simplified [functional interfaces](src/main/java/org/organicdesign/fp/function) that wrap checked exceptions
 * [Memoization](src/main/java/org/organicdesign/fp/function/Function2.java#L59) for functions
@@ -15,7 +15,9 @@ Immutable collections are fast enough to make it unnecessary to modify data in p
 Migrating large code bases to another language is not always practical.
 This project lets you think about your code the way that Clojure and to some degree Scala programmers do, but still write Java.
 
-Currently an *** Alpha Release ***.  The Sequence abstraction will soon be replaced with a [Transformation Description](https://github.com/GlenKPeterson/One-off_Examples/blob/master/src/main/java/org/organicdesign/fp/experiments/TransDesc.java) because the lazily evaluated and cached Sequence proved to be slow.  Until then, please use [View](src/main/java/org/organicdesign/fp/ephemeral/View.java) instead. The API is subject to other (hopefully minor) changes, but test coverage is currently at 73%:
+This has been in Alpha, but it is now up to the first Beta release candidate. 
+Barring new issues, the API should not change (much) at this point.
+Test coverage was at last check 73%:
 
 ![Test Coverage](testCoverage.png)
 
@@ -36,8 +38,7 @@ public enum ColorVal {
     // Convert the values() array of this enum to a map of key/value pairs
     // This can be used to look up enum values by their character codes:
     public static final ImMap<Character,ColorVal> charToColorMap =
-            Sequence.ofArray(values())
-                    .toImMap(v -> Tuple2.of(v.ch(), v));
+            vec(values()).toImMap(v -> Tuple2.of(v.ch(), v));
 }
 ```
 
@@ -53,40 +54,30 @@ ImMap<Character,ColorVal> betterMap = ColorVal.charToColorMap
 
 Create an UnmodifiableMap of 0, 1, 2, or 3 items (no nulls) depending on the values of showFirst, showSecond, and showThird:
 ```java
-ImMap<String,Integer> itemMap = PersistentMapSorted.ofSkipNull(
+ImMap<String,Integer> itemMap = vec(
         showFirst ? Tuple2.of("One", 1) : null,
         showSecond ? Tuple2.of("Two", 2) : null,
-        showThird ? Tuple2.of("Three", 3) : null);
-```
-
-Similar type-safe methods are available for producing [unmodifiable Sets and Lists of any length](src/main/java/org/organicdesign/fp/StaticImports.java#L180)
-(unMaps currently go from 0 to 10 type-safe keys and values, or an infinite number of Map.Entries/Tuple2s).
-
-Add another item to an immutable map?
-
-```java
-itemMap = itemMap.assoc("Four", 4);
+        showThird ? Tuple2.of("Three", 3) : null).filter(e -> e != null)
+                                                 .toImMap(Function1.identity());
 ```
 
 Transform unmodifiable data into other unmodifiable data, lazily, without processing any more items than necessary (based on this unit test: [SequenceTest.java](src/test/java/org/organicdesign/fp/permanent/SequenceTest.java#L145)):
 
 ```java
-ImList<Integer> list = Sequence.ofArray(4,5)//       4,5
-        .prepend(Sequence.ofArray(1,2,3))   // 1,2,3,4,5
-        .append(Sequence.ofArray(6,7,8,9))  // 1,2,3,4,5,6,7,8,9
-        .filter(i -> i > 4)                 //         5,6,7,8,9
-        .map(i -> i - 2)                    //     3,4,5,6,7
-        .take(5)                            //     3,4,5,6
-        .drop(2)                            //         5,6
+ImList<Integer> list = vec(4,5) //       4,5
+        .prepend(vec(1,2,3))    // 1,2,3,4,5
+        .append(vec(6,7,8,9))   // 1,2,3,4,5,6,7,8,9
+        .filter(i -> i > 4)     //         5,6,7,8,9
+        .map(i -> i - 2)        //     3,4,5,6,7
+        .take(5)                //     3,4,5,6
+        .drop(2)                //         5,6
         .toImList();
 
 list.toString(); // Returns: "PersistentVector(4,5,6)"
 ```
-These transformations do not change the underlying data.  They build a new collection by chaining together all the
-operations you specify, then lazily applying them in a single pass.  The laziness is
-implemented as an incremental pull, so that if your last operation is take(1), then the absolute minimum number of
-items will be evaluated through all the functions you specified.  In the example above, items 7, 8, and 9 are never
-processed.
+These transformations do not change the underlying data.  They build a new collection by chaining
+together all the operations you specify, then applying them in a single pass.  In the example above,
+items 7, 8, and 9 are never processed.
 
 #Motivations
 
@@ -130,18 +121,24 @@ If you find a better/faster implementation, please submit your improvements!
 
 #API
 
-Functions available in <code>Sequence</code> (as of 2015-03-15):
 ###Starting Points:
 ```java
-Sequence<T> Sequence.ofArray(T... i)
-Sequence<T> Sequence.ofArray(Iterator<T> i)
-Sequence<T> Sequence.ofArray(Iterable<T> i)
+import org.organicdesign.fp.StaticImports.*
+
+// Create a new vector of integers
+vec(1, 2, 3, 4);
+
+// Create a new set of Strings
+set("a", "b", "c");
+
+// Create a tuple of an int and a string (a type-safe heterogeneous container)
+tup("a", 1);
+
+// Create a map with a few key value pairs
+map(tup("a", 1), tup("b", 2), tup("c", 3);
 ```
 ###Transformations:
 ```java
-// Run a function against each item for side effects (e.g. writing output)
-void forEach(Consumer<T> se)
-
 // Apply the function to each item, accumulating the result in u.  Other
 // transformations could be implemented with just this one function, but
 // it is clearer to use the most specific transformations that meets your needs.
@@ -149,29 +146,38 @@ void forEach(Consumer<T> se)
 // This implementation follows the convention that foldLeft processes items
 // *in order* unless those items are a linked list, and in this case,
 // they are not a linked list.
-U foldLeft(U u, BiFunction<U, T, U> fun)
+U foldLeft(U u, Function2<U,? super T,U> fun);
+
+// Normally you want to terminate by doing a take(), drop(), or takeWhile() before you get
+// to the fold, but if you need to terminate based on the complete result so far, you can
+// provide your own termination condition.
+U foldLeft(U u, Function2<U,? super T,U> fun, Function1<? super U,Boolean> terminateWhen);
 
 // Return only the items for which the given predicate returns true
-Sequence<T> filter(Predicate<T> pred)
+Transformable<T> filter(Function1<? super T,Boolean> predicate);
 
 // Return items from the beginning until the given predicate returns false
-Sequence<T> takeWhile(Predicate<T> p)
+Transformable<T> takeWhile(Function1<? super T,Boolean> predicate);
 
 // Return only the first n items
-Sequence<T> take(long numItems)
+Transformable<T> take(long numItems);
 
 // Ignore the first n items and return only those that come after
-Sequence<T> drop(long numItems)
+Transformable<T> drop(long numItems);
 
 // Transform each item into exactly one new item using the given function
-Sequence<U> map(Function<T,U> func)
+Transformable<U> map(Function1<? super T,? extends U> func);
 
-// Add items to the end of this Sequence
-Sequence<T> concat(Sequence<T> pv)
+// Add items to the end of this Transformable
+Transformable<T> concat(Iterable<? extends T> list);
+
+// Add items to the beginning of this Transformable
+Transformable<T> precat(Iterable<? extends T> list);
 
 // Transform each item into zero or more new items using the given function
-Sequence<U> flatMap(Function<T,Sequence<U>> func)
+Transformable<U> flatMap(Function1<? super T,Iterable<U>> f);
 ```
+
 ###Endpoints
 ```java
 // A one-time use, not-thread-safe way to get each value of this Realizable in turn.
@@ -227,15 +233,13 @@ ImSet<T> toImSet();
 
 There is a (possibly outdated) problem-set for learning this tool-kit: https://github.com/GlenKPeterson/LearnFpJava
 
-#Details
+#Details (this section may be obsolete)
  - Like Guava, we want to be as compatible with the java.util... collections as possible, while preventing mutation-in-place.
  - org.organicdesign.fp.collection.**Un**... interfaces extend the java.util collection interfaces of the same name (minus the "Un" prefix) deprecate all the mutate-in-place methods to make your IDE show them in red, and implement them to throw UnsupportedOperationExceptions to fail fast if you try to use them anyway.  These interfaces are useful in its own right as a way to declare that a function does not modify what is passed, or that what it returns cannot be modified.  Modification errors are caught as early as possible due to deprecation warnings.
  - org.organicdesign.fp.collection.**Im**... interfaces are the immutable, lightweight-copy collection interfaces.  Only the "get" methods from the java.util... collection interfaces remain.  Additional "set" methods that return a new collectoin are added at this level.
  - org.organicdesign.fp.collection.**Persistent**... implementations have been taken directly from Clojure (hence the Eclipse licence for those components).  For starters, we will include the celebrated Vector and the sorted (tree) Set and Map implementations.  We will add the hash-based Set and Map later, but they will take a separate Equator to handle equals() and hashCode() much the way the tree-based collections take a Comparator.
 
-Within your own FP-centric world, you will use the Im interfaces and implementations and transform them with the Sequence abstraction.  Methods that interact with imperative Java code will take the java.util interfaces and return either the Im- interfaces, or Un- interfaces as necessary.  Where practical, try to use the Im-interfaces instead of their implementations, as new, better immutable collection designs surface every few years.
-
-The Sequence model implements lazy, immutable, type-safe, and thread-safe transformations.  It is also memoized/cached, so it is useful for repeated queries.  Sequence is most similar to the Clojure sequence abstraction, but it's pure Java and type-safe.  Sequence and View both allow processing in the smallest possible (and therefore laziest) increments.  I fond myself focusing on View more than Sequence at first, but Sequence has caught up and may replace View if the performance is similar.
+Within your own FP-centric world, you will use the Im interfaces and implementations and transform them with the Transformation abstraction.  Methods that interact with imperative Java code will take the java.util interfaces and return either the Im- interfaces, or Un- interfaces as necessary.  Where practical, try to use the Im-interfaces instead of their implementations, as new, better immutable collection designs surface every few years.
 
 The classes in the <code>function</code> package allow you to use the Java 8 functional interfaces smoothly warpping things that throw checked exceptions in Java 8, or as "second class" functions in Java 7.  They are all named Function*N*  where *N* is the number of arguments they take.  They all automatically wrap and re-throw checked exceptions.  There are no versions for primitives, or that return **void**.  Well, except for SideEffect, which may be removed.
 
@@ -254,6 +258,9 @@ In short, Clojure doesn't have static types.  Scala has an TMTOWTDI attitude tha
 - As of 2014-03-08, all major areas of functionality were covered by unit tests.
 
 #Change Log
+2015-08-30 version 0.10.2 Xform tests at 100%.  Applied Xform to UnmodIterable which makes it
+apply to the entire project.  Completely removed all traces of View and Sequence.
+
 2015-08-30 version 0.10.1 Added Xform and moved Transformable and Realizable into the new xform
 package.  Xform should replace Sequence and View altogether.
 
@@ -356,24 +363,13 @@ Added unit tests for the above.
  safe if the producer and the values it produces are free from outside influences.
 
 #To Do
-Note: Statistics for iterating through 30 million items:
-120ms: for-each loop or similar
-350ms: View
-1.2 seconds: Sequence (12 seconds the first time, 1.2 seconds on subsequent runs).
-120ms: Transform
-
- - Therefore: Replace View and Sequence with Transform.  It seems in every way superior.
- - Complete [Transformation Description](https://github.com/GlenKPeterson/One-off_Examples/blob/master/src/main/java/org/organicdesign/fp/experiments/TransDesc.java) (currently in the One-off Examples project until it's ready for prime time).
-- Have an Ordered version of Transform as well as the (default) unreliable order.  Only the ordered version can be used for implementing things like equals() and hashCode()
- - Change/add brief StaticImports methods for most used collections: vec() for PersistentVector can then replace all other varargs arguments with List's.  Also t2() for Tuple2, t3() for Tuple3, etc. makes constructing immutable data a snap.
+ - Have an Ordered version of Transform as well as the (default) unreliable order.  Only the ordered version can be used for implementing things like equals() and hashCode()
  - Bring unit test coverage back above 80%, or 85% if sensible.
  - Update JavaDoc, esp. Im vs. Unmod
  - Add `Either` (I have a working implementation) - it's like `Or` without the attitude.
  - Make visio drawig of interface diagram.
  - Clarify/Simplify/Improve Readme.md
  - Update learnFPJava project
- - Make sure Iterable (and List when appropriate) is implemented efficiently in all collections
- - Make sure to make use of asTransient() in all constructors (done for HashMap and maybe others).
  - Add a [Persistent RRB Tree](http://infoscience.epfl.ch/record/169879/files/RMTrees.pdf) and compare its performance to the PersistentVector.
 
 NOTE: Maybe this goes in the presentation, not in this ReadMe?
@@ -452,7 +448,7 @@ Nathan Williams: for many lengthy email conversations about this project, encour
 
 GreenJUG: for bearing with talks on early versions of this code two years in a row.
 
-Everyone whose ideas are collected in this project.
+Everyone whose ideas are collected in this project.  I tried to put names in as close as possible to the contributions.
 
 #Licenses
 Java&trade; is a registered trademark of the Oracle Corporation in the US and other countries.  UncleJim is not part of Java.  Oracle is in no way affiliated with the UncleJim project.
