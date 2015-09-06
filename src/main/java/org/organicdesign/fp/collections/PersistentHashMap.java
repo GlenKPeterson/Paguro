@@ -16,7 +16,6 @@ import org.organicdesign.fp.function.Function0;
 import org.organicdesign.fp.function.Function1;
 import org.organicdesign.fp.function.Function2;
 import org.organicdesign.fp.function.Function3;
-import org.organicdesign.fp.permanent.Sequence;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import java.io.Serializable;
@@ -455,7 +454,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 
         V findVal(int shift, int hash, K key, V notFound);
 
-        Sequence<UnmodMap.UnEntry<K,V>> nodeSeq();
+//        Sequence<UnmodMap.UnEntry<K,V>> nodeSeq();
 
         INode<K,V> assoc(AtomicReference<Thread> edit, int shift, int hash, K key, V val, Box addedLeaf);
 
@@ -531,7 +530,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
             return node.findVal(shift + 5, hash, key, notFound);
         }
 
-        @Override public Sequence<UnmodMap.UnEntry<K,V>> nodeSeq(){ return Seq.create(array); }
+//        @Override public Sequence<UnmodMap.UnEntry<K,V>> nodeSeq(){ return Seq.create(array); }
 
         @Override public UnmodIterator<UnEntry<K,V>> iterator() {
             return new Iter<>(array);
@@ -658,50 +657,50 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
             return UnmodIterable.toString("ArrayNode", this);
         }
 
-        static class Seq<K,V> implements Sequence<UnEntry<K,V>> {
-            final INode<K,V>[] nodes;
-            final int i;
-            final Sequence<UnEntry<K,V>> s;
-
-            static <K,V> Sequence<UnEntry<K,V>> create(INode<K,V>[] nodes) {
-                return create(nodes, 0, null);
-            }
-
-            private static <K,V> Sequence<UnEntry<K,V>> create(INode<K,V>[] nodes, int i, Sequence<UnEntry<K,V>> s) {
-                if ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) ) { return new Seq<>(nodes, i, s); }
-
-                for(int j = i; j < nodes.length; j++) {
-                    if (nodes[j] != null) {
-                        Sequence<UnEntry<K,V>> ns = nodes[j].nodeSeq();
-                        if (ns != null) {
-                            return new Seq<>(nodes, j + 1, ns);
-                        }
-                    }
-                }
-                return Sequence.emptySequence();
-            }
-
-            private Seq(INode<K,V>[] nodes, int i, Sequence<UnEntry<K,V>> s) {
-                super();
-                this.nodes = nodes;
-                this.i = i;
-                this.s = s;
-            }
-
-            @Override public Option<UnEntry<K,V>> head() {
-                return ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) )
-                       ? s.head()
-                       : Option.none();
-            }
-
-            @Override public Sequence<UnEntry<K,V>> tail() {
-                if ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) ) {
-                    return create(nodes, i, s.tail());
-                }
-                return create(nodes, i, null);
-
-            }
-        }
+//        static class Seq<K,V> implements Sequence<UnEntry<K,V>> {
+//            final INode<K,V>[] nodes;
+//            final int i;
+//            final Sequence<UnEntry<K,V>> s;
+//
+//            static <K,V> Sequence<UnEntry<K,V>> create(INode<K,V>[] nodes) {
+//                return create(nodes, 0, null);
+//            }
+//
+//            private static <K,V> Sequence<UnEntry<K,V>> create(INode<K,V>[] nodes, int i, Sequence<UnEntry<K,V>> s) {
+//                if ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) ) { return new Seq<>(nodes, i, s); }
+//
+//                for(int j = i; j < nodes.length; j++) {
+//                    if (nodes[j] != null) {
+//                        Sequence<UnEntry<K,V>> ns = nodes[j].nodeSeq();
+//                        if (ns != null) {
+//                            return new Seq<>(nodes, j + 1, ns);
+//                        }
+//                    }
+//                }
+//                return Sequence.emptySequence();
+//            }
+//
+//            private Seq(INode<K,V>[] nodes, int i, Sequence<UnEntry<K,V>> s) {
+//                super();
+//                this.nodes = nodes;
+//                this.i = i;
+//                this.s = s;
+//            }
+//
+//            @Override public Option<UnEntry<K,V>> head() {
+//                return ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) )
+//                       ? s.head()
+//                       : Option.none();
+//            }
+//
+//            @Override public Sequence<UnEntry<K,V>> tail() {
+//                if ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) ) {
+//                    return create(nodes, i, s.tail());
+//                }
+//                return create(nodes, i, null);
+//
+//            }
+//        }
 
         static class Iter<K,V> implements UnmodIterator<UnEntry<K,V>> {
             private final INode<K,V>[] array;
@@ -873,7 +872,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
             return notFound;
         }
 
-        @Override public Sequence<UnmodMap.UnEntry<K,V>> nodeSeq() { return NodeSeq.create(array); }
+//        @Override public Sequence<UnEntry<K,V>> nodeSeq() { return NodeSeq.create(array); }
 
         @Override public UnmodIterator<UnEntry<K,V>> iterator(){
             return new NodeIter<>(array);
@@ -1071,7 +1070,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
             return notFound;
         }
 
-        @Override public Sequence<UnmodMap.UnEntry<K,V>> nodeSeq() { return NodeSeq.create(array); }
+//        @Override public Sequence<UnEntry<K,V>> nodeSeq() { return NodeSeq.create(array); }
 
         @Override public UnmodIterator<UnEntry<K,V>> iterator(){
             return new NodeIter<>(array);
@@ -1387,52 +1386,52 @@ public static void main(String[] args){
         }
     }
 
-    static final class NodeSeq<K,V> implements Sequence<UnmodMap.UnEntry<K,V>> {
-        private final Object[] array;
-        private final int i;
-        private final Sequence<UnmodMap.UnEntry<K,V>> s;
-
-        static <K,V> Sequence<UnmodMap.UnEntry<K,V>> create(Object[] array) {
-            return create(array, 0, null);
-        }
-
-        private static <K,V> Sequence<UnmodMap.UnEntry<K,V>> create(Object[] array, int i, Sequence<UnmodMap.UnEntry<K,V>> s) {
-            if ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) ) { return new NodeSeq<>(array, i, s); }
-
-            for (int j = i; j < array.length; j += 2) {
-                if (array[j] != null) { return new NodeSeq<>(array, j, null); }
-
-                INode<K,V> node = iNode(array, j + 1);
-                if (node != null) {
-                    Sequence<UnmodMap.UnEntry<K,V>> nodeSeq = node.nodeSeq();
-
-                    if (nodeSeq != null) { return new NodeSeq<>(array, j + 2, nodeSeq); }
-                }
-            }
-            return Sequence.emptySequence();
-        }
-
-        private NodeSeq(Object[] array, int i, Sequence<UnmodMap.UnEntry<K,V>> s) {
-            super();
-            this.array = array;
-            this.i = i;
-            this.s = s;
-        }
-
-        @Override public Option<UnmodMap.UnEntry<K,V>> head() {
-            return ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) ) ? s.head() :
-                   i < array.length - 1 ? Option.of(Tuple2.of(k(array, i), v(array, i+1))) :
-                   Option.none();
-        }
-
-        @Override public Sequence<UnmodMap.UnEntry<K,V>> tail() {
-            if ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) ) {
-                return create(array, i, s.tail());
-            }
-            return create(array, i + 2, null);
-        }
-
-        @Override public String toString() { return UnmodIterable.toString("NodeSeq", this); }
-
-    } // end class NodeSeq
+//    static final class NodeSeq<K,V> implements Sequence<UnmodMap.UnEntry<K,V>> {
+//        private final Object[] array;
+//        private final int i;
+//        private final Sequence<UnmodMap.UnEntry<K,V>> s;
+//
+//        static <K,V> Sequence<UnmodMap.UnEntry<K,V>> create(Object[] array) {
+//            return create(array, 0, null);
+//        }
+//
+//        private static <K,V> Sequence<UnmodMap.UnEntry<K,V>> create(Object[] array, int i, Sequence<UnmodMap.UnEntry<K,V>> s) {
+//            if ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) ) { return new NodeSeq<>(array, i, s); }
+//
+//            for (int j = i; j < array.length; j += 2) {
+//                if (array[j] != null) { return new NodeSeq<>(array, j, null); }
+//
+//                INode<K,V> node = iNode(array, j + 1);
+//                if (node != null) {
+//                    Sequence<UnmodMap.UnEntry<K,V>> nodeSeq = node.nodeSeq();
+//
+//                    if (nodeSeq != null) { return new NodeSeq<>(array, j + 2, nodeSeq); }
+//                }
+//            }
+//            return Sequence.emptySequence();
+//        }
+//
+//        private NodeSeq(Object[] array, int i, Sequence<UnmodMap.UnEntry<K,V>> s) {
+//            super();
+//            this.array = array;
+//            this.i = i;
+//            this.s = s;
+//        }
+//
+//        @Override public Option<UnmodMap.UnEntry<K,V>> head() {
+//            return ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) ) ? s.head() :
+//                   i < array.length - 1 ? Option.of(Tuple2.of(k(array, i), v(array, i+1))) :
+//                   Option.none();
+//        }
+//
+//        @Override public Sequence<UnmodMap.UnEntry<K,V>> tail() {
+//            if ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) ) {
+//                return create(array, i, s.tail());
+//            }
+//            return create(array, i + 2, null);
+//        }
+//
+//        @Override public String toString() { return UnmodIterable.toString("NodeSeq", this); }
+//
+//    } // end class NodeSeq
 }
