@@ -42,7 +42,7 @@ import java.util.List;
  an outline for what was ideal and also what was important.  All errors are my own.
  -Glen 2015-08-30
  */
-public abstract class Xform<A> implements Transformable<A> {
+public abstract class Xform<A> implements Transformable<A>, Iterable<A> {
 
     enum OpStrategy { HANDLE_INTERNALLY, ASK_SUPPLIER, CANNOT_HANDLE; }
 
@@ -457,6 +457,10 @@ public abstract class Xform<A> implements Transformable<A> {
         }
         return (H) ret;
     } // end _foldLeft();
+
+    // I'm unsure of whether to make this an UnmodIterable or not since that would be nice, but it
+    // would also be circular inheritance.
+    @Override public Iterator<A> iterator() { return toMutableList().iterator(); }
 
     // =============================================================================================
     // These will come from Transformable, but (will be) overridden to have a different return type.

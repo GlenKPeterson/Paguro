@@ -25,7 +25,7 @@ import org.organicdesign.fp.function.Function2;
  is no caching/memoization, this may be useful for data sources that do not fit in memory.
  */
 @FunctionalInterface
-public interface View<T> extends Transformable<T> {
+public interface View<T> extends Transformable<T>, Iterable<T> {
     static final View<?> EMPTY_VIEW = Option::none;
 
     @SuppressWarnings("unchecked")

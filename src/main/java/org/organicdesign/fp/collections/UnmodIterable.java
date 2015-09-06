@@ -1,9 +1,14 @@
 package org.organicdesign.fp.collections;
 
+import org.organicdesign.fp.function.Function1;
+import org.organicdesign.fp.function.Function2;
+import org.organicdesign.fp.xform.Transformable;
+import org.organicdesign.fp.xform.Xform;
+
 import java.util.Iterator;
 
 /** An unmodifiable Iterable, without any guarantee about order. */
-public interface UnmodIterable<T> extends Iterable<T> {
+public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
     // ==================================================== Static ====================================================
 
     // This hides the same method on all sub-interfaces!
@@ -112,8 +117,60 @@ public interface UnmodIterable<T> extends Iterable<T> {
         return sB.append(")").toString();
     }
 
+    // ================================== Inherited from Iterable ==================================
     /** {@inheritDoc} */
-    @Override
-    UnmodIterator<T> iterator();
+    @Override UnmodIterator<T> iterator();
 
+    // =============================== Inherited from Transformable ===============================
+
+    /** {@inheritDoc} */
+    @Override default Transformable<T> concat(Iterable<? extends T> list) {
+        return Xform.of(this).concat(list);
+    }
+
+    /** {@inheritDoc} */
+    @Override default Transformable<T> precat(Iterable<? extends T> list) {
+        return Xform.of(this).precat(list);
+    }
+
+    /** {@inheritDoc} */
+    @Override default Transformable<T> drop(long n) {
+        return Xform.of(this).drop(n);
+    }
+
+    /** {@inheritDoc} */
+    @Override default <B> B foldLeft(B ident, Function2<B,? super T,B> reducer) {
+        return Xform.of(this).foldLeft(ident, reducer);
+    }
+
+    /** {@inheritDoc} */
+    @Override default <B> B foldLeft(B ident, Function2<B,? super T,B> reducer,
+                                    Function1<? super B,Boolean> terminateWhen) {
+        return Xform.of(this).foldLeft(ident, reducer, terminateWhen);
+    }
+
+    /** {@inheritDoc} */
+    @Override default Transformable<T> filter(Function1<? super T,Boolean> f) {
+        return Xform.of(this).filter(f);
+    }
+
+    /** {@inheritDoc} */
+    @Override default <B> Transformable<B> flatMap(Function1<? super T,Iterable<B>> f) {
+        return Xform.of(this).flatMap(f);
+    }
+
+    /** {@inheritDoc} */
+    @Override default <B> Transformable<B> map(Function1<? super T, ? extends B> f) {
+        return Xform.of(this).map(f);
+    }
+
+    /** {@inheritDoc} */
+    @Override default Transformable<T> take(long numItems) {
+        return Xform.of(this).take(numItems);
+    }
+
+    /** {@inheritDoc} */
+    @Override default Transformable<T> takeWhile(Function1<? super T,Boolean> f) {
+        return Xform.of(this).takeWhile(f);
+    }
 }

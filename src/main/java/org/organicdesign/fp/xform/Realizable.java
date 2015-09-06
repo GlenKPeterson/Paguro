@@ -14,14 +14,11 @@
 
 package org.organicdesign.fp.xform;
 
-import org.organicdesign.fp.StaticImports;
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.ImMap;
 import org.organicdesign.fp.collections.ImSet;
 import org.organicdesign.fp.collections.ImSortedMap;
 import org.organicdesign.fp.collections.ImSortedSet;
-import org.organicdesign.fp.collections.UnmodIterable;
-import org.organicdesign.fp.collections.UnmodIterator;
 import org.organicdesign.fp.function.Function1;
 
 import java.util.Comparator;
@@ -35,13 +32,7 @@ import java.util.SortedSet;
  Calling any of these methods forces eager evaluation of the underlying collection.  Infinite collections are not
  Realizable.
  */
-public interface Realizable<T> extends UnmodIterable<T> {
-    /** A one-time use, not-thread-safe way to get each value of this Realizable in turn. */
-    @Override default UnmodIterator<T> iterator() {
-        // Maybe not so performant, but gives a chance to see if this is even a useful method.
-        return StaticImports.unmodList(toMutableList()).iterator();
-    }
-
+public interface Realizable<T> {
     /**
      The contents of this Realizable as a thread-safe immutable list.  Use this when you want to access items quickly
      O(log32 n) by index.
