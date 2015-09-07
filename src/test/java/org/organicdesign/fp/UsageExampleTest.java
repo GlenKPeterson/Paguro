@@ -38,19 +38,14 @@ public class UsageExampleTest {
 
     // Part one of a 3-part example for defining data briefly and/or in a way that's easy to read.
     @Test public void dataDefinitionExample1() {
-        // Make a list of "people".  This is type-safe even though it looks like JSON.  Unlike JSON,
-        // the compiler verifies the types of all your data! The next two examples show different
-        // ways to "fix" the huge type signatures, so you can ignore them for now.
+        // We start by creating a list of "people."  The tup(), vec(), set(), and map() methods are
+        // imported from StaticImports and provide a mini data-definition language.  vec() creates
+        // a vector (immutable list) of any length.  tup() creates a Tuple (some languages call this
+        // a "record").  For now, you can think of Tuples as type-safe anonymous objects.
         //
-        // The tup() method is imported from StaticImports and creates Tuples.  Tuples are basically
-        // low-budget immutable objects.  This method is overloaded to handle 2 or 3 arguments
-        // (more arguments in the future).  We'll see shortly how you can leverage Tuples to avoid
-        // object-oriented programming, or extend them to do object-oriented programming with less
-        // boilerplate.  For this example, let's concentrate on the data definition and
-        // transformation.
-        //
-        // Also impoarted from StaticImports, vec() creates an immutable list of any length.
-        // There are also set() and map() methods that are not covered in this example.
+        // This structured date is type-safe even though it looks a little like JSON.  Unlike JSON,
+        // the compiler verifies the types! You can ignore the huge type signatures for now -
+        // subsequent examples show different ways to simplify them.
         ImList<Tuple3<String,String,ImList<Tuple2<EmailType,String>>>> people =
                 vec(tup("Jane", "Smith", vec(tup(HOME, "a@b.c"),
                                              tup(WORK, "b@c.d"))),
