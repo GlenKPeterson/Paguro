@@ -26,15 +26,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.organicdesign.fp.StaticImports.tup;
 import static org.organicdesign.fp.StaticImports.vec;
-import static org.organicdesign.fp.UsageExampleTest.ColorVal.BLUE;
-import static org.organicdesign.fp.UsageExampleTest.ColorVal.GREEN;
-import static org.organicdesign.fp.UsageExampleTest.ColorVal.RED;
-import static org.organicdesign.fp.UsageExampleTest.EType.*;
+import static org.organicdesign.fp.UsageExampleTest.ColorVal.*;
+import static org.organicdesign.fp.UsageExampleTest.EmailType.HOME;
+import static org.organicdesign.fp.UsageExampleTest.EmailType.WORK;
 
 // Usage examples are kept in this unit test to ensure they remain correct and current.
 public class UsageExampleTest {
     // Define some field name constants with a standard Java Enum
-    enum EType { HOME, WORK };
+    enum EmailType { HOME, WORK };
 
     // Part one of a 3-part example for defining data briefly and/or in a way that's easy to read.
     @Test public void dataDefinitionExample1() {
@@ -51,7 +50,7 @@ public class UsageExampleTest {
         //
         // Also impoarted from StaticImports, vec() creates an immutable list of any length.
         // There are also set() and map() methods that are not covered in this example.
-        ImList<Tuple3<String,String,ImList<Tuple2<EType,String>>>> people =
+        ImList<Tuple3<String,String,ImList<Tuple2<EmailType,String>>>> people =
                 vec(tup("Jane", "Smith", vec(tup(HOME, "a@b.c"),
                                              tup(WORK, "b@c.d"))),
                     tup("Fred", "Tase", vec(tup(HOME, "c@d.e"),
@@ -64,13 +63,13 @@ public class UsageExampleTest {
                      people.toString());
 
         // Let's look at Jane:
-        Tuple3<String,String,ImList<Tuple2<EType,String>>> jane = people.get(0);
+        Tuple3<String,String,ImList<Tuple2<EmailType,String>>> jane = people.get(0);
 
         assertEquals("Tuple3(Jane,Smith,PersistentVector(Tuple2(HOME,a@b.c),Tuple2(WORK,b@c.d)))",
                      jane.toString());
 
         // Let's make a map that we can use later to look up people by their email address.
-        ImMap<String,Tuple3<String,String,ImList<Tuple2<EType,String>>>> peopleByEmail =
+        ImMap<String,Tuple3<String,String,ImList<Tuple2<EmailType,String>>>> peopleByEmail =
 
                 // flatMap can be confusing the first time you see it.  We may need to produce
                 // multiple entries in the resulting map (dictionary) for each person.  DBA's call
@@ -143,16 +142,16 @@ public class UsageExampleTest {
     // choice would be to case classes like Scala.  The best we can do in Java is to use objects.
     // At least Tuples give us immutable fields, equals(), hashCode(), and toString() methods and
     // for free!
-    static class Email extends Tuple2<EType,String> {
-        Email(EType t, String s) { super(t, s); }
-        public static Email of(EType t, String s) { return new Email(t, s); }
+    static class Email extends Tuple2<EmailType,String> {
+        Email(EmailType t, String s) { super(t, s); }
+        public static Email of(EmailType t, String s) { return new Email(t, s); }
 
         // You can give more descriptive names to the field getters
-        public EType type() { return _1(); }
+        public EmailType type() { return _1(); }
         public String address() { return _2(); }
     }
 
-    // Notice in this type signature, we can replace Tuple2<EType,String> with Email
+    // Notice in this type signature, we can replace Tuple2<EmailType,String> with Email
     static class Person extends Tuple3<String,String,ImList<Email>> {
         Person(String f, String l, ImList<Email> es) { super(f, l, es); }
         public static Person of(String f, String l, ImList<Email> es) {
