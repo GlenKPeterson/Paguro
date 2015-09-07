@@ -32,6 +32,7 @@ import static org.organicdesign.fp.UsageExampleTest.EmailType.WORK;
 
 // Usage examples are kept in this unit test to ensure they remain correct and current.
 public class UsageExampleTest {
+
     // Define some field name constants with a standard Java Enum
     enum EmailType { HOME, WORK };
 
@@ -111,6 +112,7 @@ public class UsageExampleTest {
         // Next we'll look at two different ways to eliminate or simplify those type signatures.
     }
 
+    // Part 2 of 3
     @Test public void dataDefinitionExample2() {
         // Fluent interfaces can take maximum advantage of Java's type inferencing.  Here is
         // more-or-less the same code as the above, still type-checked by the compiler, but without
@@ -138,6 +140,7 @@ public class UsageExampleTest {
         // problem.
     }
 
+    // Part 3 of 3
     // The previous examples could have been cleaned up very easily with ML's type aliases.  Second
     // choice would be to case classes like Scala.  The best we can do in Java is to use objects,
     // but doing so has the useful side effect of letting us name the accessor methods. Extending
@@ -173,6 +176,7 @@ public class UsageExampleTest {
         public ImList<Email> emailAddrs() { return _3(); }
     }
 
+    // Part 3 of 3 (continued)
     // Use the classes we made above to simplify the types and improve the toString implementations.
     @Test public void dataDefinitionExample3() {
 
@@ -239,7 +243,7 @@ public class UsageExampleTest {
         // to define some classes in order to ensure quality code.
     }
 
-    // Here is a fresh example to just focus on the Transormable and UnmodIterable interfaces.
+    // Here is a fresh example to just focus on the Transormable/UnmodIterable interfaces.
     @Test public void transformTest() {
         // These transformations do not change the underlying data.  They build a new collection by
         // chaining together the specified operations, then applying them in a single pass.
@@ -298,10 +302,11 @@ public class UsageExampleTest {
         // collections well.
     }
 
-    // This is just a common use in Java code: to convert from a character, byte, or integer code to
-    // an enum value.
+    // This is a new example that illustrates a common short-cut to use in Java code, but we
+    // build on it in the next example.  This example converts from a character, byte, or integer
+    // code to an enum value.
     enum ColorVal {
-        // Standard enum declaration
+        // Standard enum declaration which defines a unique character code for each enum value.
         RED('R'), GREEN('G'), BLUE('B');
         private final Character ch;
         ColorVal(Character c) { ch = c; }
@@ -324,16 +329,16 @@ public class UsageExampleTest {
         // charToColorMap is "immutable" in a way that's safe to make extremely lightweight modified
         // copies of.  Someone else could build off that collection to refer to just the RED and
         // GREEN values, sometimes by number-characters instead of by letter-characters:
-        ImMap<Character,ColorVal> betterMap = ColorVal.charToColorMap
+        ImMap<Character,ColorVal> secondMap = ColorVal.charToColorMap
                 .assoc('1', RED)
                 .assoc('2', GREEN)
                 .without('B');
 
-        assertEquals(RED, betterMap.get('1'));
-        assertEquals(GREEN, betterMap.get('2'));
-        assertEquals(RED, betterMap.get('R'));
-        assertEquals(GREEN, betterMap.get('G'));
-        assertNull(betterMap.get('B'));
+        assertEquals(RED, secondMap.get('1'));
+        assertEquals(GREEN, secondMap.get('2'));
+        assertEquals(RED, secondMap.get('R'));
+        assertEquals(GREEN, secondMap.get('G'));
+        assertNull(secondMap.get('B'));
 
         // Original map is unchanged by the intervening operations:
         assertNull(ColorVal.charToColorMap.get('1'));
