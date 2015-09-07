@@ -1,86 +1,34 @@
 UncleJim ("**Un**modifiable **Coll**ections for **J**ava&trade; **Imm**utability") brings the following to Java:
 
-This README describes the project, but you'd probably rather go straight to the [usage example](src/test/java/org/organicdesign/fp/UsageExampleTest.java)!
+#Usage Examples
+[Usage examples](src/test/java/org/organicdesign/fp/UsageExampleTest.java)
+are implemented as unit tests to ensure they remain correct and current.
 
 #UncleJim Provides
-* Clojure's [immutable collections](src/main/java/org/organicdesign/fp/collections)
+* Clojure's [immutable collections](src/main/java/org/organicdesign/fp/collections) (classes start with the word "Persistent")
 * An immutable [Transformation Builder](src/main/java/org/organicdesign/fp/xform/Transformable.java) which is baked into every collection and collection wrapper.
+* Unmodifiable interfaces which deprecate mutator methods and throw exceptions to help you retrofit legacy code and catch errors in your IDE instead of at runtime.  They also implement Transformable.
+* Better [unmodifiable wrappers](src/main/java/org/organicdesign/fp/StaticImports.java#L327) for existing Java collections that deprecate the methods.
+* A tiny domain-specific language of brief helper functions: vec(), tup(), map(), set(), etc. in the [StaticImports file](src/main/java/org/organicdesign/fp/StaticImports.java).
 * An [Equator](src/main/java/org/organicdesign/fp/collections/Equator.java) and [ComparisonContext](src/main/java/org/organicdesign/fp/collections/Equator.java#L45) which work like `java.util.Comparator`, but for hash-based collections.
 * Simplified [functional interfaces](src/main/java/org/organicdesign/fp/function) that wrap checked exceptions
 * [Memoization](src/main/java/org/organicdesign/fp/function/Function2.java#L59) for functions
-* Unmodifiable interfaces which deprecate mutator methods and throw exceptions to help you retrofit legacy code.
-* Better [unmodifiable wrappers](src/main/java/org/organicdesign/fp/StaticImports.java#L327) for existing Java collections that deprecate the methods that throw Unimplemented exceptions so that you can catch errors in your IDE instead of at runtime.
-* A tiny language of brief helper functions: vec(), vecSkipNull(), tup(), hMap(), tMap(), hSet(), tSet(), etc. in the [StaticImports file](src/main/java/org/organicdesign/fp/StaticImports.java).
 
 Fluent interfaces encourage you to write expressions (that evaluate) instead of statements (that produce void).
-Immutable collections are fast enough to make it unnecessary to modify data in place.  UncleJim pushes Java toward Clojure, but keeps the type saftey, objects, classes, and C-like syntax that Java programmers are accustomed to.
+Immutable collections are fast enough to make it unnecessary to modify data in place.
+UncleJim pushes Java toward Clojure, but keeps the type saftey, objects, classes, and some of the C-like syntax that Java programmers are accustomed to.
 
 Migrating large code bases to another language is not always practical.
-This project lets you think about your code the way that Clojure and to some degree Scala programmers do, but still write Java.
+This project lets you think about your code the way that Clojure programmers do, but still write Java.
 
-This has been in Alpha, but it is now up to the first Beta release candidate. 
-Barring new issues, the API should not change (much) at this point.
-Test coverage was at last check 73%:
+This is somewhere between an Alpha and Beta release candidate.
+The code quality is high, but there is still a chance of API changes before the final release. 
+Test coverage at last check: 73%
 
 ![Test Coverage](testCoverage.png)
 
 For complete API documentation, please build the javadoc:
 `mvn javadoc:javadoc`
-
-#Usage Examples
-Create an immutable, type safe map from an enum:
-```java
-public enum ColorVal {
-    RED('R'),
-    GREEN('G'),
-    BLUE('B');
-    private final Character ch;
-    ColorVal(Character c) { ch = c; }
-    public Character ch() { return ch; }
-
-    // Convert the values() array of this enum to a map of key/value pairs
-    // This can be used to look up enum values by their character codes:
-    public static final ImMap<Character,ColorVal> charToColorMap =
-            vec(values()).toImMap(v -> Tuple2.of(v.ch(), v));
-}
-```
-
-That map is "immutable" in a way that's safe to make extremely lightweight modified copies of.  Someone else could build off that collection to refer to just the RED and GREEN values, sometimes by number-characters instead of by letter-characters:
-
-```java
-// Original charToColorMap is unchanged by this
-ImMap<Character,ColorVal> betterMap = ColorVal.charToColorMap
-        .assoc('1', ColorVal.RED)
-        .assoc('2', ColorVal.GREEN)
-        .without('B');
-```
-
-Create an UnmodifiableMap of 0, 1, 2, or 3 items (no nulls) depending on the values of showFirst, showSecond, and showThird:
-```java
-ImMap<String,Integer> itemMap = vec(
-        showFirst ? Tuple2.of("One", 1) : null,
-        showSecond ? Tuple2.of("Two", 2) : null,
-        showThird ? Tuple2.of("Three", 3) : null).filter(e -> e != null)
-                                                 .toImMap(Function1.identity());
-```
-
-Transform unmodifiable data into other unmodifiable data, lazily, without processing any more items than necessary (based on this unit test: [SequenceTest.java](src/test/java/org/organicdesign/fp/permanent/SequenceTest.java#L145)):
-
-```java
-ImList<Integer> list = vec(4,5) //       4,5
-        .prepend(vec(1,2,3))    // 1,2,3,4,5
-        .append(vec(6,7,8,9))   // 1,2,3,4,5,6,7,8,9
-        .filter(i -> i > 4)     //         5,6,7,8,9
-        .map(i -> i - 2)        //     3,4,5,6,7
-        .take(5)                //     3,4,5,6
-        .drop(2)                //         5,6
-        .toImList();
-
-list.toString(); // Returns: "PersistentVector(4,5,6)"
-```
-These transformations do not change the underlying data.  They build a new collection by chaining
-together all the operations you specify, then applying them in a single pass.  In the example above,
-items 7, 8, and 9 are never processed.
 
 #Motivations
 
@@ -148,7 +96,7 @@ map(tup("a", 1), tup("b", 2), tup("c", 3);
 // Still, sometimes you need the flexibility foldLeft provides.
 // This implementation follows the convention that foldLeft processes items
 // *in order* unless those items are a linked list, and in this case,
-// they are not a linked list.
+// they are not.
 U foldLeft(U u, Function2<U,? super T,U> fun);
 
 // Normally you want to terminate by doing a take(), drop(), or takeWhile() before you get
@@ -244,21 +192,24 @@ There is a (possibly outdated) problem-set for learning this tool-kit: https://g
 
 Within your own FP-centric world, you will use the Im interfaces and implementations and transform them with the Transformation abstraction.  Methods that interact with imperative Java code will take the java.util interfaces and return either the Im- interfaces, or Un- interfaces as necessary.  Where practical, try to use the Im-interfaces instead of their implementations, as new, better immutable collection designs surface every few years.
 
-The classes in the <code>function</code> package allow you to use the Java 8 functional interfaces smoothly warpping things that throw checked exceptions in Java 8, or as "second class" functions in Java 7.  They are all named Function*N*  where *N* is the number of arguments they take.  They all automatically wrap and re-throw checked exceptions.  There are no versions for primitives, or that return **void**.  Well, except for SideEffect, which may be removed.
+The classes in the <code>function</code> package allow you to use the Java 8 functional interfaces smoothly warpping things that throw checked exceptions in Java 8, or as "second class" functions in Java 7.  They are all named Function*N*  where *N* is the number of arguments they take.  They all automatically wrap and re-throw checked exceptions.  There are no versions for primitives, or that return **void**.
 
 In Java, variables declared outside a lambda and used within one must be effectively finial.  The Mutable.Ref class works around this limitation.
 
-In short, Clojure doesn't have static types.  Scala has an TMTOWTDI attitude that reminds me of how C++ and Perl ended up producing write-only code.  Unwilling to move a million lines of code to either language, I tried to bring the best of both to Java.
+In short, Clojure doesn't have static types.  Scala has an TMTOWTDI attitude that reminds me of how C++ and Perl ended up producing write-only code. 
+Unwilling to move a million lines of code to either language, I tried to bring the best of both to Java.
 
 #Dependencies
-- Java 8 (tested with 64-bit Linux build 1.8.0_45).  Probably can be meaningfully adapted to work well as far back as Java 5 with some work.  I plan to keep new development work on the main branch, but am very willing to help maintain branches back-ported to Java 7, 6, 5,.... if other people can share the load.
+- Java 8 (tested with 64-bit Linux build 1.8.0_51).
+Probably can be meaningfully adapted to work well at least as far back as Java 5 with some work.
+I plan to keep new development work on the main branch, but am very willing to help maintain branches back-ported to Java 7, 6, 5,.... if other people can share the load.
  
 #Build Dependencies
-- Maven (tested version: 3.2.3 64-bit Linux build)
+- Maven (tested version: 3.19.0-26 64-bit Linux build)
 
 #Test Dependencies
 - Maven will download jUnit for you
-- As of 2014-03-08, all major areas of functionality were covered by unit tests.
+- As of 2015-09-06, all major areas of functionality were covered by unit tests.
 
 #Change Log
 2015-08-30 version 0.10.2 Xform tests at 100%.  Applied Xform to UnmodIterable which makes it
@@ -375,47 +326,6 @@ Added unit tests for the above.
  - Update learnFPJava project
  - Add a [Persistent RRB Tree](http://infoscience.epfl.ch/record/169879/files/RMTrees.pdf) and compare its performance to the PersistentVector.
 
-NOTE: Maybe this goes in the presentation, not in this ReadMe?
-
-Why are fluent interfaces superior to void methods?  Answer: find the bug in the following code:
-
-```java
-Thing t = new Thing();
-t.setOne(1);
-t.setTwo(2);
-t.doStuff();
-if (t.didStuff()) {
-    System.out.println("did some stuff");
-}
- 
-Thing t2 = new Thing();
-t2.setOne(55);
-t2.setTwo(23);
-t2.doStuff();
-if (t.didStuff()) {
-    System.out.println("did more stuff");
-}
-```
-
-Did you see that t.didStuff() is checked twice and t2.didStuff() is never checked?
-With a fluent interface, this kind of bug is not possible.
-
-```java
-if (new Thing().setOne(1)
-               .setTwo(2)
-               .doStuff()
-               .didStuff()) {
-     System.out.println("did some stuff");
-}
-
-if (new Thing().setOne(55)
-               .setTwo(23)
-               .doStuff()
-               .didStuff()) {
-     System.out.println("did more stuff");
-}
-```
-
 #Out of Scope
 
 ###T reduceLeft(BiFunction<T, T, T> fun)
@@ -451,18 +361,32 @@ Nathan Williams: for many lengthy email conversations about this project, encour
 
 GreenJUG: for bearing with talks on early versions of this code two years in a row.
 
-Everyone whose ideas are collected in this project.  I tried to put names in as close as possible to the contributions.
+Greenville Clojure (and Jeff Dik before that): for bearing with my newbie Clojure questions.
+
+Everyone whose ideas are collected in this project.
+I tried to put names in as close as possible to the contributions.
 
 #Licenses
-Java&trade; is a registered trademark of the Oracle Corporation in the US and other countries.  UncleJim is not part of Java.  Oracle is in no way affiliated with the UncleJim project.
+Java&trade; is a registered trademark of the Oracle Corporation in the US and other countries.
+UncleJim is not part of Java.
+Oracle is in no way affiliated with the UncleJim project.
 
-UncleJim is not part of Clojure.  Rich Hickey and the Clojure team are in no way affiliated with the UncleJim project, though it borrows heavily from their thoughts and even some of their open-source code.
+UncleJim is not part of Clojure.
+Rich Hickey and the Clojure team are in no way affiliated with the UncleJim project, though it borrows heavily from their thoughts and is partly a derivative work of their open-source code.
 
-The Clojure collections are licensed under the Eclipse Public License.  Versions of them have been included in this project and modified to add type safety and implement different interfaces.  These files are still derivative works under the EPL.  The [EPL is not compatable with the GPL version 2 or 3](https://eclipse.org/legal/eplfaq.php#GPLCOMPATIBLE).  You can [add an exception to the GPL to allow you to release EPL code under this modified GPL](http://www.gnu.org/licenses/gpl-faq.html#GPLIncompatibleLibs), but not the other way around.
+The Clojure collections are licensed under the Eclipse Public License.
+Versions of them have been included in this project and modified to add type safety and implement different interfaces.
+These files are still derivative works under the EPL.
+The [EPL is not compatable with the GPL version 2 or 3](https://eclipse.org/legal/eplfaq.php#GPLCOMPATIBLE).
+You can [add an exception to the GPL to allow you to release EPL code under this modified GPL](http://www.gnu.org/licenses/gpl-faq.html#GPLIncompatibleLibs), but not the other way around.
 
-Unless otherwise stated, the rest of this work is licensed under the Apache 2.0 license.  New contributions should be made under the Apache 2.0 license whenever practical.  I believe it is more popular, clearer, and has been better tested in courts of law.  [The Apache 2.0 license is also one-way compatible with the GPL version 3](http://www.apache.org/licenses/GPL-compatibility.html), so that everything *except* the Clojure collections can be combined and re-distributed with GPLv3 code.  Apache is not compatible with GPLv2, though you might try the GPL modification mentioned in the previous paragraph.
+Unless otherwise stated, the rest of this work is licensed under the Apache 2.0 license.
+New contributions should be made under the Apache 2.0 license whenever practical.
+I believe it is more popular, clearer, and has been better tested in courts of law.
+[The Apache 2.0 license is also one-way compatible with the GPL version 3](http://www.apache.org/licenses/GPL-compatibility.html), so that everything *except* the Clojure collections can be combined and re-distributed with GPLv3 code.
+Apache is not compatible with GPLv2, though you might try the GPL modification mentioned in the previous paragraph.
 
-As of 2015-03-24, the following statements made me think the Apache and EPL licenses were compatible.
+As of 2015-03-24, the following statements made me think the Apache and EPL licenses were compatible enough for my purposes and for general enterprise adoption:
 
 ###From Apache
 > For the purposes of being a dependency to an Apache product, which licenses

@@ -17,13 +17,18 @@ package org.organicdesign.fp;
 import org.junit.Test;
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.ImMap;
+import org.organicdesign.fp.collections.UnmodIterable;
 import org.organicdesign.fp.function.Function1;
 import org.organicdesign.fp.tuple.Tuple2;
 import org.organicdesign.fp.tuple.Tuple3;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.organicdesign.fp.StaticImports.tup;
 import static org.organicdesign.fp.StaticImports.vec;
+import static org.organicdesign.fp.UsageExampleTest.ColorVal.BLUE;
+import static org.organicdesign.fp.UsageExampleTest.ColorVal.GREEN;
+import static org.organicdesign.fp.UsageExampleTest.ColorVal.RED;
 import static org.organicdesign.fp.UsageExampleTest.EType.*;
 
 // Usage examples are put in this unit test to prove that they work.
@@ -225,4 +230,106 @@ public class UsageExampleTest {
         // signatures should force you to do the right thing.
     }
 
+    @Test public void transformTest() {
+        // These transformations do not change the underlying data.  They build a new collection by
+        // chaining together the specified operations, then applying them in a single pass.
+
+        UnmodIterable<Integer> v1 = vec(4, 5);
+
+        // Make a new vector with more numbers at the beginning.  "precat" is short for
+        // "prepend version of concatenate" or "add-to-beginning".
+        UnmodIterable<Integer> v2 = v1.precat(vec(1, 2, 3));
+
+        // v2 now represents a bigger list of numbers
+        assertEquals(vec(1, 2, 3, 4, 5), v2.toImList());
+
+        // v1 is unchanged
+        assertEquals(vec(4, 5), v1);
+
+        // Instead of updating in place, each change returns a new data structure which is an
+        // extremelly lightweight copy of the old because it shares as much as possible with the
+        // previous structure.
+        v2 = v2.concat(vec(6, 7, 8, 9));
+
+        assertEquals(vec(1, 2, 3, 4, 5, 6, 7, 8, 9), v2.toImList());
+
+        v2 = v2.filter(i -> i > 4);
+
+        assertEquals(vec(5,6,7,8,9), v2.toImList());
+
+        v2 = v2.map(i -> i - 2);
+
+        assertEquals(vec(3,4,5,6,7), v2.toImList());
+
+        // After a take, the subsequent items are not processed by the transformation.
+        // If you had a billion items, this would only allow the first 5 to be processed.
+        v2 = v2.take(4);
+
+        assertEquals(vec(3,4,5,6), v2.toImList());
+
+        v2 = v2.drop(2);
+
+        assertEquals(vec(5,6), v2.toImList());
+
+        // Let's see that again with the methods all chained together
+        assertEquals(vec(5, 6),
+                     vec(4, 5).precat(vec(1, 2, 3))    // 1, 2, 3, 4, 5
+                             .concat(vec(6, 7, 8, 9)) // 1, 2, 3, 4, 5, 6, 7, 8, 9
+                             .filter(i -> i > 4)      //             5, 6, 7, 8, 9
+                             .map(i -> i - 2)         //       3, 4, 5, 6, 7
+                             .take(4)                 //       3, 4, 5, 6
+                             .drop(2)                 //             5, 6
+                             .toImList());
+
+        // Conclusion:
+        // Once you get used to them, Transformations are easier to write and read than their
+        // traditional Java looping counterparts (and almost as fast).  They are also much
+        // easier to understand than Java 8 streams and handle and immutable destination
+        // collections well.
+    }
+
+    // This is just a common use in Java code: to convert from a character, byte, or integer code to
+    // an enum value.
+    enum ColorVal {
+        // Standard enum declaration
+        RED('R'), GREEN('G'), BLUE('B');
+        private final Character ch;
+        ColorVal(Character c) { ch = c; }
+        public Character ch() { return ch; }
+
+        // Convert the values() array of this enum to a map of key/value pairs.  This takes at least
+        // 6 lines of code in a static initializer block or lambda to keep it private and
+        // unmodifiable in traditional Java
+        public static final ImMap<Character,ColorVal> charToColorMap =
+                vec(values()).toImMap(v -> Tuple2.of(v.ch(), v));
+    }
+
+    @Test public void enumCodeLookupTest() {
+        assertNull(ColorVal.charToColorMap.get('1'));
+        assertEquals(RED, ColorVal.charToColorMap.get('R'));
+        assertEquals(GREEN, ColorVal.charToColorMap.get('G'));
+        assertEquals(BLUE, ColorVal.charToColorMap.get('B'));
+
+        // charToColorMap is "immutable" in a way that's safe to make extremely lightweight modified
+        // copies of.  Someone else could build off that collection to refer to just the RED and
+        // GREEN values, sometimes by number-characters instead of by letter-characters:
+        ImMap<Character,ColorVal> betterMap = ColorVal.charToColorMap
+                .assoc('1', RED)
+                .assoc('2', GREEN)
+                .without('B');
+
+        assertEquals(RED, betterMap.get('1'));
+        assertEquals(GREEN, betterMap.get('2'));
+        assertEquals(RED, betterMap.get('R'));
+        assertEquals(GREEN, betterMap.get('G'));
+        assertNull(betterMap.get('B'));
+
+        // Original map is unchanged by the intervening operations:
+        assertNull(ColorVal.charToColorMap.get('1'));
+        assertEquals(RED, ColorVal.charToColorMap.get('R'));
+        assertEquals(GREEN, ColorVal.charToColorMap.get('G'));
+        assertEquals(BLUE, ColorVal.charToColorMap.get('B'));
+    }
+
+    // TODO: Add an example with a set.
 }
