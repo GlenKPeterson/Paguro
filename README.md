@@ -1,7 +1,7 @@
 UncleJim ("**Un**modifiable **Coll**ections for **J**ava&trade; **Imm**utability") brings the following to Java:
 
 #Usage Examples
-Creation of a vector, and an immutable transformation of that data.
+Create a vector (list) and perform an immutable transformation on it:
 ```java
 vec(4, 5)                        //          4, 5
         .precat(vec(1, 2, 3))    // 1, 2, 3, 4, 5
@@ -11,8 +11,8 @@ vec(4, 5)                        //          4, 5
         .take(4)                 //       3, 4, 5, 6
         .drop(2)                 //             5, 6
 ```
-The rest of the [usage examples](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34)
-are implemented as unit tests to ensure they remain correct and current.
+The rest of the [usage examples are implemented as unit tests](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34)
+to ensure they remain correct and current.
 
 #UncleJim Provides
 * Clojure's [immutable collections](src/main/java/org/organicdesign/fp/collections) (classes start with the word "Persistent")
