@@ -31,7 +31,7 @@ import static org.organicdesign.fp.UsageExampleTest.ColorVal.GREEN;
 import static org.organicdesign.fp.UsageExampleTest.ColorVal.RED;
 import static org.organicdesign.fp.UsageExampleTest.EType.*;
 
-// Usage examples are put in this unit test to prove that they work.
+// Usage examples are kept in this unit test to ensure they remain correct and current.
 public class UsageExampleTest {
     // Define some field name constants with a standard Java Enum
     enum EType { HOME, WORK };

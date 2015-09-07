@@ -1,7 +1,7 @@
 UncleJim ("**Un**modifiable **Coll**ections for **J**ava&trade; **Imm**utability") brings the following to Java:
 
 #Usage Examples
-[Usage examples](src/test/java/org/organicdesign/fp/UsageExampleTest.java)
+[Usage examples](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34)
 are implemented as unit tests to ensure they remain correct and current.
 
 #UncleJim Provides
