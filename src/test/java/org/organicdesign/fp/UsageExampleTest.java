@@ -212,6 +212,17 @@ public class UsageExampleTest {
 
         // Now look them up:
         assertEquals(jane, peopleByEmail.get("b@c.d"));
+
+        // Conclusion:
+        // This is the type of Immutable, Object-Oriented, Functional code that any Java shop should
+        // appreciate for it's legibility, reliability, and consistency.  All done with less
+        // boilerplate than traditional Java coding.  Also, you can start with something brief and
+        // dirty, then retrofit step by step to the point where your code is legible and easy to
+        // maintain.
+        //
+        // If you need to write out a complex type like the first example, then it's probably time
+        // to define some classes if you want to produce good code.  The pain of ugly type
+        // signatures should force you to do the right thing.
     }
 
 }
