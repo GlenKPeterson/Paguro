@@ -139,9 +139,10 @@ public class UsageExampleTest {
     }
 
     // The previous examples could have been cleaned up very easily with ML's type aliases.  Second
-    // choice would be to case classes like Scala.  The best we can do in Java is to use objects.
-    // Extending Tuples give us immutable fields, equals(), hashCode(), and toString() methods and
-    // for free!
+    // choice would be to case classes like Scala.  The best we can do in Java is to use objects,
+    // but doing so has the useful side effect of letting us name the accessor methods. Extending
+    // Tuples also give us immutable fields, equals(), hashCode(), and toString() methods, which
+    // would otherwise be taxing to write and debug by hand!
     static class Email extends Tuple2<EmailType,String> {
         // Constructor delegates to Tuple2 constructor
         Email(EmailType t, String s) { super(t, s); }
