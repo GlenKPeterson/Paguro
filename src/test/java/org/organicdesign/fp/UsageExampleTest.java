@@ -52,7 +52,7 @@ public class UsageExampleTest {
                     tup("Fred", "Tase", vec(tup(HOME, "c@d.e"),
                                             tup(WORK, "d@e.f"))));
 
-        // Everything has build-in toString() methods.  Collection show the first 3-5 elements.
+        // Everything has build-in toString() methods.  Collections show the first 3-5 elements.
         assertEquals("PersistentVector(" +
                      "Tuple3(Jane,Smith,PersistentVector(Tuple2(HOME,a@b.c),Tuple2(WORK,b@c.d)))," +
                      "Tuple3(Fred,Tase,PersistentVector(Tuple2(HOME,c@d.e),Tuple2(WORK,d@e.f))))",
