@@ -287,7 +287,8 @@ public class UsageExampleTest {
 
         // Let's see that again with the methods all chained together
         assertEquals(vec(5, 6),
-                     vec(4, 5).precat(vec(1, 2, 3))    // 1, 2, 3, 4, 5
+                     vec(4, 5)                        //          4, 5
+                             .precat(vec(1, 2, 3))    // 1, 2, 3, 4, 5
                              .concat(vec(6, 7, 8, 9)) // 1, 2, 3, 4, 5, 6, 7, 8, 9
                              .filter(i -> i > 4)      //             5, 6, 7, 8, 9
                              .map(i -> i - 2)         //       3, 4, 5, 6, 7

@@ -1,7 +1,17 @@
 UncleJim ("**Un**modifiable **Coll**ections for **J**ava&trade; **Imm**utability") brings the following to Java:
 
 #Usage Examples
-[Usage examples](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34)
+Creation of a vector, and an immutable transformation of that data.
+```java
+vec(4, 5)                        //          4, 5
+        .precat(vec(1, 2, 3))    // 1, 2, 3, 4, 5
+        .concat(vec(6, 7, 8, 9)) // 1, 2, 3, 4, 5, 6, 7, 8, 9
+        .filter(i -> i > 4)      //             5, 6, 7, 8, 9
+        .map(i -> i - 2)         //       3, 4, 5, 6, 7
+        .take(4)                 //       3, 4, 5, 6
+        .drop(2)                 //             5, 6
+```
+The rest of the [usage examples](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34)
 are implemented as unit tests to ensure they remain correct and current.
 
 #UncleJim Provides
