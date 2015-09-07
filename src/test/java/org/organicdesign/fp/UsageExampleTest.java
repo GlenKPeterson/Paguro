@@ -126,9 +126,9 @@ public class UsageExampleTest {
                              .flatMap(person -> person._3()
                                                       .map(mail -> tup(mail._2(), person)))
                              .toImMap(Function1.identity())
-                                     // Look up Jane by her address
+                             // Look up Jane by her address
                              .get("b@c.d")
-                                     // Get her first name
+                             // Get her first name
                              ._1());
 
         // Conclusion:
@@ -140,29 +140,39 @@ public class UsageExampleTest {
 
     // The previous examples could have been cleaned up very easily with ML's type aliases.  Second
     // choice would be to case classes like Scala.  The best we can do in Java is to use objects.
-    // At least Tuples give us immutable fields, equals(), hashCode(), and toString() methods and
+    // Extending Tuples give us immutable fields, equals(), hashCode(), and toString() methods and
     // for free!
     static class Email extends Tuple2<EmailType,String> {
+        // Constructor delegates to Tuple2 constructor
         Email(EmailType t, String s) { super(t, s); }
+
+        // Static factory method (for creating new instances) overrides Tuple2.of()
         public static Email of(EmailType t, String s) { return new Email(t, s); }
 
-        // You can give more descriptive names to the field getters
+        // As long as we are making an object, we might as well give descriptive names to the
+        // field getters
         public EmailType type() { return _1(); }
         public String address() { return _2(); }
     }
 
     // Notice in this type signature, we can replace Tuple2<EmailType,String> with Email
     static class Person extends Tuple3<String,String,ImList<Email>> {
+
+        // Constructor delegates to Tuple3 constructor
         Person(String f, String l, ImList<Email> es) { super(f, l, es); }
+
+        // Static factory method (for creating new instances) overrides Tuple3.of()
         public static Person of(String f, String l, ImList<Email> es) {
             return new Person(f, l, es);
         }
 
-        // Descriptive names are not used in the examples below, but they are a good idea!
+        // Give more descriptive names to the field getters
         public String first() { return _1(); }
         public String last() { return _2(); }
         public ImList<Email> emailAddrs() { return _3(); }
     }
+
+    // Use the classes we made above to simplify the types and improve the toString implementations.
     @Test public void dataDefinitionExample3() {
 
         // The type signatures from the first example become very simple
@@ -218,17 +228,17 @@ public class UsageExampleTest {
         assertEquals(jane, peopleByEmail.get("b@c.d"));
 
         // Conclusion:
-        // This is the type of Immutable, Object-Oriented, Functional code that any Java shop should
-        // appreciate for it's legibility, reliability, and consistency.  All done with less
-        // boilerplate than traditional Java coding.  Also, you can start with something brief and
-        // dirty, then retrofit step by step to the point where your code is legible and easy to
-        // maintain.
+        // Any Java shop should appreciate this kind of Immutable, Object-Oriented, Functional code
+        // for it's legibility, reliability, and consistency.  Extending Tuples lets us accomplish
+        // all this with less boilerplate than traditional Java coding.  Also, you can start with
+        // a brief and dirty proof of concept, then retrofit step by step to the point where your
+        // code is legible and easy to maintain.
         //
         // If you need to write out a complex type like the first example, then it's probably time
-        // to define some classes if you want to produce good code.  The pain of ugly type
-        // signatures should force you to do the right thing.
+        // to define some classes in order to ensure quality code.
     }
 
+    // Here is a fresh example to just focus on the Transormable and UnmodIterable interfaces.
     @Test public void transformTest() {
         // These transformations do not change the underlying data.  They build a new collection by
         // chaining together the specified operations, then applying them in a single pass.
@@ -303,6 +313,7 @@ public class UsageExampleTest {
                 vec(values()).toImMap(v -> Tuple2.of(v.ch(), v));
     }
 
+    // Let's use the above code to examine immutable maps in general.
     @Test public void enumCodeLookupTest() {
         assertNull(ColorVal.charToColorMap.get('1'));
         assertEquals(RED, ColorVal.charToColorMap.get('R'));
