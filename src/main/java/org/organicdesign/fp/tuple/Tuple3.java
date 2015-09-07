@@ -28,7 +28,9 @@ public class Tuple3<T,U,V> {
     protected Tuple3(T t, U u, V v) { _1 = t; _2 = u; _3 = v; }
 
     /** Public static factory method */
-    public static <T,U,V> Tuple3<T,U,V> of(T first, U second, V third) { return new Tuple3<>(first, second, third); }
+    public static <T,U,V> Tuple3<T,U,V> of(T first, U second, V third) {
+        return new Tuple3<>(first, second, third);
+    }
 
     /** Returns the first field of the tuple */
     public T _1() { return _1; }
@@ -40,7 +42,7 @@ public class Tuple3<T,U,V> {
     public V _3() { return _3; }
 
     @Override
-    public String toString() { return "Tuple3(" + _1 + "," + _2 + "," + _3 + ")"; }
+    public String toString() { return getClass().getSimpleName() + "(" + _1 + "," + _2 + "," + _3 + ")"; }
 
     @Override
     public boolean equals(Object other) {

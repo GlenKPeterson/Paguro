@@ -18,8 +18,8 @@ import org.junit.Test;
 import org.organicdesign.fp.collections.UnmodCollection;
 import org.organicdesign.fp.collections.UnmodListIterator;
 import org.organicdesign.fp.collections.UnmodMap;
-import org.organicdesign.fp.collections.UnmodSortedMap;
 import org.organicdesign.fp.collections.UnmodSet;
+import org.organicdesign.fp.collections.UnmodSortedMap;
 import org.organicdesign.fp.collections.UnmodSortedSet;
 
 import java.util.ArrayDeque;

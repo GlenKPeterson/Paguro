@@ -47,7 +47,7 @@ public class Tuple2<T,U> implements Entry<T,U>, UnmodMap.UnEntry<T,U> {
     public U _2() { return _2; }
 
     @Override
-    public String toString() { return "Tuple2(" + _1 + "," + _2 + ")"; }
+    public String toString() { return getClass().getSimpleName() + "(" + _1 + "," + _2 + ")"; }
 
     @Override
     public boolean equals(Object other) {

@@ -1,7 +1,10 @@
 UncleJim ("**Un**modifiable **Coll**ections for **J**ava&trade; **Imm**utability") brings the following to Java:
 
+This README describes the project, but you'd probably rather go straight to the [usage example](src/test/java/org/organicdesign/fp/UsageExampleTest.java)!
+
+#UncleJim Provides
 * Clojure's [immutable collections](src/main/java/org/organicdesign/fp/collections)
-* An immutable [Transformation Builder](https://github.com/GlenKPeterson/UncleJim/blob/master/src/main/java/org/organicdesign/fp/xform/Transformable.java) which is baked into every collection and collection wrapper.
+* An immutable [Transformation Builder](src/main/java/org/organicdesign/fp/xform/Transformable.java) which is baked into every collection and collection wrapper.
 * An [Equator](src/main/java/org/organicdesign/fp/collections/Equator.java) and [ComparisonContext](src/main/java/org/organicdesign/fp/collections/Equator.java#L45) which work like `java.util.Comparator`, but for hash-based collections.
 * Simplified [functional interfaces](src/main/java/org/organicdesign/fp/function) that wrap checked exceptions
 * [Memoization](src/main/java/org/organicdesign/fp/function/Function2.java#L59) for functions
@@ -121,7 +124,7 @@ If you find a better/faster implementation, please submit your improvements!
 
 #API
 
-###Starting Points:
+###Data Description Mini-Language
 ```java
 import org.organicdesign.fp.StaticImports.*
 
