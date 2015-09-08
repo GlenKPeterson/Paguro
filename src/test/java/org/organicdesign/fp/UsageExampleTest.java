@@ -41,9 +41,9 @@ public class UsageExampleTest {
         // We start by creating a list of "people."  The tup(), vec(), set(), and map() methods are
         // imported from StaticImports and provide a mini data-definition language.  vec() creates
         // a vector (immutable list) of any length.  tup() creates a Tuple (some languages call this
-        // a "record").  For now, you can think of Tuples as type-safe anonymous objects.
+        // a "record").  You can think of Tuples as type-safe anonymous objects.
         //
-        // This structured date is type-safe even though it looks a little like JSON.  Unlike JSON,
+        // This structured data is type-safe even though it looks a little like JSON.  Unlike JSON,
         // the compiler verifies the types! You can ignore the huge type signatures for now -
         // subsequent examples show different ways to simplify them.
         ImList<Tuple3<String,String,ImList<Tuple2<EmailType,String>>>> people =
@@ -58,7 +58,7 @@ public class UsageExampleTest {
                      "Tuple3(Fred,Tase,PersistentVector(Tuple2(HOME,c@d.e),Tuple2(WORK,d@e.f))))",
                      people.toString());
 
-        // Let's look at Jane:
+        // Let's look at Jane's record:
         Tuple3<String,String,ImList<Tuple2<EmailType,String>>> jane = people.get(0);
 
         assertEquals("Tuple3(Jane,Smith,PersistentVector(Tuple2(HOME,a@b.c),Tuple2(WORK,b@c.d)))",
@@ -67,24 +67,23 @@ public class UsageExampleTest {
         // Let's make a map that we can use later to look up people by their email address.
         ImMap<String,Tuple3<String,String,ImList<Tuple2<EmailType,String>>>> peopleByEmail =
 
-                // flatMap can be confusing the first time you see it.  We may need to produce
-                // multiple entries in the resulting map (dictionary) for each person.  DBA's call
-                // this a one-to-many relationship.  FlatMap is the way to produce zero or more
-                // items for each input item.
+                // We may need to produce multiple entries in the resulting map/dictionary for each
+                // person.  This is a one-to-many relationship and flatMap is the way to produce
+                // zero or more output items for each input item.
                 // Note: person._3() is the vector of email addresses
                 people.flatMap(person -> person._3()
-                                               // Map (dictionary) entries are key value pairs.
-                                               // Tuple2 implements Map.Entry so we can set up
-                                               // the pair right here.
+                                               // Map/dictionary entries are key value pairs.
+                                               // Tuple2 implements Map.Entry making it easy to
+                                               // create the pair right here.
                                                // Note: mail._2() is the address
                                                .map(mail -> tup(mail._2(), person)))
-                        // Now convert the result into an immutable map.  This function takes
-                        // another function which is normally used to convert data into key/value
-                        // pairs, but we already have key/value pairs, so we just pass the identity
-                        // function (which returns its argument unchanged)
+                        // Now convert the result into an immutable map.  The function argument is
+                        // normally used to convert data into key/value pairs, but we already have
+                        // key/value pairs, so we just pass the identity function (returns its
+                        // argument unchanged)
                       .toImMap(Function1.identity());
 
-        // Let's look at the map we just created
+        // Check look at the map we just created
         assertEquals("PersistentHashMap(" +
                      "Tuple2(d@e.f," +
                      "Tuple3(Fred,Tase,PersistentVector(Tuple2(HOME,c@d.e),Tuple2(WORK,d@e.f))))," +
@@ -96,7 +95,7 @@ public class UsageExampleTest {
                      "Tuple3(Fred,Tase,PersistentVector(Tuple2(HOME,c@d.e),Tuple2(WORK,d@e.f)))))",
                      peopleByEmail.toString());
 
-        // Look up Jane by her address
+        // Prove that we can now look up Jane by her address
         assertEquals(jane, peopleByEmail.get("b@c.d"));
 
         // Conclusion:
@@ -131,16 +130,15 @@ public class UsageExampleTest {
         // Conclusion:
         // This kind of loose and free coding is great for trying out ideas, but it can be a little
         // hard for the person after you to read, especially with all the _1(), _2(), and _3()
-        // methods on the tuples.  Naming your data types well can completely fix the legibility
-        // problem.
+        // methods on the tuples.  Naming your data types well can make it more legible.
     }
 
     // Part 3 of 3
-    // The previous examples could have been cleaned up very easily with ML's type aliases.  Second
-    // choice would be to case classes like Scala.  The best we can do in Java is to use objects,
-    // but doing so has the useful side effect of letting us name the accessor methods. Extending
-    // Tuples also give us immutable fields, equals(), hashCode(), and toString() methods, which
-    // would otherwise be taxing to write and debug by hand!
+    // The previous examples could have been cleaned up with ML's or Scala's type aliases, or
+    // Scala's case classes.  In Java we have to use objects, but doing so has the useful side
+    // effect of letting us name the accessor methods.  Extending Tuples also give us immutable
+    // fields, equals(), hashCode(), and toString() implementations, which would otherwise be taxing
+    // to write and debug by hand!
     static class Email extends Tuple2<EmailType,String> {
         // Constructor delegates to Tuple2 constructor
         Email(EmailType t, String s) { super(t, s); }
@@ -175,7 +173,7 @@ public class UsageExampleTest {
     // Use the classes we made above to simplify the types and improve the toString implementations.
     @Test public void dataDefinitionExample3() {
 
-        // The type signatures from the first example become very simple
+        // Compare this type signature with the first example.  Wow!
         ImList<Person> people =
                 vec(Person.of("Jane", "Smith", vec(Email.of(HOME, "a@b.c"),
                                                    Email.of(WORK, "b@c.d"))),
@@ -183,7 +181,7 @@ public class UsageExampleTest {
                                                   Email.of(WORK, "d@e.f"))));
 
         // Notice that the tuples are smart enough to take their new names, Person and Email instead
-        // of Tuple3 and Tuple2:
+        // of Tuple3 and Tuple2.  This aids readability when debugging.
         assertEquals("PersistentVector(" +
                      "Person(Jane,Smith," +
                      "PersistentVector(Email(HOME,a@b.c),Email(WORK,b@c.d)))," +
@@ -224,18 +222,18 @@ public class UsageExampleTest {
                      "Person(Fred,Tase,PersistentVector(Email(HOME,c@d.e),Email(WORK,d@e.f)))))",
                      peopleByEmail.toString());
 
-        // Now look them up:
+        // Now look jane up by address.
         assertEquals(jane, peopleByEmail.get("b@c.d"));
 
         // Conclusion:
-        // Any Java shop should appreciate this kind of Immutable, Object-Oriented, Functional code
-        // for it's legibility, reliability, and consistency.  Extending Tuples lets us accomplish
-        // all this with less boilerplate than traditional Java coding.  Also, you can start with
-        // a brief and dirty proof of concept, then retrofit step by step to the point where your
-        // code is legible and easy to maintain.
+        // Extending Tuples lets us write Immutable, Object-Oriented, Functional code with less
+        // boilerplate than traditional Java coding.  In addition to brevity, this approach improves
+        // legibility, reliability, and consistency.
         //
-        // If you need to write out a complex type like the first example, then it's probably time
-        // to define some classes in order to ensure quality code.
+        // You can begin with a quick and dirty proof of concept, then retrofit step by step to the
+        // point where your code is very legible and easy to maintain.  If you need to write out a
+        // complex type like the first example, that's a sign that it's time to define some classes
+        // with good names.
     }
 
     // Here is a fresh example to just focus on the Transormable/UnmodIterable interfaces.
