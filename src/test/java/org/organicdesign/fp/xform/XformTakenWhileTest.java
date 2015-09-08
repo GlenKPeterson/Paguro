@@ -5,6 +5,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.organicdesign.fp.function.Function1;
 
+import java.util.Arrays;
+
 import static org.junit.Assert.assertArrayEquals;
 
 @RunWith(JUnit4.class)
@@ -12,7 +14,7 @@ public class XformTakenWhileTest {
 
     @Test
     public void takeItemsInOneBatch() {
-        Xform<Integer> seq = Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9);
+        Xform<Integer> seq = Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9));
         assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
                           seq.takeWhile(Function1.accept()).toArray());
         assertArrayEquals(new Integer[] { 1,2,3,4,5,6,7,8,9 },
@@ -37,7 +39,7 @@ public class XformTakenWhileTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void exception1() {
-        Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).takeWhile(null);
+        Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).takeWhile(null);
     }
 
 }

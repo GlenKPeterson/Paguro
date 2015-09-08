@@ -4,6 +4,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.util.Arrays;
+
 import static org.junit.Assert.assertArrayEquals;
 
 @RunWith(JUnit4.class)
@@ -11,7 +13,7 @@ public class XformTakenTest {
     @Test
     public void takeItemsInOneBatch() {
         Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-        Xform<Integer> seq = Xform.ofArray(ints);
+        Xform<Integer> seq = Xform.of(Arrays.asList(ints));
         assertArrayEquals(ints, seq.take(9999).toArray());
         assertArrayEquals(ints, seq.take(10).toArray());
         assertArrayEquals(ints, seq.take(9).toArray());
@@ -24,14 +26,14 @@ public class XformTakenTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void exception1() { Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).take(-1); }
+    public void exception1() { Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).take(-1); }
     @Test(expected = IllegalArgumentException.class)
-    public void exception2() { Xform.ofArray(1, 2, 3, 4, 5, 6, 7, 8, 9).take(-99); }
+    public void exception2() { Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).take(-99); }
 
     @Test
     public void takeItemsInMultiBatches() {
         Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-        Xform<Integer> seq = Xform.ofArray(ints);
+        Xform<Integer> seq = Xform.of(Arrays.asList(ints));
         assertArrayEquals(ints, seq.take(10).take(9999).take(10).toArray());
         assertArrayEquals(ints, seq.take(9).take(9).take(9).toArray());
         assertArrayEquals(new Integer[] { 1,2,3,4,5,6 }, seq.take(8).take(7).take(6).toArray());

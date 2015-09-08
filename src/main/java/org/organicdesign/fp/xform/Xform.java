@@ -22,7 +22,6 @@ import org.organicdesign.fp.function.Function1;
 import org.organicdesign.fp.function.Function2;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -395,11 +394,11 @@ public abstract class Xform<A> implements UnmodIterable<A> {
         }
     }
 
-    /** Static factory methods */
-    @SafeVarargs
-    public static <T> Xform<T> ofArray(T... list) {
-        return new SourceProviderIterableDesc<>(Arrays.asList(list));
-    }
+//    /** Static factory methods */
+//    @SafeVarargs
+//    public static <T> Xform<T> ofArray(T... list) {
+//        return new SourceProviderIterableDesc<>(Arrays.asList(list));
+//    }
 
     // TODO: Rename to ofIter() to make people think instead of using ofArray().
     /** Static factory methods */
@@ -479,11 +478,11 @@ public abstract class Xform<A> implements UnmodIterable<A> {
         return new AppendIterDesc<>(this, new SourceProviderIterableDesc<>(list));
     }
 
-    @SafeVarargs
-    public final Xform<A> concatArray(A... list) {
-        if ( (list == null) || (list.length < 1) ) { return this; }
-        return concat(Arrays.asList(list));
-    }
+//    @SafeVarargs
+//    public final Xform<A> concatArray(A... list) {
+//        if ( (list == null) || (list.length < 1) ) { return this; }
+//        return concat(Arrays.asList(list));
+//    }
 
 //    public Xform<A> precatList(List<? extends A> list) {
 //        if ( (list == null) || (list.size() < 1) ) { return this; }
@@ -495,11 +494,11 @@ public abstract class Xform<A> implements UnmodIterable<A> {
         return new AppendIterDesc<>(of(list), this);
     }
 
-    @SafeVarargs
-    public final Xform<A> precatArray(A... list) {
-        if ( (list == null) || (list.length < 1) ) { return this; }
-        return precat(Arrays.asList(list));
-    }
+//    @SafeVarargs
+//    public final Xform<A> precatArray(A... list) {
+//        if ( (list == null) || (list.length < 1) ) { return this; }
+//        return precat(Arrays.asList(list));
+//    }
 
     /** The number of items to drop from the beginning of the output. */
     @Override public Xform<A> drop(long n) {
