@@ -103,16 +103,15 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 
 //    final private static Object NOT_FOUND = new Object();
 
-    /** Returns a new PersistentHashMap of the given keys and their paired values. */
-    public static <K,V> PersistentHashMap<K,V> of() {
-        return empty();
-    }
+//    /** Returns a new PersistentHashMap of the given keys and their paired values. */
+//    public static <K,V> PersistentHashMap<K,V> of() {
+//        return empty();
+//    }
 
     /**
      Returns a new PersistentHashMap of the given keys and their paired values, skipping any null Entries.
      */
-    public static <K,V> PersistentHashMap<K,V>
-    ofEq(Equator<K> eq, Iterable<Map.Entry<K,V>> es) {
+    public static <K,V> PersistentHashMap<K,V> ofEq(Equator<K> eq, Iterable<Map.Entry<K,V>> es) {
         if (es == null) { return empty(eq); }
         PersistentHashMap<K,V> m = empty(eq);
         TransientHashMap<K,V> map = m.asTransient();
@@ -125,10 +124,10 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
     }
 
     /**
-     Returns a new PersistentHashMap of the given keys and their paired values, skipping any null Entries.
+     Returns a new PersistentHashMap of the given keys and their paired values, skipping any null
+     Entries.
      */
-    public static <K,V> PersistentHashMap<K,V>
-    of(Iterable<Map.Entry<K,V>> es) {
+    public static <K,V> PersistentHashMap<K,V> of(Iterable<Map.Entry<K,V>> es) {
         if (es == null) { return empty(); }
         PersistentHashMap<K,V> m = empty();
         TransientHashMap<K,V> map = m.asTransient();
@@ -140,14 +139,15 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         return map.persistent();
     }
 
-    // =================================================== Instance ===================================================
+    // ========================================= Instance =========================================
     private final Equator<K> equator;
     private final int count;
     private final INode<K,V> root;
     private final boolean hasNull;
     private final V nullValue;
 
-    private PersistentHashMap(Equator<K> eq, int count, INode<K,V> root, boolean hasNull, V nullValue) {
+    private PersistentHashMap(Equator<K> eq, int count, INode<K,V> root, boolean hasNull,
+                              V nullValue) {
         this.equator = (eq == null) ? Equator.defaultEquator() : eq;
         this.count = count;
         this.root = root;
@@ -172,7 +172,8 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         if (newroot == root) {
             return this;
         }
-        return new PersistentHashMap<>(equator, addedLeaf.val == null ? count : count + 1, newroot, hasNull, nullValue);
+        return new PersistentHashMap<>(equator, addedLeaf.val == null ? count : count + 1, newroot,
+                                       hasNull, nullValue);
     }
 
     @Override public TransientHashMap<K,V> asTransient() {
@@ -191,9 +192,9 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
     }
 
     /**
-     This is compatible with java.util.Map but that means it wrongly allows comparisons with SortedMaps, which are
-     necessarily not commutative.  It also ignores the Equator.  As always, for meaningful equals,
-     define an equator.
+     This is compatible with java.util.Map but that means it wrongly allows comparisons with
+     SortedMaps, which are necessarily not commutative.  It also ignores the Equator.  As always,
+     for meaningful equals, define an equator.
 
      @param other the other (hopefully unsorted) map to compare to.
      @return true if these maps contain the same elements, regardless of order.
