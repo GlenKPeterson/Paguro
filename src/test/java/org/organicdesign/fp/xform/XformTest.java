@@ -30,6 +30,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.organicdesign.fp.StaticImports.vec;
+import static org.organicdesign.fp.StaticImports.xform;
 import static org.organicdesign.fp.function.Function1.accept;
 import static org.organicdesign.fp.function.Function1.reject;
 
@@ -675,18 +676,23 @@ public class XformTest extends TestCase {
         assertArrayEquals(ints, Xform.of(Arrays.asList(ints)).toArray());
     }
 
+    @Test public void testNullConstruction() {
+        assertEquals(Xform.EMPTY, Xform.of(null));
+        assertEquals(Xform.EMPTY, xform(null));
+    }
+
 //    @Test public void emptyXform() {
-//        assertEquals(0, Xform.EMPTY_SEQUENCE.hashCode());
-//        assertEquals(0, Xform.EMPTY_SEQUENCE.tail().hashCode());
-//        assertEquals(0, Xform.EMPTY_SEQUENCE.tail().tail().tail().hashCode());
+//        assertEquals(0, Xform.EMPTY.hashCode());
+//        assertEquals(0, Xform.EMPTY.drop(1).hashCode());
+//        assertEquals(0, Xform.EMPTY.drop(1).drop(1).drop(1).hashCode());
 //
-//        assertEquals(Option.none(), Xform.EMPTY_SEQUENCE.head());
+//        assertEquals(Option.none(), Xform.EMPTY.head());
 //
-//        assertEquals(Xform.EMPTY_SEQUENCE, Xform.EMPTY_SEQUENCE);
-//        assertEquals(Xform.EMPTY_SEQUENCE, Xform.EMPTY_SEQUENCE.tail());
-//        assertEquals(Xform.EMPTY_SEQUENCE, Xform.EMPTY_SEQUENCE.tail().tail());
-//        assertTrue(Xform.EMPTY_SEQUENCE.equals(Xform.EMPTY_SEQUENCE.tail()));
-//        assertTrue(Xform.EMPTY_SEQUENCE.tail().equals(Xform.EMPTY_SEQUENCE));
+//        assertEquals(Xform.EMPTY, Xform.EMPTY);
+//        assertEquals(Xform.EMPTY, Xform.EMPTY.drop(1));
+//        assertEquals(Xform.EMPTY, Xform.EMPTY.drop(1).drop(1));
+//        assertTrue(Xform.EMPTY.equals(Xform.EMPTY.drop(1)));
+//        assertTrue(Xform.EMPTY.drop(1).equals(Xform.EMPTY));
 //    }
 
     @Test public void foldLeft() {

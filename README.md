@@ -222,6 +222,9 @@ I plan to keep new development work on the main branch, but am very willing to h
 - As of 2015-09-06, all major areas of functionality were covered by unit tests.
 
 #Change Log
+2015-09-08 version 0.10.6 Fixed bug: Xform would blow up later if you passed a null to its
+constructor.
+
 2015-09-08 version 0.10.5 moved all unmod____ method wrappers from StaticImports to FunctionUtils
 because they just aren't nearly as useful as they used to be.  xform() has taken over nearly 100%
 of the use cases for the unmod____ methods.  Removed Varargs methods from everything except the

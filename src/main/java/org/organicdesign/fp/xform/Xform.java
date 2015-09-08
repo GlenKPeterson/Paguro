@@ -22,6 +22,7 @@ import org.organicdesign.fp.function.Function1;
 import org.organicdesign.fp.function.Function2;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -400,9 +401,14 @@ public abstract class Xform<A> implements UnmodIterable<A> {
 //        return new SourceProviderIterableDesc<>(Arrays.asList(list));
 //    }
 
-    // TODO: Rename to ofIter() to make people think instead of using ofArray().
+    public static Xform EMPTY = new SourceProviderIterableDesc<>(Collections.emptyList());
+
+    @SuppressWarnings("unchecked")
+    public static <T> Xform<T> empty() { return (Xform<T>) EMPTY; }
+
     /** Static factory methods */
     public static <T> Xform<T> of(Iterable<? extends T> list) {
+        if (list == null) { return empty(); }
         return new SourceProviderIterableDesc<>(list);
     }
 
