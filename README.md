@@ -224,7 +224,7 @@ I plan to keep new development work on the main branch, but am very willing to h
 #Change Log
 2015-09-08 version 0.10.4 moved all unmod____ method wrappers from StaticImports to FunctionUtils
 because they just aren't nearly as useful as they used to be.  xform() has taken over nearly 100%
-of the use cases for the unmod____ methods.
+of the use cases for the unmod____ methods.  Removed Varargs methods from PersistentVector.
 
 2015-09-08 version 0.10.3 added xform() method to StaticImports as a convenient and more efficient
 way to start a transformation than by using the unmod____ wrappers.

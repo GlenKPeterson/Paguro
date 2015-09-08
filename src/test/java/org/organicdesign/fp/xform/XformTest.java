@@ -19,7 +19,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.organicdesign.fp.Mutable;
-import org.organicdesign.fp.collections.PersistentVector;
 import org.organicdesign.fp.collections.UnmodIterator;
 import org.organicdesign.fp.function.Function1;
 
@@ -56,7 +55,7 @@ public class XformTest extends TestCase {
                            return accum;
                        }));
         assertEquals(Arrays.asList(1, 10, 100, 2, 20, 200, 3, 30, 300),
-                     td.flatMap(i -> PersistentVector.of(i, i * 10, i * 100))
+                     td.flatMap(i -> vec(i, i * 10, i * 100))
                        .foldLeft(new ArrayList<>(), (accum, i) -> {
                            accum.add(i);
                            return accum;
@@ -185,7 +184,7 @@ public class XformTest extends TestCase {
         assertEquals(Arrays.asList(3, 30, 300, 5, 50, 500, 7, 70, 700, 9, 90, 900),
                      td.filter(i -> i % 2 == 0)
                        .map(i -> i + 1)
-                       .flatMap(i -> PersistentVector.of(i, i * 10, i * 100))
+                       .flatMap(i -> vec(i, i * 10, i * 100))
                        .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                            accum.add(i);
                            return accum;
@@ -194,7 +193,7 @@ public class XformTest extends TestCase {
                      td.drop(2)
                        .filter(i -> i % 2 == 0)
                        .map(i -> i + 1)
-                       .flatMap(i -> PersistentVector.of(i, i * 10, i * 100))
+                       .flatMap(i -> vec(i, i * 10, i * 100))
                        .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                            accum.add(i);
                            return accum;
@@ -213,7 +212,7 @@ public class XformTest extends TestCase {
                      td.filter(i -> i % 2 == 0)
                        .map(i -> i + 1)
                        .drop(2)
-                       .flatMap(i -> PersistentVector.of(i, i * 10, i * 100))
+                       .flatMap(i -> vec(i, i * 10, i * 100))
                        .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                            accum.add(i);
                            return accum;
@@ -230,7 +229,7 @@ public class XformTest extends TestCase {
         assertEquals(Arrays.asList(500, 7, 70, 700, 9, 90),
                      td.filter(i -> i % 2 == 0)
                        .map(i -> i + 1)
-                       .flatMap(i -> PersistentVector.of(i, i * 10, i * 100))
+                       .flatMap(i -> vec(i, i * 10, i * 100))
                        .drop(5)
                        .take(6)
                        .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
@@ -240,7 +239,7 @@ public class XformTest extends TestCase {
         assertEquals(Arrays.asList(500, 7, 70, 700, 9, 90, 91, 92, 93),
                      td.filter(i -> i % 2 == 0)
                        .map(i -> i + 1)
-                       .flatMap(i -> PersistentVector.of(i, i * 10, i * 100))
+                       .flatMap(i -> vec(i, i * 10, i * 100))
                        .drop(5)
                        .take(6)
                        .concat(Arrays.asList(91, 92, 93))

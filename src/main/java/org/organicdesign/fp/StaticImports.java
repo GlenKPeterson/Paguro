@@ -67,7 +67,7 @@ public class StaticImports {
     @SafeVarargs
     static public <T> ImList<T> vec(T... items) {
         if ( (items == null) || (items.length < 1) ) { return PersistentVector.empty(); }
-        return PersistentVector.of(items);
+        return PersistentVector.ofIter(Arrays.asList(items));
     }
 
     // I don't know whether this is a worthwhile convenience, or a crutch.

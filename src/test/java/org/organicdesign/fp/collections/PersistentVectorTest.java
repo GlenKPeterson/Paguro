@@ -31,6 +31,7 @@ import java.util.ListIterator;
 import java.util.Map;
 
 import static org.junit.Assert.*;
+import static org.organicdesign.fp.StaticImports.vec;
 import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
 
 @RunWith(JUnit4.class)
@@ -38,7 +39,7 @@ public class PersistentVectorTest {
     @Test
     public void basics() {
         Integer[] threeIntArray = new Integer[]{1, 2, 3};
-        ImList<Integer> list = PersistentVector.of(1, 2, 3);
+        ImList<Integer> list = vec(1, 2, 3);
         Integer[] resultArray = list.toArray(new Integer[3]);
         assertArrayEquals(threeIntArray, resultArray);
     }
@@ -48,13 +49,13 @@ public class PersistentVectorTest {
         ImList<Integer> empty1 = PersistentVector.empty();
         ImList<Integer> empty2 = PersistentVector.ofIter(Collections.emptyList());
         ImList<Integer> empty3 = PersistentVector.ofIter(new ArrayList<>());
-        ImList<Integer> empty4 = PersistentVector.of();
+        ImList<Integer> empty4 = vec();
 
         equalsDistinctHashCode(empty1, empty2, empty3,
-                               PersistentVector.of(1));
+                               vec(1));
 
         equalsDistinctHashCode(empty2, empty3, empty4,
-                               PersistentVector.of((Integer) null));
+                               vec((Integer) null));
     }
 
     @Test(expected = IndexOutOfBoundsException.class)
@@ -91,40 +92,40 @@ public class PersistentVectorTest {
     public void emptyEx24() { PersistentVector.ofIter(new ArrayList<>()).get(Integer.MAX_VALUE); }
 
     @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx30() { PersistentVector.of().get(Integer.MIN_VALUE); }
+    public void emptyEx30() { vec().get(Integer.MIN_VALUE); }
     @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx31() { PersistentVector.of().get(-1); }
+    public void emptyEx31() { vec().get(-1); }
     @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx32() { PersistentVector.of().get(0); }
+    public void emptyEx32() { vec().get(0); }
     @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx33() { PersistentVector.of().get(1); }
+    public void emptyEx33() { vec().get(1); }
     @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx34() { PersistentVector.of().get(Integer.MAX_VALUE); }
+    public void emptyEx34() { vec().get(Integer.MAX_VALUE); }
 
     @Test
     public void oneInt() {
-        ImList<Integer> one1 = PersistentVector.of(1);
+        ImList<Integer> one1 = vec(1);
         List<Integer> oneList = new ArrayList<>();
         oneList.add(1);
         ImList<Integer> one2 = PersistentVector.ofIter(oneList);
         ImList<Integer> one3 = PersistentVector.ofIter(Collections.unmodifiableList(oneList));
 
         equalsDistinctHashCode(one1, one2, one3,
-                               PersistentVector.of(-1));
+                               vec(-1));
     }
 
     @Test(expected = IndexOutOfBoundsException.class)
-    public void oneEx00() { PersistentVector.of(1).get(Integer.MIN_VALUE); }
+    public void oneEx00() { vec(1).get(Integer.MIN_VALUE); }
     @Test(expected = IndexOutOfBoundsException.class)
-    public void oneEx01() { PersistentVector.of(1).get(-1); }
+    public void oneEx01() { vec(1).get(-1); }
     @Test
     public void oneIsOne() {
-        assertEquals(Integer.valueOf(1), PersistentVector.of(1).get(0));
+        assertEquals(Integer.valueOf(1), vec(1).get(0));
     }
     @Test(expected = IndexOutOfBoundsException.class)
-    public void oneEx03() { PersistentVector.of(1).get(1); }
+    public void oneEx03() { vec(1).get(1); }
     @Test(expected = IndexOutOfBoundsException.class)
-    public void oneEx04() { PersistentVector.of(1).get(Integer.MAX_VALUE); }
+    public void oneEx04() { vec(1).get(Integer.MAX_VALUE); }
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void oneEx10() {
@@ -192,8 +193,8 @@ public class PersistentVectorTest {
 
     @Test
     public void transienceTest() {
-        ImList<Integer> list = PersistentVector.of(1,2,3,4,5,6,7,8,9,0,11,12,13,14,15,16,17,18,19,20,
-                                                   21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40);
+        ImList<Integer> list = vec(1,2,3,4,5,6,7,8,9,0,11,12,13,14,15,16,17,18,19,20,
+                                   21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40);
         List<Integer> l2 = Arrays.asList(1,2,3,4,5,6,7,8,9,0,11,12,13,14,15,16,17,18,19,20,
                                          21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40);
         List<Integer> different = Arrays.asList(1,2,3,4,5,6,7,8,9,0,11,12,13,14,15,16,17,18,19,20,

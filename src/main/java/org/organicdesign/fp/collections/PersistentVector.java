@@ -111,15 +111,15 @@ public class PersistentVector<E> implements ImList<E> {
         return ret.persistent();
     }
 
-    /** Public static factory method. */
-    @SafeVarargs
-    static public <T> PersistentVector<T> of(T... items) {
-        MutableVector<T> ret = emptyTransientVector();
-        for (T item : items) {
-            ret = ret.append(item);
-        }
-        return ret.persistent();
-    }
+//    /** Public static factory method. */
+//    @SafeVarargs
+//    static public <T> PersistentVector<T> of(T... items) {
+//        MutableVector<T> ret = emptyTransientVector();
+//        for (T item : items) {
+//            ret = ret.append(item);
+//        }
+//        return ret.persistent();
+//    }
 
 //    @SafeVarargs
 //    public static <T> PersistentVector<T> ofSkipNull(T... items) {
@@ -233,18 +233,17 @@ public class PersistentVector<E> implements ImList<E> {
     }
 
     /**
-     * Adds items to the end of this PersistentVector.
-     * @param es the values to insert
+     * Efficiently adds items to the end of this PersistentVector.
+     * @param items the values to insert
      * @return a new PersistentVector with the additional items at the end.
      */
-    @SuppressWarnings("unchecked")
-    public PersistentVector<E> append(E... es) {
-        PersistentVector<E> result = this;
-        for (E e : es) {
-            result = result.appendOne(e);
+    @Override public PersistentVector<E> concat(Iterable<? extends E> items) {
+        MutableVector<E> result = this.asTransient();
+        for (E e : items) {
+            result = result.append(e);
         }
-        return result;
-    };
+        return result.persistent();
+    }
 
     private Node pushTail(int level, Node parent, Node tailnode) {
         //if parent is leaf, insert node,

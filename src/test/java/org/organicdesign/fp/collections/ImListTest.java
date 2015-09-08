@@ -20,12 +20,12 @@ import java.util.Arrays;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.organicdesign.fp.StaticImports.vec;
 
 public class ImListTest {
     @Test public void insert() {
         // Computer science is no more about computers than astronomy is about telescopes. - Dijkstra
-        ImList<String> p = PersistentVector.of("computers ")
-                                           .insert(0, "is ");
+        ImList<String> p = vec("computers ").insert(0, "is ");
 
         p = p.insert(1, "more ")
              .insert(0, "Computer ")
@@ -48,7 +48,9 @@ public class ImListTest {
     }
 
     @Test public void get() {
-        PersistentVector<String> pv = PersistentVector.of("Four", "score", "and", "seven", "years", "ago...");
+        PersistentVector<String> pv =
+                PersistentVector.ofIter(Arrays.asList("Four", "score", "and", "seven",
+                                                      "years", "ago..."));
         assertEquals("Million", pv.get(Integer.MIN_VALUE, "Million"));
         assertEquals("Million", pv.get(-1, "Million"));
 
@@ -61,10 +63,10 @@ public class ImListTest {
 
     @Test public void append() {
         assertArrayEquals(new String[]{"a", "b", "c", "d", "e", "f"},
-                          PersistentVector.of("a", "b", "c")
-                                  .append("d", "e", "f").toArray());
+                          PersistentVector.ofIter(Arrays.asList("a", "b", "c"))
+                                          .concat(Arrays.asList("d", "e", "f")).toArray());
 
-        PersistentVector<String> pv = PersistentVector.of("d", "e", "f");
+        PersistentVector<String> pv = PersistentVector.ofIter(Arrays.asList("d", "e", "f"));
         assertArrayEquals(new String[]{"a", "b", "c", "d", "e", "f"},
                           pv.precat(Arrays.asList("a", "b", "c")).toArray());
     }
