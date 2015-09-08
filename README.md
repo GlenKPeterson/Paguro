@@ -222,6 +222,9 @@ I plan to keep new development work on the main branch, but am very willing to h
 - As of 2015-09-06, all major areas of functionality were covered by unit tests.
 
 #Change Log
+2015-09-08 version 0.10.3 added xform() method to StaticImports as a convenient and more efficient
+way to start a transformation than by using the unmod____ wrappers.
+
 2015-08-30 version 0.10.2 Xform tests at 100%.  Applied Xform to UnmodIterable which makes it
 apply to the entire project.  Completely removed all traces of View and Sequence.
 

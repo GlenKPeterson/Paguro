@@ -36,6 +36,8 @@ import org.organicdesign.fp.collections.UnmodSortedMap;
 import org.organicdesign.fp.collections.UnmodSortedSet;
 import org.organicdesign.fp.tuple.Tuple2;
 import org.organicdesign.fp.tuple.Tuple3;
+import org.organicdesign.fp.xform.Transformable;
+import org.organicdesign.fp.xform.Xform;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -133,8 +135,19 @@ public class StaticImports {
 
     /** Returns a new PersistentTreeSet of the given comparator and items. */
     public static <T> ImSortedSet<T> sortedSet(Comparator<? super T> comp, Iterable<T> items) {
-        return StaticImports.unmodIterable(items).toImSortedSet(comp);
+        return Xform.of(items).toImSortedSet(comp);
     }
+
+    /**
+     If you need to wrap a regular Java collection or other iterable outside this project to perform
+     a transformation on it, this method is the most convenient, efficient way to do so - more
+     efficient than using the unmod____ methods (if your only purpose is to start a transformation).
+     */
+    public static <T> Transformable<T> xform(Iterable<T> iterable) {
+        return Xform.of(iterable);
+    }
+
+
     // EqualsWhichDoesntCheckParameterClass Note:
     // http://codereview.stackexchange.com/questions/88333/is-one-sided-equality-more-helpful-or-more-confusing-than-quick-failure
     // "There is no one-sided equality. If it is one-sided, that is it's asymmetric, then it's just
