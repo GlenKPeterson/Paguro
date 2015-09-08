@@ -17,7 +17,7 @@ package org.organicdesign.fp.collections;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.organicdesign.fp.StaticImports;
+import org.organicdesign.fp.FunctionUtils;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -203,12 +203,12 @@ public class PersistentTreeSetTest {
         ss1.add("work");
         ss1.add("an");
         ss1.add("hello");
-        equalsDistinctHashCode(s1, ss1, StaticImports.unmodSortedSet(ss1),
+        equalsDistinctHashCode(s1, ss1, FunctionUtils.unmodSortedSet(ss1),
                                PersistentTreeSet.of(Arrays.asList("hello", "an", "work", "the")));
 
         // Really, you need to read the JavaDoc for PersistentTreeSet.equals() to understand the bizarre notion of
         // equality being checked here.
-        equalsDistinctHashCode(s1, ss1, StaticImports.unmodSortedSet(ss1),
+        equalsDistinctHashCode(s1, ss1, FunctionUtils.unmodSortedSet(ss1),
                                PersistentTreeSet.ofComp(STR_LEN_COMP,
                                                         Arrays.asList("helloz", "an", "work", "b", "the")));
 
@@ -235,7 +235,7 @@ public class PersistentTreeSetTest {
 //        assertEquals(ss2, ss);
 //
 //
-        equalsDistinctHashCode(s2, ss, StaticImports.unmodSortedSet(ss),
+        equalsDistinctHashCode(s2, ss, FunctionUtils.unmodSortedSet(ss),
                                PersistentTreeSet.ofComp(STR_LEN_COMP,
                                                         Arrays.asList("helloz", "an", "work", "the")));
 
@@ -247,7 +247,7 @@ public class PersistentTreeSetTest {
 //        assertNotEquals(yadda, ss);
 //        assertNotEquals(yadda, unmodSortedSet(ss));
 
-        equalsDistinctHashCode(s2, ss, StaticImports.unmodSortedSet(ss),
+        equalsDistinctHashCode(s2, ss, FunctionUtils.unmodSortedSet(ss),
                                PersistentTreeSet.of(Arrays.asList("an", "helloz", "work", "b", "the")));
 
         equalsSameHashCode(s2,

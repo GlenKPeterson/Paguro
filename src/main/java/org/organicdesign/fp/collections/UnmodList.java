@@ -13,7 +13,7 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
-import org.organicdesign.fp.StaticImports;
+import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.function.Function2;
 
 import java.util.ArrayList;
@@ -204,7 +204,7 @@ public interface UnmodList<E> extends List<E>, UnmodCollection<E>, UnmodSortedIt
         for (int i = fromIndex; i < toIndex; i++) {
             ls.add(this.get(i));
         }
-        return StaticImports.unmodList(ls);
+        return FunctionUtils.unmodList(ls);
     }
 
     /**

@@ -17,8 +17,9 @@ package org.organicdesign.fp.collections;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.FunctionUtilsTest;
 import org.organicdesign.fp.Option;
-import org.organicdesign.fp.StaticImports;
 import org.organicdesign.fp.StaticImportsTest;
 import org.organicdesign.fp.function.Function1;
 import org.organicdesign.fp.tuple.Tuple2;
@@ -27,7 +28,6 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -342,7 +342,7 @@ public class PersistentHashMapTest {
 
         equalsDistinctHashCode(PersistentHashMap.of(vec(tup("one", 1), tup("two", 2), tup("three", 3))),
                                m,
-                               StaticImports.unmodMap(m),
+                               FunctionUtils.unmodMap(m),
                                PersistentHashMap.of(vec(tup("two", 2), tup("three", 3), tup("four", 4))));
 
         equalsDistinctHashCode(PersistentHashMap.of(vec(tup("one", 1)))
@@ -654,13 +654,13 @@ public class PersistentHashMapTest {
         Map<Integer,String> a =
                 map(tup(1, "One"), tup(2, "Two"), tup(3, "Three"), tup(4, "Four"), tup(5, "Five"),
                     tup(6, "Six"), tup(7, "Seven"), tup(8, "Eight"), tup(9, "Nine"), tup(10, "Ten"));
-        StaticImportsTest.mapHelper(a, max);
+        FunctionUtilsTest.mapHelper(a, max);
         Map<Integer,String> b = map(
                 tup(1, "One"), tup(2, "Two"), tup(3, "Three"),
                 tup(4, "Four"), tup(5, "Five"), tup(6, "Six"),
                 tup(7, "Seven"), tup(8, "Eight"), tup(9, "Nine"),
                 tup(10, "Ten"));
-        StaticImportsTest.mapHelper(b, max);
+        FunctionUtilsTest.mapHelper(b, max);
 
         Map<Integer,String> c =
                 PersistentHashMap.ofEq(Equator.defaultEquator(),
@@ -676,13 +676,13 @@ public class PersistentHashMapTest {
         assertEquals(c, b);
         assertEquals(a.hashCode(), b.hashCode());
         assertEquals(a.hashCode(), c.hashCode());
-        StaticImportsTest.mapHelperOdd(vec(tup(1, "One"), null, tup(3, "Three"),
+        FunctionUtilsTest.mapHelperOdd(vec(tup(1, "One"), null, tup(3, "Three"),
                                            null, tup(5, "Five"), null,
                                            tup(7, "Seven"), null, tup(9, "Nine"), null)
                                                .filter(t -> t != null)
                                                .toImMap(Function1.identity()),
                                        max);
-        StaticImportsTest.mapHelperEven(
+        FunctionUtilsTest.mapHelperEven(
                 vec(null, tup(2, "Two"), null, tup(4, "Four"), null,
                     tup(6, "Six"), null, tup(8, "Eight"), null, tup(10, "Ten"))
                         .filter(t -> t != null)
@@ -693,9 +693,9 @@ public class PersistentHashMapTest {
         int max = 3;
         Map<Integer,String> a = PersistentHashMap.of(vec(tup(1, "One"), tup(2, "Two"),
                                                          tup(3, "Three")));
-        StaticImportsTest.mapHelper(a, max);
+        FunctionUtilsTest.mapHelper(a, max);
         ImMap<Integer,String> b = map(tup(1, "One"), tup(2, "Two"), tup(3, "Three"));
-        StaticImportsTest.mapHelper(b, max);
+        FunctionUtilsTest.mapHelper(b, max);
         Map<Integer,String> c = PersistentHashMap.ofEq(Equator.defaultEquator(),
                                                        vec(tup(1, "One"), tup(2, "Two"), tup(3, "Three")));
         assertEquals(a, b);
@@ -706,11 +706,11 @@ public class PersistentHashMapTest {
         assertEquals(c, b);
         assertEquals(a.hashCode(), b.hashCode());
         assertEquals(a.hashCode(), c.hashCode());
-        StaticImportsTest.mapHelperOdd(vec(tup(1, "One"), null, tup(3, "Three"))
+        FunctionUtilsTest.mapHelperOdd(vec(tup(1, "One"), null, tup(3, "Three"))
                                                .filter(t -> t != null)
                                                .toImMap(Function1.identity()),
                                        max);
-        StaticImportsTest.mapHelperEven(vec(null, tup(2, "Two"), null)
+        FunctionUtilsTest.mapHelperEven(vec(null, tup(2, "Two"), null)
                                                 .filter(t -> t != null)
                                                 .toImMap(Function1.identity()),
                                         max);
@@ -719,9 +719,9 @@ public class PersistentHashMapTest {
     @Test public void testImMap1() {
         int max = 1;
         Map<Integer,String> a = map(tup(1, "One"));
-        StaticImportsTest.mapHelper(a, max);
+        FunctionUtilsTest.mapHelper(a, max);
         Map<Integer,String> b = map(tup(1, "One"));
-        StaticImportsTest.mapHelper(b, max);
+        FunctionUtilsTest.mapHelper(b, max);
         Map<Integer,String> c = PersistentHashMap.ofEq(Equator.defaultEquator(),
                                                        vec(tup(1, "One")));
         assertEquals(a, b);
@@ -732,8 +732,8 @@ public class PersistentHashMapTest {
         assertEquals(c, b);
         assertEquals(a.hashCode(), b.hashCode());
         assertEquals(a.hashCode(), c.hashCode());
-        StaticImportsTest.mapHelperOdd(map(tup(1, "One")), max);
-        StaticImportsTest.mapHelperEven(vec((Map.Entry<Integer,String>) null)
+        FunctionUtilsTest.mapHelperOdd(map(tup(1, "One")), max);
+        FunctionUtilsTest.mapHelperEven(vec((Map.Entry<Integer,String>) null)
                                                 .filter(t -> t != null)
                                                 .toImMap(Function1.identity()),
                                         max);
@@ -742,13 +742,13 @@ public class PersistentHashMapTest {
     @Test public void testImMap0() {
         int max = 0;
         Map<Integer,String> b = map();
-        StaticImportsTest.mapHelper(b, max);
+        FunctionUtilsTest.mapHelper(b, max);
         Map<Integer,String> c = PersistentHashMap.empty(Equator.defaultEquator());
         assertEquals(b, c);
         assertEquals(c, b);
         assertEquals(b.hashCode(), c.hashCode());
-        StaticImportsTest.mapHelperOdd(PersistentHashMap.of(vec()), max);
-        StaticImportsTest.mapHelperEven(map(), max);
+        FunctionUtilsTest.mapHelperOdd(PersistentHashMap.of(vec()), max);
+        FunctionUtilsTest.mapHelperEven(map(), max);
     }
 
     public static class Result<A,B> {

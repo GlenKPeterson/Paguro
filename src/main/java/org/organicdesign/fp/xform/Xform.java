@@ -14,8 +14,8 @@
 
 package org.organicdesign.fp.xform;
 
+import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.Or;
-import org.organicdesign.fp.StaticImports;
 import org.organicdesign.fp.collections.UnmodIterable;
 import org.organicdesign.fp.collections.UnmodIterator;
 import org.organicdesign.fp.function.Function1;
@@ -463,7 +463,7 @@ public abstract class Xform<A> implements UnmodIterable<A> {
 
     @Override public UnmodIterator<A> iterator() {
         // TODO: I had a really fast array-list implementation that I could probably hack into this for performance (assuming it actually works).
-        return StaticImports.unmodIterable(toMutableList()).iterator();
+        return FunctionUtils.unmodIterable(toMutableList()).iterator();
     }
 
     // =============================================================================================
