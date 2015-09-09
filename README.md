@@ -41,6 +41,30 @@ map(tup("a", 1), tup("b", 2), tup("c", 3);
 ```
 ###Transformations:
 ```java
+// Return only the first n items
+Transformable<T> take(long numItems);
+
+// Return items from the beginning until the given predicate returns false
+Transformable<T> takeWhile(Function1<? super T,Boolean> predicate);
+
+// Ignore the first n items and return only those that come after
+Transformable<T> drop(long numItems);
+
+// Add items to the end of this Transformable
+Transformable<T> concat(Iterable<? extends T> list);
+
+// Add items to the beginning of this Transformable
+Transformable<T> precat(Iterable<? extends T> list);
+
+// Return only the items for which the given predicate returns true
+Transformable<T> filter(Function1<? super T,Boolean> predicate);
+
+// Transform each item into exactly one new item using the given function
+Transformable<U> map(Function1<? super T,? extends U> func);
+
+// Transform each item into zero or more new items using the given function
+Transformable<U> flatMap(Function1<? super T,Iterable<U>> f);
+
 // Apply the function to each item, accumulating the result in u.  Other
 // transformations could be implemented with just this one function, but
 // it is clearer to use the most specific transformations that meets your needs.
@@ -50,44 +74,27 @@ map(tup("a", 1), tup("b", 2), tup("c", 3);
 // they are not.
 U foldLeft(U u, Function2<U,? super T,U> fun);
 
-// Normally you want to terminate by doing a take(), drop(), or takeWhile() before you get
-// to the fold, but if you need to terminate based on the complete result so far, you can
-// provide your own termination condition.
-U foldLeft(U u, Function2<U,? super T,U> fun, Function1<? super U,Boolean> terminateWhen);
-
-// Return only the items for which the given predicate returns true
-Transformable<T> filter(Function1<? super T,Boolean> predicate);
-
-// Return items from the beginning until the given predicate returns false
-Transformable<T> takeWhile(Function1<? super T,Boolean> predicate);
-
-// Return only the first n items
-Transformable<T> take(long numItems);
-
-// Ignore the first n items and return only those that come after
-Transformable<T> drop(long numItems);
-
-// Transform each item into exactly one new item using the given function
-Transformable<U> map(Function1<? super T,? extends U> func);
-
-// Add items to the end of this Transformable
-Transformable<T> concat(Iterable<? extends T> list);
-
-// Add items to the beginning of this Transformable
-Transformable<T> precat(Iterable<? extends T> list);
-
-// Transform each item into zero or more new items using the given function
-Transformable<U> flatMap(Function1<? super T,Iterable<U>> f);
+// Normally you want to terminate by doing a take(), drop(), or takeWhile()
+// before you get to the fold, but if you need to terminate based on the
+// complete result so far, you can  provide your own termination condition.
+U foldLeft(U u, Function2<U,? super T,U> fun,
+           Function1<? super U,Boolean> terminateWhen);
 ```
 
 ###Endpoints
 ```java
-// A one-time use, not-thread-safe way to get each value of this Realizable in turn.
-UnmodIterator<T> iterator();
-
 // The contents of this Realizable as a thread-safe immutable list.
 // Use this when you want to access items quickly O(log32 n) by index.
 ImList<T> toImList();
+
+// The contents of this Realizable presented as an unmodifiable hash set.
+// Use this when you want to very quickly O(1) tell whether the set contains
+// various items, but don't care about ordering.
+ImSet<T> toImSet();
+
+// The contents of this Realizable as an unmodifiable hash map.  Use this when
+// you want to very quickly O(1) look up values by key, and don't care about ordering.
+ImMap<U,V> toImMap(Function1<? super T,Map.Entry<U,V>> f1);
 
 // The contents of this Realizable as an thread-safe, immutable, sorted (tree) map.
 // Use this when you want to quickly O(log n) look up values by key, but still be
@@ -121,14 +128,8 @@ SortedSet<T> toMutableSortedSet(Comparator<? super T> comp);
 // Returns an Object[] for backward compatibility
 Object[] toArray();
 
-// The contents of this Realizable as an unmodifiable hash map.  Use this when
-// you want to very quickly O(1) look up values by key, and don't care about ordering.
-ImMap<U,V> toImMap(Function1<? super T,Map.Entry<U,V>> f1);
-
-// The contents of this Realizable presented as an unmodifiable hash set.
-// Use this when you want to very quickly O(1) tell whether the set contains
-// various items, but don't care about ordering.
-ImSet<T> toImSet();
+// A one-time use, not-thread-safe way to get each value of this Realizable in turn.
+UnmodIterator<T> iterator();
 ```
 
 For complete API documentation, please build the javadoc:
