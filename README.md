@@ -384,8 +384,9 @@ GreenJUG: for bearing with talks on early versions of this code two years in a r
 
 Greenville Clojure (and Jeff Dik before that): for bearing with my newbie Clojure questions.
 
-Everyone whose ideas are collected in this project.
-I tried to put names in as close as possible to the contributions.
+Mike Greata: for providing encouragement, advice, and patiently listening to me drone on about this as we carpooled to user group meetings.
+
+Everyone whose ideas are collected in this project: I tried to put names in as close as possible to the contributions.
 
 #Licenses
 Java&trade; is a registered trademark of the Oracle Corporation in the US and other countries.
