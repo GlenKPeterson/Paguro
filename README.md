@@ -16,8 +16,11 @@ to ensure they remain correct and current.
 
 #Highlights
 * Type-safe versions of Clojure's [immutable collections](src/main/java/org/organicdesign/fp/collections) (classes start with the word "Persistent")
-* An immutable [Transformation Builder](src/main/java/org/organicdesign/fp/xform/Transformable.java) (compare vs. Clojure's sequence abstraction) which is baked into every collection and collection wrapper.
-* A tiny [data definition language](src/main/java/org/organicdesign/fp/StaticImports.java) of brief helper functions: vec(), tup(), map(), set(), and xform() (compare vs. Clojure's vector, set, and map syntax).
+* An immutable [Transformation Builder](src/main/java/org/organicdesign/fp/xform/Transformable.java)
+(implementation is in [Xform](src/main/java/org/organicdesign/fp/xform/Xform.java)).
+Compare vs. Clojure's sequence abstraction) which is baked into every collection and collection wrapper.
+* A tiny [data definition language](src/main/java/org/organicdesign/fp/StaticImports.java) of brief helper
+functions: vec(), tup(), map(), set(), and xform() (compare vs. Clojure's vector, set, and map syntax).
 * Simplified Java 8 [functional interfaces](src/main/java/org/organicdesign/fp/function) that wrap checked exceptions
 
 Additional experimental features:
