@@ -34,54 +34,28 @@ import java.util.Comparator;
 import java.util.Map;
 
 /**
- The four methods map(), set(), tup(), and vec() comprise a mini data-definition language.  It's
- wordier than JSON, but still brief for Java and fairly brief over-all.  Of those four methods, only
- tup() uses overloading to take heterogeneous arguments. The other three are the only places in this
- project that use varargs.
+ <p>A mini data definition language composed of vec(), tup(), map(), set(), plus a converter to make
+ java.util collections transformable: xform().  vec(), map(), and set() are the only three methods
+ in this project to take varargs.  I tried writing out versions that took multiple type-safe
+ arguments, but IntelliJ presented you with a menu of all of them for auto-completion which
+ was overwhelming, so I reverted to varargs.  Also, varargs relax some type safety rules (variance)
+ for data definition in a relatively helpful and not very dangerous way.</p>
 
- Statically importing the functions in this file is like building a mini language in Java.  As with
- any usage of import *, there will probably be issues if you import 2 different versions of this
- file in your classpath.  Let me know if you find that the convenience is not worth the danger.
-
- The unmod___() methods are an alternative to Collections.unmodifiable____() for building immutable
- collections.  These will never return null, the closest they get is to return an empty immutable
- collection (the same one is reused).  Also, the unmodifiable interfaces they return have deprecated
- the modification methods so that any attempt to use those methods causes a warning in your IDE and
- compiler.
+ <p>As with any usage of import *, there could be issues if you import 2 different versions of this
+ file in your classpath.  Java needs a data definition language so badly that I think it is worth
+ the risk.  Also, I don't anticipate this file changing much, except to add more tup()
+ implementations, which shouldn't break anything.  Let me know if you find that the danger outweighs
+ convenience or have advice on what to do about it.</p>
  */
 @SuppressWarnings("UnusedDeclaration")
 public class StaticImports {
     // Prevent instantiation
     private StaticImports() { throw new UnsupportedOperationException("No instantiation"); }
 
-    /** Returns a new Tuple2 of the given items. */
-    public static <T,U> Tuple2<T,U> tup(T t, U u) { return Tuple2.of(t, u); }
-
-    /** Returns a new Tuple3 of the given items. */
-    public static <T,U,V> Tuple3<T,U,V> tup(T t, U u, V v) { return Tuple3.of(t, u, v); }
-
     /**
-     Returns a new PersistentVector of the given items.  This data definition method is one of the
-     three methods in this project that support varargs.
-     */
-    @SafeVarargs
-    static public <T> ImList<T> vec(T... items) {
-        if ( (items == null) || (items.length < 1) ) { return PersistentVector.empty(); }
-        return PersistentVector.ofIter(Arrays.asList(items));
-    }
-
-    // I don't know whether this is a worthwhile convenience, or a crutch.
-    // See the last two examples in PersistentHashMapTest.testSkipNull() to see how this saves
-    // a cast due to the (otherwise slightly evil) varargs.
-//    /** Returns a new PersistentVector of the given items, omitting any nulls. */
-//    @SafeVarargs
-//    public static <T> ImList<T> vecSkipNull(T... items) {
-//        return PersistentVector.ofSkipNull(items);
-//    }
-
-    /**
-     Returns a new PersistentHashMap of the given keys and their paired values.  This data
-     definition method is one of the three methods in this project that support varargs.
+     Returns a new PersistentHashMap of the given keys and their paired values.  Use the tup()
+     method to define those key/value pairs briefly and easily.  This data definition method is one
+     of the three methods in this project that support varargs.
      */
     @SafeVarargs
     public static <K,V> ImMap<K,V> map(Map.Entry<K,V>... es) {
@@ -99,31 +73,24 @@ public class StaticImports {
         return PersistentHashSet.of(Arrays.asList(items));
     }
 
-//    /** Returns a new PersistentTreeMap of the given comparable keys and their paired values. */
-//    public static <K extends Comparable<K>,V> ImSortedMap<K,V> sortedMap() {
-//        return PersistentTreeMap.empty();
-//    }
-
     /**
-     Returns a new PersistentTreeMap of the given comparable keys and their paired values, skipping
-     any null Entries.
-     */
-    public static <K extends Comparable<K>,V> ImSortedMap<K,V>
-    sortedMap(Iterable<Map.Entry<K,V>> es) {
-        return PersistentTreeMap.of(es);
-    }
-
-    /**
-     Returns a new PersistentTreeMap of the specified comparator and the given key/value pairs.
+     Returns a new PersistentTreeMap of the specified comparator and the given key/value pairs.  Use
+     the tup() method to define those key/value pairs briefly and easily.  The keys are sorted
+     according to the comparator you provide.
      */
     public static <K,V> ImSortedMap<K,V>
     sortedMap(Comparator<? super K> c, Iterable<Map.Entry<K,V>> es) {
         return PersistentTreeMap.ofComp(c, es);
     }
 
-    /** Returns a new PersistentTreeSet of the given comparable items. */
-    public static <T extends Comparable<T>> ImSortedSet<T> sortedSet(Iterable<T> items) {
-        return PersistentTreeSet.of(items);
+    /**
+     Returns a new PersistentTreeMap of the given comparable keys and their paired values, sorted in
+     the default ordering of the keys.  Use the tup() method to define those key/value pairs briefly
+     and easily.
+     */
+    public static <K extends Comparable<K>,V> ImSortedMap<K,V>
+    sortedMap(Iterable<Map.Entry<K,V>> es) {
+        return PersistentTreeMap.of(es);
     }
 
     /** Returns a new PersistentTreeSet of the given comparator and items. */
@@ -131,10 +98,30 @@ public class StaticImports {
         return Xform.of(items).toImSortedSet(comp);
     }
 
+    /** Returns a new PersistentTreeSet of the given comparable items. */
+    public static <T extends Comparable<T>> ImSortedSet<T> sortedSet(Iterable<T> items) {
+        return PersistentTreeSet.of(items);
+    }
+
+    /** Returns a new Tuple2 of the given items. */
+    public static <T,U> Tuple2<T,U> tup(T t, U u) { return Tuple2.of(t, u); }
+
+    /** Returns a new Tuple3 of the given items. */
+    public static <T,U,V> Tuple3<T,U,V> tup(T t, U u, V v) { return Tuple3.of(t, u, v); }
+
+    /**
+     Returns a new PersistentVector of the given items.  This data definition method is one of the
+     three methods in this project that support varargs.
+     */
+    @SafeVarargs
+    static public <T> ImList<T> vec(T... items) {
+        if ( (items == null) || (items.length < 1) ) { return PersistentVector.empty(); }
+        return PersistentVector.ofIter(Arrays.asList(items));
+    }
+
     /**
      If you need to wrap a regular Java collection or other iterable outside this project to perform
-     a transformation on it, this method is the most convenient, efficient way to do so - more
-     efficient than using the unmod____ methods (if your only purpose is to start a transformation).
+     a transformation on it, this method is the most convenient, efficient way to do so.
      */
     public static <T> Transformable<T> xform(Iterable<T> iterable) {
         return Xform.of(iterable);

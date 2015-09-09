@@ -14,15 +14,17 @@ vec(4, 5)                        //          4, 5
 The rest of the [usage examples are implemented as unit tests](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34)
 to ensure they remain correct and current.
 
-#UncleJim Provides
-* Clojure's [immutable collections](src/main/java/org/organicdesign/fp/collections) (classes start with the word "Persistent")
-* An immutable [Transformation Builder](src/main/java/org/organicdesign/fp/xform/Transformable.java) which is baked into every collection and collection wrapper.
-* Unmodifiable interfaces which deprecate mutator methods and throw exceptions to help you retrofit legacy code and catch errors in your IDE instead of at runtime.  They also implement Transformable.
-* Better [unmodifiable wrappers](src/main/java/org/organicdesign/fp/StaticImports.java#L327) for existing Java collections that deprecate the methods.
-* A tiny domain-specific language of brief helper functions: vec(), tup(), map(), set(), etc. in the [StaticImports file](src/main/java/org/organicdesign/fp/StaticImports.java).
+#Highlights
+* Type-safe versions of Clojure's [immutable collections](src/main/java/org/organicdesign/fp/collections) (classes start with the word "Persistent")
+* An immutable [Transformation Builder](src/main/java/org/organicdesign/fp/xform/Transformable.java) (compare vs. Clojure's sequence abstraction) which is baked into every collection and collection wrapper.
+* A tiny [data definition language](src/main/java/org/organicdesign/fp/StaticImports.java) of brief helper functions: vec(), tup(), map(), set(), and xform() (compare vs. Clojure's vector, set, and map syntax).
+* Simplified Java 8 [functional interfaces](src/main/java/org/organicdesign/fp/function) that wrap checked exceptions
+
+Additional experimental features you may find useful
 * An [Equator](src/main/java/org/organicdesign/fp/collections/Equator.java) and [ComparisonContext](src/main/java/org/organicdesign/fp/collections/Equator.java#L45) which work like `java.util.Comparator`, but for hash-based collections.
-* Simplified [functional interfaces](src/main/java/org/organicdesign/fp/function) that wrap checked exceptions
 * [Memoization](src/main/java/org/organicdesign/fp/function/Function2.java#L59) for functions
+* Unmodifiable interfaces which deprecate mutator methods and throw exceptions to retrofit legacy code and catch errors in your IDE instead of at runtime.
+These were useful before the Clojure collections and Transformable were fully integrated, but may still provide a useful extension point for integrating your own immutable collections into the traditional Java ecosystem. 
 
 Fluent interfaces encourage you to write expressions (that evaluate) instead of statements (that produce void).
 Immutable collections are fast enough to make it unnecessary to modify data in place.
@@ -31,8 +33,7 @@ UncleJim pushes Java toward Clojure, but keeps the type saftey, objects, classes
 Migrating large code bases to another language is not always practical.
 This project lets you think about your code the way that Clojure programmers do, but still write Java.
 
-This is somewhere between an Alpha and Beta release candidate.
-The code quality is high, but there is still a chance of API changes before the final release. 
+This is in Beta release.  The code quality is high, but the documentation is a work in progress and there is still a chance of API changes before the final release. 
 Test coverage at last check: 73%
 
 ![Test Coverage](testCoverage.png)

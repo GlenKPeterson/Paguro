@@ -37,10 +37,13 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 
 /**
- This is a catch-all class for occasionally useful utility functions.  The most useful functions
- have been moved to StaticImports or other more specifically relevant classes.  For instance,
- toString(Iterable) has been moved to UnmodIterable.  All the functions for composing predicates are
- now on Function1.
+ A dumping ground for utility functions that aren't useful enough to belong in StaticImports.
+
+ The unmod___() methods are an alternative to Collections.unmodifiable____() for building immutable
+ collections.  These will never return null, the closest they get is to return an empty immutable
+ collection (the same one is reused).  Also, the unmodifiable interfaces they return have deprecated
+ the modification methods so that any attempt to use those methods causes a warning in your IDE and
+ compiler.
  */
 public class FunctionUtils {
 

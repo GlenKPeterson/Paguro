@@ -1,45 +1,41 @@
 <html>
 <body>
-<p>Unmodifiable collection interfaces that extend the java.util collections, plus immutable implementations
-    copied from Clojure.</p>
+<p>Type-safe versions of the immutable Clojure collections, plus unmodifiable and immutable
+    collection interfaces that extend the java.util collections, deprecating the mutate-in-place
+    methods (Unmod____) and adding methods that return a new, immutable, modified version of the
+    collection (Im____).</p>
 
 <h3>Definitions</h3>
 <dl>
     <dt>Mutable</dt>
-    <dd>This describes the java.util collections.&#160;
-        They are built on an assumption that you will modify them in-place, rarely if ever making any copies.&#160;
+    <dd>This describes the mutate-in-place philosophy of the java.util collections.&#160;
         This was sensible when they were created in the 1990's when memory was expensive, the
         garbage collector was in its infancy, and multi-processor systems were rare.&#160;
-        Today, memory is cheap, the garbage collector is one of the wonders of the modern world, and even your phone has several processors.&#160;
-        But we still want to extend these interfaces for backward compatibility.</dd>
+        Today, memory is cheap, the garbage collector is one of the wonders of the modern world,
+        and even your phone has several processors.&#160;
+        We still want to extend these interfaces for backward compatibility.</dd>
 
     <dt>Unmodifiable</dt>
-    <dd>This is what the Collections.unmodifiableXxxx() methods return.&#160;
-        They implement the Mutable interfaces, but throw an UnsupportedOperationException when a mutation method is called.&#160;
-        It is useful for a function to accept Unmodifiable interfaces in order to say,
-        "I'm not going to modify this" and return Unmodifiable interfaces to say, "You can't modify this."&#160;
-        The "Unmod-" interfaces in this package extend the java.util mutable collections.&#160;
-        All mutator methods are overridden to throw UnsupportedOperationExceptions.&#160;
-        Mutator methods are also deprecated, so your IDE will warn you if you try to use them.&#160;
+    <dd>This is similar to what the Collections.unmodifiableXxxx() methods return.&#160;
+        Thses interfaces implement the Mutable interfaces, but deprecate all mutate-in-place methods and throw UnsupportedOperationExceptions when those methods are called.&#160;
+        The "Unmod-" interfaces in this package extend the java.util mutable collections and provide an extension point for making new Immutable interfaces and collections.&#160;
         In general, the "Unmod-" interfaces only take away mutation methods.&#160;
-        They do not add functionality.</dd>
+        They do not add functionality, except UnmodIterable which adds transformation to all collections and UnmodMap which adds iterator() to Map.</dd>
 
     <dt>Immutable</dt>
     <dd>This is what the Clojure collections provide.&#160;
         The collection itself cannot be changed, yet it has "modification" methods that return a new immutable collection reflecting the change
-        while still sharing as much data as possible with the original collection so that these methods are relatively fast and lightweight.&#160;
-        For this to work, each "set" method needs to return a new collection.&#160;
-        Unfortunately, the java.util mutable collections "set" methods all return something else, like a boolean indicating success, or the item you just inserted.&#160;
-        This package works around that limitation by providing modification methods with different names and other
-        helper-methods for expression-oriented functional programming.</dd>
+        while still sharing as much data as possible with the original collection so that these methods are relatively fast and lightweight.</dd>
 </dl>
 
 <h3>Description</h3>
-<p>In a perfect world, all the Java APIs and existing code would be magically rewritten to use Immutable (according to the above definition) collections.&#160;
-   We want to make it as easy as possible to work with existing Java code.&#160;
+<p>We want to make it as easy as possible to live in an immutable world while working with existing Java code.&#160;
+    In a perfect world, all the Java APIs and existing code would be magically rewritten to use Immutable (according to the above definition) collections.&#160;
     This package contains Unmodifiable "Unmod" interfaces which override, deprecate, and implement each of the "set" methods in the java.util collections interfaces.&#160;
+    They also provide built-in Transformations.
     Each of the "Unmod" collection interfaces is then extended by an "Im" interface which represents an "Immutable" collection.&#160;
     The Immutable interfaces further provide new alternative "set" methods which return the "altered" collection, as well as some convenience methods and hooks into the Sequence abstraction.&#160;
-    Finally, there are various implementations of the Immutable interfaces (currently, they are all copied from Clojure).</p>
+    Finally, there are various implementations of the Immutable interfaces.&#160;
+    Most of those implementations (beginning with Persistent___) are copied from Clojure.</p>
 </body>
 </html>

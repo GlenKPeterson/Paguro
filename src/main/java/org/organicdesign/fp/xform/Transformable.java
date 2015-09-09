@@ -163,7 +163,7 @@ public interface Transformable<T> extends Realizable<T> {
      @return a lazily evaluated collection which is expected to be larger than the input
      collection.  For a collection that's the same size, map() is more efficient.  If the expected
      return is smaller, use filter followed by map if possible, or vice versa if not.
-     @param fun yields a Transformable of 0 or more results for each input item.
+     @param f yields a Transformable of 0 or more results for each input item.
      */
     <U> Transformable<U> flatMap(Function1<? super T,Iterable<U>> f);
 
