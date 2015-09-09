@@ -20,18 +20,11 @@ to ensure they remain correct and current.
 * A tiny [data definition language](src/main/java/org/organicdesign/fp/StaticImports.java) of brief helper functions: vec(), tup(), map(), set(), and xform() (compare vs. Clojure's vector, set, and map syntax).
 * Simplified Java 8 [functional interfaces](src/main/java/org/organicdesign/fp/function) that wrap checked exceptions
 
-Additional experimental features you may find useful
+Additional experimental features:
 * An [Equator](src/main/java/org/organicdesign/fp/collections/Equator.java) and [ComparisonContext](src/main/java/org/organicdesign/fp/collections/Equator.java#L45) which work like `java.util.Comparator`, but for hash-based collections.
 * [Memoization](src/main/java/org/organicdesign/fp/function/Function2.java#L59) for functions
 * Unmodifiable interfaces which deprecate mutator methods and throw exceptions to retrofit legacy code and catch errors in your IDE instead of at runtime.
 These were useful before the Clojure collections and Transformable were fully integrated, but may still provide a useful extension point for integrating your own immutable collections into the traditional Java ecosystem. 
-
-Fluent interfaces encourage you to write expressions (that evaluate) instead of statements (that produce void).
-Immutable collections are fast enough to make it unnecessary to modify data in place.
-UncleJim pushes Java toward Clojure, but keeps the type saftey, objects, classes, and some of the C-like syntax that Java programmers are accustomed to.
-
-Migrating large code bases to another language is not always practical.
-This project lets you think about your code the way that Clojure programmers do, but still write Java.
 
 This is in Beta release.  The code quality is high, but the documentation is a work in progress and there is still a chance of API changes before the final release. 
 Test coverage at last check: 73%
@@ -41,48 +34,7 @@ Test coverage at last check: 73%
 For complete API documentation, please build the javadoc:
 `mvn javadoc:javadoc`
 
-#Motivations
-
-The goals of this project are to make it easy to use Java:
-
- - Immutably (Josh Bloch Item 15)
- - Type safely (Josh Bloch Item 23)
- - Functionally (using first-class functions more easily)
- - Expressiveness/Brevity (Expressions over statements: all API calls evaluate to something useful for subsequent calls).
- - Minimizing the use of primitives and arrays (except for varargs, Suggested by Josh Bloch Items 23, 25, 26, 27, 28, 29)
- - Returning empty collections instead of <code>null</code> (Josh Bloch Item 43)
- - "Throw exceptions at people, not at code" (says Bill Venners, but also Josh Bloch Item 59)
- - Concurrency friendly (Josh Bloch Item 66, 67)
- - Context-sensitive equality: prefer Equator and Comparator to <code>equals()</code>, <code>hashcode()</code> and <code>compareTo()</code> ([Daniel Spiewak, Viktor Klang, Rúnar Óli Bjarnason, Hughes Chabot](http://glenpeterson.blogspot.com/2013/09/object-equality-is-context-relative.html), java.util.TreeSet, java.util.TreeMap)
- - Sensible toString() implementations (like Scala)
- - Compatibly with existing/legacy Java code
-
-Higher order functions are not just briefer to write and read, they are less to *think* about.
-They are useful abstractions that simplify your code and focus your attention on your goals rather than the details of how to accomplish them.
-Function chaining: <code>xs.map(x -> x + 1).filter(x -> x > 7).head()</code> defines what you are doing and how you are doing it in the simplest possible way, hiding all details about how to iterate through the underlying collection.
-
-The alternative - loops - are bundles of unnecessary complexity.
-Loops generally require setting up accumulators, then running a gamut of <code>if</code>, <code>break</code>, and <code>continue</code> statements, like some kind of mad obstacle race that involves as many state changes as possible.
-Different kinds of collections require different looping constructs - more complexity.
-Looping code is vulnerable to "off-by-one" boundary overflow/underflow, improper initialization, accidental exit, infinite loops, forgetting to update a counter, updating the wrong counter...  The list goes on!
-None of that has anything to do with why the loop was created in the first place which is to transform the underlying data.
-
-You don't have to write that kind of code any more.
-If you want to map one set of values according to a given function, say so with xs.map().
-Filter?  xs.filter().
-It's clearer, simpler, and like type safety, it eliminates whole classes of errors.
-
-No data is changed when using the permanent transformers in this project.
-They allow you to write nearly elegant programs whose function calls chain together and evaluate into a useful result.
-Clojure works like this, only the syntax makes the evaluation go inside out from the order you read the statements in (hence Clojure's two arrow operators).
-With method chaining, the evaluation happens in the same order as the methods are written on the page, much like piping commands to one another in shell scripts.
-
-Incremental evaluation prevents some items from being evaluated to produce the results you need which is sometimes more efficient than traditional whole-collection transforms.
-There may be cases where a well hand-written loop will be faster, but in general, the overhead for using these transformations is minimal and, I believe, well worth the clarity, safety, and productivity benefits they provide.
-If you find a better/faster implementation, please submit your improvements!
-
 #API
-
 ###Data Description Mini-Language
 ```java
 import org.organicdesign.fp.StaticImports.*
@@ -190,6 +142,53 @@ ImMap<U,V> toImMap(Function1<? super T,Map.Entry<U,V>> f1);
 // various items, but don't care about ordering.
 ImSet<T> toImSet();
 ```
+
+#Motivations
+
+The goals of this project are to make it easy to use Java:
+
+ - Immutably (Josh Bloch Item 15)
+ - Type safely (Josh Bloch Item 23)
+ - Functionally (using first-class functions more easily)
+ - Expressiveness/Brevity (Expressions over statements: all API calls evaluate to something useful for subsequent calls).
+ - Minimizing the use of primitives and arrays (except for varargs, Suggested by Josh Bloch Items 23, 25, 26, 27, 28, 29)
+ - Returning empty collections instead of <code>null</code> (Josh Bloch Item 43)
+ - "Throw exceptions at people, not at code" (says Bill Venners, but also Josh Bloch Item 59)
+ - Concurrency friendly (Josh Bloch Item 66, 67)
+ - Context-sensitive equality: prefer Equator and Comparator to <code>equals()</code>, <code>hashcode()</code> and <code>compareTo()</code> ([Daniel Spiewak, Viktor Klang, Rúnar Óli Bjarnason, Hughes Chabot](http://glenpeterson.blogspot.com/2013/09/object-equality-is-context-relative.html), java.util.TreeSet, java.util.TreeMap)
+ - Sensible toString() implementations (like Scala)
+ - Compatibly with existing/legacy Java code
+
+Higher order functions are not just briefer to write and read, they are less to *think* about.
+They are useful abstractions that simplify your code and focus your attention on your goals rather than the details of how to accomplish them.
+Function chaining: <code>xs.map(x -> x + 1).filter(x -> x > 7).head()</code> defines what you are doing and how you are doing it in the simplest possible way, hiding all details about how to iterate through the underlying collection.
+
+The alternative - loops - are bundles of unnecessary complexity.
+Loops generally require setting up accumulators, then running a gamut of <code>if</code>, <code>break</code>, and <code>continue</code> statements, like some kind of mad obstacle race that involves as many state changes as possible.
+Different kinds of collections require different looping constructs - more complexity.
+Looping code is vulnerable to "off-by-one" boundary overflow/underflow, improper initialization, accidental exit, infinite loops, forgetting to update a counter, updating the wrong counter...  The list goes on!
+None of that has anything to do with why the loop was created in the first place which is to transform the underlying data.
+
+You don't have to write that kind of code any more.
+If you want to map one set of values according to a given function, say so with xs.map().
+Filter?  xs.filter().
+It's clearer, simpler, and like type safety, it eliminates whole classes of errors.
+
+No data is changed when using the permanent transformers in this project.
+They allow you to write nearly elegant programs whose function calls chain together and evaluate into a useful result.
+Clojure works like this, only the syntax makes the evaluation go inside out from the order you read the statements in (hence Clojure's two arrow operators).
+With method chaining, the evaluation happens in the same order as the methods are written on the page, much like piping commands to one another in shell scripts.
+
+Incremental evaluation prevents some items from being evaluated to produce the results you need which is sometimes more efficient than traditional whole-collection transforms.
+There may be cases where a well hand-written loop will be faster, but in general, the overhead for using these transformations is minimal and, I believe, well worth the clarity, safety, and productivity benefits they provide.
+If you find a better/faster implementation, please submit your improvements!
+
+Fluent interfaces encourage you to write expressions (that evaluate) instead of statements (that produce void).
+Immutable collections are fast enough to make it unnecessary to modify data in place.
+UncleJim pushes Java toward Clojure, but keeps the type saftey, objects, classes, and some of the C-like syntax that Java programmers are accustomed to.
+
+Migrating large code bases to another language is not always practical.
+This project lets you think about your code the way that Clojure programmers do, but still write Java.
 
 #Learn
 
