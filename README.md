@@ -23,12 +23,6 @@ vec(4, 5)                        //          4, 5
 The rest of the [usage examples are implemented as unit tests](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34)
 to ensure they remain correct and current.
 
-#Additional experimental features:
-* An [Equator](src/main/java/org/organicdesign/fp/collections/Equator.java) and [ComparisonContext](src/main/java/org/organicdesign/fp/collections/Equator.java#L45) which work like `java.util.Comparator`, but for hash-based collections.
-* [Memoization](src/main/java/org/organicdesign/fp/function/Function2.java#L59) for functions
-* Unmodifiable interfaces which deprecate mutator methods and throw exceptions to retrofit legacy code and catch errors in your IDE instead of at runtime.
-These were useful before the Clojure collections and Transformable were fully integrated, but may still provide a useful extension point for integrating your own immutable collections into the traditional Java ecosystem. 
-
 #API
 ###Data Description Mini-Language
 ```java
@@ -284,6 +278,12 @@ Added unit tests for the above.
  - Clarify/Simplify/Improve Readme.md
  - Update learnFPJava project
  - Add a [Persistent RRB Tree](http://infoscience.epfl.ch/record/169879/files/RMTrees.pdf) and compare its performance to the PersistentVector.
+
+#Additional experimental features:
+* An [Equator](src/main/java/org/organicdesign/fp/collections/Equator.java) and [ComparisonContext](src/main/java/org/organicdesign/fp/collections/Equator.java#L45) which work like `java.util.Comparator`, but for hash-based collections.
+* [Memoization](src/main/java/org/organicdesign/fp/function/Function2.java#L59) for functions
+* Unmodifiable interfaces which deprecate mutator methods and throw exceptions to retrofit legacy code and catch errors in your IDE instead of at runtime.
+These were useful before the Clojure collections and Transformable were fully integrated, but may still provide a useful extension point for integrating your own immutable collections into the traditional Java ecosystem. 
 
 #Out of Scope
 
