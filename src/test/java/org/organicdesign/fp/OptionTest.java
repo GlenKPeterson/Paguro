@@ -50,6 +50,28 @@ public class OptionTest {
     @Test(expected = IllegalStateException.class) public void nullNoneEx() {
         Option.someOrNullNoneOf(null).get();
     }
+//
+//    @Test public void iterationTest() {
+//        Iterator<Integer> i1 = Option.of(1).iterator();
+//        assertTrue(i1.hasNext());
+//        assertEquals(Integer.valueOf(1), i1.next());
+//        assertFalse(i1.hasNext());
+//
+//        Iterator<Integer> i2 = Option.<Integer>none().iterator();
+//        assertFalse(i2.hasNext());
+//    }
+//
+//    @Test(expected = NoSuchElementException.class)
+//    public void iterEx1() {
+//        Iterator<Integer> i1 = Option.of(1).iterator();
+//        i1.next();
+//        i1.next();
+//    }
+//
+//    @Test(expected = NoSuchElementException.class)
+//    public void iterEx2() {
+//        Option.none().iterator().next();
+//    }
 
     @Test public void equalsHash() {
         Option<Integer> o1a = Option.of(1);
@@ -97,5 +119,4 @@ public class OptionTest {
         equalsDistinctHashCode(Option.of(null), Option.of(null), Option.of(null), n2);
 
     }
-
 }

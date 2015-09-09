@@ -8,6 +8,7 @@ This can be used like Clojure's sequence abstraction, but it is baked into every
 * A tiny [data definition language](src/main/java/org/organicdesign/fp/StaticImports.java) of brief helper
 functions: vec(), tup(), map(), set(), and xform() (compare vs. Clojure's vector, set, and map syntax).
 * Simplified Java 8 [functional interfaces](src/main/java/org/organicdesign/fp/function) that wrap checked exceptions
+* Mobile friendly: compiled with -profile compact1.  Jar file is less than 200K.
 
 #Usage Examples
 Create a vector (list) and perform an immutable transformation on it:
@@ -160,6 +161,8 @@ Test coverage at last check: 73%
 ![Test Coverage](testCoverage.png)
 
 #Change Log
+2015-09-09 version 0.10.7 compiled with -profile compact1.
+
 2015-09-08 version 0.10.6 Fixed bug: Xform would blow up later if you passed a null to its
 constructor.
 

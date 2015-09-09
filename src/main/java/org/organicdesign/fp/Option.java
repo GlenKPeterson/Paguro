@@ -23,7 +23,7 @@ import java.util.Objects;
  This is NOT a type-safe null.
  @param <T>
  */
-public interface Option<T> {
+public interface Option<T> { // extends UnmodSortedIterable<T> {
 
     /** Return the value wrapped in this Option.  Only safe to call this on Some. */
     T get();
@@ -71,6 +71,10 @@ public interface Option<T> {
         @Override public T getOrElse(T t) { return t; }
 
         @Override public boolean isSome() { return false; }
+//
+//        @Override public UnmodSortedIterator<T> iterator() {
+//            return UnmodSortedIterator.empty();
+//        }
 
         @Override public <U> U patMat(Function1<T,U> has, Function0<U> hasNot) { return hasNot.get(); }
 
@@ -99,6 +103,20 @@ public interface Option<T> {
         @Override public T getOrElse(T t) { return item; }
 
         @Override public boolean isSome() { return true; }
+//
+//        @Override public UnmodSortedIterator<T> iterator() {
+//            return new UnmodSortedIterator<T>() {
+//                private boolean hasNext = true;
+//                @Override public boolean hasNext() { return hasNext; }
+//                @Override public T next() {
+//                    if (hasNext) {
+//                        hasNext = false;
+//                        return item;
+//                    }
+//                    throw new NoSuchElementException();
+//                }
+//            };
+//        }
 
         @Override public <U> U patMat(Function1<T,U> has, Function0<U> hasNot) {
             return has.apply(item);
