@@ -5,8 +5,7 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava&trade; **Imm**utability
 * An immutable [Transformation Builder](src/main/java/org/organicdesign/fp/xform/Transformable.java)
 (implementation is in [Xform](src/main/java/org/organicdesign/fp/xform/Xform.java)).
 This can be used like Clojure's sequence abstraction, but it is baked into every collection and collection wrapper.
-* A tiny [data definition language](src/main/java/org/organicdesign/fp/StaticImports.java) of brief helper
-functions: vec(), tup(), map(), set(), and xform() (compare vs. Clojure's vector, set, and map syntax).
+* A tiny, type-safe [data definition language](src/main/java/org/organicdesign/fp/StaticImports.java) of brief helper functions: `vec()`, `tup()`, `map()`, and `set()` (sort of like Clojure's vector `[]`, set `#{}`, and map `{}` syntax).
 * Simplified Java 8 [functional interfaces](src/main/java/org/organicdesign/fp/function) that wrap checked exceptions
 
 #Usage Examples
