@@ -83,46 +83,40 @@ U foldLeft(U u, Function2<U,? super T,U> fun,
 
 ###Endpoints
 ```java
-// The contents of this Realizable as a thread-safe immutable list.
-// Use this when you want to access items quickly O(log32 n) by index.
+// Realize a thread-safe immutable list to access items quickly O(log32 n) by index.
 ImList<T> toImList();
 
-// The contents of this Realizable presented as an unmodifiable hash set.
-// Use this when you want to very quickly O(1) tell whether the set contains
-// various items, but don't care about ordering.
+// Realize an unordered immutable hash set to very quickly O(1) tell whether the set
+// contains various items.
 ImSet<T> toImSet();
 
-// The contents of this Realizable as an unmodifiable hash map.  Use this when
-// you want to very quickly O(1) look up values by key, and don't care about ordering.
+// Realize an unordered immutable hash map to very quickly O(1) look up values by key.
 ImMap<U,V> toImMap(Function1<? super T,Map.Entry<U,V>> f1);
 
-// The contents of this Realizable as an thread-safe, immutable, sorted (tree) map.
-// Use this when you want to quickly O(log n) look up values by key, but still be
-// able to retrieve Entries in key order.
+// Realize an immutable, ordered (tree) map to quickly O(log n) look up values by key,
+// but still retrieve entries in key order.
 ImSortedMap<U,V> toImSortedMap(Comparator<? super U> comp,
                                Function1<? super T,Map.Entry<U,V>> f1);
 
-// The contents of this Realizable presented as an immutable, sorted (tree) set.
-// Use this when you want to quickly O(log n) tell whether the set contains various items.
+// Realize an immutable, sorted (tree) set to quickly O(log n) test it contains items,
+// but still retrieve entries in order.
 ImSortedSet<T> toImSortedSet(Comparator<? super T> comp);
 
-// The contents copied to a mutable list.  Use toImList unless you need to modify the list in-place.
+// Realize a mutable list.  Use toImList unless you need to modify the list in-place.
 List<T> toMutableList();
 
-// Returns the contents of this Realizable copied to a mutable hash map.
-// Use toImMap() unless you need to modify the map in-place.
+// Realize a mutable hash map.  Use toImMap() unless you need to modify the map in-place.
 Map<U,V> toMutableMap(Function1<? super T,Map.Entry<U,V>> f1);
 
-// Returns the contents of this Realizable copied to a mutable tree map.
-// Use toImSortedMap() unless you need to modify the map in-place.
+// Realize a mutable tree map.  Use toImSortedMap() unless you need to modify the
+// map in-place.
 SortedMap<U,V> toMutableSortedMap(Function1<? super T,Map.Entry<U,V>> f1);
 
-// Returns the contents of this Realizable copied to a mutable hash set.
-// Use toImSet() unless you need to modify the set in-place.
+// Realize a mutable hash set. Use toImSet() unless you need to modify the set in-place.
 Set<T> toMutableSet();
 
-// Returns the contents of this Realizable copied to a mutable tree set.
-// Use toImSortedSet unless you need to modify the set in-place.
+// Returns a mutable tree set. Use toImSortedSet unless you need to modify the set
+// in-place.
 SortedSet<T> toMutableSortedSet(Comparator<? super T> comp);
 
 // Returns an Object[] for backward compatibility
