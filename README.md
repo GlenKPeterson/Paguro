@@ -3,10 +3,9 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava&trade; **Imm**utability
 * Type-safe versions of Clojure's [immutable collections](src/main/java/org/organicdesign/fp/collections) (classes start with the word "Persistent")
 * An immutable [Transformation Builder](src/main/java/org/organicdesign/fp/xform/Transformable.java)
 (implementation is in [Xform](src/main/java/org/organicdesign/fp/xform/Xform.java)).
-This can be used like Clojure's sequence abstraction, but it is baked into every collection and collection wrapper.
-* A tiny, type-safe [data definition language](src/main/java/org/organicdesign/fp/StaticImports.java) of brief helper functions: `vec()`, `tup()`, `map()`, and `set()` (sort of like Clojure's vector `[]`, set `#{}`, and map `{}` syntax).
+This is like Clojure's sequence abstraction, but baked into every collection and collection wrapper.
+* A tiny, type-safe [data definition language](src/main/java/org/organicdesign/fp/StaticImports.java) of brief helper functions: `vec()`, `set()`, `map()`, and `tup()`, (sort of like Clojure's vector `[]`, set `#{}`, and map `{}` syntax).
 * Simplified Java 8 [functional interfaces](src/main/java/org/organicdesign/fp/function) that wrap checked exceptions
-* Mobile friendly: compiled with -profile compact1.  Jar file is less than 200K.
 
 #Usage Examples
 Create a vector (list) and perform an immutable transformation on it:
@@ -140,6 +139,7 @@ For complete API documentation, please build the javadoc:
 - Java 8 (tested with 64-bit Linux build 1.8.0_51).
 Probably can be meaningfully adapted to work well at least as far back as Java 5 with some work.
 I plan to keep new development work on the main branch, but am very willing to help maintain branches back-ported to Java 7, 6, 5,.... if other people can share the load.
+- Mobile friendly: compiled with -profile compact1.  Jar file is less than 200K.
  
 ##Build
 - Maven (tested version: 3.19.0-26 64-bit Linux build)
@@ -149,7 +149,7 @@ I plan to keep new development work on the main branch, but am very willing to h
 - As of 2015-09-06, all major areas of functionality were covered by unit tests.
 
 #Project Status
-This is in Beta release.  The code quality is high, but the documentation is a work in progress and there is still a chance of API changes before the final release. 
+This is in Beta release.  The code quality is high, the documentation is improving, but there is still a chance of some API changes before the final release. 
 Test coverage at last check: 73%
 
 ![Test Coverage](testCoverage.png)
