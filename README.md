@@ -1,6 +1,5 @@
 UncleJim ("**Un**modifiable **Coll**ections for **J**ava&trade; **Imm**utability") brings the following to Java:
 
-#Highlights
 * Type-safe versions of Clojure's [immutable collections](src/main/java/org/organicdesign/fp/collections) (classes start with the word "Persistent")
 * An immutable [Transformation Builder](src/main/java/org/organicdesign/fp/xform/Transformable.java)
 (implementation is in [Xform](src/main/java/org/organicdesign/fp/xform/Xform.java)).
@@ -19,6 +18,7 @@ vec(4, 5)                        //          4, 5
         .map(i -> i - 2)         //       3, 4, 5, 6, 7
         .take(4)                 //       3, 4, 5, 6
         .drop(2)                 //             5, 6
+        .toImList());
 ```
 The rest of the [usage examples are implemented as unit tests](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34)
 to ensure they remain correct and current.
@@ -141,10 +141,10 @@ For complete API documentation, please build the javadoc:
 Probably can be meaningfully adapted to work well at least as far back as Java 5 with some work.
 I plan to keep new development work on the main branch, but am very willing to help maintain branches back-ported to Java 7, 6, 5,.... if other people can share the load.
  
-#Build Dependencies
+##Build
 - Maven (tested version: 3.19.0-26 64-bit Linux build)
 
-#Test Dependencies
+##Test
 - Maven will download jUnit for you
 - As of 2015-09-06, all major areas of functionality were covered by unit tests.
 
@@ -155,7 +155,7 @@ Test coverage at last check: 73%
 ![Test Coverage](testCoverage.png)
 
 #Change Log
-2015-09-09 version 0.10.7 compiled with -profile compact1.
+2015-09-09 version 0.10.7: *Beta!*  Compiled with -profile compact1.
 
 2015-09-08 version 0.10.6 Fixed bug: Xform would blow up later if you passed a null to its
 constructor.
@@ -260,25 +260,12 @@ just be glad I didn't use car and cdr.
 2015-03-14 version 0.8.0: Removed firstMatching - in your code, replace firstMatching(...) with filter(...).head().
 Implemented filter() on Sequence.
 
-0.7.4:
-Added uMapSkipNull and other skipNull versions of the StaticImports methods.  This allows little one-liner add-if items
-to still go efficiently into an immutable map.  Next step is to probably implement an immutable map that you can
-"add things to" (returning a new immutable map, leaving the original unchanged).  Made Tuple2 implement Map.Entry.
-Added unit tests for the above.
-
-0.7.3:
- - Added back exception-safe Function0 (Producer)
- - Added LazyRef class to take a Function0 and lazily initialize a value (and free the initialization resources) on the
- first call to get().  Subsequent calls to get() cheaply return the previously initialized value.  This class is thread
- safe if the producer and the values it produces are free from outside influences.
-
 #To Do
  - Have an Ordered version of Transform as well as the (default) unreliable order.  Only the ordered version can be used for implementing things like equals() and hashCode()
  - Bring unit test coverage back above 80%, or 85% if sensible.  This basically means to add any and all practical tests for PersistentHashMap, then remove unused code.
  - Update JavaDoc, esp. Im vs. Unmod
- - Add `Either` (I have a working implementation) - it's like `Or` without the attitude.
- - Make visio drawig of interface diagram.
- - Clarify/Simplify/Improve Readme.md
+ - ?Add `Either` (I have a working implementation) - it's like `Or` without the attitude.?
+ - ?Make visio drawig of interface diagram?
  - Update learnFPJava project
  - Add a [Persistent RRB Tree](http://infoscience.epfl.ch/record/169879/files/RMTrees.pdf) and compare its performance to the PersistentVector.
 
@@ -306,7 +293,7 @@ use of the Java 8 `void forEach(i -> log(i))` or pass a constant function like
 `i -> { print(i); return Boolean.TRUE; }` to
 `Transformable<T> filter(Function1<? super T,Boolean> predicate)` instead. 
 
-###View<T> interpose(T item)
+###Transformable<T> interpose(T item)
 I also implemented interpose(), but took it out because my only use case was to add commas to a list to display
 it in English and for that, you also need a conjunction, and often a continuation symbol:
 
@@ -318,16 +305,20 @@ a,b,c...
 
 None of those are simple uses of interpose.
 
-#Motivations
+#Motivation
 
+##Executive summary
+I wanted to write Java at work more like the way I write Clojure.
+
+##Details
 The goals of this project are to make it easy to use Java:
 
- - Immutably (Josh Bloch Item 15)
+ - Immutably (Josh Bloch Item 15 and Clojure)
  - Type safely (Josh Bloch Item 23)
- - Functionally (using first-class functions more easily)
- - Expressiveness/Brevity (Expressions over statements: all API calls evaluate to something useful for subsequent calls).
- - Minimizing the use of primitives and arrays (except for varargs, Suggested by Josh Bloch Items 23, 25, 26, 27, 28, 29)
- - Returning empty collections instead of <code>null</code> (Josh Bloch Item 43)
+ - Functionally (using first-class functions more easily: Clojure and Scala)
+ - Expressiveness/Brevity (Expressions over statements: all API calls evaluate to something useful for subsequent calls: Clojure and Scala).
+ - Minimizing the use of primitives and arrays (except for varargs in 3 places, Suggested by Josh Bloch Items 23, 25, 26, 27, 28, 29, also Clojure and Scala)
+ - Returning empty collections instead of <code>null</code> (Josh Bloch Item 43, also Clojure and Scala)
  - "Throw exceptions at people, not at code" (says Bill Venners, but also Josh Bloch Item 59)
  - Concurrency friendly (Josh Bloch Item 66, 67)
  - Context-sensitive equality: prefer Equator and Comparator to <code>equals()</code>, <code>hashcode()</code> and <code>compareTo()</code> ([Daniel Spiewak, Viktor Klang, Rúnar Óli Bjarnason, Hughes Chabot](http://glenpeterson.blogspot.com/2013/09/object-equality-is-context-relative.html), java.util.TreeSet, java.util.TreeMap)
@@ -335,8 +326,8 @@ The goals of this project are to make it easy to use Java:
  - Compatibly with existing/legacy Java code
 
 Higher order functions are not just briefer to write and read, they are less to *think* about.
-They are useful abstractions that simplify your code and focus your attention on your goals rather than the details of how to accomplish them.
-Function chaining: <code>xs.map(x -> x + 1).filter(x -> x > 7).head()</code> defines what you are doing and how you are doing it in the simplest possible way, hiding all details about how to iterate through the underlying collection.
+They are useful abstractions that simplify code and focus your attention on your goals rather than the details of how to accomplish them.
+Function chaining: <code>xs.map(x -> x + 1).filter(x -> x > 7).head()</code> defines what you are doing in the simplest possible way while hiding all details about how to iterate through the underlying collection.
 
 The alternative - loops - are bundles of unnecessary complexity.
 Loops generally require setting up accumulators, then running a gamut of <code>if</code>, <code>break</code>, and <code>continue</code> statements, like some kind of mad obstacle race that involves as many state changes as possible.
@@ -349,42 +340,31 @@ If you want to map one set of values according to a given function, say so with 
 Filter?  xs.filter().
 It's clearer, simpler, and like type safety, it eliminates whole classes of errors.
 
-No data is changed when using the permanent transformers in this project.
-They allow you to write nearly elegant programs whose function calls chain together and evaluate into a useful result.
 Clojure works like this, only the syntax makes the evaluation go inside out from the order you read the statements in (hence Clojure's two arrow operators).
 With method chaining, the evaluation happens in the same order as the methods are written on the page, much like piping commands to one another in shell scripts.
 
-Incremental evaluation prevents some items from being evaluated to produce the results you need which is sometimes more efficient than traditional whole-collection transforms.
-There may be cases where a well hand-written loop will be faster, but in general, the overhead for using these transformations is minimal and, I believe, well worth the clarity, safety, and productivity benefits they provide.
+The Xform class is the third one of its kind that I have written.  For a single thread, my timings show that its speed is comparable to a for loop.  In general, the overhead for using these transformations is minimal or non-existant.  In the cases where imutability does cause overhead (and there definitely are) it is generally well worth the clarity, safety, and productivity benefits it provides.
 If you find a better/faster implementation, please submit your improvements!
 
-Fluent interfaces encourage you to write expressions (that evaluate) instead of statements (that produce void).
-Immutable collections are fast enough to make it unnecessary to modify data in place.
-UncleJim pushes Java toward Clojure, but keeps the type saftey, objects, classes, and some of the C-like syntax that Java programmers are accustomed to.
-
-Migrating large code bases to another language is not always practical.
-This project lets you think about your code the way that Clojure programmers do, but still write Java.
-
-#Learn
-
-There is a (possibly outdated) problem-set for learning this tool-kit: https://github.com/GlenKPeterson/LearnFpJava
-
-#Details (this section may be obsolete)
+###More Details
  - Like Guava, we want to be as compatible with the java.util... collections as possible, while preventing mutation-in-place.
  - org.organicdesign.fp.collection.**Un**... interfaces extend the java.util collection interfaces of the same name (minus the "Un" prefix) deprecate all the mutate-in-place methods to make your IDE show them in red, and implement them to throw UnsupportedOperationExceptions to fail fast if you try to use them anyway.  These interfaces are useful in its own right as a way to declare that a function does not modify what is passed, or that what it returns cannot be modified.  Modification errors are caught as early as possible due to deprecation warnings.
  - org.organicdesign.fp.collection.**Im**... interfaces are the immutable, lightweight-copy collection interfaces.  Only the "get" methods from the java.util... collection interfaces remain.  Additional "set" methods that return a new collectoin are added at this level.
  - org.organicdesign.fp.collection.**Persistent**... implementations have been taken directly from Clojure (hence the Eclipse licence for those components).  For starters, we will include the celebrated Vector and the sorted (tree) Set and Map implementations.  We will add the hash-based Set and Map later, but they will take a separate Equator to handle equals() and hashCode() much the way the tree-based collections take a Comparator.
 
-Within your own FP-centric world, you will use the Im interfaces and implementations and transform them with the Transformation abstraction.  Methods that interact with imperative Java code will take the java.util interfaces and return either the Im- interfaces, or Un- interfaces as necessary.  Where practical, try to use the Im-interfaces instead of their implementations, as new, better immutable collection designs surface every few years.
+Within your own FP-centric world, you will use the Im interfaces and implementations and transform them with the Transformation abstraction.  Methods that interact with imperative Java code will take the java.util interfaces and return either the Im- interfaces (or Un- interfaces) as necessary.
 
-The classes in the <code>function</code> package allow you to use the Java 8 functional interfaces smoothly warpping things that throw checked exceptions in Java 8, or as "second class" functions in Java 7.  They are all named Function*N*  where *N* is the number of arguments they take.  They all automatically wrap and re-throw checked exceptions.  There are no versions for primitives, or that return **void**.
+The classes in the <code>function</code> package allow you to use the Java 8 functional interfaces smoothly warpping checked exceptions.  They are all named Function*N*  where *N* is the number of arguments they take.  There are no versions for primitives, or that return **void**.
 
 In Java, variables declared outside a lambda and used within one must be effectively finial.  The Mutable.Ref class works around this limitation.
 
-In short, Clojure doesn't have static types.  Scala has an TMTOWTDI attitude that reminds me of how C++ and Perl ended up producing write-only code. 
-Unwilling to move a million lines of code to either language, I tried to bring the best of both to Java.
+#Learn
+
+There is a (possibly outdated) problem-set for learning this tool-kit: https://github.com/GlenKPeterson/LearnFpJava
 
 #Thank You
+The bulk of this project started as a simple question on StackExchange: [Why doesn't Java 8 include immutable collections?](http://programmers.stackexchange.com/questions/221762/why-doesnt-java-8-include-immutable-collections)  People's answers were a big help in figuring out what this project should and shouldn't do.
+
 Nathan Williams: for many lengthy email conversations about this project, encouragement to separate state from the transformation, and occasional light code review.
 
 GreenJUG: for bearing with talks on early versions of this code two years in a row.
