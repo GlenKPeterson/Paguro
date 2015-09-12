@@ -37,7 +37,7 @@ For complete API documentation, please build the javadoc:
 `mvn javadoc:javadoc`
 
 #Learn
-JimTrainer contains a few short problem-sets for learning UncleJim: https://github.com/GlenKPeterson/JimTrainer
+[JimTrainer](https://github.com/GlenKPeterson/JimTrainer) contains a few short problem-sets for learning UncleJim 
 
 #Dependencies
 - Java 8 (tested with 64-bit Linux build 1.8.0_51).
