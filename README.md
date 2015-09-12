@@ -17,7 +17,7 @@ vec(4, 5)                        //          4, 5
         .drop(2)                 //             5, 6
         .toImList());
 ```
-**START HERE:** The rest of the [usage examples are implemented as unit tests](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34)
+**START HERE ==>** [Usage examples are implemented as unit tests](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34)
 to ensure they remain correct and current.
 
 #API Highlights
