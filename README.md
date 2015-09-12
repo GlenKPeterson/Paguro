@@ -17,7 +17,7 @@ vec(4, 5)                        //          4, 5
         .drop(2)                 //             5, 6
         .toImList());
 ```
-START HERE: The rest of the [usage examples are implemented as unit tests](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34)
+**START HERE:** The rest of the [usage examples are implemented as unit tests](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34)
 to ensure they remain correct and current.
 
 #API Highlights
@@ -50,7 +50,7 @@ I plan to keep new development work on the main branch, but am very willing to h
 - As of 2015-09-06, all major areas of functionality were covered by unit tests.
 
 #Project Status
-*Beta* release.  The code quality is high, the documentation is improving, but there is still a chance of minor API changes before the final release. 
+**BETA** release.  The code quality is high, the documentation is improving, but there is still a chance of minor API changes before the final release. 
 Test coverage at last check: 73%
 
 ![Test Coverage](testCoverage.png)
