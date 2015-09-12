@@ -14,17 +14,12 @@
 package org.organicdesign.fp.collections;
 
 /**
- Holds Immutable "modification" methods that return a new ImList reflecting the modification while sharing as much data
- structure with the previous ImList as possible (for performance).
+ Holds Immutable "modification" methods that return a new ImList reflecting the modification while
+ sharing as much data structure with the previous ImList as possible (for performance).
  */
 public interface ImList<E> extends UnmodList<E> {
-    // Do we want to make an ImIterator that's truly immutable - a Sequence?
-    // Kind of a moot point when this overrides the same method on Sequence.
     /** {@inheritDoc} */
     @Override default UnmodSortedIterator<E> iterator() { return listIterator(0); }
-//
-//    /** {@inheritDoc} */
-//    @Override default UnmodListIterator<E> listIterator() { return listIterator(0); }
 
 // Inherited correctly - there is no ImIterator.
 // UnmodListIterator<E> listIterator(int index) {
@@ -43,7 +38,7 @@ public interface ImList<E> extends UnmodList<E> {
      @return a new ImList with the additional item.
      */
     default ImList<E> insert(int i, E val) {
-        if (i == size()) { return appendOne(val); }
+        if (i == size()) { return append(val); }
 
         if ( (i > size()) || (i < 0) ) {
             throw new IllegalArgumentException("Can't insert outside the possible bounds");
@@ -53,32 +48,34 @@ public interface ImList<E> extends UnmodList<E> {
         ImList<E> v = PersistentVector.empty();
         int j = 0;
         for (; j < i; j++) {
-            v = v.appendOne(iter.next());
+            v = v.append(iter.next());
         }
-        v = v.appendOne(val);
+        v = v.append(val);
         for (; j < size(); j++) {
-            v = v.appendOne(iter.next());
+            v = v.append(iter.next());
         }
         return v;
     }
 
     /**
-     * Adds items to the end of the ImList.
-     * @param e the values to insert
-     * @return a new ImList with the additional item at the end.
+     Adds one item to the end of the ImList.
+
+     @param e the value to insert
+     @return a new ImList with the additional item at the end.
      */
-    ImList<E> appendOne(E e);
+    ImList<E> append(E e);
 
     /**
-     * Adds items to the end of the ImList.
-     * @param es the values to insert
-     * @return a new ImList with the additional items at the end.
+     Adds multiple items to the end of the ImList.
+
+     @param es the values to insert
+     @return a new ImList with the additional items at the end.
      */
     @SuppressWarnings("unchecked")
     @Override default ImList<E> concat(Iterable<? extends E> es) {
         ImList<E> result = this;
         for (E e : es) {
-            result = result.appendOne(e);
+            result = result.append(e);
         }
         return result;
     };
@@ -88,16 +85,18 @@ public interface ImList<E> extends UnmodList<E> {
 
 
 //    /**
-//     The first item in this sequence.  This was originally called first() but that conflicted with SortedSet.first()
-//     which did not return an Option and threw an exception when the set was empty.
+//     The first item in this sequence.  This was originally called first() but that conflicted with
+//     SortedSet.first() which did not return an Option and threw an exception when the set was
+//     empty.
 //     */
 //    @Override default Option<E> head() {
 //        return size() > 0 ? Option.of(get(0)) : Option.none();
 //    }
 //
 //    /**
-//     The rest of this sequnce (all the items after its head).  This was originally called rest(), but when I renamed
-//     first() to head(), I renamed rest() to tail() so that it wouldn't mix metaphors.
+//     The rest of this sequnce (all the items after its head).  This was originally called rest(),
+//     but when I renamed first() to head(), I renamed rest() to tail() so that it wouldn't mix
+//     metaphors.
 //     */
 //    @Override default Sequence<E> tail() {
 //        return Sequence.ofIter(this).tail();
@@ -131,8 +130,8 @@ public interface ImList<E> extends UnmodList<E> {
     }
 
     /**
-     Replace the item at the given index.  Note: i.replace(i.size(), o) used to be equivalent to i.concat(o), but it
-     probably won't be for the RRB tree implementation, so this will change too.
+     Replace the item at the given index.  Note: i.replace(i.size(), o) used to be equivalent to
+     i.concat(o), but it probably won't be for the RRB tree implementation, so this will change too.
 
      @param idx the index where the value should be stored.
      @param e the value to store
@@ -141,12 +140,13 @@ public interface ImList<E> extends UnmodList<E> {
     // TODO: Don't make i.replace(i.size(), o) equivalent to i.concat(o)
     ImList<E> replace(int idx, E e);
 
-    // ================================================ STATIC METHODS ================================================
+    // ====================================== STATIC METHODS ======================================
 //    static <T> ImList<T> empty() { return PersistentVector.empty(); }
 
 //    /**
 //     * Inserts a new item at the specified index.
-//     * @param i the zero-based index to insert at (pushes current item and all subsequent items up)
+//     * @param i the zero-based index to insert at (pushes current item and all subsequent items
+//     *        up)
 //     * @param val the value to insert
 //     * @return a new ImList with the additional item.
 //     */

@@ -127,7 +127,7 @@ public class PersistentVector<E> implements ImList<E> {
 //        PersistentVector<T> ret = empty();
 //        for (T item : items) {
 //            if (item != null) {
-//                ret = ret.appendOne(item);
+//                ret = ret.append(item);
 //            }
 //        }
 //        return ret;
@@ -193,7 +193,7 @@ public class PersistentVector<E> implements ImList<E> {
             return new PersistentVector<>(size, shift, doAssoc(shift, root, i, val), tail);
         }
         if (i == size) {
-            return appendOne(val);
+            return append(val);
         }
         throw new IndexOutOfBoundsException();
     }
@@ -207,7 +207,7 @@ public class PersistentVector<E> implements ImList<E> {
      * @return a new Vecsicle with the additional item.
      */
     @SuppressWarnings("unchecked")
-    @Override public PersistentVector<E> appendOne(E val) {
+    @Override public PersistentVector<E> append(E val) {
         //room in tail?
         //	if(tail.length < MAX_NODE_LENGTH)
         if (size - tailoff() < MAX_NODE_LENGTH) {

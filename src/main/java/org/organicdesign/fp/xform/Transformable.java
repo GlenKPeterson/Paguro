@@ -163,7 +163,7 @@ public interface Transformable<T> extends Realizable<T> {
 
     /** {@inheritDoc} */
     @Override default ImList<T> toImList() {
-        return foldLeft(PersistentVector.empty(), (ts, t) -> ts.appendOne(t));
+        return foldLeft(PersistentVector.empty(), (ts, t) -> ts.append(t));
     }
 
     /** {@inheritDoc} */

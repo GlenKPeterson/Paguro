@@ -183,7 +183,7 @@ public class PersistentVectorTest {
         final int SEVERAL = SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
         PersistentVector<Integer> is = PersistentVector.empty();
         for (int j = 0; j < SEVERAL; j++){
-            is = is.appendOne(j);
+            is = is.append(j);
         }
         assertEquals(SEVERAL, is.size());
         for (int j = 0; j < SEVERAL; j++){
@@ -260,7 +260,7 @@ public class PersistentVectorTest {
                 startTime = System.nanoTime();
                 PersistentVector<Integer> test = PersistentVector.empty();
                 for (int i = 0; i < numItems; i++) {
-                    test = test.appendOne(i);
+                    test = test.append(i);
                 }
                 assertEquals(numItems, test.size());
                 assertEquals(Integer.valueOf(numItems / 2), test.get(numItems / 2));
@@ -307,7 +307,7 @@ public class PersistentVectorTest {
 
     @Test public void replace() {
         PersistentVector<String> pv = PersistentVector.empty();
-        pv = pv.appendOne("Hello").appendOne("World");
+        pv = pv.append("Hello").append("World");
         assertArrayEquals(new String[] { "Hello", "World" },
                           pv.toArray());
 
@@ -318,7 +318,7 @@ public class PersistentVectorTest {
         int len = 999;
         Integer[] test = new Integer[len];
         for (int i = 0; i < len; i++) {
-            pv2 = pv2.appendOne(i);
+            pv2 = pv2.append(i);
             test[i] = i;
         }
         assertArrayEquals(test, pv2.toArray());
@@ -336,7 +336,7 @@ public class PersistentVectorTest {
         Integer[] test = new Integer[len];
 
         for (int i = 0; i < len; i++) {
-            pv2 = pv2.appendOne(len - i);
+            pv2 = pv2.append(len - i);
             test[i] = len - i;
         }
         assertArrayEquals(test, pv2.toArray());

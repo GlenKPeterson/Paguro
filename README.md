@@ -56,7 +56,8 @@ Test coverage at last check: 73%
 ![Test Coverage](testCoverage.png)
 
 #Change Log
-Since 0.10.7: Documentation changes only (version number is only bumped for code changes).
+2015-09-12 0.10.8: Renamed ImList.appendOne() to just ImList.append().
+Plus, lots of documentation changes.
 
 2015-09-09 version 0.10.7: *Beta!*  Compiled with -profile compact1.
 
