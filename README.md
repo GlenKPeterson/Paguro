@@ -215,7 +215,7 @@ None of those are simple uses of interpose.
 #Motivation
 
 ##Executive summary
-I wanted to write Java at work more like the way I write Clojure.
+To be able to write Java at work more like the way I write Clojure without taking any significant performance penalty for doing so.  Also, to be able to use the Clojure collections in a type-safe language.  I was thinking "Java" but really Scala can take advantage of the type safety improvements as well.
 
 ##Details
 The goals of this project are to make it easy to use Java:
