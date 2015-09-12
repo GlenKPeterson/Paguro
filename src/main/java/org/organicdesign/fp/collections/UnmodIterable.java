@@ -121,7 +121,12 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
     }
 
     // ================================== Inherited from Iterable ==================================
-    /** {@inheritDoc} */
+    /**
+     A one-time use, mutable, not-thread-safe way to get each value of the underling collection in
+     turn. I experimented with various thread-safe alternatives, but the JVM is optimized around
+     iterators so this is the lowest common denominator of collection iteration, even though
+     iterators are inherently mutable.
+     */
     @Override UnmodIterator<T> iterator();
 
     // =============================== Inherited from Transformable ===============================

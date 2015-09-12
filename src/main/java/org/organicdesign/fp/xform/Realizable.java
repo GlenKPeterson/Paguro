@@ -29,69 +29,12 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 
 /**
- Calling any of these methods forces eager evaluation of the underlying collection.  Infinite collections are not
- Realizable.
+ Calling any of these methods forces eager evaluation of the underlying collection.  Infinite
+ collections are not Realizable.
  */
 public interface Realizable<T> {
     /**
-     The contents of this Realizable as a thread-safe immutable list.  Use this when you want to access items quickly
-     O(log32 n) by index.
-     */
-    ImList<T> toImList();
-
-    /**
-     The contents of this Realizable as an thread-safe, immutable, sorted (tree) map.  Use this when you want to quickly
-     O(log n) look up values by key, but still be able to retrieve Entries in key order.
-     @return An immutable map
-     @param comp Determines the ordering.  If U implements Comparable, you can pass Function2.defaultComparator() here.
-     @param f1 Maps each item in this collection to a key/value pair.  If the collection is composed of Map.Entries,
-     you can pass Function1.identity() here.
-     */
-    <U,V> ImSortedMap<U,V> toImSortedMap(Comparator<? super U> comp, Function1<? super T,Map.Entry<U,V>> f1);
-
-    /**
-     The contents of this Realizable presented as an immutable, sorted (tree) set.  Use this when you want to quickly
-     O(log n) tell whether the set contains various items.
-     @return An immutable set
-     @param comp Determines the ordering.  If T implements Comparable, you can pass Function2.defaultComparator() here.
-     */
-    ImSortedSet<T> toImSortedSet(Comparator<? super T> comp);
-
-    /** The contents copied to a mutable list.  Use toImList unless you need to modify the list in-place. */
-    List<T> toMutableList();
-
-    /**
-     Returns the contents of this Realizable copied to a mutable hash map.  Use toImSortedMap() unless you need to
-     modify the map in-place.  Use toUnMap if you just need the fastest O(1) access speed without modifying it in place.
-     @return A map with the keys from the given set, mapped to values using the given function.
-     @param f1 Maps keys to values
-     */
-    <U,V> Map<U,V> toMutableMap(final Function1<? super T,Map.Entry<U,V>> f1);
-
-    /**
-     Returns the contents of this Realizable copied to a mutable tree map.  Use toImSortedMap() unless you need to
-     modify the map in-place.
-     @return A map with the keys from the given set, mapped to values using the given function.
-     @param f1 Maps keys to values
-     */
-    <U,V> SortedMap<U,V> toMutableSortedMap(final Function1<? super T,Map.Entry<U,V>> f1);
-
-    /**
-     Returns the contents of this Realizable copied to a mutable hash set.  Use toImSortedSet() unless you need to
-     modify the set in-place.  Use toUnSet if you just need the fastest O(1) access speed without modifying it in place.
-     @return A map with the keys from the given set, mapped to values using the given function.
-     */
-    Set<T> toMutableSet();
-
-    /**
-     Returns the contents of this Realizable copied to a mutable tree set.  Use toImSortedSet unless you need to modify
-     the set in-place.
-     @param comp Determines the ordering.  If T implements Comparable, you can pass Function2.defaultComparator() here.
-     */
-    SortedSet<T> toMutableSortedSet(Comparator<? super T> comp);
-
-    /**
-     Returns an Object[] that doesn't require that you pass an array of the proper type and size.
+     Returns an Object[] for backward compatibility
      */
     @SuppressWarnings("unchecked")
     default Object[] toArray() {
@@ -100,21 +43,85 @@ public interface Realizable<T> {
     }
 
     /**
-     This method will be replaced with toImMap() once a PersistentHashMap is added to this project.
-     The contents of this Realizable as an unmodifiable hash map.  Use this when you want to very quickly O(1)
-     look up values by key, and don't care about ordering.
+     Realize a thread-safe immutable list to access items quickly O(log32 n) by index.
+     */
+    ImList<T> toImList();
+
+    /**
+     Realize an unordered immutable hash map to very quickly O(1) look up values by key, but don't
+     care about ordering.
+
+     @param f1 Maps each item in this collection to a key/value pair.  If the collection is composed
+               of Map.Entries, you can pass Function1.identity() here.
      @return An unmodifiable map
-     @param f1 Maps each item in this collection to a key/value pair.  If the collection is composed of Map.Entries,
-     you can pass Function1.identity() here.
      */
     <U,V> ImMap<U,V> toImMap(Function1<? super T,Map.Entry<U,V>> f1);
 
     /**
-     This method will be replaced with toImSet() once a PersistentHashSet is added to this project.
-     The contents of this Realizable presented as an unmodifiable hash set.  Use this when you want to very quickly O(1)
-     tell whether the set contains various items, but don't care about ordering.
-     @return An unmodifiable set
+     Realize an unordered immutable hash set to remove duplicates or very quickly O(1) tell whether
+     the set contains various items, but don't care about ordering.
+
+     @return An unmodifiable set (with duplicates removed)
      */
     ImSet<T> toImSet();
+
+    /**
+     Realize an immutable, ordered (tree) map to quickly O(log2 n) look up values by key, but still
+     retrieve entries in key order.
+
+     @param comp Determines the ordering.  If U implements Comparable, you can pass
+                 Function2.defaultComparator() here.
+     @param f1 Maps each item in this collection to a key/value pair.  If the collection is composed
+               of Map.Entries, you can pass Function1.identity() here.
+     @return An immutable map
+     */
+    <U,V> ImSortedMap<U,V> toImSortedMap(Comparator<? super U> comp,
+                                         Function1<? super T,Map.Entry<U,V>> f1);
+
+    /**
+     Realize an immutable, sorted (tree) set to quickly O(log2 n) test it contains items, but still
+     retrieve entries in order.
+
+     @param comp Determines the ordering.  If T implements Comparable, you can pass
+                 Function2.defaultComparator() here.
+     @return An immutable set (with duplicates removed)
+     */
+    ImSortedSet<T> toImSortedSet(Comparator<? super T> comp);
+
+    /** Realize a mutable list.  Use toImList unless you need to modify the list in-place. */
+    List<T> toMutableList();
+
+    /**
+     Realize a mutable hash map.  Use toImMap() unless you need to modify the map in-place.
+
+     @param f1 Maps keys to values
+
+     @return A map with the keys from the given set, mapped to values using the given function.
+     */
+    <U,V> Map<U,V> toMutableMap(final Function1<? super T,Map.Entry<U,V>> f1);
+
+    /**
+     Realize a mutable tree map.  Use toImSortedMap() unless you need to modify the map in-place.
+
+     @param f1 Maps keys to values
+     @return A map with the keys from the given set, mapped to values using the given function.
+     */
+    <U,V> SortedMap<U,V> toMutableSortedMap(final Function1<? super T,Map.Entry<U,V>> f1);
+
+    /**
+     Realize a mutable hash set. Use toImSet() unless you need to modify the set in-place.
+
+     @return A mutable set (with duplicates removed)
+     */
+    Set<T> toMutableSet();
+
+    /**
+     Returns a mutable tree set. Use toImSortedSet unless you need to modify the set in-place.
+
+     @param comp Determines the ordering.  If T implements Comparable, you can pass
+                 Function2.defaultComparator() here.
+     @return A mutable sorted set
+     */
+    SortedSet<T> toMutableSortedSet(Comparator<? super T> comp);
 
 }

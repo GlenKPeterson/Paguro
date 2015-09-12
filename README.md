@@ -1,11 +1,9 @@
 UncleJim ("**Un**modifiable **Coll**ections for **J**ava&trade; **Imm**utability") brings the following to Java:
 
-* Type-safe versions of Clojure's [immutable collections](src/main/java/org/organicdesign/fp/collections) (classes start with the word "Persistent")
-* An immutable [Transformation Builder](src/main/java/org/organicdesign/fp/xform/Transformable.java)
-(implementation is in [Xform](src/main/java/org/organicdesign/fp/xform/Xform.java)).
-This is like Clojure's sequence abstraction, but baked into every collection and collection wrapper.
-* A tiny, type-safe [data definition language](src/main/java/org/organicdesign/fp/StaticImports.java) of brief helper functions: `vec()`, `set()`, `map()`, and `tup()`, (sort of like Clojure's vector `[]`, set `#{}`, and map `{}` syntax).
-* Simplified Java 8 [functional interfaces](src/main/java/org/organicdesign/fp/function) that wrap checked exceptions
+* Type-safe versions of Clojure's immutable collections
+* An immutable Transformation Builder like Clojure's sequence abstraction, but single-pass and baked into every collection and collection wrapper.
+* A tiny, type-safe data definition mini-language of brief helper functions: `vec()`, `set()`, `map()`, and `tup()`, (like Clojure's vector `[]`, set `#{}`, and map `{}`).
+* Simplified Java 8 functional interfaces that wrap checked exceptions and provide memoization
 
 #Usage Examples
 Create a vector (list) and perform an immutable transformation on it:
@@ -19,112 +17,21 @@ vec(4, 5)                        //          4, 5
         .drop(2)                 //             5, 6
         .toImList());
 ```
-The rest of the [usage examples are implemented as unit tests](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34)
+START HERE: The rest of the [usage examples are implemented as unit tests](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34)
 to ensure they remain correct and current.
 
-#API
-###Data Description Mini-Language
-```java
-import org.organicdesign.fp.StaticImports.*
+#API Highlights
 
-// Create a new vector of integers
-vec(1, 2, 3, 4);
+* Type-safe versions of Clojure's [immutable collections](src/main/java/org/organicdesign/fp/collections) (classes start with the word "Persistent")
 
-// Create a new set of Strings
-set("a", "b", "c");
+* [Immutable Transformation Builder](src/main/java/org/organicdesign/fp/xform/Transformable.java)
+(implementation is in [Xform](src/main/java/org/organicdesign/fp/xform/Xform.java))
 
-// Create a tuple of an int and a string (a type-safe heterogeneous container)
-tup("a", 1);
+* [Transformation Endpoints](src/main/java/org/organicdesign/fp/xform/Realizable.java)
 
-// Create a map with a few key value pairs
-map(tup("a", 1), tup("b", 2), tup("c", 3);
-```
-###Transformations:
-```java
-// Return only the first n items
-Transformable<T> take(long numItems);
+* [Data Description Mini-Language](src/main/java/org/organicdesign/fp/StaticImports.java)
 
-// Return items from the beginning until the given predicate returns false
-Transformable<T> takeWhile(Function1<? super T,Boolean> predicate);
-
-// Ignore the first n items and return only those that come after
-Transformable<T> drop(long numItems);
-
-// Add items to the end of this Transformable
-Transformable<T> concat(Iterable<? extends T> list);
-
-// Add items to the beginning of this Transformable
-Transformable<T> precat(Iterable<? extends T> list);
-
-// Return only the items for which the given predicate returns true
-Transformable<T> filter(Function1<? super T,Boolean> predicate);
-
-// Transform each item into exactly one new item using the given function
-Transformable<U> map(Function1<? super T,? extends U> func);
-
-// Transform each item into zero or more new items using the given function
-Transformable<U> flatMap(Function1<? super T,Iterable<U>> f);
-
-// Apply the function to each item, accumulating the result in u.  Other
-// transformations could be implemented with just this one function, but
-// it is clearer to use the most specific transformations that meets your needs.
-// Still, sometimes you need the flexibility foldLeft provides.
-// This implementation follows the convention that foldLeft processes items
-// *in order* unless those items are a linked list, and in this case,
-// they are not.
-U foldLeft(U u, Function2<U,? super T,U> fun);
-
-// Normally you want to terminate by doing a take(), drop(), or takeWhile()
-// before you get to the fold, but if you need to terminate based on the
-// complete result so far, you can  provide your own termination condition.
-U foldLeft(U u, Function2<U,? super T,U> fun,
-           Function1<? super U,Boolean> terminateWhen);
-```
-
-###Endpoints
-```java
-// Realize a thread-safe immutable list to access items quickly O(log32 n) by index.
-ImList<T> toImList();
-
-// Realize an unordered immutable hash set to very quickly O(1) tell whether the set
-// contains various items.
-ImSet<T> toImSet();
-
-// Realize an unordered immutable hash map to very quickly O(1) look up values by key.
-ImMap<U,V> toImMap(Function1<? super T,Map.Entry<U,V>> f1);
-
-// Realize an immutable, ordered (tree) map to quickly O(log n) look up values by key,
-// but still retrieve entries in key order.
-ImSortedMap<U,V> toImSortedMap(Comparator<? super U> comp,
-                               Function1<? super T,Map.Entry<U,V>> f1);
-
-// Realize an immutable, sorted (tree) set to quickly O(log n) test it contains items,
-// but still retrieve entries in order.
-ImSortedSet<T> toImSortedSet(Comparator<? super T> comp);
-
-// Realize a mutable list.  Use toImList unless you need to modify the list in-place.
-List<T> toMutableList();
-
-// Realize a mutable hash map.  Use toImMap() unless you need to modify the map in-place.
-Map<U,V> toMutableMap(Function1<? super T,Map.Entry<U,V>> f1);
-
-// Realize a mutable tree map.  Use toImSortedMap() unless you need to modify the
-// map in-place.
-SortedMap<U,V> toMutableSortedMap(Function1<? super T,Map.Entry<U,V>> f1);
-
-// Realize a mutable hash set. Use toImSet() unless you need to modify the set in-place.
-Set<T> toMutableSet();
-
-// Returns a mutable tree set. Use toImSortedSet unless you need to modify the set
-// in-place.
-SortedSet<T> toMutableSortedSet(Comparator<? super T> comp);
-
-// Returns an Object[] for backward compatibility
-Object[] toArray();
-
-// A one-time use, not-thread-safe way to get each value of this Realizable in turn.
-UnmodIterator<T> iterator();
-```
+* Simplified Java 8 [functional interfaces](src/main/java/org/organicdesign/fp/function) that wrap checked exceptions
 
 For complete API documentation, please build the javadoc:
 `mvn javadoc:javadoc`
@@ -143,12 +50,14 @@ I plan to keep new development work on the main branch, but am very willing to h
 - As of 2015-09-06, all major areas of functionality were covered by unit tests.
 
 #Project Status
-This is in Beta release.  The code quality is high, the documentation is improving, but there is still a chance of some API changes before the final release. 
+*Beta* release.  The code quality is high, the documentation is improving, but there is still a chance of minor API changes before the final release. 
 Test coverage at last check: 73%
 
 ![Test Coverage](testCoverage.png)
 
 #Change Log
+Since 0.10.7: Documentation changes only (version number is only bumped for code changes).
+
 2015-09-09 version 0.10.7: *Beta!*  Compiled with -profile compact1.
 
 2015-09-08 version 0.10.6 Fixed bug: Xform would blow up later if you passed a null to its
@@ -255,12 +164,13 @@ just be glad I didn't use car and cdr.
 Implemented filter() on Sequence.
 
 #To Do
- - Have an Ordered version of Transform as well as the (default) unreliable order.  Only the ordered version can be used for implementing things like equals() and hashCode()
- - Bring unit test coverage back above 80%, or 85% if sensible.  This basically means to add any and all practical tests for PersistentHashMap, then remove unused code.
  - Update JavaDoc, esp. Im vs. Unmod
+ - Update learnFPJava project
+ - Bring unit test coverage back above 80%, or 85% if sensible.  This basically means to add any and all practical tests for PersistentHashMap, then remove unused code.
  - ?Add `Either` (I have a working implementation) - it's like `Or` without the attitude.?
  - ?Make visio drawig of interface diagram?
- - Update learnFPJava project
+ - Have an Ordered version of Transform as well as the (default) unreliable order.  Only the ordered version can be used for implementing things like equals() and hashCode()
+ - Bring back the pointer-arithmetic version of drop()
  - Add a [Persistent RRB Tree](http://infoscience.epfl.ch/record/169879/files/RMTrees.pdf) and compare its performance to the PersistentVector.
 
 #Additional experimental features:
@@ -270,6 +180,9 @@ Implemented filter() on Sequence.
 These were useful before the Clojure collections and Transformable were fully integrated, but may still provide a useful extension point for integrating your own immutable collections into the traditional Java ecosystem. 
 
 #Out of Scope
+
+###Option<T> firstMatching(Predicate<T> pred);
+Use with filter(...).head() instead
 
 ###T reduceLeft(BiFunction<T, T, T> fun)
 reduceLeft() is like foldLeft without the "u" parameter.

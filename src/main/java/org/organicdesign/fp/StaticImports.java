@@ -35,7 +35,23 @@ import java.util.Map;
 
 /**
  <p>A mini data definition language composed of vec(), tup(), map(), set(), plus a converter to make
- java.util collections transformable: xform().  vec(), map(), and set() are the only three methods
+ java.util collections transformable: xform().</p>
+
+ <pre><code>import org.organicdesign.fp.StaticImports.*
+
+ // Create a new vector of integers
+ vec(1, 2, 3, 4);
+
+ // Create a new set of Strings
+ set("a", "b", "c");
+
+ // Create a tuple of an int and a string (a type-safe heterogeneous container)
+ tup("a", 1);
+
+ // Create a map with a few key value pairs
+ map(tup("a", 1), tup("b", 2), tup("c", 3);</code></pre>
+
+ <p>vec(), map(), and set() are the only three methods
  in this project to take varargs.  I tried writing out versions that took multiple type-safe
  arguments, but IntelliJ presented you with a menu of all of them for auto-completion which
  was overwhelming, so I reverted to varargs.  Also, varargs relax some type safety rules (variance)
