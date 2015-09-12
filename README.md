@@ -169,7 +169,6 @@ Implemented filter() on Sequence.
 
 #To Do
  - Update JavaDoc, esp. Im vs. Unmod
- - Update learnFPJava project
  - Bring unit test coverage back above 80%, or 85% if sensible.  This basically means to add any and all practical tests for PersistentHashMap, then remove unused code.
  - ?Add `Either` (I have a working implementation) - it's like `Or` without the attitude.?
  - ?Make visio drawig of interface diagram?
