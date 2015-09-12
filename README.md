@@ -36,6 +36,9 @@ to ensure they remain correct and current.
 For complete API documentation, please build the javadoc:
 `mvn javadoc:javadoc`
 
+#Learn
+JimTrainer contains a few short problem-sets for learning UncleJim: https://github.com/GlenKPeterson/JimTrainer
+
 #Dependencies
 - Java 8 (tested with 64-bit Linux build 1.8.0_51).
 Probably can be meaningfully adapted to work well at least as far back as Java 5 with some work.
@@ -265,10 +268,6 @@ Within your own FP-centric world, you will use the Im interfaces and implementat
 The classes in the <code>function</code> package allow you to use the Java 8 functional interfaces smoothly warpping checked exceptions.  They are all named Function*N*  where *N* is the number of arguments they take.  There are no versions for primitives, or that return **void**.
 
 In Java, variables declared outside a lambda and used within one must be effectively finial.  The Mutable.Ref class works around this limitation.
-
-#Learn
-
-There is a (possibly outdated) problem-set for learning this tool-kit: https://github.com/GlenKPeterson/LearnFpJava
 
 #Thank You
 The bulk of this project started as a simple question on StackExchange: [Why doesn't Java 8 include immutable collections?](http://programmers.stackexchange.com/questions/221762/why-doesnt-java-8-include-immutable-collections)  People's answers were a big help in figuring out what this project should and shouldn't do.
