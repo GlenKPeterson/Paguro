@@ -4,6 +4,7 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava&trade; **Imm**utability
 * An immutable Transformation Builder like Clojure's sequence abstraction, but single-pass and baked into every collection and collection wrapper.
 * A tiny, type-safe data definition mini-language of brief helper functions: `vec()`, `set()`, `map()`, and `tup()`, (like Clojure's vector `[]`, set `#{}`, and map `{}`).
 * Simplified Java 8 functional interfaces that wrap checked exceptions and provide memoization
+* Encourage expressions (which evaluate) over Statements (which return void).  This has the happy side effect of leveraging the best aspects of Java's type inference capabilities so that you generally don't have to specify types unless you want to, yet the type-checker "keeps you honest."
 
 #Show Me the Codez!
 All examples are implemented as unit tests to ensure that they remain 100% correct and current.
