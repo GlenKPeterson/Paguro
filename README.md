@@ -338,3 +338,5 @@ Source (as of 2015-05-13): https://www.apache.org/legal/resolved#category-a
 > ...
 
 Source (as of 2015-05-13): https://eclipse.org/legal/eplfaq.php#3RDPARTY
+
+Thanks to Bodil Stokke for pointing out the EPL/GPL compatibility issue and work-around both on Twitter, and on the Lux language project.
