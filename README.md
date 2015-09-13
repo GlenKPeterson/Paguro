@@ -8,7 +8,7 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava&trade; **Imm**utability
 #Show Me the Codez!
 All examples are implemented as unit tests to ensure that they remain 100% correct and current.
 
-* [Comparison with Traditional Java and Java 8 Streams](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java)
+* [Comparison with Traditional Java and Java 8 Streams](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java#L22)
 
 * [Usage examples](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34)
 
