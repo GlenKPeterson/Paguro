@@ -10,7 +10,7 @@ All examples are implemented as unit tests to ensure that they remain 100% corre
 
 * [Comparison with Traditional Java and Java 8 Streams](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java#L22)
 
-* [Usage examples](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34)
+* [Pure-Jim usage examples](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34)
 
 #API Highlights
 
