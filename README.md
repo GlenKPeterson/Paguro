@@ -5,20 +5,12 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava&trade; **Imm**utability
 * A tiny, type-safe data definition mini-language of brief helper functions: `vec()`, `set()`, `map()`, and `tup()`, (like Clojure's vector `[]`, set `#{}`, and map `{}`).
 * Simplified Java 8 functional interfaces that wrap checked exceptions and provide memoization
 
-#Usage Examples
-Create a vector (list) and perform an immutable transformation on it:
-```java
-vec(4, 5)                        //          4, 5
-        .precat(vec(1, 2, 3))    // 1, 2, 3, 4, 5
-        .concat(vec(6, 7, 8, 9)) // 1, 2, 3, 4, 5, 6, 7, 8, 9
-        .filter(i -> i > 4)      //             5, 6, 7, 8, 9
-        .map(i -> i - 2)         //       3, 4, 5, 6, 7
-        .take(4)                 //       3, 4, 5, 6
-        .drop(2)                 //             5, 6
-        .toImList());
-```
-**START HERE ==>** [Usage examples are implemented as unit tests](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34)
-to ensure they remain correct and current.
+#Show Me the Codez!
+All examples are implemented as unit tests to ensure that they remain 100% correct and current.
+
+* [Comparison with Traditional Java and Java 8 Streams](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java)
+
+* [Usage examples](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34)
 
 #API Highlights
 
