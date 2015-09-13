@@ -4,7 +4,6 @@ import org.junit.Test;
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.ImMap;
 import org.organicdesign.fp.collections.RangeOfInt;
-import org.organicdesign.fp.collections.UnmodMap;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -12,7 +11,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import static org.junit.Assert.*;
@@ -175,7 +173,7 @@ public class TradJavaStreamComparisonTest {
     // TODO: This is maybe not the best example - it needs work!
     // It would be better to show a lambda with a checked exception.
 
-    // UncleJim's way: 3 loc, 3 loc, 3 loc
+    // UncleJim's way: 3 loc, + 3 loc = 6 loc
     @Test
     public void colorSquareU() {
         ImList<Color> imgData = RangeOfInt.of(0, 256)
@@ -199,16 +197,10 @@ public class TradJavaStreamComparisonTest {
         assertEquals(Integer.valueOf(2), counts.get(new Color(16, 128, 255)));
         assertEquals(Integer.valueOf(2), counts.get(new Color(32, 128, 255)));
         assertEquals(Integer.valueOf(2), counts.get(new Color(255, 254, 255)));
-
-        UnmodMap.UnEntry<Color,Integer> mostPopularColor =
-                counts.foldLeft((UnmodMap.UnEntry<Color,Integer>) tup((Color) null, 0),
-                                (max, entry) -> (entry.getValue() > max.getValue()) ? entry : max);
-
-//        System.out.println("mostPopularColor: " + mostPopularColor);
-        assertEquals(Integer.valueOf(2), mostPopularColor.getValue());
     }
 
-    // Same thing in "Traditional" Java: 4 loc + 2 brackets, 8 loc + 4 brackets, 4 loc + 2 brackets
+    // Same thing in "Traditional" Java: 4 loc + 2 brackets, 8 loc + 4 brackets =
+    // 12 loc + 6 brackets
     @Test public void colorSquareT() {
         java.util.List<Color> imgData = new ArrayList<>();
         for (int i = 0; i < 256; i++) {
@@ -235,25 +227,10 @@ public class TradJavaStreamComparisonTest {
         assertEquals(Integer.valueOf(2), counts.get(new Color(16, 128, 255)));
         assertEquals(Integer.valueOf(2), counts.get(new Color(32, 128, 255)));
         assertEquals(Integer.valueOf(2), counts.get(new Color(255, 254, 255)));
-
-        Map.Entry<Color,Integer> max = new Map.Entry<Color,Integer>() {
-            @Override public Color getKey() { return null; }
-            @Override public Integer getValue() { return 0; }
-            @Override public Integer setValue(Integer value) {
-                throw new UnsupportedOperationException();
-            }
-        };
-        for (Map.Entry<Color,Integer> entry : counts.entrySet()) {
-            if (entry.getValue() > max.getValue()) {
-                max = entry;
-            }
-        }
-
-        assertEquals(Integer.valueOf(2), max.getValue());
     }
 
     // Same thing with Java 8's Streams - I just used traditional Java to populate the list.
-    // 4 loc + 2 brackets, 10 loc + 3 bracket-lines, 2 loc
+    // (4 loc + 2 brackets) + (10 loc + 3 bracket-lines) = 14 loc + 5 brackets
     @Test public void colorSquare8() {
         java.util.List<Color> imgData = new ArrayList<>();
         for (int i = 0; i < 256; i++) {
@@ -288,11 +265,6 @@ public class TradJavaStreamComparisonTest {
         assertEquals(Integer.valueOf(2), counts.get(new Color(16, 128, 255)));
         assertEquals(Integer.valueOf(2), counts.get(new Color(32, 128, 255)));
         assertEquals(Integer.valueOf(2), counts.get(new Color(255, 254, 255)));
-
-        Optional<Map.Entry<Color,Integer>> mostPopularColor =
-                counts.entrySet().stream().max((e1, e2) -> e1.getValue() - e2.getValue());
-
-        assertEquals(Integer.valueOf(2), mostPopularColor.get().getValue());
     }
 
 }
