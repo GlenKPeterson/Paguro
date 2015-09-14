@@ -7,7 +7,19 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava&trade; **Imm**utability
 * Encourages expressions (which evaluate) over Statements (which return void).  This leverages Java's type inference capabilities so that you generally don't have to specify types unless you want to, yet the type-checker still "keeps you honest."
 
 #Examples
-All examples are implemented as unit tests to ensure that they remain 100% correct and current.
+Create a vector (List) of integers and perform some operations on it.
+The results of each operation show in comments to the right.
+```java
+vec(4, 5)                        //          4, 5
+        .precat(vec(1, 2, 3))    // 1, 2, 3, 4, 5
+        .concat(vec(6, 7, 8, 9)) // 1, 2, 3, 4, 5, 6, 7, 8, 9
+        .filter(i -> i > 4)      //             5, 6, 7, 8, 9
+        .map(i -> i - 2)         //       3, 4, 5, 6, 7
+        .take(4)                 //       3, 4, 5, 6
+        .drop(2)                 //             5, 6
+```
+
+The rest of the examples are implemented as unit tests to ensure that they remain 100% correct and current.
 
 * [Comparison with Traditional Java and Java 8 Streams](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java#L22) - UncleJim generally takes 1/2 to 1/3 as much code to accomplish the same thing as Traditional Java, or Java 8 Streams.
 
