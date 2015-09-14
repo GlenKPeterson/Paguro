@@ -164,11 +164,12 @@ Implemented filter() on Sequence.
  - Get an org.organicdesign Sonatype reposotory and put UncleJim there.
  - Update JavaDoc, esp. Im vs. Unmod
  - Bring unit test coverage back above 80%, or 85% if sensible.  This basically means to add any and all practical tests for PersistentHashMap, then remove unused code.
- - ?Add `Either` (I have a working implementation) - it's like `Or` without the attitude.?
  - ?Make visio drawig of interface diagram?
  - Have an Ordered version of Transform as well as the (default) unreliable order.  Only the ordered version can be used for implementing things like equals() and hashCode()
  - Bring back the pointer-arithmetic version of drop()
+ - Consider `max(Comparator<T> c, Iterable<? extends T> is)` and min()...
  - Add a [Persistent RRB Tree](http://infoscience.epfl.ch/record/169879/files/RMTrees.pdf) and compare its performance to the PersistentVector.
+ - Re-implement Persistent collections from Algorithms and Purely Functional Data Structures without relying on a wrapped transient collection and without locking checks, then compare efficiency.
 
 #Additional experimental features:
 * An [Equator](src/main/java/org/organicdesign/fp/collections/Equator.java) and [ComparisonContext](src/main/java/org/organicdesign/fp/collections/Equator.java#L45) which work like `java.util.Comparator`, but for hash-based collections.
