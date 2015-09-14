@@ -1,10 +1,13 @@
 <html>
 <body>
-<p>Immutable, type-safe, heterogeneous containers.
-These are simpler to use than defining one-off classes, easier to share between projects,
-and they come with correct, efficient <code>equals()</code> and <code>hashcode()</code> methods.
-ML, Haskell, and Scala use tuples - why not Java?</p>
+<p>Immutable, type-safe, heterogeneous containers - ML calls these "records."
+    ML, Haskell, and Scala use tuples - why not Java?
+    Actually, tuples are *more* important in Java because Java does not have type aliases.
+    Instead of type aliases, extend tuples to give them descriptive names, and you can give descriptive names to the accessor methods as well.
+    Doing so is brief, ensures immutability, and provides correct, efficient <code>equals()</code>, <code>hashcode()</code>, and <code>toString()</code> methods.
 
-<p>Defining your own class is better for building models, but tuples can be more convenient, especially for adapter code.</p>
+<p>When you are experimenting, use tuples to leverage Java's type inference engine in fluent code so that you don't need to specify any types.
+    When you decide to keep your experiment, extend tuples to give meaningful names to your data types and their fields.
+    Look at UsageExampleTest.java (the unit test) to see why tuples are so important and flexible.</p>
 </body>
 </html>

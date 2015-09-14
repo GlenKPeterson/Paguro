@@ -23,8 +23,9 @@ import java.util.Objects;
 Holds 2 items of potentially different types, and implements Map.Entry (and UnmodMap.UnEntry (there is no ImMap.ImEntry)).
  */
 public class Tuple2<T,U> implements Entry<T,U>, UnmodMap.UnEntry<T,U> {
-    private final T _1;
-    private final U _2;
+    // Fields are protected for easy inheritance
+    protected final T _1;
+    protected final U _2;
 
     /** Constructor is protected for easy inheritance. */
     protected Tuple2(T t, U u) { _1 = t; _2 = u; }

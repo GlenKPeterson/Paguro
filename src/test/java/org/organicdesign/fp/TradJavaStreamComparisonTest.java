@@ -4,8 +4,8 @@ import org.junit.Test;
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.ImMap;
 import org.organicdesign.fp.collections.RangeOfInt;
+import org.organicdesign.fp.tuple.Tuple3;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -173,6 +173,15 @@ public class TradJavaStreamComparisonTest {
     // TODO: This is maybe not the best example - it needs work!
     // It would be better to show a lambda with a checked exception.
 
+    // Instead of importing java.awt.Color, I'm adding a similar class here because java.awt
+    // is outside of profile compact1
+    static class Color extends Tuple3<Integer,Integer,Integer> {
+        Color(int r, int g, int b) { super(r, g, b); }
+//        public int red() { return _1; }
+//        public int green() { return _2; }
+//        public int blue() { return _3; }
+    }
+
     // UncleJim's way: 3 loc, + 3 loc = 6 loc
     @Test
     public void colorSquareU() {
@@ -182,11 +191,11 @@ public class TradJavaStreamComparisonTest {
 
         assertTrue(imgData.toString()
                           .startsWith("PersistentVector(" +
-                                      "java.awt.Color[r=0,g=0,b=255]," +
-                                      "java.awt.Color[r=0,g=0,b=255]," +
-                                      "java.awt.Color[r=0,g=1,b=255]," +
-                                      "java.awt.Color[r=0,g=1,b=255]," +
-                                      "java.awt.Color[r=0,g=2,b=255],"));
+                                      "Color(0,0,255)," +
+                                      "Color(0,0,255)," +
+                                      "Color(0,1,255)," +
+                                      "Color(0,1,255)," +
+                                      "Color(0,2,255),"));
 
         ImMap<Color,Integer> counts = imgData
                 .foldLeft(map(),
@@ -211,11 +220,11 @@ public class TradJavaStreamComparisonTest {
 
         assertTrue(imgData.toString()
                           .startsWith("[" +
-                                      "java.awt.Color[r=0,g=0,b=255], " +
-                                      "java.awt.Color[r=0,g=0,b=255], " +
-                                      "java.awt.Color[r=0,g=1,b=255], " +
-                                      "java.awt.Color[r=0,g=1,b=255], " +
-                                      "java.awt.Color[r=0,g=2,b=255], "));
+                                      "Color(0,0,255), " +
+                                      "Color(0,0,255), " +
+                                      "Color(0,1,255), " +
+                                      "Color(0,1,255), " +
+                                      "Color(0,2,255), "));
 
         Map<Color,Integer> counts = new HashMap<>();
         for (Color c : imgData) {
@@ -240,11 +249,11 @@ public class TradJavaStreamComparisonTest {
         }
         assertTrue(imgData.toString()
                           .startsWith("[" +
-                                      "java.awt.Color[r=0,g=0,b=255], " +
-                                      "java.awt.Color[r=0,g=0,b=255], " +
-                                      "java.awt.Color[r=0,g=1,b=255], " +
-                                      "java.awt.Color[r=0,g=1,b=255], " +
-                                      "java.awt.Color[r=0,g=2,b=255], "));
+                                      "Color(0,0,255), " +
+                                      "Color(0,0,255), " +
+                                      "Color(0,1,255), " +
+                                      "Color(0,1,255), " +
+                                      "Color(0,2,255), "));
 
         Map<Color,Integer> counts = imgData.stream()
                 .reduce(new HashMap<>(),

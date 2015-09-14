@@ -20,9 +20,10 @@ import java.util.Objects;
  Holds 3 items of potentially different types.
  */
 public class Tuple3<T,U,V> {
-    private final T _1;
-    private final U _2;
-    private final V _3;
+    // Fields are protected for easy inheritance
+    protected final T _1;
+    protected final U _2;
+    protected final V _3;
 
     /** Constructor is protected for easy inheritance. */
     protected Tuple3(T t, U u, V v) { _1 = t; _2 = u; _3 = v; }

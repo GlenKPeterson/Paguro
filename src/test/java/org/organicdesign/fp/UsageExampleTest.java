@@ -148,8 +148,8 @@ public class UsageExampleTest {
 
         // As long as we are making an object, we might as well give descriptive names to the
         // field getters
-        public EmailType type() { return _1(); }
-        public String address() { return _2(); }
+        public EmailType type() { return _1; }
+        public String address() { return _2; }
     }
 
     // Notice in this type signature, we can replace Tuple2<EmailType,String> with Email
@@ -164,9 +164,9 @@ public class UsageExampleTest {
         }
 
         // Give more descriptive names to the field getters
-        public String first() { return _1(); }
-        public String last() { return _2(); }
-        public ImList<Email> emailAddrs() { return _3(); }
+        public String first() { return _1; }
+        public String last() { return _2; }
+        public ImList<Email> emailAddrs() { return _3; }
     }
 
     // Part 3 of 3 (continued)

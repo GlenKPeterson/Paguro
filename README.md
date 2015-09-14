@@ -52,6 +52,10 @@ Test coverage at last check: 73%
 ![Test Coverage](testCoverage.png)
 
 #Change Log
+2015-09-14 0.10.9: Made tuple fields protected so that sub-classes can wrap them more efficiently in well-named accessor methods.
+Also updated docs and fixed one unit test to be within 'profile compact1'.
+*Note:* Running tests inside IntelliJ ignores this compiler option, so tests must be run from the command line to ensure compliance.
+
 2015-09-12 0.10.8: Renamed ImList.appendOne() to just ImList.append().
 Plus, lots of documentation changes.
 
@@ -168,6 +172,9 @@ Implemented filter() on Sequence.
  - Have an Ordered version of Transform as well as the (default) unreliable order.  Only the ordered version can be used for implementing things like equals() and hashCode()
  - Bring back the pointer-arithmetic version of drop()
  - Consider `max(Comparator<T> c, Iterable<? extends T> is)` and min()...
+ - Add additional tuples and Functions up through 25 arguments
+ - Study monadic thinking and ensure that Or is "monad-friendly".
+ Ensure you can chain together functions in a short-circuiting way, without exceptions or other side-effects.
  - Add a [Persistent RRB Tree](http://infoscience.epfl.ch/record/169879/files/RMTrees.pdf) and compare its performance to the PersistentVector.
  - Re-implement Persistent collections from Algorithms and Purely Functional Data Structures without relying on a wrapped transient collection and without locking checks, then compare efficiency.
 

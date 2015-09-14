@@ -57,6 +57,10 @@ import java.util.Map;
  was overwhelming, so I reverted to varargs.  Also, varargs relax some type safety rules (variance)
  for data definition in a relatively helpful and not very dangerous way.</p>
 
+ <p>If you do more Clojure/JSON than Java, you'll find that what's a map (dictionary) in those languages often becomes a tuple in UncleJim.
+ A true map data structure is homogeneous, meaning that every member has the same type (or same parent type).
+ Tuples are designed to contain unrelated data types, and enforce those types.</p>
+
  <p>As with any usage of import *, there could be issues if you import 2 different versions of this
  file in your classpath.  Java needs a data definition language so badly that I think it is worth
  the risk.  Also, I don't anticipate this file changing much, except to add more tup()
