@@ -187,7 +187,6 @@ just be glad I didn't use car and cdr.
 Implemented filter() on Sequence.
 
 #To Do
- - Get an org.organicdesign Sonatype reposotory and put UncleJim there.
  - Update JavaDoc, esp. Im vs. Unmod
  - Bring unit test coverage back above 80%, or 85% if sensible.  This basically means to add any and all practical tests for PersistentHashMap, then remove unused code.
  - ?Make visio drawig of interface diagram?
