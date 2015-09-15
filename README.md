@@ -286,6 +286,8 @@ In Java, variables declared outside a lambda and used within one must be effecti
 #Thank You
 The bulk of this project started as a simple question on StackExchange: [Why doesn't Java 8 include immutable collections?](http://programmers.stackexchange.com/questions/221762/why-doesnt-java-8-include-immutable-collections)  People's answers were a big help in figuring out what this project should and shouldn't do.
 
+John Tollison: For a brief review and suggestions.
+
 Nathan Williams: for many lengthy email conversations about this project, encouragement to separate state from the transformation, and occasional light code review.
 
 GreenJUG: for bearing with talks on early versions of this code two years in a row.
