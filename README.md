@@ -4,7 +4,8 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava&trade; **Imm**utability
 * An immutable Transformation Builder like Clojure's sequence abstraction, but single-pass and baked into every collection and collection wrapper.
 * A tiny, type-safe data definition mini-language of brief helper functions: `vec()`, `set()`, `map()`, and `tup()`, (like Clojure's vector `[]`, set `#{}`, and map `{}`).
 * Simplified Java 8 functional interfaces that wrap checked exceptions and provide memoization
-* Encourages expressions (which evaluate) over Statements (which return void).  This leverages Java's type inference capabilities so that you generally don't have to specify types unless you want to, yet the type-checker still "keeps you honest."
+* Encourages expressions (which evaluate) over Statements (which return void).  This leverages Java's type inference capabilities so that you generally don't have to specify types unless you want to.  Don't worry though, the type-checker still "keeps you honest."
+* Mobile friendly: compiled with -profile compact1.  Jar file is less than 200K.
 
 #Examples
 Create a vector (List) of integers and perform some operations on it.
@@ -19,7 +20,7 @@ vec(4, 5)                        //          4, 5
         .drop(2)                 //             5, 6
 ```
 
-The rest of the examples are implemented as unit tests to ensure that they remain 100% correct and current.
+Use the two links below to view the rest of the examples.  They are implemented as unit tests to ensure that they remain correct and current.
 
 * [Comparison with Traditional Java and Java 8 Streams](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java#L22) - UncleJim generally takes 1/2 to 1/3 as much code to accomplish the same thing as Traditional Java, or Java 8 Streams.
 
@@ -58,12 +59,10 @@ For complete API documentation, please build the javadoc:
 #Build from Source
 
 - Java 8 (tested with 64-bit Linux build 1.8.0_51).
-Probably can be meaningfully adapted to work well at least as far back as Java 5 with some work.
-I plan to keep new development work on the main branch, but am very willing to help maintain branches back-ported to Java 7, 6, 5,.... if other people can share the load.
-- Mobile friendly: compiled with -profile compact1.  Jar file is less than 200K.
 - Maven (tested version: 3.19.0-26 64-bit Linux build)
 - Maven will download jUnit for you
-- As of 2015-09-06, all major areas of functionality were covered by unit tests.
+- First `mvn clean install` on: https://github.com/GlenKPeterson/TestUtils
+- Then `mvn clean test` on UncleJim
 
 #Project Status
 **BETA** release.  The code quality is high, the documentation is improving, but there is still a chance of minor API changes before the final release. 
