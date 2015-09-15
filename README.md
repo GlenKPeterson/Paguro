@@ -25,6 +25,17 @@ The rest of the examples are implemented as unit tests to ensure that they remai
 
 * [Pure-Jim usage examples](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34) - Three different ways of improving your Java code with UncleJim.
 
+Maven Dependency
+================
+
+```xml
+    <dependency>
+        <groupId>org.organicdesign</groupId>
+        <artifactId>UncleJim</artifactId>
+        <version>0.10.10</version>
+    </dependency>
+```
+
 #API Highlights
 
 * Type-safe versions of Clojure's [immutable collections](src/main/java/org/organicdesign/fp/collections) (classes start with the word "Persistent")
@@ -64,6 +75,8 @@ Test coverage at last check: 73%
 ![Test Coverage](testCoverage.png)
 
 #Change Log
+2015-09-15 0.10.10: Changed groupId to org.organicdesign (removed the .fp).  First build deployed to Sonatype repository.
+
 2015-09-14 0.10.9: Made tuple fields protected so that sub-classes can wrap them more efficiently in well-named accessor methods.
 Also updated docs and fixed one unit test to be within 'profile compact1'.
 *Note:* Running tests inside IntelliJ ignores this compiler option, so tests must be run from the command line to ensure compliance.
@@ -309,6 +322,8 @@ These files are still derivative works under the EPL.
 The [EPL is not compatable with the GPL version 2 or 3](https://eclipse.org/legal/eplfaq.php#GPLCOMPATIBLE).
 You can [add an exception to the GPL to allow you to release EPL code under this modified GPL](http://www.gnu.org/licenses/gpl-faq.html#GPLIncompatibleLibs), but not the other way around.
 
+Thanks to Bodil Stokke for pointing out the EPL/GPL compatibility issue and work-around.
+
 Unless otherwise stated, the rest of this work is licensed under the Apache 2.0 license.
 New contributions should be made under the Apache 2.0 license whenever practical.
 I believe it is more popular, clearer, and has been better tested in courts of law.
@@ -358,5 +373,3 @@ Source (as of 2015-05-13): https://www.apache.org/legal/resolved#category-a
 > ...
 
 Source (as of 2015-05-13): https://eclipse.org/legal/eplfaq.php#3RDPARTY
-
-Thanks to Bodil Stokke for pointing out the EPL/GPL compatibility issue and work-around both on Twitter, and on the Lux language project.
