@@ -20,7 +20,7 @@ dependency:tree
 	-->
 	<groupId>org.organicdesign</groupId>
 	<artifactId>UncleJim</artifactId>
-	<version>0.10.10-SNAPSHOT</version>
+	<version>0.10.10</version>
 	<packaging>jar</packaging>
 
 	<name>UncleJim</name>
