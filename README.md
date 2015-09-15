@@ -20,7 +20,7 @@ vec(4, 5)                        //          4, 5
         .drop(2)                 //             5, 6
 ```
 
-Use the two links below to view the rest of the examples.  They are implemented as unit tests to ensure that they remain correct and current.
+Extensive examples are implemented as unit tests to ensure that they remain correct and current.
 
 * [Comparison with Traditional Java and Java 8 Streams](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java#L22) - UncleJim generally takes 1/2 to 1/3 as much code to accomplish the same thing as Traditional Java, or Java 8 Streams.
 
