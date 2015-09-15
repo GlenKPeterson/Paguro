@@ -17,6 +17,9 @@ pmd:cpd reports on cut and pasted code in your project.
 Show the dependency tree:
 http://maven.apache.org/plugins/maven-dependency-plugin/examples/resolving-conflicts-using-the-dependency-tree.html
 dependency:tree
+
+Release:
+http://central.sonatype.org/pages/apache-maven.html
 	-->
 	<groupId>org.organicdesign</groupId>
 	<artifactId>UncleJim</artifactId>
