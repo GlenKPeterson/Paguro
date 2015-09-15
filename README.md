@@ -29,11 +29,11 @@ Maven Dependency
 ================
 
 ```xml
-    <dependency>
+<dependency>
         <groupId>org.organicdesign</groupId>
         <artifactId>UncleJim</artifactId>
         <version>0.10.10</version>
-    </dependency>
+</dependency>
 ```
 
 #API Highlights
@@ -55,16 +55,13 @@ For complete API documentation, please build the javadoc:
 #Learn
 [JimTrainer](https://github.com/GlenKPeterson/JimTrainer) contains a few short problem-sets for learning UncleJim 
 
-#Dependencies
+#Build from Source
+
 - Java 8 (tested with 64-bit Linux build 1.8.0_51).
 Probably can be meaningfully adapted to work well at least as far back as Java 5 with some work.
 I plan to keep new development work on the main branch, but am very willing to help maintain branches back-ported to Java 7, 6, 5,.... if other people can share the load.
 - Mobile friendly: compiled with -profile compact1.  Jar file is less than 200K.
- 
-##Build
 - Maven (tested version: 3.19.0-26 64-bit Linux build)
-
-##Test
 - Maven will download jUnit for you
 - As of 2015-09-06, all major areas of functionality were covered by unit tests.
 
@@ -283,15 +280,7 @@ With method chaining, the evaluation happens in the same order as the methods ar
 The Xform class is the third one of its kind that I have written.  For a single thread, my timings show that its speed is comparable to a for loop.  In general, the overhead for using these transformations is minimal or non-existant.  In the cases where imutability does cause overhead (and there definitely are) it is generally well worth the clarity, safety, and productivity benefits it provides.
 If you find a better/faster implementation, please submit your improvements!
 
-###More Details
- - Like Guava, we want to be as compatible with the java.util... collections as possible, while preventing mutation-in-place.
- - org.organicdesign.fp.collection.**Un**... interfaces extend the java.util collection interfaces of the same name (minus the "Un" prefix) deprecate all the mutate-in-place methods to make your IDE show them in red, and implement them to throw UnsupportedOperationExceptions to fail fast if you try to use them anyway.  These interfaces are useful in its own right as a way to declare that a function does not modify what is passed, or that what it returns cannot be modified.  Modification errors are caught as early as possible due to deprecation warnings.
- - org.organicdesign.fp.collection.**Im**... interfaces are the immutable, lightweight-copy collection interfaces.  Only the "get" methods from the java.util... collection interfaces remain.  Additional "set" methods that return a new collectoin are added at this level.
- - org.organicdesign.fp.collection.**Persistent**... implementations have been taken directly from Clojure (hence the Eclipse licence for those components).  For starters, we will include the celebrated Vector and the sorted (tree) Set and Map implementations.  We will add the hash-based Set and Map later, but they will take a separate Equator to handle equals() and hashCode() much the way the tree-based collections take a Comparator.
-
 Within your own FP-centric world, you will use the Im interfaces and implementations and transform them with the Transformation abstraction.  Methods that interact with imperative Java code will take the java.util interfaces and return either the Im- interfaces (or Un- interfaces) as necessary.
-
-The classes in the <code>function</code> package allow you to use the Java 8 functional interfaces smoothly warpping checked exceptions.  They are all named Function*N*  where *N* is the number of arguments they take.  There are no versions for primitives, or that return **void**.
 
 In Java, variables declared outside a lambda and used within one must be effectively finial.  The Mutable.Ref class works around this limitation.
 
