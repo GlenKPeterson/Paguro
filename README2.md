@@ -1,10 +1,6 @@
 #Notice
-Please [Start with README.md](README.md) instead of this file.
-This file contains all the information that wasn't good enough to stay in the main readme.
-
-#Raison D'être
-This file is for idea hoarding.
-I emotionally needed a place to stuff all my waffle so I wouldn't feel like I was deleting it.
+Read [README.md](README.md) before this file as that is the official introduction to UncleJim.
+This file contains additional information for contributors, or maybe people who are considering opening an issue.
 
 #Additional experimental features:
 * An [Equator](src/main/java/org/organicdesign/fp/collections/Equator.java) and [ComparisonContext](src/main/java/org/organicdesign/fp/collections/Equator.java#L45) which work like `java.util.Comparator`, but for hash-based collections.
@@ -29,7 +25,7 @@ For complete API documentation, please build the javadoc:
 `mvn javadoc:javadoc`
 
 #Thank You
-Some of the people I'm listing as contributors may not actually be aware of this project.
+Some of the people I'm listing as contributors may not actually be aware of this project, but I found them inspiring in various ways.
 
 The bulk of this project started as a simple question on StackExchange: [Why doesn't Java 8 include immutable collections?](http://programmers.stackexchange.com/questions/221762/why-doesnt-java-8-include-immutable-collections)  People's answers were a big help in figuring out what this project should and shouldn't do.
 
@@ -49,9 +45,9 @@ Everyone whose ideas are collected in this project: I tried to put names in as c
 
 Bodil Stokke for pointing out the EPL/GPL compatibility issue and work-around.
 
-Joshua Bloch for writing Effective Java.
+Joshua Bloch for his book, Effective Java.
 
-Rich Hickey for writing Clojure
+Rich Hickey for Clojure
 
 #Build from Source
 
@@ -67,7 +63,7 @@ Rich Hickey for writing Clojure
  - ?Make visio drawig of interface diagram?
  - Have an Ordered version of Transform as well as the (default) unreliable order.  Only the ordered version can be used for implementing things like equals() and hashCode()
  - Bring back the pointer-arithmetic version of drop()
- - Consider `max(Comparator<T> c, Iterable<? extends T> is)` and min()...
+ - Consider `max(Comparator<T> c, Iterable<? extends T> is)` and min()...  Actually, these probably belong on Transformable.
  - Add additional tuples and Functions up through 25 arguments
  - Study monadic thinking and ensure that Or is "monad-friendly".
  Ensure you can chain together functions in a short-circuiting way, without exceptions or other side-effects.
