@@ -1,7 +1,7 @@
 UncleJim ("**Un**modifiable **Coll**ections for **J**ava&trade; **Imm**utability") brings the following to Java:
 
 * Type-safe versions of Clojure's immutable collections
-* An immutable Transformation Builder like Clojure's sequence abstraction, but single-pass.
+* An immutable Transformation Builder, kind of like Clojure's sequence abstraction.
 * A tiny, type-safe data definition mini-language of brief helper functions: `vec()`, `set()`, `map()`, and `tup()`, (like Clojure's vector `[]`, set `#{}`, and map `{}`).
 
 #Examples
