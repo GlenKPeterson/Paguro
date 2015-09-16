@@ -67,12 +67,6 @@ These were useful before the Clojure collections and Transformable were fully in
 - First `mvn clean install` on: https://github.com/GlenKPeterson/TestUtils
 - Then `mvn clean test` on UncleJim
 
-#Project Status
-**BETA** release.  The code quality is high, the documentation is improving, but there is still a chance of minor API changes before the final release. 
-Test coverage at last check: 73%
-
-![Test Coverage](testCoverage.png)
-
 #Change Log
 See [changeLog.txt](changeLog.txt)
 
