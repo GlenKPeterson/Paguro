@@ -143,7 +143,7 @@ public class UsageExampleTest {
         // Constructor delegates to Tuple2 constructor
         Email(EmailType t, String s) { super(t, s); }
 
-        // Static factory method (for creating new instances) overrides Tuple2.of()
+        // Optional static factory method for creating new instances.  Overrides Tuple2.of()
         public static Email of(EmailType t, String s) { return new Email(t, s); }
 
         // As long as we are making an object, we might as well give descriptive names to the
@@ -158,7 +158,7 @@ public class UsageExampleTest {
         // Constructor delegates to Tuple3 constructor
         Person(String f, String l, ImList<Email> es) { super(f, l, es); }
 
-        // Static factory method (for creating new instances) overrides Tuple3.of()
+        // Optional static factory method for creating new instances.  Overrides Tuple3.of()
         public static Person of(String f, String l, ImList<Email> es) {
             return new Person(f, l, es);
         }
