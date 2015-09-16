@@ -254,7 +254,7 @@ public class UsageExampleTest {
         assertEquals(vec(4, 5), v1);
 
         // Instead of updating in place, each change returns a new data structure which is an
-        // extremelly lightweight copy of the old because it shares as much as possible with the
+        // extremely lightweight copy of the old because it shares as much as possible with the
         // previous structure.
         v2 = v2.concat(vec(6, 7, 8, 9));
 
