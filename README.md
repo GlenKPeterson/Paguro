@@ -57,4 +57,4 @@ New contributions should be made under the Apache 2.0 license whenever practical
 I believe it is more popular, clearer, and has been better tested in courts of law.
 
 #Contributors
-You can find build requirements and additional information in: [README2.md](README2.md).
+You can find build requirements, API highlights, and additional information in: [README2.md](README2.md).
