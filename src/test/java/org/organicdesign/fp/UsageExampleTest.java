@@ -23,10 +23,8 @@ import org.organicdesign.fp.tuple.Tuple2;
 import org.organicdesign.fp.tuple.Tuple3;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.organicdesign.fp.StaticImports.tup;
 import static org.organicdesign.fp.StaticImports.vec;
-import static org.organicdesign.fp.UsageExampleTest.ColorVal.*;
 import static org.organicdesign.fp.UsageExampleTest.EmailType.HOME;
 import static org.organicdesign.fp.UsageExampleTest.EmailType.WORK;
 
