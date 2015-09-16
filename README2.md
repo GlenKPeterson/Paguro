@@ -1,6 +1,10 @@
+#Notice
+Please [Start with README.md](README.md) instead of this file.
+This file contains all the information that wasn't good enough to stay in the main readme.
+
 #Raison D'être
 This file is for idea hoarding.
-I emotionally needed a place to stuff all my waffle so it would feel like I wasn't really deleting it.
+I emotionally needed a place to stuff all my waffle so I wouldn't feel like I was deleting it.
 
 #Additional experimental features:
 * An [Equator](src/main/java/org/organicdesign/fp/collections/Equator.java) and [ComparisonContext](src/main/java/org/organicdesign/fp/collections/Equator.java#L45) which work like `java.util.Comparator`, but for hash-based collections.
@@ -147,3 +151,54 @@ If you find a better/faster implementation, please submit your improvements!
 Within your own FP-centric world, you will use the Im interfaces and implementations and transform them with the Transformation abstraction.  Methods that interact with imperative Java code will take the java.util interfaces and return either the Im- interfaces (or Un- interfaces) as necessary.
 
 In Java, variables declared outside a lambda and used within one must be effectively finial.  The Mutable.Ref class works around this limitation.
+
+#Licenses (continued)
+The [EPL is not compatable with the GPL version 2 or 3](https://eclipse.org/legal/eplfaq.php#GPLCOMPATIBLE).
+You can [add an exception to the GPL to allow you to release EPL code under this modified GPL](http://www.gnu.org/licenses/gpl-faq.html#GPLIncompatibleLibs), but not the other way around.
+
+[The Apache 2.0 license is also one-way compatible with the GPL version 3](http://www.apache.org/licenses/GPL-compatibility.html), so that everything *except* the Clojure collections can be combined and re-distributed with GPLv3 code.
+Apache is not compatible with GPLv2, though you might try the GPL modification mentioned in the previous paragraph.
+
+As of 2015-03-24, the following statements made me think the Apache and EPL licenses were compatible enough for my purposes and for general enterprise adoption:
+
+###From Apache
+> For the purposes of being a dependency to an Apache product, which licenses
+> are considered to be similar in terms to the Apache License 2.0?
+>
+> Works under the following licenses may be included within Apache products:
+>
+> ...
+>
+> Eclipse Distribution License 1.0
+>
+> ...
+>
+> Many of these licenses have specific attribution terms that need to be
+> adhered to, for example CC-A, often by adding them to the NOTICE file. Ensure
+> you are doing this when including these works. Note, this list is
+> colloquially known as the Category A list.
+
+Source (as of 2015-05-13): https://www.apache.org/legal/resolved#category-a
+
+###From Eclipse
+> What licenses are acceptable for third-party code redistributed by Eclipse
+> projects?
+>
+> Eclipse views license compatibility through the lens of enabling successful
+> commercial adoption of Eclipse technology in software products and services.
+> We wish to create a commercial ecosystem based on the redistribution of
+> Eclipse software technologies in commercially licensed software products.
+> Determining whether a license for third-party code is acceptable often
+> requires the input and advice of Eclipse’s legal advisors. If you have any
+> questions, please contact license@eclipse.org.
+>
+> The current list of licenses approved for use by third-party code
+> redistributed by Eclipse projects is:
+>
+> Apache Software License 1.1
+>
+> Apache Software License 2.0
+>
+> ...
+
+Source (as of 2015-05-13): https://eclipse.org/legal/eplfaq.php#3RDPARTY
