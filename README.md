@@ -1,11 +1,8 @@
 UncleJim ("**Un**modifiable **Coll**ections for **J**ava&trade; **Imm**utability") brings the following to Java:
 
 * Type-safe versions of Clojure's immutable collections
-* An immutable Transformation Builder like Clojure's sequence abstraction, but single-pass and baked into every collection and collection wrapper.
+* An immutable Transformation Builder like Clojure's sequence abstraction, but single-pass.
 * A tiny, type-safe data definition mini-language of brief helper functions: `vec()`, `set()`, `map()`, and `tup()`, (like Clojure's vector `[]`, set `#{}`, and map `{}`).
-* Simplified Java 8 functional interfaces that wrap checked exceptions and provide memoization
-* Encourages expressions (which evaluate) over Statements (which return void).  This leverages Java's type inference capabilities so that you generally don't have to specify types unless you want to.  Don't worry though, the type-checker still "keeps you honest."
-* Mobile friendly: compiled with -profile compact1.  Jar file is less than 200K.
 
 #Examples
 Create a vector (List) of integers and perform some operations on it.
@@ -20,7 +17,7 @@ vec(4, 5)                        //          4, 5
         .drop(2)                 //             5, 6
 ```
 
-Extensive examples are implemented as unit tests to ensure that they remain correct and current.
+More extensive examples are implemented as unit tests to ensure that they remain correct and current.
 
 * [Comparison with Traditional Java and Java 8 Streams](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java#L22) - UncleJim generally takes 1/2 to 1/3 as much code to accomplish the same thing as Traditional Java, or Java 8 Streams.
 
