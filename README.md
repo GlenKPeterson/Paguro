@@ -1,8 +1,12 @@
 UncleJim ("**Un**modifiable **Coll**ections for **J**ava&trade; **Imm**utability") brings the following to Java:
 
 * Type-safe versions of Clojure's immutable collections
-* An immutable Transformation Builder, kind of like Clojure's sequence abstraction.
+* An immutable Transformable.  This is a simplified alternative to Java 8 Streams, based on the ideas behind Paul Philips' Collections (Scala) Views (or Clojure Transducers).
+* Simplified functional interfaces wrap checked exceptions
 * A tiny, type-safe data definition mini-language of brief helper functions: `vec()`, `set()`, `map()`, and `tup()`, (like Clojure's vector `[]`, set `#{}`, and map `{}`).
+* Tuples can be extended to make your own immutable Java classes (with `private final` member variables and correct `equals()`, `hashCode()`, and `toString()` methods) about as easily as using case classes in Scala.
+
+Java actually has a powerful type inferencing engine built in. Void return types, and different rules for arrays and primatives make it hard to take advantage of.  UncleJim avoids these pitfalls (and checked exceptions as well), decreasing the amount of code you need to write by a factor of 2x or 3x.
 
 #Maven Dependency
 ```xml
