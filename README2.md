@@ -29,6 +29,8 @@ Some of the people I'm listing as contributors may not actually be aware of this
 
 The bulk of this project started as a simple question on StackExchange: [Why doesn't Java 8 include immutable collections?](http://programmers.stackexchange.com/questions/221762/why-doesnt-java-8-include-immutable-collections)  People's answers were a big help in figuring out what this project should and shouldn't do.
 
+Paul Philips [Scala Collections talk](https://www.youtube.com/watch?v=uiJycy6dFSQ&t=26m19s) was a huge inspiration to me.  I watched it over and over and tried to learn from his experience as much as possible.
+
 John Tollison: For a brief review and suggestions.
 
 Nathan Williams: for many lengthy email conversations about this project, encouragement to separate state from the transformation, and occasional light code review.
