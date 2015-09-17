@@ -6,7 +6,7 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava&trade; **Imm**utability
 * A tiny, type-safe data definition mini-language of brief helper functions: `vec()`, `set()`, `map()`, and `tup()`, (like Clojure's vector `[]`, set `#{}`, and map `{}`).
 * Extend tuples to make your own immutable Java classes (with `private final` member variables and correct `equals()`, `hashCode()`, and `toString()` implementations) almost as easily as using case classes in Scala.
 
-Java actually has a powerful type inferencing engine built in, but void return types, and different rules for arrays and primatives make it hard to take advantage of.  UncleJim avoids these pitfalls (and checked exceptions as well) decreasing the amount of code you need to write by a factor of 2x or 3x.
+Java actually has a powerful type inferencing engine built in, but void return types, and different rules for arrays and primatives make it hard to take advantage of.  UncleJim avoids these pitfalls (and checked exceptions in lambdas) decreasing the amount of code you need to write by a factor of 2x or 3x.
 
 #Maven Dependency
 ```xml
