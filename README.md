@@ -2,7 +2,7 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava&trade; **Imm**utability
 
 * Type-safe versions of Clojure's immutable collections
 * An immutable Transformable.  This is a simplified alternative to Java 8 Streams, based on the ideas behind Paul Philips' (Scala) Collection Views (or Clojure Transducers).
-* Simplified functional interfaces wrap checked exceptions
+* Simplified functional interfaces ignore (box) primitives and wrap checked exceptions
 * A tiny, type-safe data definition mini-language of brief helper functions: `vec()`, `set()`, `map()`, and `tup()`, (like Clojure's vector `[]`, set `#{}`, and map `{}`).
 * Tuples can be extended to make your own immutable Java classes (with `private final` member variables and correct `equals()`, `hashCode()`, and `toString()` methods) about as easily as using case classes in Scala.
 
