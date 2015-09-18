@@ -31,218 +31,17 @@ import static org.organicdesign.fp.UsageExampleTest.EmailType.WORK;
 // Usage examples are kept in this unit test to ensure they remain correct and current.
 public class UsageExampleTest {
 
-    // Define some field name constants with a standard Java Enum
-    enum EmailType { HOME, WORK };
-
-    // Part one of a 3-part example for defining data briefly and/or in a way that's easy to read.
-    @Test public void dataDefinitionExample1() {
-        // We start by creating a list of "people."  The tup(), vec(), set(), and map() methods are
-        // imported from StaticImports and provide a mini data-definition language.  vec() creates
-        // a vector (immutable list) of any length.  tup() creates a Tuple (some languages call this
-        // a "record").  You can think of Tuples as type-safe anonymous objects.
-        //
-        // This structured data is type-safe even though it looks a little like JSON.  Unlike JSON,
-        // the compiler verifies the types! You can ignore the huge type signatures for now -
-        // subsequent examples show different ways to simplify them.
-        ImList<Tuple3<String,String,ImList<Tuple2<EmailType,String>>>> people =
-                vec(tup("Jane", "Smith", vec(tup(HOME, "a@b.c"),
-                                             tup(WORK, "b@c.d"))),
-                    tup("Fred", "Tase", vec(tup(HOME, "c@d.e"),
-                                            tup(WORK, "d@e.f"))));
-
-        // Everything has build-in toString() methods.  Collections show the first 3-5 elements.
-        assertEquals("PersistentVector(" +
-                     "Tuple3(Jane,Smith,PersistentVector(Tuple2(HOME,a@b.c),Tuple2(WORK,b@c.d)))," +
-                     "Tuple3(Fred,Tase,PersistentVector(Tuple2(HOME,c@d.e),Tuple2(WORK,d@e.f))))",
-                     people.toString());
-
-        // Let's look at Jane's record:
-        Tuple3<String,String,ImList<Tuple2<EmailType,String>>> jane = people.get(0);
-
-        assertEquals("Tuple3(Jane,Smith,PersistentVector(Tuple2(HOME,a@b.c),Tuple2(WORK,b@c.d)))",
-                     jane.toString());
-
-        // Let's make a map that we can use later to look up people by their email address.
-        ImMap<String,Tuple3<String,String,ImList<Tuple2<EmailType,String>>>> peopleByEmail =
-
-                // We may need to produce multiple entries in the resulting map/dictionary for each
-                // person.  This is a one-to-many relationship and flatMap is the way to produce
-                // zero or more output items for each input item.
-                // Note: person._3() is the vector of email addresses
-                people.flatMap(person -> person._3()
-                                               // Map/dictionary entries are key value pairs.
-                                               // Tuple2 implements Map.Entry making it easy to
-                                               // create the pair right here.
-                                               // Note: mail._2() is the address
-                                               .map(mail -> tup(mail._2(), person)))
-                        // Now convert the result into an immutable map.  The function argument is
-                        // normally used to convert data into key/value pairs, but we already have
-                        // key/value pairs, so we just pass the identity function (returns its
-                        // argument unchanged)
-                      .toImMap(Function1.identity());
-
-        // Check look at the map we just created
-        assertEquals("PersistentHashMap(" +
-                     "Tuple2(d@e.f," +
-                     "Tuple3(Fred,Tase,PersistentVector(Tuple2(HOME,c@d.e),Tuple2(WORK,d@e.f))))," +
-                     "Tuple2(a@b.c," +
-                     "Tuple3(Jane,Smith,PersistentVector(Tuple2(HOME,a@b.c),Tuple2(WORK,b@c.d))))," +
-                     "Tuple2(b@c.d," +
-                     "Tuple3(Jane,Smith,PersistentVector(Tuple2(HOME,a@b.c),Tuple2(WORK,b@c.d))))," +
-                     "Tuple2(c@d.e," +
-                     "Tuple3(Fred,Tase,PersistentVector(Tuple2(HOME,c@d.e),Tuple2(WORK,d@e.f)))))",
-                     peopleByEmail.toString());
-
-        // Prove that we can now look up Jane by her address
-        assertEquals(jane, peopleByEmail.get("b@c.d"));
-
-        // Conclusion:
-        // For the price of a few long type signatures, we can write very succinct Java code
-        // without all the pre-work of defining types.  This is great for experiments, one-off
-        // reports, or other low-investment high-value projects.
-        //
-        // Next we'll look at two different ways to eliminate or simplify those type signatures.
-    }
-
-    // Part 2 of 3
-    @Test public void dataDefinitionExample2() {
-        // Fluent interfaces can take maximum advantage of Java's type inferencing.  Here is
-        // more-or-less the same code as the above, still type-checked by the compiler, but without
-        // specifying any types explicitly:
-
-        assertEquals("Jane",
-                     // This is the "people" data structure from above
-                     vec(tup("Jane", "Smith", vec(tup(HOME, "a@b.c"),
-                                                  tup(WORK, "b@c.d"))),
-                         tup("Fred", "Tase", vec(tup(HOME, "c@d.e"),
-                                                 tup(WORK, "d@e.f"))))
-                             // Create a map to look up people by their address
-                             .flatMap(person -> person._3()
-                                                      .map(mail -> tup(mail._2(), person)))
-                             .toImMap(Function1.identity())
-                             // Look up Jane by her address
-                             .get("b@c.d")
-                             // Get her first name
-                             ._1());
-
-        // Conclusion:
-        // This kind of loose and free coding is great for trying out ideas, but it can be a little
-        // hard for the person after you to read, especially with all the _1(), _2(), and _3()
-        // methods on the tuples.  Naming your data types well can make it more legible.
-    }
-
-    // Part 3 of 3
-    // The previous examples could have been cleaned up with ML's or Scala's type aliases, or
-    // Scala's case classes.  In Java we have to use objects, but doing so has the useful side
-    // effect of letting us name the accessor methods.  Extending Tuples also give us immutable
-    // fields, equals(), hashCode(), and toString() implementations, which would otherwise be taxing
-    // to write and debug by hand!
-    static class Email extends Tuple2<EmailType,String> {
-        // Constructor delegates to Tuple2 constructor
-        Email(EmailType t, String s) { super(t, s); }
-
-        // Optional static factory method for creating new instances.  Overrides Tuple2.of()
-        public static Email of(EmailType t, String s) { return new Email(t, s); }
-
-        // As long as we are making an object, we might as well give descriptive names to the
-        // field getters
-        public EmailType type() { return _1; }
-        public String address() { return _2; }
-    }
-
-    // Notice in this type signature, we can replace Tuple2<EmailType,String> with Email
-    static class Person extends Tuple3<String,String,ImList<Email>> {
-
-        // Constructor delegates to Tuple3 constructor
-        Person(String f, String l, ImList<Email> es) { super(f, l, es); }
-
-        // Optional static factory method for creating new instances.  Overrides Tuple3.of()
-        public static Person of(String f, String l, ImList<Email> es) {
-            return new Person(f, l, es);
-        }
-
-        // Give more descriptive names to the field getters
-        public String first() { return _1; }
-        public String last() { return _2; }
-        public ImList<Email> emailAddrs() { return _3; }
-    }
-
-    // Part 3 of 3 (continued)
-    // Use the classes we made above to simplify the types and improve the toString implementations.
-    @Test public void dataDefinitionExample3() {
-
-        // Compare this type signature with the first example.  Wow!
-        ImList<Person> people =
-                vec(Person.of("Jane", "Smith", vec(Email.of(HOME, "a@b.c"),
-                                                   Email.of(WORK, "b@c.d"))),
-                    Person.of("Fred", "Tase", vec(Email.of(HOME, "c@d.e"),
-                                                  Email.of(WORK, "d@e.f"))));
-
-        // Notice that the tuples are smart enough to take their new names, Person and Email instead
-        // of Tuple3 and Tuple2.  This aids readability when debugging.
-        assertEquals("PersistentVector(" +
-                     "Person(Jane,Smith," +
-                     "PersistentVector(Email(HOME,a@b.c),Email(WORK,b@c.d)))," +
-                     "Person(Fred,Tase," +
-                     "PersistentVector(Email(HOME,c@d.e),Email(WORK,d@e.f))))",
-                     people.toString());
-
-        // This type signature couldn't be simpler:
-        Person jane = people.get(0);
-
-        assertEquals("Person(Jane,Smith," +
-                     "PersistentVector(Email(HOME,a@b.c),Email(WORK,b@c.d)))",
-                     jane.toString());
-
-        // Let's use our new, descriptive field getter methods:
-        assertEquals("Jane", jane.first());
-        assertEquals("Smith", jane.last());
-
-        Email janesAddr = jane.emailAddrs().get(0);
-        assertEquals(HOME, janesAddr.type());
-        assertEquals("a@b.c", janesAddr.address());
-
-        // Another simplified type signature.  Also notice that we are using descriptive method
-        // names instead of _1(), _2(), and _3().
-        ImMap<String,Person> peopleByEmail =
-                people.flatMap(person -> person.emailAddrs()
-                                               .map(mail -> tup(mail.address(), person)))
-                      .toImMap(Function1.identity());
-
-        assertEquals("PersistentHashMap(" +
-                     "Tuple2(d@e.f," +
-                     "Person(Fred,Tase,PersistentVector(Email(HOME,c@d.e),Email(WORK,d@e.f))))," +
-                     "Tuple2(a@b.c," +
-                     "Person(Jane,Smith,PersistentVector(Email(HOME,a@b.c),Email(WORK,b@c.d))))," +
-                     "Tuple2(b@c.d," +
-                     "Person(Jane,Smith,PersistentVector(Email(HOME,a@b.c),Email(WORK,b@c.d))))," +
-                     "Tuple2(c@d.e," +
-                     "Person(Fred,Tase,PersistentVector(Email(HOME,c@d.e),Email(WORK,d@e.f)))))",
-                     peopleByEmail.toString());
-
-        // Now look jane up by address.
-        assertEquals(jane, peopleByEmail.get("b@c.d"));
-
-        // Conclusion:
-        // Extending Tuples lets us write Immutable, Object-Oriented, Functional code with less
-        // boilerplate than traditional Java coding.  In addition to brevity, this approach improves
-        // legibility, reliability, and consistency.
-        //
-        // You can begin with a quick and dirty proof of concept, then retrofit step by step to the
-        // point where your code is very legible and easy to maintain.  If you need to write out a
-        // complex type like the first example, that's a sign that it's time to define some classes
-        // with good names.
-    }
-
-    // Here is a fresh example to just focus on the Transormable/UnmodIterable interfaces.
+    // Transormable/UnmodIterable interfaces.
     @Test public void transformTest() {
         // These transformations do not change the underlying data.  They build a new collection by
         // chaining together the specified operations, then applying them in a single pass.
 
-        UnmodIterable<Integer> v1 = vec(4, 5);
+        ImList<Integer> v1 = vec(4, 5);
 
         // Make a new vector with more numbers at the beginning.  "precat" is short for
-        // "prepend version of concatenate" or "add-to-beginning".
+        // "prepend version of concatenate" or "add-to-beginning".  UnmodIterable is the primary
+        // bridge between UncleJim and traditional Java.  It extends Iterable, but adds
+        // transformations and deprecates the remove() method of the iterator it provides.
         UnmodIterable<Integer> v2 = v1.precat(vec(1, 2, 3));
 
         // v2 now represents a bigger list of numbers
@@ -292,5 +91,189 @@ public class UsageExampleTest {
         // traditional Java looping counterparts (and almost as fast).  They are also much
         // easier to understand than Java 8 streams and handle and immutable destination
         // collections well.
+    }
+
+    // Define some field name constants with a standard Java Enum for subsequent examples
+    enum EmailType { HOME, WORK };
+
+    // Part 1 of 3 for defining data briefly and/or in a way that's easy to read.
+    @Test public void dataDefinitionExample1() {
+        // Create a list of "people."  vec() creates a vector (immutable list) of any length.  tup()
+        // creates a Tuple (some languages call this a "record").  Tuples are type-safe anonymous
+        // objects.  Parts 2 and 3 of this example will show how to simplify the type signatures.
+        ImList<Tuple3<String,String,ImList<Tuple2<EmailType,String>>>> people =
+                vec(tup("Jane", "Smith", vec(tup(HOME, "a@b.c"),
+                                             tup(WORK, "b@c.d"))),
+                    tup("Fred", "Tase", vec(tup(HOME, "c@d.e"),
+                                            tup(WORK, "d@e.f"))));
+
+        // Everything has build-in toString() methods.  Collections show the first 3-5 elements.
+        assertEquals("PersistentVector(" +
+                     "Tuple3(Jane,Smith,PersistentVector(Tuple2(HOME,a@b.c),Tuple2(WORK,b@c.d)))," +
+                     "Tuple3(Fred,Tase,PersistentVector(Tuple2(HOME,c@d.e),Tuple2(WORK,d@e.f))))",
+                     people.toString());
+
+        // Inspect Jane's record:
+        Tuple3<String,String,ImList<Tuple2<EmailType,String>>> jane = people.get(0);
+
+        assertEquals("Tuple3(Jane,Smith,PersistentVector(Tuple2(HOME,a@b.c),Tuple2(WORK,b@c.d)))",
+                     jane.toString());
+
+        // Make a map to look up people by their email address.
+        ImMap<String,Tuple3<String,String,ImList<Tuple2<EmailType,String>>>> peopleByEmail =
+
+                // We may need to produce multiple entries in the resulting map/dictionary for each
+                // person.  This is a one-to-many relationship and flatMap is the way to produce
+                // zero or more output items for each input item.
+                // Note: person._3() is the vector of email addresses
+                people.flatMap(person -> person._3()
+                                               // Map/dictionary entries are key value pairs.
+                                               // Tuple2 implements Map.Entry making it easy to
+                                               // create the pair right here.
+                                               // Note: mail._2() is the address
+                                               .map(mail -> tup(mail._2(), person)))
+                        // Now convert the result into an immutable map.  The function argument is
+                        // normally used to convert data into key/value pairs, but we already have
+                        // key/value pairs, so we just pass the identity function (returns its
+                        // argument unchanged)
+                      .toImMap(Function1.identity());
+
+        // Look at the map we just created
+        assertEquals("PersistentHashMap(" +
+                     "Tuple2(d@e.f," +
+                     "Tuple3(Fred,Tase,PersistentVector(Tuple2(HOME,c@d.e),Tuple2(WORK,d@e.f))))," +
+                     "Tuple2(a@b.c," +
+                     "Tuple3(Jane,Smith,PersistentVector(Tuple2(HOME,a@b.c),Tuple2(WORK,b@c.d))))," +
+                     "Tuple2(b@c.d," +
+                     "Tuple3(Jane,Smith,PersistentVector(Tuple2(HOME,a@b.c),Tuple2(WORK,b@c.d))))," +
+                     "Tuple2(c@d.e," +
+                     "Tuple3(Fred,Tase,PersistentVector(Tuple2(HOME,c@d.e),Tuple2(WORK,d@e.f)))))",
+                     peopleByEmail.toString());
+
+        // Prove that we can now look up Jane by her address
+        assertEquals(jane, peopleByEmail.get("b@c.d"));
+
+        // Conclusion:
+        // For the price of a few long type signatures, we can write very succinct Java code
+        // without all the pre-work of defining types.  This is great for experiments, one-off
+        // reports, or other low-investment high-value projects.
+        //
+        // Next we'll look at two different ways to eliminate or simplify those type signatures.
+    }
+
+    // Part 2 of 3
+    @Test public void dataDefinitionExample2() {
+        // Fluent interfaces can take maximum advantage of Java's type inferencing.  Here is
+        // more-or-less the same code as the above, still type-checked by the compiler, but without
+        // specifying ANY types explicitly:
+        assertEquals("Jane",
+                     // This is the "people" data structure from above
+                     vec(tup("Jane", "Smith", vec(tup(HOME, "a@b.c"),
+                                                  tup(WORK, "b@c.d"))),
+                         tup("Fred", "Tase", vec(tup(HOME, "c@d.e"),
+                                                 tup(WORK, "d@e.f"))))
+                             // Create a map to look up people by their address
+                             .flatMap(person -> person._3()
+                                                      .map(mail -> tup(mail._2(), person)))
+                             .toImMap(Function1.identity())
+                             // Look up Jane by her address
+                             .get("b@c.d")
+                             // Get her first name
+                             ._1());
+
+        // Conclusion:
+        // This style of coding is great for trying out ideas, but it can be difficult for the
+        // person after you to read, especially with all the _1(), _2(), and _3() methods on tuples.
+        // Naming your data types well can make it more legible as we'll see next.
+    }
+
+    // Part 3 of 3
+    // The previous examples could have been cleaned up with ML's or Scala's type aliases, or
+    // Scala's case classes.  In Java we have to use objects, but doing so has the useful side
+    // effect of letting us name the accessor methods.  Extending Tuples also give us immutable
+    // fields, equals(), hashCode(), and toString() implementations for free, which we would
+    // otherwise have to write and debug by hand!
+    static class Email extends Tuple2<EmailType,String> {
+        Email(EmailType t, String s) { super(t, s); }
+
+        // As long as we are making an object, we might as well give descriptive names to the
+        // field getters
+        public EmailType type() { return _1; }
+        public String address() { return _2; }
+    }
+
+    // Notice in this type signature, we have replaced Tuple2<EmailType,String> with Email
+    static class Person extends Tuple3<String,String,ImList<Email>> {
+        Person(String f, String l, ImList<Email> es) { super(f, l, es); }
+
+        // Give more descriptive names to the field getters
+        public String first() { return _1; }
+        public String last() { return _2; }
+        public ImList<Email> emailAddrs() { return _3; }
+    }
+
+    // Part 3 of 3 (continued)
+    // Use the classes we made above to simplify the types and improve the toString implementations.
+    @Test public void dataDefinitionExample3() {
+
+        // Compare this type signature with the first example.  Wow!
+        ImList<Person> people =
+                vec(new Person("Jane", "Smith", vec(new Email(HOME, "a@b.c"),
+                                                    new Email(WORK, "b@c.d"))),
+                    new Person("Fred", "Tase", vec(new Email(HOME, "c@d.e"),
+                                                   new Email(WORK, "d@e.f"))));
+
+        // Notice that the tuples are smart enough to take their new names, Person and Email instead
+        // of Tuple3 and Tuple2.  This aids readability when debugging.
+        assertEquals("PersistentVector(" +
+                     "Person(Jane,Smith," +
+                     "PersistentVector(Email(HOME,a@b.c),Email(WORK,b@c.d)))," +
+                     "Person(Fred,Tase," +
+                     "PersistentVector(Email(HOME,c@d.e),Email(WORK,d@e.f))))",
+                     people.toString());
+
+        // This type signature couldn't be simpler:
+        Person jane = people.get(0);
+
+        assertEquals("Person(Jane,Smith," +
+                     "PersistentVector(Email(HOME,a@b.c),Email(WORK,b@c.d)))",
+                     jane.toString());
+
+        // Let's use our new, descriptive field getter methods:
+        assertEquals("Jane", jane.first());
+        assertEquals("Smith", jane.last());
+
+        Email janesAddr = jane.emailAddrs().get(0);
+        assertEquals(HOME, janesAddr.type());
+        assertEquals("a@b.c", janesAddr.address());
+
+        // Another simplified type signature.  Descriptive method names are much easier to read.
+        ImMap<String,Person> peopleByEmail =
+                people.flatMap(person -> person.emailAddrs()
+                                               .map(mail -> tup(mail.address(), person)))
+                      .toImMap(Function1.identity());
+
+        assertEquals("PersistentHashMap(" +
+                     "Tuple2(d@e.f," +
+                     "Person(Fred,Tase,PersistentVector(Email(HOME,c@d.e),Email(WORK,d@e.f))))," +
+                     "Tuple2(a@b.c," +
+                     "Person(Jane,Smith,PersistentVector(Email(HOME,a@b.c),Email(WORK,b@c.d))))," +
+                     "Tuple2(b@c.d," +
+                     "Person(Jane,Smith,PersistentVector(Email(HOME,a@b.c),Email(WORK,b@c.d))))," +
+                     "Tuple2(c@d.e," +
+                     "Person(Fred,Tase,PersistentVector(Email(HOME,c@d.e),Email(WORK,d@e.f)))))",
+                     peopleByEmail.toString());
+
+        // Now look jane up by address.
+        assertEquals(jane, peopleByEmail.get("b@c.d"));
+
+        // Conclusion:
+        // Extending Tuples lets us write Immutable, Object-Oriented, Functional code with less
+        // boilerplate than traditional Java coding.  In addition to brevity, this approach improves
+        // legibility, reliability, and consistency.
+        //
+        // You can begin with a quick and dirty proof of concept, then define types later to make
+        // your code easy to maintain.  If you need to write out a complex type like the first
+        // example, that's a sign that it's time to define some classes with good names.
     }
 }
