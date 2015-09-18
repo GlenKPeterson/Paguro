@@ -33,9 +33,10 @@ public class UsageExampleTest {
 
     // Transormable/UnmodIterable interfaces.
     @Test public void transformTest() {
-        // These transformations do not change the underlying data.  They build a new collection by
-        // chaining together the specified operations, then applying them in a single pass.
 
+        // These transformations do not change the underlying data.  They build a new collection by
+        // chaining together the specified operations, then applying them in a single pass.  vec()
+        // creates a vector (immutable list) of any length.
         ImList<Integer> v1 = vec(4, 5);
 
         // Make a new vector with more numbers at the beginning.  "precat" is short for
@@ -98,9 +99,9 @@ public class UsageExampleTest {
 
     // Part 1 of 3 for defining data briefly and/or in a way that's easy to read.
     @Test public void dataDefinitionExample1() {
-        // Create a list of "people."  vec() creates a vector (immutable list) of any length.  tup()
-        // creates a Tuple (some languages call this a "record").  Tuples are type-safe anonymous
-        // objects.  Parts 2 and 3 of this example will show how to simplify the type signatures.
+        // Create a list of "people."  tup() creates a Tuple (some languages call this a "record").
+        // Tuples are type-safe anonymous objects.  Parts 2 and 3 of this example will show how to
+        // simplify the type signatures.
         ImList<Tuple3<String,String,ImList<Tuple2<EmailType,String>>>> people =
                 vec(tup("Jane", "Smith", vec(tup(HOME, "a@b.c"),
                                              tup(WORK, "b@c.d"))),
