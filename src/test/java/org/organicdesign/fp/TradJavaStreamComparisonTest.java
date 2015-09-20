@@ -7,11 +7,13 @@ import org.organicdesign.fp.collections.RangeOfInt;
 import org.organicdesign.fp.tuple.Tuple3;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.*;
@@ -34,7 +36,7 @@ public class TradJavaStreamComparisonTest {
         // UncleJim's way (3 lines of code):
         static final ImMap<Character,ColorVal> charToColorMapU =
                 vec(values())
-                .toImMap(v -> tup(v.ch(), v));
+                        .toImMap(v -> tup(v.ch(), v));
 
         // Same thing in "traditional" Java (6 lines, plus closing braces):
         static final Map<Character,ColorVal> charToColorMapT;
@@ -46,18 +48,10 @@ public class TradJavaStreamComparisonTest {
             charToColorMapT = Collections.unmodifiableMap(tempMap);
         }
 
-        // Same thing with Java 8's streams (9 lines, plus closing braces).
+        // Same thing with Java 8's streams (3 lines thanks to @codepoetics on reddit)
         static final Map<Character,ColorVal> charToColorMap8 = Collections.unmodifiableMap(
-                Arrays.stream(values()).reduce(
-                        new HashMap<>(),
-                        (accum, v) -> {
-                            accum.put(v.ch(), v);
-                            return accum;
-                        },
-                        (accum1, accum2) -> {
-                            accum1.putAll(accum2);
-                            return accum1;
-                        }));
+                Stream.of(values())
+                      .collect(Collectors.toMap(ColorVal::ch, Function.identity())));
 
         // If you were using a mutable map, you'd want to protect it with a method.
         // It's still a good idea to do that on public classes to defend against having to change
@@ -127,8 +121,8 @@ public class TradJavaStreamComparisonTest {
         }
 
         // In Java8 we can use a lambda to make construction private.  8 loc, including a cast.
-        // I admit I had to look up the name of this functional class in the API docs because I
-        // thought it was Producer.
+        // I had to look up the name of this functional class in the API docs because I thought it
+        // was Producer.
         final Map<Character,ColorVal> extendedMap8 = ((Supplier<Map<Character,ColorVal>>) () -> {
             Map<Character,ColorVal> tempMap = new HashMap<>();
             tempMap.putAll(charToColorMap8);
@@ -170,16 +164,14 @@ public class TradJavaStreamComparisonTest {
     }
 
     // ====================================== Second Example =====================================
-    // TODO: This is maybe not the best example - it needs work!
-    // It would be better to show a lambda with a checked exception.
 
-    // Instead of importing java.awt.Color, I'm adding a similar class here because java.awt
-    // is outside of profile compact1
+    // java.awt.Color is outside of profile compact1, so I'm defining a simpler, but similar class
     static class Color extends Tuple3<Integer,Integer,Integer> {
         Color(int r, int g, int b) { super(r, g, b); }
-//        public int red() { return _1; }
-//        public int green() { return _2; }
-//        public int blue() { return _3; }
+
+        // Yes, throwing an Exception is contrived here.  Exceptions happen in real Java code, but
+        // usually for more complex reasons.
+        public int green() throws Exception { return _2; }
     }
 
     // UncleJim's way: 3 loc, + 3 loc = 6 loc
@@ -197,20 +189,22 @@ public class TradJavaStreamComparisonTest {
                                       "Color(0,1,255)," +
                                       "Color(0,2,255),"));
 
-        ImMap<Color,Integer> counts = imgData
+        ImMap<Integer,Integer> greenCounts = imgData
                 .foldLeft(map(),
-                          (accum, color) -> accum.assoc(color, accum.getOrElse(color, 0) + 1));
+                          (accum, color) -> accum.assoc(color.green(),
+                                                        accum.getOrElse(color.green(), 0) + 1));
 
-        assertEquals(32896, counts.size());
-        assertEquals(Integer.valueOf(2), counts.get(new Color(0, 0, 255)));
-        assertEquals(Integer.valueOf(2), counts.get(new Color(16, 128, 255)));
-        assertEquals(Integer.valueOf(2), counts.get(new Color(32, 128, 255)));
-        assertEquals(Integer.valueOf(2), counts.get(new Color(255, 254, 255)));
+        assertEquals(256, greenCounts.size());
+        assertEquals(Integer.valueOf(3), greenCounts.get(0));
+        assertEquals(Integer.valueOf(7), greenCounts.get(1));
+        assertEquals(Integer.valueOf(11), greenCounts.get(2));
+        assertEquals(Integer.valueOf(15), greenCounts.get(3));
     }
 
     // Same thing in "Traditional" Java: 4 loc + 2 brackets, 8 loc + 4 brackets =
     // 12 loc + 6 brackets
-    @Test public void colorSquareT() {
+    // Note that colorSquareT() throws an Exception (because Color.green() throws it).
+    @Test public void colorSquareT() throws Exception {
         java.util.List<Color> imgData = new ArrayList<>();
         for (int i = 0; i < 256; i++) {
             for (int j = 0; j < 256; j++) {
@@ -226,20 +220,20 @@ public class TradJavaStreamComparisonTest {
                                       "Color(0,1,255), " +
                                       "Color(0,2,255), "));
 
-        Map<Color,Integer> counts = new HashMap<>();
-        for (Color c : imgData) {
-            counts.put(c, counts.getOrDefault(c, 0) + 1);
+        Map<Integer,Integer> greenCounts = new HashMap<>();
+        for (Color color : imgData) {
+            greenCounts.put(color.green(), greenCounts.getOrDefault(color.green(), 0) + 1);
         }
 
-        assertEquals(32896, counts.size());
-        assertEquals(Integer.valueOf(2), counts.get(new Color(0, 0, 255)));
-        assertEquals(Integer.valueOf(2), counts.get(new Color(16, 128, 255)));
-        assertEquals(Integer.valueOf(2), counts.get(new Color(32, 128, 255)));
-        assertEquals(Integer.valueOf(2), counts.get(new Color(255, 254, 255)));
+        assertEquals(256, greenCounts.size());
+        assertEquals(Integer.valueOf(3), greenCounts.get(0));
+        assertEquals(Integer.valueOf(7), greenCounts.get(1));
+        assertEquals(Integer.valueOf(11), greenCounts.get(2));
+        assertEquals(Integer.valueOf(15), greenCounts.get(3));
     }
 
     // Same thing with Java 8's Streams - I just used traditional Java to populate the list.
-    // (4 loc + 2 brackets) + (10 loc + 3 bracket-lines) = 14 loc + 5 brackets
+    // (4 loc + 2 brackets) + (8 loc + 1 bracket) = 12 loc + 3 brackets
     @Test public void colorSquare8() {
         java.util.List<Color> imgData = new ArrayList<>();
         for (int i = 0; i < 256; i++) {
@@ -255,25 +249,37 @@ public class TradJavaStreamComparisonTest {
                                       "Color(0,1,255), " +
                                       "Color(0,2,255), "));
 
-        Map<Color,Integer> counts = imgData.stream()
-                .reduce(new HashMap<>(),
-                        (HashMap<Color,Integer> accum, Color c) -> {
-                            accum.put(c, accum.getOrDefault(c, 0) + 1);
-                            return accum;
-                        },
-                        (HashMap<Color,Integer> accum1, HashMap<Color,Integer> accum2) -> {
-                            for (Map.Entry<Color,Integer> e : accum2.entrySet()) {
-                                Color key = e.getKey();
-                                accum1.put(key, accum1.getOrDefault(key, 0) + e.getValue());
-                            }
-                            return accum1;
-                        });
+        // If this didn't throw an exception, we could use (thanks to @codepoetics on reddit)
+//        Map<Integer,Long> greenCounts = Collections.unmodifiableMap(
+//                imgData.stream()
+//                       .collect(Collectors.groupingBy(color -> color.green(),
+//                                                      Collectors.counting())));
 
-        assertEquals(32896, counts.size());
-        assertEquals(Integer.valueOf(2), counts.get(new Color(0, 0, 255)));
-        assertEquals(Integer.valueOf(2), counts.get(new Color(16, 128, 255)));
-        assertEquals(Integer.valueOf(2), counts.get(new Color(32, 128, 255)));
-        assertEquals(Integer.valueOf(2), counts.get(new Color(255, 254, 255)));
+        // But green does throw an exception.  There are various ways of handling this, but I think
+        // this is probably typical, and basically identical to what UncleJim does for you.
+        Map<Integer,Long> greenCounts = Collections.unmodifiableMap(
+                imgData.stream()
+                       .collect(Collectors.groupingBy(color -> {
+                           try {
+                               return color.green();
+                           } catch (Exception e) {
+                               throw new RuntimeException(e);
+                           }
+                       }, Collectors.counting())));
+
+        // Conclusion:
+        // Wrapping exceptions in lambdas is not the end of the world, but it's unnecessarily
+        // distracting.  Also, why learn a whole Collectors library when you could fold into
+        // a map and get exception wrapping for free?  Finally, what's returned here is just
+        // another Collections.unmodifiableMap - you have to make a deep copy in order to change it.
+        // If you really want to write code this way, at least use UncleJim's
+        // FunctionUtils.unmodMap() instead so that your IDE and compiler can warn you if you try to
+        // call a deprecated method.
+
+        assertEquals(256, greenCounts.size());
+        assertEquals(Long.valueOf(3), greenCounts.get(0));
+        assertEquals(Long.valueOf(7), greenCounts.get(1));
+        assertEquals(Long.valueOf(11), greenCounts.get(2));
+        assertEquals(Long.valueOf(15), greenCounts.get(3));
     }
-
 }
