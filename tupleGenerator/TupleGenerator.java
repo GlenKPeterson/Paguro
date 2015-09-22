@@ -76,7 +76,7 @@ public class TupleGenerator {
     }
 
     public static void main(String... args) throws IOException {
-        for (int i = 3; i < 27; i++) {
+        for (int i = 3; i <= 12; i++) {
             FileWriter fr = new FileWriter("../src/main/java/org/organicdesign/fp/tuple/Tuple" + i + ".java");
             fr.write("// Copyright 2015 PlanBase Inc. & Glen Peterson\n" +
                      "//\n" +
@@ -126,6 +126,9 @@ public class TupleGenerator {
             fr.write(factoryParams(i));
             fr.write(") {\n       ");
             for (int l = 1; l <= i; l++) {
+                if ((l % 10) == 0) {
+                    fr.write("\n       ");
+                }
                 fr.write(" _");
                 fr.write(String.valueOf(l));
                 fr.write(" = ");
@@ -140,7 +143,11 @@ public class TupleGenerator {
             fr.write(types(i));
             fr.write("> Tuple" + i + "<");
             fr.write(types(i));
-            fr.write("> of(");
+            fr.write(">");
+            if (i > 7) {
+                fr.write("\n   ");
+            }
+            fr.write(" of(");
             fr.write(factoryParams(i));
             fr.write(") {\n" +
                      "        return new Tuple" + i + "<>(");
@@ -154,11 +161,11 @@ public class TupleGenerator {
                 fr.write(intToChar(l).toLowerCase());
             }
             fr.write(");\n" +
-                     "    }\n");
+                     "    }\n" +
+                     "\n");
 
             for (int l = 1; l <= i; l++) {
-                fr.write("\n" +
-                         "    /** Returns the " + ordinal(l) + " field of the tuple */\n" +
+                fr.write("    /** Returns the " + ordinal(l) + " field */\n" +
                          "    public ");
                 fr.write(intToChar(l));
                 fr.write(" _");
@@ -178,12 +185,16 @@ public class TupleGenerator {
                 if (isFirst) {
                     isFirst = false;
                 } else {
-                    fr.write(" + \",\" + _");
+                    if ((l % 8) == 0) {
+                        fr.write(" + \",\" +\n" +
+                                 "               _");
+                    } else {
+                        fr.write(" + \",\" + _");
+                    }
                 }
                 fr.write(String.valueOf(l));
             }
-            fr.write(" +\n" +
-                     "               \")\";\n" +
+            fr.write(" + \")\";\n" +
                      "    }\n" +
                      "\n" +
                      "    @Override\n" +
@@ -210,14 +221,15 @@ public class TupleGenerator {
                      "\n" +
                      "    @Override\n" +
                      "    public int hashCode() {\n" +
-                     "        // Has to match Tuple2 which implements java.util.Map.Entry as part of the map contract.\n" +
-                     "        return  ( (_1 == null ? 0 : _1.hashCode()) ^\n" +
-                     "                  (_2 == null ? 0 : _2.hashCode()) )");
+                     "        // First 2 fields match Tuple2 which implements java.util.Map.Entry as part of the map\n" +
+                     "        // contract.\n" +
+                     "        int ret = 0;\n" +
+                     "        if (_1 != null) { ret = _1.hashCode(); }\n" +
+                     "        if (_2 != null) { ret = ret ^ _2.hashCode(); }\n");
             for (int l = 3; l <= i; l++) {
-                fr.write(" +\n" +
-                         "                (_" + l + " == null ? 0 : _" + l + ".hashCode())");
+                fr.write("        if (_" + l + " != null) { ret = ret + _" + l + ".hashCode(); }\n");
             }
-            fr.write(";\n" +
+            fr.write("        return ret;\n" +
                      "    }\n" +
                      "}");
             fr.flush();

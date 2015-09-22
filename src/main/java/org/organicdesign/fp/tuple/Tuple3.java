@@ -44,20 +44,17 @@ public class Tuple3<A,B,C> {
         return new Tuple3<>(a, b, c);
     }
 
-    /** Returns the 1st field of the tuple */
+    /** Returns the 1st field */
     public A _1() { return _1; }
-
-    /** Returns the 2nd field of the tuple */
+    /** Returns the 2nd field */
     public B _2() { return _2; }
-
-    /** Returns the 3rd field of the tuple */
+    /** Returns the 3rd field */
     public C _3() { return _3; }
 
     @Override
     public String toString() {
         return getClass().getSimpleName() + "(" +
-               _1 + "," + _2 + "," + _3 +
-               ")";
+               _1 + "," + _2 + "," + _3 + ")";
     }
 
     @Override
@@ -75,9 +72,12 @@ public class Tuple3<A,B,C> {
 
     @Override
     public int hashCode() {
-        // Has to match Tuple2 which implements java.util.Map.Entry as part of the map contract.
-        return  ( (_1 == null ? 0 : _1.hashCode()) ^
-                  (_2 == null ? 0 : _2.hashCode()) ) +
-                (_3 == null ? 0 : _3.hashCode());
+        // First 2 fields match Tuple2 which implements java.util.Map.Entry as part of the map
+        // contract.
+        int ret = 0;
+        if (_1 != null) { ret = _1.hashCode(); }
+        if (_2 != null) { ret = ret ^ _2.hashCode(); }
+        if (_3 != null) { ret = ret + _3.hashCode(); }
+        return ret;
     }
 }
