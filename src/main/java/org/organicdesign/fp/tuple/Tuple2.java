@@ -1,4 +1,4 @@
-// Copyright 2013 PlanBase Inc. & Glen Peterson
+// Copyright 2015 PlanBase Inc. & Glen Peterson
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,14 +21,21 @@ import java.util.Objects;
 
 /**
  Holds 2 items of potentially different types, and implements Map.Entry (and UnmodMap.UnEntry
- (there is no ImMap.ImEntry)).
+ (there is no ImMap.ImEntry)).  Designed to let you easily create immutable subclasses (to give your
+ data structures meaningful names) with correct equals(), hashCode(), and toString() methods.
  */
 public class Tuple2<A,B> implements Entry<A,B>, UnmodMap.UnEntry<A,B> {
-    // Fields are protected for easy inheritance
+    // Fields are protected so that sub-classes can make accessor methods with meaningful names.
     protected final A _1;
     protected final B _2;
 
-    /** Constructor is protected for easy inheritance. */
+    /**
+     Constructor is protected (not public) for easy inheritance.  Josh Bloch's "Item 1" says public
+     static factory methods are better than constructors because they have names, they can return
+     an existing object instead of a new one, and they can return a sub-type.  Therefore, you
+     have more flexibility with a static factory as part of your public API then with a public
+     constructor.
+     */
     protected Tuple2(A a, B b) { _1 = a; _2 = b; }
 
     /** Public static factory method */

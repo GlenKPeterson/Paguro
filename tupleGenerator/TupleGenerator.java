@@ -97,12 +97,14 @@ public class TupleGenerator {
                      "import java.util.Objects;\n" +
                      "\n" +
                      "/**\n" +
-                     " Holds " + i + " items of potentially different types.\n" +
+                     " Holds " + i + " items of potentially different types.  Designed to let you easily create immutable\n" +
+                     " subclasses (to give your data structures meaningful names) with correct equals(), hashCode(), and\n" +
+                     " toString() methods.\n" +
                      " */\n" +
                      "public class Tuple" + i + "<");
             fr.write(types(i));
             fr.write("> {\n" +
-                     "    // Fields are protected for easy inheritance\n");
+                     "    // Fields are protected so that sub-classes can make accessor methods with meaningful names.\n");
             for (int l = 1; l <= i; l++) {
                 fr.write("    protected final ");
                 fr.write(intToChar(l));
@@ -112,7 +114,13 @@ public class TupleGenerator {
             }
 
             fr.write("\n" +
-                     "    /** Constructor is protected for easy inheritance. */\n" +
+                     "    /**\n" +
+                     "     Constructor is protected (not public) for easy inheritance.  Josh Bloch's \"Item 1\" says public\n" +
+                     "     static factory methods are better than constructors because they have names, they can return\n" +
+                     "     an existing object instead of a new one, and they can return a sub-type.  Therefore, you\n" +
+                     "     have more flexibility with a static factory as part of your public API then with a public\n" +
+                     "     constructor.\n" +
+                     "     */\n" +
                      "    protected Tuple" + i + "(");
             fr.write(factoryParams(i));
             fr.write(") {\n       ");

@@ -17,15 +17,23 @@ package org.organicdesign.fp.tuple;
 import java.util.Objects;
 
 /**
- Holds 3 items of potentially different types.
+ Holds 3 items of potentially different types.  Designed to let you easily create immutable
+ subclasses (to give your data structures meaningful names) with correct equals(), hashCode(), and
+ toString() methods.
  */
 public class Tuple3<A,B,C> {
-    // Fields are protected for easy inheritance
+    // Fields are protected so that sub-classes can make accessor methods with meaningful names.
     protected final A _1;
     protected final B _2;
     protected final C _3;
 
-    /** Constructor is protected for easy inheritance. */
+    /**
+     Constructor is protected (not public) for easy inheritance.  Josh Bloch's "Item 1" says public
+     static factory methods are better than constructors because they have names, they can return
+     an existing object instead of a new one, and they can return a sub-type.  Therefore, you
+     have more flexibility with a static factory as part of your public API then with a public
+     constructor.
+     */
     protected Tuple3(A a, B b, C c) {
         _1 = a; _2 = b; _3 = c;
     }
