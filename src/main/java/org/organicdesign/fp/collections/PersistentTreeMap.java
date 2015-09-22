@@ -24,6 +24,9 @@ import java.util.Stack;
 
  See Okasaki, Kahrs, Larsen et al
 
+ This file is a derivative work based on a Clojure collection licensed under the Eclipse Public
+ License 1.0 Copyright Rich Hickey
+
  @author Rich Hickey (Primary author)
  @author Glen Peterson (Java-centric editor)
  */

@@ -20,11 +20,15 @@ import java.util.concurrent.atomic.AtomicReference;
 // TODO: Theoretically even better? https://github.com/clojure/core.rrb-vector/blob/master/src/main/clojure/clojure/core/rrb_vector.clj
 
 /**
- * This started out as Rich Hickey's PersistentVector class from Clojure in late 2014.  Glen added generic types, tried
- * to make it a little more pure-Java friendly, and removed dependencies on other Clojure stuff.
- *
- * @author Rich Hickey (Primary author)
- * @author Glen Peterson (Java-centric editor)
+ This started out as Rich Hickey's PersistentVector class from Clojure in late 2014.  Glen added
+ generic types, tried to make it a little more pure-Java friendly, and removed dependencies on other
+ Clojure stuff.
+
+ This file is a derivative work based on a Clojure collection licensed under the Eclipse Public
+ License 1.0 Copyright Rich Hickey
+
+ @author Rich Hickey (Primary author)
+ @author Glen Peterson (Java-centric editor)
  */
 public class PersistentVector<E> implements ImList<E> {
 

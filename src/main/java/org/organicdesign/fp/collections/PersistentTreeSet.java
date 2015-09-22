@@ -16,6 +16,9 @@ import java.util.SortedSet;
 
 /**
  A wrapper that turns a PersistentTreeMap into a set.
+
+ This file is a derivative work based on a Clojure collection licensed under the Eclipse Public
+ License 1.0 Copyright Rich Hickey
  */
 public class PersistentTreeSet<E> implements ImSortedSet<E> {
 

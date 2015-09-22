@@ -35,6 +35,9 @@ import java.util.concurrent.atomic.AtomicReference;
  Node polymorphism vs. conditionals,
  No sub-tree pools or root-resizing.
  Any errors are my own (said Rich, but now says Glen 2015-06-06).
+
+ This file is a derivative work based on a Clojure collection licensed under the Eclipse Public
+ License 1.0 Copyright Rich Hickey
  */
 public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 
