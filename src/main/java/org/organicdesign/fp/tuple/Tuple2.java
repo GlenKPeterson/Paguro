@@ -20,32 +20,33 @@ import java.util.Map.Entry;
 import java.util.Objects;
 
 /**
-Holds 2 items of potentially different types, and implements Map.Entry (and UnmodMap.UnEntry (there is no ImMap.ImEntry)).
+ Holds 2 items of potentially different types, and implements Map.Entry (and UnmodMap.UnEntry
+ (there is no ImMap.ImEntry)).
  */
-public class Tuple2<T,U> implements Entry<T,U>, UnmodMap.UnEntry<T,U> {
+public class Tuple2<A,B> implements Entry<A,B>, UnmodMap.UnEntry<A,B> {
     // Fields are protected for easy inheritance
-    protected final T _1;
-    protected final U _2;
+    protected final A _1;
+    protected final B _2;
 
     /** Constructor is protected for easy inheritance. */
-    protected Tuple2(T t, U u) { _1 = t; _2 = u; }
+    protected Tuple2(A a, B b) { _1 = a; _2 = b; }
 
     /** Public static factory method */
-    public static <T,U> Tuple2<T,U> of(T first, U second) {
-        return new Tuple2<>(first, second);
+    public static <A,B> Tuple2<A,B> of(A a, B b) {
+        return new Tuple2<>(a, b);
     }
 
     /**
-     Returns the first field of the tuple (the Key if this is a Key/Value pair).  This field naming scheme is compatible
-     with other (larger) tuples.
+     Returns the first field of the tuple (the Key if this is a Key/Value pair).  This field naming
+     scheme is compatible with other (larger) tuples.
      */
-    public T _1() { return _1; }
+    public A _1() { return _1; }
 
     /**
-     Returns the second field of the tuple (the Value if this is a Key/Value pair)  This field naming scheme is
-     compatible with other (larger) tuples.
+     Returns the second field of the tuple (the Value if this is a Key/Value pair).  This field
+     naming scheme is compatible with other (larger) tuples.
      */
-    public U _2() { return _2; }
+    public B _2() { return _2; }
 
     @Override
     public String toString() { return getClass().getSimpleName() + "(" + _1 + "," + _2 + ")"; }
@@ -68,11 +69,13 @@ public class Tuple2<T,U> implements Entry<T,U>, UnmodMap.UnEntry<T,U> {
     }
 
     // Inherited from Map.Entry
-    /** Returns the first field of the tuple.  This field naming scheme is to implement Map.Entry. */
-    @Override public T getKey() { return _1; }
-    /** Returns the second field of the tuple.  This field naming scheme is to implement Map.Entry. */
-    @Override public U getValue() { return _2; }
+    /** Returns the first field of the tuple.  To implement Map.Entry. */
+    @Override public A getKey() { return _1; }
+    /** Returns the second field of the tuple.  To implement Map.Entry. */
+    @Override public B getValue() { return _2; }
     /** This method is required to implement Map.Entry, but calling it only issues an exception */
     @SuppressWarnings("deprecation")
-    @Override @Deprecated public U setValue(U value) { throw new UnsupportedOperationException("Tuple2 is immutable"); }
+    @Override @Deprecated public B setValue(B value) {
+        throw new UnsupportedOperationException("Tuple2 is immutable");
+    }
 }

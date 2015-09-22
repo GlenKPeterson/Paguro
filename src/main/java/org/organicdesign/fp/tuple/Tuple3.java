@@ -1,4 +1,4 @@
-// Copyright 2013 PlanBase Inc. & Glen Peterson
+// Copyright 2015 PlanBase Inc. & Glen Peterson
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,31 +19,37 @@ import java.util.Objects;
 /**
  Holds 3 items of potentially different types.
  */
-public class Tuple3<T,U,V> {
+public class Tuple3<A,B,C> {
     // Fields are protected for easy inheritance
-    protected final T _1;
-    protected final U _2;
-    protected final V _3;
+    protected final A _1;
+    protected final B _2;
+    protected final C _3;
 
     /** Constructor is protected for easy inheritance. */
-    protected Tuple3(T t, U u, V v) { _1 = t; _2 = u; _3 = v; }
-
-    /** Public static factory method */
-    public static <T,U,V> Tuple3<T,U,V> of(T first, U second, V third) {
-        return new Tuple3<>(first, second, third);
+    protected Tuple3(A a, B b, C c) {
+        _1 = a; _2 = b; _3 = c;
     }
 
-    /** Returns the first field of the tuple */
-    public T _1() { return _1; }
+    /** Public static factory method */
+    public static <A,B,C> Tuple3<A,B,C> of(A a, B b, C c) {
+        return new Tuple3<>(a, b, c);
+    }
 
-    /** Returns the second field of the tuple */
-    public U _2() { return _2; }
+    /** Returns the 1st field of the tuple */
+    public A _1() { return _1; }
 
-    /** Returns the third field of the tuple */
-    public V _3() { return _3; }
+    /** Returns the 2nd field of the tuple */
+    public B _2() { return _2; }
+
+    /** Returns the 3rd field of the tuple */
+    public C _3() { return _3; }
 
     @Override
-    public String toString() { return getClass().getSimpleName() + "(" + _1 + "," + _2 + "," + _3 + ")"; }
+    public String toString() {
+        return getClass().getSimpleName() + "(" +
+               _1 + "," + _2 + "," + _3 +
+               ")";
+    }
 
     @Override
     public boolean equals(Object other) {
@@ -60,7 +66,7 @@ public class Tuple3<T,U,V> {
 
     @Override
     public int hashCode() {
-        // This matches Tuple2 which implements Entry which is specified in java.util.Map as part of the map contract.
+        // Has to match Tuple2 which implements java.util.Map.Entry as part of the map contract.
         return  ( (_1 == null ? 0 : _1.hashCode()) ^
                   (_2 == null ? 0 : _2.hashCode()) ) +
                 (_3 == null ? 0 : _3.hashCode());
