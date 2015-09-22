@@ -61,12 +61,14 @@ Rich Hickey for Clojure
 
 #To Do
  - Update JavaDoc, esp. Im vs. Unmod
+ - Remove SideEffect.java
+ - Improve tests for Tuple so that I can generate good tests as I generate more Tuples.
+ - Make a bunch more Tuple classes, and maybe bunch more Function classes.
  - Bring unit test coverage back above 80%, or 85% if sensible.  This basically means to add any and all practical tests for PersistentHashMap, then remove unused code.
  - ?Make visio drawig of interface diagram?
  - Have an Ordered version of Transform as well as the (default) unreliable order.  Only the ordered version can be used for implementing things like equals() and hashCode()
  - Bring back the pointer-arithmetic version of drop()
  - Consider `max(Comparator<T> c, Iterable<? extends T> is)` and min()...  Actually, these probably belong on Transformable.
- - Add additional tuples and Functions up through 25 arguments
  - Study monadic thinking and ensure that Or is "monad-friendly".
  Ensure you can chain together functions in a short-circuiting way, without exceptions or other side-effects.
  - Add a [Persistent RRB Tree](http://infoscience.epfl.ch/record/169879/files/RMTrees.pdf) and compare its performance to the PersistentVector.
