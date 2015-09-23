@@ -101,6 +101,8 @@ All have an applyEx() that you override and an apply() method that callers can u
 If you don't want to return a result, declare the return type as ? and return null.
 For example: `Function1<Integer,?>` takes an Integer and the return value is ignored.
 
+* UncleJim also has extensible Tuples and a tiny data-definition language (like a type-safe JSON).
+
 #Change Log
 See [changeLog.txt](changeLog.txt)
 
