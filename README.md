@@ -2,18 +2,17 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") m
 
 #Motivation
 
-* Immutability promotes correct code as much as type safety does.  Immutability should be the default, not some hard-to achieve option.
+* Immutability promotes correct code as much as type safety does.
 * You should be able to write functions before defining classes, yet still take advantage of type safety.
-* On-the fly data definition should be simple and easy.  Naming/formalizing ad hoc data structures should be too.
+* On-the fly data definition should be simple and easy.  Naming/formalizing these data structures should be too.
 * Yes, we're still talking about Java!
 
 #Features
 
 * Type-safe versions of Clojure's immutable collections
-* An immutable Transformable.  This is a simplified alternative to Java 8 Streams, based on the ideas behind Paul Philips' Views.
-* Simplified functional interfaces wrap checked exceptions and ignore (auto-box) primitives.
-* A tiny, type-safe data definition mini-language of brief helper functions: `vec()`, `set()`, `map()`, and `tup()`, (like Clojure's vector `[]`, set `#{}`, and map `{}`).
-* Extend Tuples to make your own immutable Java classes (with `private final` member variables and correct `equals()`, `hashCode()`, and `toString()` implementations) almost as easily as writing case classes in Scala.
+* An immutable Transformable.  This is a simplified alternative to Java 8 Streams, using functional interfaces that wrap checked exceptions and ignore (auto-box) primitives.
+* A tiny, type-safe data definition language of brief helper functions: `vec()`, `set()`, `map()`, and `tup()`, (like Clojure's vector `[]`, set `#{}`, and map `{}`).
+* Extend Tuples to make your own immutable Java classes (with correct `equals()`, `hashCode()`, and `toString()` implementations) almost as easily as writing case classes in Scala.
 
 Java actually has a decent type inferencing engine built in, but void return types, and different rules for arrays and primatives make it hard to take advantage of.
 UncleJim avoids these pitfalls (and checked exceptions in lambdas) decreasing the amount of code you need to write by a factor of at least 2x over traditional Java.
@@ -45,7 +44,7 @@ More extensive examples are implemented as unit tests to ensure that they remain
 
 * [Usage examples](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34) - Three different ways of improving your Java code with UncleJim.
 
-* [Comparison with Traditional Java and Java 8 Streams](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java#L22) - UncleJim generally takes 1/2 to 1/3 as much code to accomplish the same thing as Traditional Java, or Java 8 Streams.
+* [Comparison with Traditional Java and Java 8 Streams](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java#L22) - UncleJim generally takes 1/2 to 1/3 as much code to accomplish the same thing as Traditional Java.
 
 * For complete API documentation, please build the javadoc: `mvn javadoc:javadoc`
 
