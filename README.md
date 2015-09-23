@@ -9,7 +9,7 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") e
 
 #Features
 
-* Type-safe versions of Clojure's immutable collections
+* Type-safe versions of Clojure's immutable collections, implementing the generic java.util collection interfaces.
 * A simplified immutable alternative to Java 8 Streams, wrapping checked exceptions and avoiding primitives.
 * A tiny, type-safe data definition language of brief helper functions: `vec()`, `set()`, `map()`, and `tup()`, (like Clojure's vector `[]`, set `#{}`, and map `{}`).
 * Extend Tuples to make your own immutable Java classes (with correct `equals()`, `hashCode()`, and `toString()` implementations) almost as easily as writing case classes in Scala.
