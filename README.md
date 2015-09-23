@@ -45,10 +45,10 @@ More extensive examples are implemented as unit tests to ensure that they remain
 
 #FAQ
 
-##Q: How does this compare to pcollections?
+##Q: How does this compare to PCollections?
 
-[pcollections](http://pcollections.org/) competes only with UncleJim's first bullet point: immutable collections.
-Clojure's vector (list) and hashMap/hashSet have "big O of log base 32 of n" asymptotic performance, which theoretically scales better than the binary tree structures it looks like pcollections uses (those are log base 2 of n).
+[PCollections](http://pcollections.org/) competes only with UncleJim's first bullet point: immutable collections.
+Clojure's vector (list) and hashMap/hashSet have "big O of log base 32 of n" asymptotic performance, which theoretically scales better than the binary tree structures it looks like PCollections uses (those are log base 2 of n).
 
 ![Graph of Log base 32 (red) vs. Log base 2 (blue)](logBase2VsLogBase32.png)
 
@@ -56,9 +56,9 @@ This graph shows how many operations each lookup requires (vertical axis) when t
 Daniel Spiewak explains all the ramifications of this really well: https://www.youtube.com/watch?v=pNhBQJN44YQ
 
 The Clojure collections also walk the sibling nodes in the internal data trees of these structures to provide iterators, which is pretty cool performance-wise.
-At least in the list implementation, pcollections starts from the top of the tree doing an index lookup for each item, then increments the index to look up the next.
+At least in the list implementation, PCollections starts from the top of the tree doing an index lookup for each item, then increments the index to look up the next.
 
-Clojure's (and Java's) sorted/tree map/set implementations are log base 2, so pcollections could theoretically be as fast or faster for those two collections.
+Clojure's (and Java's) sorted/tree map/set implementations are log base 2, so PCollections could theoretically be as fast or faster for those two collections.
 If someone does performance testing to verify these theories, please let me know so I can link to it here.
 
 UncleJim has additional benefits listed in the bullets at the top of this document.
