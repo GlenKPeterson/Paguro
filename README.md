@@ -4,7 +4,7 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") m
 
 * Immutability promotes correct code as much as type safety does.
 * You should be able to write code before defining classes, yet still take advantage of type safety.
-* On-the fly data definition should be simple and easy.  Naming/formalizing immutable data structures should be too.
+* On-the fly data definition should be simple and easy.  Naming/formalizing immutable ad hoc data structures should be too.
 
 #Features
 
