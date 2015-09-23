@@ -51,7 +51,7 @@ More extensive examples are implemented as unit tests to ensure that they remain
 Clojure's vector (list) and hashMap/hashSet have "big O of log base 32 of n" asymptotic performance, which theoretically scales better than the binary tree structures it looks like pcollections uses (those are log base 2 of n).
 You can see this for yourself by using the change-base formula to Google: y=(ln x)/(ln 2), y=(ln x)/(ln 32)
 
-#[Graph of Log base 32 (red) vs. Log base 2 (blue)](logBase2VsLogBase32.png)
+![Graph of Log base 32 (red) vs. Log base 2 (blue)](logBase2VsLogBase32.png)
 
 This graph shows how many operations each lookup requires (vertical axis) when there are a given number of items in the collection (horizontal axis).
 Daniel Spiewak explains all the ramifications of this really well: https://www.youtube.com/watch?v=pNhBQJN44YQ
