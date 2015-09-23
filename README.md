@@ -52,8 +52,8 @@ Clojure's vector (list) and hashMap/hashSet have "big O of log base 32 of n" asy
 
 ![Graph of Log base 32 (red) vs. Log base 2 (blue)](logBase2VsLogBase32.png)
 
-This graph shows how many operations each lookup requires (vertical axis) when there are a given number of items in the collection (horizontal axis).
-Daniel Spiewak explains all the ramifications of this really well: https://www.youtube.com/watch?v=pNhBQJN44YQ
+This graph shows how many operations each lookup requires (vertical axis) for a given number of items in the collection (horizontal axis).
+Daniel Spiewak explains all the ramifications of this better than I ever could: https://www.youtube.com/watch?v=pNhBQJN44YQ
 
 The Clojure collections also walk the sibling nodes in the internal data trees of these structures to provide iterators, which is pretty cool performance-wise.
 At least in the list implementation, PCollections starts from the top of the tree doing an index lookup for each item, then increments the index to look up the next.
@@ -66,6 +66,7 @@ UncleJim has additional benefits listed in the bullets at the top of this docume
 ##Q: Do these Transforms create intermediate collections between each operation (like the Scala collections)?
 
 No.
+
 Xform is a lazy, immutable builder for transformations.
 It records the operations you specify without carrying any of them out.
 When you call foldLeft() or one of the "endpoint" methods like toImList(), it creates the lightest-weight execution path and performs simplified operations in a for loop with only 3 if statements (some have sub-branches).
