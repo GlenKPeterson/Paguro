@@ -64,7 +64,7 @@ This graph shows how many operations each lookup requires (y) for a given number
 Daniel Spiewak explains all the ramifications of this better than I ever could: https://www.youtube.com/watch?v=pNhBQJN44YQ
 
 The Clojure collections also walk the sibling nodes in the internal data trees of these structures to provide iterators, which is pretty cool performance-wise.
-At least in the list implementation, PCollections starts from the top of the tree doing an index lookup for each item, then increments the index to look up the next.
+PCollections starts from the top of the tree doing an index lookup for each item, then increments the index and goes back to the top to look up the next (at least for the list implementation).
 
 Clojure's (and Java's) sorted/tree map/set implementations are O(log<sub>2</sub> *n*), so PCollections could theoretically be as fast or faster for those two collections.
 If someone does performance testing to verify these theories, please let me know so I can link to it here.
