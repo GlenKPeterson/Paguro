@@ -60,6 +60,7 @@ Rich Hickey for Clojure
 - Then `mvn clean test` on UncleJim
 
 #To Do
+ - Make UnmodList extend UnmodSortedCollection instead of UnmodCollection and UnmodSortedIterable.
  - Update JavaDoc, esp. Im vs. Unmod
  - Remove SideEffect.java
  - Improve tests for Tuple so that I can generate good tests as I generate more Tuples.
