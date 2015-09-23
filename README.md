@@ -93,9 +93,8 @@ As immutable collections go, they have excellent performance.
  anonymous functions more like you would in Scala.
 
 * Complexity: For up to 2-argument functions, java.util.function has 43 different interfaces.
-The functional methods on these interfaces have 11 different names, depending on which of the 43 interfaces you use: `accept()`,
-`apply()`, `applyAsDouble()`, `applyAsInt()`, `applyAsLong()`, `test()`, `get()`, `getAsBoolean()`, `getAsDouble()`, `getAsInt()`, or `getAsLong()`.
-UncleJim has 3 equivalent interfaces, named by number of arguments (like Scala): `Function0`, `Function1`, and `Function2`.
+The functional methods on these interfaces have 11 different names, depending on which of the 43 interfaces you use.
+UncleJim has 3 equivalent interfaces, named by number of arguments (like Scala).
 All have an `applyEx()` that you override and an `apply()` method that callers can use if they want to ignore checked exceptions (they usually do).
 If you don't want to return a result, declare the return type as `?` and return `null`.
 For example: `Function1<Integer,?>` takes an Integer and the return value is ignored.
