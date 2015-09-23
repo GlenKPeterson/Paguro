@@ -60,7 +60,7 @@ Clojure's vector (list) and hashMap/hashSet have O(log<sub>32</sub> *n*) perform
 
 ![Graph of Log base 32 (red) vs. Log base 2 (blue)](logBase2VsLogBase32.png)
 
-This graph shows how many operations each lookup requires (vertical axis) for a given number of items in the collection (horizontal axis).
+This graph shows how many operations each lookup requires (y) for a given number of items in the collection (x).  The red line is the fast log<sub>32</sub>, the blue is the slower log<sub>2</sub>.
 Daniel Spiewak explains all the ramifications of this better than I ever could: https://www.youtube.com/watch?v=pNhBQJN44YQ
 
 The Clojure collections also walk the sibling nodes in the internal data trees of these structures to provide iterators, which is pretty cool performance-wise.
