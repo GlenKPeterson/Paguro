@@ -113,6 +113,8 @@ For example: `Function1<Integer,?>` takes an Integer and the return value is ign
 * I had an enum, `MyEnum` and wanted to pass `MyEnum::values` as a function reference to a Java 8 stream.  The return-type of `MyEnum.values()` is  `Enum<MyEnum>[]`.  An array of a parameterized type.  Between the `Arrays.asList()`, the cast from `MyEnum[]` to `Enum<MyEnum>[]`, the checked exception in the method body - what a nightmare!  In UncleJim, all you need is `vec(MyEnum.values())` and you're in happy functional world.
 
 * If you want to define data in Java 8, you end up learning the difference between Arrays.asList() and Collections.singletonList(), or defining one-off classes for every kind of data you might need before you start writing any code. UncleJim has a tiny data-definition language (like a type-safe JSON) with extensible Tuples to give your data structures meaningful type-safe names with a minimum of code.  With UncleJim, you can define your data first and name it later.  Even that initial definition is checked by the type system.
+ 
+* You can still use non-destructive Java 8 stream methods on immutable (or unmodifiable) collections if you want to.  UncleJim doesn't affect what you do with mutable collections at all (but, eew).
 
 #Change Log
 See [changeLog.txt](changeLog.txt)
