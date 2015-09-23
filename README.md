@@ -1,16 +1,16 @@
-UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") makes standard Java code cleaner and safer.
+UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") enabls a cleaner, safer style of programming like Clojure, or a much simpler Scala, but in Java.
 
-#Motivation
+#Manifesto
 
 * Immutability promotes correct code as much as type safety does.
-* You should be able to write functions before defining classes, yet still take advantage of type safety.
+* Better to focus on picking the appropriate collections and transformations than on looping details.
+* Write functions first, then define classes, yet still take advantage of type safety.
 * On-the fly data definition should be simple and easy.  Naming/formalizing these data structures should be too.
-* Yes, we're still talking about Java!
 
 #Features
 
 * Type-safe versions of Clojure's immutable collections
-* An immutable Transformable.  This is a simplified alternative to Java 8 Streams, using functional interfaces that wrap checked exceptions and ignore (auto-box) primitives.
+* A simplified immutable alternative to Java 8 Streams, wrapping checked exceptions and avoiding primitives.
 * A tiny, type-safe data definition language of brief helper functions: `vec()`, `set()`, `map()`, and `tup()`, (like Clojure's vector `[]`, set `#{}`, and map `{}`).
 * Extend Tuples to make your own immutable Java classes (with correct `equals()`, `hashCode()`, and `toString()` implementations) almost as easily as writing case classes in Scala.
 
