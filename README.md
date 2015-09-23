@@ -88,7 +88,7 @@ The Clojure-derived collections in UncleJim only duplicate the tiny area of the 
 to return a new immutable collection that shares as much data as practical with the old one.
 As immutable collections go, they have excellent performance.
 
-* The [java.util.function interfaces do nothing to help you with Exceptions](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java#L258).
+* The [java.util.function interfaces](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java#L258) do nothing to help you with Exceptions.
  [UncleJim wraps checked exceptions in unchecked ones](src/main/java/org/organicdesign/fp/function/Function1.java#L29) for you, so that you can write
  anonymous functions more like you would in Scala.
 
