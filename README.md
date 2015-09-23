@@ -15,7 +15,7 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") m
 * Extend Tuples to make your own immutable Java classes (with correct `equals()`, `hashCode()`, and `toString()` implementations) almost as easily as writing case classes in Scala.
 
 Java actually has a decent type inferencing engine built in, but void return types, and different rules for arrays and primatives make it hard to take advantage of.
-UncleJim avoids these pitfalls (and checked exceptions in lambdas) decreasing the amount of code you need to write by a factor of at least 2x over traditional Java.
+UncleJim avoids these pitfalls (and checked exceptions in lambdas) decreasing the amount of code you need to write by a factor of at 2x-3x over traditional Java.
 
 #Maven Dependency
 ```xml
@@ -44,7 +44,7 @@ More extensive examples are implemented as unit tests to ensure that they remain
 
 * [Usage examples](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34) - Three different ways of improving your Java code with UncleJim.
 
-* [Comparison with Traditional Java and Java 8 Streams](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java#L22) - UncleJim generally takes 1/2 to 1/3 as much code to accomplish the same thing as Traditional Java.
+* [Comparison with Traditional Java and Java 8 Streams](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java#L22) - UncleJim is simpler and safer than Java 8 streams.  It generally takes 3x as much code to accomplish the same thing in Traditional Java.
 
 * For complete API documentation, please build the javadoc: `mvn javadoc:javadoc`
 
