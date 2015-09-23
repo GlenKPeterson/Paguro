@@ -1,4 +1,12 @@
-UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") makes standard Java code cleaner and safer by providing:
+UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") makes standard Java code cleaner and safer.
+
+#Motivation
+
+* Immutability promotes correct code as much as type safety does.
+* You should be able to write code without first defining classes, yet still take advantage of type safety.
+* On-the fly data definition should be simple and easy.  Naming/formalizing immutable data structures should be too.
+
+#Features
 
 * Type-safe versions of Clojure's immutable collections
 * An immutable Transformable.  This is a simplified alternative to Java 8 Streams, based on the ideas behind Paul Philips' Views.
@@ -6,7 +14,7 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") m
 * A tiny, type-safe data definition mini-language of brief helper functions: `vec()`, `set()`, `map()`, and `tup()`, (like Clojure's vector `[]`, set `#{}`, and map `{}`).
 * Extend Tuples to make your own immutable Java classes (with `private final` member variables and correct `equals()`, `hashCode()`, and `toString()` implementations) almost as easily as writing case classes in Scala.
 
-Java actually has a powerful type inferencing engine built in, but void return types, and different rules for arrays and primatives make it hard to take advantage of.
+Java actually has a decent type inferencing engine built in, but void return types, and different rules for arrays and primatives make it hard to take advantage of.
 UncleJim avoids these pitfalls (and checked exceptions in lambdas) decreasing the amount of code you need to write by a factor of at least 2x over traditional Java.
 
 #Maven Dependency
@@ -84,7 +92,7 @@ It uses a temporary internal ArrayList to accumulate results for the termination
 You can choose to do that with UncleJim, but it's safer to store your result in an immutable collection.
 java.util.Collections can wrap mutable collections in an unmodifiable wrapper, but UncleJim's wrappers also deprecate the mutator methods so that your IDE and compiler warn you if you try to call them.
 
-* If you later want a near-copy of a collection, (with a few items added or removed), Unmodifiable collections require an expensive defensive copy of the entire collection.
+* If you later add or remove a few items, Unmodifiable collections require an expensive defensive copy of the entire collection.
 The Clojure-derived collections in UncleJim only duplicate the tiny area of the collection that was changed
 to return a new immutable collection that shares as much data as practical with the old one.
 As immutable collections go, they have excellent performance.
@@ -93,14 +101,20 @@ As immutable collections go, they have excellent performance.
  [UncleJim wraps checked exceptions in unchecked ones](src/main/java/org/organicdesign/fp/function/Function1.java#L29) for you, so that you can write
  anonymous functions more like you would in Scala.
 
-* Complexity: For up to 2-argument functions, java.util.function has 43 different interfaces.
-The functional methods on these interfaces have 11 different names, depending on which of the 43 interfaces you use.
+* For up to 2-argument functions, java.util.function has 43 different interfaces.
+The functional methods on these interfaces are named differently, with a total of 11 different names for `apply()`.
 UncleJim has 3 equivalent interfaces, named by number of arguments (like Scala).
 All have an `applyEx()` that you override and an `apply()` method that callers can use if they want to ignore checked exceptions (they usually do).
 If you don't want to return a result, declare the return type as `?` and return `null`.
 For example: `Function1<Integer,?>` takes an Integer and the return value is ignored.
 
-* UncleJim also has extensible Tuples and a tiny data-definition language (like a type-safe JSON).
+* You can't use `Collector` on Java 8 streams with immutable data structures.
+
+* Even if you love mutability, Java 8 still has the complexity of accumulator vs. combiner functions and a host of implementations of these.  UncleJim values simplicity.  It natively collects to immutable data structures with simple methods like toImList() or toImSet().  Sure, some collection methods require that you pass a comparator and or map to key/value pairs, but these are still very simple operations.
+
+* The other day I had an enum, `MyEnum` and wanted to pass `MyEnum::values` as a function reference.  The return-type of `MyEnum.values()` is  `Enum<MyEnum>[]`.  An array of a parameterized type.  Between the `Arrays.asList()`, the cast from `MyEnum[]` to `Enum<MyEnum>[]`, the checked exception in the method body...  In UncleJim, all you need is `vec(MyEnum.values())` and you're in happy world.
+
+* If you want to define data in Java 8, you end up learning the difference between Arrays.asList() and Collections.singletonList(), or defining one-off classes for every kind of data you might need before you start writing any code. UncleJim also and a tiny data-definition language (like a type-safe JSON) with extensible Tuples to give your data structures meaningful type-safe names with a minimum of code.  With UncleJim, you can define your data first and name it later.  Even that initial definition is checked by the type system.
 
 #Change Log
 See [changeLog.txt](changeLog.txt)
