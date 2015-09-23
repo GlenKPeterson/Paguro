@@ -108,9 +108,7 @@ All have an `applyEx()` that you override and an `apply()` method that callers c
 If you don't want to return a result, declare the return type as `?` and return `null`.
 For example: `Function1<Integer,?>` takes an Integer and the return value is ignored.
 
-* You can't use `Collector` on Java 8 streams with immutable data structures.
-
-* Even if you love mutability, Java 8 still has the complexity of accumulator vs. combiner functions and a host of implementations of these.  UncleJim values simplicity.  It natively collects to immutable data structures with simple methods like toImList() or toImSet().  Sure, some collection methods require that you pass a comparator and or map to key/value pairs, but these are still very simple operations.
+* You can't use `Collector` on Java 8 streams with immutable data structures.  Even if you love mutability, Java 8 still has the complexity of accumulator vs. combiner functions and a host of implementations of these.  UncleJim values simplicity.  It natively collects to immutable data structures with simple methods like toImList() or toImSet().  Some collection methods require that you pass a comparator and or map items to key/value pairs, but these are still very simple operations.
 
 * The other day I had an enum, `MyEnum` and wanted to pass `MyEnum::values` as a function reference.  The return-type of `MyEnum.values()` is  `Enum<MyEnum>[]`.  An array of a parameterized type.  Between the `Arrays.asList()`, the cast from `MyEnum[]` to `Enum<MyEnum>[]`, the checked exception in the method body...  In UncleJim, all you need is `vec(MyEnum.values())` and you're in happy world.
 
