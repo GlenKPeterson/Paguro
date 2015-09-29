@@ -1,12 +1,5 @@
 UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") is a small library that enables a cleaner, safer style of Java programming.  It approaches a domain specific language (DSL) inside Java.
 
-#Manifesto
-
-* Immutability promotes correct code as much as type safety does.
-* Better to focus on picking the appropriate collections and transformations than on looping details.
-* Write functions before defining classes, yet still take advantage of type safety.
-* On-the fly data definition should be simple and easy.  Naming/formalizing these data structures should be too.
-
 #Examples
 ```java
 // Define a type-safe data structure on the fly
@@ -30,7 +23,7 @@ Additional examples are implemented as unit tests to ensure that they remain cor
 
 * [Usage examples](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34) - Three different ways of improving your Java code with UncleJim.
 
-* [Comparison with Traditional Java and Java 8 Streams](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java#L22) - UncleJim is simpler and safer than Java 8 streams.  It generally takes 3x as much code to accomplish the same thing in Traditional Java.
+* [Comparison with Traditional Java and Java 8 Streams](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java#L22) - UncleJim is simpler and safer than Java 8 streams.  It generally takes 1/3 as much code as Traditional Java.
 
 * [Class/Interface Hierarchy](inheritanceHierarchy.pdf) (PDF)
 
@@ -44,6 +37,13 @@ Additional examples are implemented as unit tests to ensure that they remain cor
         <version>0.10.10</version>
 </dependency>
 ```
+
+#Manifesto
+
+* Immutability promotes correct code as much as type safety does.
+* Better to focus on picking the appropriate collections and transformations than on looping details.
+* Write functions before defining classes, yet still take advantage of type safety.
+* On-the fly data definition should be simple and easy.  Naming/formalizing these data structures should be too.
 
 #Features
 
