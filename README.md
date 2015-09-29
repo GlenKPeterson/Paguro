@@ -1,21 +1,38 @@
-UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") enabls a cleaner, safer style of programming like Clojure, or a much simpler Scala, but in Java.
+UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") enabls a cleaner, safer style of programming like Clojure, but type-checked and in Java.
 
 #Manifesto
 
 * Immutability promotes correct code as much as type safety does.
 * Better to focus on picking the appropriate collections and transformations than on looping details.
-* Write functions first, then define classes, yet still take advantage of type safety.
+* Write functions before defining classes, yet still take advantage of type safety.
 * On-the fly data definition should be simple and easy.  Naming/formalizing these data structures should be too.
 
-#Features
+#Examples
+```java
+// Define a data structure on the fly
+vec(tup("Jane", "Smith", vec(tup(HOME, "a@b.c"),
+                             tup(WORK, "b@c.d"))),
+    tup("Fred", "Tase", vec(tup(HOME, "c@d.e"),
+                            tup(WORK, "d@e.f"))))
+        // Create a map to look up people by their address
+        .flatMap(person -> person._3()
+                                 .map(mail -> tup(mail._2(), person)))
+        .toImMap(Function1.identity())
+        // Look up Jane by her address
+        .get("b@c.d")
+        // Get her first name (returns "Jane")
+        ._1());
+```
 
-* Type-safe versions of Clojure's immutable collections, implementing the generic `java.util` collection interfaces.
-* A simplified immutable alternative to Java 8 Streams, wrapping checked exceptions and avoiding primitives.
-* A tiny, type-safe data definition language of brief helper functions: `vec()`, `set()`, `map()`, and `tup()`, (like Clojure's vector `[]`, set `#{}`, and map `{}`).
-* Extend Tuples to make your own immutable Java classes (with correct `equals()`, `hashCode()`, and `toString()` implementations) almost as easily as writing case classes in Scala.
+Additional examples are implemented as unit tests to ensure that they remain correct and current.
 
-Java actually has a decent type inferencing engine built in, but void return types, and different rules for arrays and primatives make it hard to take advantage of.
-UncleJim avoids these pitfalls (and checked exceptions in lambdas) decreasing the amount of code you need to write by a factor of at 2x-3x over traditional Java.
+* [Usage examples](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34) - Three different ways of improving your Java code with UncleJim.
+
+* [Comparison with Traditional Java and Java 8 Streams](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java#L22) - UncleJim is simpler and safer than Java 8 streams.  It generally takes 3x as much code to accomplish the same thing in Traditional Java.
+
+* [Class/Interface Hierarchy](inheritanceHierarchy.pdf) (PDF)
+
+* For complete API documentation, please build the javadoc: `mvn javadoc:javadoc`
 
 #Maven Dependency
 ```xml
@@ -26,27 +43,14 @@ UncleJim avoids these pitfalls (and checked exceptions in lambdas) decreasing th
 </dependency>
 ```
 
-#Examples
-Create a vector (List) of integers and perform operations on it.
-The results of each operation show in comments to the right.
-```java
-vec(4, 5)                        //          4, 5
-        .precat(vec(1, 2, 3))    // 1, 2, 3, 4, 5
-        .concat(vec(6, 7, 8, 9)) // 1, 2, 3, 4, 5, 6, 7, 8, 9
-        .filter(i -> i > 4)      //             5, 6, 7, 8, 9
-        .map(i -> i - 2)         //       3, 4, 5, 6, 7
-        .take(4)                 //       3, 4, 5, 6
-        .drop(2)                 //             5, 6
-        .toImList());            // Stores result in an immutable PersistentVector
-```
+#Features
 
-More extensive examples are implemented as unit tests to ensure that they remain correct and current.
+* Type-safe versions of Clojure's immutable collections, implementing the generic `java.util` collection interfaces.
+* A simplified immutable alternative to Java 8 Streams, wrapping checked exceptions and avoiding primitives.
+* A tiny, type-safe data definition language of brief helper functions: `vec()`, `set()`, `map()`, and `tup()`, (like Clojure's vector `[]`, set `#{}`, and map `{}`).
+* Extend Tuples to make your own immutable Java classes (with correct `equals()`, `hashCode()`, and `toString()` implementations) almost as easily as writing case classes in Scala.
 
-* [Usage examples](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34) - Three different ways of improving your Java code with UncleJim.
-
-* [Comparison with Traditional Java and Java 8 Streams](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java#L22) - UncleJim is simpler and safer than Java 8 streams.  It generally takes 3x as much code to accomplish the same thing in Traditional Java.
-
-* For complete API documentation, please build the javadoc: `mvn javadoc:javadoc`
+UncleJim takes advantages of Java's type inferencing by avoiding void return types, arrays, primatives, and checked exceptions in lambdas.  It can decrease the amount of code you need to write by a factor of at 2x-3x while focusing you on using the right collections for the fastest possible code.
 
 #Self-Guided Training
 [JimTrainer](https://github.com/GlenKPeterson/JimTrainer) contains a few short problem-sets for learning UncleJim 
