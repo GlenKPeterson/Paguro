@@ -17,7 +17,7 @@ vec(tup("Jane", "Smith", vec(tup(HOME, "a@b.c"),
         // Create a map to look up people by their address
         .flatMap(person -> person._3()
                                  .map(mail -> tup(mail._2(), person)))
-        .toImMap(Function1.identity())
+        .toImMap(x -> x)
         // Look up Jane by her address
         .get("b@c.d")
         // Get her first name (returns "Jane")
