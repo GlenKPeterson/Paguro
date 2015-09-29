@@ -1,4 +1,4 @@
-UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") enabls a cleaner, safer style of programming like Clojure, but type-checked and in Java.
+UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") is a small library that enables a cleaner, safer style of Java programming.  It approaches a domain specific language (DSL) inside Java.
 
 #Manifesto
 
