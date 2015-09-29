@@ -75,7 +75,7 @@ Rich Hickey for Clojure
  Ensure you can chain together functions in a short-circuiting way, without exceptions or other side-effects.
  - Add a [Persistent RRB Tree](http://infoscience.epfl.ch/record/169879/files/RMTrees.pdf) and compare its performance to the PersistentVector.
  - Re-implement Persistent collections from Algorithms and Purely Functional Data Structures without relying on a wrapped transient collection and without locking checks, then compare efficiency.
- - This project needs a new name.  It's really not about Unmodifiable collections any more.  Consider just Jimm, Cake Pan, Baking Mold...  Something else that conveys Immutability.  I hate that name because these collections are absolutely changeable.  They just aren't changeable in-place.  It's more like hermit crabs growing by changing shells.
+ - This project needs a new name.  It's really not about Unmodifiable collections any more.  Consider just Jimm, Cake Pan, Baking Mold...  Something else that conveys Immutability.  I hate that name because these collections are absolutely changeable.  They just aren't changeable in-place.  Really, moulting is a better analogy because these collections grow by changing a lightweight wrapper while what's inside stays mostly the same.  Of the various animals that moult, most are pretty darn disgusting.  Hermit crabs changing shells, on the other hand, is very cute.  So maybe HermitCrab would be a better name?  Or at least a better mascot.
 
 #Out of Scope
 
