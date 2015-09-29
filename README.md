@@ -9,7 +9,7 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") e
 
 #Examples
 ```java
-// Define a data structure on the fly
+// Define a type-safe data structure on the fly
 vec(tup("Jane", "Smith", vec(tup(HOME, "a@b.c"),
                              tup(WORK, "b@c.d"))),
     tup("Fred", "Tase", vec(tup(HOME, "c@d.e"),
