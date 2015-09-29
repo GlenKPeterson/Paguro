@@ -9,9 +9,11 @@ vec(tup("Jane", "Smith", vec(tup(HOME, "a@b.c"),
                             tup(WORK, "d@e.f"))))
         // Create a map to look up people by their address
         .flatMap(person -> person._3()
-                                 .map(mail -> tup(mail._2(), person)))
-        // toImMap() takes a function that maps to key/value pairs.
-        // We already have k/v's so we pass it the identity function.
+                                 .map(mail -> tup(mail._2(),
+                                      person)))
+        // toImMap() takes a function that maps items to
+        // key/value pairs.  We already have those, so pass
+        // it the identity function.
         .toImMap(x -> x)
         // Look up Jane by her address
         .get("b@c.d")
