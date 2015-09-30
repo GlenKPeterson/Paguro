@@ -29,9 +29,9 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
 
 Additional examples are implemented as unit tests to ensure that they remain correct and current.
 
-* [Usage examples](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34) - Three different ways of improving your Java code with UncleJim.
+* [Usage examples](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34) - different ways of improving your Java code with UncleJim.
 
-* [Comparison with Traditional Java and Java 8 Streams](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java#L22) - UncleJim is simpler and safer than Java 8 streams.  It generally takes 1/3 as much code as Traditional Java.
+* [Comparison with Traditional Java and Java 8 Streams](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java#L22)
 
 * [Class/Interface Hierarchy](inheritanceHierarchy.pdf) (PDF)
 
