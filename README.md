@@ -3,14 +3,12 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") i
 #Examples
 ```java
 // Define a type-safe data structure on the fly
-vec(tup("Jane", "Smith", vec(tup(HOME, "a@b.c"),
-                             tup(WORK, "b@c.d"))),
-    tup("Fred", "Tase", vec(tup(HOME, "c@d.e"),
-                            tup(WORK, "d@e.f"))))
+vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
+    tup("Fred", "Tase", vec("c@d.e", "d@e.f")))
         // Create a map to look up people by address
         .flatMap(person -> person._3()
-                                 .map(mail -> tup(mail._2(),
-                                      person)))
+                                 .map(mail -> tup(mail,
+                                                  person)))
         // toImMap() expects a function that maps items to
         // key/value pairs.  We already have pairs, so pass
         // it the identity function.
