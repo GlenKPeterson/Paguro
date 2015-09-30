@@ -8,10 +8,9 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
     tup("Fred", "Tase", vec("c@d.e", "d@e.f", "e@f.g")))
 
         // Turn that into pairs of emails and people.
-        // flatMap() turns the list of people into a list
-        // of emails.  map() on the emails to build
-        // email/person pairs while the person object is
-        // still in scope.
+        // flatMap() the list of people into a list of
+        // emails.  map() the emails to email/person pairs
+        // while the person object is still in scope.
         .flatMap(person -> person._3()
                                  .map(mail -> tup(mail,
                                                   person)))
