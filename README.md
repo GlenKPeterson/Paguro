@@ -2,24 +2,28 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") i
 
 #Examples
 ```java
-// Define a type-safe data structure on the fly.
-// vec() makes a List, tup() makes a Tuple
+// Define some people with lists of email addresses on the
+// fly.  vec() makes a List, tup() makes a Tuple
 vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
     tup("Fred", "Tase", vec("c@d.e", "d@e.f", "e@f.g")))
-        // Turn people with lists of email addresses into
-        // pairs of emails and people. flatMap() processes
-        // each email for each person.  map() builds
+
+        // Turn that into pairs of emails and people.
+        // flatMap() turns the list of people into a list
+        // of emails.  map() on the emails to build
         // email/person pairs while the person object is
-        // in lexical scope.
+        // still in scope.
         .flatMap(person -> person._3()
                                  .map(mail -> tup(mail,
                                                   person)))
+
         // toImMap() expects a function that maps items to
         // key/value pairs.  We already have pairs, so pass
         // it the identity function.
         .toImMap(x -> x)
+
         // Look up Jane by her address
         .get("b@c.d")
+
         // Get her first name (returns "Jane")
         ._1());
 ```
