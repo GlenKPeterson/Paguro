@@ -6,9 +6,11 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") i
 // vec() makes a List, tup() makes a Tuple
 vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
     tup("Fred", "Tase", vec("c@d.e", "d@e.f", "e@f.g")))
-        // Create a map to look up people by address.
-        // flatMap() returns multiple outputs for each
-        // input, map() changes the type of each input.
+        // Turn people with lists of email addresses into
+        // pairs of emails and people. flatMap() processes
+        // each email for each person.  map() builds
+        // email/person pairs while the person object is
+        // in lexical scope.
         .flatMap(person -> person._3()
                                  .map(mail -> tup(mail,
                                                   person)))
