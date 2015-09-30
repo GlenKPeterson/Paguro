@@ -7,7 +7,7 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") i
 vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
     tup("Fred", "Tase", vec("c@d.e", "d@e.f", "e@f.g")))
 
-        // Turn that into pairs of emails and people.
+        // Turn that into pairs of emails and people:
         // flatMap() the list of people into a list of
         // emails.  map() the emails to email/person pairs
         // while the person object is still in scope.
