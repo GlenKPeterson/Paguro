@@ -4,7 +4,7 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") i
 ```java
 // Define a type-safe data structure on the fly
 vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
-    tup("Fred", "Tase", vec("c@d.e", "d@e.f")))
+    tup("Fred", "Tase", vec("c@d.e", "d@e.f", "e@f.g")))
         // Create a map to look up people by address
         .flatMap(person -> person._3()
                                  .map(mail -> tup(mail,
