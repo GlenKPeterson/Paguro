@@ -2,10 +2,13 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") i
 
 #Examples
 ```java
-// Define a type-safe data structure on the fly
+// Define a type-safe data structure on the fly.
+// vec() makes a List, tup() makes a Tuple
 vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
     tup("Fred", "Tase", vec("c@d.e", "d@e.f", "e@f.g")))
-        // Create a map to look up people by address
+        // Create a map to look up people by address.
+        // flatMap() returns multiple outputs for each
+        // input, map() changes the type of each input.
         .flatMap(person -> person._3()
                                  .map(mail -> tup(mail,
                                                   person)))
