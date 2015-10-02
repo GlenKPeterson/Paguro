@@ -63,7 +63,6 @@ Rich Hickey for Clojure
  - Make UnmodList extend UnmodSortedCollection instead of UnmodCollection and UnmodSortedIterable.
  - Make Realizable extend Transformable instead of the other way around.
  - Remove SideEffect.java
- - Re-organize the usage example to move the stream replacement to the end because that's a harder sell.
  - Update JavaDoc, esp. Im vs. Unmod
  - Improve tests for Tuple so that I can generate good tests as I generate more Tuples.
  - Make a bunch more Tuple classes, and maybe bunch more Function classes.
