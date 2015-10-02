@@ -31,87 +31,65 @@ import static org.organicdesign.fp.UsageExampleTest.EmailType.WORK;
 // Usage examples are kept in this unit test to ensure they remain correct and current.
 public class UsageExampleTest {
 
-    // Transormable/UnmodIterable interfaces.
-    @Test public void transformTest() {
+    // Fluent interfaces (using methods that evaluate to something useful) takes maximum advantage
+    // of Java's type inferencing.  This is still type-checked by the compiler, but without
+    // specifying ANY types explicitly
+    // Part 1 of 3
+    @Test public void dataDefinitionPart1() {
+        assertEquals("Jane",
+                     // Define some people with lists of email addresses on the
+                     // fly.  vec() makes a List, tup() makes a Tuple
+                     vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
+                         tup("Fred", "Tase", vec("c@d.e", "d@e.f", "e@f.g")))
 
-        // These transformations do not change the underlying data.  They build a new collection by
-        // chaining together the specified operations, then applying them in a single pass.  vec()
-        // creates a vector (immutable list) of any length.
-        ImList<Integer> v1 = vec(4, 5);
+                             // Turn that into pairs of emails and people:
+                             // flatMap() the list of people into a list of
+                             // emails.  map() the emails to email/person pairs
+                             // while the person object is still in scope.
+                             .flatMap(person -> person._3()
+                                                      .map(mail -> tup(mail,
+                                                                       person)))
 
-        // Make a new vector with more numbers at the beginning.  "precat" is short for
-        // "prepend version of concatenate" or "add-to-beginning".  UnmodIterable is the primary
-        // bridge between UncleJim and traditional Java.  It extends Iterable, but adds
-        // transformations and deprecates the remove() method of the iterator it provides.
-        UnmodIterable<Integer> v2 = v1.precat(vec(1, 2, 3));
+                             // toImMap() expects a function that maps items to
+                             // key/value pairs.  We already have pairs, so pass
+                             // it the identity function.
+                             .toImMap(x -> x)
 
-        // v2 now represents a bigger list of numbers
-        assertEquals(vec(1, 2, 3, 4, 5), v2.toImList());
+                             // Look up Jane by her address
+                             .get("b@c.d")
 
-        // v1 is unchanged
-        assertEquals(vec(4, 5), v1);
-
-        // Instead of updating in place, each change returns a new data structure which is an
-        // extremely lightweight copy of the old because it shares as much as possible with the
-        // previous structure.
-        v2 = v2.concat(vec(6, 7, 8, 9));
-
-        assertEquals(vec(1, 2, 3, 4, 5, 6, 7, 8, 9), v2.toImList());
-
-        v2 = v2.filter(i -> i > 4);
-
-        assertEquals(vec(5,6,7,8,9), v2.toImList());
-
-        v2 = v2.map(i -> i - 2);
-
-        assertEquals(vec(3,4,5,6,7), v2.toImList());
-
-        // After a take, the subsequent items are not processed by the transformation.
-        // If you had a billion items, this would only allow the first 5 to be processed.
-        v2 = v2.take(4);
-
-        assertEquals(vec(3,4,5,6), v2.toImList());
-
-        v2 = v2.drop(2);
-
-        assertEquals(vec(5,6), v2.toImList());
-
-        // Let's see that again with the methods all chained together
-        assertEquals(vec(5, 6),
-                     vec(4, 5)                        //          4, 5
-                             .precat(vec(1, 2, 3))    // 1, 2, 3, 4, 5
-                             .concat(vec(6, 7, 8, 9)) // 1, 2, 3, 4, 5, 6, 7, 8, 9
-                             .filter(i -> i > 4)      //             5, 6, 7, 8, 9
-                             .map(i -> i - 2)         //       3, 4, 5, 6, 7
-                             .take(4)                 //       3, 4, 5, 6
-                             .drop(2)                 //             5, 6
-                             .toImList());
+                             // Get her first name (returns "Jane")
+                             ._1());
 
         // Conclusion:
-        // Once you get used to them, Transformations are easier to write and read than their
-        // traditional Java looping counterparts (and almost as fast).  They are also much
-        // easier to understand than Java 8 streams and handle and immutable destination
-        // collections well.
+        // Traditional Java forces you to define all your data types (as classes) before writing any
+        // "logic" (functions).  While this discipline can help huge, well defined projects, a lot
+        // of coding involves experimentation.  Code like the above skips the pre-work of defining
+        // types so you can focus on building the right functions.
+        //
+        // No amount of processing power can turn O(n^2) to O(n) or to O(log n), but choosing the
+        // right collections can!  This style of coding focuses you on that (and on
+        // algorithms/transformations) instead of distracting you with looping details:
+        // if/break/continue/return/i++, etc.
     }
 
     // Define some field name constants with a standard Java Enum for subsequent examples
     enum EmailType { HOME, WORK };
 
-    // Part 1 of 3 for defining data briefly and/or in a way that's easy to read.
-    @Test public void dataDefinitionExample1() {
-        // Create a list of "people."  tup() creates a Tuple (some languages call this a "record").
-        // Tuples are type-safe anonymous objects.  Parts 2 and 3 of this example will show how to
-        // simplify the type signatures.
+    // Part 2 of 3
+    @Test public void dataDefinitionPart2() {
+        // Let's expand on the previous example by specifying home and work email addresses.  We'll
+        // also divide the processing into distinct pieces that can be used separately.  In a
+        // subsequent example, we'll show how to simplify the type signatures.
         ImList<Tuple3<String,String,ImList<Tuple2<EmailType,String>>>> people =
                 vec(tup("Jane", "Smith", vec(tup(HOME, "a@b.c"),
                                              tup(WORK, "b@c.d"))),
-                    tup("Fred", "Tase", vec(tup(HOME, "c@d.e"),
-                                            tup(WORK, "d@e.f"))));
+                    tup("Fred", "Tase", vec(tup(HOME, "c@d.e"))));
 
         // Everything has build-in toString() methods.  Collections show the first 3-5 elements.
         assertEquals("PersistentVector(" +
                      "Tuple3(Jane,Smith,PersistentVector(Tuple2(HOME,a@b.c),Tuple2(WORK,b@c.d)))," +
-                     "Tuple3(Fred,Tase,PersistentVector(Tuple2(HOME,c@d.e),Tuple2(WORK,d@e.f))))",
+                     "Tuple3(Fred,Tase,PersistentVector(Tuple2(HOME,c@d.e))))",
                      people.toString());
 
         // Inspect Jane's record:
@@ -131,24 +109,22 @@ public class UsageExampleTest {
                                                // Map/dictionary entries are key value pairs.
                                                // Tuple2 implements Map.Entry making it easy to
                                                // create the pair right here.
-                                               // Note: mail._2() is the address
+                                               // Note: mail._2() is the address string
                                                .map(mail -> tup(mail._2(), person)))
-                        // Now convert the result into an immutable map.  The function argument is
+                        // Convert the result into an immutable map.  The function argument is
                         // normally used to convert data into key/value pairs, but we already have
                         // key/value pairs, so we just pass the identity function (returns its
                         // argument unchanged)
-                      .toImMap(Function1.identity());
+                      .toImMap(x -> x);
 
         // Look at the map we just created
         assertEquals("PersistentHashMap(" +
-                     "Tuple2(d@e.f," +
-                     "Tuple3(Fred,Tase,PersistentVector(Tuple2(HOME,c@d.e),Tuple2(WORK,d@e.f))))," +
                      "Tuple2(a@b.c," +
                      "Tuple3(Jane,Smith,PersistentVector(Tuple2(HOME,a@b.c),Tuple2(WORK,b@c.d))))," +
                      "Tuple2(b@c.d," +
                      "Tuple3(Jane,Smith,PersistentVector(Tuple2(HOME,a@b.c),Tuple2(WORK,b@c.d))))," +
                      "Tuple2(c@d.e," +
-                     "Tuple3(Fred,Tase,PersistentVector(Tuple2(HOME,c@d.e),Tuple2(WORK,d@e.f)))))",
+                     "Tuple3(Fred,Tase,PersistentVector(Tuple2(HOME,c@d.e)))))",
                      peopleByEmail.toString());
 
         // Prove that we can now look up Jane by her address
@@ -162,44 +138,16 @@ public class UsageExampleTest {
         // Next we'll look at two different ways to eliminate or simplify those type signatures.
     }
 
-    // Part 2 of 3
-    @Test public void dataDefinitionExample2() {
-        // Fluent interfaces can take maximum advantage of Java's type inferencing.  Here is
-        // more-or-less the same code as the above, still type-checked by the compiler, but without
-        // specifying ANY types explicitly:
-        assertEquals("Jane",
-                     // This is the "people" data structure from above
-                     vec(tup("Jane", "Smith", vec(tup(HOME, "a@b.c"),
-                                                  tup(WORK, "b@c.d"))),
-                         tup("Fred", "Tase", vec(tup(HOME, "c@d.e"),
-                                                 tup(WORK, "d@e.f"))))
-                             // Create a map to look up people by their address
-                             .flatMap(person -> person._3()
-                                                      .map(mail -> tup(mail._2(), person)))
-                             .toImMap(Function1.identity())
-                             // Look up Jane by her address
-                             .get("b@c.d")
-                             // Get her first name
-                             ._1());
-
-        // Conclusion:
-        // This style of coding is great for trying out ideas, but it can be difficult for the
-        // person after you to read, especially with all the _1(), _2(), and _3() methods on tuples.
-        // Naming your data types well can make it more legible as we'll see next.
-    }
-
     // Part 3 of 3
-    // The previous examples could have been cleaned up with ML's or Scala's type aliases, or
-    // Scala's case classes.  In Java we have to use objects, but doing so has the useful side
-    // effect of letting us name the accessor methods.  Extending Tuples also give us immutable
-    // fields, equals(), hashCode(), and toString() implementations for free, which we would
-    // otherwise have to write and debug by hand!
+    // The previous example could have been cleaned up with ML's or Scala's type aliases, or Scala's
+    // case classes.  In Java we have to use objects, but doing so lets us name the accessor
+    // methods.  Extending Tuples also give us immutable fields, equals(), hashCode(), and
+    // toString() implementations for free!
     static class Email extends Tuple2<EmailType,String> {
         Email(EmailType t, String s) { super(t, s); }
 
-        // As long as we are making an object, we might as well give descriptive names to the
-        // field getters
-        public EmailType type() { return _1; }
+        // Give descriptive names to the field getters
+        public EmailType mailType() { return _1; }
         public String address() { return _2; }
     }
 
@@ -207,7 +155,7 @@ public class UsageExampleTest {
     static class Person extends Tuple3<String,String,ImList<Email>> {
         Person(String f, String l, ImList<Email> es) { super(f, l, es); }
 
-        // Give more descriptive names to the field getters
+        // Give descriptive names to the field getters
         public String first() { return _1; }
         public String last() { return _2; }
         public ImList<Email> emailAddrs() { return _3; }
@@ -217,7 +165,7 @@ public class UsageExampleTest {
     // Use the classes we made above to simplify the types and improve the toString implementations.
     @Test public void dataDefinitionExample3() {
 
-        // Compare this type signature with the first example.  Wow!
+        // Compare this type signature with the previous example.  Wow!
         ImList<Person> people =
                 vec(new Person("Jane", "Smith", vec(new Email(HOME, "a@b.c"),
                                                     new Email(WORK, "b@c.d"))),
@@ -233,7 +181,7 @@ public class UsageExampleTest {
                      "PersistentVector(Email(HOME,c@d.e),Email(WORK,d@e.f))))",
                      people.toString());
 
-        // This type signature couldn't be simpler:
+        // This type signature couldn't be simpler (or more descriptive):
         Person jane = people.get(0);
 
         assertEquals("Person(Jane,Smith," +
@@ -245,7 +193,7 @@ public class UsageExampleTest {
         assertEquals("Smith", jane.last());
 
         Email janesAddr = jane.emailAddrs().get(0);
-        assertEquals(HOME, janesAddr.type());
+        assertEquals(HOME, janesAddr.mailType());
         assertEquals("a@b.c", janesAddr.address());
 
         // Another simplified type signature.  Descriptive method names are much easier to read.
@@ -265,7 +213,7 @@ public class UsageExampleTest {
                      "Person(Fred,Tase,PersistentVector(Email(HOME,c@d.e),Email(WORK,d@e.f)))))",
                      peopleByEmail.toString());
 
-        // Now look jane up by address.
+        // Now look Jane up by her address.
         assertEquals(jane, peopleByEmail.get("b@c.d"));
 
         // Conclusion:
@@ -274,7 +222,78 @@ public class UsageExampleTest {
         // legibility, reliability, and consistency.
         //
         // You can begin with a quick and dirty proof of concept, then define types later to make
-        // your code easy to maintain.  If you need to write out a complex type like the first
-        // example, that's a sign that it's time to define some classes with good names.
+        // your code easy to maintain.  If you need to write out a complex type like the second
+        // example, consider defining some classes with good names.
+    }
+
+    // Transormable/UnmodIterable interface example.  These provide a simpler version of something
+    // like java.util.Stream, but wrapping checked exceptions and assuming immutability.
+    @Test public void transformTest() {
+
+        // These transformations do not change the underlying data.  They build a new collection by
+        // chaining together the specified operations, then applying them in a single pass.  vec()
+        // creates a vector (immutable list) of any length.
+        ImList<Integer> v = vec(4, 5);
+
+        // Add more numbers at the beginning.  "precat" is short for "prepend version of
+        // concatenate" or "add-to-beginning".  UnmodIterable is the primary bridge between UncleJim
+        // and traditional Java.  It extends Iterable, but adds transformations and deprecates the
+        // remove() method of the iterator it provides.
+        UnmodIterable<Integer> u1 = v.precat(vec(1, 2, 3));
+
+        // u1 now represents a bigger list of numbers
+        assertEquals(vec(1, 2, 3, 4, 5), u1.toImList());
+
+        // v is unchanged
+        assertEquals(vec(4, 5), v);
+
+        // Many people ask if these transformations are immutable.  Save off this transformation
+        // at this point so we can check that it's unchanged later.
+        UnmodIterable<Integer> u2 = u1;
+
+        // Instead of updating in place, each change returns a new data structure which is an
+        // extremely lightweight copy of the old because it shares as much as possible with the
+        // previous structure.
+        u2 = u2.concat(vec(6, 7, 8, 9));
+
+        assertEquals(vec(1, 2, 3, 4, 5, 6, 7, 8, 9), u2.toImList());
+
+        u2 = u2.filter(i -> i > 4);
+
+        assertEquals(vec(5,6,7,8,9), u2.toImList());
+
+        u2 = u2.map(i -> i - 2);
+
+        assertEquals(vec(3,4,5,6,7), u2.toImList());
+
+        // After a take, the subsequent items are not processed by the transformation.
+        // If you had a billion items, this would only allow the first 5 to be processed.
+        u2 = u2.take(4);
+
+        assertEquals(vec(3,4,5,6), u2.toImList());
+
+        u2 = u2.drop(2);
+
+        assertEquals(vec(5,6), u2.toImList());
+
+        // Let's see that again with the methods all chained together
+        assertEquals(vec(5, 6),
+                     vec(4, 5)                        //          4, 5
+                             .precat(vec(1, 2, 3))    // 1, 2, 3, 4, 5
+                             .concat(vec(6, 7, 8, 9)) // 1, 2, 3, 4, 5, 6, 7, 8, 9
+                             .filter(i -> i > 4)      //             5, 6, 7, 8, 9
+                             .map(i -> i - 2)         //       3, 4, 5, 6, 7
+                             .take(4)                 //       3, 4, 5, 6
+                             .drop(2)                 //             5, 6
+                             .toImList());
+
+        // u1 is unchanged
+        assertEquals(vec(1, 2, 3, 4, 5), u1.toImList());
+
+        // Conclusion:
+        // Once you get used to them, Transformations are easier to write and read than their
+        // traditional Java looping counterparts (and 98% as fast).  They are also much
+        // easier to understand than Java 8 streams and handle and immutable destination
+        // collections well.
     }
 }

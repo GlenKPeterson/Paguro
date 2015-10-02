@@ -24,7 +24,7 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
         .get("b@c.d")
 
         // Get her first name (returns "Jane")
-        ._1());
+        ._1();
 ```
 
 Additional examples are implemented as unit tests to ensure that they remain correct and current.
