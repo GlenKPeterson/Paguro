@@ -60,9 +60,7 @@ Rich Hickey for Clojure
 - Then `mvn clean test` on UncleJim
 
 #To Do
- - Make UnmodList extend UnmodSortedCollection instead of UnmodCollection and UnmodSortedIterable.
  - Make Realizable extend Transformable instead of the other way around.
- - Remove SideEffect.java
  - Update JavaDoc, esp. Im vs. Unmod
  - Improve tests for Tuple so that I can generate good tests as I generate more Tuples.
  - Make a bunch more Tuple classes, and maybe bunch more Function classes.

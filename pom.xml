@@ -23,7 +23,7 @@ http://central.sonatype.org/pages/apache-maven.html
 	-->
 	<groupId>org.organicdesign</groupId>
 	<artifactId>UncleJim</artifactId>
-	<version>0.10.10</version>
+	<version>0.10.11</version>
 	<packaging>jar</packaging>
 
 	<name>UncleJim</name>

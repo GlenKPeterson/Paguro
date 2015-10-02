@@ -30,13 +30,15 @@ import java.util.function.UnaryOperator;
  *
  * {@inheritDoc}
  */
-public interface UnmodList<E> extends List<E>, UnmodCollection<E>, UnmodSortedIterable<E> {
+public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
 
-    // ==================================================== Static ====================================================
+    // ========================================== Static ==========================================
 
     /** The EMPTY list - a sentinel value for use in == comparisons. */
     UnmodList<Object> EMPTY = new UnmodList<Object>() {
-        @Override public UnmodListIterator<Object> listIterator(int index) { return UnmodListIterator.empty(); }
+        @Override public UnmodListIterator<Object> listIterator(int index) {
+            return UnmodListIterator.empty();
+        }
         @Override public int size() { return 0; }
         @Override public Object get(int index) { throw new IndexOutOfBoundsException(); }
     };
@@ -46,8 +48,8 @@ public interface UnmodList<E> extends List<E>, UnmodCollection<E>, UnmodSortedIt
     static <T> UnmodList<T> empty() { return (UnmodList<T>) EMPTY; }
 
     /**
-     Apply the given function against all unique pairings of items in the list.  Does this belong on Function2 instead
-     of List?
+     Apply the given function against all unique pairings of items in the list.  Does this belong on
+     Function2 instead of List?
      */
     static <T> void permutations(List<T> items, Function2<? super T,? super T,?> f) {
         for (int i = 0; i < items.size(); i++) {
@@ -57,7 +59,7 @@ public interface UnmodList<E> extends List<E>, UnmodCollection<E>, UnmodSortedIt
         }
     }
 
-    // =================================================== Instance ===================================================
+    // ========================================= Instance =========================================
 
     /** Not allowed - this is supposed to be unmodifiable */
     @SuppressWarnings("deprecation")
@@ -99,7 +101,9 @@ public interface UnmodList<E> extends List<E>, UnmodCollection<E>, UnmodSortedIt
 
      {@inheritDoc}
      */
-    @Override default boolean containsAll(Collection<?> c) { return UnmodCollection.containsAll(this, c); }
+    @Override default boolean containsAll(Collection<?> c) {
+        return UnmodCollection.containsAll(this, c);
+    }
 
 //boolean	equals(Object o)
 //E	get(int index)
