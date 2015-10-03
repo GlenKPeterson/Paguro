@@ -20,6 +20,12 @@ dependency:tree
 
 Release:
 http://central.sonatype.org/pages/apache-maven.html
+
+I think if you can see it here, then it's deployed:
+https://oss.sonatype.org/content/groups/staging/org/organicdesign/UncleJim/
+
+They say that the Maven search site can take up to 2 hours to update:
+http://mvnrepository.com/artifact/org.organicdesign/UncleJim
 	-->
 	<groupId>org.organicdesign</groupId>
 	<artifactId>UncleJim</artifactId>
@@ -126,7 +132,7 @@ http://central.sonatype.org/pages/apache-maven.html
 				<version>1.6.3</version>
 				<extensions>true</extensions>
 				<configuration>
-					<serverId>oss.sonatype.org</serverId>
+					<serverId>ossrh</serverId>
 					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
 					<autoReleaseAfterClose>true</autoReleaseAfterClose>
 				</configuration>
@@ -142,10 +148,13 @@ http://central.sonatype.org/pages/apache-maven.html
 		</dependency>
 	</dependencies>
 	<distributionManagement>
-		<repository>
-			<id>oss.sonatype.org</id>
-			<name>Sonatype Repository</name>
+		<snapshotRepository>
+			<id>ossrh</id>
 			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 		</repository>
 	</distributionManagement>
 	<properties>
