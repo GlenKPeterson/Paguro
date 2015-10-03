@@ -47,7 +47,7 @@ UncleJim takes advantages of Java's type inferencing by avoiding void return typ
 
 #Details
 
-Additional examples are implemented as unit tests to ensure that they remain correct and current.
+Usage examples are implemented as unit tests to ensure that they remain correct and current.
 
 * [Usage examples](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34) - different ways of improving your Java code with UncleJim.
 
