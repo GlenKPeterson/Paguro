@@ -1,6 +1,6 @@
 UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") is a small library that enables a cleaner, safer style of Java programming.  It approaches a domain specific language (DSL) inside Java.
 
-#Examples
+#Brief Example
 ```java
 // Define some people with lists of email addresses on the
 // fly.  vec() makes a List, tup() makes a Tuple
@@ -27,31 +27,14 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
         ._1();
 ```
 
-Additional examples are implemented as unit tests to ensure that they remain correct and current.
-
-* [Usage examples](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34) - different ways of improving your Java code with UncleJim.
-
-* [Comparison with Traditional Java and Java 8 Streams](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java#L22)
-
-* [Class/Interface Hierarchy](inheritanceHierarchy.pdf) (PDF)
-
-* For complete API documentation, please build the javadoc: `mvn javadoc:javadoc`
-
 #Maven Dependency
 ```xml
 <dependency>
         <groupId>org.organicdesign</groupId>
         <artifactId>UncleJim</artifactId>
-        <version>0.10.10</version>
+        <version>0.10.11</version>
 </dependency>
 ```
-
-#Manifesto
-
-* Immutability promotes correct code as much as type safety does.
-* Better to focus on picking the appropriate collections and transformations than on looping details.
-* Write functions before defining classes, yet still take advantage of type safety.
-* On-the fly data definition should be simple and easy.  Naming/formalizing these data structures should be too.
 
 #Features
 
@@ -62,8 +45,28 @@ Additional examples are implemented as unit tests to ensure that they remain cor
 
 UncleJim takes advantages of Java's type inferencing by avoiding void return types, arrays, primatives, and checked exceptions in lambdas.  It can decrease the amount of code you need to write by a factor of at 2x-3x while focusing you on using the right collections for the fastest possible code.
 
-#Self-Guided Training
-[JimTrainer](https://github.com/GlenKPeterson/JimTrainer) contains a few short problem-sets for learning UncleJim 
+#Details
+
+Additional examples are implemented as unit tests to ensure that they remain correct and current.
+
+* [Usage examples](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34) - different ways of improving your Java code with UncleJim.
+
+* [Comparison with Traditional Java and Java 8 Streams](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java#L22)
+
+* [Class/Interface Hierarchy](inheritanceHierarchy.pdf) (PDF)
+
+* For complete API documentation, please build the javadoc: `mvn javadoc:javadoc`
+
+* [JimTrainer self-guided training](https://github.com/GlenKPeterson/JimTrainer) consists of a few short problem-sets for learning UncleJim
+
+* A summary of recent updates is in the [Change Log](changeLog.md)
+
+#Manifesto
+
+* Immutability promotes correct code as much as type safety does.
+* Better to focus on picking the appropriate collections and transformations than on looping details.
+* Write functions before defining classes, yet still take advantage of type safety.
+* On-the fly data definition should be simple and easy.  Naming/formalizing those data structures should be too.
 
 #FAQ
 
@@ -129,9 +132,6 @@ For example: `Function1<Integer,?>` takes an Integer and the return value is ign
 * If you want to define data in Java 8, you end up learning the difference between Arrays.asList() and Collections.singletonList(), or defining one-off classes for every kind of data you might need before you start writing any code. UncleJim has a tiny data-definition language (like a type-safe JSON) with extensible Tuples to give your data structures meaningful type-safe names with a minimum of code.  With UncleJim, you can define your data first and name it later.  Even that initial definition is checked by the type system.
  
 * You can still use non-destructive Java 8 stream methods on immutable (or unmodifiable) collections if you want to.  UncleJim doesn't affect what you do with mutable collections at all (but, eew).
-
-#Change Log
-See [changeLog.txt](changeLog.txt)
 
 #Licenses
 Java&trade; is a registered trademark of the Oracle Corporation in the US and other countries.
