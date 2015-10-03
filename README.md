@@ -95,13 +95,14 @@ No.
 Xform is a lazy, immutable builder for transformations.
 It records the operations you specify without carrying any of them out.
 When you call foldLeft() or one of the "endpoint" methods like toImList(), it creates the lightest-weight execution path and performs simplified operations in a for loop with only 3 if statements (some have sub-branches).
-On my machine, single-threaded, with 30 million items in an ArrayList source, Xform takes an average of 122ms as opposed to 120ms for the native for loop - better than 98% as fast as the fastest iteration available on the JVM, but with much more functionality.
+
+On my machine, single-threaded, with 30 million items in an ArrayList source, Xform takes an average of 122ms as opposed to 120ms for the native for loop - better than 98% as fast as the fastest iteration available on the JVM!
 The heart of the implementation is [_foldLeft() in Xform](src/main/java/org/organicdesign/fp/xform/Xform.java), but it's kind of where "useful and easy to code" meets "fast to execute" and is probably some of the hardest code in the project to read and comprehend.
 The Transfom implementation is loosely based on [Paul Philips concept of a "View,"](https://www.youtube.com/watch?v=uiJycy6dFSQ&t=26m19s) not on Clojure's Sequence abstraction.
 
-There is only one exception: a second version of foldLeft() that takes an extra terminateWhen parameter to stop processing based on an output condition instead of an input condition.
-I think I've used it once, ever, in a real-world situation (normally you use takeWhile to terminate based on an input condition).
-It uses a temporary internal ArrayList to accumulate results for the termination test, then later converts them to whatever output format you specify.
+**Note:** There is a second version of foldLeft() that takes an extra terminateWhen parameter to stop processing based on an output condition instead of an input condition.
+I think I've used it once, ever, in a real-world situation (normally you use takeWhile to terminate before you get to the final collection step).
+Anyway, foldLeft() with the extra argument uses a temporary internal ArrayList to accumulate results for the termination test, then later converts them to whatever output format you specify.
 
 ##Q: How does this compare to Streams and lambda expressions in JDK8?
 
@@ -150,4 +151,4 @@ New contributions should be made under the Apache 2.0 license whenever practical
 I believe it is more popular, clearer, and has been better tested in courts of law.
 
 #Contributors
-You can find build requirements, API highlights, and additional information in: [README2.md](README2.md).
+You can find outdated build requirements, API highlights, and additional information in: [README2.md](README2.md).
