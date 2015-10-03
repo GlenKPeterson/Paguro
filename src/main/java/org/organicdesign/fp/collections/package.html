@@ -32,11 +32,15 @@
 <p>We want to make it as easy as possible to live in an immutable world while working with existing Java code.&#160;
     In a perfect world, all the Java APIs and existing code would be magically rewritten to use Immutable (according to the above definition) collections.</p>
 
-    <p>This package contains Unmodifiable "Unmod" interfaces which override, deprecate, and implement each of the "set" methods in the java.util collections interfaces.&#160;
-    They also provide built-in Transformations (inherited from UnmodIterable).
-    Each of the "Unmod" collection interfaces are eventually extended by "Im" interfaces which represent "Immutable" collections.&#160;
-    The Immutable interfaces further provide new alternative "set" methods which return the altered collection, as well as some convenience methods.&#160;
-    Finally, there are various implementations of the Immutable interfaces.&#160;
+<p>This package contains Unmodifiable "Unmod" interfaces which override, deprecate, and implement each of the "set" methods in the java.util collections interfaces.&#160;
+    They also provide built-in Transformations (inherited from UnmodIterable).&#160;
+    These interfaces were extremely useful before the "Im" implementations were added to this project, but may be able to be worked into the Immutable interfaces some day.&#160;
+    If you find the "Unmod" interfaces really useful, please speak up!</p>
+
+<p>Each of the "Unmod" interfaces is eventually extended by an "Im" interface which represent "Immutable" collections.&#160;
+    The Immutable interfaces provide alternative "set" methods which return the altered collection, as well as some convenience methods.</p>
+
+<p>Finally, there are various implementations of the Immutable interfaces.&#160;
     Most of those implementations (beginning with Persistent___) are derivative works of the source code for Clojure.</p>
 </body>
 </html>

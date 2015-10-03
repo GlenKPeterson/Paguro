@@ -58,7 +58,6 @@ Rich Hickey for Clojure
 - Then `mvn clean test` on UncleJim
 
 #To Do
- - Update JavaDoc, esp. Im vs. Unmod
  - Improve tests for Tuple so that I can generate good tests as I generate more Tuples.
  - Make a bunch more Tuple classes, and maybe bunch more Function classes.
  - Bring unit test coverage back above 80%, or 85% if sensible.  This basically means to add any and all practical tests for PersistentHashMap, then remove unused code.
