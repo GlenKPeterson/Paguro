@@ -15,8 +15,6 @@ These were useful before the Clojure collections and Transformable were fully in
 * [Immutable Transformation Builder](src/main/java/org/organicdesign/fp/xform/Transformable.java)
 (implementation is in [Xform](src/main/java/org/organicdesign/fp/xform/Xform.java))
 
-* [Transformation Endpoints](src/main/java/org/organicdesign/fp/xform/Realizable.java)
-
 * [Data Description Mini-Language](src/main/java/org/organicdesign/fp/StaticImports.java)
 
 * Simplified Java 8 [functional interfaces](src/main/java/org/organicdesign/fp/function) that wrap checked exceptions
@@ -60,7 +58,6 @@ Rich Hickey for Clojure
 - Then `mvn clean test` on UncleJim
 
 #To Do
- - Make Realizable extend Transformable instead of the other way around.
  - Update JavaDoc, esp. Im vs. Unmod
  - Improve tests for Tuple so that I can generate good tests as I generate more Tuples.
  - Make a bunch more Tuple classes, and maybe bunch more Function classes.

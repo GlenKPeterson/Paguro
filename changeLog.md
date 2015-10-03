@@ -1,7 +1,7 @@
 2015-10-02 0.10.11: Summary: just some changes brought about by code review.
- * Removed SideEffect function.  Use `Function0<?>` instead.
+ * Removed SideEffect (zero argument function that returns null).  Use `Function0<?>` instead.
+ * Removed the Realizable interface and simply moved those methods to Transformable.
  * Made UnmodList extend UnmodSortedCollection instead of UnmodCollection and UnmodSortedIterable.
-
 
 2015-09-15 0.10.10: Changed groupId to org.organicdesign (removed the .fp).  First build deployed to Sonatype repository.
 

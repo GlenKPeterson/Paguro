@@ -40,12 +40,14 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 /**
- Represents transformations to be carried out on a collection.  This class also implements the
- methods defined in Realizable so that sub-classes can just implement foldLeft and not have to
- worry about any Realizable functions.
- @param <T>
+ Represents transformations to be carried out on a collection.  The to___() methods were formerly
+ defined by a separate Realizable interface that extended this one, but that never proved useful
+ and it complicated things slightly, so I just combined Realizable into Transformable.
+
+ @param <T> The input type to the current stage of transformation.  Some transforms produce a
+            different output type.
  */
-public interface Transformable<T> extends Realizable<T> {
+public interface Transformable<T> {
     /**
      Add items to the end of this Transformable (precat() adds to the beginning)
      @param list the items to add
@@ -153,21 +155,89 @@ public interface Transformable<T> extends Realizable<T> {
      */
     Transformable<T> takeWhile(Function1<? super T,Boolean> predicate);
 
-    /** {@inheritDoc} */
-    @Override default List<T> toMutableList() {
+    /**
+     Returns an Object[] for backward compatibility
+     */
+    @SuppressWarnings("unchecked")
+    default Object[] toArray() {
+        return toMutableList().toArray();
+//        return al.toArray((T[]) new Object[al.size()]);
+    }
+
+    /**
+     Realize a thread-safe immutable list to access items quickly O(log32 n) by index.
+     */
+    default ImList<T> toImList() {
+        return foldLeft(PersistentVector.empty(), (ts, t) -> ts.append(t));
+    }
+
+    /**
+     Realize an unordered immutable hash map to very quickly O(1) look up values by key, but don't
+     care about ordering.
+
+     @param f1 Maps each item in this collection to a key/value pair.  If the collection is composed
+               of Map.Entries, you can pass Function1.identity() here.
+     @return An unmodifiable map
+     */
+    default <U,V> ImMap<U,V> toImMap(Function1<? super T,Map.Entry<U,V>> f1) {
+        return foldLeft((ImMap<U, V>) PersistentHashMap.<U, V>empty(),
+                        (ts, t) -> ts.assoc(f1.apply(t)));
+    }
+
+    /**
+     Realize an unordered immutable hash set to remove duplicates or very quickly O(1) tell whether
+     the set contains various items, but don't care about ordering.
+
+     @return An unmodifiable set (with duplicates removed)
+     */
+    default ImSet<T> toImSet() {
+        return foldLeft(PersistentHashSet.empty(), (accum, t) -> accum.put(t));
+    }
+
+    /**
+     Realize an immutable, ordered (tree) map to quickly O(log2 n) look up values by key, but still
+     retrieve entries in key order.
+
+     @param comp Determines the ordering.  If U implements Comparable, you can pass
+                 Function2.defaultComparator() here.
+     @param f1 Maps each item in this collection to a key/value pair.  If the collection is composed
+               of Map.Entries, you can pass Function1.identity() here.
+     @return An immutable map
+     */
+    default <U,V> ImSortedMap<U,V> toImSortedMap(Comparator<? super U> comp,
+                                                 Function1<? super T,Map.Entry<U,V>> f1) {
+        return foldLeft((ImSortedMap<U, V>) PersistentTreeMap.<U, V>empty(comp),
+                        (ts, t) -> ts.assoc(f1.apply(t)));
+    }
+
+    /**
+     Realize an immutable, sorted (tree) set to quickly O(log2 n) test it contains items, but still
+     retrieve entries in order.
+
+     @param comparator Determines the ordering.  If T implements Comparable, you can pass
+                       Function2.defaultComparator() here.
+     @return An immutable set (with duplicates removed)
+     */
+    default ImSortedSet<T> toImSortedSet(Comparator<? super T> comparator) {
+        return foldLeft(PersistentTreeSet.ofComp(comparator), (accum, t) -> accum.put(t));
+    }
+
+    /** Realize a mutable list.  Use toImList unless you need to modify the list in-place. */
+    default List<T> toMutableList() {
         return foldLeft(new ArrayList<>(), (ts, t) -> {
             ts.add(t);
             return ts;
         });
     }
 
-    /** {@inheritDoc} */
-    @Override default ImList<T> toImList() {
-        return foldLeft(PersistentVector.empty(), (ts, t) -> ts.append(t));
-    }
+    /**
+     Realize a mutable hash map.  Use toImMap() unless you need to modify the map in-place.
 
-    /** {@inheritDoc} */
-    @Override default <U,V> Map<U,V> toMutableMap(final Function1<? super T,Map.Entry<U,V>> f1) {
+     @param f1 Maps keys to values
+
+     @return A map with the keys from the given set, mapped to values using the given function.
+     */
+    default <U,V> Map<U,V> toMutableMap(final Function1<? super T,Map.Entry<U,V>> f1) {
         return foldLeft(new HashMap<>(), (ts, t) -> {
             Map.Entry<U,V> entry = f1.apply(t);
             ts.put(entry.getKey(), entry.getValue());
@@ -175,8 +245,13 @@ public interface Transformable<T> extends Realizable<T> {
         });
     }
 
-    /** {@inheritDoc} */
-    @Override default <U,V> SortedMap<U,V>
+    /**
+     Realize a mutable tree map.  Use toImSortedMap() unless you need to modify the map in-place.
+
+     @param f1 Maps keys to values
+     @return A map with the keys from the given set, mapped to values using the given function.
+     */
+    default <U,V> SortedMap<U,V>
     toMutableSortedMap(final Function1<? super T,Map.Entry<U,V>> f1) {
         return foldLeft(new TreeMap<>(), (ts, t) -> {
             Map.Entry<U,V> entry = f1.apply(t);
@@ -185,42 +260,27 @@ public interface Transformable<T> extends Realizable<T> {
         });
     }
 
-    /** {@inheritDoc} */
-    @Override
-    default <U,V> ImMap<U,V> toImMap(Function1<? super T,Map.Entry<U,V>> f1) {
-        return foldLeft((ImMap<U, V>) PersistentHashMap.<U, V>empty(),
-                        (ts, t) -> ts.assoc(f1.apply(t)));
-    }
+    /**
+     Realize a mutable hash set. Use toImSet() unless you need to modify the set in-place.
 
-    /** {@inheritDoc} */
-    @Override
-    default <U,V> ImSortedMap<U,V> toImSortedMap(Comparator<? super U> comp,
-                                                 Function1<? super T,Map.Entry<U,V>> f1) {
-        return foldLeft((ImSortedMap<U, V>) PersistentTreeMap.<U, V>empty(comp),
-                        (ts, t) -> ts.assoc(f1.apply(t)));
-    }
-
-    /** {@inheritDoc} */
-    @Override default SortedSet<T> toMutableSortedSet(Comparator<? super T> comparator) {
-        return foldLeft(new TreeSet<>(comparator), (ts, t) -> {
+     @return A mutable set (with duplicates removed)
+     */
+    default Set<T> toMutableSet() {
+        return foldLeft(new HashSet<>(), (ts, t) -> {
             ts.add(t);
             return ts;
         });
     }
 
-    /** {@inheritDoc} */
-    @Override default ImSet<T> toImSet() {
-        return foldLeft(PersistentHashSet.empty(), (accum, t) -> accum.put(t));
-    }
+    /**
+     Returns a mutable tree set. Use toImSortedSet unless you need to modify the set in-place.
 
-    /** {@inheritDoc} */
-    @Override default ImSortedSet<T> toImSortedSet(Comparator<? super T> comparator) {
-        return foldLeft(PersistentTreeSet.ofComp(comparator), (accum, t) -> accum.put(t));
-    }
-
-    /** {@inheritDoc} */
-    @Override default Set<T> toMutableSet() {
-        return foldLeft(new HashSet<>(), (ts, t) -> {
+     @param comparator Determines the ordering.  If T implements Comparable, you can pass
+                       Function2.defaultComparator() here.
+     @return A mutable sorted set
+     */
+    default SortedSet<T> toMutableSortedSet(Comparator<? super T> comparator) {
+        return foldLeft(new TreeSet<>(comparator), (ts, t) -> {
             ts.add(t);
             return ts;
         });
