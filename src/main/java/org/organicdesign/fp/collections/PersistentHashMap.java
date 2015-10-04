@@ -12,19 +12,12 @@ package org.organicdesign.fp.collections;
 
 import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.Option;
-import org.organicdesign.fp.function.Function0;
-import org.organicdesign.fp.function.Function1;
-import org.organicdesign.fp.function.Function2;
-import org.organicdesign.fp.function.Function3;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -41,21 +34,21 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 
-    static private <K, V, R> R doKvreduce(Object[] array, Function3<R,K,V,R> f, R init) {
-        for (int i = 0; i < array.length; i += 2) {
-            if (array[i] != null) {
-                init = f.apply(init, k(array, i), v(array, i + 1));
-            } else {
-                INode<K,V> node = iNode(array, i + 1);
-                if (node != null)
-                    init = node.kvreduce(f, init);
-            }
-            if (isReduced(init)) {
-                return init;
-            }
-        }
-        return init;
-    }
+//    static private <K, V, R> R doKvreduce(Object[] array, Function3<R,K,V,R> f, R init) {
+//        for (int i = 0; i < array.length; i += 2) {
+//            if (array[i] != null) {
+//                init = f.apply(init, k(array, i), v(array, i + 1));
+//            } else {
+//                INode<K,V> node = iNode(array, i + 1);
+//                if (node != null)
+//                    init = node.kvreduce(f, init);
+//            }
+//            if (isReduced(init)) {
+//                return init;
+//            }
+//        }
+//        return init;
+//    }
 
     // TODO: Replace with Mutable.Ref, or make methods return Tuple2.
     private static class Box {
@@ -63,16 +56,15 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         public Box(Object val) { this.val = val; }
     }
 
-    // TODO: Consider getting rid of this.
-    private static final class Reduced {
-        Object val;
-        public Reduced(Object val) { this.val = val; }
-//        public Object deref() { return val; }
-    }
-
-    private static boolean isReduced(Object r){
-        return (r instanceof Reduced);
-    }
+//    private static final class Reduced {
+//        Object val;
+//        public Reduced(Object val) { this.val = val; }
+////        public Object deref() { return val; }
+//    }
+//
+//    private static boolean isReduced(Object r){
+//        return (r instanceof Reduced);
+//    }
 
     private static int mask(int hash, int shift){
         //return ((hash << shift) >>> 27);// & 0x01f;
@@ -456,8 +448,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 
         UnEntry<K,V> find(int shift, int hash, K key);
 
-        // TODO: Unused: Delete!
-        V findVal(int shift, int hash, K key, V notFound);
+//        V findVal(int shift, int hash, K key, V notFound);
 
 //        Sequence<UnmodMap.UnEntry<K,V>> nodeSeq();
 
@@ -465,12 +456,10 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 
         INode<K,V> without(AtomicReference<Thread> edit, int shift, int hash, K key, Box removedLeaf);
 
-        // TODO: Unused: Delete!
-        <R> R kvreduce(Function3<R,K,V,R> f, R init);
+//        <R> R kvreduce(Function3<R,K,V,R> f, R init);
 
-        // TODO: Unused: Delete!
-        <R> R fold(Function2<R,R,R> combinef, Function3<R,K,V,R> reducef, final Function1<Function0,R> fjtask,
-                   final Function1<R,Object> fjfork, final Function1<Object,R> fjjoin);
+//        <R> R fold(Function2<R,R,R> combinef, Function3<R,K,V,R> reducef, final Function1<Function0,R> fjtask,
+//                   final Function1<R,Object> fjfork, final Function1<Object,R> fjjoin);
 
         UnmodIterator<UnEntry<K,V>> iterator();
     }
@@ -529,13 +518,13 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
             return node.find(shift + 5, hash, key);
         }
 
-        @Override public V findVal(int shift, int hash, K key, V notFound){
-            int idx = mask(hash, shift);
-            INode<K,V> node = array[idx];
-            if(node == null)
-                return notFound;
-            return node.findVal(shift + 5, hash, key, notFound);
-        }
+//        @Override public V findVal(int shift, int hash, K key, V notFound){
+//            int idx = mask(hash, shift);
+//            INode<K,V> node = array[idx];
+//            if(node == null)
+//                return notFound;
+//            return node.findVal(shift + 5, hash, key, notFound);
+//        }
 
 //        @Override public Sequence<UnmodMap.UnEntry<K,V>> nodeSeq(){ return Seq.create(array); }
 
@@ -543,54 +532,53 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
             return new Iter<>(array);
         }
 
-        @Override public <R> R kvreduce(Function3<R,K,V,R> f, R init){
-            for(INode<K,V> node : array){
-                if(node != null){
-                    init = node.kvreduce(f,init);
-                    if(isReduced(init))
-                        return init;
-                }
-            }
-            return init;
-        }
-        @Override public <R> R fold(Function2<R,R,R> combinef, Function3<R,K,V,R> reducef,
-                                    final Function1<Function0,R> fjtask, final Function1<R,Object> fjfork,
-                                    final Function1<Object,R> fjjoin){
-            List<Callable<R>> tasks = new ArrayList<>();
-            for(final INode<K,V> node : array){
-                if(node != null){
-                    tasks.add(() -> node.fold(combinef, reducef, fjtask, fjfork, fjjoin));
-                }
-            }
+//        @Override public <R> R kvreduce(Function3<R,K,V,R> f, R init){
+//            for(INode<K,V> node : array){
+//                if(node != null){
+//                    init = node.kvreduce(f,init);
+//                    if(isReduced(init))
+//                        return init;
+//                }
+//            }
+//            return init;
+//        }
+//        @Override public <R> R fold(Function2<R,R,R> combinef, Function3<R,K,V,R> reducef,
+//                                    final Function1<Function0,R> fjtask, final Function1<R,Object> fjfork,
+//                                    final Function1<Object,R> fjjoin){
+//            List<Callable<R>> tasks = new ArrayList<>();
+//            for(final INode<K,V> node : array){
+//                if(node != null){
+//                    tasks.add(() -> node.fold(combinef, reducef, fjtask, fjfork, fjjoin));
+//                }
+//            }
+//
+//            return foldTasks(tasks,combinef,fjtask,fjfork,fjjoin);
+//        }
 
-            return foldTasks(tasks,combinef,fjtask,fjfork,fjjoin);
-        }
-
-        // TODO: Unused: Delete!
-        static private <R> R foldTasks(List<Callable<R>> tasks, final Function2<R,R,R> combinef,
-                                       final Function1<Function0,R> fjtask, final Function1<R,Object> fjfork,
-                                       final Function1<Object,R> fjjoin) {
-
-            if(tasks.isEmpty())
-                return combinef.apply(null,null);
-
-            if(tasks.size() == 1){
-                try {
-                    return tasks.get(0).call();
-                } catch (RuntimeException re) {
-                    throw re;
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            List<Callable<R>> t1 = tasks.subList(0,tasks.size()/2);
-            final List<Callable<R>> t2 = tasks.subList(tasks.size()/2, tasks.size());
-
-            Object forked = fjfork.apply(fjtask.apply(() -> foldTasks(t2, combinef, fjtask, fjfork, fjjoin)));
-
-            return combinef.apply(foldTasks(t1, combinef, fjtask, fjfork, fjjoin), fjjoin.apply(forked));
-        }
+//        static private <R> R foldTasks(List<Callable<R>> tasks, final Function2<R,R,R> combinef,
+//                                       final Function1<Function0,R> fjtask, final Function1<R,Object> fjfork,
+//                                       final Function1<Object,R> fjjoin) {
+//
+//            if(tasks.isEmpty())
+//                return combinef.apply(null,null);
+//
+//            if(tasks.size() == 1){
+//                try {
+//                    return tasks.get(0).call();
+//                } catch (RuntimeException re) {
+//                    throw re;
+//                } catch (Exception e) {
+//                    throw new RuntimeException(e);
+//                }
+//            }
+//
+//            List<Callable<R>> t1 = tasks.subList(0,tasks.size()/2);
+//            final List<Callable<R>> t2 = tasks.subList(tasks.size()/2, tasks.size());
+//
+//            Object forked = fjfork.apply(fjtask.apply(() -> foldTasks(t2, combinef, fjtask, fjfork, fjjoin)));
+//
+//            return combinef.apply(foldTasks(t1, combinef, fjtask, fjfork, fjjoin), fjjoin.apply(forked));
+//        }
 
 
         private ArrayNode<K,V> ensureEditable(AtomicReference<Thread> edit){
@@ -863,22 +851,22 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
             return null;
         }
 
-        @Override public V findVal(int shift, int hash, K key, V notFound) {
-            int bit = bitpos(hash, shift);
-            if ((bitmap & bit) == 0) {
-                return notFound;
-            }
-            int idx = index(bit);
-            K keyOrNull = k(array, 2 * idx);
-            if (keyOrNull == null) {
-                INode<K,V> n = iNode(array, 2 * idx + 1);
-                return n.findVal(shift + 5, hash, key, notFound);
-            }
-            if (equator.eq(key, keyOrNull)) {
-                return v(array, 2 * idx + 1);
-            }
-            return notFound;
-        }
+//        @Override public V findVal(int shift, int hash, K key, V notFound) {
+//            int bit = bitpos(hash, shift);
+//            if ((bitmap & bit) == 0) {
+//                return notFound;
+//            }
+//            int idx = index(bit);
+//            K keyOrNull = k(array, 2 * idx);
+//            if (keyOrNull == null) {
+//                INode<K,V> n = iNode(array, 2 * idx + 1);
+//                return n.findVal(shift + 5, hash, key, notFound);
+//            }
+//            if (equator.eq(key, keyOrNull)) {
+//                return v(array, 2 * idx + 1);
+//            }
+//            return notFound;
+//        }
 
 //        @Override public Sequence<UnEntry<K,V>> nodeSeq() { return NodeSeq.create(array); }
 
@@ -886,15 +874,15 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
             return new NodeIter<>(array);
         }
 
-        @Override public <R> R kvreduce(Function3<R,K,V,R> f, R init){
-            return doKvreduce(array, f, init);
-        }
+//        @Override public <R> R kvreduce(Function3<R,K,V,R> f, R init){
+//            return doKvreduce(array, f, init);
+//        }
 
-        @Override public <R> R fold(Function2<R,R,R> combinef, Function3<R,K,V,R> reducef,
-                                    final Function1<Function0,R> fjtask, final Function1<R,Object> fjfork,
-                                    final Function1<Object,R> fjjoin){
-            return doKvreduce(array, reducef, combinef.apply(null, null));
-        }
+//        @Override public <R> R fold(Function2<R,R,R> combinef, Function3<R,K,V,R> reducef,
+//                                    final Function1<Function0,R> fjtask, final Function1<R,Object> fjfork,
+//                                    final Function1<Object,R> fjjoin){
+//            return doKvreduce(array, reducef, combinef.apply(null, null));
+//        }
 
         private BitmapIndexedNode<K,V> ensureEditable(AtomicReference<Thread> edit){
             if(this.edit == edit)
@@ -1068,15 +1056,15 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
             return null;
         }
 
-        @Override public V findVal(int shift, int hash, K key, V notFound){
-            int idx = findIndex(key);
-            if(idx < 0)
-                return notFound;
-            if (equator.eq(key, k(array, idx))) {
-                return v(array, idx + 1);
-            }
-            return notFound;
-        }
+//        @Override public V findVal(int shift, int hash, K key, V notFound){
+//            int idx = findIndex(key);
+//            if(idx < 0)
+//                return notFound;
+//            if (equator.eq(key, k(array, idx))) {
+//                return v(array, idx + 1);
+//            }
+//            return notFound;
+//        }
 
 //        @Override public Sequence<UnEntry<K,V>> nodeSeq() { return NodeSeq.create(array); }
 
@@ -1084,15 +1072,15 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
             return new NodeIter<>(array);
         }
 
-        @Override public <R> R kvreduce(Function3<R,K,V,R> f, R init){
-            return doKvreduce(array, f, init);
-        }
+//        @Override public <R> R kvreduce(Function3<R,K,V,R> f, R init){
+//            return doKvreduce(array, f, init);
+//        }
 
-        @Override public <R> R fold(Function2<R,R,R> combinef, Function3<R,K,V,R> reducef,
-                                    final Function1<Function0,R> fjtask, final Function1<R,Object> fjfork,
-                                    final Function1<Object,R> fjjoin){
-            return doKvreduce(array, reducef, combinef.apply(null, null));
-        }
+//        @Override public <R> R fold(Function2<R,R,R> combinef, Function3<R,K,V,R> reducef,
+//                                    final Function1<Function0,R> fjtask, final Function1<R,Object> fjfork,
+//                                    final Function1<Object,R> fjjoin){
+//            return doKvreduce(array, reducef, combinef.apply(null, null));
+//        }
 
         public int findIndex(K key){
             for (int i = 0; i < 2*count; i+=2) {

@@ -25,6 +25,7 @@ import org.organicdesign.fp.tuple.Tuple2;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -43,7 +44,7 @@ public class PersistentHashMapTest {
     @Test public void iter() {
         assertFalse(PersistentHashMap.empty().iterator().hasNext());
 
-        PersistentHashMap<String,Integer> m1 = PersistentHashMap.of(Arrays.asList(tup("one", 1)));
+        PersistentHashMap<String,Integer> m1 = PersistentHashMap.of(Collections.singletonList(tup("one", 1)));
         UnmodIterator<UnmodMap.UnEntry<String,Integer>> iter = m1.iterator();
         assertTrue(iter.hasNext());
 
@@ -313,6 +314,53 @@ public class PersistentHashMapTest {
         }
 
         assertEquals(0, t.size());
+    }
+
+    @Test public void biggerHashCollisionWithNull() {
+        int NUM_ITEMS = 300;
+        PersistentHashMap<HashCollision,Integer> m = PersistentHashMap.empty();
+        m = m.assoc(null, -1);
+        assertEquals(1, m.size());
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            m = m.assoc(new HashCollision(ordinal(i)), i);
+            assertEquals(i + 2, m.size());
+        }
+        assertEquals(NUM_ITEMS + 1, m.size());
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            assertEquals(Integer.valueOf(i), m.get(new HashCollision(ordinal(i))));
+        }
+        assertEquals(Integer.valueOf(-1), m.get(null));
+        assertNull(m.get(new HashCollision(ordinal(NUM_ITEMS))));
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            assertTrue(m.containsKey(new HashCollision(ordinal(i))));
+        }
+        assertTrue(m.containsKey(null));
+        assertFalse(m.containsKey(new HashCollision(ordinal(NUM_ITEMS))));
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            assertTrue(m.containsValue(Integer.valueOf(i)));
+        }
+        assertTrue(m.containsValue(Integer.valueOf(-1)));
+        assertFalse(m.containsValue(Integer.valueOf(NUM_ITEMS)));
+
+        m = m.without(null);
+        assertEquals(NUM_ITEMS, m.size());
+        assertNull(m.get(null));
+        assertFalse(m.containsKey(null));
+        assertFalse(m.containsValue(-1));
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            assertEquals(NUM_ITEMS - i, m.size());
+            m = m.without(new HashCollision(ordinal(i)));
+            assertNull(m.get(new HashCollision(ordinal(i))));
+            assertFalse(m.containsKey(new HashCollision(ordinal(i))));
+            assertFalse(m.containsValue(Integer.valueOf(i)));
+        }
+
+        assertEquals(0, m.size());
     }
 
     @Test public void seq3() {
