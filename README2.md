@@ -58,7 +58,6 @@ Rich Hickey for Clojure
 - Then `mvn clean test` on UncleJim
 
 #To Do
- - Bring unit test coverage back above 80%, or 85% if sensible.  This basically means to add any and all practical tests for PersistentHashMap, then remove unused code.
  - Have an Ordered version of Transform as well as the (default) unreliable order.  Only the ordered version can be used for implementing things like equals() and hashCode()
  - Bring back the pointer-arithmetic version of drop()
  - Consider `max(Comparator<T> c, Iterable<? extends T> is)` and min()...  Actually, these probably belong on Transformable.

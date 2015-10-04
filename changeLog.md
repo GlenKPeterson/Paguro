@@ -1,3 +1,6 @@
+**2015-10-04 0.10.14**: *Release 1.0 Candidate* Removed unused code from PersistentHashMap.
+ Making a release in case I made a mistake, so that people can A/B compare.
+
 **2015-10-04 0.10.12**: *Release 1.0 Candidate* Added Tuple4 through Tuple12 plus tests for same.
 These classes and tests are generated, not hand coded, so that we can produce more as needed.
 I did not add corresponding StaticImports tup() methods for the new tuples.
