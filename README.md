@@ -1,5 +1,8 @@
 UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") is a small library that enables a cleaner, safer style of Java programming.  It approaches a domain specific language (DSL) inside Java.
 
+[![Build Status](https://travis-ci.org/GlenKPeterson/UncleJim.svg?branch=master)](https://travis-ci.org/GlenKPeterson/UncleJim)
+[![Code Coverage](http://codecov.io/github/GlenKPeterson/UncleJim/coverage.svg?branch=master)](http://codecov.io/github/GlenKPeterson/UncleJim?branch=master)
+
 #Brief Example
 ```java
 // Define some people with lists of email addresses on the
