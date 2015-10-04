@@ -2,9 +2,6 @@
 Read [README.md](README.md) before this file as that is the official introduction to UncleJim.
 This file contains additional information for contributors, or maybe people who are considering opening an issue.
 
-[![Build Status](https://travis-ci.org/GlenKPeterson/UncleJim.svg?branch=master)](https://travis-ci.org/GlenKPeterson/UncleJim)
-[![Code Coverage](http://codecov.io/github/GlenKPeterson/UncleJim/coverage.svg?branch=master)](http://codecov.io/github/GlenKPeterson/UncleJim?branch=master)
-
 #Additional experimental features:
 * An [Equator](src/main/java/org/organicdesign/fp/collections/Equator.java) and [ComparisonContext](src/main/java/org/organicdesign/fp/collections/Equator.java#L45) which work like `java.util.Comparator`, but for hash-based collections.
 * [Memoization](src/main/java/org/organicdesign/fp/function/Function2.java#L59) for functions
