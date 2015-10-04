@@ -51,6 +51,16 @@ public class PersistentHashMapTest {
 
 //        System.out.println("class: " + iter.getClass());
         assertFalse(iter.hasNext());
+
+        PersistentHashMap<String,Integer> m2 = PersistentHashMap.of(Arrays.asList(tup(null, 2),
+                                                                                  tup("three", 3)));
+        UnmodIterator<UnmodMap.UnEntry<String,Integer>> iter2 = m2.iterator();
+        assertTrue(iter2.hasNext());
+        assertEquals(tup(null, 2), iter2.next());
+
+        assertTrue(iter2.hasNext());
+        assertEquals(tup("three", 3), iter2.next());
+        assertFalse(iter2.hasNext());
     }
 
     @Test public void assocAndGet() {
