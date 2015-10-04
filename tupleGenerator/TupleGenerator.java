@@ -100,7 +100,7 @@ public class TupleGenerator {
                "\n";
     }
 
-    static genTuple(int i) {
+    static void genTuple(int i) throws IOException {
         FileWriter fr = new FileWriter("../src/main/java/org/organicdesign/fp/tuple/Tuple" + i + ".java");
         fr.write(copyright() +
                  "package org.organicdesign.fp.tuple;\n" +
@@ -260,7 +260,7 @@ public class TupleGenerator {
         return sB.toString();
     }
 
-    static void genTupleTest(int i) {
+    static void genTupleTest(int i) throws IOException {
         FileWriter fr = new FileWriter("../src/test/java/org/organicdesign/fp/tuple/Tuple" + i +
                                        "Test.java");
         fr.write(copyright() +
@@ -269,10 +269,8 @@ public class TupleGenerator {
                  "import org.junit.Test;\n" +
                  "\n" +
                  "import static org.junit.Assert.assertEquals;\n" +
-                 "import static org.junit.Assert.assertTrue;\n" +
                  "import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;\n" +
                  "import static org.organicdesign.fp.testUtils.EqualsContract.equalsSameHashCode;\n" +
-                 "\n" +
                  generatedWarning() +
                  "public class Tuple" + i + "Test {\n" +
                  "    @Test public void constructionAndAccess() {\n" +
@@ -302,23 +300,25 @@ public class TupleGenerator {
         // Switch order of first 2 params for same hashcode.
         fr.write("\"" + ordinal(2) + "\",\"" + ordinal(1) + "\"");
         for (int j = 3; j <= i; j++) {
-            sB.append(",\"" + ordinal(j) + "\"");
+            fr.write(",\"" + ordinal(j) + "\"");
         }
         fr.write("));\n" +
                  "\n" +
                  "        assertEquals(\"Tuple" + i + "(");
-        boolean isFirst = true;
+        isFirst = true;
         for (int j = 1; j <= i; j++) {
             if (isFirst) {
                 isFirst = false;
             } else {
-                sB.append(",");
+                fr.write(",");
             }
-            sB.append(ordinal(j));
+            fr.write(ordinal(j));
         }
         fr.write(")\", a.toString());\n" +
                  "    }\n" +
-                 "}\n"
+                 "}\n");
+        fr.flush();
+        fr.close();
     }
 
     public static void main(String... args) throws IOException {
