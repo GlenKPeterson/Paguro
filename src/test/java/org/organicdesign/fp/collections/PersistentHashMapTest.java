@@ -183,6 +183,138 @@ public class PersistentHashMapTest {
 
     }
 
+    @Test public void biggerHashMaps() {
+        int NUM_ITEMS = 300;
+        PersistentHashMap<String,Integer> m = PersistentHashMap.empty();
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            m = m.assoc(ordinal(i), i);
+            assertEquals(i + 1, m.size());
+        }
+        assertEquals(NUM_ITEMS, m.size());
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            assertEquals(Integer.valueOf(i), m.get(ordinal(i)));
+        }
+        assertNull(m.get(ordinal(NUM_ITEMS)));
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            assertTrue(m.containsKey(ordinal(i)));
+        }
+
+        assertFalse(m.containsKey(ordinal(NUM_ITEMS)));
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            assertTrue(m.containsValue(Integer.valueOf(i)));
+        }
+        assertFalse(m.containsValue(Integer.valueOf(NUM_ITEMS)));
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            assertEquals(NUM_ITEMS - i, m.size());
+            m = m.without(ordinal(i));
+            assertNull(m.get(ordinal(i)));
+            assertFalse(m.containsKey(ordinal(i)));
+            assertFalse(m.containsValue(Integer.valueOf(i)));
+        }
+
+        assertEquals(0, m.size());
+    }
+
+    @Test public void biggerHashMapsWithNull() {
+        int NUM_ITEMS = 300;
+        PersistentHashMap<String,Integer> m = PersistentHashMap.empty();
+        m = m.assoc(null, -1);
+        assertEquals(1, m.size());
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            m = m.assoc(ordinal(i), i);
+            assertEquals(i + 2, m.size());
+        }
+        assertEquals(NUM_ITEMS + 1, m.size());
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            assertEquals(Integer.valueOf(i), m.get(ordinal(i)));
+        }
+        assertEquals(Integer.valueOf(-1), m.get(null));
+        assertNull(m.get(ordinal(NUM_ITEMS)));
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            assertTrue(m.containsKey(ordinal(i)));
+        }
+        assertTrue(m.containsKey(null));
+        assertFalse(m.containsKey(ordinal(NUM_ITEMS)));
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            assertTrue(m.containsValue(Integer.valueOf(i)));
+        }
+        assertTrue(m.containsValue(Integer.valueOf(-1)));
+        assertFalse(m.containsValue(Integer.valueOf(NUM_ITEMS)));
+
+        m = m.without(null);
+        assertEquals(NUM_ITEMS, m.size());
+        assertNull(m.get(null));
+        assertFalse(m.containsKey(null));
+        assertFalse(m.containsValue(-1));
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            assertEquals(NUM_ITEMS - i, m.size());
+            m = m.without(ordinal(i));
+            assertNull(m.get(ordinal(i)));
+            assertFalse(m.containsKey(ordinal(i)));
+            assertFalse(m.containsValue(Integer.valueOf(i)));
+        }
+
+        assertEquals(0, m.size());
+    }
+
+    @Test public void transientWithNull() {
+        int NUM_ITEMS = 300;
+        PersistentHashMap<String,Integer> m = PersistentHashMap.empty();
+        PersistentHashMap.TransientHashMap<String,Integer> t = m.asTransient();
+        t = t.assoc(null, -1);
+        assertEquals(1, t.size());
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            t = t.assoc(ordinal(i), i);
+            assertEquals(i + 2, t.size());
+        }
+        assertEquals(NUM_ITEMS + 1, t.size());
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            assertEquals(Integer.valueOf(i), t.get(ordinal(i)));
+        }
+        assertEquals(Integer.valueOf(-1), t.get(null));
+        assertNull(t.get(ordinal(NUM_ITEMS)));
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            assertTrue(t.containsKey(ordinal(i)));
+        }
+        assertTrue(t.containsKey(null));
+        assertFalse(t.containsKey(ordinal(NUM_ITEMS)));
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            assertTrue(t.containsValue(Integer.valueOf(i)));
+        }
+        assertTrue(t.containsValue(Integer.valueOf(-1)));
+        assertFalse(t.containsValue(Integer.valueOf(NUM_ITEMS)));
+
+        t = t.without(null);
+        assertEquals(NUM_ITEMS, t.size());
+        assertNull(t.get(null));
+        assertFalse(t.containsKey(null));
+        assertFalse(t.containsValue(-1));
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            assertEquals(NUM_ITEMS - i, t.size());
+            t = t.without(ordinal(i));
+            assertNull(t.get(ordinal(i)));
+            assertFalse(t.containsKey(ordinal(i)));
+            assertFalse(t.containsValue(Integer.valueOf(i)));
+        }
+
+        assertEquals(0, t.size());
+    }
+
     @Test public void seq3() {
         PersistentHashMap<String,Integer> m1 = PersistentHashMap.of(vec(tup("c", 1)));
         assertEquals(Option.of(tup("c", 1)),
