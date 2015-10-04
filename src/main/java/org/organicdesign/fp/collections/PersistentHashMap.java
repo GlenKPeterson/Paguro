@@ -449,14 +449,14 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         }
     }
 
-    interface INode<K,V> extends Serializable {
+    private interface INode<K,V> extends Serializable {
         INode<K,V> assoc(int shift, int hash, K key, V val, Box addedLeaf);
 
         INode<K,V> without(int shift, int hash, K key);
 
         UnEntry<K,V> find(int shift, int hash, K key);
 
-        // TODO: I think this is unused.
+        // TODO: Unused: Delete!
         V findVal(int shift, int hash, K key, V notFound);
 
 //        Sequence<UnmodMap.UnEntry<K,V>> nodeSeq();
@@ -465,8 +465,10 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 
         INode<K,V> without(AtomicReference<Thread> edit, int shift, int hash, K key, Box removedLeaf);
 
+        // TODO: Unused: Delete!
         <R> R kvreduce(Function3<R,K,V,R> f, R init);
 
+        // TODO: Unused: Delete!
         <R> R fold(Function2<R,R,R> combinef, Function3<R,K,V,R> reducef, final Function1<Function0,R> fjtask,
                    final Function1<R,Object> fjfork, final Function1<Object,R> fjjoin);
 
@@ -564,9 +566,10 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
             return foldTasks(tasks,combinef,fjtask,fjfork,fjjoin);
         }
 
-        static public <R> R foldTasks(List<Callable<R>> tasks, final Function2<R,R,R> combinef,
-                                      final Function1<Function0,R> fjtask, final Function1<R,Object> fjfork,
-                                      final Function1<Object,R> fjjoin) {
+        // TODO: Unused: Delete!
+        static private <R> R foldTasks(List<Callable<R>> tasks, final Function2<R,R,R> combinef,
+                                       final Function1<Function0,R> fjtask, final Function1<R,Object> fjfork,
+                                       final Function1<Object,R> fjjoin) {
 
             if(tasks.isEmpty())
                 return combinef.apply(null,null);
