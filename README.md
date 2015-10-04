@@ -67,6 +67,7 @@ Usage examples are implemented as unit tests to ensure that they remain correct 
 * Better to focus on picking the appropriate collections and transformations than on looping details.
 * Write functions before defining classes, yet still take advantage of type safety.
 * On-the fly data definition should be simple and easy.  Naming/formalizing those data structures should be too.
+* Minimal, easy-to-understand interface covering the most critical building blocks for higher functionality.
 
 #FAQ
 
