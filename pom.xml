@@ -92,7 +92,11 @@ http://mvnrepository.com/artifact/org.organicdesign/UncleJim
 				<executions>
 					<execution>
 						<id>sign-artifacts</id>
+						<!--
+						Changed this to deploy to make trivis-ci build correctly.
 						<phase>verify</phase>
+						-->
+						<phase>deploy</phase>
 						<goals>
 							<goal>sign</goal>
 						</goals>
