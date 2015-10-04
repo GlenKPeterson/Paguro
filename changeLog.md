@@ -1,15 +1,24 @@
-2015-10-03 0.10.11: Summary: just some changes brought about by code review.
+**2015-10-04 0.10.12**: *Release 1.0 Candidate* Added Tuple4 through Tuple12 plus tests for same.
+These classes and tests are generated, not hand coded, so that we can produce more as needed.
+I did not add corresponding StaticImports tup() methods for the new tuples.
+There is a point where you should be defining classes instead of flinging tuples around.
+I don't know where that point is, I suspect it's around Tuple5 or 6.
+I can never take things away from StaticImports, so I want to be sure before adding them.
+Feedback on this is appreciated.
+
+**2015-10-03 0.10.11**: Summary: just some changes brought about by code review.
+
  * Removed SideEffect (zero argument function that returns null).  Use `Function0<?>` instead.
  * Removed the Realizable interface and simply moved those methods to Transformable.
  * Made UnmodList extend UnmodSortedCollection instead of UnmodCollection and UnmodSortedIterable.
 
-2015-09-15 0.10.10: Changed groupId to org.organicdesign (removed the .fp).  First build deployed to Sonatype repository.
+**2015-09-15 0.10.10**: Changed groupId to org.organicdesign (removed the .fp).  First build deployed to Sonatype repository.
 
-2015-09-14 0.10.9: Made tuple fields protected so that sub-classes can wrap them more efficiently in well-named accessor methods.
+**2015-09-14 0.10.9**: Made tuple fields protected so that sub-classes can wrap them more efficiently in well-named accessor methods.
 Also updated docs and fixed one unit test to be within 'profile compact1'.
 *Note:* Running tests inside IntelliJ ignores this compiler option, so tests must be run from the command line to ensure compliance.
 
-2015-09-12 0.10.8: Renamed ImList.appendOne() to just ImList.append().
+**2015-09-12 0.10.8**: Renamed ImList.appendOne() to just ImList.append().
 Plus, lots of documentation changes.
 
 2015-09-09 version 0.10.7: *Beta!*  Compiled with -profile compact1.

@@ -58,8 +58,6 @@ Rich Hickey for Clojure
 - Then `mvn clean test` on UncleJim
 
 #To Do
- - Improve tests for Tuple so that I can generate good tests as I generate more Tuples.
- - Make a bunch more Tuple classes, and maybe bunch more Function classes.
  - Bring unit test coverage back above 80%, or 85% if sensible.  This basically means to add any and all practical tests for PersistentHashMap, then remove unused code.
  - Have an Ordered version of Transform as well as the (default) unreliable order.  Only the ordered version can be used for implementing things like equals() and hashCode()
  - Bring back the pointer-arithmetic version of drop()
@@ -68,7 +66,7 @@ Rich Hickey for Clojure
  Ensure you can chain together functions in a short-circuiting way, without exceptions or other side-effects.
  - Add a [Persistent RRB Tree](http://infoscience.epfl.ch/record/169879/files/RMTrees.pdf) and compare its performance to the PersistentVector.
  - Re-implement Persistent collections from Algorithms and Purely Functional Data Structures without relying on a wrapped transient collection and without locking checks, then compare efficiency.
- - This project needs a new name.  It's really not about Unmodifiable collections any more.  Consider just Jimm (used), Cake Pan, Baking Mold...
+ - This project needs a better name.  It's really not about Unmodifiable collections any more.  Consider just Jimm (used), Cake Pan, Baking Mold...
  Something else that conveys Immutability.  I hate that name because these collections are absolutely changeable.  They just aren't changeable in-place.
  Really, moulting (or shedding an exoskeleton) is a better analogy because these collections grow by changing a lightweight wrapper while what's inside stays basically the same.
  Of the various animals that moult or shed their skins or exoskeletons, most are pretty darn disgusting.

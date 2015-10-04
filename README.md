@@ -32,7 +32,7 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
 <dependency>
         <groupId>org.organicdesign</groupId>
         <artifactId>UncleJim</artifactId>
-        <version>0.10.11</version>
+        <version>0.10.12</version>
 </dependency>
 ```
 
