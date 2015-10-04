@@ -21,8 +21,7 @@ import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCo
 import static org.organicdesign.fp.testUtils.EqualsContract.equalsSameHashCode;
 
 public class Tuple3Test {
-    @Test
-    public void constructionAndAccess() {
+    @Test public void constructionAndAccess() {
         Tuple3<Integer,String,Boolean> a = Tuple3.of(3, "2nd", true);
 
         assertEquals(new Integer(3), a._1());
@@ -61,5 +60,4 @@ public class Tuple3Test {
 
         assertEquals("Tuple3(hi,11,true)", Tuple3.of("hi", 11, true).toString());
     }
-
 }
