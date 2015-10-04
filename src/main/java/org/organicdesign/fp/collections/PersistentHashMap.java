@@ -456,6 +456,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 
         UnEntry<K,V> find(int shift, int hash, K key);
 
+        // TODO: I think this is unused.
         V findVal(int shift, int hash, K key, V notFound);
 
 //        Sequence<UnmodMap.UnEntry<K,V>> nodeSeq();

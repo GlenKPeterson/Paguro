@@ -20,7 +20,6 @@ import org.junit.runners.JUnit4;
 import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.FunctionUtilsTest;
 import org.organicdesign.fp.Option;
-import org.organicdesign.fp.StaticImportsTest;
 import org.organicdesign.fp.function.Function1;
 import org.organicdesign.fp.tuple.Tuple2;
 
@@ -30,6 +29,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import static org.junit.Assert.*;
@@ -63,6 +63,23 @@ public class PersistentHashMapTest {
         assertFalse(iter2.hasNext());
     }
 
+    static class HashCollision {
+        final String str;
+        HashCollision(String s) { str = s; }
+
+        public int hashCode() { return 37; }
+        @Override public String toString() { return str; }
+        @Override public boolean equals(Object other) {
+            // Cheapest operation first...
+            if (this == other) { return true; }
+            if (!(other instanceof HashCollision)) { return false; }
+            // Details...
+            @SuppressWarnings("rawtypes") final HashCollision that = (HashCollision) other;
+
+            return Objects.equals(str, that.toString());
+        }
+    }
+
     @Test public void assocAndGet() {
         PersistentHashMap<String,Integer> m1 = PersistentHashMap.empty();
         PersistentHashMap<String,Integer> m2 = m1.assoc("one", 1);
@@ -92,6 +109,12 @@ public class PersistentHashMapTest {
         assertEquals(Integer.valueOf(1), m3.get("one"));
         assertEquals(Integer.valueOf(2), m3.get("two"));
         assertNull(m3.get("three"));
+        assertTrue(m3.containsKey("one"));
+        assertTrue(m3.containsKey("two"));
+        assertFalse(m3.containsKey("three"));
+        assertTrue(m3.containsValue(Integer.valueOf(1)));
+        assertTrue(m3.containsValue(Integer.valueOf(2)));
+        assertFalse(m3.containsValue(Integer.valueOf(3)));
 
 //        System.out.println("m3: " + m3);
 //        PersistentHashMap<String,Integer> m4 = m3.assoc("two", twoInt);
@@ -102,6 +125,62 @@ public class PersistentHashMapTest {
 
         // Check that it uses the == test and not the .equals() test.
         assertFalse(m3 == m3.assoc("two", new Integer(2)));
+
+        // Check without().
+        PersistentHashMap<String,Integer> m3a = m3.without("one");
+        assertEquals(1, m3a.size());
+        assertNull(m3a.get("one"));
+        assertEquals(Integer.valueOf(2), m3a.get("two"));
+        assertNull(m3a.get("three"));
+        assertFalse(m3a.containsKey("one"));
+        assertTrue(m3a.containsKey("two"));
+        assertFalse(m3a.containsKey("three"));
+        assertFalse(m3a.containsValue(Integer.valueOf(1)));
+        assertTrue(m3a.containsValue(Integer.valueOf(2)));
+        assertFalse(m3a.containsValue(Integer.valueOf(3)));
+
+        // Test what happens when the hashcodes collide but objects are different.
+        PersistentHashMap<HashCollision,Integer> m4 = PersistentHashMap.empty();
+        m4 = m4.assoc(new HashCollision("one"), 1)
+               .assoc(new HashCollision("two"), 2)
+               .assoc(new HashCollision("three"), 3);
+
+        assertEquals(3, m4.size());
+        assertEquals(Integer.valueOf(1), m4.get(new HashCollision("one")));
+        assertEquals(Integer.valueOf(2), m4.get(new HashCollision("two")));
+        assertEquals(Integer.valueOf(3), m4.get(new HashCollision("three")));
+        assertNull(m4.get(new HashCollision("four")));
+        assertTrue(m4.containsKey(new HashCollision("one")));
+        assertTrue(m4.containsKey(new HashCollision("two")));
+        assertTrue(m4.containsKey(new HashCollision("three")));
+        assertFalse(m4.containsKey(new HashCollision("four")));
+        assertTrue(m4.containsValue(Integer.valueOf(1)));
+        assertTrue(m4.containsValue(Integer.valueOf(2)));
+        assertTrue(m4.containsValue(Integer.valueOf(3)));
+        assertFalse(m4.containsValue(Integer.valueOf(4)));
+
+        // Check that inserting the same key/value pair returns the same collection.
+        assertTrue(m4 == m4.assoc(new HashCollision("two"), twoInt));
+
+        // Check that it uses the == test and not the .equals() test.
+        assertFalse(m4 == m4.assoc(new HashCollision("two"), new Integer(2)));
+
+        // Check without().
+        PersistentHashMap<HashCollision,Integer> m5 = m4.without(new HashCollision("two"));
+        assertEquals(2, m5.size());
+        assertEquals(Integer.valueOf(1), m5.get(new HashCollision("one")));
+        assertNull(m5.get(new HashCollision("two")));
+        assertEquals(Integer.valueOf(3), m5.get(new HashCollision("three")));
+        assertNull(m5.get(new HashCollision("four")));
+        assertTrue(m5.containsKey(new HashCollision("one")));
+        assertFalse(m5.containsKey(new HashCollision("two")));
+        assertTrue(m5.containsKey(new HashCollision("three")));
+        assertFalse(m5.containsKey(new HashCollision("four")));
+        assertTrue(m5.containsValue(Integer.valueOf(1)));
+        assertFalse(m5.containsValue(Integer.valueOf(2)));
+        assertTrue(m5.containsValue(Integer.valueOf(3)));
+        assertFalse(m5.containsValue(Integer.valueOf(4)));
+
     }
 
     @Test public void seq3() {
