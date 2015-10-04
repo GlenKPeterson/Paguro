@@ -26,5 +26,4 @@ public class Tuple4Test {
 
         assertEquals("Tuple4(1.0,3,3rd,true)", a.toString());
     }
-
 }
