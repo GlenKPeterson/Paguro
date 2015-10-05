@@ -210,6 +210,9 @@ public class PersistentHashMapTest {
         }
         assertFalse(m.containsValue(Integer.valueOf(NUM_ITEMS)));
 
+        // If you remove a key that's not there, you should get back the original map.
+        assertTrue(m == m.without(ordinal(NUM_ITEMS)));
+
         for (int i = 0; i < NUM_ITEMS; i++) {
             assertEquals(NUM_ITEMS - i, m.size());
             m = m.without(ordinal(i));
@@ -314,6 +317,14 @@ public class PersistentHashMapTest {
         }
 
         assertEquals(0, t.size());
+    }
+
+    @Test (expected = IllegalAccessError.class)
+    public void transientHashEx1() {
+        PersistentHashMap<String,Integer> m = PersistentHashMap.empty();
+        PersistentHashMap.TransientHashMap<String,Integer> t = m.asTransient();
+        t.persistent();
+        t.size();
     }
 
     @Test public void biggerHashCollisionWithNull() {

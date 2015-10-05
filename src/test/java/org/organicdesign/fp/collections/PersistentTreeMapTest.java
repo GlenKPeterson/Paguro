@@ -28,6 +28,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import static org.junit.Assert.*;
+import static org.organicdesign.fp.FunctionUtils.ordinal;
 import static org.organicdesign.fp.StaticImports.tup;
 import static org.organicdesign.fp.StaticImports.vec;
 import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
@@ -396,6 +397,80 @@ public class PersistentTreeMapTest {
                        "twenty one");
 
         assertEquals(v, m.map(e -> e.getValue()).toImList());
+    }
+
+    @Test public void biggerTreeMaps() {
+        int NUM_ITEMS = 300;
+        PersistentTreeMap<String,Integer> m = PersistentTreeMap.empty();
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            m = m.assoc(ordinal(i), i);
+            assertEquals(i + 1, m.size());
+        }
+        assertEquals(NUM_ITEMS, m.size());
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            assertEquals(Integer.valueOf(i), m.get(ordinal(i)));
+        }
+        assertNull(m.get(ordinal(NUM_ITEMS)));
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            assertTrue(m.containsKey(ordinal(i)));
+        }
+
+        assertFalse(m.containsKey(ordinal(NUM_ITEMS)));
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            assertTrue(m.containsValue(Integer.valueOf(i)));
+        }
+        assertFalse(m.containsValue(Integer.valueOf(NUM_ITEMS)));
+
+        // If you remove a key that's not there, you should get back the original map.
+        assertTrue(m == m.without(ordinal(NUM_ITEMS)));
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            assertEquals(NUM_ITEMS - i, m.size());
+            m = m.without(ordinal(i));
+            assertNull(m.get(ordinal(i)));
+            assertFalse(m.containsKey(ordinal(i)));
+            assertFalse(m.containsValue(Integer.valueOf(i)));
+        }
+
+        assertEquals(0, m.size());
+
+        // Because this map is sorted, building it in reverse is also a useful test.
+        for (int i = NUM_ITEMS - 1; i >= 0; i--) {
+            m = m.assoc(ordinal(i), i);
+            assertEquals(NUM_ITEMS - i, m.size());
+        }
+        assertEquals(NUM_ITEMS, m.size());
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            assertEquals(Integer.valueOf(i), m.get(ordinal(i)));
+        }
+        assertNull(m.get(ordinal(NUM_ITEMS)));
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            assertTrue(m.containsKey(ordinal(i)));
+        }
+
+        assertFalse(m.containsKey(ordinal(NUM_ITEMS)));
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            assertTrue(m.containsValue(Integer.valueOf(i)));
+        }
+        assertFalse(m.containsValue(Integer.valueOf(NUM_ITEMS)));
+
+        // If you remove a key that's not there, you should get back the original map.
+        assertTrue(m == m.without(ordinal(NUM_ITEMS)));
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            assertEquals(NUM_ITEMS - i, m.size());
+            m = m.without(ordinal(i));
+            assertNull(m.get(ordinal(i)));
+            assertFalse(m.containsKey(ordinal(i)));
+            assertFalse(m.containsValue(Integer.valueOf(i)));
+        }
     }
 
     @Test public void entrySet() {
