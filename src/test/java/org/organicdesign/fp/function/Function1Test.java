@@ -3,12 +3,14 @@ package org.organicdesign.fp.function;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.organicdesign.fp.Mutable;
 
 import java.io.IOException;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.organicdesign.fp.FunctionUtils.ordinal;
 import static org.organicdesign.fp.StaticImports.vec;
 
 @RunWith(JUnit4.class)
@@ -98,6 +100,16 @@ public class Function1Test {
     }
 
     @Test public void compose() {
+        assertEquals(Function1.IDENTITY,
+                     Function1.compose((Iterable<Function1<String,String>>) null));
+
+        assertEquals(Function1.IDENTITY, Function1.compose(vec(null, null, null)));
+
+        assertEquals(Function1.IDENTITY, Function1.compose(vec(null, Function1.identity(), null)));
+
+        assertEquals(Function1.ACCEPT, Function1.compose(vec(null, Function1.identity(), null,
+                                                             Function1.accept())));
+
         Function1<Integer,String> intToStr = new Function1<Integer, String>() {
             @Override
             public String applyEx(Integer i) throws Exception {
@@ -166,5 +178,31 @@ public class Function1Test {
                         .toMutableList()
                         .toArray(),
                 new Integer[]{1, 2, 4, 6, 7, 8, 9});
+    }
+
+    @Test public void testMemoize() {
+        final int MAX_INT = 1000;
+        Mutable.IntRef ir = Mutable.IntRef.of(0);
+        Function1<Integer,String> f = Function1.memoize(i -> {
+            ir.increment();
+            return ordinal(i);
+        });
+
+        assertEquals(0, ir.value());
+
+        // Call function a bunch of times, memoizing the results.
+        for (int i = 0; i < MAX_INT; i++) {
+            f.apply(i);
+        }
+        // Assert count of calls equals the actual number.
+        assertEquals(MAX_INT, ir.value());
+
+        // Make all those calls again.
+        for (int i = 0; i < MAX_INT; i++) {
+            f.apply(i);
+        }
+
+        // Assert that function has not actually been called again.
+        assertEquals(MAX_INT, ir.value());
     }
 }

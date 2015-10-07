@@ -32,41 +32,8 @@ import java.util.function.Function;
  */
 @FunctionalInterface
 public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
-    /** Implement this one method and you don't have to worry about checked exceptions. */
-    U applyEx(T t) throws Exception;
-
-    /** Call this convenience method so that you don't have to worry about checked exceptions. */
-    @Override default U apply(T t) {
-        try {
-            return applyEx(t);
-        } catch (RuntimeException re) {
-            throw re;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override default void accept(T t) { apply(t); }
-
-    @SuppressWarnings("unchecked")
-    default <S> Function1<S,U> compose(final Function1<? super S, ? extends T> f) {
-        if (f == IDENTITY) {
-            // This violates type safety, but makes sense - composing any function with the
-            // identity function should return the original function unchanged.  If you mess up the
-            // types, then that's your problem.  With generics and type erasure this may be the
-            // best you can do.
-            return (Function1<S,U>) this;
-        }
-        final Function1<T,U> parent = this;
-        return new Function1<S, U>() {
-            @Override
-            public U applyEx(S s) throws Exception {
-                return parent.applyEx(f.applyEx(s));
-            }
-        };
-    }
-
-    public static final Function1<Object,Object> IDENTITY = new Function1<Object,Object>() {
+    // ========================================== Static ==========================================
+    Function1<Object,Object> IDENTITY = new Function1<Object,Object>() {
 
         @Override
         public Object applyEx(Object t) throws Exception {
@@ -84,6 +51,47 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
 
     @SuppressWarnings("unchecked")
     public static <V> Function1<V,V> identity() { return (Function1<V,V>) IDENTITY; }
+
+    static <S> Function1<S,Boolean> or(Function1<S,Boolean> a, Function1<S,Boolean> b) {
+        return  a == ACCEPT ? a : // If any are true, all are true.  Accept is always true, so no composition necessary.
+                a == REJECT ? b : // return whatever b is.
+                b == ACCEPT ? b : // If any are true, all are true.
+                b == REJECT ? a : // Just amounts to if a else false, no composition necessary.
+                (S s) -> (a.apply(s) == Boolean.TRUE) || (b.apply(s) == Boolean.TRUE); // compose new function.
+    }
+
+    static <S> Function1<S,Boolean> and(Function1<S,Boolean> a, Function1<S,Boolean> b) {
+        return  a == ACCEPT ? b : // return whatever b is.
+                a == REJECT ? a : // if any are false, all are false.  No composition necessary.
+                b == ACCEPT ? a : // Just amounts to if a else false, no composition necessary.
+                b == REJECT ? b : // If any are false, all are false.
+                (S s) -> (a.apply(s) == Boolean.TRUE) && (b.apply(s) == Boolean.TRUE); // compose new fn
+    }
+
+    static <S> Function1<S,Boolean> negate(Function1<? super S,Boolean> a) {
+        return  a == ACCEPT ? reject() :
+                a == REJECT ? accept() :
+                        (S s) -> (a.apply(s) == Boolean.TRUE) ? Boolean.FALSE : Boolean.TRUE;
+    }
+
+    /** A predicate that always returns true.  Use accept() for a type-safe version of this predicate. */
+    Function1<Object,Boolean> ACCEPT = new Function1<Object,Boolean>() {
+        @Override public Boolean applyEx(Object t) { return Boolean.TRUE; }
+    };
+
+    /** A predicate that always returns false. Use reject() for a type-safe version of this predicate. */
+    Function1<Object,Boolean> REJECT = new Function1<Object,Boolean>() {
+        @Override public Boolean applyEx(Object t) { return Boolean.FALSE; }
+    };
+
+    /** Returns a type-safe version of the ACCEPT predicate. */
+    @SuppressWarnings("unchecked")
+    public static <T> Function1<T,Boolean> accept() { return (Function1<T,Boolean>) ACCEPT; }
+
+    /** Returns a type-safe version of the REJECT predicate. */
+    @SuppressWarnings("unchecked")
+    public static <T> Function1<T,Boolean> reject() { return (Function1<T,Boolean>) REJECT; }
+
 
     /**
      Composes multiple functions into a single function to potentially minimize trips through
@@ -152,75 +160,6 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
             };
         }
     }
-
-//    /**
-//     Composes multiple functions into a single function to potentially minimize trips through
-//     the source data.  The resultant function will loop through the functions for each item in the
-//     source, but for few filters and many source items, that takes less memory.  Considers no
-//     function to mean the identity function.  This decision is based on the way filters work and
-//     may or may not prove useful in practice.  Please use the identity()/IDENTITY
-//     sentinel value in this abstract class since function comparison is done by reference.
-//
-//     @param in the functions to applyEx in order.  Nulls and IDENTITY functions are ignored.
-//     No functions means IDENTITY.
-//
-//     @param <V> the type of object to chain functions on
-//
-//     @return a function which applies all the given functions in order.
-//     */
-//    public static <A,B,C> Function1<A,C> chain2(final Function1<A,B> f1, final Function1<B,C> f2) {
-//        return new Function1<A,C>() {
-//            @Override
-//            public C applyEx(A a) throws Exception {
-//                return f2.applyEx(f1.applyEx(a));
-//            }
-//        };
-//    }
-
-// Don't think this is necessary.  Is it?
-//    default Function<T,U> asFunction() {
-//        return (T t) -> apply(t);
-//    }
-
-    static <S> Function1<S,Boolean> or(Function1<S,Boolean> a, Function1<S,Boolean> b) {
-        return  a == ACCEPT ? a : // If any are true, all are true.  Accept is always true, so no composition necessary.
-                a == REJECT ? b : // return whatever b is.
-                b == ACCEPT ? b : // If any are true, all are true.
-                b == REJECT ? a : // Just amounts to if a else false, no composition necessary.
-                (S s) -> (a.apply(s) == Boolean.TRUE) || (b.apply(s) == Boolean.TRUE); // compose new function.
-    }
-
-    static <S> Function1<S,Boolean> and(Function1<S,Boolean> a, Function1<S,Boolean> b) {
-        return  a == ACCEPT ? b : // return whatever b is.
-                a == REJECT ? a : // if any are false, all are false.  No composition necessary.
-                b == ACCEPT ? a : // Just amounts to if a else false, no composition necessary.
-                b == REJECT ? b : // If any are false, all are false.
-                (S s) -> (a.apply(s) == Boolean.TRUE) && (b.apply(s) == Boolean.TRUE); // compose new fn
-    }
-
-    static <S> Function1<S,Boolean> negate(Function1<? super S,Boolean> a) {
-        return  a == ACCEPT ? reject() :
-                a == REJECT ? accept() :
-                        (S s) -> (a.apply(s) == Boolean.TRUE) ? Boolean.FALSE : Boolean.TRUE;
-    }
-
-    /** A predicate that always returns true.  Use accept() for a type-safe version of this predicate. */
-    Function1<Object,Boolean> ACCEPT = new Function1<Object,Boolean>() {
-        @Override public Boolean applyEx(Object t) { return Boolean.TRUE; }
-    };
-
-    /** A predicate that always returns false. Use reject() for a type-safe version of this predicate. */
-    Function1<Object,Boolean> REJECT = new Function1<Object,Boolean>() {
-        @Override public Boolean applyEx(Object t) { return Boolean.FALSE; }
-    };
-
-    /** Returns a type-safe version of the ACCEPT predicate. */
-    @SuppressWarnings("unchecked")
-    public static <T> Function1<T,Boolean> accept() { return (Function1<T,Boolean>) ACCEPT; }
-
-    /** Returns a type-safe version of the REJECT predicate. */
-    @SuppressWarnings("unchecked")
-    public static <T> Function1<T,Boolean> reject() { return (Function1<T,Boolean>) REJECT; }
 
     /**
      Composes multiple predicates into a single predicate to potentially minimize trips through
@@ -306,7 +245,7 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
      for this to work correctly and quickly.
      */
     static <A,B> Function1<A,B> memoize(Function1<A,B> f) {
-        return new Function1<A, B>() {
+        return new Function1<A,B>() {
             private final Map<A,Option<B>> memo = new HashMap<>();
             @Override
             public synchronized B applyEx(A a) throws Exception {
@@ -315,6 +254,42 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
                 B ret = f.apply(a);
                 memo.put(a, Option.of(ret));
                 return ret;
+            }
+        };
+    }
+
+    // ========================================= Instance =========================================
+
+    /** Implement this one method and you don't have to worry about checked exceptions. */
+    U applyEx(T t) throws Exception;
+
+    /** Call this convenience method so that you don't have to worry about checked exceptions. */
+    @Override default U apply(T t) {
+        try {
+            return applyEx(t);
+        } catch (RuntimeException re) {
+            throw re;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override default void accept(T t) { apply(t); }
+
+    @SuppressWarnings("unchecked")
+    default <S> Function1<S,U> compose(final Function1<? super S, ? extends T> f) {
+        if (f == IDENTITY) {
+            // This violates type safety, but makes sense - composing any function with the
+            // identity function should return the original function unchanged.  If you mess up the
+            // types, then that's your problem.  With generics and type erasure this may be the
+            // best you can do.
+            return (Function1<S,U>) this;
+        }
+        final Function1<T,U> parent = this;
+        return new Function1<S, U>() {
+            @Override
+            public U applyEx(S s) throws Exception {
+                return parent.applyEx(f.applyEx(s));
             }
         };
     }
