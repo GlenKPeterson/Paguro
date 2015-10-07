@@ -1,3 +1,6 @@
+**2015-10-07 0.10.15**: Added OneOf2 class to approximate a union type.
+This is a little bit experimental - see the JavaDocs.
+
 **2015-10-04 0.10.14**: *Release 1.0 Candidate* Removed unused code from PersistentHashMap.
  Making a release in case I made a mistake, so that people can A/B compare.
 
