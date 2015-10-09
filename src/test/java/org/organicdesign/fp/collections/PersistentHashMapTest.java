@@ -851,10 +851,22 @@ public class PersistentHashMapTest {
         Z z5 = Z.of(LocalDateTime.of(2015, 7, 13, 18, 38), 2);
         Z z6 = Z.of(LocalDateTime.of(2016, 6, 13, 18, 38), 1);
 
+        ImMap<Z,String> a0 = PersistentHashMap.ofEq(BY_DATE, null);
+        assertEquals(PersistentHashMap.empty(BY_DATE), a0);
+
+        assertEquals(1, a0.assoc(tup(Z.of(LocalDateTime.of(2015, 6, 13, 18, 38), 6), "one"))
+                          .assoc(tup(Z.of(LocalDateTime.of(2015, 6, 13, 18, 38), 7), "one"))
+                          .size());
+
+        assertEquals(2, a0.assoc(tup(Z.of(LocalDateTime.of(2015, 6, 13, 18, 38), 6), "one"))
+                          .assoc(tup(Z.of(LocalDateTime.of(2015, 6, 13, 18, 39), 6), "one"))
+                          .size());
+
         ImMap<Z,String> a = PersistentHashMap.ofEq(
                 BY_DATE,
                 vec(tup(z1, ordinal(z1.integer)),
                     tup(z3, ordinal(z3.integer)),
+                    null,
                     tup(z5, ordinal(z5.integer)),
                     tup(z6, ordinal(z6.integer))));
 
@@ -971,7 +983,11 @@ public class PersistentHashMapTest {
 
     @Test public void testImMap3() {
         int max = 3;
-        Map<Integer,String> a = PersistentHashMap.of(vec(tup(1, "One"), tup(2, "Two"),
+
+        ImMap<Z,String> a0 = PersistentHashMap.of(null);
+        assertEquals(PersistentHashMap.EMPTY, a0);
+
+        Map<Integer,String> a = PersistentHashMap.of(vec(tup(1, "One"), tup(2, "Two"), null,
                                                          tup(3, "Three")));
         FunctionUtilsTest.mapHelper(a, max);
         ImMap<Integer,String> b = map(tup(1, "One"), tup(2, "Two"), tup(3, "Three"));
@@ -1120,5 +1136,26 @@ public class PersistentHashMapTest {
 
         verify(result, PersistentHashMap.<Integer,String>empty(Equator.defaultEquator())
                 .assoc(1, "one").assoc(null, "nada").assoc(2, "two"));
+
+        PersistentHashMap<Integer,String> h1 = PersistentHashMap.of(vec(tup(null, "nada"),
+                                                                        tup(1, "one"),
+                                                                        tup(2, "two")));
+        // associating the same value with an existing null key is a no-op.
+        assertTrue(h1 == h1.assoc(null, "nada"));
+        assertEquals(h1, h1.assoc(null, "nada"));
+        assertEquals(h1.size(), h1.assoc(null, "nada").size());
+
+        // associating a different value with an existing null key returns a new map.
+        assertFalse(h1 == h1.assoc(null, "different"));
+        assertNotEquals(h1, h1.assoc(null, "different"));
+        assertEquals(h1.size(), h1.assoc(null, "different").size());
+
+        PersistentHashMap<Integer,String> h2 = h1.without(null);
+
+        // associating a null value with an existing map produces a new map with a new null/value
+        // pair.
+        assertFalse(h2 == h2.assoc(null, "nada"));
+        assertNotEquals(h2, h2.assoc(null, "nada"));
+        assertEquals(h2.size() + 1, h2.assoc(null, "nada").size());
     }
 }

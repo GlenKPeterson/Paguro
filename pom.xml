@@ -18,7 +18,10 @@ Show the dependency tree:
 http://maven.apache.org/plugins/maven-dependency-plugin/examples/resolving-conflicts-using-the-dependency-tree.html
 dependency:tree
 
-Release:
+Release: just type:
+mvn clean deploy
+
+Full release instructions (they can change):
 http://central.sonatype.org/pages/apache-maven.html
 
 I think if you can see it here, then it's deployed:
