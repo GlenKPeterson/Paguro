@@ -28,12 +28,13 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
 ```
 
 #Status
-[![Join the chat at https://gitter.im/GlenKPeterson/UncleJim](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/GlenKPeterson/UncleJim?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 [![Build Status](https://travis-ci.org/GlenKPeterson/UncleJim.svg?branch=master)](https://travis-ci.org/GlenKPeterson/UncleJim)
 [![Code Coverage](http://codecov.io/github/GlenKPeterson/UncleJim/coverage.svg?branch=master)](http://codecov.io/github/GlenKPeterson/UncleJim?branch=master)
 
+[![Join the chat at https://gitter.im/GlenKPeterson/UncleJim](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/GlenKPeterson/UncleJim?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 #Maven Dependency
+Available from the [Maven Repository](http://mvnrepository.com/artifact/org.organicdesign/UncleJim) as:
 ```xml
 <dependency>
         <groupId>org.organicdesign</groupId>
@@ -79,67 +80,15 @@ Usage examples are implemented as unit tests to ensure that they remain correct 
 
 ##Q: How does this compare to PCollections?
 
-[PCollections](http://pcollections.org/) competes only with UncleJim's first bullet point: immutable collections.
-Clojure's vector (list) and hashMap/hashSet have O(log<sub>32</sub> *n*) performance, which theoretically scales better than the O(log<sub>2</sub> *n*) binary tree structures it looks like PCollections uses.
-
-![Graph of Log base 32 (red) vs. Log base 2 (blue)](logBase2VsLogBase32.png)
-
-This graph shows how many operations each lookup requires (y) for a given number of items in the collection (x).  The red line is the fast log<sub>32</sub>, the blue is the slower log<sub>2</sub>.
-Daniel Spiewak explains all the ramifications of this better than I ever could: https://www.youtube.com/watch?v=pNhBQJN44YQ
-
-The Clojure collections also walk the sibling nodes in the internal data trees of these structures to provide iterators, which is pretty cool performance-wise.
-PCollections starts from the top of the tree doing an index lookup for each item, then increments the index and goes back to the top to look up the next (at least for the list implementation).
-
-Clojure's (and Java's) sorted/tree map/set implementations are O(log<sub>2</sub> *n*), so PCollections could theoretically be as fast or faster for those two collections.
-If someone does performance testing to verify these theories, please let me know so I can link to it here.
-
-UncleJim has additional benefits listed in the bullets at the top of this document.
+[UncleJim is based on Clojure, theoretically faster and has additional features](wiki/UncleJim%20vs.%20PCollections)
 
 ##Q: Do these Transforms create intermediate collections between each operation (like the Scala collections)?
 
-No.
-
-Xform is a lazy, immutable builder for transformations.
-It records the operations you specify without carrying any of them out.
-When you call foldLeft() or one of the "endpoint" methods like toImList(), it creates the lightest-weight execution path and performs simplified operations in a for loop with only 3 if statements (some have sub-branches).
-
-On my machine, single-threaded, with 30 million items in an ArrayList source, Xform takes an average of 122ms as opposed to 120ms for the native for loop - better than 98% as fast as the fastest iteration available on the JVM!
-The heart of the implementation is [_foldLeft() in Xform](src/main/java/org/organicdesign/fp/xform/Xform.java), but it's kind of where "useful and easy to code" meets "fast to execute" and is probably some of the hardest code in the project to read and comprehend.
-The Transfom implementation is loosely based on [Paul Philips concept of a "View,"](https://www.youtube.com/watch?v=uiJycy6dFSQ&t=26m19s) not on Clojure's Sequence abstraction.
-
-**Note:** There is a second version of foldLeft() that takes an extra terminateWhen parameter to stop processing based on an output condition instead of an input condition.
-I think I've used it once, ever, in a real-world situation (normally you use takeWhile to terminate before you get to the final collection step).
-Anyway, foldLeft() with the extra argument uses a temporary internal ArrayList to accumulate results for the termination test, then later converts them to whatever output format you specify.
+[No](https://github.com/GlenKPeterson/UncleJim/wiki/How-do-%22Xforms%22---Transformations-work%3F)
 
 ##Q: How does this compare to Streams and lambda expressions in JDK8?
 
-* When you process data with a Java8 stream, you end up with a mutable collection.
-You can choose to do that with UncleJim, but it's safer to store your result in an immutable collection.
-java.util.Collections can wrap mutable collections in an unmodifiable wrapper, but UncleJim's wrappers also deprecate the mutator methods so that your IDE and compiler warn you if you try to call them.
-
-* If you later add or remove a few items, Unmodifiable collections require an expensive defensive copy of the entire collection.
-The Clojure-derived collections in UncleJim only duplicate the tiny area of the collection that was changed
-to return a new immutable collection that shares as much data as practical with the old one.
-As immutable collections go, they have excellent performance.
-
-* The [java.util.function interfaces](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java#L258) do nothing to help you with Exceptions.
- [UncleJim wraps checked exceptions in unchecked ones](src/main/java/org/organicdesign/fp/function/Function1.java#L29) for you, so that you can write
- anonymous functions more like you would in Scala.
-
-* For up to 2-argument functions, java.util.function has 43 different interfaces.
-The functional methods on these interfaces are named differently, with a total of 11 different names for `apply()`.
-UncleJim has 3 equivalent interfaces, named by number of arguments (like Scala).
-All have an `applyEx()` that you override and an `apply()` method that callers can use if they want to ignore checked exceptions (they usually do).
-If you don't want to return a result, declare the return type as `?` and return `null`.
-For example: `Function1<Integer,?>` takes an Integer and the return value is ignored.
-
-* You can't use `Collector` on Java 8 streams with immutable data structures.  Even if you love mutability, Java 8 still has the complexity of accumulator vs. combiner functions and a host of implementations of these.  UncleJim collects to immutable data structures with simple methods like toImList() or toImSet().  Some collection methods require that you pass a comparator and or map items to key/value pairs, but these are still very simple operations.
-
-* I had an enum, `MyEnum` and wanted to pass `MyEnum::values` as a function reference to a Java 8 stream.  The return-type of `MyEnum.values()` is  `Enum<MyEnum>[]`.  An array of a parameterized type.  Between the `Arrays.asList()`, the cast from `MyEnum[]` to `Enum<MyEnum>[]`, the checked exception in the method body - what a nightmare!  In UncleJim, all you need is `vec(MyEnum.values())` and you're in happy functional world.
-
-* If you want to define data in Java 8, you end up learning the difference between Arrays.asList() and Collections.singletonList(), or defining one-off classes for every kind of data you might need before you start writing any code. UncleJim has a tiny data-definition language (like a type-safe JSON) with extensible Tuples to give your data structures meaningful type-safe names with a minimum of code.  With UncleJim, you can define your data first and name it later.  Even that initial definition is checked by the type system.
- 
-* You can still use non-destructive Java 8 stream methods on immutable (or unmodifiable) collections if you want to.  UncleJim doesn't affect what you do with mutable collections at all (but, eew).
+[Comparison](https://github.com/GlenKPeterson/UncleJim/wiki/Comparison-with-Streams-and-Lambdas-in-JDK8)
 
 #Licenses
 Java&trade; is a registered trademark of the Oracle Corporation in the US and other countries.
