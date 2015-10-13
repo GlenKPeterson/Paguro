@@ -28,8 +28,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 
@@ -62,6 +64,47 @@ public class PersistentHashMapTest {
         assertTrue(iter2.hasNext());
         assertEquals(tup("three", 3), iter2.next());
         assertFalse(iter2.hasNext());
+    }
+
+    @Test(expected = NoSuchElementException.class)
+    public void iterEx0() { PersistentHashMap.empty().iterator().next(); }
+
+    @Test(expected = NoSuchElementException.class)
+    public void iterEx1() {
+        PersistentHashMap<String,Integer> m = PersistentHashMap.empty();
+        m = m.assoc(null, 1);
+        Iterator<UnmodMap.UnEntry<String,Integer>> iter = m.iterator();
+        iter.next();
+        iter.next();
+    }
+
+    @Test(expected = NoSuchElementException.class)
+    public void iterEx2() {
+        PersistentHashMap<String,Integer> m = PersistentHashMap.empty();
+        m = m.assoc("one", 1);
+        Iterator<UnmodMap.UnEntry<String,Integer>> iter = m.iterator();
+        iter.next();
+        iter.next();
+    }
+
+    @Test(expected = NoSuchElementException.class)
+    public void iterEx3() {
+        PersistentHashMap<String,Integer> m = PersistentHashMap.empty();
+        m = m.assoc(null, 1).assoc("two", 2);
+        Iterator<UnmodMap.UnEntry<String,Integer>> iter = m.iterator();
+        iter.next();
+        iter.next();
+        iter.next();
+    }
+
+    @Test(expected = NoSuchElementException.class)
+    public void iterEx4() {
+        PersistentHashMap<String,Integer> m = PersistentHashMap.empty();
+        m = m.assoc("one", 1).assoc("two", 2);
+        Iterator<UnmodMap.UnEntry<String,Integer>> iter = m.iterator();
+        iter.next();
+        iter.next();
+        iter.next();
     }
 
     static class HashCollision {
@@ -210,8 +253,13 @@ public class PersistentHashMapTest {
         }
         assertFalse(m.containsValue(Integer.valueOf(NUM_ITEMS)));
 
+        assertTrue(m == m.persistent());
+
         // If you remove a key that's not there, you should get back the original map.
         assertTrue(m == m.without(ordinal(NUM_ITEMS)));
+
+        // Same if that key is null.
+        assertTrue(m == m.without(null));
 
         for (int i = 0; i < NUM_ITEMS; i++) {
             assertEquals(NUM_ITEMS - i, m.size());
@@ -253,6 +301,8 @@ public class PersistentHashMapTest {
         }
         assertTrue(m.containsValue(Integer.valueOf(-1)));
         assertFalse(m.containsValue(Integer.valueOf(NUM_ITEMS)));
+
+        assertTrue(m == m.persistent());
 
         m = m.without(null);
         assertEquals(NUM_ITEMS, m.size());
@@ -301,6 +351,8 @@ public class PersistentHashMapTest {
         }
         assertTrue(t.containsValue(Integer.valueOf(-1)));
         assertFalse(t.containsValue(Integer.valueOf(NUM_ITEMS)));
+
+        assertTrue(t == t.asTransient());
 
         t = t.without(null);
         assertEquals(NUM_ITEMS, t.size());
@@ -626,11 +678,13 @@ public class PersistentHashMapTest {
                                PersistentHashMap.of(vec(tup("two", 2), tup("three", 3), tup("four", 4))));
 
         equalsDistinctHashCode(PersistentHashMap.of(vec(tup("one", 1)))
-                                                .assoc("two", 2).assoc("three", 3),
+                                                .assoc("two", 2).assoc("three", 3).assoc(null, 4),
                                PersistentHashMap.of(vec(tup("three", 3)))
-                                                .assoc("two", 2).assoc("one", 1),
-                               PersistentHashMap.of(vec(tup("two", 2), tup("three", 3), tup("one", 1))),
-                               PersistentHashMap.of(vec(tup("zne", 1), tup("two", 2), tup("three", 3))));
+                                                .assoc("two", 2).assoc("one", 1).assoc(null, 4),
+                               PersistentHashMap.of(vec(tup("two", 2), tup("three", 3),
+                                                        tup("one", 1), tup(null, 4))),
+                               PersistentHashMap.of(vec(tup("zne", 1), tup("two", 2),
+                                                        tup("three", 3), tup(null,4))));
 
         equalsDistinctHashCode(PersistentHashMap.of(vec(tup("one", 1)))
                                                 .assoc("two", 2).assoc("three", 3),
@@ -645,6 +699,15 @@ public class PersistentHashMapTest {
                                             .assoc("two", 2).assoc("one", 1),
                            PersistentHashMap.of(vec(tup("two", 2), tup("three", 3), tup("one", 1))),
                            PersistentHashMap.of(vec(tup(1, "one"), tup(2, "two"), tup(3, "three"))));
+
+        equalsSameHashCode(PersistentHashMap.of(vec(tup("one", 1)))
+                                            .assoc("two", 2).assoc("three", 3).assoc(null, 4),
+                           PersistentHashMap.of(vec(tup("three", 3))).assoc(null, 4)
+                                            .assoc("two", 2).assoc("one", 1),
+                           PersistentHashMap.of(vec(tup("two", 2), tup(null, 4), tup("three", 3),
+                                                    tup("one", 1))),
+                           PersistentHashMap.of(vec(tup(1, "one"), tup(2, "two"), tup(3, "three"),
+                                                    tup(4, null))));
     }
 
     public void friendlierArrayEq(Object[] a1, Object[] a2) {
