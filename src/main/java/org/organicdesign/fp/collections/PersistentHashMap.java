@@ -86,7 +86,8 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 
 //    interface IFn {}
 
-    final public static PersistentHashMap<Object,Object> EMPTY = new PersistentHashMap<>(null, 0, null, false, null);
+    final public static PersistentHashMap<Object,Object> EMPTY =
+            new PersistentHashMap<>(null, 0, null, false, null);
 
     @SuppressWarnings("unchecked")
     public static <K,V> PersistentHashMap<K,V> empty() { return (PersistentHashMap<K,V>) EMPTY; }
@@ -104,7 +105,8 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 //    }
 
     /**
-     Returns a new PersistentHashMap of the given keys and their paired values, skipping any null Entries.
+     Returns a new PersistentHashMap of the given keys and their paired values, skipping any null
+     Entries.
      */
     public static <K,V> PersistentHashMap<K,V> ofEq(Equator<K> eq, Iterable<Map.Entry<K,V>> es) {
         if (es == null) { return empty(eq); }
@@ -279,7 +281,8 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 //            R ret = combinef.apply(null,null);
 //            if(root != null)
 //                ret = combinef.apply(ret, root.fold(combinef, reducef, fjtask, fjfork, fjjoin));
-//            return hasNull ? combinef.apply(ret, reducef.apply(combinef.apply(null,null), null, nullValue))
+//            return hasNull ? combinef.apply(ret, reducef.apply(combinef.apply(null,null), null,
+//                                            nullValue))
 //                           : ret;
 //        };
 //        return fjinvoke.apply(top);
@@ -320,10 +323,12 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         private final Box leafFlag = new Box(null);
 
         TransientHashMap(PersistentHashMap<K,V> m) {
-            this(m.equator(), new AtomicReference<>(Thread.currentThread()), m.root, m.count, m.hasNull, m.nullValue);
+            this(m.equator(), new AtomicReference<>(Thread.currentThread()), m.root, m.count,
+                 m.hasNull, m.nullValue);
         }
 
-        TransientHashMap(Equator<K> e, AtomicReference<Thread> edit, INode<K,V> root, int count, boolean hasNull, V nullValue) {
+        TransientHashMap(Equator<K> e, AtomicReference<Thread> edit, INode<K,V> root, int count,
+                         boolean hasNull, V nullValue) {
             this.equator = (e == null) ? Equator.defaultEquator() : e;
             this.edit = edit;
             this.root = root;
@@ -452,13 +457,16 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 
 //        Sequence<UnmodMap.UnEntry<K,V>> nodeSeq();
 
-        INode<K,V> assoc(AtomicReference<Thread> edit, int shift, int hash, K key, V val, Box addedLeaf);
+        INode<K,V> assoc(AtomicReference<Thread> edit, int shift, int hash, K key, V val,
+                         Box addedLeaf);
 
-        INode<K,V> without(AtomicReference<Thread> edit, int shift, int hash, K key, Box removedLeaf);
+        INode<K,V> without(AtomicReference<Thread> edit, int shift, int hash, K key,
+                           Box removedLeaf);
 
 //        <R> R kvreduce(Function3<R,K,V,R> f, R init);
 
-//        <R> R fold(Function2<R,R,R> combinef, Function3<R,K,V,R> reducef, final Function1<Function0,R> fjtask,
+//        <R> R fold(Function2<R,R,R> combinef, Function3<R,K,V,R> reducef,
+//                   final Function1<Function0,R> fjtask,
 //                   final Function1<R,Object> fjfork, final Function1<Object,R> fjjoin);
 
         UnmodIterator<UnEntry<K,V>> iterator();
@@ -543,7 +551,8 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 //            return init;
 //        }
 //        @Override public <R> R fold(Function2<R,R,R> combinef, Function3<R,K,V,R> reducef,
-//                                    final Function1<Function0,R> fjtask, final Function1<R,Object> fjfork,
+//                                    final Function1<Function0,R> fjtask,
+//                                    final Function1<R,Object> fjfork,
 //                                    final Function1<Object,R> fjjoin){
 //            List<Callable<R>> tasks = new ArrayList<>();
 //            for(final INode<K,V> node : array){
@@ -556,7 +565,8 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 //        }
 
 //        static private <R> R foldTasks(List<Callable<R>> tasks, final Function2<R,R,R> combinef,
-//                                       final Function1<Function0,R> fjtask, final Function1<R,Object> fjfork,
+//                                       final Function1<Function0,R> fjtask,
+//                                       final Function1<R,Object> fjfork,
 //                                       final Function1<Object,R> fjjoin) {
 //
 //            if(tasks.isEmpty())
@@ -575,9 +585,11 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 //            List<Callable<R>> t1 = tasks.subList(0,tasks.size()/2);
 //            final List<Callable<R>> t2 = tasks.subList(tasks.size()/2, tasks.size());
 //
-//            Object forked = fjfork.apply(fjtask.apply(() -> foldTasks(t2, combinef, fjtask, fjfork, fjjoin)));
+//            Object forked = fjfork.apply(fjtask.apply(() -> foldTasks(t2, combinef, fjtask,
+//                                         fjfork, fjjoin)));
 //
-//            return combinef.apply(foldTasks(t1, combinef, fjtask, fjfork, fjjoin), fjjoin.apply(forked));
+//            return combinef.apply(foldTasks(t1, combinef, fjtask, fjfork, fjjoin),
+//                                  fjjoin.apply(forked));
 //        }
 
 
@@ -587,7 +599,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
             return new ArrayNode<>(equator, edit, count, this.array.clone());
         }
 
-        private ArrayNode<K,V> editAndSet(AtomicReference<Thread> edit, int i, INode<K,V> n){
+        private ArrayNode<K,V> editAndSet(AtomicReference<Thread> edit, int i, INode<K,V> n) {
             ArrayNode<K,V> editable = ensureEditable(edit);
             editable.array[i] = n;
             return editable;
@@ -613,12 +625,14 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
             return new BitmapIndexedNode<>(equator, edit, bitmap, newArray);
         }
 
-        @Override public INode<K,V> assoc(AtomicReference<Thread> edit, int shift, int hash, K key, V val, Box addedLeaf){
+        @Override public INode<K,V> assoc(AtomicReference<Thread> edit, int shift, int hash,
+                                          K key, V val, Box addedLeaf) {
             int idx = mask(hash, shift);
             INode<K,V> node = array[idx];
             if(node == null) {
                 BitmapIndexedNode<K,V> en = BitmapIndexedNode.empty(equator);
-                ArrayNode<K,V> editable = editAndSet(edit, idx, en.assoc(edit, shift + 5, hash, key, val, addedLeaf));
+                ArrayNode<K,V> editable = editAndSet(edit, idx, en.assoc(edit, shift + 5, hash,
+                                                                         key, val, addedLeaf));
                 editable.count++;
                 return editable;
             }
@@ -629,7 +643,8 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         }
 
         @Override
-        public INode<K,V> without(AtomicReference<Thread> edit, int shift, int hash, K key, Box removedLeaf) {
+        public INode<K,V> without(AtomicReference<Thread> edit, int shift, int hash, K key,
+                                  Box removedLeaf) {
             int idx = mask(hash, shift);
             INode<K,V> node = array[idx];
             if (node == null) {
@@ -652,51 +667,6 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         @Override public String toString() {
             return UnmodIterable.toString("ArrayNode", this);
         }
-
-//        static class Seq<K,V> implements Sequence<UnEntry<K,V>> {
-//            final INode<K,V>[] nodes;
-//            final int i;
-//            final Sequence<UnEntry<K,V>> s;
-//
-//            static <K,V> Sequence<UnEntry<K,V>> create(INode<K,V>[] nodes) {
-//                return create(nodes, 0, null);
-//            }
-//
-//            private static <K,V> Sequence<UnEntry<K,V>> create(INode<K,V>[] nodes, int i, Sequence<UnEntry<K,V>> s) {
-//                if ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) ) { return new Seq<>(nodes, i, s); }
-//
-//                for(int j = i; j < nodes.length; j++) {
-//                    if (nodes[j] != null) {
-//                        Sequence<UnEntry<K,V>> ns = nodes[j].nodeSeq();
-//                        if (ns != null) {
-//                            return new Seq<>(nodes, j + 1, ns);
-//                        }
-//                    }
-//                }
-//                return Sequence.emptySequence();
-//            }
-//
-//            private Seq(INode<K,V>[] nodes, int i, Sequence<UnEntry<K,V>> s) {
-//                super();
-//                this.nodes = nodes;
-//                this.i = i;
-//                this.s = s;
-//            }
-//
-//            @Override public Option<UnEntry<K,V>> head() {
-//                return ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) )
-//                       ? s.head()
-//                       : Option.none();
-//            }
-//
-//            @Override public Sequence<UnEntry<K,V>> tail() {
-//                if ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) ) {
-//                    return create(nodes, i, s.tail());
-//                }
-//                return create(nodes, i, null);
-//
-//            }
-//        }
 
         static class Iter<K,V> implements UnmodIterator<UnEntry<K,V>> {
             private final INode<K,V>[] array;
@@ -752,12 +722,14 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         final AtomicReference<Thread> edit;
 
         @Override public String toString() {
-            return "BitmapIndexedNode(" + bitmap + "," + FunctionUtils.toString(array) + "," + edit + ")";
+            return "BitmapIndexedNode(" + bitmap + "," + FunctionUtils.toString(array) + "," +
+                   edit + ")";
         }
 
         final int index(int bit) { return Integer.bitCount(bitmap & (bit - 1)); }
 
-        BitmapIndexedNode(Equator<K> equator, AtomicReference<Thread> edit, int bitmap, Object[] array){
+        BitmapIndexedNode(Equator<K> equator, AtomicReference<Thread> edit, int bitmap,
+                          Object[] array) {
             this.equator = equator;
             this.bitmap = bitmap;
             this.array = array;
@@ -774,18 +746,20 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
                     INode<K,V> n = ((INode) valOrNode).assoc(shift + 5, hash, key, val, addedLeaf);
                     if(n == valOrNode)
                         return this;
-                    return new BitmapIndexedNode<>(equator, null, bitmap, cloneAndSet(array, 2*idx+1, n));
+                    return new BitmapIndexedNode<>(equator, null, bitmap,
+                                                   cloneAndSet(array, 2*idx+1, n));
                 }
                 if(equator.eq(key, keyOrNull)) {
                     if(val == valOrNode)
                         return this;
-                    return new BitmapIndexedNode<>(equator, null, bitmap, cloneAndSet(array, 2*idx+1, val));
+                    return new BitmapIndexedNode<>(equator, null, bitmap,
+                                                   cloneAndSet(array, 2*idx+1, val));
                 }
                 addedLeaf.val = addedLeaf;
                 return new BitmapIndexedNode<>(equator, null, bitmap,
-                                               cloneAndSet(array,
-                                                           2*idx, null,
-                                                           2*idx+1, createNode(equator, shift + 5, keyOrNull, valOrNode, hash, key, val)));
+                                               cloneAndSet(array, 2*idx, null, 2*idx+1,
+                                                           createNode(equator, shift + 5, keyOrNull,
+                                                                      valOrNode, hash, key, val)));
             } else {
                 int n = Integer.bitCount(bitmap);
                 if(n >= 16) {
@@ -798,7 +772,10 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
                             if (array[j] == null)
                                 nodes[i] = (INode) array[j+1];
                             else
-                                nodes[i] = empty(equator).assoc(shift + 5, equator.hash(k(array, j)), k(array, j), array[j + 1], addedLeaf);
+                                nodes[i] = empty(equator).assoc(shift + 5,
+                                                                equator.hash(k(array, j)),
+                                                                k(array, j), array[j + 1],
+                                                                addedLeaf);
                             j += 2;
                         }
                     return new ArrayNode(equator, null, n + 1, nodes);
@@ -826,7 +803,8 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
                 if (n == valOrNode)
                     return this;
                 if (n != null)
-                    return new BitmapIndexedNode<>(equator, null, bitmap, cloneAndSet(array, 2*idx+1, n));
+                    return new BitmapIndexedNode<>(equator, null, bitmap, cloneAndSet(array,
+                                                                                      2*idx+1, n));
                 if (bitmap == bit)
                     return null;
                 return new BitmapIndexedNode<>(equator, null, bitmap ^ bit, removePair(array, idx));
@@ -879,7 +857,8 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 //        }
 
 //        @Override public <R> R fold(Function2<R,R,R> combinef, Function3<R,K,V,R> reducef,
-//                                    final Function1<Function0,R> fjtask, final Function1<R,Object> fjfork,
+//                                    final Function1<Function0,R> fjtask,
+//                                    final Function1<R,Object> fjfork,
 //                                    final Function1<Object,R> fjjoin){
 //            return doKvreduce(array, reducef, combinef.apply(null, null));
 //        }
@@ -899,32 +878,37 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
             return editable;
         }
 
-        private BitmapIndexedNode<K,V> editAndSet(AtomicReference<Thread> edit, int i, Object a, int j, Object b) {
+        private BitmapIndexedNode<K,V> editAndSet(AtomicReference<Thread> edit, int i, Object a,
+                                                  int j, Object b) {
             BitmapIndexedNode editable = ensureEditable(edit);
             editable.array[i] = a;
             editable.array[j] = b;
             return editable;
         }
 
-        private BitmapIndexedNode<K,V> editAndRemovePair(AtomicReference<Thread> edit, int bit, int i) {
+        private BitmapIndexedNode<K,V> editAndRemovePair(AtomicReference<Thread> edit, int bit,
+                                                         int i) {
             if (bitmap == bit)
                 return null;
             BitmapIndexedNode<K,V> editable = ensureEditable(edit);
             editable.bitmap ^= bit;
-            System.arraycopy(editable.array, 2*(i+1), editable.array, 2*i, editable.array.length - 2*(i+1));
+            System.arraycopy(editable.array, 2*(i+1), editable.array, 2*i,
+                             editable.array.length - 2*(i+1));
             editable.array[editable.array.length - 2] = null;
             editable.array[editable.array.length - 1] = null;
             return editable;
         }
 
-        @Override public INode<K,V> assoc(AtomicReference<Thread> edit, int shift, int hash, K key, V val, Box addedLeaf){
+        @Override public INode<K,V> assoc(AtomicReference<Thread> edit, int shift, int hash,
+                                          K key, V val, Box addedLeaf) {
             int bit = bitpos(hash, shift);
             int idx = index(bit);
             if((bitmap & bit) != 0) {
                 K keyOrNull = k(array, 2*idx);
                 Object valOrNode = array[2*idx+1];
                 if(keyOrNull == null) {
-                    INode<K,V> n = ((INode<K,V>) valOrNode).assoc(edit, shift + 5, hash, key, val, addedLeaf);
+                    INode<K,V> n = ((INode<K,V>) valOrNode).assoc(edit, shift + 5, hash, key, val,
+                                                                  addedLeaf);
                     if(n == valOrNode)
                         return this;
                     return editAndSet(edit, 2*idx+1, n);
@@ -936,7 +920,8 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
                 }
                 addedLeaf.val = addedLeaf;
                 return editAndSet(edit, 2*idx, null, 2*idx+1,
-                                  createNode(equator, edit, shift + 5, keyOrNull, valOrNode, hash, key, val));
+                                  createNode(equator, edit, shift + 5, keyOrNull, valOrNode, hash,
+                                             key, val));
             } else {
                 int n = Integer.bitCount(bitmap);
                 if(n*2 < array.length) {
@@ -958,7 +943,10 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
                             if (array[j] == null)
                                 nodes[i] = (INode) array[j+1];
                             else
-                                nodes[i] = empty(equator).assoc(edit, shift + 5, equator.hash(k(array, j)), k(array, j), array[j + 1], addedLeaf);
+                                nodes[i] = empty(equator).assoc(edit, shift + 5,
+                                                                equator.hash(k(array, j)),
+                                                                k(array, j), array[j + 1],
+                                                                addedLeaf);
                             j += 2;
                         }
                     return new ArrayNode(equator, edit, n + 1, nodes);
@@ -977,7 +965,8 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
             }
         }
 
-        @Override public INode<K,V> without(AtomicReference<Thread> edit, int shift, int hash, K key, Box removedLeaf){
+        @Override public INode<K,V> without(AtomicReference<Thread> edit, int shift, int hash,
+                                            K key, Box removedLeaf){
             int bit = bitpos(hash, shift);
             if((bitmap & bit) == 0)
                 return this;
@@ -1010,7 +999,8 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         Object[] array;
         final AtomicReference<Thread> edit;
 
-        HashCollisionNode(Equator<K> eq, AtomicReference<Thread> edit, int hash, int count, Object... array){
+        HashCollisionNode(Equator<K> eq, AtomicReference<Thread> edit, int hash, int count,
+                          Object... array){
             this.equator = eq;
             this.edit = edit;
             this.hash = hash;
@@ -1024,7 +1014,8 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
                 if(idx != -1) {
                     if(array[idx + 1] == val)
                         return this;
-                    return new HashCollisionNode<>(equator, null, hash, count, cloneAndSet(array, idx + 1, val));
+                    return new HashCollisionNode<>(equator, null, hash, count,
+                                                   cloneAndSet(array, idx + 1, val));
                 }
                 Object[] newArray = new Object[2 * (count + 1)];
                 System.arraycopy(array, 0, newArray, 0, 2 * count);
@@ -1034,7 +1025,8 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
                 return new HashCollisionNode<>(equator, edit, hash, count + 1, newArray);
             }
             // nest it in a bitmap node
-            return new BitmapIndexedNode<K,V>(equator, null, bitpos(this.hash, shift), new Object[] {null, this})
+            return new BitmapIndexedNode<K,V>(equator, null, bitpos(this.hash, shift),
+                                              new Object[] {null, this})
                     .assoc(shift, hash, key, val, addedLeaf);
         }
 
@@ -1044,7 +1036,8 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
                 return this;
             if(count == 1)
                 return null;
-            return new HashCollisionNode<>(equator, null, hash, count - 1, removePair(array, idx/2));
+            return new HashCollisionNode<>(equator, null, hash, count - 1,
+                                           removePair(array, idx/2));
         }
 
         @Override public UnmodMap.UnEntry<K,V> find(int shift, int hash, K key){
@@ -1068,16 +1061,15 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 
 //        @Override public Sequence<UnEntry<K,V>> nodeSeq() { return NodeSeq.create(array); }
 
-        @Override public UnmodIterator<UnEntry<K,V>> iterator(){
-            return new NodeIter<>(array);
-        }
+        @Override public UnmodIterator<UnEntry<K,V>> iterator() { return new NodeIter<>(array); }
 
 //        @Override public <R> R kvreduce(Function3<R,K,V,R> f, R init){
 //            return doKvreduce(array, f, init);
 //        }
 
 //        @Override public <R> R fold(Function2<R,R,R> combinef, Function3<R,K,V,R> reducef,
-//                                    final Function1<Function0,R> fjtask, final Function1<R,Object> fjfork,
+//                                    final Function1<Function0,R> fjtask,
+//                                    final Function1<R,Object> fjfork,
 //                                    final Function1<Object,R> fjjoin){
 //            return doKvreduce(array, reducef, combinef.apply(null, null));
 //        }
@@ -1097,7 +1089,8 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
             return new HashCollisionNode<>(equator, edit, hash, count, newArray);
         }
 
-        private HashCollisionNode<K,V> ensureEditable(AtomicReference<Thread> edit, int count, Object[] array){
+        private HashCollisionNode<K,V> ensureEditable(AtomicReference<Thread> edit, int count,
+                                                      Object[] array){
             if(this.edit == edit) {
                 this.array = array;
                 this.count = count;
@@ -1112,7 +1105,8 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
             return editable;
         }
 
-        private HashCollisionNode<K,V> editAndSet(AtomicReference<Thread> edit, int i, Object a, int j, Object b) {
+        private HashCollisionNode<K,V> editAndSet(AtomicReference<Thread> edit, int i, Object a,
+                                                  int j, Object b) {
             HashCollisionNode<K,V> editable = ensureEditable(edit);
             editable.array[i] = a;
             editable.array[j] = b;
@@ -1120,7 +1114,8 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         }
 
 
-        @Override public INode<K,V> assoc(AtomicReference<Thread> edit, int shift, int hash, K key, V val, Box addedLeaf){
+        @Override public INode<K,V> assoc(AtomicReference<Thread> edit, int shift, int hash,
+                                          K key, V val, Box addedLeaf) {
             if(hash == this.hash) {
                 int idx = findIndex(key);
                 if(idx != -1) {
@@ -1130,7 +1125,8 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
                 }
                 if (array.length > 2*count) {
                     addedLeaf.val = addedLeaf;
-                    HashCollisionNode<K,V> editable = editAndSet(edit, 2*count, key, 2*count+1, val);
+                    HashCollisionNode<K,V> editable =
+                            editAndSet(edit, 2*count, key, 2*count+1, val);
                     editable.count++;
                     return editable;
                 }
@@ -1142,11 +1138,13 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
                 return ensureEditable(edit, count + 1, newArray);
             }
             // nest it in a bitmap node
-            return new BitmapIndexedNode<K,V>(equator, edit, bitpos(this.hash, shift), new Object[] {null, this, null, null})
+            return new BitmapIndexedNode<K,V>(equator, edit, bitpos(this.hash, shift),
+                                              new Object[] {null, this, null, null})
                     .assoc(edit, shift, hash, key, val, addedLeaf);
         }
 
-        @Override public INode<K,V> without(AtomicReference<Thread> edit, int shift, int hash, K key, Box removedLeaf){
+        @Override public INode<K,V> without(AtomicReference<Thread> edit, int shift, int hash,
+                                            K key, Box removedLeaf) {
             int idx = findIndex(key);
             if(idx == -1)
                 return this;
@@ -1275,10 +1273,12 @@ public static void main(String[] args){
         return newArray;
     }
 
-    private static <K,V> INode<K,V> createNode(Equator<K> equator, int shift, K key1, V val1, int key2hash, K key2, V val2) {
+    private static <K,V> INode<K,V> createNode(Equator<K> equator, int shift, K key1, V val1,
+                                               int key2hash, K key2, V val2) {
         int key1hash = equator.hash(key1);
         if(key1hash == key2hash)
-            return new HashCollisionNode<>(equator, null, key1hash, 2, new Object[] {key1, val1, key2, val2});
+            return new HashCollisionNode<>(equator, null, key1hash, 2,
+                                           new Object[] {key1, val1, key2, val2});
         Box addedLeaf = new Box(null);
         AtomicReference<Thread> edit = new AtomicReference<>();
         return BitmapIndexedNode.<K,V>empty(equator)
@@ -1286,10 +1286,13 @@ public static void main(String[] args){
                 .assoc(edit, shift, key2hash, key2, val2, addedLeaf);
     }
 
-    private static <K,V> INode<K,V> createNode(Equator<K> equator, AtomicReference<Thread> edit, int shift, K key1, V val1, int key2hash, K key2, V val2) {
+    private static <K,V> INode<K,V> createNode(Equator<K> equator, AtomicReference<Thread> edit,
+                                               int shift, K key1, V val1, int key2hash,
+                                               K key2, V val2) {
         int key1hash = equator.hash(key1);
         if(key1hash == key2hash)
-            return new HashCollisionNode<>(equator, null, key1hash, 2, new Object[] {key1, val1, key2, val2});
+            return new HashCollisionNode<>(equator, null, key1hash, 2,
+                                           new Object[] {key1, val1, key2, val2});
         Box addedLeaf = new Box(null);
         return BitmapIndexedNode.<K,V>empty(equator)
                 .assoc(edit, shift, key1hash, key1, val1, addedLeaf)
@@ -1303,10 +1306,14 @@ public static void main(String[] args){
     static final class NodeIter<K,V> implements UnmodIterator<UnEntry<K,V>> {
         private static final UnEntry ABSENCE = new UnEntry() {
             @Override public Object getKey() {
-                throw new UnsupportedOperationException("This class is a sentinel value.  If you can see this, something is terribly wrong.");
+                throw new UnsupportedOperationException("This class is a sentinel value.  If you" +
+                                                        " can see this, something is terribly" +
+                                                        " wrong.");
             }
             @Override public Object getValue() {
-                throw new UnsupportedOperationException("This class is a sentinel value.  If you can see this, something is terribly wrong.");
+                throw new UnsupportedOperationException("This class is a sentinel value.  If you" +
+                                                        " can see this, something is terribly" +
+                                                        " wrong.");
             }
         };
         @SuppressWarnings("unchecked")
@@ -1391,8 +1398,11 @@ public static void main(String[] args){
 //            return create(array, 0, null);
 //        }
 //
-//        private static <K,V> Sequence<UnmodMap.UnEntry<K,V>> create(Object[] array, int i, Sequence<UnmodMap.UnEntry<K,V>> s) {
-//            if ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) ) { return new NodeSeq<>(array, i, s); }
+//        private static <K,V> Sequence<UnmodMap.UnEntry<K,V>> create(Object[] array, int i,
+//                                                              Sequence<UnmodMap.UnEntry<K,V>> s) {
+//            if ( (s != null) && (s != Sequence.EMPTY_SEQUENCE) ) {
+//                return new NodeSeq<>(array, i, s);
+//            }
 //
 //            for (int j = i; j < array.length; j += 2) {
 //                if (array[j] != null) { return new NodeSeq<>(array, j, null); }
