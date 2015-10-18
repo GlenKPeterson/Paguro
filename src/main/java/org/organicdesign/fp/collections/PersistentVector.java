@@ -215,10 +215,10 @@ public class PersistentVector<E> implements ImList<E> {
         //room in tail?
         //	if(tail.length < MAX_NODE_LENGTH)
         if (size - tailoff() < MAX_NODE_LENGTH) {
-            Object[] newTail = new Object[tail.length + 1];
+            E[] newTail = (E[]) new Object[tail.length + 1];
             System.arraycopy(tail, 0, newTail, 0, tail.length);
             newTail[tail.length] = val;
-            return new PersistentVector<>(size + 1, shift, root, (E[]) newTail);
+            return new PersistentVector<>(size + 1, shift, root, newTail);
         }
         //full tail, push into tree
         Node newroot;
