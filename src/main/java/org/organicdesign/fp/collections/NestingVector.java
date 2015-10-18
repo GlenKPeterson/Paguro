@@ -14,8 +14,6 @@
 
 package org.organicdesign.fp.collections;
 
-import java.util.Arrays;
-
 public class NestingVector<E> implements ImList<E> {
     // There's bit shifting going on here because it's a very fast operation.
     // Shifting right by 5 is aeons faster than dividing by 32.
@@ -163,7 +161,7 @@ public class NestingVector<E> implements ImList<E> {
         // Returns a new node of just one leaf.
         @SuppressWarnings("unchecked")
         public static <T> Node1<T> ofLeaf(T[] leaf) {
-            return new Node1<>((T[][]) new Object[][] { { leaf } });
+            return new Node1<>((T[][]) new Object[][] { leaf });
         }
 
         @Override public boolean isFull() {
@@ -188,7 +186,6 @@ public class NestingVector<E> implements ImList<E> {
         }
 
         @Override public T get(int index) {
-            System.out.println("Node1, firstIdx: " + (index >> SHIFT) + " second: " + (index & HIGH_AND_MASK));
             return tree[index >> SHIFT][index & HIGH_AND_MASK];
         }
 
@@ -263,6 +260,23 @@ public class NestingVector<E> implements ImList<E> {
                 }
             };
         }
+
+        public String toString() {
+            StringBuilder sB = new StringBuilder("Node1(");
+            for (int i = 0; i < tree.length; i++) {
+                T[] subTree = tree[i];
+                if (i != 0) { sB.append(",\n      "); }
+                sB.append("subTree").append(i).append("[");
+                for (int j = 0; j < subTree.length; j++) {
+                    T item = subTree[j];
+                    if (j != 0) { sB.append(","); }
+                    sB.append(item);
+                }
+                sB.append("]");
+            }
+
+            return sB.append(")").toString();
+        }
     }
 
     private static class Node2<T> implements Node<T> {
@@ -290,6 +304,8 @@ public class NestingVector<E> implements ImList<E> {
         @SuppressWarnings("unchecked")
         @Override public Node<T> pushLeafArray(T[] leaf) {
             if (isFull()) { return fullPromote(leaf); }
+
+            // TODO: Here!
             // Try to push to last existing node
             Node<T> appendNode = nodes[nodes.length - 1];
             if (appendNode.isFull()) {
@@ -502,22 +518,21 @@ public class NestingVector<E> implements ImList<E> {
         // Make the first bucket
         E[] cpy = arrayOfLength(MAX_BUCKET_LENGTH);
         System.arraycopy(es, 0, cpy, 0, MAX_BUCKET_LENGTH);
-        System.out.println("Copied initial array: " + Arrays.asList(cpy));
         Node<E> node = Node1.ofLeaf(cpy);
         int tailLen = es.length % MAX_BUCKET_LENGTH;
 
         // For each subsequent bucket, just push leaves into existing Node
         for (int i = MAX_BUCKET_LENGTH; i < es.length - tailLen; i += MAX_BUCKET_LENGTH) {
-            E[] copy = arrayOfLength(es.length);
+            E[] copy = arrayOfLength(MAX_BUCKET_LENGTH);
             System.arraycopy(es, i, copy, 0, MAX_BUCKET_LENGTH);
-            System.out.println("Copied array: " + Arrays.asList(copy));
-            node.pushLeafArray(copy);
+//            System.out.println("Copied array: " + Arrays.asList(copy));
+            node = node.pushLeafArray(copy);
         }
 
         // The remainder goes into the tail.
         E[] newTail = arrayOfLength(tailLen);
         System.arraycopy(es, es.length - tailLen, newTail, 0, tailLen);
-        System.out.println("Copied tail: " + Arrays.asList(newTail));
+//        System.out.println("Copied tail: " + Arrays.asList(newTail));
 
         // Return a new vector of the node we made, plust the new tail.
         return new NestingVector<>(node, newTail, es.length);
@@ -543,7 +558,7 @@ public class NestingVector<E> implements ImList<E> {
         }
     }
 
-    private int tailStartIdx() { return (size - tail.length) - 1; }
+    private int tailStartIdx() { return size - tail.length; }
 
     /** {@inheritDoc} */
     @Override public NestingVector<E> replace(int idx, E e) {
@@ -559,7 +574,9 @@ public class NestingVector<E> implements ImList<E> {
     @Override public E get(int idx) {
         if ((idx < 0) || (idx >= size) ) { throw new IndexOutOfBoundsException(); }
         int tailStartIdx = tailStartIdx();
+//        System.out.println("tailStartIdx: " + tailStartIdx);
         if (idx >= tailStartIdx) {
+//            System.out.println("idx - tailStartIdx: " + (idx - tailStartIdx));
             return tail[idx - tailStartIdx];
         }
         return tree.get(idx);
