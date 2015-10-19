@@ -96,8 +96,8 @@ public class NestingVectorTest {
     @Test(expected = IndexOutOfBoundsException.class)
     public void emptyEx34() { NestingVector.ofArray(null).get(Integer.MAX_VALUE); }
 
-    @Test
-    public void oneInt() {
+    @Ignore
+    @Test public void oneInt() {
         ImList<Integer> one1 = NestingVector.ofArray(new Integer[] { 1 });
         ImList<Integer> one2 = NestingVector.ofArray(new Integer[] { 1 });
         ImList<Integer> one3 = NestingVector.ofArray(new Integer[]{1});
