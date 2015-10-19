@@ -43,8 +43,7 @@ public class NestingVector<E> implements ImList<E> {
     private static <T> T[] arrayOfLength(int i) { return (T[]) new Object[i]; }
 
     /** Copy an array as quickly as possible, replacing the item at the specified index. */
-    // TODO: Swap t and idx parameters to match replace(idx, item)
-    private static <T> T[] copyReplace(T[] ts, T t, int idx) {
+    private static <T> T[] copyReplace(T[] ts, int idx, T t) {
         T[] result = arrayOfLength(ts.length);
         // Copy the old kids up to the split kid
         System.arraycopy(ts, 0, result, 0, idx);
@@ -94,7 +93,7 @@ public class NestingVector<E> implements ImList<E> {
 
         /** {@inheritDoc} */
         @Override public ImList<E> replace(int idx, E e) {
-            return new Nest0<>(copyReplace(tail, e, idx));
+            return new Nest0<>(copyReplace(tail, idx, e));
         }
 
         /** {@inheritDoc} */
@@ -172,7 +171,10 @@ public class NestingVector<E> implements ImList<E> {
             throw new UnsupportedOperationException("This level doesn't need this operation.");
         }
 
-        @Override public Node2<T> fullPromote(T[] leaf) { return Node2.ofLeaf(leaf); }
+        @SuppressWarnings("unchecked")
+        @Override public Node2<T> fullPromote(T[] leaf) {
+            return new Node2<>((Node1<T>[]) new Node1[] { this, Node1.ofLeaf(leaf) });
+        }
 
         @SuppressWarnings("unchecked")
         @Override public Node<T> pushLeafArray(T[] leaf) {
@@ -190,9 +192,9 @@ public class NestingVector<E> implements ImList<E> {
         }
 
         @Override public Node1<T> replace(int index, T e) {
-            return new Node1<>(copyReplace(tree, copyReplace(tree[index >> SHIFT], e,
-                                                             index & HIGH_AND_MASK),
-                                           index >> SHIFT));
+            return new Node1<>(copyReplace(tree, index >> SHIFT, copyReplace(tree[index >> SHIFT], index & HIGH_AND_MASK, e
+                                           )
+            ));
         }
 
 //        /** {@inheritDoc} */
@@ -262,20 +264,18 @@ public class NestingVector<E> implements ImList<E> {
         }
 
         public String toString() {
-            StringBuilder sB = new StringBuilder("Node1(");
-            for (int i = 0; i < tree.length; i++) {
-                T[] subTree = tree[i];
-                if (i != 0) { sB.append(",\n      "); }
-                sB.append("subTree").append(i).append("[");
-                for (int j = 0; j < subTree.length; j++) {
-                    T item = subTree[j];
-                    if (j != 0) { sB.append(","); }
-                    sB.append(item);
-                }
-                sB.append("]");
+            if (tree.length == 1) {
+                T[] subTree = tree[0];
+                return "Node1(subTree0[" + subTree[0] + "..." + subTree[subTree.length - 1] + "])";
             }
 
-            return sB.append(")").toString();
+            T[] firstSubTree = tree[0];
+            int lastSubTreeIdx = tree.length - 1;
+            T[] lastSubTree = tree[lastSubTreeIdx];
+            return "Node1(subTree0[" + firstSubTree[0] + "..." +
+                   firstSubTree[firstSubTree.length - 1] + "]...subTree" +
+                   lastSubTreeIdx + "[" + lastSubTree[0] + "..." +
+                   lastSubTree[lastSubTree.length - 1] + "])";
         }
     }
 
@@ -305,11 +305,13 @@ public class NestingVector<E> implements ImList<E> {
         @Override public Node<T> pushLeafArray(T[] leaf) {
             if (isFull()) { return fullPromote(leaf); }
 
-            // TODO: Here!
+//            System.out.println("Trying to add: " + Arrays.toString(leaf));
+//            System.out.println("To: " + this);
+
             // Try to push to last existing node
             Node<T> appendNode = nodes[nodes.length - 1];
             if (appendNode.isFull()) {
-                // Allocate a new node list
+                // Allocate a new, longer node list
                 Node<T>[] newNodes = (Node<T>[]) new Node[nodes.length + 1];
                 // Copy all the old nodes to the new array
                 System.arraycopy(nodes, 0, newNodes, 0, nodes.length);
@@ -317,8 +319,13 @@ public class NestingVector<E> implements ImList<E> {
                 newNodes[nodes.length] = newChild(leaf);
                 return new Node2<>(newNodes);
             } else {
-                return new Node2<>(copyReplace(nodes, appendNode.pushLeafArray(leaf),
-                                               nodes.length - 1));
+                // Allocate a new node list (same length as the old one)
+                Node<T>[] newNodes = (Node<T>[]) new Node[nodes.length];
+                // Copy all the unchanged nodes to the new array
+                System.arraycopy(nodes, 0, newNodes, 0, nodes.length - 1);
+                // replace the last node
+                newNodes[nodes.length - 1] = appendNode.pushLeafArray(leaf);
+                return new Node2<>(newNodes);
             }
         }
 
@@ -329,8 +336,8 @@ public class NestingVector<E> implements ImList<E> {
         @Override public Node2<T> replace(int index, T e) {
             int nodeIdx = index >> SHIFT;
             return new Node2<>(copyReplace(nodes,
-                                           nodes[nodeIdx].replace(index & HIGH_AND_MASK, e),
-                                           nodeIdx));
+                                           nodeIdx, nodes[nodeIdx].replace(index & HIGH_AND_MASK, e)
+            ));
         }
 
         @Override public LeafIterator<T> leafIteratorFor(int index) {
@@ -376,6 +383,10 @@ public class NestingVector<E> implements ImList<E> {
                 }
             };
         }
+
+        public String toString() {
+            return "Node2("+ nodes[0] + "..." + nodes[nodes.length - 1] + "])";
+        }
     }
 
     private static class Node3<T> extends Node2<T> {
@@ -401,8 +412,8 @@ public class NestingVector<E> implements ImList<E> {
         @Override public Node3<T> replace(int index, T e) {
             int nodeIdx = index >> SHIFT;
             return new Node3<>(copyReplace(super.nodes,
-                                           super.nodes[nodeIdx].replace(index & HIGH_AND_MASK, e),
-                                           nodeIdx));
+                                           nodeIdx, super.nodes[nodeIdx].replace(index & HIGH_AND_MASK, e)
+            ));
         }
     }
 
@@ -429,8 +440,8 @@ public class NestingVector<E> implements ImList<E> {
         @Override public Node4<T> replace(int index, T e) {
             int nodeIdx = index >> SHIFT;
             return new Node4<>(copyReplace(super.nodes,
-                                           super.nodes[nodeIdx].replace(index & HIGH_AND_MASK, e),
-                                           nodeIdx));
+                                           nodeIdx, super.nodes[nodeIdx].replace(index & HIGH_AND_MASK, e)
+            ));
         }
     }
 
@@ -457,8 +468,8 @@ public class NestingVector<E> implements ImList<E> {
         @Override public Node5<T> replace(int index, T e) {
             int nodeIdx = index >> SHIFT;
             return new Node5<>(copyReplace(super.nodes,
-                                           super.nodes[nodeIdx].replace(index & HIGH_AND_MASK, e),
-                                           nodeIdx));
+                                           nodeIdx, super.nodes[nodeIdx].replace(index & HIGH_AND_MASK, e)
+            ));
         }
     }
 
@@ -489,8 +500,8 @@ public class NestingVector<E> implements ImList<E> {
         @Override public Node6<T> replace(int index, T e) {
             int nodeIdx = index >> SHIFT;
             return new Node6<>(copyReplace(super.nodes,
-                                           super.nodes[nodeIdx].replace(index & HIGH_AND_MASK, e),
-                                           nodeIdx));
+                                           nodeIdx, super.nodes[nodeIdx].replace(index & HIGH_AND_MASK, e)
+            ));
         }
     }
 
@@ -565,7 +576,7 @@ public class NestingVector<E> implements ImList<E> {
         if ((idx < 0) || (idx >= size) ) { throw new IndexOutOfBoundsException(); }
         int tailStartIdx = tailStartIdx();
         if (idx >= tailStartIdx) {
-            return new NestingVector<>(tree, copyReplace(tail, e, idx - tailStartIdx), size);
+            return new NestingVector<>(tree, copyReplace(tail, idx - tailStartIdx, e), size);
         }
         return new NestingVector<>(tree.replace(idx, e), tail, size);
     }
