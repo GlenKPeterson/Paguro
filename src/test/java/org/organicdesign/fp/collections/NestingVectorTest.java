@@ -108,7 +108,7 @@ public class NestingVectorTest {
 
     // TODO: HERE!
     @Test public void arrayConstruction() {
-        for (int num = 31; num < 2000; num++) {
+        for (int num = 31; num < 32768; num = num * 3) {
             Integer[] is = new Integer[num];
             for (int i = 0; i < num; i++) {
                 is[i] = i;
