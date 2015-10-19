@@ -325,7 +325,7 @@ public class NestingVector<E> implements ImList<E> {
                 System.arraycopy(nodes, 0, newNodes, 0, nodes.length - 1);
                 // replace the last node
                 newNodes[nodes.length - 1] = appendNode.pushLeafArray(leaf);
-                return new Node2<>(newNodes);
+                return new Node2<>(newNodes); // TODO: this won't work for Node3!  In fact it doesn't!
             }
         }
 
