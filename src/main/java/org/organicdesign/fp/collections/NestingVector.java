@@ -136,6 +136,7 @@ public class NestingVector<E> implements ImList<E> {
         boolean isFull();
         Node<T> pushLeafArray(T[] leaf);
         Node<T> newChild(T[] leaf);
+        Node<T> create(Node<T>[] kids);
         Node<T> fullPromote(T[] leaf);
         T get(int index);
         Node<T> replace(int idx, T e);
@@ -169,6 +170,10 @@ public class NestingVector<E> implements ImList<E> {
 
         @Override public Node<T> newChild(T[] leaf) {
             throw new UnsupportedOperationException("This level doesn't need this operation.");
+        }
+
+        @Override public Node<T> create(Node<T>[] kids) {
+            throw new UnsupportedOperationException("This level can't support this operation.");
         }
 
         @SuppressWarnings("unchecked")
@@ -299,6 +304,8 @@ public class NestingVector<E> implements ImList<E> {
 
         @Override public Node<T> newChild(T[] leaf) { return Node1.ofLeaf(leaf); }
 
+        @Override public Node2<T> create(Node<T>[] kids) { return new Node2<>(kids); }
+
         @Override public Node3<T> fullPromote(T[] leaf) { return Node3.ofLeaf(leaf); }
 
         @SuppressWarnings("unchecked")
@@ -317,7 +324,7 @@ public class NestingVector<E> implements ImList<E> {
                 System.arraycopy(nodes, 0, newNodes, 0, nodes.length);
                 // Make a new "right kind" of node here...
                 newNodes[nodes.length] = newChild(leaf);
-                return new Node2<>(newNodes);
+                return create(newNodes);
             } else {
                 // Allocate a new node list (same length as the old one)
                 Node<T>[] newNodes = (Node<T>[]) new Node[nodes.length];
@@ -325,7 +332,7 @@ public class NestingVector<E> implements ImList<E> {
                 System.arraycopy(nodes, 0, newNodes, 0, nodes.length - 1);
                 // replace the last node
                 newNodes[nodes.length - 1] = appendNode.pushLeafArray(leaf);
-                return new Node2<>(newNodes); // TODO: this won't work for Node3!  In fact it doesn't!
+                return create(newNodes);
             }
         }
 
@@ -403,9 +410,12 @@ public class NestingVector<E> implements ImList<E> {
 
         @Override public Node<T> newChild(T[] leaf) { return Node2.ofLeaf(leaf); }
 
+        @Override public Node3<T> create(Node<T>[] kids) { return new Node3<>(kids); }
+
         @Override public Node4<T> fullPromote(T[] leaf) { return Node4.ofLeaf(leaf); }
 
         @Override public T get(int index) {
+            System.out.println("Get on: " + this);
             return super.nodes[index >> SHIFT].get(index & HIGH_AND_MASK);
         }
 
@@ -414,6 +424,10 @@ public class NestingVector<E> implements ImList<E> {
             return new Node3<>(copyReplace(super.nodes,
                                            nodeIdx, super.nodes[nodeIdx].replace(index & HIGH_AND_MASK, e)
             ));
+        }
+
+        public String toString() {
+            return "Node3("+ nodes[0] + "..." + nodes[nodes.length - 1] + "])";
         }
     }
 
@@ -431,6 +445,8 @@ public class NestingVector<E> implements ImList<E> {
 
         @Override public Node<T> newChild(T[] leaf) { return Node3.ofLeaf(leaf); }
 
+        @Override public Node4<T> create(Node<T>[] kids) { return new Node4<>(kids); }
+
         @Override public Node5<T> fullPromote(T[] leaf) { return Node5.ofLeaf(leaf); }
 
         @Override public T get(int index) {
@@ -442,6 +458,10 @@ public class NestingVector<E> implements ImList<E> {
             return new Node4<>(copyReplace(super.nodes,
                                            nodeIdx, super.nodes[nodeIdx].replace(index & HIGH_AND_MASK, e)
             ));
+        }
+
+        public String toString() {
+            return "Node3("+ nodes[0] + "..." + nodes[nodes.length - 1] + "])";
         }
     }
 
@@ -458,6 +478,8 @@ public class NestingVector<E> implements ImList<E> {
         }
 
         @Override public Node<T> newChild(T[] leaf) { return Node4.ofLeaf(leaf); }
+
+        @Override public Node5<T> create(Node<T>[] kids) { return new Node5<>(kids); }
 
         @Override public Node6<T> fullPromote(T[] leaf) { return Node6.ofLeaf(leaf); }
 
@@ -488,6 +510,8 @@ public class NestingVector<E> implements ImList<E> {
         }
 
         @Override public Node<T> newChild(T[] leaf) { return Node5.ofLeaf(leaf); }
+
+        @Override public Node6<T> create(Node<T>[] kids) { return new Node6<>(kids); }
 
         @Override public Node6<T> fullPromote(T[] leaf) {
             throw new UnsupportedOperationException("This should be unreachable.");

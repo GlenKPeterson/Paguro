@@ -108,7 +108,7 @@ public class NestingVectorTest {
 
     // TODO: HERE!
     @Test public void arrayConstruction() {
-        for (int num = 31; num < 32768; num = num * 3) {
+        for (int num = 31; num < 67797; num = num * 3) {
             Integer[] is = new Integer[num];
             for (int i = 0; i < num; i++) {
                 is[i] = i;
@@ -116,7 +116,8 @@ public class NestingVectorTest {
             ImList<Integer> nv = NestingVector.ofArray(is);
             assertEquals(num, nv.size());
             for (int i = 0; i < num; i++) {
-                assertEquals(Integer.valueOf(is[i]), nv.get(i));
+                assertEquals("Trouble getting " + i + "th element from vector of size " + num,
+                             Integer.valueOf(is[i]), nv.get(i));
             }
         }
     }
