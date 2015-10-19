@@ -108,6 +108,7 @@ public class NestingVectorTest {
 
     // TODO: HERE!
     @Test public void arrayConstruction() {
+        int max = 0;
         for (int num = 31; num < 67797; num = num * 3) {
             Integer[] is = new Integer[num];
             for (int i = 0; i < num; i++) {
@@ -119,7 +120,9 @@ public class NestingVectorTest {
                 assertEquals("Trouble getting " + i + "th element from vector of size " + num,
                              Integer.valueOf(is[i]), nv.get(i));
             }
+            max = num;
         }
+        System.out.println("Max test was for vector of size " + max);
     }
 
 
