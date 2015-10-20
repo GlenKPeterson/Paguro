@@ -55,6 +55,20 @@ public class NestingVector<E> implements ImList<E> {
         return result;
     }
 
+    private static <T> String abbrevArrayStr(T[] ts) {
+        StringBuilder sB = new StringBuilder("[");
+        if (ts.length > 0) {
+            sB.append(String.valueOf(ts[0]));
+        }
+        if (ts.length > 1) {
+            int lastIdx = ts.length - 1;
+            sB.append("...")
+              .append(lastIdx).append(":")
+              .append(String.valueOf(ts[lastIdx]));
+        }
+        return sB.append("]").toString();
+    }
+
     private interface LeafIterator<E> {
         E[] nextLeaf();
         E[] reqLeaf();
@@ -271,16 +285,12 @@ public class NestingVector<E> implements ImList<E> {
         public String toString() {
             if (tree.length == 1) {
                 T[] subTree = tree[0];
-                return "Node1(subTree0[" + subTree[0] + "..." + subTree[subTree.length - 1] + "])";
+                return "Node1(subTree0" + abbrevArrayStr(subTree) + ")";
             }
 
-            T[] firstSubTree = tree[0];
             int lastSubTreeIdx = tree.length - 1;
-            T[] lastSubTree = tree[lastSubTreeIdx];
-            return "Node1(subTree0[" + firstSubTree[0] + "..." +
-                   firstSubTree[firstSubTree.length - 1] + "]...subTree" +
-                   lastSubTreeIdx + "[" + lastSubTree[0] + "..." +
-                   lastSubTree[lastSubTree.length - 1] + "])";
+            return "Node1(subTree0" + abbrevArrayStr(tree[0]) + "...subTree" +
+                   lastSubTreeIdx + abbrevArrayStr(tree[lastSubTreeIdx]) + ")";
         }
     }
 
@@ -306,7 +316,10 @@ public class NestingVector<E> implements ImList<E> {
 
         @Override public Node2<T> create(Node<T>[] kids) { return new Node2<>(kids); }
 
-        @Override public Node3<T> fullPromote(T[] leaf) { return Node3.ofLeaf(leaf); }
+        @SuppressWarnings("unchecked")
+        @Override public Node3<T> fullPromote(T[] leaf) {
+            return new Node3<>((Node2<T>[]) new Node2[] { this, Node2.ofLeaf(leaf) });
+        }
 
         @SuppressWarnings("unchecked")
         @Override public Node<T> pushLeafArray(T[] leaf) {
@@ -392,7 +405,7 @@ public class NestingVector<E> implements ImList<E> {
         }
 
         public String toString() {
-            return "Node2("+ nodes[0] + "..." + nodes[nodes.length - 1] + "])";
+            return "Node2("+ abbrevArrayStr(nodes) + ")";
         }
     }
 
@@ -412,10 +425,13 @@ public class NestingVector<E> implements ImList<E> {
 
         @Override public Node3<T> create(Node<T>[] kids) { return new Node3<>(kids); }
 
-        @Override public Node4<T> fullPromote(T[] leaf) { return Node4.ofLeaf(leaf); }
+        @SuppressWarnings("unchecked")
+        @Override public Node4<T> fullPromote(T[] leaf) {
+            return new Node4<>((Node3<T>[]) new Node3[] { this, Node3.ofLeaf(leaf) });
+        }
 
         @Override public T get(int index) {
-            System.out.println("Get on: " + this);
+//            System.out.println("Get on: " + this);
             return super.nodes[index >> SHIFT].get(index & HIGH_AND_MASK);
         }
 
@@ -427,7 +443,7 @@ public class NestingVector<E> implements ImList<E> {
         }
 
         public String toString() {
-            return "Node3("+ nodes[0] + "..." + nodes[nodes.length - 1] + "])";
+            return "Node3("+ abbrevArrayStr(nodes) + ")";
         }
     }
 
@@ -447,7 +463,10 @@ public class NestingVector<E> implements ImList<E> {
 
         @Override public Node4<T> create(Node<T>[] kids) { return new Node4<>(kids); }
 
-        @Override public Node5<T> fullPromote(T[] leaf) { return Node5.ofLeaf(leaf); }
+        @SuppressWarnings("unchecked")
+        @Override public Node5<T> fullPromote(T[] leaf) {
+            return new Node5<>((Node4<T>[]) new Node4[] { this, Node4.ofLeaf(leaf) });
+        }
 
         @Override public T get(int index) {
             return super.nodes[index >> SHIFT].get(index & HIGH_AND_MASK);
@@ -461,7 +480,7 @@ public class NestingVector<E> implements ImList<E> {
         }
 
         public String toString() {
-            return "Node3("+ nodes[0] + "..." + nodes[nodes.length - 1] + "])";
+            return "Node4("+ abbrevArrayStr(nodes) + ")";
         }
     }
 
@@ -481,7 +500,11 @@ public class NestingVector<E> implements ImList<E> {
 
         @Override public Node5<T> create(Node<T>[] kids) { return new Node5<>(kids); }
 
-        @Override public Node6<T> fullPromote(T[] leaf) { return Node6.ofLeaf(leaf); }
+        @SuppressWarnings("unchecked")
+        @Override public Node6<T> fullPromote(T[] leaf) {
+            return new Node6<>((Node5<T>[]) new Node5[] { this, Node5.ofLeaf(leaf) });
+        }
+
 
         @Override public T get(int index) {
             return super.nodes[index >> SHIFT].get(index & HIGH_AND_MASK);
@@ -492,6 +515,10 @@ public class NestingVector<E> implements ImList<E> {
             return new Node5<>(copyReplace(super.nodes,
                                            nodeIdx, super.nodes[nodeIdx].replace(index & HIGH_AND_MASK, e)
             ));
+        }
+
+        public String toString() {
+            return "Node5("+ abbrevArrayStr(nodes) + ")";
         }
     }
 
@@ -526,6 +553,10 @@ public class NestingVector<E> implements ImList<E> {
             return new Node6<>(copyReplace(super.nodes,
                                            nodeIdx, super.nodes[nodeIdx].replace(index & HIGH_AND_MASK, e)
             ));
+        }
+
+        public String toString() {
+            return "Node6("+ abbrevArrayStr(nodes) + ")";
         }
     }
 
@@ -614,6 +645,9 @@ public class NestingVector<E> implements ImList<E> {
 //            System.out.println("idx - tailStartIdx: " + (idx - tailStartIdx));
             return tail[idx - tailStartIdx];
         }
+//        if ( (size >= 22599) && (idx == 0) ) {
+//            System.out.println("Get on: " + this);
+//        }
         return tree.get(idx);
     }
 
@@ -680,5 +714,9 @@ public class NestingVector<E> implements ImList<E> {
 
             @Override public int previousIndex() { return idx - 1; }
         };
+    }
+
+    public String toString() {
+        return "NestingVector(" + tree + " tail: " + abbrevArrayStr(tail) + ")";
     }
 }
