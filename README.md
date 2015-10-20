@@ -1,6 +1,8 @@
 UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") is a small library that enables a cleaner, safer style of Java programming.  It approaches a domain specific language (DSL) inside Java.
 
 #Brief Example
+
+[![Join the chat at https://gitter.im/GlenKPeterson/UncleJim](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/GlenKPeterson/UncleJim?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 ```java
 // Define some people with lists of email addresses on the
 // fly.  vec() makes a List, tup() makes a Tuple
