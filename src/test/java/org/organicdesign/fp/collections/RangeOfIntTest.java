@@ -5,6 +5,7 @@ import org.organicdesign.fp.testUtils.EqualsContract;
 
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -32,6 +33,11 @@ public class RangeOfIntTest {
         assertEquals(ir1.contains(1), false);
         assertEquals(ir1.contains(-1), false);
         assertEquals(ir1.size(), 1);
+
+        List<Integer> a = Collections.singletonList(99);
+        List<Integer> b = RangeOfInt.of(99, 100); // Is this correct?  It matches Scala, but...
+        assertEquals(a.size(), b.size());
+        assertEquals(a.get(0), b.get(0));
     }
 
     @SuppressWarnings("SuspiciousMethodCalls")
@@ -137,6 +143,12 @@ public class RangeOfIntTest {
     @Test(expected = IndexOutOfBoundsException.class)
     public void testEx04() { RangeOfInt.of(1, 2).get(Integer.MAX_VALUE); }
 
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testEx05() {
+        RangeOfInt r = RangeOfInt.of(99);
+        r.get(r.size());
+    }
+
     @Test public void equality() {
         EqualsContract.equalsDistinctHashCode(RangeOfInt.of(Integer.valueOf(-1),
                                                             Integer.valueOf(4)),
@@ -210,8 +222,18 @@ public class RangeOfIntTest {
     @Test public void subListTest() {
         List<Integer> a = Arrays.asList(-2, -1, 0, 1, 2, 3, 4);
         List<Integer> b = RangeOfInt.of(-2, 5);
+
+        assertEquals(a.size(), b.size());
+        assertEquals(a.get(0), b.get(0));
+        assertEquals(a.get(a.size() - 1), b.get(b.size() - 1));
+
         List<Integer> sla = a.subList(1, 3);
         List<Integer> slb = b.subList(1, 3);
+
+        assertEquals(sla.size(), slb.size());
+        assertEquals(sla.get(0), slb.get(0));
+        assertEquals(sla.get(sla.size() - 1), slb.get(slb.size() - 1));
+
         assertEquals(RangeOfInt.LIST_EQUATOR.hash(sla),
                      RangeOfInt.LIST_EQUATOR.hash(slb));
         assertTrue(RangeOfInt.LIST_EQUATOR.eq(sla, slb));
@@ -221,5 +243,118 @@ public class RangeOfIntTest {
                                               RangeOfInt.of(-3, 5).subList(2, 4),
                                               RangeOfInt.of(-2, 5));
 
+        sla = a.subList(0, a.size());
+        slb = b.subList(0, b.size());
+
+        assertEquals(sla.size(), slb.size());
+        assertEquals(sla.get(0), slb.get(0));
+        assertEquals(sla.get(sla.size() - 1), slb.get(slb.size() - 1));
+
+        sla = a.subList(0, a.size() - 1);
+        slb = b.subList(0, b.size() - 1);
+
+        assertEquals(sla.size(), slb.size());
+        assertEquals(sla.get(0), slb.get(0));
+        assertEquals(sla.get(sla.size() - 1), slb.get(slb.size() - 1));
+
+        sla = a.subList(0, 1);
+        slb = b.subList(0, 1);
+
+        assertEquals(sla.size(), slb.size());
+        assertEquals(sla.get(0), slb.get(0));
+        assertEquals(sla.get(sla.size() - 1), slb.get(slb.size() - 1));
+
+        sla = a.subList(0, 0);
+        slb = b.subList(0, 0);
+
+        assertEquals(sla.size(), slb.size());
+
+        sla = a.subList(2, 2);
+        slb = b.subList(2, 2);
+
+        assertEquals(sla.size(), slb.size());
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void subListExArray1() { Arrays.asList(-2, -1, 0, 1, 2, 3, 4).subList(-1, 1); }
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void subListEx1() { RangeOfInt.of(-2, 5).subList(-1, 1); }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subListExArray2() { Arrays.asList(-2, -1, 0, 1, 2, 3, 4).subList(1, 0); }
+    @Test(expected = IllegalArgumentException.class)
+    public void subListEx2() { RangeOfInt.of(-2, 5).subList(1, 0); }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void subListExArray3() {
+        List<Integer> r = Arrays.asList(-2, -1, 0, 1, 2, 3, 4);
+        r.subList(0, r.size() + 1);
+    }
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void subListEx3() {
+        RangeOfInt r = RangeOfInt.of(-2, 5);
+        r.subList(0, r.size() + 1);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void subListExArray4() {
+        List<Integer> r = Arrays.asList(-2, -1, 0, 1, 2, 3, 4);
+        r.subList(0, 0).get(0);
+    }
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void subListEx4() {
+        RangeOfInt r = RangeOfInt.of(-2, 5);
+        r.subList(0, 0).get(0);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void subListExArray5() {
+        List<Integer> r = Arrays.asList(-2, -1, 0, 1, 2, 3, 4);
+        r.subList(3,3).get(0);
+    }
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void subListEx5() {
+        RangeOfInt r = RangeOfInt.of(-2, 5);
+        r.subList(3,3).get(0);
+    }
+
+    @Test public void foundBug() {
+        int MAX_BUCKET_LENGTH = 32;
+//        List<Integer> ls = new ArrayList<>();
+//        for (int i = 0; i < 81; i++) {
+//            ls.add(i);
+//        }
+        List<Integer> ls = RangeOfInt.of(81);
+
+        // Make the first bucket
+        Object[] tmp = ls.subList(0, MAX_BUCKET_LENGTH).toArray();
+//        System.out.println("First bucket: " + Arrays.toString(tmp));
+//        Node<E> node = Node1.ofLeaf(tmp);
+        int tailLen = ls.size() % MAX_BUCKET_LENGTH;
+
+        int maxIdx = ls.size() - 1;
+        // For each subsequent bucket, just push leaves into existing Node
+        int i = MAX_BUCKET_LENGTH;
+        for (; i < maxIdx - tailLen; i += MAX_BUCKET_LENGTH) {
+            Object[] cpy = ls.subList(i, i + MAX_BUCKET_LENGTH).toArray();
+//            System.out.println("Chunk of node size: " + cpy.length);
+//            System.out.println("Chunk of node: " + Arrays.toString(cpy));
+//            node = node.pushLeafArray(cpy);
+        }
+        // If we skip the above loop (when the input is too short), then i is correct for
+        // what's below.  If we pop out of the loop after going around a few times, then i is
+        // one too big.  Instead of doing something over and over inside the loop, just
+        // correct i once here.
+        if (i > MAX_BUCKET_LENGTH) {
+            i = i - 1;
+        }
+
+//        System.out.println("final i: " + i);
+        // Here it go boom!
+//        System.out.println("ls.get(i): " + ls.get(i));
+//        System.out.println("maxIdx: " + maxIdx);
+        // The remainder goes into the tail.
+        ls.subList(i, ls.size()).toArray();
+//        System.out.println("Copied tail: " + Arrays.toString(newTail));
     }
 }

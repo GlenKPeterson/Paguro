@@ -14,6 +14,16 @@
 
 package org.organicdesign.fp.collections;
 
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+
+/**
+ Hickey's PersistentVector is one of the wonders of the modern world.  I don't see how its get()
+ method could be made significantly faster.  But its construction assumes single-item appends.
+ NestingVector makes every effort to construct in 32-item chunks, which should theoretically be
+ faster and might make a transient version unnecessary.
+ */
 public class NestingVector<E> implements ImList<E> {
     // There's bit shifting going on here because it's a very fast operation.
     // Shifting right by 5 is aeons faster than dividing by 32.
@@ -602,6 +612,82 @@ public class NestingVector<E> implements ImList<E> {
 
         // Return a new vector of the node we made, plust the new tail.
         return new NestingVector<>(node, newTail, es.length);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <E> ImList<E> of(Iterable<E> es) {
+        if (es == null) {
+            return (ImList<E>) EMPTY;
+        }
+        if (es instanceof List) {
+            List<E> ls = (List) es;
+            if (ls.size() < 1) {
+                return (ImList<E>) EMPTY;
+            }
+
+            // Short vectors have their own lighter-weight class that wraps a simple array.
+            if (ls.size() <= MAX_BUCKET_LENGTH) {
+                return new Nest0<>((E[]) ls.toArray());
+            }
+
+            // Make the first bucket
+            E[] tmp = (E[]) ls.subList(0, MAX_BUCKET_LENGTH).toArray();
+//            System.out.println("First bucket: " + Arrays.toString(tmp));
+            Node<E> node = Node1.ofLeaf(tmp);
+            int tailLen = ls.size() % MAX_BUCKET_LENGTH;
+
+            int maxIdx = ls.size() - 1;
+            // For each subsequent bucket, just push leaves into existing Node
+            int i = MAX_BUCKET_LENGTH;
+            for (; i < maxIdx - tailLen; i += MAX_BUCKET_LENGTH) {
+                E[] cpy = (E[]) ls.subList(i, i + MAX_BUCKET_LENGTH).toArray();
+//                System.out.println("Chunk of node size: " + cpy.length);
+//                System.out.println("Chunk of node: " + Arrays.toString(cpy));
+                node = node.pushLeafArray(cpy);
+            }
+            // If we skip the above loop (when the input is too short), then i is correct for
+            // what's below.  If we pop out of the loop after going around a few times, then i is
+            // one too big.  Instead of doing something over and over inside the loop, just
+            // correct i once here.
+            if (i > MAX_BUCKET_LENGTH) {
+                i = i - 1;
+            }
+
+//            System.out.println("final i: " + i);
+//            System.out.println("ls.get(i): " + ls.get(i));
+//            System.out.println("maxIdx: " + maxIdx);
+            // The remainder goes into the tail.
+            E[] newTail = (E[]) ls.subList(i, ls.size()).toArray();
+//            System.out.println("Copied tail: " + Arrays.toString(newTail));
+
+            // Return a new vector of the node we made, plust the new tail.
+            return new NestingVector<>(node, newTail, ls.size());
+        } else {
+            Iterator<E> iter = es.iterator();
+            E[] tempArray = null;
+            Node<E> node = null;
+            int i = 0;
+            for (; iter.hasNext(); i++) {
+                if ((i % MAX_BUCKET_LENGTH) == 0) {
+                    if (tempArray != null) {
+                        if (node == null) {
+                            node = Node1.ofLeaf(tempArray);
+                        }
+                        node = node.pushLeafArray(tempArray);
+                    }
+                    tempArray = arrayOfLength(MAX_BUCKET_LENGTH);
+                }
+            }
+            if (tempArray == null) {
+                return (ImList<E>) EMPTY;
+            }
+            if (i < MAX_BUCKET_LENGTH) { // Could be if node == null
+                E[] copy = arrayOfLength(i);
+                System.arraycopy(tempArray, 0, copy, 0, i);
+                return new Nest0<>(copy);
+            }
+            return new NestingVector<>(node, tempArray, i);
+        }
     }
 
     /** {@inheritDoc} */

@@ -106,31 +106,58 @@ public class NestingVectorTest {
                                vec(-1));
     }
 
-    // TODO: HERE!
     @Test public void arrayConstruction() {
-        int max = 0;
         // Never finished (at least 10 min), but didn't blow up.
         // int num = 100000000;
+        int num = 1;
 //        for (long num = 31; num <= (long) Integer.MAX_VALUE; num = num * 1021) {
-//            System.out.println("Size: " + num);
-        for (int num = 31; num < 1000000; num = num * 7) {
-//            System.out.println("Size: " + num);
+        for (; num < 1000000; num = num * 7) {
 //        for (int num = 31; num < 50000000; num = num * 7) {
 //            System.out.println("Size: " + num);
             Integer[] is = new Integer[ (int) num];
             for (int i = 0; i < num; i++) {
                 is[i] = i;
             }
-//            System.out.println("Created array.  Filling vector...");
+//            long startMs = System.currentTimeMillis();
             ImList<Integer> nv = NestingVector.ofArray(is);
+//            System.out.println("Created nesting vector from array in " +
+//                               (System.currentTimeMillis() - startMs) + "ms");
             assertEquals(num, nv.size());
+//            startMs = System.currentTimeMillis();
             for (int i = 0; i < num; i++) {
                 assertEquals("Trouble getting " + i + "th element from vector of size " + num,
                              Integer.valueOf(is[i]), nv.get(i));
             }
-            max = (int) num;
+//            System.out.println("Accessed each item in " +
+//                               (System.currentTimeMillis() - startMs) + "ms");
         }
-        System.out.println("Max test was for vector of size " + max);
+//        System.out.println("Max test was for vector of size " + num);
+    }
+
+    @Test public void listConstruction() {
+        // For some reason, my JVM won't use more than 2.1GB for these tests.
+        // Created 62,748,517 items in 23 seconds.  Took forever to check each index.
+        // Runs into a GC loop and crashes before 410,338,673
+        long num = 1;
+        for (; num <= 1000000; num = num * 7) {
+//        for (int num = 31; num < 1000000; num = num * 7) {
+//            System.out.println("Size: " + num);
+
+            RangeOfInt is = RangeOfInt.of(num);
+//            long startMs = System.currentTimeMillis();
+            ImList<Integer> nv = NestingVector.of(is);
+//            System.out.println("Created nesting vector from Range in " +
+//                               (System.currentTimeMillis() - startMs) + "ms");
+            assertEquals(num, nv.size());
+//            startMs = System.currentTimeMillis();
+            for (int i = 0; i < num; i++) {
+                assertEquals("Trouble getting " + i + "th element from vector of size " + num,
+                             is.get(i), nv.get(i));
+            }
+//            System.out.println("Accessed each item in " +
+//                               (System.currentTimeMillis() - startMs) + "ms");
+        }
+//        System.out.println("Max test was for vector of size " + num);
     }
 
 
