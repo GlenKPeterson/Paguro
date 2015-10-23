@@ -109,14 +109,19 @@ public class NestingVectorTest {
     // TODO: HERE!
     @Test public void arrayConstruction() {
         int max = 0;
+        // Never finished (at least 10 min), but didn't blow up.
+        // int num = 100000000;
 //        for (long num = 31; num <= (long) Integer.MAX_VALUE; num = num * 1021) {
 //            System.out.println("Size: " + num);
         for (int num = 31; num < 1000000; num = num * 7) {
+//            System.out.println("Size: " + num);
+//        for (int num = 31; num < 50000000; num = num * 7) {
 //            System.out.println("Size: " + num);
             Integer[] is = new Integer[ (int) num];
             for (int i = 0; i < num; i++) {
                 is[i] = i;
             }
+//            System.out.println("Created array.  Filling vector...");
             ImList<Integer> nv = NestingVector.ofArray(is);
             assertEquals(num, nv.size());
             for (int i = 0; i < num; i++) {
