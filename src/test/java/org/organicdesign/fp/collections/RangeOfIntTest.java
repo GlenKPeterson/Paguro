@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import static org.junit.Assert.*;
+import static org.organicdesign.fp.collections.RangeOfInt.LIST_EQUATOR;
 
 public class RangeOfIntTest {
     @Test(expected = IllegalArgumentException.class)
@@ -192,31 +193,62 @@ public class RangeOfIntTest {
     @Test public void equatorTest() {
         List<Integer> a = Arrays.asList(-2, -1, 0, 1, 2, 3, 4);
         List<Integer> b = RangeOfInt.of(-2, 5);
-        assertEquals(RangeOfInt.LIST_EQUATOR.hash(a),
-                     RangeOfInt.LIST_EQUATOR.hash(b));
+        assertEquals(LIST_EQUATOR.hash(a),
+                     LIST_EQUATOR.hash(b));
         assertEquals(a.size(), b.size());
 
         assertTrue(UnmodSortedIterable.equals(UnmodSortedIterable.castFromList(a),
                                               UnmodSortedIterable.castFromList(b)));
 
-        assertTrue("List and range are equal", RangeOfInt.LIST_EQUATOR.eq(a, b));
+        assertTrue("List and range are equal", LIST_EQUATOR.eq(a, b));
 
-        assertTrue("Range and range are equal", RangeOfInt.LIST_EQUATOR.eq(RangeOfInt.of(-2, 5),
+        assertTrue("List equal to self", LIST_EQUATOR.eq(a, a));
+
+        assertTrue("Range equal to self", LIST_EQUATOR.eq(b, b));
+
+        assertTrue("Range equal to different Range", LIST_EQUATOR.eq(b, RangeOfInt.of(-2, 5)));
+
+        // Is this a good idea?
+        assertTrue("Null equal to self", LIST_EQUATOR.eq(null, null));
+
+        assertTrue("Range and range are equal", LIST_EQUATOR.eq(RangeOfInt.of(-2, 5),
                                                                            b));
 
+        assertFalse("Not equal to null", LIST_EQUATOR.eq(a, null));
+        assertFalse("Not equal to null", LIST_EQUATOR.eq(null, a));
+
+        assertFalse("Not equal to different Range", LIST_EQUATOR.eq(a, RangeOfInt.of(-3, 4)));
+        assertFalse("Not equal to different Range", LIST_EQUATOR.eq(b, RangeOfInt.of(-2, 4)));
+        assertFalse("Not equal to different Range", LIST_EQUATOR.eq(RangeOfInt.of(-3, 4), b));
+        assertFalse("Not equal to different Range", LIST_EQUATOR.eq(RangeOfInt.of(-3, 5), a));
     }
 
+    @SuppressWarnings("SuspiciousMethodCalls")
     @Test public void indexOfTest() {
         List<Integer> a = Arrays.asList(-2, -1, 0, 1, 2, 3, 4);
         List<Integer> b = RangeOfInt.of(-2, 5);
+
+        assertEquals(a.size(), b.size());
 
         for (int i : a) {
             assertEquals(a.indexOf(i), b.indexOf(i));
             assertEquals(a.lastIndexOf(i), b.lastIndexOf(i));
         }
 
+        // List can't take a Long as an index for some reason, but we can.
+        int i = 0;
+        for (long l : a) {
+            assertEquals(i, b.indexOf(Long.valueOf(l)));
+            assertEquals(i, b.lastIndexOf(Long.valueOf(l)));
+            i = i + 1;
+        }
+
         assertEquals(a.indexOf(Integer.MAX_VALUE), b.indexOf(Integer.MAX_VALUE));
+        assertEquals(a.indexOf(Integer.MIN_VALUE), b.indexOf(Integer.MIN_VALUE));
+        assertEquals(a.indexOf(a.size()), b.indexOf(b.size()));
         assertEquals(a.lastIndexOf(Integer.MAX_VALUE), b.lastIndexOf(Integer.MAX_VALUE));
+
+        assertEquals(a.indexOf("Hullabaloo"), b.indexOf("Hullabaloo"));
     }
 
     @Test public void subListTest() {
@@ -234,9 +266,9 @@ public class RangeOfIntTest {
         assertEquals(sla.get(0), slb.get(0));
         assertEquals(sla.get(sla.size() - 1), slb.get(slb.size() - 1));
 
-        assertEquals(RangeOfInt.LIST_EQUATOR.hash(sla),
-                     RangeOfInt.LIST_EQUATOR.hash(slb));
-        assertTrue(RangeOfInt.LIST_EQUATOR.eq(sla, slb));
+        assertEquals(LIST_EQUATOR.hash(sla),
+                     LIST_EQUATOR.hash(slb));
+        assertTrue(LIST_EQUATOR.eq(sla, slb));
 
         EqualsContract.equalsDistinctHashCode(slb,
                                               RangeOfInt.of(-1, 1).subList(0, 2),
@@ -252,6 +284,13 @@ public class RangeOfIntTest {
 
         sla = a.subList(0, a.size() - 1);
         slb = b.subList(0, b.size() - 1);
+
+        assertEquals(sla.size(), slb.size());
+        assertEquals(sla.get(0), slb.get(0));
+        assertEquals(sla.get(sla.size() - 1), slb.get(slb.size() - 1));
+
+        sla = a.subList(1, a.size());
+        slb = b.subList(1, b.size());
 
         assertEquals(sla.size(), slb.size());
         assertEquals(sla.get(0), slb.get(0));
@@ -274,6 +313,12 @@ public class RangeOfIntTest {
 
         assertEquals(sla.size(), slb.size());
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void factoryEx1() { RangeOfInt.of(null); }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void factoryEx2() { RangeOfInt.of(-1); }
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void subListExArray1() { Arrays.asList(-2, -1, 0, 1, 2, 3, 4).subList(-1, 1); }
@@ -316,45 +361,5 @@ public class RangeOfIntTest {
     public void subListEx5() {
         RangeOfInt r = RangeOfInt.of(-2, 5);
         r.subList(3,3).get(0);
-    }
-
-    @Test public void foundBug() {
-        int MAX_BUCKET_LENGTH = 32;
-//        List<Integer> ls = new ArrayList<>();
-//        for (int i = 0; i < 81; i++) {
-//            ls.add(i);
-//        }
-        List<Integer> ls = RangeOfInt.of(81);
-
-        // Make the first bucket
-        Object[] tmp = ls.subList(0, MAX_BUCKET_LENGTH).toArray();
-//        System.out.println("First bucket: " + Arrays.toString(tmp));
-//        Node<E> node = Node1.ofLeaf(tmp);
-        int tailLen = ls.size() % MAX_BUCKET_LENGTH;
-
-        int maxIdx = ls.size() - 1;
-        // For each subsequent bucket, just push leaves into existing Node
-        int i = MAX_BUCKET_LENGTH;
-        for (; i < maxIdx - tailLen; i += MAX_BUCKET_LENGTH) {
-            Object[] cpy = ls.subList(i, i + MAX_BUCKET_LENGTH).toArray();
-//            System.out.println("Chunk of node size: " + cpy.length);
-//            System.out.println("Chunk of node: " + Arrays.toString(cpy));
-//            node = node.pushLeafArray(cpy);
-        }
-        // If we skip the above loop (when the input is too short), then i is correct for
-        // what's below.  If we pop out of the loop after going around a few times, then i is
-        // one too big.  Instead of doing something over and over inside the loop, just
-        // correct i once here.
-        if (i > MAX_BUCKET_LENGTH) {
-            i = i - 1;
-        }
-
-//        System.out.println("final i: " + i);
-        // Here it go boom!
-//        System.out.println("ls.get(i): " + ls.get(i));
-//        System.out.println("maxIdx: " + maxIdx);
-        // The remainder goes into the tail.
-        ls.subList(i, ls.size()).toArray();
-//        System.out.println("Copied tail: " + Arrays.toString(newTail));
     }
 }
