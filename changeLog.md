@@ -1,3 +1,9 @@
+**2015-10-24 0.10.16**: Fixed bug with RangeOfInt.sublist() when the second parameter was size
+and the first parameter was between 1 and size - 1.  Added RangeOfInt.of(singleArg) to match the
+same method in Clojure and Scala (resulting range is 0 inclusive to singleArg exclusive).
+Also clarified that range is always inclusive of the low extent and exclusive of the high one
+because this is how ranges in other languages behave.
+
 **2015-10-07 0.10.15**: Added OneOf2 class to approximate a union type.
 This is a little bit experimental - see the JavaDocs.
 

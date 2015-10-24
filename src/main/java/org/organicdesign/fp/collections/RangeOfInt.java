@@ -22,8 +22,8 @@ import java.util.List;
  compatible.
 
  A RangeOfInt is an indexed sequence of integers.  It currently assumes a step of 1.
- Like everything in Java and similar classes in Clojure, Python, and Scala, the iterator it produces
- is inclusive of the the start endpoint but exclusive of the end.
+ Like everything in Java and similar classes in Clojure, Python, and Scala, it is inclusive of the
+ start value but exclusive of the end.
 
  In theory, a class like this could be made for anything that can provide it's next() and previous()
  item and a size.  To do that, Integer would need to implement something that defined what the
@@ -61,18 +61,34 @@ public class RangeOfInt implements UnmodList<Integer> {
 
     private RangeOfInt(int s, int e) { start = s; end = e; size = (end - start); }
 
-    public static RangeOfInt of(int s, int e) {
-        if (e < s) {
-            throw new IllegalArgumentException("end of range must be >= start of range");
-        }
-        return new RangeOfInt(s, e);
-    }
+//    public static RangeOfInt of(int s, int e) {
+//        if (e < s) {
+//            throw new IllegalArgumentException("end of range must be >= start of range");
+//        }
+//        return new RangeOfInt(s, e);
+//    }
 
     public static RangeOfInt of(Number s, Number e) {
         if ((s == null) || (e == null)) {
             throw new IllegalArgumentException("Nulls not allowed");
         }
+        if (e.longValue() < s.longValue()) {
+            throw new IllegalArgumentException("end of range must be >= start of range");
+        }
         return new RangeOfInt(s.intValue(), e.intValue());
+    }
+
+    //
+    public static RangeOfInt of(Number e) {
+        if (e == null) {
+            throw new IllegalArgumentException("Nulls not allowed");
+        }
+        if (e.longValue() < 0) {
+            throw new IllegalArgumentException("Single argument factory can't accept a negative" +
+                                               " endpoint (it assumes start is zero and positive" +
+                                               " unit step).");
+        }
+        return new RangeOfInt(0, e.intValue());
     }
 
 //    public static RangeOfInt of(int s, int e) { return of((int) s, (int) e); }
@@ -168,6 +184,36 @@ public class RangeOfInt implements UnmodList<Integer> {
 
     @Override public int size() { return size; }
 
+//    @Override
+//    public int hashCode() {
+//        // My theory is that we can compute a hashCode compatible with ArrayList using
+//        // sum of a series.  Maybe the summing hashCode truncates differently on overflow, but I
+//        // thought this was worth a try.
+//
+//        // size * (start + end) / 2
+//        // But convert to long to avoid premature overflow
+//        long tmp = ((long) start) + ((long) end);
+//        tmp = tmp * (long) size;
+//        return (int) (tmp / 2L);
+//    }
+//    @Override
+//    public boolean equals(Object other) {
+//        if (this == other) { return true; }
+//        if ( !(other instanceof List) ) { return false; }
+//
+//        // Fast compare for other int ranges:
+//        if (other instanceof RangeOfInt) {
+//            final RangeOfInt that = (RangeOfInt) other;
+//            return (this.start == that.start) &&
+//                   (this.end == that.end);
+//        }
+//
+//        // Slower compare for other lists:
+//        final List that = (List) other;
+//        // This is not a database object; compare "significant" fields here.
+//        return UnmodSortedIterable.equals(this, UnmodSortedIterable.castFromList(that));
+//    }
+
     @Override
     public int hashCode() { return start + end; }
 
@@ -213,9 +259,29 @@ public class RangeOfInt implements UnmodList<Integer> {
 
     /** {@inheritDoc} */
     @Override public RangeOfInt subList(int fromIndex, int toIndex) {
-        if ( (fromIndex == 0) && (toIndex == size()) ) {
+        if ( (fromIndex == 0) && (toIndex == size) ) {
             return this;
         }
-        return RangeOfInt.of(get(fromIndex), get(toIndex));
+        // Note that this is an IllegalArgumentException, not IndexOutOfBoundsException in order to
+        // match ArrayList.
+        if (fromIndex > toIndex) {
+            throw new IllegalArgumentException("fromIndex(" + fromIndex + ") > toIndex(" + toIndex +
+                                               ")");
+        }
+        // The text of this matches ArrayList
+        if (fromIndex < 0) {
+            throw new IndexOutOfBoundsException("fromIndex = " + fromIndex);
+        }
+        if (toIndex > size) {
+            throw new IndexOutOfBoundsException("toIndex = " + toIndex);
+        }
+
+        // Look very closely at the second parameter because the bounds checking is *different*
+        // from the get() method.  get(toIndex) can throw an exception if toIndex >= start+size.
+        // But since a range is exclusive of it's right-bound, we can create a new sub-range
+        // with a right bound index of size, as opposed to size minus 1.  I spent hours
+        // understanding this before fixing a bug with it.  In the end, subList should do the same
+        // thing on a Range that it does on the equivalent ArrayList.  I made tests for the same.
+        return RangeOfInt.of(start + fromIndex, start + toIndex);
     }
 }
