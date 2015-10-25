@@ -341,12 +341,6 @@ Created nesting vector from Range in 27180ms
             @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
             UnmodList<String> testList = new Repeater((int) num);
 //            RangeOfInt is = RangeOfInt.of(num);
-            System.gc();
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
 
             startNs = System.nanoTime();
 //            List<String> nv = new ArrayList<>(testList);
