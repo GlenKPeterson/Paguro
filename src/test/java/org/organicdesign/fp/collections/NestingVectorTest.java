@@ -338,6 +338,7 @@ Created nesting vector from Range in 27180ms
             System.out.print(num);
             // This is a very low memory, low GC implementation of list, being a flyweight
             // with only 5 objects.
+            @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
             UnmodList<String> testList = new Repeater((int) num);
 //            RangeOfInt is = RangeOfInt.of(num);
             System.gc();

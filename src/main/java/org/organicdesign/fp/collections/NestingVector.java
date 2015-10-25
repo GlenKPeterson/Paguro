@@ -54,14 +54,9 @@ public class NestingVector<E> implements ImList<E> {
 
     /** Copy an array as quickly as possible, replacing the item at the specified index. */
     private static <T> T[] copyReplace(T[] ts, int idx, T t) {
-        T[] result = arrayOfLength(ts.length);
-        // Copy the old kids up to the split kid
-        System.arraycopy(ts, 0, result, 0, idx);
+        // Copy the old kids, then replace the one item.
+        T[] result = Arrays.copyOf(ts, ts.length);
         result[idx] = t;
-        if (idx < (ts.length - 1)) {
-            // Copy the old kids from the split-kid onward
-            System.arraycopy(ts, idx + 1, result, idx + 1, (ts.length - idx));
-        }
         return result;
     }
 
@@ -98,8 +93,7 @@ public class NestingVector<E> implements ImList<E> {
         /** {@inheritDoc} */
         @Override public ImList<E> append(E e) {
             if (tail.length < (MAX_BUCKET_LENGTH - 1)) {
-                E[] newTail = arrayOfLength(tail.length + 1);
-                System.arraycopy(tail, 0, newTail, 0, tail.length);
+                E[] newTail = Arrays.copyOf(tail, tail.length + 1);
                 newTail[tail.length] = e;
                 return new Nest0<>(newTail);
             } else if (tail.length == MAX_BUCKET_LENGTH) {
@@ -205,13 +199,11 @@ public class NestingVector<E> implements ImList<E> {
             return new Node2<>((Node1<T>[]) new Node1[] { this, Node1.ofLeaf(leaf) });
         }
 
-        @SuppressWarnings("unchecked")
         @Override public Node<T> pushLeafArray(T[] leaf) {
             if (isFull()) { return fullPromote(leaf); }
             // Allocate a new tree.
-            T[][] newTree = (T[][]) new Object[tree.length + 1][];
             // Copy all the old packed arrays of items to the new array
-            System.arraycopy(tree, 0, newTree, 0, tree.length);
+            T[][] newTree = Arrays.copyOf(tree, tree.length + 1);
             newTree[tree.length] = leaf;
             return new Node1<>(newTree);
         }
@@ -331,7 +323,6 @@ public class NestingVector<E> implements ImList<E> {
             return new Node3<>((Node2<T>[]) new Node2[] { this, Node2.ofLeaf(leaf) });
         }
 
-        @SuppressWarnings("unchecked")
         @Override public Node<T> pushLeafArray(T[] leaf) {
             if (isFull()) { return fullPromote(leaf); }
 
@@ -342,17 +333,15 @@ public class NestingVector<E> implements ImList<E> {
             Node<T> appendNode = nodes[nodes.length - 1];
             if (appendNode.isFull()) {
                 // Allocate a new, longer node list
-                Node<T>[] newNodes = (Node<T>[]) new Node[nodes.length + 1];
                 // Copy all the old nodes to the new array
-                System.arraycopy(nodes, 0, newNodes, 0, nodes.length);
+                Node<T>[] newNodes = Arrays.copyOf(nodes, nodes.length + 1);
                 // Make a new "right kind" of node here...
                 newNodes[nodes.length] = newChild(leaf);
                 return create(newNodes);
             } else {
                 // Allocate a new node list (same length as the old one)
-                Node<T>[] newNodes = (Node<T>[]) new Node[nodes.length];
                 // Copy all the unchanged nodes to the new array
-                System.arraycopy(nodes, 0, newNodes, 0, nodes.length - 1);
+                Node<T>[] newNodes = Arrays.copyOf(nodes, nodes.length);
                 // replace the last node
                 newNodes[nodes.length - 1] = appendNode.pushLeafArray(leaf);
                 return create(newNodes);
@@ -694,8 +683,7 @@ public class NestingVector<E> implements ImList<E> {
 
         if (tail.length < (MAX_BUCKET_LENGTH - 1)) {
             // Simple case is to just append to the tail
-            E[] newTail = arrayOfLength(tail.length + 1);
-            System.arraycopy(tail, 0, newTail, 0, tail.length);
+            E[] newTail = Arrays.copyOf(tail, tail.length + 1);
             newTail[tail.length] = e;
             return new NestingVector<>(tree, newTail, size + 1);
         } else {
