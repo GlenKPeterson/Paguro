@@ -279,72 +279,92 @@ Created nesting vector from Range in 27180ms
 
 
      */
+
+    static class Repeater implements UnmodList<String> {
+        private final int size;
+        Repeater(int sz) { size = sz; }
+        String[] testStrs = new String[] { "First", "Second", "Third", "Fourth", "Fifth" };
+        final int testLen = testStrs.length;
+        @Override public int size() { return size; }
+        @Override public String get(int index) { return testStrs[index % testLen]; }
+        @Override public String[] toArray() {
+            String[] ret = new String[size];
+            for (int i = 0; i < size; i++) {
+                ret[i] = testStrs[i % testLen];
+            }
+            return ret;
+        }
+        @Override public UnmodListIterator<String> listIterator(int index) {
+//                    throw new UnsupportedOperationException("Not implemented");
+            return new UnmodListIterator<String>() {
+                int i = index;
+                @Override public boolean hasNext() { return i < size; }
+
+                @Override public String next() {
+                    String ret = get(i);
+                    i = i + 1;
+                    return ret;
+                }
+
+                @Override public boolean hasPrevious() { return i > 0; }
+
+                @Override public String previous() {
+                    i = i - 1;
+                    return get(i);
+                }
+
+                @Override public int nextIndex() { return i; }
+
+                @Override public int previousIndex() { return i - 1; }
+            };
+        }
+    };
+
+
     @Test public void listConstruction() {
         // For some reason, my JVM won't use more than 2.1GB for these tests.
         // Created 62,748,517 items in 23 seconds.  Took forever to check each index.
         // Runs into a GC loop and crashes before 410,338,673
         long num = 1;
+        // To prevent optimization
+        String s = null;
+        System.out.println("Size\tCreation\tAccess");
+        long startNs = 0;
+        long endNs = 0;
 
 //        for (; num <= Integer.MAX_VALUE; num = num * 7) {
-        for (; num < 1000000; num = num * 7) {
-            System.out.println("Size: " + num);
-            final int size = (int) num;
+//        for (; num <= 40353607; num = num * 7) {
+        for (; num <= 1000000; num = num * 7) {
+            System.out.print(num);
             // This is a very low memory, low GC implementation of list, being a flyweight
             // with only 5 objects.
-            UnmodList<String> testList = new UnmodList<String>() {
-                String[] testStrs = new String[] { "First", "Second", "Third", "Fourth", "Fifth" };
-                final int testLen = testStrs.length;
-                @Override public int size() { return size; }
-                @Override public String get(int index) { return testStrs[index % testLen]; }
-                @Override public String[] toArray() {
-                    String[] ret = new String[size];
-                    for (int i = 0; i < size; i++) {
-                        ret[i] = testStrs[i % testLen];
-                    }
-                    return ret;
-                }
-                @Override public UnmodListIterator<String> listIterator(int index) {
-//                    throw new UnsupportedOperationException("Not implemented");
-                    return new UnmodListIterator<String>() {
-                        int i = index;
-                        @Override public boolean hasNext() { return i < size; }
-
-                        @Override public String next() {
-                            String ret = get(i);
-                            i = i + 1;
-                            return ret;
-                        }
-
-                        @Override public boolean hasPrevious() { return i > 0; }
-
-                        @Override public String previous() {
-                            i = i - 1;
-                            return get(i);
-                        }
-
-                        @Override public int nextIndex() { return i; }
-
-                        @Override public int previousIndex() { return i - 1; }
-                    };
-                }
-            };
+            UnmodList<String> testList = new Repeater((int) num);
 //            RangeOfInt is = RangeOfInt.of(num);
-            long startMs = System.currentTimeMillis();
+            System.gc();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            startNs = System.nanoTime();
 //            List<String> nv = new ArrayList<>(testList);
             List<String> nv = NestingVector.of(testList);
 //            List<String> nv = PersistentVector.ofIter(testList);
-            System.out.println("Created nesting vector from Range in " +
-                               (System.currentTimeMillis() - startMs) + "ms");
+            endNs = System.nanoTime();
+            System.out.print("\t" + ((endNs - startNs) / num));
             assertEquals(num, nv.size());
-            startMs = System.currentTimeMillis();
+            startNs = System.nanoTime();
             for (int i = 0; i < num; i++) {
-                assertEquals("Trouble getting " + i + "th element from vector of size " + num,
-                             testList.get(i), nv.get(i));
+                s = nv.get(i);
+//                assertEquals("Trouble getting " + i + "th element from vector of size " + num,
+//                             testList.get(i), nv.get(i));
             }
-            System.out.println("Accessed each item in " +
-                               (System.currentTimeMillis() - startMs) + "ms");
+            endNs = System.nanoTime();
+            System.out.println("\t" + ((endNs - startNs) / num));
         }
-        System.out.println("Max test was for vector of size " + num);
+        System.out.println("All times are nanoseconds per item processed.");
+        System.out.println("Max test was for vector of size " + num + " with last string: " + s);
     }
 
 
