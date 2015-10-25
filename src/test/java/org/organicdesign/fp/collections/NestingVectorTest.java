@@ -134,30 +134,217 @@ public class NestingVectorTest {
 //        System.out.println("Max test was for vector of size " + num);
     }
 
+    /*
+With flyweight list:
+
+Using Arrays.copyOf and .copyOfRange
+Size: 1
+Created nesting vector from Range in 0ms
+Accessed each item in 0ms
+Size: 7
+Created nesting vector from Range in 0ms
+Accessed each item in 1ms
+Size: 49
+Created nesting vector from Range in 1ms
+Accessed each item in 0ms
+Size: 343
+Created nesting vector from Range in 1ms
+Accessed each item in 0ms
+Size: 2401
+Created nesting vector from Range in 1ms
+Accessed each item in 2ms
+Size: 16807
+Created nesting vector from Range in 4ms
+Accessed each item in 12ms
+Size: 117649
+Created nesting vector from Range in 19ms
+Accessed each item in 55ms
+Size: 823543
+Created nesting vector from Range in 74ms
+Accessed each item in 212ms
+Size: 5764801
+Created nesting vector from Range in 289ms
+Accessed each item in 1312ms
+Size: 40353607
+Created nesting vector from Range in 2960ms
+Accessed each item in 11252ms
+Size: 282475249
+Created nesting vector from Range in 24441ms
+Accessed each item in 61866ms
+
+NextingVector.ofIter() uses toArray() on the source
+Size: 1
+Created nesting vector from Range in 0ms
+Accessed each item in 0ms
+Size: 7
+Created nesting vector from Range in 0ms
+Accessed each item in 0ms
+Size: 49
+Created nesting vector from Range in 3ms
+Accessed each item in 0ms
+Size: 343
+Created nesting vector from Range in 2ms
+Accessed each item in 0ms
+Size: 2401
+Created nesting vector from Range in 1ms
+Accessed each item in 2ms
+Size: 16807
+Created nesting vector from Range in 3ms
+Accessed each item in 12ms
+Size: 117649
+Created nesting vector from Range in 15ms
+Accessed each item in 63ms
+Size: 823543
+Created nesting vector from Range in 48ms
+Accessed each item in 216ms
+Size: 5764801
+Created nesting vector from Range in 249ms
+Accessed each item in 1248ms
+Size: 40353607
+Created nesting vector from Range in 3507ms
+Accessed each item in 11032ms
+Size: 282475249
+Created nesting vector from Range in 21407ms
+Accessed each item in 64793ms
+Size: 1977326743
+Stopped before GC Crash.
+
+ArrayList() uses toArray() on the source.
+Size: 1
+Created nesting vector from Range in 0ms
+Accessed each item in 0ms
+Size: 7
+Created nesting vector from Range in 0ms
+Accessed each item in 1ms
+Size: 49
+Created nesting vector from Range in 0ms
+Accessed each item in 0ms
+Size: 343
+Created nesting vector from Range in 0ms
+Accessed each item in 0ms
+Size: 2401
+Created nesting vector from Range in 0ms
+Accessed each item in 2ms
+Size: 16807
+Created nesting vector from Range in 1ms
+Accessed each item in 9ms
+Size: 117649
+Created nesting vector from Range in 3ms
+Accessed each item in 45ms
+Size: 823543
+Created nesting vector from Range in 17ms
+Accessed each item in 239ms
+Size: 5764801
+Created nesting vector from Range in 55ms
+Accessed each item in 1488ms
+Size: 40353607
+Created nesting vector from Range in 2948ms
+Accessed each item in 8743ms
+Size: 282475249
+java.lang.OutOfMemoryError: Java heap space
+
+PersistentVector.ofIter() which uses listIterator on the source.
+Size: 1
+Created nesting vector from Range in 0ms
+Accessed each item in 1ms
+Size: 7
+Created nesting vector from Range in 0ms
+Accessed each item in 0ms
+Size: 49
+Created nesting vector from Range in 0ms
+Accessed each item in 0ms
+Size: 343
+Created nesting vector from Range in 2ms
+Accessed each item in 2ms
+Size: 2401
+Created nesting vector from Range in 1ms
+Accessed each item in 2ms
+Size: 16807
+Created nesting vector from Range in 4ms
+Accessed each item in 15ms
+Size: 117649
+Created nesting vector from Range in 18ms
+Accessed each item in 74ms
+Size: 823543
+Created nesting vector from Range in 44ms
+Accessed each item in 202ms
+Size: 5764801
+Created nesting vector from Range in 124ms
+Accessed each item in 1527ms
+Size: 40353607
+Created nesting vector from Range in 876ms
+Accessed each item in 10674ms
+Size: 282475249
+Created nesting vector from Range in 27180ms
+
+
+     */
     @Test public void listConstruction() {
         // For some reason, my JVM won't use more than 2.1GB for these tests.
         // Created 62,748,517 items in 23 seconds.  Took forever to check each index.
         // Runs into a GC loop and crashes before 410,338,673
         long num = 1;
-        for (; num <= 1000000; num = num * 7) {
-//        for (int num = 31; num < 1000000; num = num * 7) {
-//            System.out.println("Size: " + num);
 
-            RangeOfInt is = RangeOfInt.of(num);
-//            long startMs = System.currentTimeMillis();
-            ImList<Integer> nv = NestingVector.of(is);
-//            System.out.println("Created nesting vector from Range in " +
-//                               (System.currentTimeMillis() - startMs) + "ms");
+//        for (; num <= Integer.MAX_VALUE; num = num * 7) {
+        for (; num < 1000000; num = num * 7) {
+            System.out.println("Size: " + num);
+            final int size = (int) num;
+            // This is a very low memory, low GC implementation of list, being a flyweight
+            // with only 5 objects.
+            UnmodList<String> testList = new UnmodList<String>() {
+                String[] testStrs = new String[] { "First", "Second", "Third", "Fourth", "Fifth" };
+                final int testLen = testStrs.length;
+                @Override public int size() { return size; }
+                @Override public String get(int index) { return testStrs[index % testLen]; }
+                @Override public String[] toArray() {
+                    String[] ret = new String[size];
+                    for (int i = 0; i < size; i++) {
+                        ret[i] = testStrs[i % testLen];
+                    }
+                    return ret;
+                }
+                @Override public UnmodListIterator<String> listIterator(int index) {
+//                    throw new UnsupportedOperationException("Not implemented");
+                    return new UnmodListIterator<String>() {
+                        int i = index;
+                        @Override public boolean hasNext() { return i < size; }
+
+                        @Override public String next() {
+                            String ret = get(i);
+                            i = i + 1;
+                            return ret;
+                        }
+
+                        @Override public boolean hasPrevious() { return i > 0; }
+
+                        @Override public String previous() {
+                            i = i - 1;
+                            return get(i);
+                        }
+
+                        @Override public int nextIndex() { return i; }
+
+                        @Override public int previousIndex() { return i - 1; }
+                    };
+                }
+            };
+//            RangeOfInt is = RangeOfInt.of(num);
+            long startMs = System.currentTimeMillis();
+//            List<String> nv = new ArrayList<>(testList);
+            List<String> nv = NestingVector.of(testList);
+//            List<String> nv = PersistentVector.ofIter(testList);
+            System.out.println("Created nesting vector from Range in " +
+                               (System.currentTimeMillis() - startMs) + "ms");
             assertEquals(num, nv.size());
-//            startMs = System.currentTimeMillis();
+            startMs = System.currentTimeMillis();
             for (int i = 0; i < num; i++) {
                 assertEquals("Trouble getting " + i + "th element from vector of size " + num,
-                             is.get(i), nv.get(i));
+                             testList.get(i), nv.get(i));
             }
-//            System.out.println("Accessed each item in " +
-//                               (System.currentTimeMillis() - startMs) + "ms");
+            System.out.println("Accessed each item in " +
+                               (System.currentTimeMillis() - startMs) + "ms");
         }
-//        System.out.println("Max test was for vector of size " + num);
+        System.out.println("Max test was for vector of size " + num);
     }
 
 

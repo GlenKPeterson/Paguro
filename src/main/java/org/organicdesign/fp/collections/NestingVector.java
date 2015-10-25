@@ -573,6 +573,9 @@ public class NestingVector<E> implements ImList<E> {
     @SuppressWarnings("unchecked")
     public static final ImList EMPTY = new Nest0(new Object[0]);
 
+    @SuppressWarnings("unchecked")
+    public static <E> ImList<E> empty() {return (ImList<E>) EMPTY; }
+
     // These three fields (plus the wrapper object) are what's duplicated for each change operation.
     private final int size;
     private final Node<E> tree;
@@ -580,49 +583,42 @@ public class NestingVector<E> implements ImList<E> {
 
     private NestingVector(Node<E> es, E[] tl, int sz) { tree = es; tail = tl; size = sz; }
 
-    @SuppressWarnings("unchecked")
     public static <E> ImList<E> ofArray(E[] es) {
         if ( (es == null) || (es.length < 1) ) {
-            return (ImList<E>) EMPTY;
+            return empty();
         }
         if (es.length < MAX_BUCKET_LENGTH) {
-            E[] copy = arrayOfLength(es.length);
-            System.arraycopy(es, 0, copy, 0, es.length);
-            return new Nest0<>(copy);
+            return new Nest0<>(Arrays.copyOf(es, es.length));
         }
 
         // Make the first bucket
-        E[] cpy = arrayOfLength(MAX_BUCKET_LENGTH);
-        System.arraycopy(es, 0, cpy, 0, MAX_BUCKET_LENGTH);
-        Node<E> node = Node1.ofLeaf(cpy);
+        Node<E> node = Node1.ofLeaf(Arrays.copyOf(es, MAX_BUCKET_LENGTH));
         int tailLen = es.length % MAX_BUCKET_LENGTH;
 
         // For each subsequent bucket, just push leaves into existing Node
         for (int i = MAX_BUCKET_LENGTH; i < es.length - tailLen; i += MAX_BUCKET_LENGTH) {
-            E[] copy = arrayOfLength(MAX_BUCKET_LENGTH);
-            System.arraycopy(es, i, copy, 0, MAX_BUCKET_LENGTH);
 //            System.out.println("Copied array: " + Arrays.asList(copy));
-            node = node.pushLeafArray(copy);
+            node = node.pushLeafArray(Arrays.copyOfRange(es, i, i + MAX_BUCKET_LENGTH));
         }
 
         // The remainder goes into the tail.
-        E[] newTail = arrayOfLength(tailLen);
-        System.arraycopy(es, es.length - tailLen, newTail, 0, tailLen);
 //        System.out.println("Copied tail: " + Arrays.asList(newTail));
 
         // Return a new vector of the node we made, plust the new tail.
-        return new NestingVector<>(node, newTail, es.length);
+        return new NestingVector<>(node,
+                                   Arrays.copyOfRange(es, es.length - tailLen, es.length),
+                                   es.length);
     }
 
     @SuppressWarnings("unchecked")
     public static <E> ImList<E> of(Iterable<E> es) {
         if (es == null) {
-            return (ImList<E>) EMPTY;
+            return empty();
         }
         if (es instanceof List) {
-            List<E> ls = (List) es;
+            List<E> ls = (List<E>) es;
             if (ls.size() < 1) {
-                return (ImList<E>) EMPTY;
+                return empty();
             }
 
             // Short vectors have their own lighter-weight class that wraps a simple array.
@@ -679,12 +675,10 @@ public class NestingVector<E> implements ImList<E> {
                 }
             }
             if (tempArray == null) {
-                return (ImList<E>) EMPTY;
+                return empty();
             }
             if (i < MAX_BUCKET_LENGTH) { // Could be if node == null
-                E[] copy = arrayOfLength(i);
-                System.arraycopy(tempArray, 0, copy, 0, i);
-                return new Nest0<>(copy);
+                return new Nest0<>(Arrays.copyOfRange(tempArray, 0, i));
             }
             return new NestingVector<>(node, tempArray, i);
         }
