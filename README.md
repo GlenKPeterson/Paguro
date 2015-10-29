@@ -1,8 +1,8 @@
 UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") is a small library that enables a cleaner, safer style of Java programming.  It approaches a domain specific language (DSL) inside Java.
 
 ```java
-// Define some people with lists of email addresses on the
-// fly.  vec() makes a List, tup() makes a Tuple
+// Define some people with lists of email addresses on the fly.
+// vec() makes a Vector/List, tup() makes a Tuple
 vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
     tup("Fred", "Tase", vec("c@d.e", "d@e.f", "e@f.g")))
 
@@ -15,8 +15,8 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
         // of email and person.
                                  .map(email -> tup(email, person)))
 
-        // toImMap() needs a function that maps items to
-        // key/value pairs.  We already have pairs, so pass
+        // toImMap() collects the results to key/value pairs and puts
+        // them in an immutable map.  We already have pairs, so pass
         // it the identity function.
         .toImMap(x -> x)
 
