@@ -14,8 +14,10 @@
 package org.organicdesign.fp.collections;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Predicate;
 
 /**
@@ -51,7 +53,7 @@ public interface UnmodCollection<E> extends Collection<E>, UnmodIterable<E> {
     @Override default boolean contains(Object o) { return contains(this, o); }
 
     /**
-     This is quick for sets O(m) or O(m log n), but slow for Lists O(m * n).
+     The default implementation of this method has O(this.size() + that.size()) performance.
 
      {@inheritDoc}
      */
@@ -124,22 +126,21 @@ public interface UnmodCollection<E> extends Collection<E>, UnmodIterable<E> {
     /** This is quick for sets, but slow for Lists. */
     static boolean contains(Collection uc, Object o) {
         for (Object item : uc) {
-            if (Objects.equals(item, o)) {
-                return true;
-            }
+            if (Objects.equals(item, o)) { return true; }
         }
         return false;
     }
 
-    /** This is quick for sets, but slow for Lists. */
+    /** The default implementation of this method has O(this.size() + that.size()) performance. */
+    @SuppressWarnings("unchecked")
     static <T> boolean containsAll(Collection<T> ts, Collection<?> c) {
-        for (Object item : c) {
-            //noinspection SuspiciousMethodCalls
-            if (!ts.contains(item)) {
-                return false;
-            }
+        // Faster to create a HashSet and call containsAll on that because it's
+        // O(this size PLUS that size), whereas looping through both would be
+        // O(this size TIMES that size).
+        if (ts instanceof Set) {
+            return ((Set) ts).containsAll(c);
         }
-        return true;
+        return new HashSet<>(ts).containsAll(c);
     }
 
     /**

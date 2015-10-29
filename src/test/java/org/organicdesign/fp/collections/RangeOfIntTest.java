@@ -176,6 +176,9 @@ public class RangeOfIntTest {
         }
         assertFalse(b.hasNext());
 
+        assertEquals(a.nextIndex(), b.nextIndex());
+        assertEquals(a.previousIndex(), b.previousIndex());
+
         while (a.hasPrevious()) {
             assertTrue(b.hasPrevious());
 

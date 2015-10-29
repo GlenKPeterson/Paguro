@@ -13,13 +13,12 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
-import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.function.Function2;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
@@ -96,11 +95,7 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
      */
     @Override default boolean contains(Object o) { return UnmodCollection.contains(this, o); }
 
-    /**
-     The default implementation of this method has O(this.size() * that.size()) performance.
-
-     {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override default boolean containsAll(Collection<?> c) {
         return UnmodCollection.containsAll(this, c);
     }
@@ -146,10 +141,50 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
     /** {@inheritDoc} */
     @Override default UnmodListIterator<E> listIterator() { return listIterator(0); }
 
+    /** {@inheritDoc}  Subclasses should override this when they can do so more efficiently. */
+    @Override default UnmodListIterator<E> listIterator(int index) {
+        if ( (index < 0) || (index >= size()) ) {
+            throw new IndexOutOfBoundsException("Expected an index between 0 and " + size() +
+                                                " but found: " + index);
+        }
+        return new UnmodListIterator<E>() {
+            private final int sz = size();
+            private int idx = index;
+            @Override public boolean hasNext() { return (idx < sz); }
 
-    /** {@inheritDoc} */
-    @Override
-    UnmodListIterator<E> listIterator(int index);
+            @Override public E next() {
+                // I think this temporary variable i gets compiled to a register access
+                // Load memory value from idx to register.  This is the index we will use against
+                // our internal data.
+                int i = idx;
+                // Throw based on value in register
+                if (i >= size()) { throw new NoSuchElementException(); }
+                // Store incremented register value back to memory.  Note that this is the
+                // next index value we will access.
+                idx = i + 1;
+                // call get() using the old value of idx (before our increment).
+                // i should still be in the register, not in memory.
+                return get(i);
+            }
+
+            @Override public boolean hasPrevious() { return idx > 0; }
+
+            @Override public E previous() {
+                // I think this temporary variable i gets compiled to a register access
+                // retrieve idx, subtract 1, leaving result in register.  The JVM only has one
+                // register.
+                int i = idx - 1;
+                // throw if item in register is < 0
+                if (i < 0) { throw new NoSuchElementException(); }
+                // Write register to memory location
+                idx = i;
+                // retrieve item at the index in the register.
+                return get(i);
+            }
+
+            @Override public int nextIndex() { return idx; }
+        };
+    }
 
     /** Not allowed - this is supposed to be unmodifiable */
     @Override @Deprecated default E remove(int index) {
@@ -198,17 +233,24 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
         if ( (fromIndex == 0) && (toIndex == size()) ) {
             return this;
         }
-// I think this should be the implementation in ImList.
-//        PersistentVector<E> pv = PersistentVector.empty();
-//        for (int i = fromIndex; i < toIndex; i++) {
-//            pv = pv.append(this.get(i));
-//        }
-//        return pv;
-        List<E> ls = new ArrayList<>();
-        for (int i = fromIndex; i < toIndex; i++) {
-            ls.add(this.get(i));
+        // Note that this is an IllegalArgumentException, not IndexOutOfBoundsException in order to
+        // match ArrayList.
+        if (fromIndex > toIndex) {
+            throw new IllegalArgumentException("fromIndex(" + fromIndex + ") > toIndex(" + toIndex +
+                                               ")");
         }
-        return FunctionUtils.unmodList(ls);
+        // The text of this matches ArrayList
+        if (fromIndex < 0) { throw new IndexOutOfBoundsException("fromIndex = " + fromIndex); }
+        if (toIndex > size()) { throw new IndexOutOfBoundsException("toIndex = " + toIndex); }
+
+        final UnmodList<E> parent = this;
+        return new UnmodList<E>() {
+            private final int size = toIndex - fromIndex;
+
+            @Override public int size() { return size; }
+
+            @Override public E get(int index) { return parent.get(index + fromIndex); }
+        };
     }
 
     /**

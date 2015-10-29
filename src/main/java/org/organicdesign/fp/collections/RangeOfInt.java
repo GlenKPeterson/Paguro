@@ -238,22 +238,18 @@ public class RangeOfInt implements UnmodList<Integer> {
     @Override public UnmodListIterator<Integer> listIterator(final int startIdx) {
         return new UnmodListIterator<Integer>() {
             int val = start + startIdx;
-            int idx = startIdx;
             @Override public boolean hasNext() { return val < end; }
             @Override public Integer next() {
-                idx = idx + 1;
                 Integer t = val;
                 val = val + 1;
                 return t;
             }
             @Override public boolean hasPrevious() { return val > start; }
             @Override public Integer previous() {
-                idx = idx - 1;
                 val = val - 1;
                 return val;
             }
-            @Override public int nextIndex() { return idx; }
-            @Override public int previousIndex() { return idx - 1; }
+            @Override public int nextIndex() { return val - start; }
         };
     }
 

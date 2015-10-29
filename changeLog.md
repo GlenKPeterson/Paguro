@@ -1,3 +1,9 @@
+**2015-10-28 0.10.17**: Made UnmodList implement listIterator(int i)
+Made Collection.containsAll() convert to a Set to bring performance from O(n^2) to O(n).
+Made UnmodSet implement containsAll() because that's the highest level where we can do it really fast.
+Made default implementation of previousIndex() in UnmodListIterator because there is probably only one useful way to implement this method.
+Improved test coverage.
+
 **2015-10-24 0.10.16**: Fixed bug with RangeOfInt.sublist() when the second parameter was size
 and the first parameter was between 1 and size - 1.  Added RangeOfInt.of(singleArg) to match the
 same method in Clojure and Scala (resulting range is 0 inclusive to singleArg exclusive).
