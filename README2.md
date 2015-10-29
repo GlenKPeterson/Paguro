@@ -58,8 +58,10 @@ Rich Hickey for Clojure
 - Then `mvn clean test` on UncleJim
 
 #To Do
+ - Can I make UnmodMap extend UnmodCollection instead of UnmodIterable?  Or do the contains() and contains() all methods conflict?
+   Hmm... Maybe have a SizedIterable that both maps and collections can extend?  Ditto UnmodSortedMap extend UnmodSortedCollection instead of UnmodSortedIterable.
  - Have an Ordered version of Transform as well as the (default) unreliable order.  Only the ordered version can be used for implementing things like equals() and hashCode()
- - Bring back the pointer-arithmetic version of drop()
+ - Implement drop() for list with listIterator(dropAmount)
  - Consider `max(Comparator<T> c, Iterable<? extends T> is)` and min()...  Actually, these probably belong on Transformable.
  - Study monadic thinking and ensure that Or is "monad-friendly".
  Ensure you can chain together functions in a short-circuiting way, without exceptions or other side-effects.
