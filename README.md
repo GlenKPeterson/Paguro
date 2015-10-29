@@ -12,12 +12,12 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
         .flatMap(person -> person._3()
 
         // For each address, produce a key/value pair
-        // of email and person.
+        // of email and person (Tuple2 implements Map.Entry)
                                  .map(email -> tup(email, person)))
 
         // toImMap() collects the results to key/value pairs and puts
         // them in an immutable map.  We already have pairs, so pass
-        // it the identity function.
+        // them through unchanged.
         .toImMap(x -> x)
 
         // Look up Jane by her address
