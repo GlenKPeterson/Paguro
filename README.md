@@ -1,21 +1,21 @@
 UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") is a small library that enables a cleaner, safer style of Java programming.  It approaches a domain specific language (DSL) inside Java.
 
-#Brief Example
 ```java
 // Define some people with lists of email addresses on the
 // fly.  vec() makes a List, tup() makes a Tuple
 vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
     tup("Fred", "Tase", vec("c@d.e", "d@e.f", "e@f.g")))
 
-        // Turn that into pairs of emails and people:
-        // flatMap() the list of people into a list of
-        // emails.  map() the emails to email/person pairs
-        // while the person object is still in scope.
+        // We want to look up people by their address.
+        // There are multiple addresses per person.
+        // For each person, find their email addresses.
         .flatMap(person -> person._3()
-                                 .map(mail -> tup(mail,
-                                                  person)))
 
-        // toImMap() expects a function that maps items to
+        // For each address, produce a key/value pair
+        // of email and person.
+                                 .map(email -> tup(email, person)))
+
+        // toImMap() needs a function that maps items to
         // key/value pairs.  We already have pairs, so pass
         // it the identity function.
         .toImMap(x -> x)
@@ -27,13 +27,11 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
         ._1();
 ```
 
-#Status
 [![Build Status](https://travis-ci.org/GlenKPeterson/UncleJim.svg?branch=master)](https://travis-ci.org/GlenKPeterson/UncleJim)
 [![Code Coverage](http://codecov.io/github/GlenKPeterson/UncleJim/coverage.svg?branch=master)](http://codecov.io/github/GlenKPeterson/UncleJim?branch=master)
 
 [![Join the chat at https://gitter.im/GlenKPeterson/UncleJim](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/GlenKPeterson/UncleJim?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-#Maven Dependency
 Available from the [Maven Repository](http://mvnrepository.com/artifact/org.organicdesign/UncleJim) as:
 ```xml
 <dependency>
