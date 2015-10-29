@@ -2,7 +2,7 @@
 <body>
 <p>Exception-friendly functional interfaces named by the number of arguments: Function0, Function1, Function2....
     All of these have an <code>applyEx()</code> method that that throws an Exception and returns a result.
-    Implementers should override the <code>applyEx()</code> method.
+    Implementers should override the <code>applyEx()</code> method (this happens automatically when you use Java 8's lambda syntax).
     Each interface also has a default <code>apply()</code> method for consumers of this function to call.
     It re-throws all exceptions after wrapping any checked ones in unchecked <code>RuntimeException</code>s.</p>
 
