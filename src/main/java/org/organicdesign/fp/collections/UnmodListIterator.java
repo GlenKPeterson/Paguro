@@ -17,7 +17,11 @@ public interface UnmodListIterator<E> extends ListIterator<E>, UnmodSortedIterat
 // E	next()
 // int	nextIndex()
 // E	previous()
-// int	previousIndex()
+
+    // I think this is the only valid implementation of this method. You can override it if you
+    // think otherwise.
+    /** {@inheritDoc} */
+    @Override default int previousIndex() { return nextIndex() - 1; }
 
     /** Not allowed - this is supposed to be unmodifiable */
     @SuppressWarnings("deprecation")
@@ -36,7 +40,6 @@ public interface UnmodListIterator<E> extends ListIterator<E>, UnmodSortedIterat
         @Override public boolean hasPrevious() { return false; }
         @Override public Object previous() { throw new NoSuchElementException(); }
         @Override public int nextIndex() { return 0; }
-        @Override public int previousIndex() { return -1; }
     };
     @SuppressWarnings("unchecked")
     static <T> UnmodListIterator<T> empty() { return (UnmodListIterator<T>) EMPTY; }

@@ -286,37 +286,17 @@ Created nesting vector from Range in 27180ms
         String[] testStrs = new String[] { "First", "Second", "Third", "Fourth", "Fifth" };
         final int testLen = testStrs.length;
         @Override public int size() { return size; }
-        @Override public String get(int index) { return testStrs[index % testLen]; }
+        @Override public String get(int index) {
+            if ( (index >= 0) && (index < size) ) { return testStrs[index % testLen]; }
+            throw new IndexOutOfBoundsException("Index " + index +
+                                                " was outside the range 0 - " + (size - 1));
+        }
         @Override public String[] toArray() {
             String[] ret = new String[size];
             for (int i = 0; i < size; i++) {
                 ret[i] = testStrs[i % testLen];
             }
             return ret;
-        }
-        @Override public UnmodListIterator<String> listIterator(int index) {
-//                    throw new UnsupportedOperationException("Not implemented");
-            return new UnmodListIterator<String>() {
-                int i = index;
-                @Override public boolean hasNext() { return i < size; }
-
-                @Override public String next() {
-                    String ret = get(i);
-                    i = i + 1;
-                    return ret;
-                }
-
-                @Override public boolean hasPrevious() { return i > 0; }
-
-                @Override public String previous() {
-                    i = i - 1;
-                    return get(i);
-                }
-
-                @Override public int nextIndex() { return i; }
-
-                @Override public int previousIndex() { return i - 1; }
-            };
         }
     };
 

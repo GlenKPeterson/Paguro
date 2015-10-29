@@ -261,7 +261,6 @@ public class FunctionUtils {
             @Override public boolean hasPrevious() { return iter.hasPrevious(); }
             @Override public T previous() { return iter.previous(); }
             @Override public int nextIndex() { return iter.nextIndex(); }
-            @Override public int previousIndex() { return iter.previousIndex(); }
             // Defining equals and hashcode makes no sense because can't call them without changing
             // the iterator which both makes it useless, and changes the equals and hashcode
             // results.
@@ -277,9 +276,6 @@ public class FunctionUtils {
         if (inner instanceof UnmodList) { return (UnmodList<T>) inner; }
         if (inner.size() < 1) { return UnmodList.empty(); }
         return new UnmodList<T>() {
-            @Override public UnmodListIterator<T> listIterator(int index) {
-                return unmodListIterator(inner.listIterator(index));
-            }
             @Override public int size() { return inner.size(); }
             @Override public T get(int index) { return inner.get(index); }
             @Override public int hashCode() { return inner.hashCode(); }

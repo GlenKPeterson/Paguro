@@ -14,11 +14,13 @@
 
 package org.organicdesign.fp.collections;
 
+import org.junit.Test;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-
-import org.junit.Test;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.junit.Assert.*;
 
@@ -43,6 +45,72 @@ public class UnmodCollectionTest {
         assertFalse(UnmodCollection.contains(UnmodCollection.empty(), null));
         assertFalse(UnmodCollection.containsAll(UnmodCollection.empty(), Collections.singletonList("phone")));
         assertFalse(UnmodCollection.containsAll(UnmodCollection.empty(), Collections.singletonList(null)));
+    }
+
+    private static final String[] sticksAndStones = new String[] {
+            "Sticks", "and", "stones", "will", "break", "my", "bones", "but", "tests",
+            "will", "never", "hurt", "me." };
+
+    // unColl is part of where the UncleJim names comes from.
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+    private static final UnmodCollection<String> unColl = new UnmodCollection<String>() {
+        @Override public UnmodIterator<String> iterator() {
+            return new UnmodIterator<String>() {
+                int idx = 0;
+                @Override public boolean hasNext() { return idx < sticksAndStones.length; }
+
+                @Override public String next() {
+                    // I think this temporary variable i gets compiled to a register access
+                    // Load memory value from idx to register.  This is the index we will use against
+                    // our internal data.
+                    int i = idx;
+                    // Throw based on value in register
+                    if (i >= size()) { throw new NoSuchElementException(); }
+                    // Store incremented register value back to memory.  Note that this is the
+                    // next index value we will access.
+                    idx = i + 1;
+                    // call get() using the old value of idx (before our increment).
+                    // i should still be in the register, not in memory.
+                    return sticksAndStones[i];
+                }
+            };
+        }
+        @Override public int size() { return sticksAndStones.length; }
+    };
+
+    @Test public void containsTest() {
+        for (String s : sticksAndStones) {
+            assertTrue(unColl.contains(s));
+        }
+        assertFalse(unColl.contains("phrog"));
+    }
+
+    @Test public void containsAllTest() {
+        List<String> ls = Arrays.asList(sticksAndStones);
+        assertTrue(ls.containsAll(unColl));
+        assertTrue(unColl.containsAll(ls));
+
+        List<String> ls2 = Arrays.asList("Sticks", "and", "stones", "will", "break", "my", "bones",
+                                         "but", "tests", "will", "never", "hurt");
+        assertFalse(ls2.containsAll(unColl));
+        assertTrue(unColl.containsAll(ls2));
+
+        List<String> ls3 = Arrays.asList("Sticks", "and", "stones", "will", "break", "my", "bones",
+                                         "but", "tests", "will", "never", "hurt", "me.",
+                                         "maybe");
+        assertTrue(ls3.containsAll(unColl));
+        assertFalse(unColl.containsAll(ls3));
+    }
+
+    @Test public void toArrayTest() {
+        assertArrayEquals(sticksAndStones, unColl.toArray());
+        assertArrayEquals(sticksAndStones, unColl.toArray(new String[3]));
+        assertArrayEquals(sticksAndStones, unColl.toArray(new String[sticksAndStones.length]));
+        String [] result = unColl.toArray(new String[sticksAndStones.length + 3]);
+        assertEquals(sticksAndStones.length + 3, result.length);
+        assertEquals(null, result[result.length - 3]);
+        assertEquals(null, result[result.length - 2]);
+        assertEquals(null, result[result.length - 1]);
     }
 
     @Test public void toArray() {

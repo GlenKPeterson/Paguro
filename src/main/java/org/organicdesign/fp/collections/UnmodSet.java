@@ -54,8 +54,14 @@ public interface UnmodSet<E> extends UnmodCollection<E>, Set<E> {
      should be O(log n) or O(1).
      */
     @Override boolean contains(Object o);
+
     /** {@inheritDoc} */
-    @Override default boolean containsAll(Collection<?> c) { return UnmodCollection.containsAll(this, c); }
+    @Override default boolean containsAll(Collection<?> items) {
+        for (Object item : items) {
+            if (!this.contains(item)) { return false; }
+        }
+        return true;
+    }
 // boolean	equals(Object o)
 // int	hashCode()
 

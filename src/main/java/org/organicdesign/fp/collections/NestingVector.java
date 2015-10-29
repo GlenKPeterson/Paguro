@@ -143,8 +143,6 @@ public class NestingVector<E> implements ImList<E> {
                 }
 
                 @Override public int nextIndex() { return idx; }
-
-                @Override public int previousIndex() { return idx - 1; }
             };
         }
     }
@@ -252,8 +250,6 @@ public class NestingVector<E> implements ImList<E> {
 //                }
 //
 //                @Override public int nextIndex() { return idx; }
-//
-//                @Override public int previousIndex() { return idx - 1; }
 //            };
 //        }
 
@@ -762,7 +758,7 @@ public class NestingVector<E> implements ImList<E> {
                 return ret;
             }
 
-            @Override public boolean hasPrevious() { return idx >= 0; }
+            @Override public boolean hasPrevious() { return idx > 0; }
 
             @Override public E previous() {
                 int maskedIdx = idx & LOW_BITS;
@@ -779,8 +775,6 @@ public class NestingVector<E> implements ImList<E> {
             }
 
             @Override public int nextIndex() { return idx; }
-
-            @Override public int previousIndex() { return idx - 1; }
         };
     }
 

@@ -300,8 +300,6 @@ public class PersistentVector<E> implements ImList<E> {
                 }
                 return array[--i & LOW_BITS];
             }
-            /** {@inheritDoc} */
-            @Override public int previousIndex() { return i - 1; }
         };
     }
 
