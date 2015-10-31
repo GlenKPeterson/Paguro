@@ -20,7 +20,7 @@ import java.util.function.Predicate;
 /** An unmodifiable set */
 public interface UnmodSet<E> extends UnmodCollection<E>, Set<E> {
 
-    // ==================================================== Static ====================================================
+    // ========================================== Static ==========================================
     UnmodSet<Object> EMPTY = new UnmodSet<Object>() {
         @Override public boolean contains(Object o) { return false; }
         @Override public int size() { return 0; }
@@ -30,7 +30,7 @@ public interface UnmodSet<E> extends UnmodCollection<E>, Set<E> {
     @SuppressWarnings("unchecked")
     static <T> UnmodSet<T> empty() { return (UnmodSet<T>) EMPTY; }
 
-    // =================================================== Instance ===================================================
+    // ========================================= Instance =========================================
 
     /** Not allowed - this is supposed to be unmodifiable */
     @SuppressWarnings("deprecation")
@@ -50,8 +50,8 @@ public interface UnmodSet<E> extends UnmodCollection<E>, Set<E> {
 
     /**
      Returns true if the set contains the given item.  This is the defining method of a set.
-     Sets have to override this because the default implementation in UnmodCollection is O(n) whereas a sorted set
-     should be O(log n) or O(1).
+     Sets have to override this because the default implementation in UnmodCollection is O(n)
+     whereas a sorted set should be O(log n) or O(1).
      */
     @Override boolean contains(Object o);
 
@@ -66,8 +66,8 @@ public interface UnmodSet<E> extends UnmodCollection<E>, Set<E> {
 // int	hashCode()
 
     /**
-     This is a convenience method inherited from Collection that returns true if size() == 0 (if this set contains no
-     elements).
+     This is a convenience method inherited from Collection that returns true if size() == 0 (if
+     this set contains no elements).
      */
     @Override default boolean isEmpty() { return size() == 0; }
 
@@ -98,27 +98,30 @@ public interface UnmodSet<E> extends UnmodCollection<E>, Set<E> {
 // default Spliterator<E>	spliterator()
 
     /**
-     * This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for backwards
-     * compatibility in some performance-critical situations.  If you really need an array, consider using the somewhat
-     * type-safe version of this method instead, but read the caveats first.
-     * {@inheritDoc}
+     This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for
+     backwards compatibility in some performance-critical situations.  If you really need an array,
+     consider using the somewhat type-safe version of this method instead, but read the caveats
+     first.
+
+     {@inheritDoc}
      */
-    @Override default Object[] toArray() { return UnmodCollection.toArray(this); }
+    @Override default Object[] toArray() { return UnmodCollection.super.toArray(); }
 
     /**
-     * This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for backwards
-     * compatibility in some performance-critical situations.  If you need to create an array (you almost always do)
-     * then the best way to use this method is:
-     *
-     * <code>MyThing[] things = col.toArray(new MyThing[coll.size()]);</code>
-     *
-     * Calling this method any other way causes unnecessary work to be done - an extra memory allocation and potential
-     * garbage collection if the passed array is too small, extra effort to fill the end of the array with nulls if it
-     * is too large.
-     *
-     * {@inheritDoc}
+     This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for
+     backwards compatibility in some performance-critical situations.  If you need to create an
+     array (you almost always do) then the best way to use this method is:
+
+     <code>MyThing[] things = col.toArray(new MyThing[coll.size()]);</code>
+
+     Calling this method any other way causes unnecessary work to be done - an extra memory
+     allocation and potential garbage collection if the passed array is too small, extra effort to
+     fill the end of the array with nulls if it is too large.
+
+     {@inheritDoc}
      */
-    @Override default <T> T[] toArray(T[] as) { return UnmodCollection.toArray(this, as); }
+    @SuppressWarnings("SuspiciousToArrayCall")
+    @Override default <T> T[] toArray(T[] as) { return UnmodCollection.super.toArray(as); }
 
 // Methods inherited from interface java.util.Collection
 // parallelStream, removeIf, stream

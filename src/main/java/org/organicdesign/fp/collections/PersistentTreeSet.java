@@ -178,6 +178,11 @@ public class PersistentTreeSet<E> implements ImSortedSet<E> {
         return PersistentTreeSet.ofMap(impl.subMap(fromElement, toElement));
     }
 
+    /** {@inheritDoc} */
+    @Override public ImSortedSet<E> tailSet(E fromElement) {
+        return PersistentTreeSet.ofMap(impl.tailMap(fromElement));
+    }
+
 //    // TODO: Ensure that KeySet is sorted.
 //    /** {@inheritDoc} */
 //    @Override public Sequence<E> tail() { return impl.without(first()).keySet().seq(); }

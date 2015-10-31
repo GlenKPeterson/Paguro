@@ -1,3 +1,9 @@
+**2015-10-28 0.10.18**: Removed default implementation of UnmodSortedSet.tailSet() because correct implementation there was not possible.
+Fixed implementation of UnmodSortedSet.headSet() to be correct.
+Removed UnmodList.insert because it was O(n).
+Replacing it with a default implementation that's O(log2 n) will take time (a rough implementation is commented out).
+Improved test coverage by 3-4%.
+
 **2015-10-28 0.10.17**: Made UnmodList implement listIterator(int i)
 Made Collection.containsAll() convert to a Set to bring performance from O(n^2) to O(n).
 Made UnmodSet implement containsAll() because that's the highest level where we can do it really fast.

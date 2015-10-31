@@ -16,30 +16,61 @@ package org.organicdesign.fp.collections;
 
 import org.junit.Test;
 import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.tuple.Tuple2;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
 public class UnmodListTest {
+    @Test public void permutationsTest() {
+        Set<Tuple2<Integer,Integer>> answerSet = new HashSet<>();
+        UnmodList.permutations(Arrays.asList(1,2,3,4),
+                               (a, b) -> {
+                                   answerSet.add(Tuple2.of(a, b));
+                                   return answerSet;
+                               });
+        assertEquals(6, answerSet.size());
+        assertTrue(answerSet.contains(Tuple2.of(1, 2)));
+        assertTrue(answerSet.contains(Tuple2.of(1, 3)));
+        assertTrue(answerSet.contains(Tuple2.of(1, 4)));
+        assertTrue(answerSet.contains(Tuple2.of(2, 3)));
+        assertTrue(answerSet.contains(Tuple2.of(2, 4)));
+        assertTrue(answerSet.contains(Tuple2.of(3, 4)));
+    }
+
     @Test public void indexOf() {
-        assertEquals(-1, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider")).indexOf("hamster"));
-        assertEquals(0, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider")).indexOf("Along"));
-        assertEquals(2, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider")).indexOf("a"));
-        assertEquals(3, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider")).indexOf("spider"));
+        assertEquals(-1, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider"))
+                                      .indexOf("hamster"));
+        assertEquals(0, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider"))
+                                     .indexOf("Along"));
+        assertEquals(2, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider"))
+                                     .indexOf("a"));
+        assertEquals(3, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider"))
+                                     .indexOf("spider"));
 
-        assertEquals(-1, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider")).lastIndexOf("hamster"));
-        assertEquals(0, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider")).lastIndexOf("Along"));
-        assertEquals(2, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider")).lastIndexOf("a"));
-        assertEquals(3, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider")).lastIndexOf("spider"));
+        assertEquals(-1, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider"))
+                                      .lastIndexOf("hamster"));
+        assertEquals(0, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider"))
+                                     .lastIndexOf("Along"));
+        assertEquals(2, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider"))
+                                     .lastIndexOf("a"));
+        assertEquals(3, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider"))
+                                     .lastIndexOf("spider"));
 
-        assertEquals(5, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider", "and", "a", "poodle")).lastIndexOf("a"));
-        assertEquals(5, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider", "and", "a")).lastIndexOf("a"));
-        assertEquals(6, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider", "and", "a", "Along")).lastIndexOf("Along"));
+        assertEquals(5, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider", "and",
+                                                              "a", "poodle")).lastIndexOf("a"));
+        assertEquals(5, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider", "and",
+                                                              "a")).lastIndexOf("a"));
+        assertEquals(6, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider", "and",
+                                                              "a", "Along")).lastIndexOf("Along"));
 
         assertEquals(-1, UnmodList.empty().indexOf("hamster"));
         assertEquals(-1, UnmodList.empty().indexOf(39));
@@ -82,38 +113,113 @@ public class UnmodListTest {
         assertFalse(unList.containsAll(ls3));
     }
 
-    @Test public void listIteratorTest() {
-        ListIterator<String> a = Arrays.asList(sticksAndStones).listIterator();
-        UnmodListIterator<String> b = unList.listIterator();
-
+    // TODO: This belongs in testUtils
+    /**
+     Call with two Iterators to test that they are equal
+     @param a the reference iterator
+     @param b the iterator under test.
+     */
+    public static <A,B> void iteratorTest(Iterator<A> a, Iterator<B> b) {
         while (a.hasNext()) {
-            assertTrue(b.hasNext());
-
-            assertEquals(a.nextIndex(), b.nextIndex());
-            assertEquals(a.previousIndex(), b.previousIndex());
-
-            assertEquals(a.next(), b.next());
-
-            assertEquals(a.nextIndex(), b.nextIndex());
-            assertEquals(a.previousIndex(), b.previousIndex());
+            assertTrue("When a has a next, b should too", b.hasNext());
+            assertEquals("a.next should equal b.next", a.next(), b.next());
         }
-        assertFalse(b.hasNext());
+        assertFalse("When a has no next, b shouldn't either", b.hasNext());
+    }
 
-        assertEquals(a.nextIndex(), b.nextIndex());
-        assertEquals(a.previousIndex(), b.previousIndex());
+    // TODO: This belongs in testUtils
+    /**
+     Call with two ListIterators to test that they are equal
+     @param aList the reference iterator
+     @param bList the iterator under test.
+     */
+    public static <A,B> void listIteratorTest(List<A> aList, List<B> bList) {
+        for (int i = 0; i < aList.size(); i++) {
+            ListIterator<A> a = aList.listIterator(i);
+            ListIterator<B> b = bList.listIterator(i);
 
-        while (a.hasPrevious()) {
-            assertTrue(b.hasPrevious());
+            assertEquals("a.hasNext should initially equal b.hasNext (started at " + i + ")",
+                         a.hasNext(), b.hasNext());
+            assertEquals("a.hasPrevious should initially equal b.hasPrevious" +
+                         " (started at " + i + ")",
+                         a.hasPrevious(), b.hasPrevious());
+            assertEquals("a.nextIndex should initially equal b.nextIndex (started at " + i + ")",
+                         a.nextIndex(), b.nextIndex());
+            assertEquals("a.previousIndex should initially equal b.previousIndex" +
+                         " (started at " + i + ")",
+                         a.previousIndex(), b.previousIndex());
 
-            assertEquals(a.nextIndex(), b.nextIndex());
-            assertEquals(a.previousIndex(), b.previousIndex());
+            while (a.hasNext()) {
+                assertTrue("When a has a next, b should too (started at " + i + ")", b.hasNext());
 
-            assertEquals(a.previous(), b.previous());
+                assertEquals("a.nextIndex should equal b.nextIndex before calling next()" +
+                             " (started at " + i + ")",
+                             a.nextIndex(), b.nextIndex());
+                assertEquals("a.previousIndex should equal b.previousIndex before calling next()" +
+                             " (started at " + i + ")",
+                             a.previousIndex(), b.previousIndex());
 
-            assertEquals(a.nextIndex(), b.nextIndex());
-            assertEquals(a.previousIndex(), b.previousIndex());
+                assertEquals("a.next should equal b.next (started at " + i + ")",
+                             a.next(), b.next());
+
+                assertEquals("a.nextIndex should equal b.nextIndex after calling next()" +
+                             " (started at " + i + ")",
+                             a.nextIndex(), b.nextIndex());
+                assertEquals("a.previousIndex should equal b.previousIndex after calling next()" +
+                             " (started at " + i + ")",
+                             a.previousIndex(), b.previousIndex());
+            }
+            assertFalse("When a has no next, b shouldn't either (started at " + i + ")",
+                        b.hasNext());
+
+            assertEquals("a.hasPrevious should equal b.hasPrevious after the last item" +
+                         " (started at " + i + ")",
+                         a.hasPrevious(), b.hasPrevious());
+            assertEquals("a.nextIndex should equal b.nextIndex after the last item" +
+                         " (started at " + i + ")",
+                         a.nextIndex(), b.nextIndex());
+            assertEquals("a.previousIndex should equal b.previousIndex after the last item" +
+                         " (started at " + i + ")",
+                         a.previousIndex(), b.previousIndex());
+
+            while (a.hasPrevious()) {
+                assertTrue("When a hasPrevious, b should too. (started at " + i + ")",
+                           b.hasPrevious());
+
+                assertEquals("a.nextIndex should equal b.nextIndex before calling previous()" +
+                             " (started at " + i + ")",
+                             a.nextIndex(), b.nextIndex());
+                assertEquals("a.previousIndex should equal b.previousIndex before calling" +
+                             " previous() (started at " + i + ")",
+                             a.previousIndex(), b.previousIndex());
+
+                assertEquals("a.previous should equal b.previous (started at " + i + ")",
+                             a.previous(), b.previous());
+
+                assertEquals("a.nextIndex should equal b.nextIndex after calling previous()" +
+                             " (started at " + i + ")",
+                             a.nextIndex(), b.nextIndex());
+                assertEquals("a.previousIndex should equal b.previousIndex after calling" +
+                             " previous() (started at " + i + ")",
+                             a.previousIndex(), b.previousIndex());
+            }
+            assertFalse("When a has no previous, b shouldn't either (started at " + i + ")",
+                        b.hasPrevious());
+
+            assertEquals("a.hasPrevious should equal b.hasPrevious before first item" +
+                         " (started at " + i + ")",
+                         a.hasPrevious(), b.hasPrevious());
+            assertEquals("a.nextIndex should equal b.nextIndex before first item" +
+                         " (started at " + i + ")",
+                         a.nextIndex(), b.nextIndex());
+            assertEquals("a.previousIndex should equal b.previousIndex before first item" +
+                         " (started at " + i + ")",
+                         a.previousIndex(), b.previousIndex());
         }
-        assertFalse(b.hasPrevious());
+    }
+
+    @Test public void listIteratorTest() {
+        listIteratorTest(Arrays.asList(sticksAndStones), unList);
     }
 
     @Test (expected = IndexOutOfBoundsException.class)
@@ -133,7 +239,7 @@ public class UnmodListTest {
     public void listIterEx04() { unList.listIterator(0).previous(); }
 
     @Test public void subList() {
-        List<String> testList = Arrays.asList(sticksAndStones);
+        List<String> a = Arrays.asList(sticksAndStones);
         assertEquals(Arrays.asList("stones", "will", "break"),
                      unList.subList(2, 5));
 
@@ -143,7 +249,6 @@ public class UnmodListTest {
         assertEquals(Collections.emptyList(),
                      unList.subList(2, 2));
 
-        List<String> a = testList;
         List<String> b = unList;
 
         assertEquals(a.size(), b.size());
@@ -221,4 +326,65 @@ public class UnmodListTest {
         assertTrue(sticksAndStones.length <
                    unList.toArray(new String[sticksAndStones.length + 1]).length);
     }
+
+    @Test public void testDidley() {
+        // for those of you who want 100% test coverage just on principle, this one's for you.
+        assertTrue(UnmodListIterator.EMPTY == UnmodList.empty().listIterator(0));
+        assertEquals(0, UnmodList.empty().size());
+    }
+
+    @Test (expected = IndexOutOfBoundsException.class)
+    public void outOfBounds01() { UnmodList.EMPTY.get(0); }
+
+    @SuppressWarnings("deprecation")
+    @Test (expected = UnsupportedOperationException.class)
+    public void unsupportedOpAdd() { unList.add("hi"); }
+
+    @SuppressWarnings("deprecation")
+    @Test (expected = UnsupportedOperationException.class)
+    public void unsupportedOpAddIdx() { unList.add(0, "hi"); }
+
+    @SuppressWarnings("deprecation")
+    @Test (expected = UnsupportedOperationException.class)
+    public void unsupportedOpAddAll() { unList.addAll(Arrays.asList("hi", "there")); }
+
+    @SuppressWarnings("deprecation")
+    @Test (expected = UnsupportedOperationException.class)
+    public void unsupportedOpAddAllIdx() { unList.addAll(0, Arrays.asList("hi", "there")); }
+
+    @SuppressWarnings("deprecation")
+    @Test (expected = UnsupportedOperationException.class)
+    public void unsupportedOpClear() { unList.clear(); }
+
+    @SuppressWarnings("deprecation")
+    @Test (expected = UnsupportedOperationException.class)
+    public void unsupportedOpRemoveIdx() { unList.remove(0); }
+
+    @SuppressWarnings("deprecation")
+    @Test (expected = UnsupportedOperationException.class)
+    public void unsupportedOpRemove() { unList.remove("hi"); }
+
+    @SuppressWarnings("deprecation")
+    @Test (expected = UnsupportedOperationException.class)
+    public void unsupportedOpRemoveAll() { unList.removeAll(Arrays.asList("hi", "there")); }
+
+    @SuppressWarnings("deprecation")
+    @Test (expected = UnsupportedOperationException.class)
+    public void unsupportedOpReplaceAll() { unList.replaceAll(x -> x); }
+
+    @SuppressWarnings("deprecation")
+    @Test (expected = UnsupportedOperationException.class)
+    public void unsupportedOpRemoveIf() { unList.removeIf(item -> false); }
+
+    @SuppressWarnings("deprecation")
+    @Test (expected = UnsupportedOperationException.class)
+    public void unsupportedOpRetainAll() { unList.retainAll(Arrays.asList("hi", "there")); }
+
+    @SuppressWarnings("deprecation")
+    @Test (expected = UnsupportedOperationException.class)
+    public void unsupportedOpSet() { unList.set(0, "hi"); }
+
+    @SuppressWarnings("deprecation")
+    @Test (expected = UnsupportedOperationException.class)
+    public void unsupportedOpSort() { unList.sort(String.CASE_INSENSITIVE_ORDER); }
 }

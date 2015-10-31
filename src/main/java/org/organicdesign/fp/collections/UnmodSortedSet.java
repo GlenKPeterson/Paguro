@@ -25,8 +25,10 @@ public interface UnmodSortedSet<E> extends UnmodSet<E>, SortedSet<E>, UnmodSorte
         @Override public int size() { return 0; }
         @Override public boolean isEmpty() { return true; }
         @Override public UnmodSortedIterator<Object> iterator() { return UnmodSortedIterator.empty(); }
+        // Is this implementation a reason not to have an empty sorted set singleton?
         @Override public Comparator<? super Object> comparator() { return null; }
         @Override public UnmodSortedSet<Object> subSet(Object fromElement, Object toElement) { return this; }
+        @Override public UnmodSortedSet<Object> tailSet(Object fromElement) { return this; }
         @Override public Object first() { throw new NoSuchElementException("Empty set"); }
         @Override public Object last() { throw new NoSuchElementException("Empty set"); }
     };
@@ -35,7 +37,24 @@ public interface UnmodSortedSet<E> extends UnmodSet<E>, SortedSet<E>, UnmodSorte
 
     // =================================================== Instance ===================================================
     /** {@inheritDoc} */
-    @Override default UnmodSortedSet<E> headSet(E toElement) { return subSet(first(), toElement); }
+    @SuppressWarnings("unchecked")
+    @Override default UnmodSortedSet<E> headSet(E toElement) {
+        // This is tricky because of the case where toElement > last()
+        Comparator<? super E> comparator = comparator();
+        if (comparator == null) {
+            // By the rules of the constructor type signature, we either need a comparator,
+            // or we need to accept only Comparable items into this collection, so this cast should
+            // always work.
+            Comparable<E> last = (Comparable<E>) last();
+            if (last.compareTo(toElement) < 0) {
+                return this;
+            }
+        } else if (comparator.compare(last(), toElement) < 0) {
+            return this;
+        }
+        // All other cases are trivial.
+        return subSet(first(), toElement);
+    }
 
     /**
      Iterates over contents in a guaranteed order.
@@ -49,5 +68,8 @@ public interface UnmodSortedSet<E> extends UnmodSet<E>, SortedSet<E>, UnmodSorte
     UnmodSortedSet<E> subSet(E fromElement, E toElement);
 
     /** {@inheritDoc} */
-    @Override default UnmodSortedSet<E> tailSet(E fromElement) { return subSet(fromElement, last()); }
+    // Note: there is no simple default implementation because subSet() is exclusive of the given
+    // end element and there is no way to reliably find an element exactly larger than last().
+    // Otherwise we could just return subSet(fromElement, last());
+    @Override UnmodSortedSet<E> tailSet(E fromElement);
 }

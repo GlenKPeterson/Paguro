@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -332,7 +331,7 @@ public class PersistentVectorTest {
 
     @Test public void listIterator() {
         PersistentVector<Integer> pv2 = PersistentVector.empty();
-        int len = 999;
+        int len = 99;
         Integer[] test = new Integer[len];
 
         for (int i = 0; i < len; i++) {
@@ -342,39 +341,6 @@ public class PersistentVectorTest {
         assertArrayEquals(test, pv2.toArray());
 
         List<Integer> tList = Arrays.asList(test);
-        ListIterator<Integer> benchmark = tList.listIterator(7);
-        ListIterator<Integer> subjectIter = pv2.listIterator(7);
-
-        assertEquals(benchmark.hasNext(), subjectIter.hasNext());
-        assertEquals(benchmark.hasPrevious(), subjectIter.hasPrevious());
-        assertEquals(benchmark.nextIndex(), subjectIter.nextIndex());
-        assertEquals(benchmark.previousIndex(), subjectIter.previousIndex());
-
-        while(benchmark.hasNext() && subjectIter.hasNext()) {
-            assertEquals(benchmark.next(), subjectIter.next());
-            assertEquals(benchmark.hasNext(), subjectIter.hasNext());
-            assertEquals(benchmark.hasPrevious(), subjectIter.hasPrevious());
-            assertEquals(benchmark.nextIndex(), subjectIter.nextIndex());
-            assertEquals(benchmark.previousIndex(), subjectIter.previousIndex());
-        }
-
-        assertEquals(benchmark.hasNext(), subjectIter.hasNext());
-        assertEquals(benchmark.hasPrevious(), subjectIter.hasPrevious());
-        assertEquals(benchmark.nextIndex(), subjectIter.nextIndex());
-        assertEquals(benchmark.previousIndex(), subjectIter.previousIndex());
-
-        while(benchmark.hasPrevious() && subjectIter.hasPrevious()) {
-            assertEquals(benchmark.previous(), subjectIter.previous());
-            assertEquals(benchmark.hasNext(), subjectIter.hasNext());
-            assertEquals(benchmark.hasPrevious(), subjectIter.hasPrevious());
-            assertEquals(benchmark.nextIndex(), subjectIter.nextIndex());
-            assertEquals(benchmark.previousIndex(), subjectIter.previousIndex());
-        }
-
-        assertEquals(benchmark.hasNext(), subjectIter.hasNext());
-        assertEquals(benchmark.hasPrevious(), subjectIter.hasPrevious());
-        assertEquals(benchmark.nextIndex(), subjectIter.nextIndex());
-        assertEquals(benchmark.previousIndex(), subjectIter.previousIndex());
-
+        UnmodListTest.listIteratorTest(tList, pv2);
     }
 }

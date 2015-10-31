@@ -93,11 +93,13 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
 
      {@inheritDoc}
      */
-    @Override default boolean contains(Object o) { return UnmodCollection.contains(this, o); }
+    @Override default boolean contains(Object o) {
+        return UnmodSortedCollection.super.contains(o);
+    }
 
     /** {@inheritDoc} */
     @Override default boolean containsAll(Collection<?> c) {
-        return UnmodCollection.containsAll(this, c);
+        return UnmodSortedCollection.super.containsAll(c);
     }
 
 //boolean	equals(Object o)
@@ -254,27 +256,30 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
     }
 
     /**
-     * This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for backwards
-     * compatibility in some performance-critical situations.  If you really need an array, consider using the somewhat
-     * type-safe version of this method instead, but read the caveats first.
-     * {@inheritDoc}
+     This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for
+     backwards compatibility in some performance-critical situations.  If you really need an array,
+     consider using the somewhat type-safe version of this method instead, but read the caveats
+     first.
+
+     {@inheritDoc}
      */
-    @Override default Object[] toArray() { return UnmodCollection.toArray(this); }
+    @Override default Object[] toArray() { return UnmodSortedCollection.super.toArray(); }
 
     /**
-     * This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for backwards
-     * compatibility in some performance-critical situations.  If you need to create an array (you almost always do)
-     * then the best way to use this method is:
-     *
-     * <code>MyThing[] things = col.toArray(new MyThing[coll.size()]);</code>
-     *
-     * Calling this method any other way causes unnecessary work to be done - an extra memory allocation and potential
-     * garbage collection if the passed array is too small, extra effort to fill the end of the array with nulls if it
-     * is too large.
-     *
-     * {@inheritDoc}
+     This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for
+     backwards compatibility in some performance-critical situations.  If you need to create an
+     array (you almost always do) then the best way to use this method is:
+
+     <code>MyThing[] things = col.toArray(new MyThing[coll.size()]);</code>
+
+     Calling this method any other way causes unnecessary work to be done - an extra memory
+     allocation and potential garbage collection if the passed array is too small, extra effort to
+     fill the end of the array with nulls if it is too large.
+
+     {@inheritDoc}
      */
-    @Override default <T> T[] toArray(T[] as) { return UnmodCollection.toArray(this, as); }
+    @SuppressWarnings("SuspiciousToArrayCall")
+    @Override default <T> T[] toArray(T[] as) { return UnmodSortedCollection.super.toArray(as); }
 
 //Methods inherited from interface java.util.Collection
 //parallelStream, removeIf, stream

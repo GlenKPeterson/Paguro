@@ -478,11 +478,11 @@ public class PersistentTreeMapTest {
                 PersistentTreeMap.of(vec(tup(1, "one"))).assoc(2, "two").assoc(3, "three").assoc(4, "four").assoc(5, "five");
         ImSet<Map.Entry<Integer,String>> s =
                 PersistentTreeSet.ofComp((a, b) -> a.getKey() - b.getKey(),
-                                         vec(UnmodMap.UnEntry.of(1, "one"),
-                                             UnmodMap.UnEntry.of(2, "two"),
-                                             UnmodMap.UnEntry.of(3, "three"),
-                                             UnmodMap.UnEntry.of(4, "four"),
-                                             UnmodMap.UnEntry.of(5, "five")));
+                                         vec(Tuple2.of(1, "one"),
+                                             Tuple2.of(2, "two"),
+                                             Tuple2.of(3, "three"),
+                                             Tuple2.of(4, "four"),
+                                             Tuple2.of(5, "five")));
         assertArrayEquals(s.toArray(),
                           m.entrySet().map((u) -> tup(u.getKey(), u.getValue())).toArray());
     }

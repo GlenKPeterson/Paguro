@@ -16,41 +16,74 @@ package org.organicdesign.fp.collections;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.organicdesign.fp.StaticImports.vec;
 
 public class ImListTest {
-    @Test public void insert() {
-        // Computer science is no more about computers than astronomy is about telescopes. - Dijkstra
-        ImList<String> p = vec("computers ").insert(0, "is ");
+//    @Test public void insert() {
+//        // Computer science is no more about computers than astronomy is about telescopes. - Dijkstra
+//        ImList<String> p = vec("computers ").insert(0, "is ");
+//
+//        p = p.insert(1, "more ")
+//             .insert(0, "Computer ")
+//             .insert(1, "science ");
+//        p = p.insert(3, "no ")
+//             .insert(5, "about ")
+//             .insert(7, "about ")
+//             .insert(7, "is ")
+//             .insert(7, "astronomy ")
+//             .insert(7, "than ");
+//        p = p.insert(p.size(), "telescopes.");
+//
+//        StringBuilder sB = new StringBuilder();
+//        for (String s : p) { sB.append(s); }
+//        assertEquals("Computer science is no more about computers than astronomy is about telescopes.",
+//                     sB.toString());
+//
+//        assertEquals("PersistentVector(Computer ,science ,is ,no ,more ,...)",
+//                     p.toString());
+//    }
 
-        p = p.insert(1, "more ")
-             .insert(0, "Computer ")
-             .insert(1, "science ");
-        p = p.insert(3, "no ")
-             .insert(5, "about ")
-             .insert(7, "about ")
-             .insert(7, "is ")
-             .insert(7, "astronomy ")
-             .insert(7, "than ");
-        p = p.insert(p.size(), "telescopes.");
+    static class TestList<T> implements ImList<T> {
+        static <T> List<T> dup(Collection<T> in) {
+            List<T> out = new ArrayList<>();
+            out.addAll(in);
+            return out;
+        }
 
-        StringBuilder sB = new StringBuilder();
-        for (String s : p) { sB.append(s); }
-        assertEquals("Computer science is no more about computers than astronomy is about telescopes.",
-                     sB.toString());
+        private final List<T> inner;
 
-        assertEquals("PersistentVector(Computer ,science ,is ,no ,more ,...)",
-                     p.toString());
+        TestList(Collection<T> s) {
+            inner = new ArrayList<>();
+            inner.addAll(s);
+        }
+
+        @Override public ImList<T> append(T t) {
+            List<T> next = dup(inner);
+            next.add(t);
+            return new TestList<>(next);
+        }
+
+        @Override public ImList<T> replace(int idx, T t) {
+            List<T> next = dup(inner);
+            next.set(idx, t);
+            return new TestList<>(next);
+        }
+
+        @Override public int size() { return inner.size(); }
+
+        @Override public T get(int index) { return inner.get(index); }
     }
 
     @Test public void get() {
-        PersistentVector<String> pv =
-                PersistentVector.ofIter(Arrays.asList("Four", "score", "and", "seven",
-                                                      "years", "ago..."));
+        ImList<String> pv =
+                new TestList<>(Arrays.asList("Four", "score", "and", "seven",
+                                             "years", "ago..."));
         assertEquals("Million", pv.get(Integer.MIN_VALUE, "Million"));
         assertEquals("Million", pv.get(-1, "Million"));
 
@@ -61,13 +94,15 @@ public class ImListTest {
         assertEquals("Million", pv.get(Integer.MAX_VALUE, "Million"));
     }
 
-    @Test public void append() {
+    @Test public void concatTest() {
         assertArrayEquals(new String[]{"a", "b", "c", "d", "e", "f"},
-                          PersistentVector.ofIter(Arrays.asList("a", "b", "c"))
-                                          .concat(Arrays.asList("d", "e", "f")).toArray());
+                          new TestList<>(Arrays.asList("a", "b", "c"))
+                                  .concat(Arrays.asList("d", "e", "f")).toArray());
+    }
 
-        PersistentVector<String> pv = PersistentVector.ofIter(Arrays.asList("d", "e", "f"));
-        assertArrayEquals(new String[]{"a", "b", "c", "d", "e", "f"},
-                          pv.precat(Arrays.asList("a", "b", "c")).toArray());
+    @Test public void iteratorTest() {
+        String[] fourScore = new String[] {"Four", "score", "and", "seven", "years", "ago..."};
+        UnmodListTest.listIteratorTest(Arrays.asList(fourScore),
+                                       new TestList<>(Arrays.asList(fourScore)));
     }
 }

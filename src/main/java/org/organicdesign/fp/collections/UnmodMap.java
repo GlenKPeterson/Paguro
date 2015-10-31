@@ -17,13 +17,17 @@ import org.organicdesign.fp.tuple.Tuple2;
 
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-/** An unmodifiable map */
+/**
+ An unmodifiable map.
+ This cannot extend Collection because the remove() method would then be inherited
+ from both Collection and Map and Collection.remove() returns a boolean while Map.remove() returns
+ a V (the type of the value in the key/value pair).  Maybe an UnmodSizedIterable is called for?
+ */
 public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<K,V>> {
-    // ==================================================== Static ====================================================
+    // ========================================== Static ==========================================
     /**
      * A map entry (key-value pair).  The <tt>UnmodMap.entrySet</tt> method returns
      * a collection-view of the map, whose elements are of this class.  The
@@ -39,25 +43,29 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
             throw new UnsupportedOperationException("Modification attempted");
         }
 
-        static <K,V> UnEntry<K,V> wrap(Map.Entry<K,V> entry) {
+        static <K,V> UnEntry<K,V> entryToUnEntry(Map.Entry<K,V> entry) {
             return Tuple2.of(entry.getKey(), entry.getValue());
         }
 
-        static <K,V> UnmodIterator<UnEntry<K,V>> wrap(Iterator<Entry<K,V>> innerIter) {
+        static <K,V>
+        UnmodIterator<UnEntry<K,V>> entryIterToUnEntryUnIter(Iterator<Entry<K,V>> innerIter) {
             return new UnmodIterator<UnEntry<K, V>>() {
                 @Override public boolean hasNext() { return innerIter.hasNext(); }
-                @Override public UnEntry<K, V> next() { return UnmodMap.UnEntry.wrap(innerIter.next()); }
+                @Override public UnEntry<K, V> next() {
+                    return UnmodMap.UnEntry.entryToUnEntry(innerIter.next());
+                }
             };
         }
 
-        static <K,V> UnmodSortedIterator<UnEntry<K,V>> wrap(UnmodSortedIterator<Entry<K,V>> innerIter) {
+        static <K,V> UnmodSortedIterator<UnEntry<K,V>> unSortIterEntToUnSortIterUnEnt(
+                UnmodSortedIterator<Entry<K,V>> innerIter) {
             return new UnmodSortedIterator<UnEntry<K, V>>() {
                 @Override public boolean hasNext() { return innerIter.hasNext(); }
-                @Override public UnEntry<K, V> next() { return UnmodMap.UnEntry.wrap(innerIter.next()); }
+                @Override public UnEntry<K, V> next() {
+                    return UnmodMap.UnEntry.entryToUnEntry(innerIter.next());
+                }
             };
         }
-
-        static <K,V> UnEntry<K,V> of(K k, V v) { return Tuple2.of(k, v); }
 //
 //        class Impl<K,V> implements UnEntry<K,V> {
 //            private final K key;
@@ -71,7 +79,8 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
 //                if ((other == null) || !(other instanceof UnEntry)) { return false; }
 //
 //                UnEntry that = (UnEntry) other;
-//                return Objects.equals(this.key, that.getKey()) && Objects.equals(this.getValue(), that.getValue());
+//                return Objects.equals(this.key, that.getKey()) &&
+//                       Objects.equals(this.getValue(), that.getValue());
 //            }
 //
 //            @Override
@@ -92,10 +101,12 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
     UnmodMap<Object,Object> EMPTY = new UnmodMap<Object,Object>() {
         @Override public UnmodSet<Entry<Object,Object>> entrySet() { return UnmodSet.empty(); }
         @Override public UnmodSet<Object> keySet() { return UnmodSet.empty(); }
-        @Override public UnmodCollection<Object> values() { return UnmodSet.empty(); }
+        @Override public UnmodCollection<Object> values() { return UnmodCollection.empty(); }
         @Override public int size() { return 0; }
         @Override public boolean isEmpty() { return true; }
-        @Override public UnmodIterator<UnEntry<Object,Object>> iterator() { return UnmodIterator.empty(); }
+        @Override public UnmodIterator<UnEntry<Object,Object>> iterator() {
+            return UnmodIterator.empty();
+        }
         @Override public boolean containsKey(Object key) { return false; }
         @Override public boolean containsValue(Object value) { return false; }
         @Override public Object get(Object key) { return null; }
@@ -103,7 +114,7 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
     @SuppressWarnings("unchecked")
     static <T,U> UnmodMap<T,U> empty() { return (UnmodMap<T,U>) EMPTY; }
 
-    // =================================================== Instance ===================================================
+    // ========================================= Instance =========================================
 
     // Modification Operations
 
@@ -113,33 +124,36 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
     }
 
     /** Not allowed - this is supposed to be unmodifiable */
-    @Override @Deprecated default V compute(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
+    @Override @Deprecated
+    default V compute(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
         throw new UnsupportedOperationException("Modification attempted");
     }
     /** Not allowed - this is supposed to be unmodifiable */
-    @Override @Deprecated default V computeIfAbsent(K key, Function<? super K, ? extends V> mappingFunction) {
+    @Override @Deprecated
+    default V computeIfAbsent(K key, Function<? super K, ? extends V> mappingFunction) {
         throw new UnsupportedOperationException("Modification attempted");
     }
     /** Not allowed - this is supposed to be unmodifiable */
-    @Override @Deprecated default V computeIfPresent(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
+    @Override @Deprecated
+    default V computeIfPresent(K key,
+                               BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
         throw new UnsupportedOperationException("Modification attempted");
     }
 // boolean	containsKey(Object key)
 // boolean	containsValue(Object value)
 
-    /** Most maps are not designed for this - the default implementation has O(n) performance. {@inheritDoc} */
-    @Override default boolean containsValue(Object value) {
-        for (Entry<K,V> entry : this.entrySet()) {
-            if (Objects.equals(value, entry.getValue())) {
-                return true;
-            }
-        }
-        return false;
-    }
+    /**
+     Most maps are not designed for this - the default implementation has O(n) performance.
+     {@inheritDoc}
+     */
+    @SuppressWarnings("SuspiciousMethodCalls")
+    @Override default boolean containsValue(Object value) { return this.values().contains(value); }
 
     /**
-     * Returns a view of the mappings contained in this map.  The set should actually contain UnmodMap.Entry items, but
-     * that return signature is illegal in Java, so you'll just have to remember. */
+     Returns a view of the mappings contained in this map.  The set should actually contain
+     UnmodMap.Entry items, but that return signature is illegal in Java, so you'll just have to
+     remember.
+     */
     @Override
     UnmodSet<Entry<K,V>> entrySet();
 
@@ -179,7 +193,9 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
     UnmodSet<K> keySet();
 
     /** Not allowed - this is supposed to be unmodifiable */
-    @Override @Deprecated default V merge(K key, V value, BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
+    @Override @Deprecated
+    default V merge(K key, V value,
+                    BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
         throw new UnsupportedOperationException("Modification attempted");
     }
     /** Not allowed - this is supposed to be unmodifiable */
@@ -211,7 +227,8 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
         throw new UnsupportedOperationException("Modification attempted");
     }
     /** Not allowed - this is supposed to be unmodifiable */
-    @Override @Deprecated default void replaceAll(BiFunction<? super K, ? super V, ? extends V> function) {
+    @Override @Deprecated
+    default void replaceAll(BiFunction<? super K, ? super V, ? extends V> function) {
         throw new UnsupportedOperationException("Modification attempted");
     }
 

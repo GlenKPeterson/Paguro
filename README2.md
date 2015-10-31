@@ -58,6 +58,7 @@ Rich Hickey for Clojure
 - Then `mvn clean test` on UncleJim
 
 #To Do
+ - Add insert(int i, E element) to ImList, implemented by wrapping the existing list in an ImSortedMap and time it.
  - Cover a few more lines with tests in UnmodCollection and merge changes into NestingVector branch.
  - Can I make UnmodMap extend UnmodCollection instead of UnmodIterable?  Or do the contains() and contains() all methods conflict?
    Hmm... Maybe have a SizedIterable that both maps and collections can extend?  Ditto UnmodSortedMap extend UnmodSortedCollection instead of UnmodSortedIterable.

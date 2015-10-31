@@ -343,7 +343,7 @@ public class FunctionUtils {
             /** {@inheritDoc} */
             @Override
             public UnmodIterator<UnEntry<K,V>> iterator() {
-                return UnEntry.wrap(map.entrySet().iterator());
+                return UnEntry.entryIterToUnEntryUnIter(map.entrySet().iterator());
             }
 
             @Override public UnmodSet<Entry<K,V>> entrySet() { return unmodSet(map.entrySet()); }
@@ -386,6 +386,14 @@ public class FunctionUtils {
                         return unmodSortedMap(map.subMap(fromElement.getKey(), toElement.getKey()))
                                 .entrySet();
                     }
+
+                    @Override public UnmodSortedSet<Entry<K,V>> tailSet(Entry<K,V> fromElement) {
+                        // This is recursive.  I hope it's not an infinite loop 'cause I don't want
+                        // to write this all out again.
+                        return unmodSortedMap(map.tailMap(fromElement.getKey()))
+                                .entrySet();
+                    }
+
                     @Override public Comparator<? super Entry<K,V>> comparator() {
                         return (o1, o2) -> map.comparator().compare(o1.getKey(), o2.getKey());
                     }

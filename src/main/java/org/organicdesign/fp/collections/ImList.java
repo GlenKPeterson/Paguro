@@ -18,11 +18,9 @@ package org.organicdesign.fp.collections;
  sharing as much data structure with the previous ImList as possible (for performance).
  */
 public interface ImList<E> extends UnmodList<E> {
-    /** {@inheritDoc} */
-    @Override default UnmodSortedIterator<E> iterator() { return listIterator(0); }
-
 // Inherited correctly - there is no ImIterator.
-// UnmodListIterator<E> listIterator(int index) {
+// UnmodSortedIterator<E> iterator();
+// UnmodListIterator<E> listIterator(int index);
 
 // Inherited correctly and need to be implemented by the implementing class
 // int size() {
@@ -30,32 +28,94 @@ public interface ImList<E> extends UnmodList<E> {
 // int hashCode() {
 // E get(int index) {
 
-    /**
-     This default implementation is at least O(n) slow.
-     Inserts a new item at the specified index, shifting that item and subsequent items up/right.
-     @param i the zero-based index to insert at
-     @param val the value to insert
-     @return a new ImList with the additional item.
-     */
-    default ImList<E> insert(int i, E val) {
-        if (i == size()) { return append(val); }
-
-        if ( (i > size()) || (i < 0) ) {
-            throw new IllegalArgumentException("Can't insert outside the possible bounds");
-        }
-
-        UnmodIterator<E> iter = iterator();
-        ImList<E> v = PersistentVector.empty();
-        int j = 0;
-        for (; j < i; j++) {
-            v = v.append(iter.next());
-        }
-        v = v.append(val);
-        for (; j < size(); j++) {
-            v = v.append(iter.next());
-        }
-        return v;
-    }
+//    /**
+//     This scales more like an ImSortedMap than like an ImList because the more you insert,
+//     the more this is stored in an ImSortedMap than in an ImList.  Still O(log2 n) is waaay
+//     better than O(n)
+//     */
+//    class InsertedList<E> implements ImList<E> {
+//        private static final Object MISSING = new Object();
+//
+//        private final ImList<E> innerList;
+//        private final ImSortedMap<Integer,E> insertedItems;
+//        InsertedList(ImList<E> ls, ImSortedMap<Integer,E> is) {
+//            innerList = ls; insertedItems = is;
+//        }
+//
+//        @Override public ImList<E> append(E e) {
+//            // This needs to be timed to see at what point we should prefer the map to the list.
+//            // TODO: My best guess is that we should *always* prefer the map.
+//            if (innerList.size() > insertedItems.size()) {
+//                return new InsertedList<>(innerList.append(e), insertedItems);
+//            }
+//            return new InsertedList<>(innerList, insertedItems.assoc(size(), e));
+//        }
+//
+//        @Override public ImList<E> replace(int idx, E e) {
+//            E mapItem = insertedItems.getOrDefault(idx, (E) MISSING);
+//            if ( (mapItem != MISSING) || (innerList.size() < 1) ) {
+//                if (Objects.equals(mapItem, e)) {
+//                    return this;
+//                }
+//                return new InsertedList<>(innerList, insertedItems.assoc(idx, e));
+//            }
+//            return new InsertedList<>(innerList.replace(idx, e), insertedItems);
+//        }
+//
+//        @Override public int size() { return innerList.size() + insertedItems.size(); }
+//
+//        @Override public E get(int index) {
+//            if ( (index < 0) || (index >= size()) ) {
+//                throw new IndexOutOfBoundsException("Index must be between 0 <= index < " +
+//                                                    size());
+//            }
+//            E mapItem = insertedItems.getOrDefault(index, (E) MISSING);
+//            if (mapItem != MISSING) {
+//                return mapItem;
+//            }
+//            if (innerList.size() == 0) {
+//                return null;
+//            }
+//            int offset = 0;
+//            for (Map.Entry<Integer,E> entry : insertedItems.entrySet()) {
+//                if (entry.getKey() > index) {
+//                    break;
+//                }
+//                if (entry.getKey() == index) {
+//                    return entry.getValue();
+//                }
+//                offset = offset + 1;
+//            }
+//            return inner.get(index + offset);
+//        }
+//    }
+//
+//    /**
+//     This default implementation is at least O(n) slow.
+//     Inserts a new item at the specified index, shifting that item and subsequent items up/right.
+//     @param i the zero-based index to insert at
+//     @param val the value to insert
+//     @return a new ImList with the additional item.
+//     */
+//    default ImList<E> insert(int i, E val) {
+//        if (i == size()) { return append(val); }
+//
+//        if ( (i > size()) || (i < 0) ) {
+//            throw new IllegalArgumentException("Can't insert outside the possible bounds");
+//        }
+//
+//        UnmodIterator<E> iter = iterator();
+//        ImList<E> v = PersistentVector.empty();
+//        int j = 0;
+//        for (; j < i; j++) {
+//            v = v.append(iter.next());
+//        }
+//        v = v.append(val);
+//        for (; j < size(); j++) {
+//            v = v.append(iter.next());
+//        }
+//        return v;
+//    }
 
     /**
      Adds one item to the end of the ImList.
@@ -71,7 +131,6 @@ public interface ImList<E> extends UnmodList<E> {
      @param es the values to insert
      @return a new ImList with the additional items at the end.
      */
-    @SuppressWarnings("unchecked")
     @Override default ImList<E> concat(Iterable<? extends E> es) {
         ImList<E> result = this;
         for (E e : es) {
@@ -102,12 +161,12 @@ public interface ImList<E> extends UnmodList<E> {
 //        return Sequence.ofIter(this).tail();
 //    }
 //
-    /**
-     * This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for
-     * backwards compatibility in some performance-critical situations.
-     * {@inheritDoc}
-     */
-    @Override default Object[] toArray() { return UnmodCollection.toArray(this); }
+//    /**
+//     * This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for
+//     * backwards compatibility in some performance-critical situations.
+//     * {@inheritDoc}
+//     */
+//    @Override default Object[] toArray() { return UnmodCollection.super.toArray(); }
 
 // I don't know if this is a good idea or not and I don't want to have to support it if not.
 //    /**

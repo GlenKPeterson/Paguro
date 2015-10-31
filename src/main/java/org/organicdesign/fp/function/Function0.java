@@ -46,7 +46,7 @@ public interface Function0<U> extends Supplier<U>, Callable<U> {
     /** {@inheritDoc} */
     @Override default U call() throws Exception { return applyEx(); }
 
-    // ==================================================== Static ====================================================
+    // ========================================== Static ==========================================
     public static final Function0<Object> NULL = new Function0<Object>() {
         @Override
         public Object applyEx() throws Exception {
@@ -55,8 +55,8 @@ public interface Function0<U> extends Supplier<U>, Callable<U> {
     };
 
     /**
-     Wraps a value in a constant function.  If you need to "memoize" some really expensive operation, use it to wrap
-     a LazyRef.
+     Wraps a value in a constant function.  If you need to "memoize" some really expensive
+     operation, use it to wrap a LazyRef.
      */
     static <K> Function0<K> constantFunction(final K k) {
         return new Function0<K>() {

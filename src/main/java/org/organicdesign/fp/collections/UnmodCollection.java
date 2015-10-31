@@ -13,21 +13,33 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.Predicate;
 
 /**
- * An unmodifiable version of {@link java.util.Collection} which formalizes the return type of
+ * A collection is an {@link java.lang.Iterable} with a size (a size() method).  UnmodCollection is
+ * an unmodifiable version of {@link java.util.Collection} which formalizes the return type of
  * Collections.unmodifiableCollection()
  *
  * {@inheritDoc}
  */
 public interface UnmodCollection<E> extends Collection<E>, UnmodIterable<E> {
 
+    // ========================================== Static ==========================================
+    UnmodCollection<Object> EMPTY = new UnmodCollection<Object>() {
+        @Override public boolean contains(Object o) { return false; }
+        @Override public int size() { return 0; }
+        @Override public boolean isEmpty() { return true; }
+        @Override public UnmodIterator<Object> iterator() { return UnmodIterator.empty(); }
+    };
+    @SuppressWarnings("unchecked")
+    static <T> UnmodCollection<T> empty() { return (UnmodCollection<T>) EMPTY; }
+
+    // ========================================= Instance =========================================
     // Methods are listed in the same order as the javadocs.
 
     /** Not allowed - this is supposed to be unmodifiable */
@@ -50,14 +62,28 @@ public interface UnmodCollection<E> extends Collection<E>, UnmodIterable<E> {
 
      {@inheritDoc}
      */
-    @Override default boolean contains(Object o) { return contains(this, o); }
+    @Override default boolean contains(Object o) {
+        for (Object item : this) {
+            if (Objects.equals(item, o)) { return true; }
+        }
+        return false;
+    }
 
     /**
      The default implementation of this method has O(this.size() + that.size()) performance.
 
      {@inheritDoc}
      */
-    @Override default boolean containsAll(Collection<?> c) { return containsAll(this, c); }
+    @Override default boolean containsAll(Collection<?> c) {
+        // Faster to create a HashSet and call containsAll on that because it's
+        // O(this size PLUS that size), whereas looping through both would be
+        // O(this size TIMES that size).
+        return  ( (c == null) || (c.size() < 1) ) ? true :
+                (size() < 1) ? false :
+//                (ts instanceof Set) ? ((Set) ts).containsAll(c) :
+//                (ts instanceof Map) ? ((Map) ts).entrySet().containsAll(c) :
+                new HashSet<>(this).containsAll(c);
+    }
 
 //boolean	equals(Object o)
 //int	hashCode()
@@ -102,7 +128,9 @@ public interface UnmodCollection<E> extends Collection<E>, UnmodIterable<E> {
      *
      * {@inheritDoc}
      */
-    @Override default Object[] toArray() { return toArray(this); }
+    @Override default Object[] toArray() {
+        return this.toArray(new Object[size()]);
+    }
 
     /**
      * This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for backwards
@@ -117,80 +145,18 @@ public interface UnmodCollection<E> extends Collection<E>, UnmodIterable<E> {
      *
      * {@inheritDoc}
      */
-    @Override default <T> T[] toArray(T[] as) { return toArray(this, as); }
-
-//forEach
-
-    // ==================================================== Static ====================================================
-
-    /** This is quick for sets, but slow for Lists. */
-    static boolean contains(Collection uc, Object o) {
-        for (Object item : uc) {
-            if (Objects.equals(item, o)) { return true; }
-        }
-        return false;
-    }
-
-    /** The default implementation of this method has O(this.size() + that.size()) performance. */
     @SuppressWarnings("unchecked")
-    static <T> boolean containsAll(Collection<T> ts, Collection<?> c) {
-        // Faster to create a HashSet and call containsAll on that because it's
-        // O(this size PLUS that size), whereas looping through both would be
-        // O(this size TIMES that size).
-        if (ts instanceof Set) {
-            return ((Set) ts).containsAll(c);
+    @Override default <T> T[] toArray(T[] as) {
+        if (as.length < size()) {
+            as = (T[]) new Object[size()];
         }
-        return new HashSet<>(ts).containsAll(c);
-    }
-
-    /**
-     * This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for backwards
-     * compatibility in some performance-critical situations.  If you really need an array, consider using the somewhat
-     * type-safe version of this method instead, but read the caveats first.
-     */
-    static Object[] toArray(Collection uc) {
-        Object[] os = new Object[uc.size()];
-        Iterator iter = uc.iterator();
-        for (int i = 0; i < uc.size(); i++) {
-            os[i] = iter.next();
+        Iterator<E> iter = iterator();
+        for (int i = 0; i < size(); i++) {
+            as[i] = (T) iter.next();
         }
-        return os;
-    }
-
-    /**
-     * This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for backwards
-     * compatibility in some performance-critical situations.  If you need to create an array (you almost always do)
-     * then the best way to use this method is:
-     *
-     * <code>MyThing[] things = col.toArray(new MyThing[coll.size()]);</code>
-     *
-     * Calling this method any other way causes unnecessary work to be done - an extra memory allocation and potential
-     * garbage collection if the passed array is too small, extra effort to fill the end of the array with nulls if it
-     * is too large.
-     */
-    @SuppressWarnings("unchecked")
-    static <T> T[] toArray(Collection uc, T[] as) {
-        if (as.length < uc.size()) {
-            as = (T[]) new Object[uc.size()];
-        }
-        Iterator<T> iter = uc.iterator();
-        int i = 0;
-        for (; i < uc.size(); i++) {
-            as[i] = iter.next();
-        }
-        for (; i < uc.size(); i++) {
-            as[i] = null;
+        if (size() < as.length) {
+            Arrays.fill(as, size(), as.length, null);
         }
         return as;
     }
-
-    static UnmodCollection<Object> EMPTY = new UnmodCollection<Object>() {
-        @Override public boolean contains(Object o) { return false; }
-        @Override public int size() { return 0; }
-        @Override public boolean isEmpty() { return true; }
-        @Override public UnmodIterator<Object> iterator() { return UnmodIterator.empty(); }
-    };
-    @SuppressWarnings("unchecked")
-    static <T> UnmodCollection<T> empty() { return (UnmodCollection<T>) EMPTY; }
-
 }

@@ -40,13 +40,15 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
     @SuppressWarnings("unchecked")
     static <T,U> UnmodSortedMap<T,U> empty() { return (UnmodSortedMap<T,U>) EMPTY; }
 
-    // =================================================== Instance ===================================================
+    // ========================================= Instance =========================================
 
 // public Comparator<? super K>	comparator()
 
     /**
-     * Returns a view of the mappings contained in this map.  The set should actually contain UnmodMap.Entry items, but
-     * that return signature is illegal in Java, so you'll just have to remember. */
+     Returns a view of the mappings contained in this map.  The set should actually contain
+     UnmodMap.Entry items, but that return signature is illegal in Java, so you'll just have to
+     remember.
+     */
     @Override
     UnmodSortedSet<Entry<K,V>> entrySet();
 
@@ -56,7 +58,9 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
     @Override default UnmodSortedMap<K,V> headMap(K toKey) { return subMap(firstKey(), toKey); }
 
     /** {@inheritDoc} */
-    @Override default UnmodSortedIterator<UnEntry<K,V>> iterator() { return UnmodMap.UnEntry.wrap(entrySet().iterator()); }
+    @Override default UnmodSortedIterator<UnEntry<K,V>> iterator() {
+        return UnmodMap.UnEntry.unSortIterEntToUnSortIterUnEnt(entrySet().iterator());
+    }
 
     /** Returns a view of the keys contained in this map. */
     @Override

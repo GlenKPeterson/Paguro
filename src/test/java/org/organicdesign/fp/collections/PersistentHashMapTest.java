@@ -823,11 +823,11 @@ public class PersistentHashMapTest {
                 PersistentHashMap.of(vec(tup(1, "one")))
                                  .assoc(2, "two").assoc(3, "three").assoc(4, "four").assoc(5, "five");
         Set<Map.Entry<Integer,String>> s = new HashSet<>();
-        s.add(UnmodMap.UnEntry.of(3, "three"));
-        s.add(UnmodMap.UnEntry.of(5, "five"));
-        s.add(UnmodMap.UnEntry.of(2, "two"));
-        s.add(UnmodMap.UnEntry.of(1, "one"));
-        s.add(UnmodMap.UnEntry.of(4, "four"));
+        s.add(Tuple2.of(3, "three"));
+        s.add(Tuple2.of(5, "five"));
+        s.add(Tuple2.of(2, "two"));
+        s.add(Tuple2.of(1, "one"));
+        s.add(Tuple2.of(4, "four"));
         assertEquals(s, m.entrySet());
     }
 

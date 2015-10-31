@@ -15,32 +15,39 @@ package org.organicdesign.fp.collections;
 
 /** An immutable set interface */
 public interface ImSet<E> extends UnmodSet<E> {
-    /** Adds an item, returning a modified version of the set (leaving the original set unchanged). */
+    /**
+     Adds an item, returning a modified version of the set (leaving the original set unchanged).
+     */
     ImSet<E> put(E e);
 
-    /** Removes the given item, returning a modified version of the set (leaving the original set unchanged). */
+    /**
+     Removes the given item, returning a modified version of the set (leaving the original set
+     unchanged).
+     */
     ImSet<E> without(E key);
 
 //    /**
-//     A sequence of the items contained in this set.  Note that for some implementations, multiple calls to seq()
-//     will yield sequences with different ordering of the same elements.
+//     A sequence of the items contained in this set.  Note that for some implementations, multiple
+//     calls to seq() will yield sequences with different ordering of the same elements.
 //     */
 //    Sequence<E> seq();
 
     default ImSet<E> union(Iterable<? extends E> iter) {
+        if (iter == null) { return this; }
         ImSet<E> ret = this;
         for (E e : iter) { ret = ret.put(e); }
         return ret;
     }
 
-    /** {@inheritDoc} */
-    @Override UnmodIterator<E> iterator();
+//    /** {@inheritDoc} */
+//    @Override UnmodIterator<E> iterator();
 
-    /**
-     * This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for backwards
-     * compatibility in some performance-critical situations.  If you really need an array, consider using the somewhat
-     * type-safe version of this method instead, but read the caveats first.
-     * {@inheritDoc}
-     */
-    @Override default Object[] toArray() { return UnmodCollection.toArray(this); }
+//    /**
+//     This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for
+//     backwards compatibility in some performance-critical situations.  If you really need an array,
+//     consider using the somewhat type-safe version of this method instead, but read the caveats
+//     first.
+//     {@inheritDoc}
+//     */
+//    @Override default Object[] toArray() { return UnmodSet.super.toArray(); }
 }

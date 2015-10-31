@@ -17,36 +17,12 @@ package org.organicdesign.fp.collections;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 import static org.junit.Assert.*;
 
 public class UnmodCollectionTest {
-    @Test public void contains() {
-        Collection<String> c1 = Arrays.asList("Hello", "there", "world", "this", "is", "a", "test");
-        assertFalse(UnmodCollection.contains(c1, "poodle"));
-        assertFalse(UnmodCollection.contains(c1, null));
-        assertTrue(UnmodCollection.contains(c1, "Hello"));
-        assertTrue(UnmodCollection.contains(c1, "this"));
-        assertTrue(UnmodCollection.contains(c1, "test"));
-
-        assertTrue(UnmodCollection.containsAll(c1, c1));
-        assertTrue(UnmodCollection.containsAll(c1, Arrays.asList("there", "this", "a")));
-        assertTrue(UnmodCollection.containsAll(c1, Arrays.asList("Hello", "world", "is", "test")));
-        assertFalse(UnmodCollection.containsAll(c1, Arrays.asList("Hello", "world", "is", "test", "noodle")));
-        assertFalse(UnmodCollection.containsAll(c1, Arrays.asList("billboard", "Hello", "world", "is", "test")));
-        assertFalse(UnmodCollection.containsAll(c1, Collections.singletonList("phone")));
-        assertFalse(UnmodCollection.containsAll(c1, Collections.singletonList(null)));
-
-        assertFalse(UnmodCollection.contains(UnmodCollection.empty(), "phone"));
-        assertFalse(UnmodCollection.contains(UnmodCollection.empty(), null));
-        assertFalse(UnmodCollection.containsAll(UnmodCollection.empty(), Collections.singletonList("phone")));
-        assertFalse(UnmodCollection.containsAll(UnmodCollection.empty(), Collections.singletonList(null)));
-    }
-
     private static final String[] sticksAndStones = new String[] {
             "Sticks", "and", "stones", "will", "break", "my", "bones", "but", "tests",
             "will", "never", "hurt", "me." };
@@ -113,20 +89,40 @@ public class UnmodCollectionTest {
         assertEquals(null, result[result.length - 1]);
     }
 
-    @Test public void toArray() {
-        Collection<String> c1 = Arrays.asList("Hello", "there", "world", "this", "is", "a", "test");
-        assertArrayEquals(new String[]{"Hello", "there", "world", "this", "is", "a", "test"},
-                          UnmodCollection.toArray(c1));
-        assertArrayEquals(new String[]{"Hello", "there", "world", "this", "is", "a", "test"},
-                          UnmodCollection.toArray(c1, new String[0]));
-        assertArrayEquals(new String[]{"Hello", "there", "world", "this", "is", "a", "test"},
-                          UnmodCollection.toArray(c1, new String[7]));
-        assertArrayEquals(new String[]{"Hello", "there", "world", "this", "is", "a", "test"},
-                          Arrays.copyOf(UnmodCollection.toArray(c1, new String[99]), 7));
-
-        assertArrayEquals(new Object[0],
-                          UnmodCollection.toArray(UnmodCollection.empty()));
-        assertArrayEquals(new Object[0],
-                          UnmodCollection.toArray(UnmodCollection.empty(), new Object[0]));
+    @Test public void testDidley() {
+        // for those of you who want 100% test coverage just on principle, this one's for you.
+        assertFalse(UnmodCollection.empty().contains(null));
+        assertEquals(0, UnmodCollection.empty().size());
+        assertTrue(UnmodCollection.empty().isEmpty());
+        assertTrue(UnmodIterator.EMPTY == UnmodCollection.empty().iterator());
+        assertFalse(unColl.isEmpty());
     }
+
+    @SuppressWarnings("deprecation")
+    @Test (expected = UnsupportedOperationException.class)
+    public void unsupportedOp01() { unColl.add("hi"); }
+
+    @SuppressWarnings("deprecation")
+    @Test (expected = UnsupportedOperationException.class)
+    public void unsupportedOp02() { unColl.addAll(Arrays.asList("hi", "there")); }
+
+    @SuppressWarnings("deprecation")
+    @Test (expected = UnsupportedOperationException.class)
+    public void unsupportedOp03() { unColl.clear(); }
+
+    @SuppressWarnings("deprecation")
+    @Test (expected = UnsupportedOperationException.class)
+    public void unsupportedOp04() { unColl.remove("hi"); }
+
+    @SuppressWarnings("deprecation")
+    @Test (expected = UnsupportedOperationException.class)
+    public void unsupportedOp05() { unColl.removeAll(Arrays.asList("hi", "there")); }
+
+    @SuppressWarnings("deprecation")
+    @Test (expected = UnsupportedOperationException.class)
+    public void unsupportedOp06() { unColl.removeIf(item -> false); }
+
+    @SuppressWarnings("deprecation")
+    @Test (expected = UnsupportedOperationException.class)
+    public void unsupportedOp07() { unColl.retainAll(Arrays.asList("hi", "there")); }
 }
