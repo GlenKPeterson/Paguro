@@ -15,6 +15,7 @@ package org.organicdesign.fp.collections;
 
 import org.organicdesign.fp.tuple.Tuple2;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
@@ -288,6 +289,37 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
                 };
             }
             @Override public int size() { return parentMap.size(); }
+
+            @Override public int hashCode() { return UnmodIterable.hashCode(this); }
+
+            @SuppressWarnings("unchecked")
+            @Override public boolean equals(Object o) {
+                if (this == o) { return true; }
+
+                // java.util.SortedMap.entrySet() returns just a Set, not a SortedSet, even though
+                // the order is guaranteed to be the same as the SortedMap it came from as
+                // guaranteed by the comparator (which seems more like a SortedSet, but no-one
+                // asked me).  So we have to accept a Set here for equals 'cause Java might
+                // hand us one.  All of this could have been avoided if SortedMap extended
+                // Collection<Map.Entry<K,V>> which is essentially an Iterable with a size().
+                if ( !(o instanceof Collection) ) { return false; }
+
+                // If you're using UncleJim, then you should have passed us a sortedSet.
+                if ( (o instanceof UnmodCollection) &&
+                     !(o instanceof UnmodSortedCollection) ) {
+                    return false;
+                }
+
+                Collection<V> that = (Collection<V>) o;
+                if (that.size() != this.size()) { return false; }
+
+                return UnmodSortedIterable.equals(this,
+                                                  UnmodSortedIterable.castFromCollection(that));
+            }
+            @Override public String toString() {
+                return UnmodIterable.toString("UnmodSortedMap.entrySet", this);
+            }
+
         };
     }
 

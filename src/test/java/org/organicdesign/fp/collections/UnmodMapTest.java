@@ -195,6 +195,21 @@ public class UnmodMapTest {
         @Override public V getValue() { return value; }
 
         @Override public V setValue(V val) { value = val; return val; }
+
+        @Override public String toString() { return "Entry(" + key + "," + value + ")"; }
+
+        @Override public int hashCode() {
+            int ret = (key == null) ? 0 : key.hashCode();
+            return ret ^ ((key == null) ? 0 : value.hashCode());
+        }
+
+        @Override public boolean equals(Object other) {
+            if (this == other) { return true; }
+            if ( !(other instanceof Map.Entry)) { return false; }
+            Map.Entry that = (Map.Entry) other;
+            return Objects.equals(key,  that.getKey()) &&
+                   Objects.equals(value, that.getValue());
+        }
     }
 
     static class TestUnEntry<K,V> implements UnmodMap.UnEntry<K,V> {
