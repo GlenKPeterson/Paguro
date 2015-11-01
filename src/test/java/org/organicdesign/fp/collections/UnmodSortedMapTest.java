@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -20,11 +21,11 @@ import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCo
 public class UnmodSortedMapTest {
     static class TestMap<K, V> implements UnmodSortedMap<K,V> {
 
-        static <K, V> SortedMap<K,V> dup(SortedMap<K,V> in) {
-            SortedMap<K,V> out = new TreeMap<>(in.comparator());
-            out.putAll(in);
-            return out;
-        }
+//        static <K, V> SortedMap<K,V> dup(SortedMap<K,V> in) {
+//            SortedMap<K,V> out = new TreeMap<>(in.comparator());
+//            out.putAll(in);
+//            return out;
+//        }
 
         private final SortedMap<K,V> inner;
 
@@ -474,5 +475,25 @@ public class UnmodSortedMapTest {
                                set(vec(avoKey.getValue(), banKey.getValue(), clemKey.getValue())));
 
     }
+
+    @Test public void testEmpty() {
+        assertEquals(UnmodSortedSet.<Map.Entry>empty(), UnmodSortedMap.empty().entrySet());
+        assertEquals(UnmodSortedSet.<Map.Entry>empty(), UnmodSortedMap.empty().keySet());
+        assertNull(UnmodSortedMap.empty().comparator());
+        assertEquals(UnmodSortedMap.empty(), UnmodSortedMap.empty().subMap(null, null));
+        assertEquals(UnmodSortedMap.empty(), UnmodSortedMap.empty().tailMap(null));
+        assertEquals(UnmodSortedSet.empty(), UnmodSortedMap.empty().values());
+        assertEquals(0, UnmodSortedMap.empty().size());
+        assertTrue(UnmodSortedMap.empty().isEmpty());
+        assertEquals(UnmodSortedIterator.empty(), UnmodSortedMap.empty().iterator());
+        assertFalse(UnmodSortedMap.empty().containsKey(null));
+        assertFalse(UnmodSortedMap.empty().containsValue(null));
+        assertNull(UnmodSortedMap.empty().get(null));
+    }
+
+    @Test (expected = NoSuchElementException.class)
+    public void testEmptyEx01() { UnmodSortedMap.empty().firstKey(); }
+    @Test (expected = NoSuchElementException.class)
+    public void testEmptyEx02() { UnmodSortedMap.empty().lastKey(); }
 
 }
