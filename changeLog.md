@@ -4,7 +4,7 @@ Removed UnmodList.insert because it was O(n).
 Replacing it with a default implementation that's O(log2 n) will take time (a rough implementation is commented out).
 Fixed some return types in UnmodSortedMap to be Unmod*Sorted*Sets/Collections instead of UnmodSets/Collections.
 Changed which methods have default implementations in UnmodSortedMap to make it easier to subclass.
-Improved test coverage by 3-4%.
+Improved test coverage by maybe 5%.
 
 **2015-10-28 0.10.17**: Made UnmodList implement listIterator(int i)
 Made Collection.containsAll() convert to a Set to bring performance from O(n^2) to O(n).
