@@ -368,58 +368,58 @@ public class FunctionUtils {
         if (map instanceof UnmodSortedMap) { return (UnmodSortedMap<K,V>) map; }
         if (map.size() < 1) { return UnmodSortedMap.empty(); }
         return new UnmodSortedMap<K,V>() {
-            // TODO: Test this.
-            @Override public UnmodSortedSet<Entry<K,V>> entrySet() {
-                return new UnmodSortedSet<Entry<K,V>>() {
-                    Set<Entry<K,V>> entrySet = map.entrySet();
-                    @Override public UnmodSortedIterator<Entry<K,V>> iterator() {
-                        return new UnmodSortedIterator<Entry<K,V>>() {
-                            Iterator<Entry<K,V>> iter = entrySet.iterator();
-                            @Override public boolean hasNext() { return iter.hasNext(); }
-                            @Override public Entry<K,V> next() { return iter.next(); }
-                        };
-                    }
-                    @Override public UnmodSortedSet<Entry<K,V>> subSet(Entry<K,V> fromElement,
-                                                                       Entry<K,V> toElement) {
-                        // This is recursive.  I hope it's not an infinite loop 'cause I don't want
-                        // to write this all out again.
-                        return unmodSortedMap(map.subMap(fromElement.getKey(), toElement.getKey()))
-                                .entrySet();
-                    }
-
-                    @Override public UnmodSortedSet<Entry<K,V>> tailSet(Entry<K,V> fromElement) {
-                        // This is recursive.  I hope it's not an infinite loop 'cause I don't want
-                        // to write this all out again.
-                        return unmodSortedMap(map.tailMap(fromElement.getKey()))
-                                .entrySet();
-                    }
-
-                    @Override public Comparator<? super Entry<K,V>> comparator() {
-                        return (o1, o2) -> map.comparator().compare(o1.getKey(), o2.getKey());
-                    }
-                    @Override public Entry<K,V> first() {
-                        K key = map.firstKey();
-                        return Tuple2.of(key, map.get(key));
-                    }
-
-                    @Override public Entry<K,V> last() {
-                        K key = map.lastKey();
-                        return Tuple2.of(key, map.get(key));
-                    }
-                    @Override public boolean contains(Object o) { return entrySet.contains(o); }
-                    @Override public boolean isEmpty() { return entrySet.isEmpty(); }
-                    @Override public int size() { return entrySet.size(); }
-                    @Override public int hashCode() { return entrySet.hashCode(); }
-                    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
-                    @Override public boolean equals(Object o) { return entrySet.equals(o); }
-                };
-            }
+//            // TODO: Test this.
+//            @Override public UnmodSortedSet<Entry<K,V>> entrySet() {
+//                return new UnmodSortedSet<Entry<K,V>>() {
+//                    Set<Entry<K,V>> entrySet = map.entrySet();
+//                    @Override public UnmodSortedIterator<Entry<K,V>> iterator() {
+//                        return new UnmodSortedIterator<Entry<K,V>>() {
+//                            Iterator<Entry<K,V>> iter = entrySet.iterator();
+//                            @Override public boolean hasNext() { return iter.hasNext(); }
+//                            @Override public Entry<K,V> next() { return iter.next(); }
+//                        };
+//                    }
+//                    @Override public UnmodSortedSet<Entry<K,V>> subSet(Entry<K,V> fromElement,
+//                                                                       Entry<K,V> toElement) {
+//                        // This is recursive.  I hope it's not an infinite loop 'cause I don't want
+//                        // to write this all out again.
+//                        return unmodSortedMap(map.subMap(fromElement.getKey(), toElement.getKey()))
+//                                .entrySet();
+//                    }
+//
+//                    @Override public UnmodSortedSet<Entry<K,V>> tailSet(Entry<K,V> fromElement) {
+//                        // This is recursive.  I hope it's not an infinite loop 'cause I don't want
+//                        // to write this all out again.
+//                        return unmodSortedMap(map.tailMap(fromElement.getKey()))
+//                                .entrySet();
+//                    }
+//
+//                    @Override public Comparator<? super Entry<K,V>> comparator() {
+//                        return (o1, o2) -> map.comparator().compare(o1.getKey(), o2.getKey());
+//                    }
+//                    @Override public Entry<K,V> first() {
+//                        K key = map.firstKey();
+//                        return Tuple2.of(key, map.get(key));
+//                    }
+//
+//                    @Override public Entry<K,V> last() {
+//                        K key = map.lastKey();
+//                        return Tuple2.of(key, map.get(key));
+//                    }
+//                    @Override public boolean contains(Object o) { return entrySet.contains(o); }
+//                    @Override public boolean isEmpty() { return entrySet.isEmpty(); }
+//                    @Override public int size() { return entrySet.size(); }
+//                    @Override public int hashCode() { return entrySet.hashCode(); }
+//                    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
+//                    @Override public boolean equals(Object o) { return entrySet.equals(o); }
+//                };
+//            }
             @Override public int size() { return map.size(); }
             @Override public boolean isEmpty() { return map.isEmpty(); }
             @Override public boolean containsKey(Object key) { return map.containsKey(key); }
             @Override public boolean containsValue(Object value) { return map.containsValue(value); }
             @Override public V get(Object key) { return map.get(key); }
-            @Override public UnmodSet<K> keySet() { return unmodSet(map.keySet()); }
+//            @Override public UnmodSortedSet<K> keySet() { return unmodSet(map.keySet()); }
             @Override public Comparator<? super K> comparator() { return map.comparator(); }
             @Override public UnmodSortedMap<K,V> subMap(K fromKey, K toKey) {
                 return unmodSortedMap(map.subMap(fromKey, toKey));
@@ -429,7 +429,21 @@ public class FunctionUtils {
             }
             @Override public K firstKey() { return map.firstKey(); }
             @Override public K lastKey() { return map.lastKey(); }
-            @Override public UnmodCollection<V> values() { return unmodCollection(map.values()); }
+//            @Override public UnmodSortedCollection<V> values() {
+//                return unmodSortedCollection(map.values());
+//            }
+            @Override public UnmodSortedIterator<UnEntry<K,V>> iterator() {
+                return new UnmodSortedIterator<UnEntry<K,V>>() {
+                    // Could have gone with values() instead.
+                    Iterator<Entry<K,V>> iter = map.entrySet().iterator();
+                    @Override public boolean hasNext() { return iter.hasNext(); }
+
+                    @Override public UnEntry<K,V> next() {
+                        Entry<K,V> entry = iter.next();
+                        return Tuple2.of(entry.getKey(), entry.getValue());
+                    }
+                };
+            }
             @Override public int hashCode() { return map.hashCode(); }
             @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
             @Override public boolean equals(Object o) { return map.equals(o); }

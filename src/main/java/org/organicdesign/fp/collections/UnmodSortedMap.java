@@ -13,7 +13,10 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
+import org.organicdesign.fp.tuple.Tuple2;
+
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.SortedMap;
 
@@ -23,13 +26,13 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
     // ==================================================== Static ====================================================
     UnmodSortedMap<Object,Object> EMPTY = new UnmodSortedMap<Object,Object>() {
         @Override public UnmodSortedSet<Entry<Object,Object>> entrySet() { return UnmodSortedSet.empty(); }
-        @Override public UnmodSet<Object> keySet() { return UnmodSet.empty(); }
+        @Override public UnmodSortedSet<Object> keySet() { return UnmodSortedSet.empty(); }
         @Override public Comparator<? super Object> comparator() { return null; }
         @Override public UnmodSortedMap<Object,Object> subMap(Object fromKey, Object toKey) { return this; }
         @Override public UnmodSortedMap<Object,Object> tailMap(Object fromKey) { return this; }
         @Override public Object firstKey() { throw new NoSuchElementException("empty map"); }
         @Override public Object lastKey() { throw new NoSuchElementException("empty map"); }
-        @Override public UnmodCollection<Object> values() { return UnmodSet.empty(); }
+        @Override public UnmodSortedCollection<Object> values() { return UnmodSortedSet.empty(); }
         @Override public int size() { return 0; }
         @Override public boolean isEmpty() { return true; }
         @Override public UnmodSortedIterator<UnEntry<Object,Object>> iterator() { return UnmodSortedIterator.empty(); }
@@ -49,36 +52,130 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
      UnmodMap.Entry items, but that return signature is illegal in Java, so you'll just have to
      remember.
      */
-    @Override
-    UnmodSortedSet<Entry<K,V>> entrySet();
+    @Override default UnmodSortedSet<Entry<K,V>> entrySet() {
+        UnmodSortedMap<K,V> parentMap = this;
+        return new UnmodSortedSet<Entry<K,V>>() {
+            @Override public int size() { return parentMap.size(); }
+
+            @SuppressWarnings("unchecked")
+            @Override public boolean contains(Object o) {
+                if ( !(o instanceof Entry) ) { return false; }
+                return containsKey(((Entry<K, V>) o).getKey());
+            }
+
+            @SuppressWarnings("unchecked")
+            @Override public UnmodSortedIterator<Entry<K,V>> iterator() {
+                // Converting from
+                // UnmodSortedIterator<UnEntry<K,V>> to
+                // UnmodSortedIterator<Entry<K,V>>
+                // Is a totally legal widening conversion (at runtime) because UnEntry extends
+                // (is an) Entry.  But Java's type system doesn't know that because (I think)
+                // it's a higher kinded type.  Thanks to type erasure, we can forget about all
+                // that and cast it to a base type then suppress the unchecked warning.
+                return (UnmodSortedIterator) parentMap.iterator();
+            }
+
+            @SuppressWarnings("unchecked")
+            @Override public Comparator<Entry<K,V>> comparator() {
+                if (parentMap.comparator() == null) {
+                    return (a, b) -> Equator.ComparisonContext.DEFAULT_COMPARATOR
+                                                        .compare((Comparable) a.getKey(),
+                                                                 (Comparable) b.getKey());
+                }
+                return (o1, o2) -> parentMap.comparator().compare(o1.getKey(), o2.getKey());
+            }
+
+            @Override public UnmodSortedSet<Entry<K,V>> subSet(Entry<K,V> fromElement,
+                                                               Entry<K,V> toElement) {
+                return parentMap.subMap(fromElement.getKey(), toElement.getKey()).entrySet();
+            }
+
+            @Override public UnmodSortedSet<Entry<K,V>> tailSet(Entry<K,V> fromElement) {
+                return parentMap.tailMap(fromElement.getKey()).entrySet();
+            }
+
+            @Override public Entry<K,V> first() {
+                K key = parentMap.firstKey();
+                return Tuple2.of(key, parentMap.get(key));
+            }
+
+            @Override public Entry<K,V> last() {
+                K key = parentMap.lastKey();
+                return Tuple2.of(key, parentMap.get(key));
+            }
+        };
+    }
 
 // public  K	firstKey()
 
     /** {@inheritDoc} */
     @Override default UnmodSortedMap<K,V> headMap(K toKey) { return subMap(firstKey(), toKey); }
 
-    /** {@inheritDoc} */
-    @Override default UnmodSortedIterator<UnEntry<K,V>> iterator() {
-        return UnmodMap.UnEntry.unSortIterEntToUnSortIterUnEnt(entrySet().iterator());
-    }
+//    /** {@inheritDoc} */
+//    @Override default UnmodSortedIterator<UnEntry<K,V>> iterator() {
+//        return UnmodMap.UnEntry.unSortIterEntToUnSortIterUnEnt(entrySet().iterator());
+//    }
 
     /** Returns a view of the keys contained in this map. */
-    @Override
-    UnmodSet<K> keySet();
+    @Override default UnmodSortedSet<K> keySet() {
+        UnmodSortedMap<K,V> parentMap = this;
+        return new UnmodSortedSet<K>() {
+            @SuppressWarnings("SuspiciousMethodCalls")
+            @Override public boolean contains(Object o) { return parentMap.containsKey(o); }
+
+            @Override public UnmodSortedIterator<K> iterator() {
+                return new UnmodSortedIterator<K>() {
+                    Iterator<UnEntry<K,V>> iter = parentMap.iterator();
+                    @Override public boolean hasNext() { return iter.hasNext(); }
+                    @Override public K next() { return iter.next().getKey(); }
+                };
+            }
+
+            @Override public int size() { return parentMap.size(); }
+
+            @Override public UnmodSortedSet<K> subSet(K fromElement, K toElement) {
+                return parentMap.subMap(fromElement, toElement).keySet();
+            }
+
+            @Override public UnmodSortedSet<K> tailSet(K fromElement) {
+                return parentMap.tailMap(fromElement).keySet();
+            }
+
+            @Override public Comparator<? super K> comparator() { return parentMap.comparator(); }
+
+            @Override public K first() {
+                return parentMap.firstKey();
+            }
+
+            @Override
+            public K last() {
+                return parentMap.lastKey();
+            }
+        };
+    }
 
 // public  K	lastKey()
 
     /** {@inheritDoc} */
-    @Override
-    UnmodSortedMap<K,V> subMap(K fromKey, K toKey);
+    @Override UnmodSortedMap<K,V> subMap(K fromKey, K toKey);
 
     /** {@inheritDoc} */
-    @Override
-    UnmodSortedMap<K,V> tailMap(K fromKey);
+    @Override UnmodSortedMap<K,V> tailMap(K fromKey);
 
     /** {@inheritDoc} */
-    @Override
-    UnmodCollection<V> values();
+    @Override default UnmodSortedCollection<V> values() {
+        UnmodSortedMap<K,V> parentMap = this;
+        return new UnmodSortedCollection<V>() {
+            @Override public UnmodSortedIterator<V> iterator() {
+                return new UnmodSortedIterator<V>() {
+                    Iterator<UnEntry<K,V>> iter = parentMap.iterator();
+                    @Override public boolean hasNext() { return iter.hasNext(); }
+                    @Override public V next() { return iter.next().getValue(); }
+                };
+            }
+            @Override public int size() { return parentMap.size(); }
+        };
+    }
 
 // Methods inherited from interface java.util.Map
 // clear, compute, computeIfAbsent, computeIfPresent, containsKey, containsValue, equals, forEach, get, getOrDefault, hashCode, isEmpty, merge, put, putAll, putIfAbsent, remove, remove, replace, replace, replaceAll, size

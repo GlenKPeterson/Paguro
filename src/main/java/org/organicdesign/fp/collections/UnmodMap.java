@@ -151,7 +151,7 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
 
     /**
      Returns a view of the mappings contained in this map.  The set should actually contain
-     UnmodMap.Entry items, but that return signature is illegal in Java, so you'll just have to
+     UnmodMap.UnEntry items, but that return signature is illegal in Java, so you'll just have to
      remember.
      */
     @Override
