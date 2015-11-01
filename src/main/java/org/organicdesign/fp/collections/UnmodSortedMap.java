@@ -17,7 +17,9 @@ import org.organicdesign.fp.tuple.Tuple2;
 
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.SortedMap;
 
 /** An unmodifiable SortedMap. */
@@ -103,6 +105,59 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
                 K key = parentMap.lastKey();
                 return Tuple2.of(key, parentMap.get(key));
             }
+
+            @Override public int hashCode() { return UnmodIterable.hashCode(this); }
+
+            @SuppressWarnings("unchecked")
+            @Override public boolean equals(Object o) {
+                if (this == o) { return true; }
+
+                // java.util.SortedMap.entrySet() returns just a Set, not a SortedSet, even though
+                // the order is guaranteed to be the same as the SortedMap it came from as
+                // guaranteed by the comparator (which seems more like a SortedSet, but no-one
+                // asked me).  So we have to accept a Set here for equals 'cause Java might
+                // hand us one.  All of this could have been avoided if SortedMap extended
+                // Collection<Map.Entry<K,V>> which is essentially an Iterable with a size().
+                if ( !(o instanceof Set) ) { return false; }
+
+                // If you're using UncleJim, then you should have passed us a sortedSet.
+                if ( (o instanceof UnmodSet) &&
+                     !(o instanceof UnmodSortedSet) ) {
+                    return false;
+                }
+
+                Set<Map.Entry<K,V>> that = (Set<Map.Entry<K,V>>) o;
+                if (that.size() != this.size()) { return false; }
+
+                // OK, this is a pain because Map.Entries may not know how to equal Tuples.
+                // So this compares based on the interface, not on the implementation.
+                // Hmm... Maybe this should ues the comparator instead?
+                Iterator<Map.Entry<K,V>> as = this.iterator();
+                Iterator<Map.Entry<K,V>> bs = that.iterator();
+                while (as.hasNext() && bs.hasNext()) {
+                    Map.Entry<K,V> aEntry = as.next();
+                    Map.Entry<K,V> bEntry = bs.next();
+                    if (comparator().compare(aEntry, bEntry) != 0) {
+                        return false;
+                    }
+//                    if (aEntry == bEntry) {
+//                        continue; // it's good, check the next.
+//                    }
+//                    if ( (aEntry == null) || (bEntry == null) ) {
+//                        return false; // they are different.
+//                    }
+//                    if (!Objects.equals(aEntry.getKey(), bEntry.getKey())) {
+//                        return false;
+//                    }
+//                    if (!Objects.equals(aEntry.getValue(), bEntry.getValue())) {
+//                        return false;
+//                    }
+                }
+                return !as.hasNext() && !bs.hasNext();
+            }
+            @Override public String toString() {
+                return UnmodIterable.toString("UnmodSortedMap.entrySet", this);
+            }
         };
     }
 
@@ -141,7 +196,10 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
                 return parentMap.tailMap(fromElement).keySet();
             }
 
-            @Override public Comparator<? super K> comparator() { return parentMap.comparator(); }
+            @Override public Comparator<? super K> comparator() {
+                return (parentMap.comparator() == null) ? Equator.defaultComparator()
+                                                        : parentMap.comparator();
+            }
 
             @Override public K first() {
                 return parentMap.firstKey();
@@ -151,6 +209,62 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
             public K last() {
                 return parentMap.lastKey();
             }
+
+            @Override public int hashCode() { return UnmodIterable.hashCode(this); }
+
+            @SuppressWarnings("unchecked")
+            @Override public boolean equals(Object o) {
+                if (this == o) { return true; }
+
+                // java.util.SortedMap.entrySet() returns just a Set, not a SortedSet, even though
+                // the order is guaranteed to be the same as the SortedMap it came from as
+                // guaranteed by the comparator (which seems more like a SortedSet, but no-one
+                // asked me).  So we have to accept a Set here for equals 'cause Java might
+                // hand us one.  All of this could have been avoided if SortedMap extended
+                // Collection<Map.Entry<K,V>> which is essentially an Iterable with a size().
+                if ( !(o instanceof Set) ) { return false; }
+
+                // If you're using UncleJim, then you should have passed us a sortedSet.
+                if ( (o instanceof UnmodSet) &&
+                     !(o instanceof UnmodSortedSet) ) {
+                    return false;
+                }
+
+                Set<K> that = (Set<K>) o;
+                if (that.size() != this.size()) { return false; }
+
+                // OK, this is a pain because Map.Entries may not know how to equal Tuples.
+                // So this compares based on the interface, not on the implementation.
+                // Hmm... Maybe this should ues the comparator instead?
+                Iterator<K> as = this.iterator();
+                Iterator<K> bs = that.iterator();
+                Comparator<? super K> comp = comparator();
+                assert comp != null;
+                while (as.hasNext() && bs.hasNext()) {
+                    K a = as.next();
+                    K b = bs.next();
+                    if (comp.compare(a, b) != 0) {
+                        return false;
+                    }
+//                    if (aEntry == bEntry) {
+//                        continue; // it's good, check the next.
+//                    }
+//                    if ( (aEntry == null) || (bEntry == null) ) {
+//                        return false; // they are different.
+//                    }
+//                    if (!Objects.equals(aEntry.getKey(), bEntry.getKey())) {
+//                        return false;
+//                    }
+//                    if (!Objects.equals(aEntry.getValue(), bEntry.getValue())) {
+//                        return false;
+//                    }
+                }
+                return !as.hasNext() && !bs.hasNext();
+            }
+            @Override public String toString() {
+                return UnmodIterable.toString("UnmodSortedMap.entrySet", this);
+            }
+
         };
     }
 
