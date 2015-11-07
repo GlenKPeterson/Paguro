@@ -260,6 +260,42 @@ public class TupleGenerator {
         return sB.toString();
     }
 
+    static String tupleTestParamsEvenNull(int i) {
+        StringBuilder sB = new StringBuilder();
+        boolean isFirst = true;
+        for (int j = 1; j <= i; j++) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                sB.append(",");
+            }
+            if ((j % 2) == 0) {
+                sB.append("null");
+            } else {
+                sB.append("\"" + ordinal(j) + "\"");
+            }
+        }
+        return sB.toString();
+    }
+
+    static String tupleTestParamsOddNull(int i) {
+        StringBuilder sB = new StringBuilder();
+        boolean isFirst = true;
+        for (int j = 1; j <= i; j++) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                sB.append(",");
+            }
+            if ((j % 2) == 0) {
+                sB.append("\"" + ordinal(j) + "\"");
+            } else {
+                sB.append("null");
+            }
+        }
+        return sB.toString();
+    }
+
     static void genTupleTest(int i) throws IOException {
         FileWriter fr = new FileWriter("../src/test/java/org/organicdesign/fp/tuple/Tuple" + i +
                                        "Test.java");
@@ -293,6 +329,16 @@ public class TupleGenerator {
                  "        equalsDistinctHashCode(a, Tuple" + i + ".of(" + tupleTestParams(i) + "),\n" +
                  "                               Tuple" + i + ".of(" + tupleTestParams(i) + "),\n" +
                  "                               Tuple" + i + ".of(" + tupleTestParams(i-1) + ",\"wrong\"));\n" +
+                 "\n" +
+                 "        equalsDistinctHashCode(Tuple" + i + ".of(" + tupleTestParamsEvenNull(i) + "),\n" +
+                 "                               Tuple" + i + ".of(" + tupleTestParamsEvenNull(i) + "),\n" +
+                 "                               Tuple" + i + ".of(" + tupleTestParamsEvenNull(i) + "),\n" +
+                 "                               Tuple" + i + ".of(" + tupleTestParamsEvenNull(i-1) + ",\"wrong\"));\n" +
+                 "\n" +
+                 "        equalsDistinctHashCode(Tuple" + i + ".of(" + tupleTestParamsOddNull(i) + "),\n" +
+                 "                               Tuple" + i + ".of(" + tupleTestParamsOddNull(i) + "),\n" +
+                 "                               Tuple" + i + ".of(" + tupleTestParamsOddNull(i) + "),\n" +
+                 "                               Tuple" + i + ".of(" + tupleTestParamsOddNull(i-1) + ",\"wrong\"));\n" +
                  "\n" +
                  "        equalsSameHashCode(a, Tuple" + i + ".of(" + tupleTestParams(i) + "),\n" +
                  "                           Tuple" + i + ".of(" + tupleTestParams(i) + "),\n" +

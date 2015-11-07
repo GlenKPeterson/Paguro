@@ -39,6 +39,16 @@ public class Tuple6Test {
                                Tuple6.of("1st","2nd","3rd","4th","5th","6th"),
                                Tuple6.of("1st","2nd","3rd","4th","5th","wrong"));
 
+        equalsDistinctHashCode(Tuple6.of("1st",null,"3rd",null,"5th",null),
+                               Tuple6.of("1st",null,"3rd",null,"5th",null),
+                               Tuple6.of("1st",null,"3rd",null,"5th",null),
+                               Tuple6.of("1st",null,"3rd",null,"5th","wrong"));
+
+        equalsDistinctHashCode(Tuple6.of(null,"2nd",null,"4th",null,"6th"),
+                               Tuple6.of(null,"2nd",null,"4th",null,"6th"),
+                               Tuple6.of(null,"2nd",null,"4th",null,"6th"),
+                               Tuple6.of(null,"2nd",null,"4th",null,"wrong"));
+
         equalsSameHashCode(a, Tuple6.of("1st","2nd","3rd","4th","5th","6th"),
                            Tuple6.of("1st","2nd","3rd","4th","5th","6th"),
                            Tuple6.of("2nd","1st","3rd","4th","5th","6th"));

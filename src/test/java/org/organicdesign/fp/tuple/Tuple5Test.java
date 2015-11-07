@@ -38,6 +38,16 @@ public class Tuple5Test {
                                Tuple5.of("1st","2nd","3rd","4th","5th"),
                                Tuple5.of("1st","2nd","3rd","4th","wrong"));
 
+        equalsDistinctHashCode(Tuple5.of("1st",null,"3rd",null,"5th"),
+                               Tuple5.of("1st",null,"3rd",null,"5th"),
+                               Tuple5.of("1st",null,"3rd",null,"5th"),
+                               Tuple5.of("1st",null,"3rd",null,"wrong"));
+
+        equalsDistinctHashCode(Tuple5.of(null,"2nd",null,"4th",null),
+                               Tuple5.of(null,"2nd",null,"4th",null),
+                               Tuple5.of(null,"2nd",null,"4th",null),
+                               Tuple5.of(null,"2nd",null,"4th","wrong"));
+
         equalsSameHashCode(a, Tuple5.of("1st","2nd","3rd","4th","5th"),
                            Tuple5.of("1st","2nd","3rd","4th","5th"),
                            Tuple5.of("2nd","1st","3rd","4th","5th"));

@@ -41,6 +41,16 @@ public class Tuple8Test {
                                Tuple8.of("1st","2nd","3rd","4th","5th","6th","7th","8th"),
                                Tuple8.of("1st","2nd","3rd","4th","5th","6th","7th","wrong"));
 
+        equalsDistinctHashCode(Tuple8.of("1st",null,"3rd",null,"5th",null,"7th",null),
+                               Tuple8.of("1st",null,"3rd",null,"5th",null,"7th",null),
+                               Tuple8.of("1st",null,"3rd",null,"5th",null,"7th",null),
+                               Tuple8.of("1st",null,"3rd",null,"5th",null,"7th","wrong"));
+
+        equalsDistinctHashCode(Tuple8.of(null,"2nd",null,"4th",null,"6th",null,"8th"),
+                               Tuple8.of(null,"2nd",null,"4th",null,"6th",null,"8th"),
+                               Tuple8.of(null,"2nd",null,"4th",null,"6th",null,"8th"),
+                               Tuple8.of(null,"2nd",null,"4th",null,"6th",null,"wrong"));
+
         equalsSameHashCode(a, Tuple8.of("1st","2nd","3rd","4th","5th","6th","7th","8th"),
                            Tuple8.of("1st","2nd","3rd","4th","5th","6th","7th","8th"),
                            Tuple8.of("2nd","1st","3rd","4th","5th","6th","7th","8th"));

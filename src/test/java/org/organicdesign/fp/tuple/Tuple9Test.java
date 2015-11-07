@@ -42,6 +42,16 @@ public class Tuple9Test {
                                Tuple9.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th"),
                                Tuple9.of("1st","2nd","3rd","4th","5th","6th","7th","8th","wrong"));
 
+        equalsDistinctHashCode(Tuple9.of("1st",null,"3rd",null,"5th",null,"7th",null,"9th"),
+                               Tuple9.of("1st",null,"3rd",null,"5th",null,"7th",null,"9th"),
+                               Tuple9.of("1st",null,"3rd",null,"5th",null,"7th",null,"9th"),
+                               Tuple9.of("1st",null,"3rd",null,"5th",null,"7th",null,"wrong"));
+
+        equalsDistinctHashCode(Tuple9.of(null,"2nd",null,"4th",null,"6th",null,"8th",null),
+                               Tuple9.of(null,"2nd",null,"4th",null,"6th",null,"8th",null),
+                               Tuple9.of(null,"2nd",null,"4th",null,"6th",null,"8th",null),
+                               Tuple9.of(null,"2nd",null,"4th",null,"6th",null,"8th","wrong"));
+
         equalsSameHashCode(a, Tuple9.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th"),
                            Tuple9.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th"),
                            Tuple9.of("2nd","1st","3rd","4th","5th","6th","7th","8th","9th"));

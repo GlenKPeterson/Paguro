@@ -76,7 +76,7 @@ public class Tuple3<A,B,C> {
     @Override
     public int hashCode() {
         // First 2 fields match Tuple2 which implements java.util.Map.Entry as part of the map
-        // contract.
+        // contract and therefore must match java.util.HashMap.Node.hashCode().
         int ret = 0;
         if (_1 != null) { ret = _1.hashCode(); }
         if (_2 != null) { ret = ret ^ _2.hashCode(); }

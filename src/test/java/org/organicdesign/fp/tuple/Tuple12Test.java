@@ -45,6 +45,16 @@ public class Tuple12Test {
                                Tuple12.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th","12th"),
                                Tuple12.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th","wrong"));
 
+        equalsDistinctHashCode(Tuple12.of("1st",null,"3rd",null,"5th",null,"7th",null,"9th",null,"11th",null),
+                               Tuple12.of("1st",null,"3rd",null,"5th",null,"7th",null,"9th",null,"11th",null),
+                               Tuple12.of("1st",null,"3rd",null,"5th",null,"7th",null,"9th",null,"11th",null),
+                               Tuple12.of("1st",null,"3rd",null,"5th",null,"7th",null,"9th",null,"11th","wrong"));
+
+        equalsDistinctHashCode(Tuple12.of(null,"2nd",null,"4th",null,"6th",null,"8th",null,"10th",null,"12th"),
+                               Tuple12.of(null,"2nd",null,"4th",null,"6th",null,"8th",null,"10th",null,"12th"),
+                               Tuple12.of(null,"2nd",null,"4th",null,"6th",null,"8th",null,"10th",null,"12th"),
+                               Tuple12.of(null,"2nd",null,"4th",null,"6th",null,"8th",null,"10th",null,"wrong"));
+
         equalsSameHashCode(a, Tuple12.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th","12th"),
                            Tuple12.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th","12th"),
                            Tuple12.of("2nd","1st","3rd","4th","5th","6th","7th","8th","9th","10th","11th","12th"));
