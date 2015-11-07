@@ -35,6 +35,21 @@ public class Tuple4Test {
 
         equalsDistinctHashCode(a, Tuple4.of("1st","2nd","3rd","4th"),
                                Tuple4.of("1st","2nd","3rd","4th"),
+                               Tuple4.of("wrong","2nd","3rd","4th"));
+
+
+        equalsDistinctHashCode(a, Tuple4.of("1st","2nd","3rd","4th"),
+                               Tuple4.of("1st","2nd","3rd","4th"),
+                               Tuple4.of("1st","wrong","3rd","4th"));
+
+
+        equalsDistinctHashCode(a, Tuple4.of("1st","2nd","3rd","4th"),
+                               Tuple4.of("1st","2nd","3rd","4th"),
+                               Tuple4.of("1st","2nd","wrong","4th"));
+
+
+        equalsDistinctHashCode(a, Tuple4.of("1st","2nd","3rd","4th"),
+                               Tuple4.of("1st","2nd","3rd","4th"),
                                Tuple4.of("1st","2nd","3rd","wrong"));
 
         equalsDistinctHashCode(Tuple4.of("1st",null,"3rd",null),

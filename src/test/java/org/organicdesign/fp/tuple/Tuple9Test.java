@@ -40,6 +40,46 @@ public class Tuple9Test {
 
         equalsDistinctHashCode(a, Tuple9.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th"),
                                Tuple9.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th"),
+                               Tuple9.of("wrong","2nd","3rd","4th","5th","6th","7th","8th","9th"));
+
+
+        equalsDistinctHashCode(a, Tuple9.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th"),
+                               Tuple9.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th"),
+                               Tuple9.of("1st","wrong","3rd","4th","5th","6th","7th","8th","9th"));
+
+
+        equalsDistinctHashCode(a, Tuple9.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th"),
+                               Tuple9.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th"),
+                               Tuple9.of("1st","2nd","wrong","4th","5th","6th","7th","8th","9th"));
+
+
+        equalsDistinctHashCode(a, Tuple9.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th"),
+                               Tuple9.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th"),
+                               Tuple9.of("1st","2nd","3rd","wrong","5th","6th","7th","8th","9th"));
+
+
+        equalsDistinctHashCode(a, Tuple9.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th"),
+                               Tuple9.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th"),
+                               Tuple9.of("1st","2nd","3rd","4th","wrong","6th","7th","8th","9th"));
+
+
+        equalsDistinctHashCode(a, Tuple9.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th"),
+                               Tuple9.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th"),
+                               Tuple9.of("1st","2nd","3rd","4th","5th","wrong","7th","8th","9th"));
+
+
+        equalsDistinctHashCode(a, Tuple9.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th"),
+                               Tuple9.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th"),
+                               Tuple9.of("1st","2nd","3rd","4th","5th","6th","wrong","8th","9th"));
+
+
+        equalsDistinctHashCode(a, Tuple9.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th"),
+                               Tuple9.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th"),
+                               Tuple9.of("1st","2nd","3rd","4th","5th","6th","7th","wrong","9th"));
+
+
+        equalsDistinctHashCode(a, Tuple9.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th"),
+                               Tuple9.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th"),
                                Tuple9.of("1st","2nd","3rd","4th","5th","6th","7th","8th","wrong"));
 
         equalsDistinctHashCode(Tuple9.of("1st",null,"3rd",null,"5th",null,"7th",null,"9th"),

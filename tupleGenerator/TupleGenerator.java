@@ -16,6 +16,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.StringBuilder;
+import java.util.function.Function;
 
 public class TupleGenerator {
 
@@ -260,7 +261,7 @@ public class TupleGenerator {
         return sB.toString();
     }
 
-    static String tupleTestParamsEvenNull(int i) {
+    static String tupleTestParamsReplace(int i, Function<Integer,String> repFun) {
         StringBuilder sB = new StringBuilder();
         boolean isFirst = true;
         for (int j = 1; j <= i; j++) {
@@ -269,31 +270,26 @@ public class TupleGenerator {
             } else {
                 sB.append(",");
             }
-            if ((j % 2) == 0) {
-                sB.append("null");
-            } else {
+            String repStr = repFun.apply(j);
+            if (repStr == null) {
                 sB.append("\"" + ordinal(j) + "\"");
+            } else {
+                sB.append(repStr);
             }
         }
         return sB.toString();
     }
 
+    static String tupleTestParamsReplace(int i, int repIdx, String repStr) {
+        return tupleTestParamsReplace(i, j -> (j == repIdx) ? "\"" + repStr + "\"" : null);
+    }
+
+    static String tupleTestParamsEvenNull(int i) {
+        return tupleTestParamsReplace(i, j -> ( (j % 2) == 0) ? "null" : null);
+    }
+
     static String tupleTestParamsOddNull(int i) {
-        StringBuilder sB = new StringBuilder();
-        boolean isFirst = true;
-        for (int j = 1; j <= i; j++) {
-            if (isFirst) {
-                isFirst = false;
-            } else {
-                sB.append(",");
-            }
-            if ((j % 2) == 0) {
-                sB.append("\"" + ordinal(j) + "\"");
-            } else {
-                sB.append("null");
-            }
-        }
-        return sB.toString();
+        return tupleTestParamsReplace(i, j -> ( (j % 2) == 0) ? null : "null");
     }
 
     static void genTupleTest(int i) throws IOException {
@@ -325,12 +321,14 @@ public class TupleGenerator {
         for (int j = 1; j <= i; j++) {
             fr.write("        assertEquals(\"" + ordinal(j) + "\", a._" + j + "());\n");
         }
-        fr.write("\n" +
-                 "        equalsDistinctHashCode(a, Tuple" + i + ".of(" + tupleTestParams(i) + "),\n" +
-                 "                               Tuple" + i + ".of(" + tupleTestParams(i) + "),\n" +
-                 "                               Tuple" + i + ".of(" + tupleTestParams(i-1) + ",\"wrong\"));\n" +
-                 "\n" +
-                 "        equalsDistinctHashCode(Tuple" + i + ".of(" + tupleTestParamsEvenNull(i) + "),\n" +
+        for (int j = 1; j <= i; j++) {
+            fr.write("\n" +
+                     "        equalsDistinctHashCode(a, Tuple" + i + ".of(" + tupleTestParams(i) + "),\n" +
+                     "                               Tuple" + i + ".of(" + tupleTestParams(i) + "),\n" +
+                     "                               Tuple" + i + ".of(" + tupleTestParamsReplace(i, j, "wrong") + "));\n" +
+                     "\n");
+        }
+        fr.write("        equalsDistinctHashCode(Tuple" + i + ".of(" + tupleTestParamsEvenNull(i) + "),\n" +
                  "                               Tuple" + i + ".of(" + tupleTestParamsEvenNull(i) + "),\n" +
                  "                               Tuple" + i + ".of(" + tupleTestParamsEvenNull(i) + "),\n" +
                  "                               Tuple" + i + ".of(" + tupleTestParamsEvenNull(i-1) + ",\"wrong\"));\n" +

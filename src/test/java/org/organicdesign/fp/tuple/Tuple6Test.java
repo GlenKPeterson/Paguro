@@ -37,6 +37,31 @@ public class Tuple6Test {
 
         equalsDistinctHashCode(a, Tuple6.of("1st","2nd","3rd","4th","5th","6th"),
                                Tuple6.of("1st","2nd","3rd","4th","5th","6th"),
+                               Tuple6.of("wrong","2nd","3rd","4th","5th","6th"));
+
+
+        equalsDistinctHashCode(a, Tuple6.of("1st","2nd","3rd","4th","5th","6th"),
+                               Tuple6.of("1st","2nd","3rd","4th","5th","6th"),
+                               Tuple6.of("1st","wrong","3rd","4th","5th","6th"));
+
+
+        equalsDistinctHashCode(a, Tuple6.of("1st","2nd","3rd","4th","5th","6th"),
+                               Tuple6.of("1st","2nd","3rd","4th","5th","6th"),
+                               Tuple6.of("1st","2nd","wrong","4th","5th","6th"));
+
+
+        equalsDistinctHashCode(a, Tuple6.of("1st","2nd","3rd","4th","5th","6th"),
+                               Tuple6.of("1st","2nd","3rd","4th","5th","6th"),
+                               Tuple6.of("1st","2nd","3rd","wrong","5th","6th"));
+
+
+        equalsDistinctHashCode(a, Tuple6.of("1st","2nd","3rd","4th","5th","6th"),
+                               Tuple6.of("1st","2nd","3rd","4th","5th","6th"),
+                               Tuple6.of("1st","2nd","3rd","4th","wrong","6th"));
+
+
+        equalsDistinctHashCode(a, Tuple6.of("1st","2nd","3rd","4th","5th","6th"),
+                               Tuple6.of("1st","2nd","3rd","4th","5th","6th"),
                                Tuple6.of("1st","2nd","3rd","4th","5th","wrong"));
 
         equalsDistinctHashCode(Tuple6.of("1st",null,"3rd",null,"5th",null),
