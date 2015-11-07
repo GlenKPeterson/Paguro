@@ -232,7 +232,7 @@ public class TupleGenerator {
                  "    @Override\n" +
                  "    public int hashCode() {\n" +
                  "        // First 2 fields match Tuple2 which implements java.util.Map.Entry as part of the map\n" +
-                 "        // contract.\n" +
+                 "        // contract and therefore must match java.util.HashMap.Node.hashCode().\n" +
                  "        int ret = 0;\n" +
                  "        if (_1 != null) { ret = _1.hashCode(); }\n" +
                  "        if (_2 != null) { ret = ret ^ _2.hashCode(); }\n");

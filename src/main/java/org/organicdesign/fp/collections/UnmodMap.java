@@ -17,6 +17,7 @@ import org.organicdesign.fp.tuple.Tuple2;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -57,15 +58,16 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
             };
         }
 
-        static <K,V> UnmodSortedIterator<UnEntry<K,V>> unSortIterEntToUnSortIterUnEnt(
-                UnmodSortedIterator<Entry<K,V>> innerIter) {
-            return new UnmodSortedIterator<UnEntry<K, V>>() {
-                @Override public boolean hasNext() { return innerIter.hasNext(); }
-                @Override public UnEntry<K, V> next() {
-                    return UnmodMap.UnEntry.entryToUnEntry(innerIter.next());
-                }
-            };
-        }
+        // This should be done with a cast, not with code.
+//        static <K,V> UnmodSortedIterator<UnEntry<K,V>> unSortIterEntToUnSortIterUnEnt(
+//                UnmodSortedIterator<Entry<K,V>> innerIter) {
+//            return new UnmodSortedIterator<UnEntry<K, V>>() {
+//                @Override public boolean hasNext() { return innerIter.hasNext(); }
+//                @Override public UnEntry<K, V> next() {
+//                    return UnmodMap.UnEntry.entryToUnEntry(innerIter.next());
+//                }
+//            };
+//        }
 //
 //        class Impl<K,V> implements UnEntry<K,V> {
 //            private final K key;
@@ -146,16 +148,55 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
      Most maps are not designed for this - the default implementation has O(n) performance.
      {@inheritDoc}
      */
+    // This is the place to define this slow operation so that it can be used in
+    // values().contains(), UnmodSortedMap.containsValue() and UnmodSortedMap.values().contains().
     @SuppressWarnings("SuspiciousMethodCalls")
-    @Override default boolean containsValue(Object value) { return this.values().contains(value); }
+    @Override default boolean containsValue(Object value) {
+        for (UnEntry<K,V> item : this) {
+            if (Objects.equals(item.getValue(), value)) { return true; }
+        }
+        return false;
+    }
 
     /**
-     Returns a view of the mappings contained in this map.  The set should actually contain
-     UnmodMap.UnEntry items, but that return signature is illegal in Java, so you'll just have to
-     remember.
+     Returns a view of the mappings contained in this map.  The set will contain UnmodMap.UnEntry
+     items, but that return signature is illegal in Java, so you'll just have to remember. An
+     UnmodMap is iterable, so this method is probably not nearly as useful as it once was.
+
+     {@inheritDoc}
      */
-    @Override
-    UnmodSet<Entry<K,V>> entrySet();
+    @Override default UnmodSet<Entry<K,V>> entrySet() {
+        final UnmodMap<K,V> parent = this;
+        return new UnmodSet.AbstractUnmodSet<Entry<K,V>>() {
+            @SuppressWarnings("unchecked")
+            @Override public boolean contains(Object o) {
+                if ( !(o instanceof Entry) ) { return false; }
+                Entry<K,V> entry = (Entry<K,V>) o;
+                if (!parent.containsKey(entry.getKey())) { return false; }
+                V value = parent.get(entry.getKey());
+                return Objects.equals(entry.getValue(), value);
+            }
+
+            @SuppressWarnings("unchecked")
+            @Override public UnmodIterator<Entry<K,V>> iterator() {
+                // Converting from
+                // UnmodIterator<UnEntry<K,V>> to
+                // UnmodIterator<Entry<K,V>>
+                // Is a totally legal widening conversion (at runtime) because UnEntry extends
+                // (is an) Entry.  But Java's type system doesn't know that because (I think)
+                // it's a higher kinded type.  Thanks to type erasure, we can forget about all
+                // that and cast it to a base type then suppress the unchecked warning.
+                return (UnmodIterator) parent.iterator();
+            }
+
+            @Override public int size() { return parent.size(); }
+
+            @Override public String toString() {
+                return UnmodIterable.toString("UnmodMap.entrySet", this);
+            }
+        };
+    }
+
 
 // boolean	equals(Object o)
 
@@ -188,9 +229,32 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
     /** {@inheritDoc} */
     @Override default boolean isEmpty() { return size() == 0; }
 
-    /** Returns a view of the keys contained in this map. */
-    @Override
-    UnmodSet<K> keySet();
+    /**
+     Returns a view of the keys contained in this map.  An UnmodMap is iterable, so this method
+     is probably not nearly as useful as it once was.
+
+     {@inheritDoc}
+     */
+    @Override default UnmodSet<K> keySet() {
+        final UnmodMap<K,V> parent = this;
+        return new UnmodSet.AbstractUnmodSet<K>() {
+            @SuppressWarnings("SuspiciousMethodCalls")
+            @Override public boolean contains(Object o) { return parent.containsKey(o); }
+
+            @Override public UnmodIterator<K> iterator() {
+                final UnmodIterator<UnEntry<K,V>> iter = parent.iterator();
+                return new UnmodIterator<K>() {
+                    @Override public boolean hasNext() { return iter.hasNext(); }
+                    @Override public K next() { return iter.next().getKey(); }
+                };
+            }
+            @Override public int size() { return parent.size(); }
+
+            @Override public String toString() {
+                return UnmodIterable.toString("UnmodMap.keySet", this);
+            }
+        };
+    }
 
     /** Not allowed - this is supposed to be unmodifiable */
     @Override @Deprecated
@@ -234,7 +298,34 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
 
 // int	size()
 
-    /** Returns a view of the values contained in this map. */
-    @Override
-    UnmodCollection<V> values();
+    /**
+     Returns a view of the values contained in this map.  java.util.HashMap returns an instance of
+     java.util.HashMap.Values() when you call this method which (Java 8) does *not* have equals()
+     or hashCode() defined.  So it only does referential equality and there is no way to implement
+     equality with that.
+
+     An UnmodMap is iterable, so this method
+     is probably not nearly as useful as it once was.
+
+     {@inheritDoc}
+     */
+    @Override default UnmodCollection<V> values() {
+        final UnmodMap<K,V> parent = this;
+        return new UnmodCollection.AbstractUnmodCollection<V>() {
+            @SuppressWarnings("SuspiciousMethodCalls")
+            @Override public boolean contains(Object o) { return parent.containsValue(o); }
+            @Override public UnmodIterator<V> iterator() {
+                final UnmodIterator<UnEntry<K,V>> iter = parent.iterator();
+                return new UnmodIterator<V>() {
+                    @Override public boolean hasNext() { return iter.hasNext(); }
+                    @Override public V next() { return iter.next().getValue(); }
+                };
+            }
+            @Override public int size() { return parent.size(); }
+
+            @Override public String toString() {
+                return UnmodIterable.toString("UnmodMap.values", this);
+            }
+        };
+    }
 }

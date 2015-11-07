@@ -130,32 +130,21 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
                 Set<Map.Entry<K,V>> that = (Set<Map.Entry<K,V>>) o;
                 if (that.size() != this.size()) { return false; }
 
-                // OK, this is a pain because Map.Entries may not know how to equal Tuples.
-                // So this compares based on the interface, not on the implementation.
-                // Hmm... Maybe this should ues the comparator instead?
-                Iterator<Map.Entry<K,V>> as = this.iterator();
-                Iterator<Map.Entry<K,V>> bs = that.iterator();
-                while (as.hasNext() && bs.hasNext()) {
-                    Map.Entry<K,V> aEntry = as.next();
-                    Map.Entry<K,V> bEntry = bs.next();
-                    if (comparator().compare(aEntry, bEntry) != 0) {
-                        return false;
-                    }
-//                    if (aEntry == bEntry) {
-//                        continue; // it's good, check the next.
-//                    }
-//                    if ( (aEntry == null) || (bEntry == null) ) {
-//                        return false; // they are different.
-//                    }
-//                    if (!Objects.equals(aEntry.getKey(), bEntry.getKey())) {
-//                        return false;
-//                    }
-//                    if (!Objects.equals(aEntry.getValue(), bEntry.getValue())) {
-//                        return false;
-//                    }
+                // Here we are again.  The default implementation of EntrySet.equals() is in
+                // java.util.AbstractSet and it ignores order, even though this has a guaranteed
+                // order.  I sort of think that's wrong, but lacking absolute certainty, I choose
+                // compatibility.  If you want a better equals test, use an Equator.
+                // TODO: Test vs. TreeMap!
+
+                try {
+                    return containsAll(that);
+                } catch (ClassCastException ignore)   {
+                    return false;
+                } catch (NullPointerException ignore) {
+                    return false;
                 }
-                return !as.hasNext() && !bs.hasNext();
             }
+
             @Override public String toString() {
                 return UnmodIterable.toString("UnmodSortedMap.entrySet", this);
             }
@@ -289,6 +278,9 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
                 };
             }
             @Override public int size() { return parentMap.size(); }
+
+            @SuppressWarnings("SuspiciousMethodCalls")
+            @Override public boolean contains(Object o) { return parentMap.containsValue(o); }
 
             @Override public int hashCode() { return UnmodIterable.hashCode(this); }
 

@@ -94,7 +94,10 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
      {@inheritDoc}
      */
     @Override default boolean contains(Object o) {
-        return UnmodSortedCollection.super.contains(o);
+        for (Object item : this) {
+            if (Objects.equals(item, o)) { return true; }
+        }
+        return false;
     }
 
     /** {@inheritDoc} */

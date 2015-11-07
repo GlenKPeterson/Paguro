@@ -16,63 +16,54 @@ package org.organicdesign.fp.collections;
 
 import org.junit.Test;
 import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.tuple.Tuple2;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.TreeMap;
 
 import static org.junit.Assert.*;
+import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class UnmodMapTest {
-    static UnmodMap<String,Integer> unMap = new UnmodMap<String,Integer>() {
-        String[] keys = new String[] { "a", "b", "c" };
-        int[] vals = new int[] { 1, 2, 3 };
+    static class TestMap<K,V> implements UnmodMap<K,V> {
+        private final Map<K,V> inner;
 
-        @Override public UnmodSet<Entry<String,Integer>> entrySet() { return UnmodSet.empty(); }
+        TestMap(Iterable<Entry<K,V>> items) {
+            inner = new HashMap<>();
+            for (Entry<K,V> item : items) {
+                inner.put(item.getKey(), item.getValue());
+            }
+        }
 
-        @Override public UnmodSet<String> keySet() { return UnmodSet.empty(); }
+        @Override public UnmodIterator<UnEntry<K,V>> iterator() {
+            Iterator<Entry<K,V>> iter = inner.entrySet().iterator();
+            return new UnmodIterator<UnEntry<K,V>>() {
+                @Override public boolean hasNext() { return iter.hasNext(); }
 
-        @Override public UnmodCollection<Integer> values() {
-            return new UnmodCollection<Integer>() {
-                @Override public UnmodIterator<Integer> iterator() {
-                    return new UnmodIterator<Integer>() {
-                        int i = 0;
-                        @Override public boolean hasNext() { return i < vals.length; }
-
-                        @Override public Integer next() {
-                            int idx = i;
-                            i = i + 1;
-                            return vals[idx];
-                        }
-                    };
+                @Override public UnEntry<K,V> next() {
+                    Entry<K,V> next = iter.next();
+                    return Tuple2.of(next.getKey(), next.getValue());
                 }
-                @Override public int size() { return vals.length; }
             };
         }
 
-        @Override public int size() { return keys.length; }
+        @Override public int size() { return inner.size(); }
 
-        @Override public boolean containsKey(Object key) {
-            for (String s : keys) {
-                if (Objects.equals(key, s)) { return true; }
-            }
-            return false;
-        }
+        @Override public boolean containsKey(Object key) { return inner.containsKey(key); }
 
-        @Override public Integer get(Object key) {
-            for (int i = 0; i < keys.length; i++) {
-                if (Objects.equals(key, keys[i])) {
-                    return vals[i];
-                }
-            }
-            return null;
-        }
+        @Override public V get(Object key) { return inner.get(key); }
+    }
 
-        @Override public UnmodIterator<UnEntry<String,Integer>> iterator() {
-            return null;
-        }
-    };
+    TestMap<String,Integer> unMap = new TestMap<>(Arrays.asList(
+            Tuple2.of("a", 1),
+            Tuple2.of("b", 2),
+            Tuple2.of("c", 3)));
 
     @Test public void containsValue() {
         Map<String,Integer> mm = new HashMap<>();
@@ -130,6 +121,112 @@ public class UnmodMapTest {
         assertFalse(UnmodMap.empty().containsKey(null));
         assertFalse(UnmodMap.empty().containsValue(null));
         assertNull(UnmodMap.empty().get(null));
+    }
+
+    final static UnmodMapTest.TestEntry<String,Integer> avoKey =
+            new UnmodMapTest.TestEntry<>("avocado", -9);
+    final static UnmodMapTest.TestEntry<String,Integer> banKey =
+            new UnmodMapTest.TestEntry<>("banana", 777);
+    final static UnmodMapTest.TestEntry<String,Integer> clemKey =
+            new UnmodMapTest.TestEntry<>("clementine", 1);
+    final static UnmodMapTest.TestEntry<String,Integer> junkKey =
+            new UnmodMapTest.TestEntry<>("junk", -2);
+    final static UnmodMapTest.TestEntry<String,Integer> pastLast =
+            new UnmodMapTest.TestEntry<>("zzzLast", Integer.MIN_VALUE);
+
+    final static Map<String,Integer> refMap = new HashMap<>();
+    static {
+        refMap.put(avoKey.getKey(), avoKey.getValue());
+        refMap.put(banKey.getKey(), banKey.getValue());
+        refMap.put(clemKey.getKey(), clemKey.getValue());
+    }
+
+    final static TestMap<String,Integer> testMap =
+            new TestMap<>(Arrays.asList(avoKey, banKey, clemKey));
+
+    final static Map<String,Integer> uneqMap = new HashMap<>();
+    static {
+        uneqMap.put(avoKey.getKey(), avoKey.getValue());
+        uneqMap.put(banKey.getKey(), banKey.getValue());
+        uneqMap.put(junkKey.getKey(), junkKey.getValue());
+    }
+
+    @Test public void entrySet() {
+        Set<Map.Entry<String,Integer>> refEntSet = refMap.entrySet();
+        Set<Map.Entry<String,Integer>> testEntSet = testMap.entrySet();
+
+        assertEquals(refEntSet.size(), testEntSet.size());
+
+        assertFalse(refEntSet.contains(null));
+        assertFalse(testEntSet.contains(null));
+        assertFalse(refEntSet.contains(junkKey));
+        assertFalse(testEntSet.contains(junkKey));
+        assertTrue(refEntSet.contains(avoKey));
+        assertTrue(testEntSet.contains(avoKey));
+        assertTrue(refEntSet.contains(banKey));
+        assertTrue(testEntSet.contains(banKey));
+        assertTrue(refEntSet.contains(clemKey));
+        assertTrue(testEntSet.contains(clemKey));
+
+        UnmodListTest.iteratorTest(refEntSet.iterator(), testEntSet.iterator());
+
+        equalsDistinctHashCode(testEntSet, refEntSet, testMap.entrySet(), uneqMap.entrySet());
+
+        assertTrue(testEntSet.toString().startsWith("UnmodMap.entrySet"));
+    }
+
+    @Test public void keySetTest() {
+        Set<String> refKeySet = refMap.keySet();
+        Set<String> testKeySet = testMap.keySet();
+
+        assertEquals(refKeySet.size(), testKeySet.size());
+
+        assertFalse(refKeySet.contains(null));
+        assertFalse(testKeySet.contains(null));
+        assertFalse(refKeySet.contains(junkKey.getKey()));
+        assertFalse(testKeySet.contains(junkKey.getKey()));
+        assertTrue(refKeySet.contains(avoKey.getKey()));
+        assertTrue(testKeySet.contains(avoKey.getKey()));
+        assertTrue(refKeySet.contains(banKey.getKey()));
+        assertTrue(testKeySet.contains(banKey.getKey()));
+        assertTrue(refKeySet.contains(clemKey.getKey()));
+        assertTrue(testKeySet.contains(clemKey.getKey()));
+
+        UnmodListTest.iteratorTest(refKeySet.iterator(), testKeySet.iterator());
+
+        equalsDistinctHashCode(testKeySet, refKeySet, testMap.keySet(), uneqMap.keySet());
+
+        assertTrue(testKeySet.toString().startsWith("UnmodMap.keySet"));
+    }
+
+    @Test public void valuesTest() {
+        Collection<Integer> refValues = refMap.values();
+        Collection<Integer> testValues = testMap.values();
+
+        assertEquals(refValues.size(), testValues.size());
+
+        assertFalse(refValues.contains(null));
+        assertFalse(testValues.contains(null));
+        assertFalse(refValues.contains(junkKey.getValue()));
+        assertFalse(testValues.contains(junkKey.getValue()));
+        assertTrue(refValues.contains(avoKey.getValue()));
+        assertTrue(testValues.contains(avoKey.getValue()));
+        assertTrue(refValues.contains(banKey.getValue()));
+        assertTrue(testValues.contains(banKey.getValue()));
+        assertTrue(refValues.contains(clemKey.getValue()));
+        assertTrue(testValues.contains(clemKey.getValue()));
+
+        UnmodListTest.iteratorTest(refValues.iterator(), testValues.iterator());
+
+        System.out.println("uneqMap.values(): " + uneqMap.values());
+        System.out.println("uneqMap.values() class: " + uneqMap.values().getClass().getCanonicalName());
+
+        // java.util.HashMap.Values does not implement equals() or hashCode() and therefore
+        // inherites them from java.lang.Object, which only does referential equality.
+        // As a result, there is no way to be equal to the resulting collection.
+        equalsDistinctHashCode(testValues, testMap.values(), testMap.values(), uneqMap.values());
+
+        assertTrue(testValues.toString().startsWith("UnmodMap.values"));
     }
 
     @SuppressWarnings("deprecation")
@@ -227,6 +324,19 @@ public class UnmodMapTest {
     static UnmodMap.UnEntry<String,Integer> ue = UnmodMap.UnEntry.entryToUnEntry(me);
 
     @Test public void unEntryTest() {
+
+
+        Map<String,Integer> mm = new HashMap<>();
+        mm.put("Hello", 3);
+        Map.Entry<String,Integer> entry = mm.entrySet().iterator().next();
+        System.out.println("helloHash: " + "Hello".hashCode());
+        System.out.println("entryHash: " + entry.hashCode());
+        System.out.println("tupHash: " + Tuple2.of("Hello", 3).hashCode());
+        System.out.println("entryClass: " + entry.getClass().getCanonicalName());
+        System.out.println("mm.entrySet() Class: " + mm.entrySet().getClass().getCanonicalName());
+
+
+
         assertEquals(me.getKey(), ue.getKey());
         assertEquals(me.getValue(), ue.getValue());
 

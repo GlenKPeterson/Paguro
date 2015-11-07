@@ -155,14 +155,14 @@ public interface Transformable<T> {
      */
     Transformable<T> takeWhile(Function1<? super T,Boolean> predicate);
 
-    /**
-     Returns an Object[] for backward compatibility
-     */
-    @SuppressWarnings("unchecked")
-    default Object[] toArray() {
-        return toMutableList().toArray();
-//        return al.toArray((T[]) new Object[al.size()]);
-    }
+//    /**
+//     Returns an Object[] for backward compatibility
+//     */
+//    @SuppressWarnings("unchecked")
+//    default Object[] toArray() {
+//        return toMutableList().toArray();
+////        return al.toArray((T[]) new Object[al.size()]);
+//    }
 
     /**
      Realize a thread-safe immutable list to access items quickly O(log32 n) by index.

@@ -96,7 +96,7 @@ public class PersistentTreeMapTest {
 
         // Values are a sorted set as well...
         assertArrayEquals(new Integer[]{3, 2, 1},
-                          m1.map(e -> e.getValue()).toArray());
+                          m1.map(e -> e.getValue()).toMutableList().toArray());
 
         assertArrayEquals(new String[]{"a", "b", "c"},
                           PersistentTreeMap.of(vec(tup("a", 3),
@@ -252,7 +252,8 @@ public class PersistentTreeMapTest {
         assertArrayEquals(new UnmodMap.UnEntry[]{tup(2, "two"), tup(3, "three")},
                           PersistentTreeMap.of(vec(tup(1, "one"))).assoc(2, "two").assoc(3, "three")
                                            .drop(1)
-                                           .map((u) -> tup(u.getKey(), u.getValue())).toArray());
+                                           .map((u) -> tup(u.getKey(), u.getValue()))
+                                           .toMutableList().toArray());
 
         assertFalse(PersistentTreeMap.of(vec(tup(1, "one"))).drop(1).iterator().hasNext());
     }
@@ -484,7 +485,8 @@ public class PersistentTreeMapTest {
                                              Tuple2.of(4, "four"),
                                              Tuple2.of(5, "five")));
         assertArrayEquals(s.toArray(),
-                          m.entrySet().map((u) -> tup(u.getKey(), u.getValue())).toArray());
+                          m.entrySet().map((u) -> tup(u.getKey(), u.getValue()))
+                           .toMutableList().toArray());
     }
 
     @Test public void values() {
@@ -493,7 +495,7 @@ public class PersistentTreeMapTest {
                                  .assoc(5, "five").assoc(2, "two").assoc(3, "three").assoc(1, "one");
 
         assertArrayEquals(new String[]{"one", "two", "three", "four", "five"},
-                          m1.map(e -> e.getValue()).toArray());
+                          m1.map(e -> e.getValue()).toMutableList().toArray());
 
 //        assertTrue(m.values().equals(Arrays.asList("one", "two", "three", "four", "five")));
         assertNotEquals(0, m1.values().hashCode());

@@ -17,7 +17,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Objects;
 import java.util.function.Predicate;
 
 /**
@@ -39,6 +38,21 @@ public interface UnmodCollection<E> extends Collection<E>, UnmodIterable<E> {
     @SuppressWarnings("unchecked")
     static <T> UnmodCollection<T> empty() { return (UnmodCollection<T>) EMPTY; }
 
+    /**
+     Implements equals and hashCode() methods to make defining unmod sets easier, especially for
+     implementing Map.keySet() and such.
+     */
+    abstract class AbstractUnmodCollection<T> implements UnmodCollection<T> {
+        @Override public boolean equals(Object other) {
+            if (this == other) { return true; }
+            if ( !(other instanceof Collection) ) { return false; }
+            Collection that = (Collection) other;
+            return (size() == that.size()) &&
+                   containsAll(that);
+        }
+
+        @Override public int hashCode() { return UnmodIterable.hashCode(this); }
+    }
     // ========================================= Instance =========================================
     // Methods are listed in the same order as the javadocs.
 
@@ -57,17 +71,19 @@ public interface UnmodCollection<E> extends Collection<E>, UnmodIterable<E> {
         throw new UnsupportedOperationException("Modification attempted");
     }
 
-    /**
-     This is quick for sets O(1) or O(log n), but slow for Lists O(n).
-
-     {@inheritDoc}
-     */
-    @Override default boolean contains(Object o) {
-        for (Object item : this) {
-            if (Objects.equals(item, o)) { return true; }
-        }
-        return false;
-    }
+// I don't think that this should be implemented here.  It's a core function so each implementation
+// of the interface should implement it
+//    /**
+//     This is quick for sets O(1) or O(log n), but slow for Lists O(n).
+//
+//     {@inheritDoc}
+//     */
+//    @Override default boolean contains(Object o) {
+//        for (Object item : this) {
+//            if (Objects.equals(item, o)) { return true; }
+//        }
+//        return false;
+//    }
 
     /**
      The default implementation of this method has O(this.size() + that.size()) performance.

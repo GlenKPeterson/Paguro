@@ -36,7 +36,7 @@ public interface Equator<T> {
 
     Equator<Object> DEFAULT_EQUATOR = new Equator<Object>() {
         @Override public int hash(Object o) {
-            return (o == null) ? Integer.MIN_VALUE : o.hashCode();
+            return (o == null) ? 0 : o.hashCode();
         }
 
         @Override public boolean eq(Object o1, Object o2) {
@@ -53,9 +53,6 @@ public interface Equator<T> {
             (o1, o2) -> {
                 if (o1 == o2) { return 0; }
                 if (o1 == null) {
-                    if (o2 == null) {
-                        return 0;
-                    }
                     return -o2.compareTo(o1);
                 }
                 return o1.compareTo(o2);
@@ -72,28 +69,25 @@ public interface Equator<T> {
         default boolean lt(T o1, T o2) { return compare(o1, o2) < 0; }
 
         /** Returns true if the first object is less than or equal to the second. */
-        default boolean le(T o1, T o2) { return compare(o1, o2) <= 0; }
+        default boolean lte(T o1, T o2) { return compare(o1, o2) <= 0; }
 
         /** Returns true if the first object is greater than the second. */
         default boolean gt(T o1, T o2) { return compare(o1, o2) > 0; }
 
         /** Returns true if the first object is greater than or equal to the second. */
-        default boolean ge(T o1, T o2) { return compare(o1, o2) >= 0; }
+        default boolean gte(T o1, T o2) { return compare(o1, o2) >= 0; }
 
         @Override default boolean eq(T o1, T o2) { return compare(o1, o2) == 0; }
 
         ComparisonContext<Comparable<Object>> DEFAULT_CONTEXT =
                 new ComparisonContext<Comparable<Object>>() {
             @Override public int hash(Comparable<Object> o) {
-                return (o == null) ? Integer.MIN_VALUE : o.hashCode();
+                return (o == null) ? 0 : o.hashCode();
             }
             @SuppressWarnings("ConstantConditions")
             @Override public int compare(Comparable<Object> o1, Comparable<Object> o2) {
                 if (o1 == o2) { return 0; }
                 if (o1 == null) {
-                    if (o2 == null) {
-                        return 0;
-                    }
                     return -o2.compareTo(o1);
                 }
                 return o1.compareTo(o2);

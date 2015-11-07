@@ -16,25 +16,25 @@ public class XformTakenWhileTest {
     public void takeItemsInOneBatch() {
         Xform<Integer> seq = Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9));
         assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
-                          seq.takeWhile(Function1.accept()).toArray());
+                          seq.takeWhile(Function1.accept()).toMutableList().toArray());
         assertArrayEquals(new Integer[] { 1,2,3,4,5,6,7,8,9 },
-                          seq.takeWhile(i -> i < 10).toArray());
+                          seq.takeWhile(i -> i < 10).toMutableList().toArray());
         assertArrayEquals(new Integer[] { 1,2,3,4,5,6,7,8,9 },
-                          seq.takeWhile(i -> i <= 9).toArray());
+                          seq.takeWhile(i -> i <= 9).toMutableList().toArray());
         assertArrayEquals(new Integer[] { 1,2,3,4,5,6,7,8 },
-                          seq.takeWhile(i -> i <= 8).toArray());
+                          seq.takeWhile(i -> i <= 8).toMutableList().toArray());
         assertArrayEquals(new Integer[] { 1,2,3,4,5,6,7 },
-                          seq.takeWhile(i -> i <= 7).toArray());
+                          seq.takeWhile(i -> i <= 7).toMutableList().toArray());
         assertArrayEquals(new Integer[] { 1,2,3 },
-                          seq.takeWhile(i -> i <= 3).toArray());
+                          seq.takeWhile(i -> i <= 3).toMutableList().toArray());
         assertArrayEquals(new Integer[] { 1,2 },
-                          seq.takeWhile(i -> i <= 2).toArray());
+                          seq.takeWhile(i -> i <= 2).toMutableList().toArray());
         assertArrayEquals(new Integer[] { 1 },
-                          seq.takeWhile(i -> i <= 1).toArray());
+                          seq.takeWhile(i -> i <= 1).toMutableList().toArray());
         assertArrayEquals(new Integer[] {  },
-                          seq.takeWhile(Function1.reject()).toArray());
+                          seq.takeWhile(Function1.reject()).toMutableList().toArray());
         assertArrayEquals(new Integer[] {  },
-                          seq.takeWhile(i -> i > 10).toArray());
+                          seq.takeWhile(i -> i > 10).toMutableList().toArray());
     }
 
     @Test(expected = IllegalArgumentException.class)

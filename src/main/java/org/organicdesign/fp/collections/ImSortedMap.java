@@ -15,7 +15,6 @@ package org.organicdesign.fp.collections;
 
 import org.organicdesign.fp.Option;
 
-import java.util.Collection;
 import java.util.Map;
 
 /** An immutable sorted map. */
@@ -23,11 +22,12 @@ public interface ImSortedMap<K,V> extends UnmodSortedMap<K,V> {
 
     Option<UnmodMap.UnEntry<K,V>> entry(K key);
 
-    /**
-     * Returns a view of the mappings contained in this map.  The set should actually contain UnmodMap.Entry items, but
-     * that return signature is illegal in Java, so you'll just have to remember. */
-    @Override
-    ImSortedSet<Entry<K,V>> entrySet();
+//    /**
+//     Returns a view of the mappings contained in this map.  The set should actually contain
+//     UnmodMap.Entry items, but that return signature is illegal in Java, so you'll just have to
+//     remember.
+//     */
+//    @Override ImSortedSet<Entry<K,V>> entrySet();
 
 // public  K	firstKey()
 
@@ -68,32 +68,36 @@ public interface ImSortedMap<K,V> extends UnmodSortedMap<K,V> {
     @Override
     ImSortedMap<K,V> tailMap(K fromKey);
 
-    /** {@inheritDoc} */
-    @Override default UnmodSortedCollection<V> values() {
-        // We need values, but still ordered by their keys.
-        final ImSortedMap<K,V> inner = this;
-        return new UnmodSortedCollection<V>() {
-            @Override public UnmodSortedIterator<V> iterator() {
-                return UnmodSortedIterable.castFromTypedList(inner.entrySet()
-                                                                  .map(e -> e.getValue())
-                                                                  .toMutableList())
-                                          .iterator();
-            }
-            @Override public int size() { return inner.size(); }
-
-            @Override public int hashCode() { return UnmodIterable.hashCode(this); }
-
-            @Override public boolean equals(Object o) {
-                if (this == o) { return true; }
-                if ( !(o instanceof Collection) ) { return false; }
-                Collection that = (Collection) o;
-                if (this.size() != that.size()) { return false; }
-                return containsAll(that);
-            }
-
-            @Override public String toString() { return UnmodIterable.toString("ImMapOrd.values.UnCollectionOrd", this); }
-        };
-    }
+//    /** {@inheritDoc} */
+//    @Override default UnmodSortedCollection<V> values() {
+//        // We need values, but still ordered by their keys.
+//        final ImSortedMap<K,V> parent = this;
+//        return new UnmodSortedCollection<V>() {
+//            @Override public UnmodSortedIterator<V> iterator() {
+//                return new UnmodListIterator<V>() {}
+//                return UnmodSortedIterable.castFromTypedList(parent.entrySet()
+//                                                                   .map(e -> e.getValue())
+//                                                                   .toMutableList())
+//                                          .iterator();
+//            }
+//            @Override public int size() { return parent.size(); }
+//
+//            @SuppressWarnings("SuspiciousMethodCalls")
+//            @Override public boolean contains(Object o) { return parent.containsValue(o); }
+//
+//            @Override public int hashCode() { return UnmodIterable.hashCode(this); }
+//
+//            @Override public boolean equals(Object o) {
+//                if (this == o) { return true; }
+//                if ( !(o instanceof Collection) ) { return false; }
+//                Collection that = (Collection) o;
+//                if (this.size() != that.size()) { return false; }
+//                return containsAll(that);
+//            }
+//
+//            @Override public String toString() { return UnmodIterable.toString("ImMapOrd.values.UnCollectionOrd", this); }
+//        };
+//    }
 
     /** Returns a new map with the given key/value added */
     ImSortedMap<K,V> assoc(K key, V val);

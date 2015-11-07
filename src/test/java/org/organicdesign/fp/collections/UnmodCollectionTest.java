@@ -19,6 +19,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 import static org.junit.Assert.*;
 
@@ -27,9 +28,9 @@ public class UnmodCollectionTest {
             "Sticks", "and", "stones", "will", "break", "my", "bones", "but", "tests",
             "will", "never", "hurt", "me." };
 
-    // unColl is part of where the UncleJim names comes from.
-    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-    private static final UnmodCollection<String> unColl = new UnmodCollection<String>() {
+    // Fun Fact: unColl is part of where the "Uncle" part of UncleJim names comes from.
+    private static final UnmodCollection<String> unColl =
+            new UnmodCollection.AbstractUnmodCollection<String>() {
         @Override public UnmodIterator<String> iterator() {
             return new UnmodIterator<String>() {
                 int idx = 0;
@@ -52,6 +53,13 @@ public class UnmodCollectionTest {
             };
         }
         @Override public int size() { return sticksAndStones.length; }
+
+        @Override public boolean contains(Object o) {
+            for (Object item : this) {
+                if (Objects.equals(item, o)) { return true; }
+            }
+            return false;
+        }
     };
 
     @Test public void containsTest() {
