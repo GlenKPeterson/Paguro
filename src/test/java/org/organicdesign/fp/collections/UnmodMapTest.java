@@ -328,14 +328,12 @@ public class UnmodMapTest {
 
         Map<String,Integer> mm = new HashMap<>();
         mm.put("Hello", 3);
-        Map.Entry<String,Integer> entry = mm.entrySet().iterator().next();
-        System.out.println("helloHash: " + "Hello".hashCode());
-        System.out.println("entryHash: " + entry.hashCode());
-        System.out.println("tupHash: " + Tuple2.of("Hello", 3).hashCode());
-        System.out.println("entryClass: " + entry.getClass().getCanonicalName());
-        System.out.println("mm.entrySet() Class: " + mm.entrySet().getClass().getCanonicalName());
-
-
+//        Map.Entry<String,Integer> entry = mm.entrySet().iterator().next();
+//        System.out.println("helloHash: " + "Hello".hashCode());
+//        System.out.println("entryHash: " + entry.hashCode());
+//        System.out.println("tupHash: " + Tuple2.of("Hello", 3).hashCode());
+//        System.out.println("entryClass: " + entry.getClass().getCanonicalName());
+//        System.out.println("mm.entrySet() Class: " + mm.entrySet().getClass().getCanonicalName());
 
         assertEquals(me.getKey(), ue.getKey());
         assertEquals(me.getValue(), ue.getValue());
