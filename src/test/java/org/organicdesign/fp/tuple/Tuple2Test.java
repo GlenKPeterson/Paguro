@@ -18,9 +18,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.Assert.*;
+import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class Tuple2Test {
     @Rule
@@ -89,11 +91,24 @@ public class Tuple2Test {
         assertFalse(a.equals(d));
         assertFalse(b.equals(d));
         assertFalse(c.equals(d));
+        assertFalse(a.equals("Hello"));
+        assertFalse(b.equals(null));
+        assertFalse(c.equals(7));
         assertNotEquals(d.hashCode(), a.hashCode());
         assertNotEquals(d.hashCode(), b.hashCode());
         assertNotEquals(d.hashCode(), c.hashCode());
 
         assertEquals("Tuple2(hi,3)", Tuple2.of("hi", 3).toString());
+
+
+        Map<Integer,String> realMap = new HashMap<>();
+        realMap.put(7, "Hello");
+        Map.Entry<Integer,String> realEntry = realMap.entrySet().iterator().next();
+
+        equalsDistinctHashCode(a,
+                               Tuple2.of(7, "Hello"),
+                               realEntry,
+                               Tuple2.of(7, "hello"));
     }
 
     @SuppressWarnings("deprecation")

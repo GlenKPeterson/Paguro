@@ -368,9 +368,7 @@ public class TupleGenerator {
     public static void main(String... args) throws IOException {
         for (int i = 3; i <= 12; i++) {
             genTuple(i);
-            if (i > 3) {
-                genTupleTest(i);
-            }
+            genTupleTest(i);
         }
         return;
     }
