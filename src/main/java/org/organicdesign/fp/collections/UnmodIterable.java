@@ -10,7 +10,7 @@ import java.util.Iterator;
 
 /** An unmodifiable Iterable, without any guarantee about order. */
 public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
-    // ==================================================== Static ====================================================
+    // ========================================== Static ==========================================
 
     static UnmodIterable<Object> EMPTY = () -> UnmodIterator.empty();
 
@@ -18,11 +18,12 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
     static <E> UnmodIterable<E> emptyUnmodIterable() { return (UnmodIterable<E>) EMPTY; }
 
     //    /**
-//     Caution: this is a convenient optimization for immutable data structures and a nightmare waiting to happen to
-//     mutable ones.  Don't go slapping this on immutable wrappers for mutable data.  If all the underlying
-//     data is truly immutable, this allows you to compute the hashCode the first time it is needed, then return
-//     that same code without re-computing it again.  It's the internal version of a memoizer.  Also, use this only
-//     for decent sized collections.  If you only have 2 or 3 fields, this isn't buying you anything.
+// Caution: this is a convenient optimization for immutable data structures and a nightmare
+// waiting to happen to mutable ones.  Don't go slapping this on immutable wrappers for mutable
+// data.  If all the underlying data is truly immutable, this allows you to compute the hashCode
+// the first time it is needed, then return that same code without re-computing it again.  It's
+// the internal version of a memoizer.  Also, use this only for decent sized collections.  If you
+// only have 2 or 3 fields, this isn't buying you anything.
 //     */
 //    static Lazy.Int lazyHashCode(UnmodIterable iter) {
 //        if (iter == null) { throw new IllegalArgumentException("Can't have a null iterable."); }
@@ -30,10 +31,11 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
 //    }
 //
 //    /**
-//     Caution: this is a convenient optimization for immutable data structures and a nightmare waiting to happen to
-//     mutable ones.  Don't go slapping this on immutable wrappers for mutable data structures.  If all the underlying
-//     data is truly immutable, this allows you to compute a reasonable toString() the first time it is needed, then
-//     return that same String without re-computing it again.  It's the internal version of a memoizer.
+//     Caution: this is a convenient optimization for immutable data structures and a nightmare
+//     waiting to happen to mutable ones.  Don't go slapping this on immutable wrappers for mutable
+//     data structures.  If all the underlying data is truly immutable, this allows you to compute a
+//     reasonable toString() the first time it is needed, then return that same String without
+//     re-computing it again.  It's the internal version of a memoizer.
 //     */
 //    static LazyRef<String> lazyToString(String name, UnmodIterable iter) {
 //        if (name == null) { throw new IllegalArgumentException("Can't have a null name."); }
@@ -52,7 +54,8 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
 //    }
 //
 //    /** A default comparator for UnIterables comparable */
-//    static <F extends Comparable<F>,E extends UnmodIterable<F>> Comparator<E> iterableComparator() {
+//    static <F extends Comparable<F>,E extends UnmodIterable<F>> Comparator<E>
+//    iterableComparator() {
 //        return new Comparator<E>() {
 //            @Override
 //            public int compare(E o1, E o2) {
@@ -72,19 +75,20 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
 //                        return ret;
 //                    }
 //                }
-//                // If we run out of items in one, the longer one is considered greater, just like ordering words in a
-//                // dictionary.
+//                // If we run out of items in one, the longer one is considered greater, just like
+//                // ordering words in a dictionary.
 //                if (as.hasNext()) { return -1; }
 //                if (bs.hasNext()) { return 1; }
-//                // All items compare 0 and same number of items - these are sorted the same (and probably equal)
+//                // All items compare 0 and same number of items - these are sorted the same (and
+//                // probably equal)
 //                return 0;
 //            }
 //        };
 //    }
 
     /**
-     This is correct, but O(n).
-     It also works regardless of the order of the items because a + b = b + a, even when an overflow occurs.
+     This is correct, but O(n).  It also works regardless of the order of the items because
+     a + b = b + a, even when an overflow occurs.
      */
     static int hashCode(Iterable is) {
         if (is == null) { throw new IllegalArgumentException("Can't have a null iteratable."); }
@@ -102,7 +106,9 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
     /** Computes a reasonable to-string. */
     static String toString(String name, Iterable iterable) {
         if (name == null) { throw new IllegalArgumentException("Can't have a null name."); }
-        if (iterable == null) { throw new IllegalArgumentException("Can't have a null iteratable."); }
+        if (iterable == null) {
+            throw new IllegalArgumentException("Can't have a null iteratable.");
+        }
         StringBuilder sB = new StringBuilder();
         sB.append(name).append("(");
         int i = 0;
@@ -184,8 +190,8 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
 
     // TODO: This is for temporary Sequence backward-compatibility.  Remove once Sequence is deleted.
     /**
-     The first item in this sequence.  This was originally called first() but that conflicted with SortedSet.first()
-     which did not return an Option and threw an exception when the set was empty.
+     The first item in this sequence.  This was originally called first() but that conflicted with
+     SortedSet.first() which did not return an Option and threw an exception when the set was empty.
      */
     default Option<T> head() {
         Iterator<T> iter = iterator();
@@ -194,8 +200,9 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
     }
 
 //    /**
-//     The rest of this sequnce (all the items after its head).  This was originally called rest(), but when I renamed
-//     first() to head(), I renamed rest() to tail() so that it wouldn't mix metaphors.
+//     The rest of this sequnce (all the items after its head).  This was originally called rest(),
+//     but when I renamed first() to head(), I renamed rest() to tail() so that it wouldn't mix
+//     metaphors.
 //     */
 //    @Deprecated
 //    default Transformable<T> tail() {
