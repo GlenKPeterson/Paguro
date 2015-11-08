@@ -1,3 +1,23 @@
+**2015-11-07 0.10.19**: There are many changes in this point release, but unless you are writing your own collections by subclassing the Unmod interfaces, you probably won't notice.
+The main push at this point is near 100% test coverage before a 1.0 release.  NOTE: this has not been released to Maven Central yet.
+
+ - Made null hash to 0 instead of Integer.MIN_VALUE in Equator and ComparisonContext.
+ - Changed ComparisonContext helper method names from le to lte (for less-than-or-equal-to) and ge to gte.
+ - Allowed ImSortedMap.entrySet() to return and UnmodSortedSet instead of an ImSortedSet.  I may go back on this.
+ - Allowed ImSortedMap to inherit .values() from UnmodSortedSet.
+ - Added abstract classes to UnmodCollection and UnmodMap to implement .equals() and .hashCode() for easier, correct implementations of these interfaces -
+especially for implementing Map.keySet() and Map.entrySet().
+ - Removed default implementation of UnmodCollection.contains().
+ That's a critical component of a Collection and deserves to have subclasses implement it.
+ Especially because it is used in containsAll().
+ - Removed unSortIterEntToUnSortIterUnEnt() static method from UnmodMap.  That should be done with a cast, not with code.  Also, it was never used.
+ - Added implementations of entrySet(), keySet(), and values() in UnmodMap.  This was painful, but it makes subclassing a snap.
+ The implementations rely on AbstractUnmodSet and AbstractUnmodCollection for .equals() and .hashCode() implementations (see above).
+ - Regenerated tuples to bring test coverage to 100% for most of them.
+ - Removed .toArray() from Transformable.  I'm not promoting array use with UncleJim, only providing it for backwards compatibility.
+ I could bring it back for the right reason.
+ - Added tests, tests, tests.  CodeCov now reports 86%, IntelliJ 92% coverage.
+
 **2015-10-28 0.10.18**: Removed default implementation of UnmodSortedSet.tailSet() because correct implementation there was not possible.
 Fixed implementation of UnmodSortedSet.headSet() to be correct.
 Removed UnmodList.insert because it was O(n).
