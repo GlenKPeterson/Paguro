@@ -156,6 +156,7 @@ public class UnmodCollectionTest {
         assertTrue(UnmodCollection.empty().isEmpty());
         assertTrue(UnmodIterator.EMPTY == UnmodCollection.empty().iterator());
         assertFalse(unColl.isEmpty());
+        assertTrue(new TestColl<>(new Object[0]).isEmpty());
     }
 
     @SuppressWarnings("deprecation")
