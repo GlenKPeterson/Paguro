@@ -355,6 +355,8 @@ public class FunctionUtils {
             }
             @Override public V get(Object key) { return map.get(key); }
             @Override public UnmodSet<K> keySet() { return unmodSet(map.keySet()); }
+            @SuppressWarnings("deprecation")
+            @Deprecated
             @Override public UnmodCollection<V> values() { return unmodCollection(map.values()); }
             @Override public int hashCode() { return map.hashCode(); }
             @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.

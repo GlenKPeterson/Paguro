@@ -15,7 +15,6 @@ package org.organicdesign.fp.collections;
 
 import org.organicdesign.fp.tuple.Tuple2;
 
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
@@ -35,7 +34,10 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
         @Override public UnmodSortedMap<Object,Object> tailMap(Object fromKey) { return this; }
         @Override public Object firstKey() { throw new NoSuchElementException("empty map"); }
         @Override public Object lastKey() { throw new NoSuchElementException("empty map"); }
-        @Override public UnmodSortedCollection<Object> values() { return UnmodSortedSet.empty(); }
+        // I don't think I should need this suppression because it's not deprecated in
+        // UnmodSortedMap.  My IDE doesn't warn me, but Java 1.8.0_60 does.
+        @SuppressWarnings("deprecation")
+        @Override public UnmodList<Object> values() { return UnmodList.empty(); }
         @Override public int size() { return 0; }
         @Override public boolean isEmpty() { return true; }
         @Override public UnmodSortedIterator<UnEntry<Object,Object>> iterator() { return UnmodSortedIterator.empty(); }
@@ -266,53 +268,66 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
     /** {@inheritDoc} */
     @Override UnmodSortedMap<K,V> tailMap(K fromKey);
 
-    /** {@inheritDoc} */
-    @Override default UnmodSortedCollection<V> values() {
-        UnmodSortedMap<K,V> parentMap = this;
-        return new UnmodSortedCollection<V>() {
-            @Override public UnmodSortedIterator<V> iterator() {
-                return new UnmodSortedIterator<V>() {
-                    Iterator<UnEntry<K,V>> iter = parentMap.iterator();
-                    @Override public boolean hasNext() { return iter.hasNext(); }
-                    @Override public V next() { return iter.next().getValue(); }
-                };
-            }
-            @Override public int size() { return parentMap.size(); }
+    /**
+     This method is deprecated on UnmodMap because equals() and hashCode() cannot be implemented
+     on the resulting collection, but the guaranteed order of the result in a SortedMap makes this
+     able to return a List.  It's still an unnecessary convenience method and you should use
+     this map as an Iterable instead for consistency in dealing with all maps.
 
-            @SuppressWarnings("SuspiciousMethodCalls")
-            @Override public boolean contains(Object o) { return parentMap.containsValue(o); }
+     <pre><code>mySortedMap.map((UnEntry&lt;K,V&gt; entry) -> entry.getValue())
+             .toImList();</code></pre>
 
-            @Override public int hashCode() { return UnmodIterable.hashCode(this); }
-
-            @SuppressWarnings("unchecked")
-            @Override public boolean equals(Object o) {
-                if (this == o) { return true; }
-
-                // java.util.SortedMap.entrySet() returns just a Set, not a SortedSet, even though
-                // the order is guaranteed to be the same as the SortedMap it came from as
-                // guaranteed by the comparator (which seems more like a SortedSet, but no-one
-                // asked me).  So we have to accept a Set here for equals 'cause Java might
-                // hand us one.  All of this could have been avoided if SortedMap extended
-                // Collection<Map.Entry<K,V>> which is essentially an Iterable with a size().
-                if ( !(o instanceof Collection) ) { return false; }
-
-                // If you're using UncleJim, then you should have passed us a sortedSet.
-                if ( (o instanceof UnmodCollection) &&
-                     !(o instanceof UnmodSortedCollection) ) {
-                    return false;
-                }
-
-                Collection<V> that = (Collection<V>) o;
-                if (that.size() != this.size()) { return false; }
-
-                return UnmodSortedIterable.equals(this,
-                                                  UnmodSortedIterable.castFromCollection(that));
-            }
-            @Override public String toString() {
-                return UnmodIterable.toString("UnmodSortedMap.entrySet", this);
-            }
-
-        };
+     {@inheritDoc}
+     */
+    @SuppressWarnings("deprecation")
+    @Override default UnmodList<V> values() {
+        return map((UnEntry<K,V> entry) -> entry.getValue())
+                .toImList();
+//        UnmodSortedMap<K,V> parentMap = this;
+//        return new UnmodSortedCollection<V>() {
+//            @Override public UnmodSortedIterator<V> iterator() {
+//                return new UnmodSortedIterator<V>() {
+//                    Iterator<UnEntry<K,V>> iter = parentMap.iterator();
+//                    @Override public boolean hasNext() { return iter.hasNext(); }
+//                    @Override public V next() { return iter.next().getValue(); }
+//                };
+//            }
+//            @Override public int size() { return parentMap.size(); }
+//
+//            @SuppressWarnings("SuspiciousMethodCalls")
+//            @Override public boolean contains(Object o) { return parentMap.containsValue(o); }
+//
+//            @Override public int hashCode() { return UnmodIterable.hashCode(this); }
+//
+//            @SuppressWarnings("unchecked")
+//            @Override public boolean equals(Object o) {
+//                if (this == o) { return true; }
+//
+//                // java.util.SortedMap.entrySet() returns just a Set, not a SortedSet, even though
+//                // the order is guaranteed to be the same as the SortedMap it came from as
+//                // guaranteed by the comparator (which seems more like a SortedSet, but no-one
+//                // asked me).  So we have to accept a Set here for equals 'cause Java might
+//                // hand us one.  All of this could have been avoided if SortedMap extended
+//                // Collection<Map.Entry<K,V>> which is essentially an Iterable with a size().
+//                if ( !(o instanceof Collection) ) { return false; }
+//
+//                // If you're using UncleJim, then you should have passed us a sortedSet.
+//                if ( (o instanceof UnmodCollection) &&
+//                     !(o instanceof UnmodSortedCollection) ) {
+//                    return false;
+//                }
+//
+//                Collection<V> that = (Collection<V>) o;
+//                if (that.size() != this.size()) { return false; }
+//
+//                return UnmodSortedIterable.equals(this,
+//                                                  UnmodSortedIterable.castFromCollection(that));
+//            }
+//            @Override public String toString() {
+//                return UnmodIterable.toString("UnmodSortedMap.entrySet", this);
+//            }
+//
+//        };
     }
 
 // Methods inherited from interface java.util.Map

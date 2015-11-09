@@ -41,7 +41,7 @@ public interface ImMap<K,V> extends UnmodMap<K,V> {
         return entry.isSome() ? entry.get().getValue() : notFound;
     }
 
-    @Override default UnmodCollection<V> values() { return map(e -> e.getValue()).toImSet(); }
+//    @Override default UnmodCollection<V> values() { return map(e -> e.getValue()).toImSet(); }
 
 //    @Override default UnmodIterator<UnEntry<K,V>> iterator() { return seq().iterator(); }
 

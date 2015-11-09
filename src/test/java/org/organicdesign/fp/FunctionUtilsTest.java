@@ -634,6 +634,7 @@ public class FunctionUtilsTest {
         );
     }
 
+    @SuppressWarnings("deprecation")
     @Test public void unMapTest() {
         final UnmodMap<Integer,String> ts;
         Map<Integer,String> sm = new HashMap<>();

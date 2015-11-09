@@ -299,20 +299,38 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
 // int	size()
 
     /**
-     An UnmodMap is iterable, so this method is probably not nearly as useful as it once was.
-     Actually, this might deserve to be deprecated.
+     This method has been deprecated because it is impossible to implement equals() or hashCode()
+     on the resulting collection, and calling this method is probably at least a missed opportunity,
+     if not an outright error.  Use an UnmodMap as an UnmodIterable&lt;UnmodMap.UnEntry&gt; instead.
 
-     Definitely don't call .equals() or .hashCode() on what this returns.  It could have duplicates.
-     If the Map isn't sorted, it could have random ordering.  Collection just isn't specific enough
-     to instantiate, but we do it anyway here for backward compatibility.
+     If you don't care about eliminating duplicate values, and want a compatible return type call:
+     <pre><code>myMap.map((UnEntry&lt;K,V&gt; entry) -> entry.getValue())
+             .toImSet();</code></pre>
 
-     Returns a view of the values contained in this map.  java.util.HashMap returns an instance of
-     java.util.HashMap.Values() when you call this method which (Java 8) does *not* have equals()
-     or hashCode() defined.  So it only does referential equality and there is no way be equal to
-     that.
+     If you want to keep a count of duplicates, try something like this, but it has a different
+     signature:
+     <pre<code>ImMap&lt;V,Integer&gt; valueCounts = myMap.foldLeft(PersistentHashMap.empty(),
+                     (ImMap<V,Integer> accum, UnEntry<K,V> origEntry) -> {
+                             V inVal = origEntry.getValue();
+                             return accum.assoc(inVal,
+                                                accum.getOrElse(inVal, 0) + 1);
+                         });</code></pre>
+
+     You really shouldn't turn values() into a List, because a List has order and an unsorted Map
+     is unordered by key, and especially unordered by value.  On a SortedMap, List is the proper
+     return type.
+
+     java.util.HashMap.values() returns an instance of java.util.HashMap.Values which does *not*
+     have equals() or hashCode() defined.  This is because List.equals() and Set.equals() return
+     not-equal when compared to a Collection.  There is no good way to implement a reflexive
+     equals with both of those because they are just too different.  Ultimately, Collection just
+     isn't specific enough to instantiate, but we do it anyway here for backward compatibility.
+     We don't implement equals() or hashCode() either because the result could have duplicates.
+     If the Map isn't sorted, the result could have random ordering.
 
      {@inheritDoc}
      */
+    @Deprecated
     @Override default UnmodCollection<V> values() {
         final UnmodMap<K,V> parent = this;
         return new UnmodCollection<V>() {

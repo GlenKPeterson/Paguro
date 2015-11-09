@@ -605,6 +605,7 @@ public class PersistentHashMapTest {
 //        println("accum: " + accum);
     }
 
+    @SuppressWarnings("deprecation")
     @Test public void unorderedOps() {
         PersistentHashMap<String,Integer> m1 = PersistentHashMap.of(
                 vec(tup("c", 1),
@@ -621,8 +622,9 @@ public class PersistentHashMapTest {
 //        // System.out.println(m1.keySet().toString());
 
         // Values are an unsorted set as well...
-        assertEquals(new HashSet<>(Arrays.asList(3, 2, 1)),
-                     m1.values());
+        Set<Integer> values = new HashSet<>(Arrays.asList(3, 2, 1));
+        assertTrue(values.containsAll(m1.values()));
+        assertTrue(m1.values().containsAll(values));
 
         assertEquals(new HashSet<>(Arrays.asList("a", "b", "c")),
                      PersistentHashMap.of(vec(tup("a", 3),
@@ -786,6 +788,7 @@ public class PersistentHashMapTest {
         assertEquals(0, m.size());
     }
 
+    @SuppressWarnings("deprecation")
     @Test public void largerMap() {
         PersistentHashMap<Integer,String> m =
                 PersistentHashMap.of(vec(tup(1, "one")))
@@ -810,12 +813,14 @@ public class PersistentHashMapTest {
 
         assertEquals(new HashSet<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21)),
                      m.keySet());
-        assertEquals(new HashSet<>(Arrays.asList("one again", "two", "three", "four", "five", "six", "seven", "eight",
-                                                 "nine again", "ten again", "eleven again", "twelve", "thirteen",
-                                                 "fourteen",
-                                                 "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty again",
-                                                 "twenty one")),
-                     m.values());
+
+        HashSet<String> values = new HashSet<>(Arrays.asList("one again", "two", "three", "four", "five", "six", "seven", "eight",
+                                                         "nine again", "ten again", "eleven again", "twelve", "thirteen",
+                                                         "fourteen",
+                                                         "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty again",
+                                                         "twenty one"));
+        assertTrue(values.containsAll(m.values()));
+        assertTrue(m.values().containsAll(values));
     }
 
     @Test public void entrySet() {
@@ -831,6 +836,7 @@ public class PersistentHashMapTest {
         assertEquals(s, m.entrySet());
     }
 
+    @SuppressWarnings("deprecation")
     @Test public void values() {
         PersistentHashMap<Integer,String> m =
                 PersistentHashMap.of(vec(tup(4, "four")))
@@ -865,23 +871,27 @@ public class PersistentHashMapTest {
         // System.out.println("m.seq().map(e -> e.getValue()).toImSet(): " + m.seq().map(e -> e.getValue()).toImSet());
         // System.out.println("m.values(): " + m.values());
 
-        assertEquals(s, m.values());
+        assertTrue(s.containsAll(m.values()));
+        assertTrue(m.values().containsAll(s));
 
-        equalsDistinctHashCode(m.values(),
-                               PersistentHashMap.of(vec(tup(4, "four")))
-                                                .assoc(2, "two").assoc(5, "five").assoc(1, "one").assoc(3, "three").values(),
-                               s,
-                               new HashSet<>(Arrays.asList("four", "one", "zippy", "two", "three")));
+// values() takes its hashCode() and equals() implementations from java.lang.Object, so they are
+// both based on memory location instead of contents.
+//        equalsDistinctHashCode(m.values(),
+//                               PersistentHashMap.of(vec(tup(4, "four")))
+//                                                .assoc(2, "two").assoc(5, "five").assoc(1, "one").assoc(3, "three").values(),
+//                               s,
+//                               new HashSet<>(Arrays.asList("four", "one", "zippy", "two", "three")));
 
 //        assertTrue(m.values().equals(Arrays.asList("one", "two", "three", "four", "five")));
-        assertNotEquals(0, m.values().hashCode());
-        assertNotEquals(m.values().hashCode(), PersistentHashMap.of(vec(tup(4, "four")))
-                                                                .assoc(5, "five").hashCode());
-        assertEquals(m.values().hashCode(),
-                     PersistentHashMap.of(vec(tup(4, "four")))
-                                      .assoc(2, "two").assoc(5, "five").assoc(1, "one").assoc(3, "three")
-                                      .values()
-                                      .hashCode());
+
+//        assertNotEquals(0, m.values().hashCode());
+//        assertNotEquals(m.values().hashCode(), PersistentHashMap.of(vec(tup(4, "four")))
+//                                                                .assoc(5, "five").hashCode());
+//        assertEquals(m.values().hashCode(),
+//                     PersistentHashMap.of(vec(tup(4, "four")))
+//                                      .assoc(2, "two").assoc(5, "five").assoc(1, "one").assoc(3, "three")
+//                                      .values()
+//                                      .hashCode());
 
     }
 

@@ -58,6 +58,8 @@ Rich Hickey for Clojure
 - Then `mvn clean test` on UncleJim
 
 #To Do
+ - Rename foldLeft() to just fold().  It's too confusing for people used to linked list implementations
+ to think about what foldLeft() means in terms of ordering.
  - Add insert(int i, E element) to ImList, implemented by wrapping the existing list in an ImSortedMap and time it.
  - Cover a few more lines with tests in UnmodCollection and merge changes into NestingVector branch.
  - Can I make UnmodMap extend UnmodCollection instead of UnmodIterable?  Or do the contains() and contains() all methods conflict?

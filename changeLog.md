@@ -1,7 +1,9 @@
 **2015-11-07 0.10.19**: There are many changes in this point release, but unless you are writing your own collections by subclassing the Unmod interfaces, you probably won't notice.
 The main push at this point is near 100% test coverage before a 1.0 release.  NOTE: this has not been released to Maven Central yet.
 
- - Deprecated List.contains().  See note there.
+ - Deprecated UnmodList.contains().  See note there.  Maybe should have deprecated UnmodCollection.contains() instead?  This still functions the way java.util.List.contains() does, it's just an error to use it.
+ - Deprecated UnmodMap.values().  See note there.  Removed all tests for equality on resulting collection.  This still functions the way java.util.Map.values() does, it's just an error to use it.
+ Note: UnmodSortedMap.values() is *not* deprecated and now returns an UnmodList, which is appropriate and can be compared for equality.
  - Made null hash to 0 instead of Integer.MIN_VALUE in Equator and ComparisonContext.
  - Changed ComparisonContext helper method names from le to lte (for less-than-or-equal-to) and ge to gte.
  - Allowed ImSortedMap.entrySet() to return and UnmodSortedSet instead of an ImSortedSet.  I may go back on this.

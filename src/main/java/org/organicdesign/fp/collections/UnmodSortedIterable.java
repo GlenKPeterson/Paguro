@@ -1,6 +1,5 @@
 package org.organicdesign.fp.collections;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -64,21 +63,21 @@ public interface UnmodSortedIterable<T> extends UnmodIterable<T> {
         };
     }
 
-    static <U> UnmodSortedIterable<U> castFromTypedList(List<U> ss) {
-        return () -> new UnmodSortedIterator<U>() {
-            Iterator<U> iter = ss.iterator();
-            @Override public boolean hasNext() { return iter.hasNext(); }
-            @Override public U next() { return iter.next(); }
-        };
-    }
-
-    static <U> UnmodSortedIterable<U> castFromCollection(Collection<U> ss) {
-        return () -> new UnmodSortedIterator<U>() {
-            Iterator<U> iter = ss.iterator();
-            @Override public boolean hasNext() { return iter.hasNext(); }
-            @Override public U next() { return iter.next(); }
-        };
-    }
+//    static <U> UnmodSortedIterable<U> castFromTypedList(List<U> ss) {
+//        return () -> new UnmodSortedIterator<U>() {
+//            Iterator<U> iter = ss.iterator();
+//            @Override public boolean hasNext() { return iter.hasNext(); }
+//            @Override public U next() { return iter.next(); }
+//        };
+//    }
+//
+//    static <U> UnmodSortedIterable<U> castFromCollection(Collection<U> ss) {
+//        return () -> new UnmodSortedIterator<U>() {
+//            Iterator<U> iter = ss.iterator();
+//            @Override public boolean hasNext() { return iter.hasNext(); }
+//            @Override public U next() { return iter.next(); }
+//        };
+//    }
 
 //    static <K,V> UnmodSortedIterable<Map.Entry<K,V>> castFromSortedMap(SortedMap<K,V> sm) {
 //        return () -> new UnmodSortedIterator<Map.Entry<K,V>>() {

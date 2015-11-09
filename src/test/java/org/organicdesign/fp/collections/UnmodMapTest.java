@@ -110,6 +110,7 @@ public class UnmodMapTest {
 //    }
 
 
+    @SuppressWarnings("deprecation")
     @Test public void emptyTest() {
         assertEquals(0, UnmodMap.empty().entrySet().size());
         assertTrue(UnmodSet.EMPTY == UnmodMap.empty().keySet());
@@ -131,8 +132,8 @@ public class UnmodMapTest {
             new UnmodMapTest.TestEntry<>("clementine", 1);
     final static UnmodMapTest.TestEntry<String,Integer> junkKey =
             new UnmodMapTest.TestEntry<>("junk", -2);
-    final static UnmodMapTest.TestEntry<String,Integer> pastLast =
-            new UnmodMapTest.TestEntry<>("zzzLast", Integer.MIN_VALUE);
+//    final static UnmodMapTest.TestEntry<String,Integer> pastLast =
+//            new UnmodMapTest.TestEntry<>("zzzLast", Integer.MIN_VALUE);
 
     final static Map<String,Integer> refMap = new HashMap<>();
     static {
@@ -199,6 +200,7 @@ public class UnmodMapTest {
         assertTrue(testKeySet.toString().startsWith("UnmodMap.keySet"));
     }
 
+    @SuppressWarnings("deprecation")
     @Test public void valuesTest() {
         Collection<Integer> refValues = refMap.values();
         Collection<Integer> testValues = testMap.values();

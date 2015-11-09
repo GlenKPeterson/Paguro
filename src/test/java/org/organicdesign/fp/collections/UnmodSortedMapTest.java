@@ -469,10 +469,10 @@ public class UnmodSortedMapTest {
                                sortedSet(defaultComparator(),
                                          vec(avoKey.getValue(), banKey.getValue(), junkKey.getValue())));
 
-        equalsDistinctHashCode(testValColl,
-                               testMap.values(),
-                               testMap.values(),
-                               set(vec(avoKey.getValue(), banKey.getValue(), clemKey.getValue())));
+//        equalsSameHashCode(testValColl,
+//                               testMap.values(),
+//                               testMap.values(),
+//                               vec(avoKey.getValue(), clemKey.getValue(), banKey.getValue()));
 
     }
 
@@ -482,7 +482,7 @@ public class UnmodSortedMapTest {
         assertNull(UnmodSortedMap.empty().comparator());
         assertEquals(UnmodSortedMap.empty(), UnmodSortedMap.empty().subMap(null, null));
         assertEquals(UnmodSortedMap.empty(), UnmodSortedMap.empty().tailMap(null));
-        assertEquals(UnmodSortedSet.empty(), UnmodSortedMap.empty().values());
+        assertEquals(UnmodList.empty(), UnmodSortedMap.empty().values());
         assertEquals(0, UnmodSortedMap.empty().size());
         assertTrue(UnmodSortedMap.empty().isEmpty());
         assertEquals(UnmodSortedIterator.empty(), UnmodSortedMap.empty().iterator());

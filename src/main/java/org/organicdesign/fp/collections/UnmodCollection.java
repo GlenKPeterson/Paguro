@@ -129,10 +129,9 @@ public interface UnmodCollection<E> extends Collection<E>, UnmodIterable<E> {
 //    }
 
     /**
-     The default implementation of this method has O(this.size() + that.size()) performance.
+     The default implementation of this method has O(this.size() + that.size()) or O(n) performance.
      So even though contains() is impossible to implement efficiently for Lists, containsAll()
-     has a decent implementation (brute force would be O(this.size() * that.size())).  That's times
-     as opposed to plus.
+     has a decent implementation (brute force would be O(this.size() * that.size()) or O(n^2) ).
 
      {@inheritDoc}
      */
@@ -147,6 +146,9 @@ public interface UnmodCollection<E> extends Collection<E>, UnmodIterable<E> {
                 new HashSet<>(this).containsAll(c);
     }
 
+    // You can't implement equals correctly for a Collection due to duplicates, ordering, and
+    // the fact that List.equals(other) and Set.equals(other) both return false when other is
+    // not an instance of List or Set.  This interface just isn't meant to be instantiated.
 //boolean	equals(Object o)
 //int	hashCode()
 
