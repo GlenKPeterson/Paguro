@@ -89,6 +89,7 @@ public class UnmodListTest {
         @Override public String get(int index) { return sticksAndStones[index]; }
     };
 
+    @SuppressWarnings("deprecation")
     @Test public void containsTest() {
         for (String s : sticksAndStones) {
             assertTrue(unList.contains(s));

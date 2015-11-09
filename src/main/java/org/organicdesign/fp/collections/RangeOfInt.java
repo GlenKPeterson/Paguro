@@ -29,6 +29,7 @@ import java.util.List;
  item and a size.  To do that, Integer would need to implement something that defined what the
  next() and previous() values.  Currently limited to Integer.MIN_VALUE to Integer.MAX_VALUE.
  */
+// Note: In theory, this could implement both List<Integer> and Set<Integer>
 public class RangeOfInt implements UnmodList<Integer> {
 
     public static final Equator<List<Integer>> LIST_EQUATOR = new Equator<List<Integer>>() {
@@ -126,6 +127,7 @@ public class RangeOfInt implements UnmodList<Integer> {
      String.
      @throws NumberFormatException if a String argument cannot be parsed using Integer.valueOf().
      */
+    @SuppressWarnings("deprecation")
     @Override public boolean contains(Object o) {
         // Only accept classes where we can convert to an integer while preventing
         // overflow/underflow.  If there were a way to reliably test for overflow/underflow in

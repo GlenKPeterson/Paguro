@@ -16,51 +16,47 @@ package org.organicdesign.fp.collections;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
 public class UnmodCollectionTest {
+
+    static class TestColl<T> implements UnmodCollection<T> {
+        HashSet<T> items;
+//        TestColl(Collection<T> is) { items = new HashSet<>(is); }
+        TestColl(T[] is) { items = new HashSet<>(Arrays.asList(is)); }
+
+        @Override public int size() { return items.size(); }
+
+        @Override public boolean contains(Object o) {
+            for (Object item : items) {
+                if (Objects.equals(item, o)) { return true; }
+            }
+            return false;
+        }
+
+        @Override public UnmodIterator<T> iterator() {
+            Iterator<T> iter = items.iterator();
+            return new UnmodIterator<T>() {
+                @Override public boolean hasNext() { return iter.hasNext(); }
+                @Override public T next() { return iter.next(); }
+            };
+        }
+    }
+
     private static final String[] sticksAndStones = new String[] {
             "Sticks", "and", "stones", "will", "break", "my", "bones", "but", "tests",
             "will", "never", "hurt", "me." };
 
     // Fun Fact: unColl is part of where the "Uncle" part of UncleJim names comes from.
-    private static final UnmodCollection<String> unColl =
-            new UnmodCollection.AbstractUnmodCollection<String>() {
-        @Override public UnmodIterator<String> iterator() {
-            return new UnmodIterator<String>() {
-                int idx = 0;
-                @Override public boolean hasNext() { return idx < sticksAndStones.length; }
-
-                @Override public String next() {
-                    // I think this temporary variable i gets compiled to a register access
-                    // Load memory value from idx to register.  This is the index we will use against
-                    // our internal data.
-                    int i = idx;
-                    // Throw based on value in register
-                    if (i >= size()) { throw new NoSuchElementException(); }
-                    // Store incremented register value back to memory.  Note that this is the
-                    // next index value we will access.
-                    idx = i + 1;
-                    // call get() using the old value of idx (before our increment).
-                    // i should still be in the register, not in memory.
-                    return sticksAndStones[i];
-                }
-            };
-        }
-        @Override public int size() { return sticksAndStones.length; }
-
-        @Override public boolean contains(Object o) {
-            for (Object item : this) {
-                if (Objects.equals(item, o)) { return true; }
-            }
-            return false;
-        }
-    };
+    private static final UnmodCollection<String> unColl = new TestColl<>(sticksAndStones);
 
     @Test public void containsTest() {
         for (String s : sticksAndStones) {
@@ -68,6 +64,10 @@ public class UnmodCollectionTest {
         }
         assertFalse(unColl.contains("phrog"));
     }
+
+    static String[] sticksMay = new String[] {"Sticks", "and", "stones", "MAY",
+                                              "break", "my", "bones", "but", "tests",
+                                              "will", "never", "hurt", "me."};
 
     @Test public void containsAllTest() {
         List<String> ls = Arrays.asList(sticksAndStones);
@@ -84,13 +84,65 @@ public class UnmodCollectionTest {
                                          "maybe");
         assertTrue(ls3.containsAll(unColl));
         assertFalse(unColl.containsAll(ls3));
+
+        assertFalse(unColl.containsAll(Arrays.asList(sticksMay)));
+
+        // OK, this was eye-opening.  The sticksMay list contains all the elements of the
+        // sticksAndStones list, plus the additional element "MAY" - and the lists are the same
+        // size.  How? Because "will" occurs twice.  The ultimate issue here is that equality
+        // for lists and sets is not the same.  Lists are ordered and have duplicates.
+        // sets have no duplicates and may or may not be ordered.
+        assertTrue(Arrays.asList(sticksMay).containsAll(unColl));
+
+        assertTrue(unColl.containsAll(null));
+        assertTrue(unColl.containsAll(UnmodCollection.empty()));
+        assertFalse(UnmodCollection.empty().containsAll(unColl));
+    }
+
+    // I don't think equals() can be implemented on a Collection.  It's the return type for
+    // Map.values() which can have duplicates and may be ordered, or unordered.
+//    @Test public void equalityTest() {
+//        assertTrue(unColl.contains("will"));
+//        assertFalse(unColl.contains("MAY"));
+//
+//        // Unequal due to distinct elements.
+//        equalsDistinctHashCode(unColl,
+//                               new TestColl<>(sticksAndStones),
+//                               new TestColl<>(sticksAndStones),
+//                               new TestColl<>(new String[] {"Sticks", "and", "stones", "MAY",
+//                                                            "break", "my", "bones", "but", "tests",
+//                                                            "will", "never", "hurt", "me."}));
+//
+//        // Unequal due to size (missing last element)
+//        equalsDistinctHashCode(unColl,
+//                               new TestColl<>(sticksAndStones),
+//                               new TestColl<>(sticksAndStones),
+//                               new TestColl<>(new String[] {"Sticks", "and", "stones", "will",
+//                                                            "break", "my", "bones", "but", "tests",
+//                                                            "will", "never", "hurt"}));
+//    }
+
+    static <T> void assertSetEqualsOnArrays(T[] as, T[] bs) {
+        Set<T> aSet = new HashSet<>(Arrays.asList(as));
+        Set<T> bSet = new HashSet<>(Arrays.asList(bs));
+        assertTrue("set a.size() == b.size()", aSet.size() == bSet.size());
+        assertTrue("set a.containsAll(b)", aSet.containsAll(bSet));
+        assertTrue("set b.containsAll(a)", bSet.containsAll(aSet));
+        assertTrue("set a.equals(b)", aSet.equals(bSet));
+        assertTrue("set b.equals(a)", bSet.equals(aSet));
     }
 
     @Test public void toArrayTest() {
-        assertArrayEquals(sticksAndStones, unColl.toArray());
-        assertArrayEquals(sticksAndStones, unColl.toArray(new String[3]));
-        assertArrayEquals(sticksAndStones, unColl.toArray(new String[sticksAndStones.length]));
-        String [] result = unColl.toArray(new String[sticksAndStones.length + 3]);
+        assertSetEqualsOnArrays(sticksAndStones, unColl.toArray());
+        assertSetEqualsOnArrays(sticksAndStones, unColl.toArray(new String[3]));
+        assertSetEqualsOnArrays(sticksAndStones,
+                                unColl.toArray(new String[unColl.size()]));
+        String[] result = unColl.toArray(new String[sticksAndStones.length + 3]);
+        List<String> temp = new ArrayList<>(Arrays.asList(sticksAndStones));
+        temp.add(null);
+
+        String[] stonesAndNull = temp.toArray(new String[temp.size()]);
+        assertSetEqualsOnArrays(stonesAndNull, result);
         assertEquals(sticksAndStones.length + 3, result.length);
         assertEquals(null, result[result.length - 3]);
         assertEquals(null, result[result.length - 2]);

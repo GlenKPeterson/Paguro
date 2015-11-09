@@ -218,13 +218,15 @@ public class UnmodMapTest {
 
         UnmodListTest.iteratorTest(refValues.iterator(), testValues.iterator());
 
-        System.out.println("uneqMap.values(): " + uneqMap.values());
-        System.out.println("uneqMap.values() class: " + uneqMap.values().getClass().getCanonicalName());
+//        System.out.println("uneqMap.values(): " + uneqMap.values());
+//        System.out.println("uneqMap.values() class: " + uneqMap.values().getClass().getCanonicalName());
 
         // java.util.HashMap.Values does not implement equals() or hashCode() and therefore
-        // inherites them from java.lang.Object, which only does referential equality.
+        // inherits them from java.lang.Object, which only does referential equality.
         // As a result, there is no way to be equal to the resulting collection.
-        equalsDistinctHashCode(testValues, testMap.values(), testMap.values(), uneqMap.values());
+        // Hmm...  I don't think equals() can be implemented the return type for Map.values() which
+        // can have duplicates and may be ordered, or unordered.
+//        equalsDistinctHashCode(testValues, testMap.values(), testMap.values(), uneqMap.values());
 
         assertTrue(testValues.toString().startsWith("UnmodMap.values"));
     }

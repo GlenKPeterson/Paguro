@@ -299,19 +299,23 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
 // int	size()
 
     /**
+     An UnmodMap is iterable, so this method is probably not nearly as useful as it once was.
+     Actually, this might deserve to be deprecated.
+
+     Definitely don't call .equals() or .hashCode() on what this returns.  It could have duplicates.
+     If the Map isn't sorted, it could have random ordering.  Collection just isn't specific enough
+     to instantiate, but we do it anyway here for backward compatibility.
+
      Returns a view of the values contained in this map.  java.util.HashMap returns an instance of
      java.util.HashMap.Values() when you call this method which (Java 8) does *not* have equals()
-     or hashCode() defined.  So it only does referential equality and there is no way to implement
-     equality with that.
-
-     An UnmodMap is iterable, so this method
-     is probably not nearly as useful as it once was.
+     or hashCode() defined.  So it only does referential equality and there is no way be equal to
+     that.
 
      {@inheritDoc}
      */
     @Override default UnmodCollection<V> values() {
         final UnmodMap<K,V> parent = this;
-        return new UnmodCollection.AbstractUnmodCollection<V>() {
+        return new UnmodCollection<V>() {
             @SuppressWarnings("SuspiciousMethodCalls")
             @Override public boolean contains(Object o) { return parent.containsValue(o); }
             @Override public UnmodIterator<V> iterator() {

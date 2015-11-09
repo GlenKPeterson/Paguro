@@ -20,11 +20,20 @@ import java.util.Iterator;
 import java.util.function.Predicate;
 
 /**
- * A collection is an {@link java.lang.Iterable} with a size (a size() method).  UnmodCollection is
- * an unmodifiable version of {@link java.util.Collection} which formalizes the return type of
- * Collections.unmodifiableCollection()
- *
- * {@inheritDoc}
+ Don't implement this interface directly if you don't have to. A collection is an
+ {@link java.lang.Iterable} with a size (a size() method) and unfortunately a contains() method
+ (deprecated on Lists).
+
+ Collection defines the return of Map.values() which can have duplicates and may be ordered, or
+ unordered.  For this reason, I don't think it's possible to define an equals() method on Collection
+ that works in all circumstances (when comparing it to a List, a Set, or another amorphous
+ Collection).  I don't think Map.values() would exist if Generics had existed and Map had
+ implemented Iterable&lt;Entry&gt; from the beginning.
+
+ UnmodCollection is an unmodifiable version of {@link java.util.Collection}
+ which formalizes the return type of Collections.unmodifiableCollection() and Map.values().
+
+ {@inheritDoc}
  */
 public interface UnmodCollection<E> extends Collection<E>, UnmodIterable<E> {
 
@@ -38,21 +47,55 @@ public interface UnmodCollection<E> extends Collection<E>, UnmodIterable<E> {
     @SuppressWarnings("unchecked")
     static <T> UnmodCollection<T> empty() { return (UnmodCollection<T>) EMPTY; }
 
-    /**
-     Implements equals and hashCode() methods to make defining unmod sets easier, especially for
-     implementing Map.keySet() and such.
-     */
-    abstract class AbstractUnmodCollection<T> implements UnmodCollection<T> {
-        @Override public boolean equals(Object other) {
-            if (this == other) { return true; }
-            if ( !(other instanceof Collection) ) { return false; }
-            Collection that = (Collection) other;
-            return (size() == that.size()) &&
-                   containsAll(that);
-        }
-
-        @Override public int hashCode() { return UnmodIterable.hashCode(this); }
-    }
+//    /**
+//     Don't use this.  There may not be any way to implement equals() meaningfully on a Collection
+//     because the definition of Collection is too broad.
+//
+//     Implements equals and hashCode() methods to make defining unmod sets easier, especially for
+//     implementing Map.values() and such.
+//     */
+//    abstract class AbstractUnmodCollection<T> implements UnmodCollection<T> {
+//        @SuppressWarnings("unchecked")
+//        @Override public boolean equals(Object other) {
+//            if (this == other) { return true; }
+//            if ( !(other instanceof Collection) ) { return false; }
+//            Collection that = (Collection) other;
+//            if (size() != that.size()) { return false; }
+//
+//            // A set may contain all the elements of a list, plus additional elements, and have the
+//            // same size as a list that contains duplicates.  Equality for lists and
+//            // sets is not the same.  Lists are ordered and have duplicates. Sets have no duplicates
+//            // and may or may not be ordered.
+//            //
+//            // The only place that a Collection is returned and needs to live with an equals method
+//            // is on Map.values().  It can contain duplicates, so it's not a set.  It can be ordered
+//            // (as in SortedMap.values()) which could equal a List, or unordered (just Map.values())
+//            // which can't be a Set because it needs to contain duplicates.  Ugh, that one method
+//            // is an abomination and should not exist.  If only Map had implemented Iterable<Entry>
+//            // none of this would have been necessary.
+//            //
+//            // In order to have reflexive equals, check first for legitimate child interfaces
+//            // and let the other object compare itself to this one.  I don't like the idea of
+//            // saying, "Are we equal?  I don't know.  What do you think?" because another class
+//            // could do the same thing and go into an infinite call loop (trampoline loop?).
+//            // So even though this is maybe unordered, we'll compare the random ordering to the
+//            // list.
+//            //
+//            // Hmm... Maybe there is no java.util.AbstractCollection because there is no sensible
+//            // way to implement it.  Ditto why java.util.Map.values() doesn't implement equals() or
+//            // hashCode().
+//
+//            // I can't imagine why containsAll would ever call equals on the parent collection,
+//            // so this should be safe from infinite call loops.
+//
+//            // Doing containsAll() both ways should ensure that duplicates are checked properly
+//            // without checking order, but it's going to likely be a little slow.  You want fast?
+//            // Implement List or Set instead!
+//            return containsAll(that) && that.containsAll(this);
+//        }
+//
+//        @Override public int hashCode() { return UnmodIterable.hashCode(this); }
+//    }
     // ========================================= Instance =========================================
     // Methods are listed in the same order as the javadocs.
 
@@ -87,6 +130,9 @@ public interface UnmodCollection<E> extends Collection<E>, UnmodIterable<E> {
 
     /**
      The default implementation of this method has O(this.size() + that.size()) performance.
+     So even though contains() is impossible to implement efficiently for Lists, containsAll()
+     has a decent implementation (brute force would be O(this.size() * that.size())).  That's times
+     as opposed to plus.
 
      {@inheritDoc}
      */
