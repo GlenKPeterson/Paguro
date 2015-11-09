@@ -54,23 +54,24 @@ public class UnmodIterableTest {
                                                accum.add(str + "z");
                                                return accum;
                                            },
-                                           (list) -> list.size() > 1));
+                                           (List<String> list) -> list.size() > 1));
 
         assertEquals(Arrays.asList("How", "now", "cow"),
-                     testIterable.filter(s -> s.endsWith("w")).toMutableList());
+                     testIterable.filter((String s) -> s.endsWith("w")).toMutableList());
 
         assertEquals(Arrays.asList("How", "are", "you", "now", "are", "you", "brown", "are", "you",
                                    "cow", "are", "you"),
-                     testIterable.flatMap(s -> Arrays.asList(s, "are", "you")).toMutableList());
+                     testIterable.flatMap((String s) ->
+                                                  Arrays.asList(s, "are", "you")).toMutableList());
 
         assertEquals(Arrays.asList(3, 3, 5, 3),
-                     testIterable.map(s -> s.length()).toMutableList());
+                     testIterable.map((String s) -> s.length()).toMutableList());
 
         assertEquals(Arrays.asList("How", "now", "brown"),
                      testIterable.take(3).toMutableList());
 
         assertEquals(Arrays.asList("How", "now"),
-                     testIterable.takeWhile(s -> s.length() < 4).toMutableList());
+                     testIterable.takeWhile((String s) -> s.length() < 4).toMutableList());
     }
 
     @Test public void emptyTest() {
