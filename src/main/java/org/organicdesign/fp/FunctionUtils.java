@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -364,11 +365,33 @@ public class FunctionUtils {
         };
     }
 
+    static UnmodSortedMap<Object,Object> EMPTY_SORTED_MAP = new UnmodSortedMap<Object,Object>() {
+        @Override public UnmodSortedSet<Entry<Object,Object>> entrySet() { return UnmodSortedSet.empty(); }
+        @Override public UnmodSortedSet<Object> keySet() { return UnmodSortedSet.empty(); }
+        @Override public Comparator<? super Object> comparator() { return null; }
+        @Override public UnmodSortedMap<Object,Object> subMap(Object fromKey, Object toKey) { return this; }
+        @Override public UnmodSortedMap<Object,Object> tailMap(Object fromKey) { return this; }
+        @Override public Object firstKey() { throw new NoSuchElementException("empty map"); }
+        @Override public Object lastKey() { throw new NoSuchElementException("empty map"); }
+        // I don't think I should need this suppression because it's not deprecated in
+        // UnmodSortedMap.  My IDE doesn't warn me, but Java 1.8.0_60 does.
+        @SuppressWarnings("deprecation")
+        @Override public UnmodList<Object> values() { return UnmodList.empty(); }
+        @Override public int size() { return 0; }
+        @Override public boolean isEmpty() { return true; }
+        @Override public UnmodSortedIterator<UnEntry<Object,Object>> iterator() { return UnmodSortedIterator.empty(); }
+        @Override public boolean containsKey(Object key) { return false; }
+        @Override public boolean containsValue(Object value) { return false; }
+        @Override public Object get(Object key) { return null; }
+    };
+    @SuppressWarnings("unchecked")
+    static <T,U> UnmodSortedMap<T,U> emptyUnmodSortedMap() { return (UnmodSortedMap<T,U>) EMPTY_SORTED_MAP; }
+
     /** Returns an unmodifiable version of the given sorted map. */
     public static <K,V> UnmodSortedMap<K,V> unmodSortedMap(SortedMap<K,V> map) {
-        if (map == null) { return UnmodSortedMap.empty(); }
+        if (map == null) { return emptyUnmodSortedMap(); }
         if (map instanceof UnmodSortedMap) { return (UnmodSortedMap<K,V>) map; }
-        if (map.size() < 1) { return UnmodSortedMap.empty(); }
+        if (map.size() < 1) { return emptyUnmodSortedMap(); }
         return new UnmodSortedMap<K,V>() {
 //            // TODO: Test this.
 //            @Override public UnmodSortedSet<Entry<K,V>> entrySet() {

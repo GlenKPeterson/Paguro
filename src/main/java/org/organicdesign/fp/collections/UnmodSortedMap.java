@@ -18,35 +18,11 @@ import org.organicdesign.fp.tuple.Tuple2;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.SortedMap;
 
 /** An unmodifiable SortedMap. */
 public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, UnmodSortedIterable<UnmodMap.UnEntry<K,V>> {
-
-    // ==================================================== Static ====================================================
-    UnmodSortedMap<Object,Object> EMPTY = new UnmodSortedMap<Object,Object>() {
-        @Override public UnmodSortedSet<Entry<Object,Object>> entrySet() { return UnmodSortedSet.empty(); }
-        @Override public UnmodSortedSet<Object> keySet() { return UnmodSortedSet.empty(); }
-        @Override public Comparator<? super Object> comparator() { return null; }
-        @Override public UnmodSortedMap<Object,Object> subMap(Object fromKey, Object toKey) { return this; }
-        @Override public UnmodSortedMap<Object,Object> tailMap(Object fromKey) { return this; }
-        @Override public Object firstKey() { throw new NoSuchElementException("empty map"); }
-        @Override public Object lastKey() { throw new NoSuchElementException("empty map"); }
-        // I don't think I should need this suppression because it's not deprecated in
-        // UnmodSortedMap.  My IDE doesn't warn me, but Java 1.8.0_60 does.
-        @SuppressWarnings("deprecation")
-        @Override public UnmodList<Object> values() { return UnmodList.empty(); }
-        @Override public int size() { return 0; }
-        @Override public boolean isEmpty() { return true; }
-        @Override public UnmodSortedIterator<UnEntry<Object,Object>> iterator() { return UnmodSortedIterator.empty(); }
-        @Override public boolean containsKey(Object key) { return false; }
-        @Override public boolean containsValue(Object value) { return false; }
-        @Override public Object get(Object key) { return null; }
-    };
-    @SuppressWarnings("unchecked")
-    static <T,U> UnmodSortedMap<T,U> empty() { return (UnmodSortedMap<T,U>) EMPTY; }
 
     // ========================================= Instance =========================================
 
@@ -86,6 +62,12 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
                     return (a, b) -> Equator.ComparisonContext.DEFAULT_COMPARATOR
                                                         .compare((Comparable) a.getKey(),
                                                                  (Comparable) b.getKey());
+                    // This may be more flexible, but from what I can tell, nothing else in the
+                    // chain is this flexible and it's just going to be unused code that can't be
+                    // tested.  For an unsorted Map, this may be appropriate.
+//                    .compare((a == null) ? null : (Comparable) a.getKey(),
+//                             (b == null) ? null : (Comparable) b.getKey());
+
                 }
                 return (o1, o2) -> parentMap.comparator().compare(o1.getKey(), o2.getKey());
             }
@@ -138,13 +120,17 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
                 // compatibility.  If you want a better equals test, use an Equator.
                 // TODO: Test vs. TreeMap!
 
-                try {
+//                try {
                     return containsAll(that);
-                } catch (ClassCastException ignore)   {
-                    return false;
-                } catch (NullPointerException ignore) {
-                    return false;
-                }
+
+                // I was unable to write a test for this.  With an unsorted map, sure,
+                // but you can't put an un-castable class or a null into a sorted map.
+                // When we can write a test to prove this code is used, we'll bring it back.
+//                } catch (ClassCastException ignore)   {
+//                    return false;
+//                } catch (NullPointerException ignore) {
+//                    return false;
+//                }
             }
 
             @Override public String toString() {

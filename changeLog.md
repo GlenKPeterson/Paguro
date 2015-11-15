@@ -7,6 +7,7 @@ The main push at this point is near 100% test coverage before a 1.0 release.  NO
  - Made null hash to 0 instead of Integer.MIN_VALUE in Equator and ComparisonContext.
  - Made StaticImports final - if someone gave me a good reason to subclass it, I would make it non-final.
  - Made PersistentVector.EMPTY public
+ - Moved UnmodSortedMap.EMPTY and .empty() to FunctionUtils.EMPTY_SORTED_MAP and .emptyUnmodSortedMap().
  - Changed ComparisonContext helper method names from le to lte (for less-than-or-equal-to) and ge to gte.
  - Allowed ImSortedMap.entrySet() to return and UnmodSortedSet instead of an ImSortedSet.  I may go back on this.
  - Allowed ImSortedMap to inherit .values() from UnmodSortedSet.

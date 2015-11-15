@@ -18,9 +18,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.organicdesign.fp.collections.UnmodCollection;
+import org.organicdesign.fp.collections.UnmodList;
 import org.organicdesign.fp.collections.UnmodListIterator;
 import org.organicdesign.fp.collections.UnmodMap;
 import org.organicdesign.fp.collections.UnmodSet;
+import org.organicdesign.fp.collections.UnmodSortedIterator;
 import org.organicdesign.fp.collections.UnmodSortedMap;
 import org.organicdesign.fp.collections.UnmodSortedSet;
 
@@ -33,12 +35,14 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.*;
+import static org.organicdesign.fp.FunctionUtils.emptyUnmodSortedMap;
 import static org.organicdesign.fp.FunctionUtils.ordinal;
 import static org.organicdesign.fp.FunctionUtils.unmodCollection;
 import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
@@ -814,6 +818,27 @@ public class FunctionUtilsTest {
 //        // These will have the same hashcodes, but different comparators.
 //        equalsHashCode(ts, m2, sm, m4);
     }
+
+    @Test public void testEmptyUnmodSortedMap() {
+        Assert.assertEquals(UnmodSortedSet.<Map.Entry>empty(), emptyUnmodSortedMap().entrySet());
+        Assert.assertEquals(UnmodSortedSet.<Map.Entry>empty(), emptyUnmodSortedMap().keySet());
+        assertNull(emptyUnmodSortedMap().comparator());
+        assertEquals(emptyUnmodSortedMap(), emptyUnmodSortedMap().subMap(null, null));
+        assertEquals(emptyUnmodSortedMap(), emptyUnmodSortedMap().tailMap(null));
+        Assert.assertEquals(UnmodList.empty(), emptyUnmodSortedMap().values());
+        Assert.assertEquals(0, emptyUnmodSortedMap().size());
+        assertTrue(emptyUnmodSortedMap().isEmpty());
+        Assert.assertEquals(UnmodSortedIterator.empty(), emptyUnmodSortedMap().iterator());
+        assertFalse(emptyUnmodSortedMap().containsKey(null));
+        assertFalse(emptyUnmodSortedMap().containsValue(null));
+        assertNull(emptyUnmodSortedMap().get(null));
+    }
+
+    @Test (expected = NoSuchElementException.class)
+    public void testEmptyEx01() { emptyUnmodSortedMap().firstKey(); }
+    @Test (expected = NoSuchElementException.class)
+    public void testEmptyEx02() { emptyUnmodSortedMap().lastKey(); }
+
 
     @Test public void unCollection() {
         ArrayDeque<Integer> ad = new ArrayDeque<>(Arrays.asList(1, 2, 3));

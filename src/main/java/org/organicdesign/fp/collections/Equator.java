@@ -53,7 +53,7 @@ public interface Equator<T> {
             (o1, o2) -> {
                 if (o1 == o2) { return 0; }
                 if (o1 == null) {
-                    return -o2.compareTo(o1);
+                    return - (o2.compareTo(o1));
                 }
                 return o1.compareTo(o2);
             };
@@ -88,7 +88,7 @@ public interface Equator<T> {
             @Override public int compare(Comparable<Object> o1, Comparable<Object> o2) {
                 if (o1 == o2) { return 0; }
                 if (o1 == null) {
-                    return -o2.compareTo(o1);
+                    return - (o2.compareTo(o1));
                 }
                 return o1.compareTo(o2);
             }

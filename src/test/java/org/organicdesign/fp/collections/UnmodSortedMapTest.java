@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -112,6 +111,7 @@ public class UnmodSortedMapTest {
 
     final static TestMap<String,Integer> testMap = new TestMap<>(refMap, null);
 
+    @SuppressWarnings("unchecked")
     @Test public void entrySet() {
 
         Set<Map.Entry<String,Integer>> refEntSet = refMap.entrySet();
@@ -258,6 +258,47 @@ public class UnmodSortedMapTest {
                                          vec(avoKey, banKey, clemKey)),
                                sortedSet(testEntSet.comparator(),
                                          vec(avoKey, banKey, pastLast)));
+
+        // Test size less than
+        equalsDistinctHashCode(testEntSet,
+                               sortedSet(testEntSet.comparator(),
+                                         vec(avoKey, banKey, clemKey)),
+                               sortedSet(testEntSet.comparator(),
+                                         vec(avoKey, banKey, clemKey)),
+                               sortedSet(testEntSet.comparator(),
+                                         vec(avoKey, banKey)));
+
+        // Test size greater than
+        equalsDistinctHashCode(testEntSet,
+                               sortedSet(testEntSet.comparator(),
+                                         vec(avoKey, banKey, clemKey)),
+                               sortedSet(testEntSet.comparator(),
+                                         vec(avoKey, banKey, clemKey)),
+                               sortedSet(testEntSet.comparator(),
+                                         vec(avoKey, banKey, clemKey, pastLast)));
+
+        // This blows up just creating the sorted set with a null entry.
+//        // Test with a null
+//        equalsDistinctHashCode(testEntSet,
+//                               sortedSet(testEntSet.comparator(),
+//                                         vec(avoKey, banKey, clemKey)),
+//                               sortedSet(testEntSet.comparator(),
+//                                         vec(avoKey, banKey, clemKey)),
+//                               sortedSet(testEntSet.comparator(),
+//                                         vec(avoKey, null, clemKey)));
+
+        // This blows up just creating the sorted set with a bogus object.
+//        // Test with a the wrong type of object.
+//        equalsDistinctHashCode(testEntSet,
+//                               sortedSet(testEntSet.comparator(),
+//                                         vec(avoKey, banKey, clemKey)),
+//                               sortedSet(testEntSet.comparator(),
+//                                         vec(avoKey, banKey, clemKey)),
+//                               sortedSet(testEntSet.comparator(),
+//                                         vec(avoKey, (Map.Entry<String,Integer>) new Object(),
+//                                             clemKey)));
+
+        // Test with an unsorted set
         equalsDistinctHashCode(testEntSet,
                                sortedSet(testEntSet.comparator(),
                                          vec(avoKey, banKey, clemKey)),
@@ -434,6 +475,26 @@ public class UnmodSortedMapTest {
                                          vec(avoKey.getKey(), banKey.getKey(), clemKey.getKey())),
                                sortedSet(testKeySet.comparator(),
                                          vec(avoKey.getKey(), banKey.getKey(), pastLast.getKey())));
+
+        // Test smaller
+        equalsDistinctHashCode(testKeySet,
+                               sortedSet(testKeySet.comparator(),
+                                         vec(avoKey.getKey(), banKey.getKey(), clemKey.getKey())),
+                               sortedSet(testKeySet.comparator(),
+                                         vec(avoKey.getKey(), banKey.getKey(), clemKey.getKey())),
+                               sortedSet(testKeySet.comparator(),
+                                         vec(avoKey.getKey(), banKey.getKey())));
+
+        // Test larger
+        equalsDistinctHashCode(testKeySet,
+                               sortedSet(testKeySet.comparator(),
+                                         vec(avoKey.getKey(), banKey.getKey(), clemKey.getKey())),
+                               sortedSet(testKeySet.comparator(),
+                                         vec(avoKey.getKey(), banKey.getKey(), clemKey.getKey())),
+                               sortedSet(testKeySet.comparator(),
+                                         vec(avoKey.getKey(), banKey.getKey(), clemKey.getKey(),
+                                             pastLast.getKey())));
+
         equalsDistinctHashCode(testKeySet,
                                sortedSet(testKeySet.comparator(),
                                          vec(avoKey.getKey(), banKey.getKey(), clemKey.getKey())),
@@ -475,25 +536,4 @@ public class UnmodSortedMapTest {
 //                               vec(avoKey.getValue(), clemKey.getValue(), banKey.getValue()));
 
     }
-
-    @Test public void testEmpty() {
-        assertEquals(UnmodSortedSet.<Map.Entry>empty(), UnmodSortedMap.empty().entrySet());
-        assertEquals(UnmodSortedSet.<Map.Entry>empty(), UnmodSortedMap.empty().keySet());
-        assertNull(UnmodSortedMap.empty().comparator());
-        assertEquals(UnmodSortedMap.empty(), UnmodSortedMap.empty().subMap(null, null));
-        assertEquals(UnmodSortedMap.empty(), UnmodSortedMap.empty().tailMap(null));
-        assertEquals(UnmodList.empty(), UnmodSortedMap.empty().values());
-        assertEquals(0, UnmodSortedMap.empty().size());
-        assertTrue(UnmodSortedMap.empty().isEmpty());
-        assertEquals(UnmodSortedIterator.empty(), UnmodSortedMap.empty().iterator());
-        assertFalse(UnmodSortedMap.empty().containsKey(null));
-        assertFalse(UnmodSortedMap.empty().containsValue(null));
-        assertNull(UnmodSortedMap.empty().get(null));
-    }
-
-    @Test (expected = NoSuchElementException.class)
-    public void testEmptyEx01() { UnmodSortedMap.empty().firstKey(); }
-    @Test (expected = NoSuchElementException.class)
-    public void testEmptyEx02() { UnmodSortedMap.empty().lastKey(); }
-
 }
