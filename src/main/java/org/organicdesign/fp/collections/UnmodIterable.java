@@ -12,11 +12,6 @@ import java.util.Iterator;
 public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
     // ========================================== Static ==========================================
 
-    static UnmodIterable<Object> EMPTY = () -> UnmodIterator.empty();
-
-    @SuppressWarnings("unchecked")
-    static <E> UnmodIterable<E> emptyUnmodIterable() { return (UnmodIterable<E>) EMPTY; }
-
     //    /**
 // Caution: this is a convenient optimization for immutable data structures and a nightmare
 // waiting to happen to mutable ones.  Don't go slapping this on immutable wrappers for mutable

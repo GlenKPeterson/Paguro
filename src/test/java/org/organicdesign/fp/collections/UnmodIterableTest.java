@@ -74,10 +74,6 @@ public class UnmodIterableTest {
                      testIterable.takeWhile((String s) -> s.length() < 4).toMutableList());
     }
 
-    @Test public void emptyTest() {
-        assertFalse(UnmodIterable.emptyUnmodIterable().iterator().hasNext());
-    }
-
     @Test public void equalsHashcodeTest() {
         UnmodSortedIterable<Integer> a = () -> UnmodSortedIterator.empty();
         UnmodSortedIterable<Integer> b = () -> UnmodSortedIterator.empty();

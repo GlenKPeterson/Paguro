@@ -531,6 +531,15 @@ public class FunctionUtilsTest {
 //        assertEquals(UnmodSet.empty(), unSetSkipNull());
 //    }
 
+    @Test public void emptyIteratorTest() {
+        assertTrue(emptyUnmodIterable() == unmodIterable(null));
+        assertFalse(emptyUnmodIterable().iterator().hasNext());
+    }
+
+    @Test(expected = NoSuchElementException.class)
+    public void emptyIteratorTestEx() { emptyUnmodIterable().iterator().next(); }
+
+
     @Test public void unListIterator() {
         UnmodListIterator<Integer> uli = FunctionUtils.unmodList(Arrays.asList(5, 4, 3)).listIterator();
         assertFalse(uli.hasPrevious());

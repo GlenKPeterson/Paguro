@@ -213,10 +213,15 @@ public class FunctionUtils {
     // wrong."  Which is a little ironic because with inheritance, there are many cases in Java
     // where equality is one-sided.
 
+    static UnmodIterable<Object> EMPTY_UNMOD_ITERABLE = UnmodIterator::empty;
+
+    @SuppressWarnings("unchecked")
+    static <E> UnmodIterable<E> emptyUnmodIterable() { return (UnmodIterable<E>) EMPTY_UNMOD_ITERABLE; }
+
     /** Returns an unmodifiable version of the given iterable. */
     // TODO: Test this.
     public static <T> UnmodIterable<T> unmodIterable(Iterable<T> iterable) {
-        if (iterable == null) { return () -> UnmodIterator.empty(); }
+        if (iterable == null) { return emptyUnmodIterable(); }
         if (iterable instanceof UnmodIterable) { return (UnmodIterable<T>) iterable; }
         return () -> new UnmodIterator<T>() {
             private final Iterator<T> iter = iterable.iterator();
