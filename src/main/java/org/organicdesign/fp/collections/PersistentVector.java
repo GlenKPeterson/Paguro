@@ -79,8 +79,8 @@ public class PersistentVector<E> implements ImList<E> {
 
     private final static Node EMPTY_NODE = new Node(NOEDIT, new Object[MAX_NODE_LENGTH]);
 
-    private final static PersistentVector<?> EMPTY = new PersistentVector<>(0, NODE_LENGTH_POW_2, EMPTY_NODE,
-            new Object[]{});
+    public final static PersistentVector<?> EMPTY =
+            new PersistentVector<>(0, NODE_LENGTH_POW_2, EMPTY_NODE, new Object[]{});
 
     /** Returns the empty ImList (there only needs to be one) */
     @SuppressWarnings("unchecked")

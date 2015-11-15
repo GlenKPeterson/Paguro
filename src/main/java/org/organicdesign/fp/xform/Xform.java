@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 /**
  An immutable description of operations to be performed (a transformation, transform, or x-form).
@@ -392,6 +393,13 @@ public abstract class Xform<A> implements UnmodIterable<A> {
         SourceProviderIterableDesc(Iterable<? extends T> l) { super(null); list = l; }
         @Override protected RunList toRunList() {
             return RunList.of(null, list);
+        }
+
+        @Override public int hashCode() { return UnmodIterable.hashCode(this); }
+        @Override public boolean equals(Object other) {
+            if (this == other) { return true; }
+            if ( !(other instanceof SourceProviderIterableDesc) ) { return false; }
+            return Objects.equals(this.list, ((SourceProviderIterableDesc) other).list);
         }
     }
 

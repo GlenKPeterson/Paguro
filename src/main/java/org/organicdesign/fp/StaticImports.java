@@ -68,7 +68,7 @@ import java.util.Map;
  convenience or have advice on what to do about it.</p>
  */
 @SuppressWarnings("UnusedDeclaration")
-public class StaticImports {
+public final class StaticImports {
     // Prevent instantiation
     private StaticImports() { throw new UnsupportedOperationException("No instantiation"); }
 
@@ -143,7 +143,5 @@ public class StaticImports {
      If you need to wrap a regular Java collection or other iterable outside this project to perform
      a transformation on it, this method is the most convenient, efficient way to do so.
      */
-    public static <T> Transformable<T> xform(Iterable<T> iterable) {
-        return Xform.of(iterable);
-    }
+    public static <T> Transformable<T> xform(Iterable<T> iterable) { return Xform.of(iterable); }
 }

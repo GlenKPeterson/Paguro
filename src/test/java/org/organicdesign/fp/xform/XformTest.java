@@ -33,6 +33,7 @@ import static org.organicdesign.fp.StaticImports.vec;
 import static org.organicdesign.fp.StaticImports.xform;
 import static org.organicdesign.fp.function.Function1.accept;
 import static org.organicdesign.fp.function.Function1.reject;
+import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
 
 @RunWith(JUnit4.class)
 public class XformTest extends TestCase {
@@ -140,6 +141,13 @@ public class XformTest extends TestCase {
                            accum.add(i);
                            return accum;
                        }));
+    }
+
+    @Test public void testEqualsHashCode() {
+        equalsDistinctHashCode(new Xform.SourceProviderIterableDesc<>(Arrays.asList("Hi", "Pleased", "Bye")),
+                               Xform.of(Arrays.asList("Hi", "Pleased", "Bye")),
+                               Xform.of(Arrays.asList("Hi", "Pleased", "Bye")),
+                               Xform.of(Arrays.asList("Hi", "PleaZed", "Bye")));
     }
 
     @Test public void testBasics() {

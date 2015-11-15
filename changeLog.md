@@ -5,6 +5,8 @@ The main push at this point is near 100% test coverage before a 1.0 release.  NO
  - Deprecated UnmodMap.values().  See note there.  Removed all tests for equality on resulting collection.  This still functions the way java.util.Map.values() does, it's just an error to use it.
  Note: UnmodSortedMap.values() is *not* deprecated and now returns an UnmodList, which is appropriate and can be compared for equality.
  - Made null hash to 0 instead of Integer.MIN_VALUE in Equator and ComparisonContext.
+ - Made StaticImports final - if someone gave me a good reason to subclass it, I would make it non-final.
+ - Made PersistentVector.EMPTY public
  - Changed ComparisonContext helper method names from le to lte (for less-than-or-equal-to) and ge to gte.
  - Allowed ImSortedMap.entrySet() to return and UnmodSortedSet instead of an ImSortedSet.  I may go back on this.
  - Allowed ImSortedMap to inherit .values() from UnmodSortedSet.

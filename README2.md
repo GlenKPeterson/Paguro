@@ -58,6 +58,9 @@ Rich Hickey for Clojure
 - Then `mvn clean test` on UncleJim
 
 #To Do
+ - Remove empty() and EMPTY from all interfaces except maybe UnmodIterator.
+ These are a problem when you inherit from the interface because you have to override them or suffer.
+ These objects don't implement equals() and you end up expecting in UnmodWhatever.EMPTY to .append() or otherwise behave like an ImWhatever, which it probably should never do.
  - Rename foldLeft() to just fold().  It's too confusing for people used to linked list implementations
  to think about what foldLeft() means in terms of ordering.
  - Add insert(int i, E element) to ImList, implemented by wrapping the existing list in an ImSortedMap and time it.

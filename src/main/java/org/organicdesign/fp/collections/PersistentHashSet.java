@@ -23,12 +23,17 @@ import java.util.Set;
 */
 public class PersistentHashSet<E> implements ImSet<E> {
 
-//    public static final PersistentHashSet<Object> EMPTY = new PersistentHashSet<>(PersistentHashMap.EMPTY);
+    // If you don't put this here, it inherits EMPTY from UnmodSet, which does not have .equals()
+    // defined.  UnmodSet.empty won't put() either.
+    public static final PersistentHashSet<Object> EMPTY =
+            new PersistentHashSet<>(PersistentHashMap.EMPTY);
 
     @SuppressWarnings("unchecked")
-    public static <E> PersistentHashSet<E> empty() { return (PersistentHashSet<E>) new PersistentHashSet<>(PersistentHashMap.empty()); }
+    public static <E> PersistentHashSet<E> empty() { return (PersistentHashSet<E>) EMPTY; }
 
-    public static <E> PersistentHashSet<E> empty(Equator<E> eq) { return new PersistentHashSet<>(PersistentHashMap.empty(eq)); }
+    public static <E> PersistentHashSet<E> empty(Equator<E> eq) {
+        return new PersistentHashSet<>(PersistentHashMap.empty(eq));
+    }
 
     public static <E>  PersistentHashSet<E> of(Iterable<E> init) {
         PersistentHashSet<E> empty = empty();
