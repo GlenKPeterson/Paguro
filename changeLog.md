@@ -1,4 +1,4 @@
-**2015-11-07 0.10.19**: There are many changes in this point release, but unless you are writing your own collections by subclassing the Unmod interfaces, you probably won't notice.
+**2015-11-07 0.11.0**: There are many changes in this point release, but unless you are writing your own collections by subclassing the Unmod interfaces, you probably won't notice.
 The main push at this point is near 100% test coverage before a 1.0 release.  NOTE: this has not been released to Maven Central yet.
 
  - Deprecated UnmodList.contains().  See note there.  Maybe should have deprecated UnmodCollection.contains() instead?  This still functions the way java.util.List.contains() does, it's just an error to use it.
@@ -7,7 +7,7 @@ The main push at this point is near 100% test coverage before a 1.0 release.  NO
  - Made null hash to 0 instead of Integer.MIN_VALUE in Equator and ComparisonContext.
  - Made StaticImports final - if someone gave me a good reason to subclass it, I would make it non-final.
  - Made PersistentVector.EMPTY public
- - Moved UnmodSortedMap.EMPTY and .empty() to FunctionUtils.EMPTY_SORTED_MAP and .emptyUnmodSortedMap().
+ - Moved all Unmodxxxxx.EMPTY and Unmodxxxxx.empty() to FunctionUtils.EMPTY_UNMOD_XXXXX and .emptyUnmodXXXXXX().
  - Changed ComparisonContext helper method names from le to lte (for less-than-or-equal-to) and ge to gte.
  - Allowed ImSortedMap.entrySet() to return and UnmodSortedSet instead of an ImSortedSet.  I may go back on this.
  - Allowed ImSortedMap to inherit .values() from UnmodSortedSet.

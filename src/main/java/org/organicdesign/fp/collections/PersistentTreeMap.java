@@ -69,10 +69,10 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V> {
         comp = c; tree = t; size = n;
     }
 
-    /** Returns a new PersistentTreeMap of the given comparable keys and their paired values. */
-    public static <K extends Comparable<K>,V> PersistentTreeMap<K,V> of() {
-        return empty();
-    }
+//    /** Returns a new PersistentTreeMap of the given comparable keys and their paired values. */
+//    public static <K extends Comparable<K>,V> PersistentTreeMap<K,V> of() {
+//        return empty();
+//    }
 
 
     /**
