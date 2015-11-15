@@ -54,6 +54,7 @@ public interface Function0<U> extends Supplier<U>, Callable<U> {
         }
     };
 
+    // TODO: Would this be better as a sub-class?  I kind of think so.
     /**
      Wraps a value in a constant function.  If you need to "memoize" some really expensive
      operation, use it to wrap a LazyRef.
