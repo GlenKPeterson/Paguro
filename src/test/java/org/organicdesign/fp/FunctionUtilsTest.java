@@ -22,7 +22,6 @@ import org.organicdesign.fp.collections.UnmodIterator;
 import org.organicdesign.fp.collections.UnmodListIterator;
 import org.organicdesign.fp.collections.UnmodMap;
 import org.organicdesign.fp.collections.UnmodSet;
-import org.organicdesign.fp.collections.UnmodSortedIterator;
 import org.organicdesign.fp.collections.UnmodSortedMap;
 import org.organicdesign.fp.collections.UnmodSortedSet;
 
@@ -539,6 +538,13 @@ public class FunctionUtilsTest {
     public void emptyIteratorTestEx() { emptyUnmodIterable().iterator().next(); }
 
 
+    @Test public void testEmptyUnmodListIterator() {
+        assertFalse(emptyUnmodListIterator().hasNext());
+        assertFalse(emptyUnmodListIterator().hasPrevious());
+        assertEquals(0, emptyUnmodListIterator().nextIndex());
+        assertEquals(-1, emptyUnmodListIterator().previousIndex());
+    }
+
     @Test public void unListIterator() {
         UnmodListIterator<Integer> uli = FunctionUtils.unmodList(Arrays.asList(5, 4, 3)).listIterator();
         assertFalse(uli.hasPrevious());
@@ -594,7 +600,7 @@ public class FunctionUtilsTest {
         assertEquals(-1, emptyUnmodList().indexOf(39));
         assertEquals(-1, emptyUnmodList().lastIndexOf("hamster"));
         assertEquals(-1, emptyUnmodList().lastIndexOf(39));
-        assertTrue(UnmodListIterator.EMPTY == emptyUnmodList().listIterator(0));
+        assertTrue(EMPTY_UNMOD_LIST_ITERATOR == emptyUnmodList().listIterator(0));
         assertEquals(0, emptyUnmodList().size());
     }
 
@@ -628,7 +634,7 @@ public class FunctionUtilsTest {
         assertFalse(emptyUnmodSortedSet().contains(null));
         Assert.assertEquals(0, emptyUnmodSortedSet().size());
         assertTrue(emptyUnmodSortedSet().isEmpty());
-        assertTrue(UnmodSortedIterator.EMPTY == emptyUnmodSortedSet().iterator());
+        assertTrue(EMPTY_UNMOD_SORTED_ITERATOR == emptyUnmodSortedSet().iterator());
         assertNull(emptyUnmodSortedSet().comparator());
         assertTrue(EMPTY_UNMOD_SORTED_SET == emptyUnmodSortedSet().subSet(null, null));
         assertTrue(EMPTY_UNMOD_SORTED_SET == emptyUnmodSortedSet().tailSet(null));
@@ -875,6 +881,14 @@ public class FunctionUtilsTest {
 //        equalsHashCode(ts, m2, sm, m4);
     }
 
+
+    @Test public void testEmptyUnmodSortedIterator() {
+        assertFalse(emptyUnmodSortedIterator().hasNext());
+    }
+
+    @Test(expected = NoSuchElementException.class)
+    public void testEmptyUnmodSortedIteratorNext() { emptyUnmodSortedIterator().next(); }
+
     @Test public void testEmptyUnmodSortedMap() {
         Assert.assertEquals(emptyUnmodSortedSet(), emptyUnmodSortedMap().entrySet());
         Assert.assertEquals(emptyUnmodSortedSet(), emptyUnmodSortedMap().keySet());
@@ -884,7 +898,7 @@ public class FunctionUtilsTest {
         Assert.assertEquals(emptyUnmodList(), emptyUnmodSortedMap().values());
         Assert.assertEquals(0, emptyUnmodSortedMap().size());
         assertTrue(emptyUnmodSortedMap().isEmpty());
-        Assert.assertEquals(UnmodSortedIterator.empty(), emptyUnmodSortedMap().iterator());
+        Assert.assertEquals(emptyUnmodSortedIterator(), emptyUnmodSortedMap().iterator());
         assertFalse(emptyUnmodSortedMap().containsKey(null));
         assertFalse(emptyUnmodSortedMap().containsValue(null));
         assertNull(emptyUnmodSortedMap().get(null));

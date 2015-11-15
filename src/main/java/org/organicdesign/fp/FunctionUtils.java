@@ -254,12 +254,25 @@ public class FunctionUtils {
         };
     }
 
+    public static UnmodListIterator<Object> EMPTY_UNMOD_LIST_ITERATOR =
+            new UnmodListIterator<Object>() {
+        @Override public boolean hasNext() { return false; }
+        @Override public Object next() { throw new NoSuchElementException(); }
+        @Override public boolean hasPrevious() { return false; }
+        @Override public Object previous() { throw new NoSuchElementException(); }
+        @Override public int nextIndex() { return 0; }
+    };
+    @SuppressWarnings("unchecked")
+    public static <T> UnmodListIterator<T> emptyUnmodListIterator() {
+        return (UnmodListIterator<T>) EMPTY_UNMOD_LIST_ITERATOR;
+    }
+
     /**
      Returns an unmodifiable version of the given listIterator.  This is private because sharing
      iterators is bad.
      */
     private static <T> UnmodListIterator<T> unmodListIterator(ListIterator<T> iter) {
-        if (iter == null) { return UnmodListIterator.empty(); }
+        if (iter == null) { return emptyUnmodListIterator(); }
         if (iter instanceof UnmodListIterator) { return (UnmodListIterator<T>) iter; }
         return new UnmodListIterator<T>() {
             @Override public boolean hasNext() { return iter.hasNext(); }
@@ -279,7 +292,7 @@ public class FunctionUtils {
     /** The EMPTY list - a sentinel value for use in == comparisons. */
     public static UnmodList<Object> EMPTY_UNMOD_LIST = new UnmodList<Object>() {
         @Override public UnmodListIterator<Object> listIterator(int index) {
-            return UnmodListIterator.empty();
+            return emptyUnmodListIterator();
         }
         @Override public int size() { return 0; }
         @Override public Object get(int index) { throw new IndexOutOfBoundsException(); }
@@ -328,12 +341,22 @@ public class FunctionUtils {
         };
     }
 
+    public static UnmodSortedIterator<Object> EMPTY_UNMOD_SORTED_ITERATOR =
+            new UnmodSortedIterator<Object>() {
+        @Override public boolean hasNext() { return false; }
+        @Override public Object next() { throw new NoSuchElementException(); }
+    };
+    @SuppressWarnings("unchecked")
+    public static <T> UnmodSortedIterator<T> emptyUnmodSortedIterator() {
+        return (UnmodSortedIterator<T>) EMPTY_UNMOD_SORTED_ITERATOR;
+    }
+
     public static UnmodSet<Object> EMPTY_UNMOD_SORTED_SET = new UnmodSortedSet<Object>() {
         @Override public boolean contains(Object o) { return false; }
         @Override public int size() { return 0; }
         @Override public boolean isEmpty() { return true; }
         @Override public UnmodSortedIterator<Object> iterator() {
-            return UnmodSortedIterator.empty();
+            return emptyUnmodSortedIterator();
         }
         // Is this implementation a reason not to have an empty sorted set singleton?
         @Override public Comparator<? super Object> comparator() { return null; }
@@ -450,7 +473,7 @@ public class FunctionUtils {
         @Override public int size() { return 0; }
         @Override public boolean isEmpty() { return true; }
         @Override public UnmodSortedIterator<UnEntry<Object,Object>> iterator() {
-            return UnmodSortedIterator.empty();
+            return emptyUnmodSortedIterator();
         }
         @Override public boolean containsKey(Object key) { return false; }
         @Override public boolean containsValue(Object value) { return false; }

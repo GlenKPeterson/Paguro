@@ -1,21 +1,9 @@
 package org.organicdesign.fp.collections;
 
 import java.util.ListIterator;
-import java.util.NoSuchElementException;
 
 /** An unmodifiable ListIterator */
 public interface UnmodListIterator<E> extends ListIterator<E>, UnmodSortedIterator<E> {
-
-    // ========================================== Static ==========================================
-    UnmodListIterator<Object> EMPTY = new UnmodListIterator<Object>() {
-        @Override public boolean hasNext() { return false; }
-        @Override public Object next() { throw new NoSuchElementException(); }
-        @Override public boolean hasPrevious() { return false; }
-        @Override public Object previous() { throw new NoSuchElementException(); }
-        @Override public int nextIndex() { return 0; }
-    };
-    @SuppressWarnings("unchecked")
-    static <T> UnmodListIterator<T> empty() { return (UnmodListIterator<T>) EMPTY; }
 
     // ========================================= Instance =========================================
     /** Not allowed - this is supposed to be unmodifiable */

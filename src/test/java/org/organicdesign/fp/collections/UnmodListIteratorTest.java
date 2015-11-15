@@ -4,33 +4,25 @@ import org.junit.Test;
 
 import java.util.NoSuchElementException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.organicdesign.fp.FunctionUtils.emptyUnmodListIterator;
 
 public class UnmodListIteratorTest {
 
-    @Test public void testEmpty() {
-        assertFalse(UnmodListIterator.empty().hasNext());
-        assertFalse(UnmodListIterator.empty().hasPrevious());
-        assertEquals(0, UnmodListIterator.empty().nextIndex());
-        assertEquals(-1, UnmodListIterator.empty().previousIndex());
-    }
+    @SuppressWarnings("deprecation")
+    @Test(expected = UnsupportedOperationException.class)
+    public void testEmptyExAdd() { emptyUnmodListIterator().add(null); }
 
     @SuppressWarnings("deprecation")
     @Test(expected = UnsupportedOperationException.class)
-    public void testEmptyExAdd() { UnmodListIterator.empty().add(null); }
+    public void testEmptyExRemove() { emptyUnmodListIterator().remove(); }
 
     @SuppressWarnings("deprecation")
     @Test(expected = UnsupportedOperationException.class)
-    public void testEmptyExRemove() { UnmodListIterator.empty().remove(); }
-
-    @SuppressWarnings("deprecation")
-    @Test(expected = UnsupportedOperationException.class)
-    public void testEmptyExSet() { UnmodListIterator.empty().set(null); }
+    public void testEmptyExSet() { emptyUnmodListIterator().set(null); }
 
     @Test(expected = NoSuchElementException.class)
-    public void testEmptyNext() { UnmodListIterator.empty().next(); }
+    public void testEmptyNext() { emptyUnmodListIterator().next(); }
 
     @Test(expected = NoSuchElementException.class)
-    public void testEmptyPrevious() { UnmodListIterator.empty().previous(); }
+    public void testEmptyPrevious() { emptyUnmodListIterator().previous(); }
 }

@@ -3,6 +3,7 @@ package org.organicdesign.fp.collections;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.organicdesign.fp.FunctionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -75,8 +76,8 @@ public class UnmodIterableTest {
     }
 
     @Test public void equalsHashcodeTest() {
-        UnmodSortedIterable<Integer> a = () -> UnmodSortedIterator.empty();
-        UnmodSortedIterable<Integer> b = () -> UnmodSortedIterator.empty();
+        UnmodSortedIterable<Integer> a = () -> FunctionUtils.emptyUnmodSortedIterator();
+        UnmodSortedIterable<Integer> b = () -> FunctionUtils.emptyUnmodSortedIterator();
         UnmodSortedIterable<Integer> c = () -> new UnmodSortedIterator<Integer>() {
             private final Iterator<Integer> intern = Arrays.asList(1).iterator();
             @Override public boolean hasNext() { return intern.hasNext(); }
