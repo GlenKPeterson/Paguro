@@ -260,7 +260,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
      able to return a List.  It's still an unnecessary convenience method and you should use
      this map as an Iterable instead for consistency in dealing with all maps.
 
-     <pre><code>mySortedMap.map((UnEntry&lt;K,V&gt; entry) -> entry.getValue())
+     <pre><code>mySortedMap.map((UnEntry&lt;K,V&gt; entry) -&gt; entry.getValue())
              .toImList();</code></pre>
 
      {@inheritDoc}

@@ -288,13 +288,13 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
      if not an outright error.  Use an UnmodMap as an UnmodIterable&lt;UnmodMap.UnEntry&gt; instead.
 
      If you don't care about eliminating duplicate values, and want a compatible return type call:
-     <pre><code>myMap.map((UnEntry&lt;K,V&gt; entry) -> entry.getValue())
+     <pre><code>myMap.map((UnEntry&lt;K,V&gt; entry) -&gt; entry.getValue())
              .toImSet();</code></pre>
 
      If you want to keep a count of duplicates, try something like this, but it has a different
      signature:
-     <pre<code>ImMap&lt;V,Integer&gt; valueCounts = myMap.foldLeft(PersistentHashMap.empty(),
-                     (ImMap<V,Integer> accum, UnEntry<K,V> origEntry) -> {
+     <pre><code>ImMap&lt;V,Integer&gt; valueCounts = myMap.foldLeft(PersistentHashMap.empty(),
+                     (ImMap&lt;V,Integer&gt; accum, UnEntry&lt;K,V&gt; origEntry) -&gt; {
                              V inVal = origEntry.getValue();
                              return accum.assoc(inVal,
                                                 accum.getOrElse(inVal, 0) + 1);
