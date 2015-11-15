@@ -213,7 +213,16 @@ public class FunctionUtils {
     // wrong."  Which is a little ironic because with inheritance, there are many cases in Java
     // where equality is one-sided.
 
-    static UnmodIterable<Object> EMPTY_UNMOD_ITERABLE = UnmodIterator::empty;
+    public static UnmodIterator<Object> EMPTY_UNMOD_ITERATOR = new UnmodIterator<Object>() {
+        @Override public boolean hasNext() { return false; }
+        @Override public Object next() { throw new NoSuchElementException(); }
+    };
+    @SuppressWarnings("unchecked")
+    public static <T> UnmodIterator<T> emptyUnmodIterator() {
+        return (UnmodIterator<T>) EMPTY_UNMOD_ITERATOR;
+    }
+
+    static UnmodIterable<Object> EMPTY_UNMOD_ITERABLE = () -> emptyUnmodIterator();
 
     @SuppressWarnings("unchecked")
     static <E> UnmodIterable<E> emptyUnmodIterable() { return (UnmodIterable<E>) EMPTY_UNMOD_ITERABLE; }
@@ -240,7 +249,7 @@ public class FunctionUtils {
     // Never make this public.  We can't trust an iterator that we didn't get
     // brand new ourselves, because iterators are inherently unsafe to share.
     private static <T> UnmodIterator<T> unmodIterator(Iterator<T> iter) {
-        if (iter == null) { return UnmodIterator.empty(); }
+        if (iter == null) { return emptyUnmodIterator(); }
         if (iter instanceof UnmodIterator) { return (UnmodIterator<T>) iter; }
         return new UnmodIterator<T>() {
             @Override public boolean hasNext() { return iter.hasNext(); }
@@ -320,7 +329,7 @@ public class FunctionUtils {
         @Override public boolean contains(Object o) { return false; }
         @Override public int size() { return 0; }
         @Override public boolean isEmpty() { return true; }
-        @Override public UnmodIterator<Object> iterator() { return UnmodIterator.empty(); }
+        @Override public UnmodIterator<Object> iterator() { return emptyUnmodIterator(); }
     };
     @SuppressWarnings("unchecked")
     public static <T> UnmodSet<T> emptyUnmodSet() { return (UnmodSet<T>) EMPTY_UNMOD_SET; }
@@ -414,7 +423,7 @@ public class FunctionUtils {
         @Override public int size() { return 0; }
         @Override public boolean isEmpty() { return true; }
         @Override public UnmodIterator<UnEntry<Object,Object>> iterator() {
-            return UnmodIterator.empty();
+            return emptyUnmodIterator();
         }
         @Override public boolean containsKey(Object key) { return false; }
         @Override public boolean containsValue(Object value) { return false; }
@@ -576,7 +585,7 @@ public class FunctionUtils {
         @Override public boolean contains(Object o) { return false; }
         @Override public int size() { return 0; }
         @Override public boolean isEmpty() { return true; }
-        @Override public UnmodIterator<Object> iterator() { return UnmodIterator.empty(); }
+        @Override public UnmodIterator<Object> iterator() { return emptyUnmodIterator(); }
     };
 
     @SuppressWarnings("unchecked")

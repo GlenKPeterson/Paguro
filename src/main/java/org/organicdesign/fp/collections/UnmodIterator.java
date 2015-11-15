@@ -1,7 +1,6 @@
 package org.organicdesign.fp.collections;
 
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 /**
  A one-time use, mutable, not-thread-safe way to get each value of the underling collection in
@@ -14,14 +13,6 @@ import java.util.NoSuchElementException;
  the ultimate client gets its own, unshared iteraTOR.  Order is not guaranteed.
  */
 public interface UnmodIterator<E> extends Iterator<E> {
-    // ========================================== Static ==========================================
-    UnmodIterator<Object> EMPTY = new UnmodIterator<Object>() {
-        @Override public boolean hasNext() { return false; }
-        @Override public Object next() { throw new NoSuchElementException(); }
-    };
-    @SuppressWarnings("unchecked")
-    static <T> UnmodIterator<T> empty() { return (UnmodIterator<T>) EMPTY; }
-
     // ========================================= Instance =========================================
 //default void forEachRemaining(Consumer<? super E> action)
 //boolean hasNext()

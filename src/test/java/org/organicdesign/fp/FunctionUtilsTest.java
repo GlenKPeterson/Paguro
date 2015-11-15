@@ -18,7 +18,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.organicdesign.fp.collections.UnmodCollection;
-import org.organicdesign.fp.collections.UnmodIterator;
 import org.organicdesign.fp.collections.UnmodListIterator;
 import org.organicdesign.fp.collections.UnmodMap;
 import org.organicdesign.fp.collections.UnmodSet;
@@ -608,11 +607,18 @@ public class FunctionUtilsTest {
     public void outOfBounds01() { emptyUnmodList().get(0); }
 
 
+    @Test public void testEmptyUnmodIterator() {
+        assertFalse(emptyUnmodIterator().hasNext());
+    }
+
+    @Test(expected = NoSuchElementException.class)
+    public void testEmptyNext() { emptyUnmodIterator().next(); }
+
     @Test public void emptyUnmodSetTest() {
         assertFalse(emptyUnmodSet().contains(null));
         assertEquals(0, emptyUnmodSet().size());
         assertTrue(emptyUnmodSet().isEmpty());
-        assertTrue(UnmodIterator.EMPTY == emptyUnmodSet().iterator());
+        assertTrue(EMPTY_UNMOD_ITERATOR == emptyUnmodSet().iterator());
     }
 
     @Test public void unSetTest() {
@@ -693,7 +699,7 @@ public class FunctionUtilsTest {
         assertTrue(EMPTY_UNMOD_COLLECTION == emptyUnmodMap().values());
         assertEquals(0, emptyUnmodMap().size());
         assertTrue(emptyUnmodMap().isEmpty());
-        assertTrue(UnmodIterator.<UnmodMap.UnEntry<Object,Object>>empty() ==
+        assertTrue(FunctionUtils.<UnmodMap.UnEntry<Object,Object>>emptyUnmodIterator() ==
                    emptyUnmodMap().iterator());
         assertFalse(emptyUnmodMap().containsKey(null));
         assertFalse(emptyUnmodMap().containsValue(null));
@@ -951,7 +957,7 @@ public class FunctionUtilsTest {
         assertFalse(emptyUnmodCollection().contains(null));
         assertEquals(0, emptyUnmodCollection().size());
         assertTrue(emptyUnmodCollection().isEmpty());
-        assertTrue(UnmodIterator.EMPTY == emptyUnmodCollection().iterator());
+        assertTrue(EMPTY_UNMOD_ITERATOR == emptyUnmodCollection().iterator());
 
     }
 

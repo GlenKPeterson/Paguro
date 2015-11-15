@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static org.organicdesign.fp.FunctionUtils.emptyUnmodIterator;
+
 /**
  Rich Hickey's persistent rendition of Phil Bagwell's Hash Array Mapped Trie.
 
@@ -230,7 +232,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 
     // This is cut and pasted exactly to the Transient version of this class below.
     @Override public UnmodIterator<UnEntry<K,V>> iterator() {
-        final UnmodIterator<UnEntry<K,V>> rootIter = (root == null) ? UnmodIterator.empty()
+        final UnmodIterator<UnEntry<K,V>> rootIter = (root == null) ? emptyUnmodIterator()
                                                                     : root.iterator();
         if (hasNull) {
             return new UnmodIterator<UnEntry<K,V>>() {
@@ -383,7 +385,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 
         // This is an exact cut-and paste of the Persistent version of this class above.
         @Override public UnmodIterator<UnEntry<K,V>> iterator() {
-            final UnmodIterator<UnEntry<K,V>> rootIter = (root == null) ? UnmodIterator.empty()
+            final UnmodIterator<UnEntry<K,V>> rootIter = (root == null) ? emptyUnmodIterator()
                                                                         : root.iterator();
             if (hasNull) {
                 return new UnmodIterator<UnEntry<K,V>>() {

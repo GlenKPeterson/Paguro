@@ -19,7 +19,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.organicdesign.fp.Mutable;
-import org.organicdesign.fp.collections.UnmodIterator;
 import org.organicdesign.fp.function.Function1;
 
 import java.util.ArrayList;
@@ -29,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import static org.junit.Assert.assertArrayEquals;
+import static org.organicdesign.fp.FunctionUtils.emptyUnmodIterator;
 import static org.organicdesign.fp.StaticImports.vec;
 import static org.organicdesign.fp.StaticImports.xform;
 import static org.organicdesign.fp.function.Function1.accept;
@@ -548,12 +548,12 @@ public class XformTest extends TestCase {
 
     @Test public void singleFlatMap() {
         assertEquals(0, Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                             .flatMap((i) -> () -> UnmodIterator.empty())
+                             .flatMap((i) -> () -> emptyUnmodIterator())
                              .toImList()
                              .size());
 
         assertEquals(0, Xform.of(Collections.emptyList())
-                             .flatMap((i) -> () -> UnmodIterator.empty())
+                             .flatMap((i) -> () -> emptyUnmodIterator())
                              .toImList()
                              .size());
 
@@ -571,7 +571,7 @@ public class XformTest extends TestCase {
 
     @Test public void flatEmpty() {
         assertEquals(0, Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                             .flatMap((a) -> () -> UnmodIterator.empty())
+                             .flatMap((a) -> () -> emptyUnmodIterator())
                              .toImList()
                              .size());
 
@@ -651,9 +651,9 @@ public class XformTest extends TestCase {
 
     @Test public void flatMapChain() {
         assertEquals(0, Xform.of(vec(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                             .flatMap((i) -> () -> UnmodIterator.empty())
-                             .flatMap((i) -> () -> UnmodIterator.empty())
-                             .flatMap((i) -> () -> UnmodIterator.empty())
+                             .flatMap((i) -> () -> emptyUnmodIterator())
+                             .flatMap((i) -> () -> emptyUnmodIterator())
+                             .flatMap((i) -> () -> emptyUnmodIterator())
                              .toImList()
                              .size());
 
@@ -666,9 +666,9 @@ public class XformTest extends TestCase {
 
         assertArrayEquals(new Integer[] {},
                           Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                               .flatMap((i) -> () -> UnmodIterator.empty())
-                               .flatMap((i) -> () -> UnmodIterator.empty())
-                               .flatMap((i) -> () -> UnmodIterator.empty()).toMutableList().toArray());
+                               .flatMap((i) -> () -> emptyUnmodIterator())
+                               .flatMap((i) -> () -> emptyUnmodIterator())
+                               .flatMap((i) -> () -> emptyUnmodIterator()).toMutableList().toArray());
 
         assertArrayEquals(new Integer[] { 1,2, 2,3, 3,4, 10,11, 20,21, 30,31},
                           Xform.of(Arrays.asList(1, 10))
