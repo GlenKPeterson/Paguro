@@ -33,19 +33,6 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
 
     // ========================================== Static ==========================================
 
-    /** The EMPTY list - a sentinel value for use in == comparisons. */
-    UnmodList<Object> EMPTY = new UnmodList<Object>() {
-        @Override public UnmodListIterator<Object> listIterator(int index) {
-            return UnmodListIterator.empty();
-        }
-        @Override public int size() { return 0; }
-        @Override public Object get(int index) { throw new IndexOutOfBoundsException(); }
-    };
-
-    /** Returns a type-aware version of the EMPTY list. */
-    @SuppressWarnings("unchecked")
-    static <T> UnmodList<T> empty() { return (UnmodList<T>) EMPTY; }
-
     /**
      Apply the given function against all unique pairings of items in the list.  Does this belong on
      Function2 instead of List?

@@ -276,11 +276,24 @@ public class FunctionUtils {
         };
     }
 
+    /** The EMPTY list - a sentinel value for use in == comparisons. */
+    public static UnmodList<Object> EMPTY_UNMOD_LIST = new UnmodList<Object>() {
+        @Override public UnmodListIterator<Object> listIterator(int index) {
+            return UnmodListIterator.empty();
+        }
+        @Override public int size() { return 0; }
+        @Override public Object get(int index) { throw new IndexOutOfBoundsException(); }
+    };
+
+    /** Returns a type-aware version of the EMPTY list. */
+    @SuppressWarnings("unchecked")
+    public static <T> UnmodList<T> emptyUnmodList() { return (UnmodList<T>) EMPTY_UNMOD_LIST; }
+
     /** Returns an unmodifiable version of the given list. */
     public static <T> UnmodList<T> unmodList(List<T> inner) {
-        if (inner == null) { return UnmodList.empty(); }
+        if (inner == null) { return emptyUnmodList(); }
         if (inner instanceof UnmodList) { return (UnmodList<T>) inner; }
-        if (inner.size() < 1) { return UnmodList.empty(); }
+        if (inner.size() < 1) { return emptyUnmodList(); }
         return new UnmodList<T>() {
             @Override public int size() { return inner.size(); }
             @Override public T get(int index) { return inner.get(index); }
@@ -290,11 +303,20 @@ public class FunctionUtils {
         };
     }
 
+    public static UnmodSet<Object> EMPTY_UNMOD_SET = new UnmodSet<Object>() {
+        @Override public boolean contains(Object o) { return false; }
+        @Override public int size() { return 0; }
+        @Override public boolean isEmpty() { return true; }
+        @Override public UnmodIterator<Object> iterator() { return UnmodIterator.empty(); }
+    };
+    @SuppressWarnings("unchecked")
+    public static <T> UnmodSet<T> emptyUnmodSet() { return (UnmodSet<T>) EMPTY_UNMOD_SET; }
+
     /** Returns an unmodifiable version of the given set. */
     public static <T> UnmodSet<T> unmodSet(Set<T> set) {
-        if (set == null) { return UnmodSet.empty(); }
+        if (set == null) { return emptyUnmodSet(); }
         if (set instanceof UnmodSet) { return (UnmodSet<T>) set; }
-        if (set.size() < 1) { return UnmodSet.empty(); }
+        if (set.size() < 1) { return emptyUnmodSet(); }
         return new UnmodSet<T>() {
             @Override public boolean contains(Object o) { return set.contains(o); }
             @Override public int size() { return set.size(); }
@@ -306,11 +328,32 @@ public class FunctionUtils {
         };
     }
 
+    public static UnmodSet<Object> EMPTY_UNMOD_SORTED_SET = new UnmodSortedSet<Object>() {
+        @Override public boolean contains(Object o) { return false; }
+        @Override public int size() { return 0; }
+        @Override public boolean isEmpty() { return true; }
+        @Override public UnmodSortedIterator<Object> iterator() {
+            return UnmodSortedIterator.empty();
+        }
+        // Is this implementation a reason not to have an empty sorted set singleton?
+        @Override public Comparator<? super Object> comparator() { return null; }
+        @Override public UnmodSortedSet<Object> subSet(Object fromElement, Object toElement) {
+            return this;
+        }
+        @Override public UnmodSortedSet<Object> tailSet(Object fromElement) { return this; }
+        @Override public Object first() { throw new NoSuchElementException("Empty set"); }
+        @Override public Object last() { throw new NoSuchElementException("Empty set"); }
+    };
+    @SuppressWarnings("unchecked")
+    public static <T> UnmodSortedSet<T> emptyUnmodSortedSet() {
+        return (UnmodSortedSet<T>) EMPTY_UNMOD_SORTED_SET;
+    }
+
     /** Returns an unmodifiable version of the given set. */
     public static <T> UnmodSortedSet<T> unmodSortedSet(SortedSet<T> set) {
-        if (set == null) { return UnmodSortedSet.empty(); }
+        if (set == null) { return emptyUnmodSortedSet(); }
         if (set instanceof UnmodSortedSet) { return (UnmodSortedSet<T>) set; }
-        if (set.size() < 1) { return UnmodSortedSet.empty(); }
+        if (set.size() < 1) { return emptyUnmodSortedSet(); }
         return new UnmodSortedSet<T>() {
             @Override public Comparator<? super T> comparator() { return set.comparator(); }
             @Override public UnmodSortedSet<T> subSet(T fromElement, T toElement) {
@@ -341,8 +384,8 @@ public class FunctionUtils {
     }
 
     public static UnmodMap<Object,Object> EMPTY_UNMOD_MAP = new UnmodMap<Object,Object>() {
-        @Override public UnmodSet<Entry<Object,Object>> entrySet() { return UnmodSet.empty(); }
-        @Override public UnmodSet<Object> keySet() { return UnmodSet.empty(); }
+        @Override public UnmodSet<Entry<Object,Object>> entrySet() { return emptyUnmodSet(); }
+        @Override public UnmodSet<Object> keySet() { return emptyUnmodSet(); }
         @SuppressWarnings("deprecation")
         @Override public UnmodCollection<Object> values() { return emptyUnmodCollection(); }
         @Override public int size() { return 0; }
@@ -387,27 +430,36 @@ public class FunctionUtils {
         };
     }
 
-    static UnmodSortedMap<Object,Object> EMPTY_SORTED_MAP = new UnmodSortedMap<Object,Object>() {
-        @Override public UnmodSortedSet<Entry<Object,Object>> entrySet() { return UnmodSortedSet.empty(); }
-        @Override public UnmodSortedSet<Object> keySet() { return UnmodSortedSet.empty(); }
+    static UnmodSortedMap<Object,Object> EMPTY_UNMOD_SORTED_MAP =
+            new UnmodSortedMap<Object,Object>() {
+        @Override public UnmodSortedSet<Entry<Object,Object>> entrySet() {
+            return emptyUnmodSortedSet();
+        }
+        @Override public UnmodSortedSet<Object> keySet() { return emptyUnmodSortedSet(); }
         @Override public Comparator<? super Object> comparator() { return null; }
-        @Override public UnmodSortedMap<Object,Object> subMap(Object fromKey, Object toKey) { return this; }
+        @Override public UnmodSortedMap<Object,Object> subMap(Object fromKey, Object toKey) {
+            return this;
+        }
         @Override public UnmodSortedMap<Object,Object> tailMap(Object fromKey) { return this; }
         @Override public Object firstKey() { throw new NoSuchElementException("empty map"); }
         @Override public Object lastKey() { throw new NoSuchElementException("empty map"); }
         // I don't think I should need this suppression because it's not deprecated in
         // UnmodSortedMap.  My IDE doesn't warn me, but Java 1.8.0_60 does.
         @SuppressWarnings("deprecation")
-        @Override public UnmodList<Object> values() { return UnmodList.empty(); }
+        @Override public UnmodList<Object> values() { return emptyUnmodList(); }
         @Override public int size() { return 0; }
         @Override public boolean isEmpty() { return true; }
-        @Override public UnmodSortedIterator<UnEntry<Object,Object>> iterator() { return UnmodSortedIterator.empty(); }
+        @Override public UnmodSortedIterator<UnEntry<Object,Object>> iterator() {
+            return UnmodSortedIterator.empty();
+        }
         @Override public boolean containsKey(Object key) { return false; }
         @Override public boolean containsValue(Object value) { return false; }
         @Override public Object get(Object key) { return null; }
     };
     @SuppressWarnings("unchecked")
-    static <T,U> UnmodSortedMap<T,U> emptyUnmodSortedMap() { return (UnmodSortedMap<T,U>) EMPTY_SORTED_MAP; }
+    static <T,U> UnmodSortedMap<T,U> emptyUnmodSortedMap() {
+        return (UnmodSortedMap<T,U>) EMPTY_UNMOD_SORTED_MAP;
+    }
 
     /** Returns an unmodifiable version of the given sorted map. */
     public static <K,V> UnmodSortedMap<K,V> unmodSortedMap(SortedMap<K,V> map) {

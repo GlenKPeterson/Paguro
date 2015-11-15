@@ -19,7 +19,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.organicdesign.fp.collections.UnmodCollection;
 import org.organicdesign.fp.collections.UnmodIterator;
-import org.organicdesign.fp.collections.UnmodList;
 import org.organicdesign.fp.collections.UnmodListIterator;
 import org.organicdesign.fp.collections.UnmodMap;
 import org.organicdesign.fp.collections.UnmodSet;
@@ -590,6 +589,24 @@ public class FunctionUtilsTest {
                                FunctionUtils.unmodList(new ArrayList<>(Arrays.asList(3, 4, 5))),
                                new LinkedList<>(Arrays.asList(3, 4, 5)),
                                new ArrayList<>(Arrays.asList(4, 5, 3)));
+
+        assertEquals(-1, emptyUnmodList().indexOf("hamster"));
+        assertEquals(-1, emptyUnmodList().indexOf(39));
+        assertEquals(-1, emptyUnmodList().lastIndexOf("hamster"));
+        assertEquals(-1, emptyUnmodList().lastIndexOf(39));
+        assertTrue(UnmodListIterator.EMPTY == emptyUnmodList().listIterator(0));
+        assertEquals(0, emptyUnmodList().size());
+    }
+
+    @Test (expected = IndexOutOfBoundsException.class)
+    public void outOfBounds01() { emptyUnmodList().get(0); }
+
+
+    @Test public void emptyUnmodSetTest() {
+        assertFalse(emptyUnmodSet().contains(null));
+        assertEquals(0, emptyUnmodSet().size());
+        assertTrue(emptyUnmodSet().isEmpty());
+        assertTrue(UnmodIterator.EMPTY == emptyUnmodSet().iterator());
     }
 
     @Test public void unSetTest() {
@@ -606,6 +623,23 @@ public class FunctionUtilsTest {
                                FunctionUtils.unmodSet(new HashSet<>(Arrays.asList(4, 5, 6)))
         );
     }
+
+    @Test public void emptyUnmodSortedSetTest() {
+        assertFalse(emptyUnmodSortedSet().contains(null));
+        Assert.assertEquals(0, emptyUnmodSortedSet().size());
+        assertTrue(emptyUnmodSortedSet().isEmpty());
+        assertTrue(UnmodSortedIterator.EMPTY == emptyUnmodSortedSet().iterator());
+        assertNull(emptyUnmodSortedSet().comparator());
+        assertTrue(EMPTY_UNMOD_SORTED_SET == emptyUnmodSortedSet().subSet(null, null));
+        assertTrue(EMPTY_UNMOD_SORTED_SET == emptyUnmodSortedSet().tailSet(null));
+    }
+
+    @Test (expected = NoSuchElementException.class)
+    public void testEmptyUnmodSortedSetExFirst() { emptyUnmodSortedSet().first(); }
+
+    @Test (expected = NoSuchElementException.class)
+    public void testEmptyUnmodSortedSetExLast() { emptyUnmodSortedSet().last(); }
+
 
     @Test public void unSetSorted() {
         UnmodSortedSet<Integer> ts = FunctionUtils.unmodSortedSet(new TreeSet<>(Arrays.asList(5, 4, 3)));
@@ -649,7 +683,7 @@ public class FunctionUtilsTest {
     @SuppressWarnings("deprecation")
     @Test public void emptyUnmodMapTest() {
         assertEquals(0, emptyUnmodMap().entrySet().size());
-        assertTrue(UnmodSet.EMPTY == emptyUnmodMap().keySet());
+        assertTrue(EMPTY_UNMOD_SET == emptyUnmodMap().keySet());
         assertTrue(EMPTY_UNMOD_COLLECTION == emptyUnmodMap().values());
         assertEquals(0, emptyUnmodMap().size());
         assertTrue(emptyUnmodMap().isEmpty());
@@ -842,12 +876,12 @@ public class FunctionUtilsTest {
     }
 
     @Test public void testEmptyUnmodSortedMap() {
-        Assert.assertEquals(UnmodSortedSet.<Map.Entry>empty(), emptyUnmodSortedMap().entrySet());
-        Assert.assertEquals(UnmodSortedSet.<Map.Entry>empty(), emptyUnmodSortedMap().keySet());
+        Assert.assertEquals(emptyUnmodSortedSet(), emptyUnmodSortedMap().entrySet());
+        Assert.assertEquals(emptyUnmodSortedSet(), emptyUnmodSortedMap().keySet());
         assertNull(emptyUnmodSortedMap().comparator());
         assertEquals(emptyUnmodSortedMap(), emptyUnmodSortedMap().subMap(null, null));
         assertEquals(emptyUnmodSortedMap(), emptyUnmodSortedMap().tailMap(null));
-        Assert.assertEquals(UnmodList.empty(), emptyUnmodSortedMap().values());
+        Assert.assertEquals(emptyUnmodList(), emptyUnmodSortedMap().values());
         Assert.assertEquals(0, emptyUnmodSortedMap().size());
         assertTrue(emptyUnmodSortedMap().isEmpty());
         Assert.assertEquals(UnmodSortedIterator.empty(), emptyUnmodSortedMap().iterator());

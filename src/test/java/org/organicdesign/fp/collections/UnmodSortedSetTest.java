@@ -6,11 +6,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class UnmodSortedSetTest {
     static class TestSortSet<E> implements UnmodSortedSet<E> {
@@ -87,20 +87,4 @@ public class UnmodSortedSetTest {
 //        assertTrue(unionized.containsAll(unSortSet));
 //        assertFalse(unSortSet.containsAll(unionized));
     }
-
-    @Test public void emptyTest() {
-        assertFalse(UnmodSortedSet.empty().contains(null));
-        assertEquals(0, UnmodSortedSet.empty().size());
-        assertTrue(UnmodSortedSet.empty().isEmpty());
-        assertTrue(UnmodSortedIterator.EMPTY == UnmodSortedSet.empty().iterator());
-        assertNull(UnmodSortedSet.empty().comparator());
-        assertTrue(UnmodSortedSet.EMPTY == UnmodSortedSet.empty().subSet(null, null));
-        assertTrue(UnmodSortedSet.EMPTY == UnmodSortedSet.empty().tailSet(null));
-    }
-
-    @Test (expected = NoSuchElementException.class)
-    public void testEmptyExFirst() { UnmodSortedSet.empty().first(); }
-
-    @Test (expected = NoSuchElementException.class)
-    public void testEmptyExLast() { UnmodSortedSet.empty().last(); }
 }

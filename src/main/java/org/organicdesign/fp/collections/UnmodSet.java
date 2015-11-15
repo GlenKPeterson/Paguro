@@ -21,14 +21,6 @@ import java.util.function.Predicate;
 public interface UnmodSet<E> extends UnmodCollection<E>, Set<E> {
 
     // ========================================== Static ==========================================
-    UnmodSet<Object> EMPTY = new UnmodSet<Object>() {
-        @Override public boolean contains(Object o) { return false; }
-        @Override public int size() { return 0; }
-        @Override public boolean isEmpty() { return true; }
-        @Override public UnmodIterator<Object> iterator() { return UnmodIterator.empty(); }
-    };
-    @SuppressWarnings("unchecked")
-    static <T> UnmodSet<T> empty() { return (UnmodSet<T>) EMPTY; }
 
     /**
      Implements equals and hashCode() methods to make defining unmod sets easier, especially for

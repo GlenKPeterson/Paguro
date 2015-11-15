@@ -14,28 +14,10 @@
 package org.organicdesign.fp.collections;
 
 import java.util.Comparator;
-import java.util.NoSuchElementException;
 import java.util.SortedSet;
 
 /** An unmodifiable SortedSet. */
 public interface UnmodSortedSet<E> extends UnmodSet<E>, SortedSet<E>, UnmodSortedCollection<E> {
-    // ==================================================== Static ====================================================
-    UnmodSet<Object> EMPTY = new UnmodSortedSet<Object>() {
-        @Override public boolean contains(Object o) { return false; }
-        @Override public int size() { return 0; }
-        @Override public boolean isEmpty() { return true; }
-        @Override public UnmodSortedIterator<Object> iterator() { return UnmodSortedIterator.empty(); }
-        // Is this implementation a reason not to have an empty sorted set singleton?
-        @Override public Comparator<? super Object> comparator() { return null; }
-        @Override public UnmodSortedSet<Object> subSet(Object fromElement, Object toElement) { return this; }
-        @Override public UnmodSortedSet<Object> tailSet(Object fromElement) { return this; }
-        @Override public Object first() { throw new NoSuchElementException("Empty set"); }
-        @Override public Object last() { throw new NoSuchElementException("Empty set"); }
-    };
-    @SuppressWarnings("unchecked")
-    static <T> UnmodSortedSet<T> empty() { return (UnmodSortedSet<T>) EMPTY; }
-
-    // =================================================== Instance ===================================================
     /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     @Override default UnmodSortedSet<E> headSet(E toElement) {

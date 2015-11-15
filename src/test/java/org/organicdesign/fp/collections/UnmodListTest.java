@@ -71,11 +71,6 @@ public class UnmodListTest {
                                                               "a")).lastIndexOf("a"));
         assertEquals(6, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider", "and",
                                                               "a", "Along")).lastIndexOf("Along"));
-
-        assertEquals(-1, UnmodList.empty().indexOf("hamster"));
-        assertEquals(-1, UnmodList.empty().indexOf(39));
-        assertEquals(-1, UnmodList.empty().lastIndexOf("hamster"));
-        assertEquals(-1, UnmodList.empty().lastIndexOf(39));
     }
 
     private static final String[] sticksAndStones = new String[] {
@@ -327,15 +322,6 @@ public class UnmodListTest {
         assertTrue(sticksAndStones.length <
                    unList.toArray(new String[sticksAndStones.length + 1]).length);
     }
-
-    @Test public void testDidley() {
-        // for those of you who want 100% test coverage just on principle, this one's for you.
-        assertTrue(UnmodListIterator.EMPTY == UnmodList.empty().listIterator(0));
-        assertEquals(0, UnmodList.empty().size());
-    }
-
-    @Test (expected = IndexOutOfBoundsException.class)
-    public void outOfBounds01() { UnmodList.EMPTY.get(0); }
 
     @SuppressWarnings("deprecation")
     @Test (expected = UnsupportedOperationException.class)

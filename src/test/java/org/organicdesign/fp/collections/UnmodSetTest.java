@@ -32,13 +32,6 @@ public class UnmodSetTest {
         @Override public int size() { return vals.length; }
     };
 
-    @Test public void emptyTest() {
-        assertFalse(UnmodSet.empty().contains(null));
-        assertEquals(0, UnmodSet.empty().size());
-        assertTrue(UnmodSet.empty().isEmpty());
-        assertTrue(UnmodIterator.EMPTY == UnmodSet.empty().iterator());
-    }
-
     @Test public void containsAllTest() {
         assertTrue(unSet.containsAll(Arrays.asList(vals)));
         assertFalse(unSet.containsAll(Arrays.asList("junk", "no")));
