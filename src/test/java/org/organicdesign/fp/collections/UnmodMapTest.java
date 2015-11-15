@@ -109,21 +109,6 @@ public class UnmodMapTest {
 //        };
 //    }
 
-
-    @SuppressWarnings("deprecation")
-    @Test public void emptyTest() {
-        assertEquals(0, UnmodMap.empty().entrySet().size());
-        assertTrue(UnmodSet.EMPTY == UnmodMap.empty().keySet());
-        assertTrue(UnmodCollection.EMPTY == UnmodMap.empty().values());
-        assertEquals(0, UnmodMap.empty().size());
-        assertTrue(UnmodMap.empty().isEmpty());
-        assertTrue(UnmodIterator.<UnmodMap.UnEntry<Object,Object>>empty() ==
-                   UnmodMap.empty().iterator());
-        assertFalse(UnmodMap.empty().containsKey(null));
-        assertFalse(UnmodMap.empty().containsValue(null));
-        assertNull(UnmodMap.empty().get(null));
-    }
-
     final static UnmodMapTest.TestEntry<String,Integer> avoKey =
             new UnmodMapTest.TestEntry<>("avocado", -9);
     final static UnmodMapTest.TestEntry<String,Integer> banKey =

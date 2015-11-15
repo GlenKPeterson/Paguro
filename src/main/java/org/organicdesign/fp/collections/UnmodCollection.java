@@ -38,14 +38,6 @@ import java.util.function.Predicate;
 public interface UnmodCollection<E> extends Collection<E>, UnmodIterable<E> {
 
     // ========================================== Static ==========================================
-    UnmodCollection<Object> EMPTY = new UnmodCollection<Object>() {
-        @Override public boolean contains(Object o) { return false; }
-        @Override public int size() { return 0; }
-        @Override public boolean isEmpty() { return true; }
-        @Override public UnmodIterator<Object> iterator() { return UnmodIterator.empty(); }
-    };
-    @SuppressWarnings("unchecked")
-    static <T> UnmodCollection<T> empty() { return (UnmodCollection<T>) EMPTY; }
 
 //    /**
 //     Don't use this.  There may not be any way to implement equals() meaningfully on a Collection

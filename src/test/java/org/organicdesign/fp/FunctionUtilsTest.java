@@ -18,6 +18,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.organicdesign.fp.collections.UnmodCollection;
+import org.organicdesign.fp.collections.UnmodIterator;
 import org.organicdesign.fp.collections.UnmodList;
 import org.organicdesign.fp.collections.UnmodListIterator;
 import org.organicdesign.fp.collections.UnmodMap;
@@ -42,9 +43,7 @@ import java.util.TreeSet;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.*;
-import static org.organicdesign.fp.FunctionUtils.emptyUnmodSortedMap;
-import static org.organicdesign.fp.FunctionUtils.ordinal;
-import static org.organicdesign.fp.FunctionUtils.unmodCollection;
+import static org.organicdesign.fp.FunctionUtils.*;
 import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
 
 @RunWith(JUnit4.class)
@@ -639,6 +638,20 @@ public class FunctionUtilsTest {
     }
 
     @SuppressWarnings("deprecation")
+    @Test public void emptyUnmodMapTest() {
+        assertEquals(0, emptyUnmodMap().entrySet().size());
+        assertTrue(UnmodSet.EMPTY == emptyUnmodMap().keySet());
+        assertTrue(EMPTY_UNMOD_COLLECTION == emptyUnmodMap().values());
+        assertEquals(0, emptyUnmodMap().size());
+        assertTrue(emptyUnmodMap().isEmpty());
+        assertTrue(UnmodIterator.<UnmodMap.UnEntry<Object,Object>>empty() ==
+                   emptyUnmodMap().iterator());
+        assertFalse(emptyUnmodMap().containsKey(null));
+        assertFalse(emptyUnmodMap().containsValue(null));
+        assertNull(emptyUnmodMap().get(null));
+    }
+
+    @SuppressWarnings("deprecation")
     @Test public void unMapTest() {
         final UnmodMap<Integer,String> ts;
         Map<Integer,String> sm = new HashMap<>();
@@ -876,5 +889,13 @@ public class FunctionUtilsTest {
 //        assertEquals(0b10001, lazyHashCoder(a, null, null, null, e).get());
 //        assertEquals(0b01110, lazyHashCoder(null, b, c, d, null).get());
 //    }
+
+    @Test public void testEmptyCollection() {
+        assertFalse(emptyUnmodCollection().contains(null));
+        assertEquals(0, emptyUnmodCollection().size());
+        assertTrue(emptyUnmodCollection().isEmpty());
+        assertTrue(UnmodIterator.EMPTY == emptyUnmodCollection().iterator());
+
+    }
 
 }

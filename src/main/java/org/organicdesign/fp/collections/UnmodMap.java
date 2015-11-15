@@ -100,22 +100,6 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
 //        };
     }
 
-    UnmodMap<Object,Object> EMPTY = new UnmodMap<Object,Object>() {
-        @Override public UnmodSet<Entry<Object,Object>> entrySet() { return UnmodSet.empty(); }
-        @Override public UnmodSet<Object> keySet() { return UnmodSet.empty(); }
-        @Override public UnmodCollection<Object> values() { return UnmodCollection.empty(); }
-        @Override public int size() { return 0; }
-        @Override public boolean isEmpty() { return true; }
-        @Override public UnmodIterator<UnEntry<Object,Object>> iterator() {
-            return UnmodIterator.empty();
-        }
-        @Override public boolean containsKey(Object key) { return false; }
-        @Override public boolean containsValue(Object value) { return false; }
-        @Override public Object get(Object key) { return null; }
-    };
-    @SuppressWarnings("unchecked")
-    static <T,U> UnmodMap<T,U> empty() { return (UnmodMap<T,U>) EMPTY; }
-
     // ========================================= Instance =========================================
 
     // Modification Operations

@@ -335,11 +335,28 @@ public class FunctionUtils {
         };
     }
 
+    public static UnmodMap<Object,Object> EMPTY_UNMOD_MAP = new UnmodMap<Object,Object>() {
+        @Override public UnmodSet<Entry<Object,Object>> entrySet() { return UnmodSet.empty(); }
+        @Override public UnmodSet<Object> keySet() { return UnmodSet.empty(); }
+        @SuppressWarnings("deprecation")
+        @Override public UnmodCollection<Object> values() { return emptyUnmodCollection(); }
+        @Override public int size() { return 0; }
+        @Override public boolean isEmpty() { return true; }
+        @Override public UnmodIterator<UnEntry<Object,Object>> iterator() {
+            return UnmodIterator.empty();
+        }
+        @Override public boolean containsKey(Object key) { return false; }
+        @Override public boolean containsValue(Object value) { return false; }
+        @Override public Object get(Object key) { return null; }
+    };
+    @SuppressWarnings("unchecked")
+    public static <T,U> UnmodMap<T,U> emptyUnmodMap() { return (UnmodMap<T,U>) EMPTY_UNMOD_MAP; }
+
     /** Returns an unmodifiable version of the given map. */
     public static <K,V> UnmodMap<K,V> unmodMap(Map<K,V> map) {
-        if (map == null) { return UnmodMap.empty(); }
+        if (map == null) { return emptyUnmodMap(); }
         if (map instanceof UnmodMap) { return (UnmodMap<K,V>) map; }
-        if (map.size() < 1) { return UnmodMap.empty(); }
+        if (map.size() < 1) { return emptyUnmodMap(); }
         return new UnmodMap<K,V>() {
             /** {@inheritDoc} */
             @Override
@@ -475,11 +492,24 @@ public class FunctionUtils {
         };
     }
 
+    public static UnmodCollection<Object> EMPTY_UNMOD_COLLECTION = new UnmodCollection<Object>() {
+        @Override public boolean contains(Object o) { return false; }
+        @Override public int size() { return 0; }
+        @Override public boolean isEmpty() { return true; }
+        @Override public UnmodIterator<Object> iterator() { return UnmodIterator.empty(); }
+    };
+
+    @SuppressWarnings("unchecked")
+    public static <T> UnmodCollection<T> emptyUnmodCollection() {
+        return (UnmodCollection<T>) EMPTY_UNMOD_COLLECTION;
+    }
+
+
     /** Returns an unmodifiable version of the given collection. */
     public static <T> UnmodCollection<T> unmodCollection(Collection<T> coll) {
-        if (coll == null) { return UnmodCollection.empty(); }
+        if (coll == null) { return emptyUnmodCollection(); }
         if (coll instanceof UnmodCollection) { return (UnmodCollection<T>) coll; }
-        if (coll.size() < 1) { return UnmodCollection.empty(); }
+        if (coll.size() < 1) { return emptyUnmodCollection(); }
         return new UnmodCollection<T>() {
             @Override public boolean contains(Object o) { return coll.contains(o); }
             @Override public int size() { return coll.size(); }

@@ -15,6 +15,7 @@
 package org.organicdesign.fp.collections;
 
 import org.junit.Test;
+import org.organicdesign.fp.FunctionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -95,8 +96,8 @@ public class UnmodCollectionTest {
         assertTrue(Arrays.asList(sticksMay).containsAll(unColl));
 
         assertTrue(unColl.containsAll(null));
-        assertTrue(unColl.containsAll(UnmodCollection.empty()));
-        assertFalse(UnmodCollection.empty().containsAll(unColl));
+        assertTrue(unColl.containsAll(FunctionUtils.emptyUnmodCollection()));
+        assertFalse(FunctionUtils.emptyUnmodCollection().containsAll(unColl));
     }
 
     // I don't think equals() can be implemented on a Collection.  It's the return type for
@@ -151,10 +152,6 @@ public class UnmodCollectionTest {
 
     @Test public void testDidley() {
         // for those of you who want 100% test coverage just on principle, this one's for you.
-        assertFalse(UnmodCollection.empty().contains(null));
-        assertEquals(0, UnmodCollection.empty().size());
-        assertTrue(UnmodCollection.empty().isEmpty());
-        assertTrue(UnmodIterator.EMPTY == UnmodCollection.empty().iterator());
         assertFalse(unColl.isEmpty());
         assertTrue(new TestColl<>(new Object[0]).isEmpty());
     }

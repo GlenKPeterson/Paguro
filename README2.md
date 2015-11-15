@@ -58,6 +58,8 @@ Rich Hickey for Clojure
 - Then `mvn clean test` on UncleJim
 
 #To Do
+ - Change UnmodIterable.hashCode(item) to UnmodIterable.calcHashCode(item) to avoid confusion with
+ the instance method of the same name (but different arity).
  - Remove empty() and EMPTY from all interfaces except maybe UnmodIterator.
  These are a problem when you inherit from the interface because you have to override them or suffer.
  These objects don't implement equals() and you end up expecting in UnmodWhatever.EMPTY to .append() or otherwise behave like an ImWhatever, which it probably should never do.
