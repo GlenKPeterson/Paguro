@@ -76,9 +76,9 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
     }
 
     /**
-     This method is deprecated because implementing it on a List has O(n) performance.  This method
-     will never go away because it's declared on java.util.Collection which List extends.  It's
-     deprecated because you should never use it.
+     This method is deprecated because implementing it on a List has O(n) performance.  It will
+     never go away because it's declared on java.util.Collection which List extends.  It still
+     shouldn't be used.
 
      If you need repeated or fast contains() tests, use a Set instead instead of a List.
      SortedSet.contains() has O(log2 n) performance.  HashSet.contains() has O(1) performance!
