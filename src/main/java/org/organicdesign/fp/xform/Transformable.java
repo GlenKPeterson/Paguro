@@ -252,7 +252,8 @@ public interface Transformable<T> {
      @return A map with the keys from the given set, mapped to values using the given function.
      */
     default <U,V> SortedMap<U,V>
-    toMutableSortedMap(final Function1<? super T,Map.Entry<U,V>> f1) {
+    toMutableSortedMap(Comparator<? super U> comp,
+                       final Function1<? super T,Map.Entry<U,V>> f1) {
         return foldLeft(new TreeMap<>(), (ts, t) -> {
             Map.Entry<U,V> entry = f1.apply(t);
             ts.put(entry.getKey(), entry.getValue());

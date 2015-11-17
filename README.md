@@ -37,7 +37,7 @@ Available from the [Maven Repository](http://mvnrepository.com/artifact/org.orga
 <dependency>
         <groupId>org.organicdesign</groupId>
         <artifactId>UncleJim</artifactId>
-        <version>0.11.0</version>
+        <version>0.11.1</version>
 </dependency>
 ```
 

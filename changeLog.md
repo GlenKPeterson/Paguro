@@ -1,5 +1,7 @@
-**2015-11-07 0.11.0**: There are many changes in this point release, but unless you are writing your own collections by subclassing the Unmod interfaces, you probably won't notice.
-The main push at this point is near 100% test coverage before a 1.0 release.  NOTE: this has not been released to Maven Central yet.
+**2015-11-16 0.11.1**: Added a comparator parameter to Transformable.toMutableSortedMap(). 
+
+**2015-11-15 0.11.0**: There are many changes in this point release, but unless you are writing your own collections by subclassing the Unmod interfaces, you probably won't notice.
+The main push at this point is near 100% test coverage before a 1.0 release.
 
  - Deprecated UnmodList.contains().  See note there.  Maybe should have deprecated UnmodCollection.contains() instead?  This still functions the way java.util.List.contains() does, it's just an error to use it.
  - Deprecated UnmodMap.values().  See note there.  Removed all tests for equality on resulting collection.  This still functions the way java.util.Map.values() does, it's just an error to use it.
