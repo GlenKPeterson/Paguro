@@ -1,4 +1,6 @@
-**2015-11-16 0.11.1**: Added a comparator parameter to Transformable.toMutableSortedMap(). 
+**2015-11-16 0.12.0**:
+ - Removed Mutable class because it wasn't thread-safe.  Use java.util.concurrent.atomic.AtomicInteger and AtomicReference instead.
+ - Added a comparator parameter to Transformable.toMutableSortedMap().
 
 **2015-11-15 0.11.0**: There are many changes in this point release, but unless you are writing your own collections by subclassing the Unmod interfaces, you probably won't notice.
 The main push at this point is near 100% test coverage before a 1.0 release.

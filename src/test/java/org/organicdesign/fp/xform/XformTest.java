@@ -18,7 +18,6 @@ import junit.framework.TestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.organicdesign.fp.Mutable;
 import org.organicdesign.fp.function.Function1;
 
 import java.util.ArrayList;
@@ -26,6 +25,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.organicdesign.fp.FunctionUtils.emptyUnmodIterator;
@@ -581,72 +582,60 @@ public class XformTest extends TestCase {
                              .size());
 
         // This tests that I didn't just look ahead 2 or 3 times.  That the look-ahead is sufficient.
-        Mutable.Ref<Integer> count = Mutable.Ref.of(0);
+        AtomicInteger count = new AtomicInteger(0);
         assertArrayEquals(new String[]{"a9", "b9"},
                           Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                                  .flatMap((a) -> {
-                                      count.set(count.value() + 1);
-                                      return (count.value() > 8)
-                                             ? Xform.of(Arrays.asList("a" + a, "b" + a))
-                                             : Xform.of(Collections.emptyList());
-                                  }).toMutableList().toArray());
+                               .flatMap((a) ->  (count.incrementAndGet() > 8)
+                                                ? Xform.of(Arrays.asList("a" + a, "b" + a))
+                                                : Xform.of(Collections.emptyList()))
+                               .toMutableList().toArray());
 
         count.set(0);
         assertArrayEquals(new String[]{"c8", "d8", "c9", "d9"},
                           Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                                  .flatMap((a) -> {
-                                      count.set(count.value() + 1);
-                                      return (count.value() > 7)
-                                             ? Xform.of(Arrays.asList("c" + a, "d" + a))
-                                             : Xform.of(Collections.emptyList());
-                                  })
+                               .flatMap((a) -> (count.incrementAndGet() > 7)
+                                               ? Xform.of(Arrays.asList("c" + a, "d" + a))
+                                               : Xform.of(Collections.emptyList()))
 //                                  .forEach((item) -> {
 //                              System.out.println("Item " + item);
 //                              return null;
 //                          })
-                                  .toMutableList().toArray());
+                               .toMutableList().toArray());
 
         count.set(0);
         assertArrayEquals(new String[]{"e1", "f1", "e2", "f2"},
                           Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                                  .flatMap((a) -> {
-                                      count.set(count.value() + 1);
-                                      return (count.value() < 3)
-                                             ? Xform.of(Arrays.asList("e" + a, "f" + a))
-                                             : Xform.of(Collections.emptyList());
-                                  })
+                               .flatMap((a) -> (count.incrementAndGet() < 3)
+                                               ? Xform.of(Arrays.asList("e" + a, "f" + a))
+                                               : Xform.of(Collections.emptyList()))
 //                                  .forEach((item) -> {
 //                              System.out.println("count: " + count.value() + " Item " + item);
 //                              return null;
 //                          })
-                                  .toMutableList().toArray());
+                               .toMutableList().toArray());
 
-        Mutable.Ref<Xform<Integer>> shrinkSeq = Mutable.Ref.of(Xform.of(Arrays.asList(1, 2, 3)));
+        AtomicReference<Xform<Integer>> shrinkSeq =
+                new AtomicReference<>(Xform.of(Arrays.asList(1, 2, 3)));
         assertArrayEquals(new Integer[]{2, 3, 3},
                           Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                                  .flatMap((a) -> {
-                                      shrinkSeq.set(shrinkSeq.value().drop(1));
-//                                      System.out.print("seq val: " + shrinkSeq.value());
-                                      return shrinkSeq.value();
-                                  })
+                                  .flatMap((a) -> shrinkSeq.updateAndGet(seq -> seq.drop(1)))
                                   .toMutableList().toArray());
 
         // Now start by returning an ofArray, then a seq of length 1, then length 2, etc.
         // The first ofArray should not end the processing.
-        Mutable.Ref<Xform<Integer>> growSeq = Mutable.Ref.of(Xform.of(Collections.emptyList()));
-        Mutable.Ref<Integer> incInt = Mutable.Ref.of(0);
+        AtomicReference<Xform<Integer>> growSeq =
+                new AtomicReference<>(Xform.of(Collections.emptyList()));
+        AtomicInteger incInt = new AtomicInteger(0);
         assertArrayEquals(new Integer[]{1, 1,2},
                           Xform.of(Arrays.asList(1, 2, 3))
-                                  .flatMap((a) -> {
-                                      if (incInt.value() > 0) {
-                                          growSeq.set(growSeq.value()
-                                                             .concat(Xform.of(Collections.singletonList(incInt.value()))));
-                                      }
-                                      incInt.set(incInt.value() + 1);
-                                      return growSeq.value();
-                                  })
-                                  .toMutableList().toArray());
-
+                               .flatMap((a) -> {
+                                   if (incInt.get() > 0) {
+                                       growSeq.updateAndGet(seq -> seq.concat(vec(incInt.get())));
+                                   }
+                                   incInt.getAndIncrement();
+                                   return growSeq.get();
+                               })
+                               .toMutableList().toArray());
     }
 
     @Test public void flatMapChain() {

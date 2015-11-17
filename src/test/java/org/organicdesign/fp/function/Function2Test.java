@@ -1,11 +1,11 @@
 package org.organicdesign.fp.function;
 
-import java.io.IOException;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.organicdesign.fp.Mutable;
+
+import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;
 
@@ -36,30 +36,30 @@ public class Function2Test {
     }
 
     @Test public void memoize() {
-        Mutable.IntRef counter = Mutable.IntRef.of(0);
+        AtomicInteger counter = new AtomicInteger(0);
         Function2<Integer,Double,String> f = (l, d) -> {
-            counter.increment();
+            counter.getAndIncrement();
             return String.valueOf(l) + "~" + String.valueOf(d);
         };
         Function2<Integer,Double,String> g = Function2.memoize(f);
         assertEquals("3~2.5", g.apply(3, 2.5));
-        assertEquals(1, counter.value());
+        assertEquals(1, counter.get());
         assertEquals("3~2.5", g.apply(3, 2.5));
-        assertEquals(1, counter.value());
+        assertEquals(1, counter.get());
 
         assertEquals("3~2.5", f.apply(3, 2.5));
-        assertEquals(2, counter.value());
+        assertEquals(2, counter.get());
 
         assertEquals("3~2.5", g.apply(3, 2.5));
-        assertEquals(2, counter.value());
+        assertEquals(2, counter.get());
 
         assertEquals("5~4.3", g.apply(5, 4.3));
-        assertEquals(3, counter.value());
+        assertEquals(3, counter.get());
         assertEquals("3~2.5", g.apply(3, 2.5));
-        assertEquals(3, counter.value());
+        assertEquals(3, counter.get());
         assertEquals("5~4.3", g.apply(5, 4.3));
-        assertEquals(3, counter.value());
+        assertEquals(3, counter.get());
         assertEquals("3~2.5", g.apply(3, 2.5));
-        assertEquals(3, counter.value());
+        assertEquals(3, counter.get());
     }
 }

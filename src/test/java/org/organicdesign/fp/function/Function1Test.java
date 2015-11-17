@@ -3,9 +3,9 @@ package org.organicdesign.fp.function;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.organicdesign.fp.Mutable;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertArrayEquals;
@@ -182,20 +182,20 @@ public class Function1Test {
 
     @Test public void testMemoize() {
         final int MAX_INT = 1000;
-        Mutable.IntRef ir = Mutable.IntRef.of(0);
+        AtomicInteger ir = new AtomicInteger(0);
         Function1<Integer,String> f = Function1.memoize(i -> {
-            ir.increment();
+            ir.getAndIncrement();
             return ordinal(i);
         });
 
-        assertEquals(0, ir.value());
+        assertEquals(0, ir.get());
 
         // Call function a bunch of times, memoizing the results.
         for (int i = 0; i < MAX_INT; i++) {
             f.apply(i);
         }
         // Assert count of calls equals the actual number.
-        assertEquals(MAX_INT, ir.value());
+        assertEquals(MAX_INT, ir.get());
 
         // Make all those calls again.
         for (int i = 0; i < MAX_INT; i++) {
@@ -203,6 +203,6 @@ public class Function1Test {
         }
 
         // Assert that function has not actually been called again.
-        assertEquals(MAX_INT, ir.value());
+        assertEquals(MAX_INT, ir.get());
     }
 }
