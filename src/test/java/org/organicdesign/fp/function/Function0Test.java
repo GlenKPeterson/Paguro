@@ -6,9 +6,7 @@ import org.junit.runners.JUnit4;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
 
 @RunWith(JUnit4.class)
@@ -31,9 +29,10 @@ public class Function0Test {
         }.apply();
     }
 
-    @Test public void constantFunction() {
+    @Test public void constantFunction() throws Exception {
         Function0<Integer> f = Function0.constantFunction(7);
         assertEquals(Integer.valueOf(7), f.apply());
+        assertEquals(Integer.valueOf(7), f.applyEx());
         assertEquals(Integer.valueOf(7), f.get());
         assertEquals(f.hashCode(), Function0.constantFunction(Integer.valueOf(7)).hashCode());
         assertTrue(f.equals(Function0.constantFunction(Integer.valueOf(7))));
@@ -44,6 +43,10 @@ public class Function0Test {
                                Function0.constantFunction(7),
                                Function0.constantFunction(7),
                                Function0.constantFunction(8));
+
+        assertEquals(0, Function0.constantFunction(null).hashCode());
+
+        assertNotEquals(Function0.constantFunction(null), null);
     }
 
     @Test(expected = IllegalStateException.class)
