@@ -3,11 +3,13 @@ package org.organicdesign.fp.function;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.organicdesign.fp.collections.ImList;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.organicdesign.fp.FunctionUtils.ordinal;
@@ -39,64 +41,74 @@ public class Function1Test {
         }.apply(3);
     }
 
-    @Test
-    public void composePredicatesWithAnd() {
-//        assertTrue(Function1.andArray() == Function1.accept());
-        assertTrue(Function1.and(null) == Function1.accept());
-        assertTrue(Function1.and(vec()) == Function1.accept());
+    static Function1<Object,Boolean> NOT_PROCESSED = i -> {
+        throw new IllegalStateException("Didn't short-circuit");
+    };
 
-//        assertTrue(Function1.andArray(Function1.accept()) == Function1.accept());
-        assertTrue(Function1.and(vec(Function1.accept())) ==
-                   Function1.accept());
+    @Test public void composePredicatesWithAnd() {
+        assertEquals(Function1.ACCEPT, Function1.and(null));
+        assertEquals(Function1.ACCEPT, Function1.and(vec()));
+        assertEquals(Function1.ACCEPT, Function1.and(Collections.emptyList()));
 
-//        assertTrue(Function1.<Object>andArray(Function1.accept(),
-//                                                  Function1.accept(),
-//                                                  Function1.accept()) ==
-//                   Function1.accept());
-        assertTrue(Function1.<Object>and(vec(Function1.accept(),
-                                             Function1.accept(),
-                                             Function1.accept())) ==
-                   Function1.accept());
+        assertEquals(Function1.REJECT,
+                     Function1.and(vec(Function1.reject(),
+                                       NOT_PROCESSED)));
 
-//        assertTrue(Function1.andArray(Function1.reject()) == Function1.reject());
-        assertTrue(Function1.and(vec(Function1.reject())) ==
-                   Function1.reject());
+        assertEquals(Function1.REJECT,
+                     Function1.and(vec(null, null, null, Function1.reject(),
+                                       NOT_PROCESSED)));
+
+        assertEquals(Function1.REJECT,
+                     Function1.and(Arrays.asList(null, null, null, Function1.reject(),
+                                                 NOT_PROCESSED)));
+
+        assertEquals(Function1.REJECT,
+                     Function1.and(vec(Function1.accept(),
+                                       Function1.accept(),
+                                       Function1.accept(),
+                                       Function1.reject(),
+                                       NOT_PROCESSED)));
+
+        assertEquals(Function1.REJECT,
+                     Function1.and(vec(Function1.reject(),
+                                       Function1.accept(),
+                                       Function1.accept(),
+                                       Function1.accept())));
+
+        assertEquals(Function1.ACCEPT,
+                     Function1.and(vec(Function1.accept())));
     }
 
-    @Test
-    public void composePredicatesWithOr() {
-//        assertTrue(Function1.orArray() == Function1.reject());
-        assertTrue(Function1.or(null) == Function1.reject());
+    @Test public void composePredicatesWithOr() {
+        assertEquals(Function1.REJECT, Function1.or(null));
 
-//        assertTrue(Function1.orArray(Function1.accept()) == Function1.accept());
-        assertTrue(Function1.or(vec(Function1.accept())) ==
-                   Function1.accept());
+        assertEquals(Function1.ACCEPT,
+                     Function1.or(vec(Function1.accept(),
+                                      NOT_PROCESSED)));
 
-//        assertTrue(Function1.<Object>orArray(Function1.reject(),
-//                                             Function1.reject(),
-//                                             Function1.reject(),
-//                                             Function1.accept()) ==
-//                   Function1.accept());
-        assertTrue(Function1.<Object>or(vec(Function1.reject(),
-                                                     Function1.reject(),
-                                                     Function1.reject(),
-                                                     Function1.accept())) ==
-                   Function1.accept());
+        assertEquals(Function1.ACCEPT,
+                     Function1.or(vec(null, null, null, Function1.accept(),
+                                      NOT_PROCESSED)));
 
-//        assertTrue(Function1.<Object>orArray(Function1.accept(),
-//                                             Function1.reject(),
-//                                             Function1.reject(),
-//                                             Function1.reject()) ==
-//                   Function1.accept());
-        assertTrue(Function1.<Object>or(vec(Function1.accept(),
-                                                     Function1.reject(),
-                                                     Function1.reject(),
-                                                     Function1.reject())) ==
-                   Function1.accept());
+        assertEquals(Function1.ACCEPT,
+                     Function1.or(Arrays.asList(null, null, null, Function1.accept(),
+                                                NOT_PROCESSED)));
 
-//        assertTrue(Function1.orArray(Function1.reject()) == Function1.reject());
-        assertTrue(Function1.or(vec(Function1.reject())) ==
-                Function1.reject());
+        assertEquals(Function1.ACCEPT,
+                     Function1.or(vec(Function1.reject(),
+                                      Function1.reject(),
+                                      Function1.reject(),
+                                      Function1.accept(),
+                                      NOT_PROCESSED)));
+
+        assertEquals(Function1.ACCEPT,
+                     Function1.or(vec(Function1.accept(),
+                                      Function1.reject(),
+                                      Function1.reject(),
+                                      Function1.reject())));
+
+        assertEquals(Function1.REJECT,
+                     Function1.or(vec(Function1.reject())));
     }
 
     @Test public void compose() {
@@ -157,52 +169,125 @@ public class Function1Test {
 
     @Test
     public void filtersOfPredicates() {
-        assertArrayEquals(vec(1, 2, 3, 4, 5, 6, 7, 8, 9)
-                        .filter(Function1.<Integer>and((i) -> i > 2,
-                                (i) -> i < 6))
-                        .toMutableList()
-                        .toArray(),
-                new Integer[]{3, 4, 5});
+        Integer[] oneToNineArray = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        ImList<Integer> oneToNine = vec(oneToNineArray);
 
-        assertArrayEquals(vec(1, 2, 3, 4, 5, 6, 7, 8, 9)
-                        .filter(Function1.or(i -> i < 3,
-                                i -> i > 5))
-                        .toMutableList()
-                        .toArray(),
-                new Integer[]{1, 2, 6, 7, 8, 9});
+        assertEquals(Function1.ACCEPT, Function1.or(Function1.accept(), (Integer i) -> i < 6));
+        assertEquals(Function1.ACCEPT, Function1.or((Integer i) -> i < 6, Function1.accept()));
 
-        assertArrayEquals(vec(1, 2, 3, 4, 5, 6, 7, 8, 9)
-                        .filter(Function1.or(vec(i -> i < 3,
-                                i -> i == 4,
-                                i -> i > 5)))
-                        .toMutableList()
-                        .toArray(),
-                new Integer[]{1, 2, 4, 6, 7, 8, 9});
+        assertArrayEquals(oneToNineArray,
+                          oneToNine.filter(Function1.or(i -> i < 3,
+                                                        Function1.accept()))
+                                   .toMutableList()
+                                   .toArray());
+
+        assertArrayEquals(oneToNineArray,
+                          oneToNine.filter(Function1.or(Function1.accept(),
+                                                        i -> i > 5))
+                                   .toMutableList()
+                                   .toArray());
+
+
+        assertArrayEquals(new Integer[]{6, 7, 8, 9},
+                          oneToNine.filter(Function1.or(Function1.reject(),
+                                                        i -> i > 5))
+                                   .toMutableList()
+                                   .toArray());
+
+        assertArrayEquals(new Integer[]{1, 2},
+                          oneToNine.filter(Function1.or(i -> i < 3,
+                                                        Function1.reject()))
+                                   .toMutableList()
+                                   .toArray());
+
+        assertArrayEquals(new Integer[]{1, 2, 6, 7, 8, 9},
+                          oneToNine.filter(Function1.or(i -> i < 3,
+                                                        i -> i > 5))
+                                   .toMutableList()
+                                   .toArray());
+
+        assertArrayEquals(new Integer[]{1, 2, 4, 6, 7, 8, 9},
+                          oneToNine.filter(Function1.or(vec(i -> i < 3,
+                                                            i -> i == 4,
+                                                            i -> i > 5)))
+                                   .toMutableList()
+                                   .toArray());
+
+        // and(a, b)
+        assertEquals(Function1.REJECT, Function1.and(Function1.reject(), (Integer i) -> i < 6));
+        assertEquals(Function1.REJECT, Function1.and((Integer i) -> i < 6, Function1.reject()));
+
+        assertArrayEquals(new Integer[]{},
+                          oneToNine.filter(Function1.and((i) -> i > 2,
+                                                         Function1.reject()))
+                                   .toMutableList()
+                                   .toArray());
+
+        assertArrayEquals(new Integer[]{},
+                          oneToNine.filter(Function1.and(Function1.reject(),
+                                                         (i) -> i > 2))
+                                   .toMutableList()
+                                   .toArray());
+
+        assertArrayEquals(new Integer[]{3, 4, 5, 6, 7, 8, 9},
+                          oneToNine.filter(Function1.and((i) -> i > 2,
+                                                         Function1.accept()))
+                                   .toMutableList()
+                                   .toArray());
+
+        assertArrayEquals(new Integer[]{1, 2, 3, 4, 5},
+                          oneToNine.filter(Function1.and(Function1.accept(),
+                                                         (i) -> i < 6))
+                                   .toMutableList()
+                                   .toArray());
+
+        assertArrayEquals(new Integer[]{3, 4, 5},
+                          oneToNine.filter(Function1.and((i) -> i > 2,
+                                                         (i) -> i < 6))
+                                   .toMutableList()
+                                   .toArray());
+
+        assertArrayEquals(new Integer[]{4, 5},
+                          oneToNine.filter(Function1.and(vec(i -> i > 2,
+                                                             i -> i > 3,
+                                                             i -> i < 6)))
+                                   .toMutableList()
+                                   .toArray());
+
+        assertEquals(Function1.REJECT, Function1.negate(Function1.accept()));
+        assertEquals(Function1.ACCEPT, Function1.negate(Function1.reject()));
+
+        assertArrayEquals(new Integer[]{1, 2},
+                          oneToNine.filter(Function1.negate(i -> i > 2))
+                                   .toMutableList()
+                                   .toArray());
     }
 
     @Test public void testMemoize() {
         final int MAX_INT = 1000;
-        AtomicInteger ir = new AtomicInteger(0);
+        AtomicInteger counter = new AtomicInteger(0);
         Function1<Integer,String> f = Function1.memoize(i -> {
-            ir.getAndIncrement();
+            counter.getAndIncrement();
             return ordinal(i);
         });
 
-        assertEquals(0, ir.get());
+        assertEquals(0, counter.get());
 
         // Call function a bunch of times, memoizing the results.
         for (int i = 0; i < MAX_INT; i++) {
-            f.apply(i);
+            assertEquals(ordinal(i), f.apply(i));
         }
         // Assert count of calls equals the actual number.
-        assertEquals(MAX_INT, ir.get());
+        assertEquals(MAX_INT, counter.get());
 
         // Make all those calls again.
         for (int i = 0; i < MAX_INT; i++) {
-            f.apply(i);
+            assertEquals(ordinal(i), f.apply(i));
+            // this is for compatibility with Consumer.
+            f.accept(i);
         }
 
         // Assert that function has not actually been called again.
-        assertEquals(MAX_INT, ir.get());
+        assertEquals(MAX_INT, counter.get());
     }
 }
