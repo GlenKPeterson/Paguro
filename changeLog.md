@@ -1,3 +1,6 @@
+**2015-11-22 0.12.1**:
+ - Renamed overloaded toString() methods on FunctionUtils to mapToString() and arrayToString().
+
 **2015-11-16 0.12.0**:
  - Removed Mutable class because it wasn't thread-safe.  Use java.util.concurrent.atomic.AtomicInteger and AtomicReference instead.
  - Added a comparator parameter to Transformable.toMutableSortedMap().

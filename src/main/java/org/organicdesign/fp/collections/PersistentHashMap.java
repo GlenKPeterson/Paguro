@@ -724,7 +724,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         final AtomicReference<Thread> edit;
 
         @Override public String toString() {
-            return "BitmapIndexedNode(" + bitmap + "," + FunctionUtils.toString(array) + "," +
+            return "BitmapIndexedNode(" + bitmap + "," + FunctionUtils.arrayToString(array) + "," +
                    edit + ")";
         }
 

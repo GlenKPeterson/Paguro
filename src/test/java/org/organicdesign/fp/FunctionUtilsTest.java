@@ -17,13 +17,21 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.organicdesign.fp.collections.ImList;
+import org.organicdesign.fp.collections.ImMap;
+import org.organicdesign.fp.collections.ImSet;
+import org.organicdesign.fp.collections.ImSortedMap;
+import org.organicdesign.fp.collections.ImSortedSet;
 import org.organicdesign.fp.collections.UnmodCollection;
-import org.organicdesign.fp.collections.UnmodListIterator;
+import org.organicdesign.fp.collections.UnmodList;
+import org.organicdesign.fp.collections.UnmodListTest;
 import org.organicdesign.fp.collections.UnmodMap;
 import org.organicdesign.fp.collections.UnmodSet;
 import org.organicdesign.fp.collections.UnmodSortedMap;
 import org.organicdesign.fp.collections.UnmodSortedSet;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,10 +49,25 @@ import java.util.TreeSet;
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.FunctionUtils.*;
+import static org.organicdesign.fp.StaticImports.*;
 import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
 
 @RunWith(JUnit4.class)
 public class FunctionUtilsTest {
+
+    @Test (expected = UnsupportedOperationException.class)
+    public void instantiationEx() throws Throwable {
+        Class<FunctionUtils> c = FunctionUtils.class;
+        Constructor defCons = c.getDeclaredConstructor();
+        defCons.setAccessible(true);
+        try {
+            // This catches the exception and wraps it in an InvocationTargetException
+            defCons.newInstance();
+        } catch (InvocationTargetException ite) {
+            // Here we throw the original exception.
+            throw ite.getTargetException();
+        }
+    }
 
     @Test
     public void testToString() {
@@ -54,30 +77,34 @@ public class FunctionUtilsTest {
         is.add(3);
         is.add(4);
         is.add(5);
-        assertEquals("Array<Integer>(1,2,3,4,5)", FunctionUtils.toString(is.toArray()));
+        assertEquals("Array<Integer>(1,2,3,4,5)", FunctionUtils.arrayToString(is.toArray()));
 
         is.add(6);
-        assertEquals("Array<Integer>(1,2,3,4,5,...)", FunctionUtils.toString(is.toArray()));
+        assertEquals("Array<Integer>(1,2,3,4,5,...)", FunctionUtils.arrayToString(is.toArray()));
 
         Map<String,Integer> m = new TreeMap<>();
         m.put("Hello", 99);
         m.put("World", -237);
-        assertEquals("TreeMap(Entry(Hello,99),Entry(World,-237))", FunctionUtils.toString(m));
+        assertEquals("TreeMap(Entry(Hello,99),Entry(World,-237))", FunctionUtils.mapToString(m));
 
         m.put("x", 3);
         m.put("y", 2);
         m.put("z", 1);
         m.put("zz", 0);
 
-        assertEquals("TreeMap(Entry(Hello,99),Entry(World,-237),Entry(x,3),Entry(y,2),Entry(z,1),...)", FunctionUtils.toString(m));
+        assertEquals("TreeMap(Entry(Hello,99),Entry(World,-237),Entry(x,3),Entry(y,2),Entry(z,1),...)",
+                     FunctionUtils.mapToString(m));
+
+        assertEquals("Array()", FunctionUtils.arrayToString(new Integer[0]));
+        assertEquals("Array(null)", FunctionUtils.arrayToString(new Integer[] {null}));
 
     }
 
     @SuppressWarnings({"ConstantConditions","Unchecked"})
     @Test public void testToStringNull() {
-        assertEquals("null", FunctionUtils.toString((Map<String,Integer>) null));
+        assertEquals("null", FunctionUtils.mapToString(null));
         Integer[] zs = null;
-        assertEquals("null", FunctionUtils.toString(zs));
+        assertEquals("null", FunctionUtils.arrayToString(zs));
     }
 
 //    @SuppressWarnings("Convert2Lambda")
@@ -537,6 +564,15 @@ public class FunctionUtilsTest {
     public void emptyIteratorTestEx() { emptyUnmodIterable().iterator().next(); }
 
 
+    @Test public void unmodIterableTest() {
+        ImList<Integer> oneTwoThree = vec(1,2,3);
+        assertTrue("An unmod iterable comes through unmodified",
+                   oneTwoThree == unmodIterable(oneTwoThree));
+
+        UnmodListTest.iteratorTest(Arrays.asList(1,2,3).iterator(),
+                                   unmodIterable(Arrays.asList(1,2,3)).iterator());
+    }
+
     @Test public void testEmptyUnmodListIterator() {
         assertFalse(emptyUnmodListIterator().hasNext());
         assertFalse(emptyUnmodListIterator().hasPrevious());
@@ -544,49 +580,23 @@ public class FunctionUtilsTest {
         assertEquals(-1, emptyUnmodListIterator().previousIndex());
     }
 
-    @Test public void unListIterator() {
-        UnmodListIterator<Integer> uli = FunctionUtils.unmodList(Arrays.asList(5, 4, 3)).listIterator();
-        assertFalse(uli.hasPrevious());
-        assertTrue(uli.hasNext());
+    @Test (expected = NoSuchElementException.class)
+    public void testUnmodListIteratorNext() { EMPTY_UNMOD_LIST_ITERATOR.next(); }
 
-        Assert.assertEquals(-1, uli.previousIndex());
-        Assert.assertEquals(0, uli.nextIndex());
-        Assert.assertEquals(Integer.valueOf(5), uli.next());
-        assertTrue(uli.hasPrevious());
-        assertTrue(uli.hasNext());
+    @Test (expected = NoSuchElementException.class)
+    public void testUnmodListIteratorPrev() { EMPTY_UNMOD_LIST_ITERATOR.previous(); }
 
-        Assert.assertEquals(0, uli.previousIndex());
-        Assert.assertEquals(1, uli.nextIndex());
-        Assert.assertEquals(Integer.valueOf(4), uli.next());
-        assertTrue(uli.hasPrevious());
-        assertTrue(uli.hasNext());
+    @Test public void unmodListIteratorTest() {
+        UnmodList emptyUnList = FunctionUtils.unmodList(null);
+        assertTrue(EMPTY_UNMOD_LIST == emptyUnList);
+        assertTrue(EMPTY_UNMOD_LIST_ITERATOR == emptyUnList.listIterator());
+        assertTrue(EMPTY_UNMOD_LIST == FunctionUtils.unmodList(Collections.emptyList()));
 
-        Assert.assertEquals(1, uli.previousIndex());
-        Assert.assertEquals(2, uli.nextIndex());
-        Assert.assertEquals(Integer.valueOf(3), uli.next());
-        assertTrue(uli.hasPrevious());
-        assertFalse(uli.hasNext());
+        ImList<Integer> oneTwoThree = vec(1,2,3);
+        assertTrue("An unmod List comes through unmodified",
+                   oneTwoThree == unmodList(oneTwoThree));
 
-        Assert.assertEquals(2, uli.previousIndex());
-        Assert.assertEquals(3, uli.nextIndex());
-        Assert.assertEquals(Integer.valueOf(3), uli.previous());
-        assertTrue(uli.hasPrevious());
-        assertTrue(uli.hasNext());
-
-        Assert.assertEquals(1, uli.previousIndex());
-        Assert.assertEquals(2, uli.nextIndex());
-        Assert.assertEquals(Integer.valueOf(4), uli.previous());
-        assertTrue(uli.hasPrevious());
-        assertTrue(uli.hasNext());
-
-        Assert.assertEquals(0, uli.previousIndex());
-        Assert.assertEquals(1, uli.nextIndex());
-        Assert.assertEquals(Integer.valueOf(5), uli.previous());
-        assertFalse(uli.hasPrevious());
-        assertTrue(uli.hasNext());
-
-        Assert.assertEquals(-1, uli.previousIndex());
-        Assert.assertEquals(0, uli.nextIndex());
+        UnmodListTest.listIteratorTest(Arrays.asList(1,2,3), unmodList(Arrays.asList(1,2,3)));
     }
 
     @Test public void unListTest() {
@@ -601,6 +611,17 @@ public class FunctionUtilsTest {
         assertEquals(-1, emptyUnmodList().lastIndexOf(39));
         assertTrue(EMPTY_UNMOD_LIST_ITERATOR == emptyUnmodList().listIterator(0));
         assertEquals(0, emptyUnmodList().size());
+
+        List<Integer> refList = Arrays.asList(1,2,3,4);
+        UnmodList<Integer> testList = unmodList(Arrays.asList(1,2,3,4));
+
+        assertEquals(refList.size(), testList.size());
+
+        for (int i = 0; i < refList.size(); i++) {
+            assertEquals(refList.get(i), testList.get(i));
+        }
+
+        UnmodListTest.iteratorTest(refList.iterator(), testList.iterator());
     }
 
     @Test (expected = IndexOutOfBoundsException.class)
@@ -623,6 +644,12 @@ public class FunctionUtilsTest {
 
     @Test public void unSetTest() {
         UnmodSet<Integer> s = FunctionUtils.unmodSet(new HashSet<>(Arrays.asList(5, 4, 3)));
+
+        assertEquals(FunctionUtils.EMPTY_UNMOD_SET, FunctionUtils.unmodSet(null));
+        assertEquals(FunctionUtils.EMPTY_UNMOD_SET, FunctionUtils.unmodSet(Collections.emptySet()));
+
+        ImSet<Integer> imSet = set(1,2,3);
+        assertTrue(imSet == FunctionUtils.unmodSet(imSet));
 
         assertTrue(s.contains(3));
         assertFalse(s.contains(-1));
@@ -654,6 +681,13 @@ public class FunctionUtilsTest {
 
 
     @Test public void unSetSorted() {
+        assertEquals(FunctionUtils.EMPTY_UNMOD_SORTED_SET, FunctionUtils.unmodSortedSet(null));
+        assertEquals(FunctionUtils.EMPTY_UNMOD_SORTED_SET,
+                     FunctionUtils.unmodSortedSet(Collections.emptySortedSet()));
+
+        ImSortedSet<Integer> imSet = sortedSet((a, b) -> a - b, vec(1, 2, 3));
+        assertTrue(imSet == FunctionUtils.unmodSortedSet(imSet));
+
         UnmodSortedSet<Integer> ts = FunctionUtils.unmodSortedSet(new TreeSet<>(Arrays.asList(5, 4, 3)));
         assertNull(ts.comparator());
         // headSet is exclusive.
@@ -708,6 +742,16 @@ public class FunctionUtilsTest {
 
     @SuppressWarnings("deprecation")
     @Test public void unMapTest() {
+        assertEquals(FunctionUtils.EMPTY_UNMOD_MAP, FunctionUtils.unmodMap(null));
+        assertEquals(FunctionUtils.EMPTY_UNMOD_MAP,
+                     FunctionUtils.unmodMap(Collections.emptyMap()));
+
+        ImMap<Integer,String> imMap = map(tup(1, ordinal(1)),
+                                          tup(2, ordinal(2)),
+                                          tup(3, ordinal(3)));
+
+        assertTrue(imMap == FunctionUtils.unmodMap(imMap));
+
         final UnmodMap<Integer,String> ts;
         Map<Integer,String> sm = new HashMap<>();
         sm.put(5, "five");
@@ -731,6 +775,12 @@ public class FunctionUtilsTest {
         assertFalse(ts.containsValue("six"));
 
         assertFalse(ts.isEmpty());
+
+        UnmodListTest.iteratorTest(ts.iterator(), sm.entrySet().iterator());
+
+        assertEquals(ts.values().hashCode(), sm.values().hashCode());
+        assertTrue(ts.values().equals(sm.values()));
+//        assertTrue(sm.values().equals(ts.values()));
 
         final UnmodMap<Integer,String> m2;
         {
@@ -775,6 +825,15 @@ public class FunctionUtilsTest {
     }
 
     @Test public void unMapSorted() {
+        assertEquals(FunctionUtils.EMPTY_UNMOD_SORTED_MAP, FunctionUtils.unmodSortedMap(null));
+        assertEquals(FunctionUtils.EMPTY_UNMOD_SORTED_MAP,
+                     FunctionUtils.unmodSortedMap(Collections.emptySortedMap()));
+
+        ImSortedMap<Integer,String> imMap = sortedMap((a, b) -> a - b, vec(tup(1, ordinal(1)),
+                                                                           tup(2, ordinal(2)),
+                                                                           tup(3, ordinal(3))));
+        assertTrue(imMap == FunctionUtils.unmodSortedMap(imMap));
+
         final UnmodSortedMap<Integer,String> ts;
         SortedMap<Integer,String> sm = new TreeMap<>();
         sm.put(5, "five");
@@ -916,7 +975,15 @@ public class FunctionUtilsTest {
     public void testEmptyEx02() { emptyUnmodSortedMap().lastKey(); }
 
 
+    @SuppressWarnings("deprecation")
     @Test public void unCollection() {
+        assertEquals(FunctionUtils.EMPTY_UNMOD_COLLECTION, FunctionUtils.unmodCollection(null));
+        assertEquals(FunctionUtils.EMPTY_UNMOD_COLLECTION,
+                     FunctionUtils.unmodCollection(Collections.emptySet()));
+
+        ImSet<Integer> imSet = set(1, 2, 3);
+        assertTrue(imSet == FunctionUtils.unmodCollection(imSet));
+
         ArrayDeque<Integer> ad = new ArrayDeque<>(Arrays.asList(1, 2, 3));
         UnmodCollection<Integer> a = unmodCollection(new ArrayDeque<>(Arrays.asList(1, 2, 3)));
         Assert.assertEquals(3, a.size());

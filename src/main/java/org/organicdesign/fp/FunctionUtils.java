@@ -49,11 +49,12 @@ import java.util.SortedSet;
 public class FunctionUtils {
 
     // I don't want any instances of this class.
-    private FunctionUtils() {}
-
+    private FunctionUtils() {
+        throw new UnsupportedOperationException("No instantiation");
+    }
 
     /** Returns a String showing the type and first few elements of a map */
-    public static <A,B> String toString(Map<A,B> map) {
+    public static <A,B> String mapToString(Map<A,B> map) {
         if (map == null) {
             return "null";
         }
@@ -80,7 +81,7 @@ public class FunctionUtils {
     }
 
     /** Returns a String showing the type and first few elements of an array */
-    public static String toString(Object[] as) {
+    public static String arrayToString(Object[] as) {
         if (as == null) {
             return "null";
         }
@@ -207,11 +208,11 @@ public class FunctionUtils {
         return Integer.toString(origI) + "th";
     }
 
-    // EqualsWhichDoesntCheckParameterClass Note:
-    // http://codereview.stackexchange.com/questions/88333/is-one-sided-equality-more-helpful-or-more-confusing-than-quick-failure
-    // "There is no one-sided equality. If it is one-sided, that is it's asymmetric, then it's just
-    // wrong."  Which is a little ironic because with inheritance, there are many cases in Java
-    // where equality is one-sided.
+// EqualsWhichDoesntCheckParameterClass Note:
+// http://codereview.stackexchange.com/questions/88333/is-one-sided-equality-more-helpful-or-more-confusing-than-quick-failure
+// "There is no one-sided equality. If it is one-sided, that is it's asymmetric, then it's just
+// wrong."  Which is a little ironic because with inheritance, there are many cases in Java
+// where equality is one-sided.
 
     public static UnmodIterator<Object> EMPTY_UNMOD_ITERATOR = new UnmodIterator<Object>() {
         @Override public boolean hasNext() { return false; }
@@ -225,10 +226,11 @@ public class FunctionUtils {
     static UnmodIterable<Object> EMPTY_UNMOD_ITERABLE = () -> emptyUnmodIterator();
 
     @SuppressWarnings("unchecked")
-    static <E> UnmodIterable<E> emptyUnmodIterable() { return (UnmodIterable<E>) EMPTY_UNMOD_ITERABLE; }
+    static <E> UnmodIterable<E> emptyUnmodIterable() {
+        return (UnmodIterable<E>) EMPTY_UNMOD_ITERABLE;
+    }
 
     /** Returns an unmodifiable version of the given iterable. */
-    // TODO: Test this.
     public static <T> UnmodIterable<T> unmodIterable(Iterable<T> iterable) {
         if (iterable == null) { return emptyUnmodIterable(); }
         if (iterable instanceof UnmodIterable) { return (UnmodIterable<T>) iterable; }
@@ -322,6 +324,19 @@ public class FunctionUtils {
             @Override public int hashCode() { return inner.hashCode(); }
             @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
             @Override public boolean equals(Object o) { return inner.equals(o); }
+            @Override public UnmodListIterator<T> listIterator(int idx) {
+                return unmodListIterator(inner.listIterator(idx));
+            }
+            @Override public UnmodListIterator<T> listIterator() {
+                return unmodListIterator(inner.listIterator());
+            }
+            @Override public UnmodSortedIterator<T> iterator() {
+                Iterator<T> iter = inner.iterator();
+                return new UnmodSortedIterator<T>() {
+                    @Override public boolean hasNext() { return iter.hasNext(); }
+                    @Override public T next() { return iter.next(); }
+                };
+            }
         };
     }
 
@@ -499,7 +514,6 @@ public class FunctionUtils {
         if (map instanceof UnmodSortedMap) { return (UnmodSortedMap<K,V>) map; }
         if (map.size() < 1) { return emptyUnmodSortedMap(); }
         return new UnmodSortedMap<K,V>() {
-//            // TODO: Test this.
 //            @Override public UnmodSortedSet<Entry<K,V>> entrySet() {
 //                return new UnmodSortedSet<Entry<K,V>>() {
 //                    Set<Entry<K,V>> entrySet = map.entrySet();
@@ -548,7 +562,9 @@ public class FunctionUtils {
             @Override public int size() { return map.size(); }
             @Override public boolean isEmpty() { return map.isEmpty(); }
             @Override public boolean containsKey(Object key) { return map.containsKey(key); }
-            @Override public boolean containsValue(Object value) { return map.containsValue(value); }
+            @Override public boolean containsValue(Object value) {
+                return map.containsValue(value);
+            }
             @Override public V get(Object key) { return map.get(key); }
 //            @Override public UnmodSortedSet<K> keySet() { return unmodSet(map.keySet()); }
             @Override public Comparator<? super K> comparator() { return map.comparator(); }
@@ -594,8 +610,13 @@ public class FunctionUtils {
     }
 
 
-    /** Returns an unmodifiable version of the given collection. */
-    public static <T> UnmodCollection<T> unmodCollection(Collection<T> coll) {
+    /**
+     Returns an unmodifiable version of the given collection.  Collections shouldn't be instantiated
+     because they are an abomination from the equals() point of view - neither List nor Set will
+     call themselves equal to a Collection.
+     */
+    @Deprecated
+    static <T> UnmodCollection<T> unmodCollection(Collection<T> coll) {
         if (coll == null) { return emptyUnmodCollection(); }
         if (coll instanceof UnmodCollection) { return (UnmodCollection<T>) coll; }
         if (coll.size() < 1) { return emptyUnmodCollection(); }

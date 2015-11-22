@@ -53,7 +53,6 @@ public class StaticImportsTest {
         }
     }
 
-
     @SuppressWarnings({"NullArgumentToVariableArgMethod", "RedundantArrayCreation", "unchecked"})
     @Test public void testMap() throws Exception {
         assertEquals(PersistentHashMap.EMPTY, map());
