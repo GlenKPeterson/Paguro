@@ -16,6 +16,7 @@ package org.organicdesign.fp;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
+import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class OrTest {
     @Test public void bad() {
@@ -60,6 +61,16 @@ public class OrTest {
     }
 
     @Test public void equalsHashCodeToStr() {
+        equalsDistinctHashCode(Or.bad("Hello"),
+                               Or.bad("Hello"),
+                               Or.bad("Hello"),
+                               Or.good("Hello"));
+
+        equalsDistinctHashCode(Or.good("Hello"),
+                               Or.good("Hello"),
+                               Or.good("Hello"),
+                               Or.bad("Hello"));
+
         Or<Integer,String> b = Or.bad("Hello");
         assertEquals(b.hashCode(), Or.bad("Hello").hashCode());
         assertTrue(b.equals(Or.bad("Hello")));

@@ -12,6 +12,9 @@ versions:display-dependency-updates
 To see third-party licenses: http://mojo.codehaus.org/license-maven-plugin/
 license:add-third-party
 
+// Java Code Coverage report:
+mvn clean test jacoco:report
+
 pmd:cpd reports on cut and pasted code in your project.
 
 Show the dependency tree:
