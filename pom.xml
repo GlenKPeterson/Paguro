@@ -35,7 +35,7 @@ http://mvnrepository.com/artifact/org.organicdesign/UncleJim
 	-->
 	<groupId>org.organicdesign</groupId>
 	<artifactId>UncleJim</artifactId>
-	<version>0.12.0</version>
+	<version>0.12.1</version>
 	<packaging>jar</packaging>
 
 	<name>UncleJim</name>
