@@ -5,6 +5,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.io.IOException;
+import java.util.concurrent.Callable;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
@@ -34,6 +35,7 @@ public class Function0Test {
         assertEquals(Integer.valueOf(7), f.apply());
         assertEquals(Integer.valueOf(7), f.applyEx());
         assertEquals(Integer.valueOf(7), f.get());
+        assertEquals(Integer.valueOf(7), f.call());
         assertEquals(f.hashCode(), Function0.constantFunction(Integer.valueOf(7)).hashCode());
         assertTrue(f.equals(Function0.constantFunction(Integer.valueOf(7))));
 
@@ -47,6 +49,8 @@ public class Function0Test {
         assertEquals(0, Function0.constantFunction(null).hashCode());
 
         assertNotEquals(Function0.constantFunction(null), null);
+
+        assertFalse(Function0.constantFunction(35).equals((Callable<Integer>) () -> 35));
     }
 
     @Test(expected = IllegalStateException.class)
