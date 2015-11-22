@@ -713,12 +713,22 @@ public class XformTest extends TestCase {
                           .foldLeft(0, null, Function1.reject()));
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void flatMapEx() { Xform.of(Arrays.asList(1, 2, 3)).flatMap(null); }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void mapEx() { Xform.of(Arrays.asList(1, 2, 3)).map(null); }
+
     @Test public void foldLeftTerm() {
         Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
         assertEquals(Integer.valueOf(45),
                      Xform.of(Arrays.asList(ints))
                           .foldLeft(0, (accum, i) -> accum + i, Function1.reject()));
+
+        assertEquals(Integer.valueOf(45),
+                     Xform.of(Arrays.asList(ints))
+                          .foldLeft(0, (accum, i) -> accum + i, null));
 
         assertArrayEquals(new Integer[]{2, 3, 4},
                           Xform.of(Arrays.asList(ints))
