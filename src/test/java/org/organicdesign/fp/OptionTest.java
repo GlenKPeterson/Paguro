@@ -40,7 +40,10 @@ public class OptionTest {
         assertEquals("Hello", os.getOrElse("Goodbye"));
         assertEquals(Integer.valueOf(1), o1a.patMat(s -> 1,
                                                     () -> 2));
+        assertEquals(Option.NONE, Option.someOrNullNoneOf(Option.NONE));
 
+        assertTrue(Option.NONE.equals(Option.NONE));
+        assertTrue(Option.NONE.equals(Option.someOrNullNoneOf(null)));
     }
 
     @Test(expected = IllegalStateException.class) public void noneEx() {

@@ -3,6 +3,7 @@ package org.organicdesign.fp.either;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class OneOf2Test {
@@ -17,16 +18,18 @@ public class OneOf2Test {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void testEx1() {
-        OneOf2._1(57).throw2("hi");
-    }
+    public void testEx1() { OneOf2._1(57).throw2("hi"); }
 
     @Test(expected = IllegalStateException.class)
-    public void testEx2() {
-        OneOf2._2("good").throw1(23);
-    }
+    public void testEx2() { OneOf2._2("good").throw1(23); }
 
     @Test public void testEquality() {
+        assertEquals(0, OneOf2._1(null).hashCode());
+        assertEquals(~0, OneOf2._2(null).hashCode());
+
+        assertFalse(OneOf2._1(37).equals(OneOf2._2(37)));
+        assertFalse(OneOf2._2(37).equals(OneOf2._1(37)));
+
         equalsDistinctHashCode(OneOf2._1("one"), OneOf2._1("one"), OneOf2._1("one"),
                                OneOf2._1("onf"));
 
