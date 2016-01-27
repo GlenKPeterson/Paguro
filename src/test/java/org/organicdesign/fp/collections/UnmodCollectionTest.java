@@ -50,6 +50,20 @@ public class UnmodCollectionTest {
                 @Override public T next() { return iter.next(); }
             };
         }
+
+        @Override public String toString() {
+            StringBuilder sB = new StringBuilder("TestColl(");
+            boolean isFirst = true;
+            for (T item : this) {
+                if (isFirst) {
+                    isFirst = false;
+                } else {
+                    sB.append(",");
+                }
+                sB.append(item);
+            }
+            return sB.append(")").toString();
+        }
     }
 
     private static final String[] sticksAndStones = new String[] {
