@@ -78,7 +78,7 @@ Usage examples are implemented as unit tests to ensure that they remain correct 
 
 ##Q: How does this compare to PCollections?
 
-[UncleJim is based on Clojure, theoretically faster and has additional features](wiki/UncleJim%20vs.%20PCollections)
+[UncleJim is based on Clojure, theoretically faster and has additional features](https://github.com/GlenKPeterson/UncleJim/wiki/UncleJim-vs.-PCollections)
 
 ##Q: Do these Transforms create intermediate collections between each operation (like the Scala collections)?
 
