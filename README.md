@@ -1,4 +1,4 @@
-UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") is a small library that enables a cleaner, safer style of Java programming.  It approaches a domain specific language (DSL) inside Java.
+UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") provides type-safe versions of Clojure's immutable collections and a few other tools to make functional programming in Java a little easier.
 
 ```java
 // Define some people with lists of email addresses on the fly.
@@ -46,15 +46,15 @@ Available from the [Maven Repository](http://mvnrepository.com/artifact/org.orga
 * Type-safe versions of Clojure's immutable collections, implementing the generic `java.util` collection interfaces.
 * A simplified immutable alternative to Java 8 Streams, wrapping checked exceptions and avoiding primitives.
 * A tiny, type-safe data definition language of brief helper functions: `vec()`, `set()`, `map()`, and `tup()`, (like Clojure's vector `[]`, set `#{}`, and map `{}`).
-* Extend Tuples to make your own immutable Java classes (with correct `equals()`, `hashCode()`, and `toString()` implementations) almost as easily as writing case classes in Scala.
+* Tuples which can be extended to make your own immutable Java classes with correct `equals()`, `hashCode()`, and `toString()` implementations.
 
-UncleJim takes advantages of Java's type inferencing by avoiding void return types, arrays, primatives, and checked exceptions in lambdas.  It can decrease the amount of code you need to write by a factor of at 2x-3x while focusing you on using the right collections for the fastest possible code.
+UncleJim takes advantages of Java's type inferencing by avoiding void return types, arrays, primatives, and checked exceptions in lambdas.  It can decrease the amount of code you need to write by a factor of at 2x-3x while focusing you on using the right collections for the best possible Big O scalability.
 
 #Details
 
 Usage examples are implemented as unit tests to ensure that they remain correct and current.
 
-* [Usage examples](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34) - different ways of improving your Java code with UncleJim.
+* [Usage examples](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34) - different ways of improving your Java code with UncleJim.  Note: IntelliJ IDEA reports some non-issues in this file.
 
 * [Comparison with Traditional Java and Java 8 Streams](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java#L22)
 
