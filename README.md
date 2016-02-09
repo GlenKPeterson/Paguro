@@ -43,12 +43,12 @@ Available from the [Maven Repository](http://mvnrepository.com/artifact/org.orga
 
 #Features
 
-* Type-safe versions of Clojure's immutable collections, implementing the generic `java.util` collection interfaces.
+* Type-safe versions of Clojure's immutable collections (arguably the best immutable collection implementations on the JVM).
 * A simplified immutable alternative to Java 8 Streams, wrapping checked exceptions and avoiding primitives.
 * A tiny, type-safe data definition language of brief helper functions: `vec()`, `set()`, `map()`, and `tup()`, (like Clojure's vector `[]`, set `#{}`, and map `{}`).
-* Tuples which can be extended to make your own immutable Java classes with correct `equals()`, `hashCode()`, and `toString()` implementations.
+* Tuples!  Use them for rapid prototyping, then later extend them to make your own immutable Java classes with correct `equals()`, `hashCode()`, and `toString()` implementations.
 
-UncleJim takes advantages of Java's type inferencing by avoiding void return types, arrays, primatives, and checked exceptions in lambdas.  It can decrease the amount of code you need to write by a factor of at 2x-3x while focusing you on using the right collections for the best possible Big O scalability.
+UncleJim takes advantages of Java's type inferencing.  It eschews void return types, arrays, primatives, and checked exceptions in lambdas.  It can decrease the amount of code you need to write by a factor of at 2x-3x.  Using functional transfomrations instead of loops focuses you on choosing the right collections which leads to more readable code AND the better Big O complexity/scalability.
 
 #Details
 
