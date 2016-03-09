@@ -43,12 +43,16 @@ Available from the [Maven Repository](http://mvnrepository.com/artifact/org.orga
 
 #Features
 
-* Type-safe versions of Clojure's [immutable collections](src/main/java/org/organicdesign/fp/collections) (arguably the best immutable collection implementations on the JVM).
-* [Functional Transformations](src/main/java/org/organicdesign/fp/xform/Transformable.java#L42) - A simplified immutable alternative to Java 8 Streams, wrapping checked exceptions and avoiding primitives.
-* A tiny, type-safe [data definition language of brief helper functions](src/main/java/org/organicdesign/fp/StaticImports.java#L36): `vec()`, `set()`, `map()`, and `tup()`, (like Clojure's vector `[]`, set `#{}`, and map `{}`).
+* [Immutable collections](src/main/java/org/organicdesign/fp/collections) - type-safe generic versions of Clojure's arguably best immutable collection implementations on the JVM.
+* [Functional Transformations](src/main/java/org/organicdesign/fp/xform/Transformable.java#L42) are a simplified immutable alternative to Java 8 Streams, wrapping checked exceptions and avoiding primitives.
+* [brief collection constructors](src/main/java/org/organicdesign/fp/StaticImports.java#L36) are like a tiny, type-safe data definition language:
+  * `vec("one", "two", "three")` - an immutable vector/list of three strings
+  * `set(3, 5, 7)` - an immutable set of three integers
+  * `tup("Alice", 11, 3.14)` - an immutable 3-field tuple or record
+  * `map(tup(1, "single"), tup(2, "double"), tup(3, "triple"))` - an immutable map that uses integers to look up appropriate strings.
 * [Immutable tuples](src/main/java/org/organicdesign/fp/tuple) - use them for rapid prototyping, then later extend them to make your own lightweight, immutable Java classes with correct `equals()`, `hashCode()`, and `toString()` implementations.
-* [Lazy Initialization](src/main/java/org/organicdesign/fp/LazyRef.java#L5)
-* [Memoization](src/main/java/org/organicdesign/fp/function/Function3.java#L42)
+* [Lazy Initialization](src/main/java/org/organicdesign/fp/LazyRef.java#L5) - Perform initialization the first time they are used, then free initialization resources.
+* [Memoization](src/main/java/org/organicdesign/fp/function/Function3.java#L42) - Turns function calls into hashtable lookups to speed up slow functions over a limited range of inputs.
 
 UncleJim takes advantages of Java's type inferencing.  It eschews void return types, arrays, primatives, and checked exceptions in lambdas.  It can decrease the amount of code you need to write by a factor of at 2x-3x.  Using functional transfomrations instead of loops focuses you on choosing the right collections which leads to more readable code AND the better Big O complexity/scalability.
 
