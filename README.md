@@ -1,5 +1,38 @@
 UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") provides type-safe versions of Clojure's immutable collections and a few other tools to make functional programming in Java a little easier.
 
+#Features
+
+* [Immutable collections](src/main/java/org/organicdesign/fp/collections) - type-safe generic versions of Clojure's arguably best immutable collection implementations on the JVM.
+* [Functional transformations](src/main/java/org/organicdesign/fp/xform/Transformable.java#L42) are a simplified immutable alternative to Java 8 Streams, wrapping checked exceptions and avoiding primitives.  You can still use Java 8 streams if you want to.
+* [Brief collection constructors](src/main/java/org/organicdesign/fp/StaticImports.java#L36) are like a tiny, type-safe data definition language:
+  * `vec("one", "two", "three")` - an immutable vector/list of three strings
+  * `set(3, 5, 7)` - an immutable set of three integers
+  * `tup("Alice", 11, 3.14)` - an immutable 3-field tuple or record
+  * `map(tup(1, "single"), tup(2, "double"), tup(3, "triple"))` - an immutable map that uses integers to look up appropriate strings.
+* [Immutable tuples](src/main/java/org/organicdesign/fp/tuple) - use them for rapid prototyping, then later extend them to make your own lightweight, immutable Java classes with correct `equals()`, `hashCode()`, and `toString()` implementations.
+* [Lazy initialization](src/main/java/org/organicdesign/fp/LazyRef.java#L5) - Perform initialization the first time they are used, then free initialization resources.
+* [Memoization](src/main/java/org/organicdesign/fp/function/Function3.java#L42) - Turns function calls into hashtable lookups to speed up slow functions over a limited range of inputs.
+
+UncleJim takes advantages of Java's type inferencing.  It eschews void return types, arrays, primatives, and checked exceptions in lambdas.  It can decrease the amount of code you need to write by a factor of at 2x-3x.  Using functional transfomrations instead of loops focuses you on choosing the right collections which leads to more readable code AND better Big O complexity/scalability.
+
+[![Build Status](https://travis-ci.org/GlenKPeterson/UncleJim.svg?branch=master)](https://travis-ci.org/GlenKPeterson/UncleJim)
+[![Code Coverage](http://codecov.io/github/GlenKPeterson/UncleJim/coverage.svg?branch=master)](http://codecov.io/github/GlenKPeterson/UncleJim?branch=master)
+
+[![Join the chat at https://gitter.im/GlenKPeterson/UncleJim](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/GlenKPeterson/UncleJim?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+Available from the [Maven Repository](http://mvnrepository.com/artifact/org.organicdesign/UncleJim) as:
+```xml
+<dependency>
+        <groupId>org.organicdesign</groupId>
+        <artifactId>UncleJim</artifactId>
+        <version>0.12.1</version>
+</dependency>
+```
+
+#Details
+
+
+
 ```java
 // Define some people with lists of email addresses on the fly.
 // vec() makes a Vector/List, tup() makes a Tuple
@@ -27,44 +60,11 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
         ._1();
 ```
 
-[![Build Status](https://travis-ci.org/GlenKPeterson/UncleJim.svg?branch=master)](https://travis-ci.org/GlenKPeterson/UncleJim)
-[![Code Coverage](http://codecov.io/github/GlenKPeterson/UncleJim/coverage.svg?branch=master)](http://codecov.io/github/GlenKPeterson/UncleJim?branch=master)
-
-[![Join the chat at https://gitter.im/GlenKPeterson/UncleJim](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/GlenKPeterson/UncleJim?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-Available from the [Maven Repository](http://mvnrepository.com/artifact/org.organicdesign/UncleJim) as:
-```xml
-<dependency>
-        <groupId>org.organicdesign</groupId>
-        <artifactId>UncleJim</artifactId>
-        <version>0.12.1</version>
-</dependency>
-```
-
-#Features
-
-* [Immutable collections](src/main/java/org/organicdesign/fp/collections) - type-safe generic versions of Clojure's arguably best immutable collection implementations on the JVM.
-* [Functional Transformations](src/main/java/org/organicdesign/fp/xform/Transformable.java#L42) are a simplified immutable alternative to Java 8 Streams, wrapping checked exceptions and avoiding primitives.
-* [brief collection constructors](src/main/java/org/organicdesign/fp/StaticImports.java#L36) are like a tiny, type-safe data definition language:
-  * `vec("one", "two", "three")` - an immutable vector/list of three strings
-  * `set(3, 5, 7)` - an immutable set of three integers
-  * `tup("Alice", 11, 3.14)` - an immutable 3-field tuple or record
-  * `map(tup(1, "single"), tup(2, "double"), tup(3, "triple"))` - an immutable map that uses integers to look up appropriate strings.
-* [Immutable tuples](src/main/java/org/organicdesign/fp/tuple) - use them for rapid prototyping, then later extend them to make your own lightweight, immutable Java classes with correct `equals()`, `hashCode()`, and `toString()` implementations.
-* [Lazy Initialization](src/main/java/org/organicdesign/fp/LazyRef.java#L5) - Perform initialization the first time they are used, then free initialization resources.
-* [Memoization](src/main/java/org/organicdesign/fp/function/Function3.java#L42) - Turns function calls into hashtable lookups to speed up slow functions over a limited range of inputs.
-
-UncleJim takes advantages of Java's type inferencing.  It eschews void return types, arrays, primatives, and checked exceptions in lambdas.  It can decrease the amount of code you need to write by a factor of at 2x-3x.  Using functional transfomrations instead of loops focuses you on choosing the right collections which leads to more readable code AND the better Big O complexity/scalability.
-
-#Details
-
-Usage examples are implemented as unit tests to ensure that they remain correct and current.
-
-* [Usage examples](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34) - different ways of improving your Java code with UncleJim.  Note: IntelliJ IDEA reports some non-issues in this file.
-
-* [Comparison with Traditional Java and Java 8 Streams](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java#L22)
+* Other [usage examples](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34) are implemented as unit tests to ensure that they remain correct and current.  Note: IntelliJ IDEA reports some non-issues in this file.
 
 * [Class/Interface Hierarchy](inheritanceHierarchy.pdf) (PDF)
+
+* [Comparison with Traditional Java and Java 8 Streams](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java#L22)
 
 * For complete API documentation, please build the javadoc: `mvn javadoc:javadoc`
 
