@@ -179,8 +179,8 @@ public interface Transformable<T> {
                of Map.Entries, you can pass Function1.identity() here.
      @return An unmodifiable map
      */
-    default <U,V> ImMap<U,V> toImMap(Function1<? super T,Map.Entry<U,V>> f1) {
-        return foldLeft((ImMap<U, V>) PersistentHashMap.<U, V>empty(),
+    default <K,V> ImMap<K,V> toImMap(Function1<? super T,Map.Entry<K,V>> f1) {
+        return foldLeft((ImMap<K, V>) PersistentHashMap.<K, V>empty(),
                         (ts, t) -> ts.assoc(f1.apply(t)));
     }
 
@@ -198,15 +198,15 @@ public interface Transformable<T> {
      Realize an immutable, ordered (tree) map to quickly O(log2 n) look up values by key, but still
      retrieve entries in key order.
 
-     @param comp Determines the ordering.  If U implements Comparable, you can pass
-                 Function2.defaultComparator() here.
+     @param comp Determines the ordering of the keys (not key-value pairs).  If K (the type of the
+                 keys) implements Comparable, you can pass Function2.defaultComparator() here.
      @param f1 Maps each item in this collection to a key/value pair.  If the collection is composed
                of Map.Entries, you can pass Function1.identity() here.
      @return An immutable map
      */
-    default <U,V> ImSortedMap<U,V> toImSortedMap(Comparator<? super U> comp,
-                                                 Function1<? super T,Map.Entry<U,V>> f1) {
-        return foldLeft((ImSortedMap<U, V>) PersistentTreeMap.<U, V>empty(comp),
+    default <K,V> ImSortedMap<K,V> toImSortedMap(Comparator<? super K> comp,
+                                                 Function1<? super T,Map.Entry<K,V>> f1) {
+        return foldLeft((ImSortedMap<K, V>) PersistentTreeMap.<K, V>empty(comp),
                         (ts, t) -> ts.assoc(f1.apply(t)));
     }
 
@@ -237,9 +237,9 @@ public interface Transformable<T> {
 
      @return A map with the keys from the given set, mapped to values using the given function.
      */
-    default <U,V> Map<U,V> toMutableMap(final Function1<? super T,Map.Entry<U,V>> f1) {
+    default <K,V> Map<K,V> toMutableMap(final Function1<? super T,Map.Entry<K,V>> f1) {
         return foldLeft(new HashMap<>(), (ts, t) -> {
-            Map.Entry<U,V> entry = f1.apply(t);
+            Map.Entry<K,V> entry = f1.apply(t);
             ts.put(entry.getKey(), entry.getValue());
             return ts;
         });
@@ -251,11 +251,11 @@ public interface Transformable<T> {
      @param f1 Maps keys to values
      @return A map with the keys from the given set, mapped to values using the given function.
      */
-    default <U,V> SortedMap<U,V>
-    toMutableSortedMap(Comparator<? super U> comp,
-                       final Function1<? super T,Map.Entry<U,V>> f1) {
+    default <K,V> SortedMap<K,V>
+    toMutableSortedMap(Comparator<? super K> comp,
+                       final Function1<? super T,Map.Entry<K,V>> f1) {
         return foldLeft(new TreeMap<>(), (ts, t) -> {
-            Map.Entry<U,V> entry = f1.apply(t);
+            Map.Entry<K,V> entry = f1.apply(t);
             ts.put(entry.getKey(), entry.getValue());
             return ts;
         });
