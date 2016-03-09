@@ -47,7 +47,7 @@ Available from the [Maven Repository](http://mvnrepository.com/artifact/org.orga
 * [Functional Transformations](src/main/java/org/organicdesign/fp/xform/Transformable.java#L42) - A simplified immutable alternative to Java 8 Streams, wrapping checked exceptions and avoiding primitives.
 * A tiny, type-safe [data definition language of brief helper functions](src/main/java/org/organicdesign/fp/StaticImports.java#L36): `vec()`, `set()`, `map()`, and `tup()`, (like Clojure's vector `[]`, set `#{}`, and map `{}`).
 * [Immutable tuples](src/main/java/org/organicdesign/fp/tuple) - use them for rapid prototyping, then later extend them to make your own lightweight, immutable Java classes with correct `equals()`, `hashCode()`, and `toString()` implementations.
-* [Lazy Initialization](src/main/java/org/organicdesign/fp/LazyRef.java)
+* [Lazy Initialization](src/main/java/org/organicdesign/fp/LazyRef.java#L5)
 * [Memoization](src/main/java/org/organicdesign/fp/function/Function3.java#L42)
 
 UncleJim takes advantages of Java's type inferencing.  It eschews void return types, arrays, primatives, and checked exceptions in lambdas.  It can decrease the amount of code you need to write by a factor of at 2x-3x.  Using functional transfomrations instead of loops focuses you on choosing the right collections which leads to more readable code AND the better Big O complexity/scalability.
