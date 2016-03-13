@@ -168,16 +168,20 @@ public interface Transformable<T> {
      Realize a thread-safe immutable list to access items quickly O(log32 n) by index.
      */
     default ImList<T> toImList() {
-        return foldLeft(PersistentVector.empty(), (ts, t) -> ts.append(t));
+        return foldLeft(PersistentVector.empty(), PersistentVector::append);
     }
 
     /**
      Realize an unordered immutable hash map to very quickly O(1) look up values by key, but don't
-     care about ordering.
+     care about ordering.  In the case of a duplicate key, later values from this transform will
+     overwrite the earlier ones. The resulting map can contain zero or one null key and any number
+     of null values.
 
      @param f1 Maps each item in this collection to a key/value pair.  If the collection is composed
-               of Map.Entries, you can pass Function1.identity() here.
-     @return An unmodifiable map
+     of Map.Entries (or Tuple2's), you can pass Function1.identity() here.  This function must never
+     return null (filter out nulls in an earlier step of the transform if necessary).
+
+     @return An immutable map
      */
     default <K,V> ImMap<K,V> toImMap(Function1<? super T,Map.Entry<K,V>> f1) {
         return foldLeft((ImMap<K, V>) PersistentHashMap.<K, V>empty(),
@@ -186,23 +190,31 @@ public interface Transformable<T> {
 
     /**
      Realize an unordered immutable hash set to remove duplicates or very quickly O(1) tell whether
-     the set contains various items, but don't care about ordering.
+     the set contains various items, but don't care about ordering.  If the input contains duplicate
+     elements, later values overwrite earlier ones.
 
-     @return An unmodifiable set (with duplicates removed)
+     @return An immutable set (with duplicates removed)
      */
     default ImSet<T> toImSet() {
-        return foldLeft(PersistentHashSet.empty(), (accum, t) -> accum.put(t));
+        return foldLeft(PersistentHashSet.empty(), PersistentHashSet::put);
     }
 
     /**
      Realize an immutable, ordered (tree) map to quickly O(log2 n) look up values by key, but still
-     retrieve entries in key order.
+     retrieve entries in key order.  The keys are sorted according to the comparator you provide.
 
-     @param comp Determines the ordering of the keys (not key-value pairs).  If K (the type of the
-                 keys) implements Comparable, you can pass Function2.defaultComparator() here.
+     @param comp A comparator (on the keys) that defines the sort order inside the new map.  This
+     becomes a permanent part of the map and all sub-maps or appended maps derived from it.  If you
+     want to use a null key, make sure the comparator treats nulls correctly in all circumstances!
+
      @param f1 Maps each item in this collection to a key/value pair.  If the collection is composed
-               of Map.Entries, you can pass Function1.identity() here.
-     @return An immutable map
+     of Map.Entries, you can pass Function1.identity() here.  In the case of a duplicate key, later
+     values in transform overwrite the earlier ones.  The resulting map can contain zero or one
+     null key (if your comparator knows how to sort nulls) and any number of null values.  This
+     function must never return null (filter out nulls in an earlier step of the transform if
+     necessary).
+
+     @return a new PersistentTreeMap of the specified comparator and the given key/value pairs
      */
     default <K,V> ImSortedMap<K,V> toImSortedMap(Comparator<? super K> comp,
                                                  Function1<? super T,Map.Entry<K,V>> f1) {
@@ -216,10 +228,10 @@ public interface Transformable<T> {
 
      @param comparator Determines the ordering.  If T implements Comparable, you can pass
                        Function2.defaultComparator() here.
-     @return An immutable set (with duplicates removed)
+     @return An immutable set (with duplicates removed).  Null elements are not allowed.
      */
     default ImSortedSet<T> toImSortedSet(Comparator<? super T> comparator) {
-        return foldLeft(PersistentTreeSet.ofComp(comparator), (accum, t) -> accum.put(t));
+        return foldLeft(PersistentTreeSet.ofComp(comparator), PersistentTreeSet::put);
     }
 
     /** Realize a mutable list.  Use toImList unless you need to modify the list in-place. */
@@ -233,7 +245,8 @@ public interface Transformable<T> {
     /**
      Realize a mutable hash map.  Use toImMap() unless you need to modify the map in-place.
 
-     @param f1 Maps keys to values
+     @param f1 Maps keys to values.  This function must never return null (filter out nulls in an
+     earlier step of the transform if necessary).
 
      @return A map with the keys from the given set, mapped to values using the given function.
      */
@@ -248,7 +261,11 @@ public interface Transformable<T> {
     /**
      Realize a mutable tree map.  Use toImSortedMap() unless you need to modify the map in-place.
 
-     @param f1 Maps keys to values
+     @param comp A comparator (on the keys) that defines the sort order inside the new map.  Null
+     keys are probably not allowed.
+
+     @param f1 Maps keys to values.  This should never return null.
+
      @return A map with the keys from the given set, mapped to values using the given function.
      */
     default <K,V> SortedMap<K,V>

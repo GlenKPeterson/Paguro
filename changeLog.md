@@ -1,3 +1,6 @@
+**2016-03-13 0.12.2**:
+ - Improved some documentation of the toMap methods, used K and V for the key and value types.
+
 **2015-11-22 0.12.1**:
  - Renamed overloaded toString() methods on FunctionUtils to mapToString() and arrayToString().
 

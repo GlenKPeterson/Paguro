@@ -16,7 +16,13 @@ package org.organicdesign.fp.collections;
 /** An immutable set interface */
 public interface ImSet<E> extends UnmodSet<E> {
     /**
-     Adds an item, returning a modified version of the set (leaving the original set unchanged).
+     Adds an element, returning a modified version of the set (leaving the original set unchanged).
+     If the element already exists in this set, the new value overwrites the old one.  If the new
+     element is the same as an old element (based on the address of that item in memory, not an
+     equals test), the old set is returned unchanged.
+
+     @param e the element to add to this set
+     @return a new set with the element added (see note above about adding duplicate elements).
      */
     ImSet<E> put(E e);
 

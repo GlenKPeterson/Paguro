@@ -106,7 +106,10 @@ public class PersistentVector<E> implements ImList<E> {
         this.tail = tail;
     }
 
-    /** Public static factory method. */
+    /**
+     Public static factory method to create a vector from an Iterable.  A varargs version of this
+     method is: {@link org.organicdesign.fp.StaticImports#vec(Object...)}.
+     */
     static public <T> PersistentVector<T> ofIter(Iterable<T> items) {
         MutableVector<T> ret = emptyTransientVector();
         for (T item : items) {

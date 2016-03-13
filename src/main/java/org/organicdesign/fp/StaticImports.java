@@ -34,8 +34,8 @@ import java.util.Comparator;
 import java.util.Map;
 
 /**
- <p>A mini data definition language composed of vec(), tup(), map(), set(), plus a converter to make
- java.util collections transformable: xform().</p>
+ <p>A mini data definition language composed of vec(), tup(), map(), set(), plus xform() which makes
+ java.util collections transformable.</p>
 
  <pre><code>import org.organicdesign.fp.StaticImports.*
 
@@ -51,15 +51,16 @@ import java.util.Map;
  // Create a map with a few key value pairs
  map(tup("a", 1), tup("b", 2), tup("c", 3);</code></pre>
 
- <p>vec(), map(), and set() are the only three methods
- in this project to take varargs.  I tried writing out versions that took multiple type-safe
- arguments, but IntelliJ presented you with a menu of all of them for auto-completion which
- was overwhelming, so I reverted to varargs.  Also, varargs relax some type safety rules (variance)
- for data definition in a relatively helpful and not very dangerous way.</p>
+ <p>vec(), map(), and set() are the only three methods in this project to take varargs.  I tried
+ writing out versions that took multiple type-safe arguments, but IntelliJ presented you with a
+ menu of all of them for auto-completion which was overwhelming, so I reverted to varargs.  Also,
+ varargs relax some type safety rules (variance) for data definition in a generally helpful (rarely
+ dangerous) way.</p>
 
- <p>If you do more Clojure/JSON than Java, you'll find that what's a map (dictionary) in those languages often becomes a tuple in UncleJim.
- A true map data structure is homogeneous, meaning that every member has the same type (or same parent type).
- Tuples are designed to contain unrelated data types, and enforce those types.</p>
+ <p>If you're used to Clojure/JSON, you'll find that what's a map (dictionary) in those languages
+ usually becomes a tuple in UncleJim. A true map data structure in a type-safe language is
+ homogeneous, meaning that every member is of the same type (or a descendant of a common ancestor).
+ Tuples are designed to contain unrelated data types and enforce those types.</p>
 
  <p>As with any usage of import *, there could be issues if you import 2 different versions of this
  file in your classpath.  Java needs a data definition language so badly that I think it is worth
@@ -73,19 +74,27 @@ public final class StaticImports {
     private StaticImports() { throw new UnsupportedOperationException("No instantiation"); }
 
     /**
-     Returns a new PersistentHashMap of the given keys and their paired values.  Use the tup()
-     method to define those key/value pairs briefly and easily.  This data definition method is one
-     of the three methods in this project that support varargs.
+     Returns a new PersistentHashMap of the given keys and their paired values.  Use the
+     {@link StaticImports#tup(Object, Object)} method to define those key/value pairs briefly and
+     easily.  This data definition method is one of the three methods in this project that support
+     varargs.
+
+     @param kvPairs Key/value pairs (to go into the map).  In the case of a duplicate key, later
+     values in the input list overwrite the earlier ones.  The resulting map can contain zero or one
+     null key and any number of null values.  Null k/v pairs will be silently ignored.
+
+     @return a new PersistentHashMap of the given key/value pairs
      */
     @SafeVarargs
-    public static <K,V> ImMap<K,V> map(Map.Entry<K,V>... es) {
-        if ( (es == null) || (es.length < 1) ) { return PersistentHashMap.empty(); }
-        return PersistentHashMap.of(Arrays.asList(es));
+    public static <K,V> ImMap<K,V> map(Map.Entry<K,V>... kvPairs) {
+        if ( (kvPairs == null) || (kvPairs.length < 1) ) { return PersistentHashMap.empty(); }
+        return PersistentHashMap.of(Arrays.asList(kvPairs));
     }
 
     /**
      Returns a new PersistentHashSet of the values.  This data definition method is one of the three
-     methods in this project that support varargs.
+     methods in this project that support varargs.  If the input contains duplicate elements, later
+     values overwrite earlier ones.
      */
     @SafeVarargs
     public static <T> ImSet<T> set(T... items) {
@@ -97,25 +106,47 @@ public final class StaticImports {
      Returns a new PersistentTreeMap of the specified comparator and the given key/value pairs.  Use
      the tup() method to define those key/value pairs briefly and easily.  The keys are sorted
      according to the comparator you provide.
+
+     @param comp A comparator (on the keys) that defines the sort order inside the new map.  This
+     becomes a permanent part of the map and all sub-maps or appended maps derived from it.  If you
+     want to use a null key, make sure the comparator treats nulls correctly in all circumstances!
+
+     @param kvPairs Key/value pairs (to go into the map).  In the case of a duplicate key, later
+     values in the input list overwrite the earlier ones.  The resulting map can contain zero or one
+     null key (if your comparator knows how to sort nulls) and any number of null values.  Null k/v
+     pairs will be silently ignored.
+
+     @return a new PersistentTreeMap of the specified comparator and the given key/value pairs
      */
     public static <K,V> ImSortedMap<K,V>
-    sortedMap(Comparator<? super K> c, Iterable<Map.Entry<K,V>> es) {
-        return PersistentTreeMap.ofComp(c, es);
+    sortedMap(Comparator<? super K> comp, Iterable<Map.Entry<K,V>> kvPairs) {
+        return PersistentTreeMap.ofComp(comp, kvPairs);
     }
 
     /**
      Returns a new PersistentTreeMap of the given comparable keys and their paired values, sorted in
      the default ordering of the keys.  Use the tup() method to define those key/value pairs briefly
      and easily.
+
+     @param kvPairs Key/value pairs (to go into the map).  In the case of a duplicate key, later
+     values overwrite earlier ones.
+     @return a new PersistentTreeMap of the specified comparator and the given key/value pairs which
+     uses the default comparator defined on the element type.
      */
     public static <K extends Comparable<K>,V> ImSortedMap<K,V>
-    sortedMap(Iterable<Map.Entry<K,V>> es) {
-        return PersistentTreeMap.of(es);
-    }
+    sortedMap(Iterable<Map.Entry<K,V>> kvPairs) { return PersistentTreeMap.of(kvPairs); }
 
-    /** Returns a new PersistentTreeSet of the given comparator and items. */
-    public static <T> ImSortedSet<T> sortedSet(Comparator<? super T> comp, Iterable<T> items) {
-        return Xform.of(items).toImSortedSet(comp);
+    /**
+     Returns a new PersistentTreeSet of the given comparator and items.
+
+     @param comp A comparator that defines the sort order of elements in the new set.  This
+     becomes part of the set (it's not for pre-sorting).
+     @param elements items to go into the set.  In the case of duplicates, later elements overwrite
+     earlier ones.
+     @return a new PersistentTreeSet of the specified comparator and the given elements
+     */
+    public static <T> ImSortedSet<T> sortedSet(Comparator<? super T> comp, Iterable<T> elements) {
+        return Xform.of(elements).toImSortedSet(comp);
     }
 
     /** Returns a new PersistentTreeSet of the given comparable items. */

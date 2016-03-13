@@ -60,19 +60,28 @@ public class PersistentTreeSet<E> implements ImSortedSet<E> {
     private PersistentTreeSet(ImSortedMap<E,?> i) { impl = i; }
 
     /**
-     Returns a new PersistentTreeSet of the given comparator.  Always use this instead of starting with empty() because
-     there is no way to assign a comparator later on.
+     Returns a new PersistentTreeSet of the given comparator.  Always use this instead of starting
+     with empty() because there is no way to assign a comparator to an existing set.
      */
     public static <T> PersistentTreeSet<T> ofComp(Comparator<? super T> comp) {
         return new PersistentTreeSet<>(PersistentTreeMap.empty(comp));
     }
 
-    /** Returns a new PersistentTreeSet of the given comparator and items. */
-    public static <T> PersistentTreeSet<T> ofComp(Comparator<? super T> comp, Iterable<T> items) {
+    /**
+     Returns a new PersistentTreeSet of the given comparator and items.
+
+     @param comp A comparator that defines the sort order of elements in the new set.  This
+     becomes part of the set (it's not for pre-sorting).
+     @param elements items to go into the set.  In the case of a duplicate element, later
+     values in the input list overwrite the earlier ones.
+     @return a new PersistentTreeSet of the specified comparator and the given elements
+     */
+    public static <T> PersistentTreeSet<T> ofComp(Comparator<? super T> comp,
+                                                  Iterable<T> elements) {
         PersistentTreeSet<T> ret = new PersistentTreeSet<>(PersistentTreeMap.empty(comp));
-        if (items == null) { return ret; }
-        for (T item : items) {
-            ret = ret.put(item);
+        if (elements == null) { return ret; }
+        for (T element : elements) {
+            ret = ret.put(element);
         }
         return ret;
     }

@@ -90,12 +90,25 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V> {
         return map;
     }
 
-    /** Returns a new PersistentTreeMap of the specified comparator and the given key/value pairs. */
+    /**
+     Returns a new PersistentTreeMap of the specified comparator and the given key/value pairs.
+
+     @param comp A comparator (on the keys) that defines the sort order inside the new map.  This
+     becomes a permanent part of the map and all sub-maps or appended maps derived from it.  If you
+     want to use a null key, make sure the comparator treats nulls correctly in all circumstances!
+
+     @param kvPairs Key/value pairs (to go into the map).  In the case of a duplicate key, later
+     values in the input list overwrite the earlier ones.  The resulting map can contain zero or one
+     null key (if your comparator knows how to sort nulls) and any number of null values.  Null k/v
+     pairs will be silently ignored.
+
+     @return a new PersistentTreeMap of the specified comparator and the given key/value pairs
+     */
     public static <K,V> PersistentTreeMap<K,V>
-    ofComp(Comparator<? super K> c, Iterable<Map.Entry<K,V>> es) {
-        if (es == null) { return new PersistentTreeMap<>(c, null, 0); }
-        PersistentTreeMap<K,V> map = new PersistentTreeMap<>(c, null, 0);
-        for (Map.Entry<K,V> entry : es) {
+    ofComp(Comparator<? super K> comp, Iterable<Map.Entry<K,V>> kvPairs) {
+        if (kvPairs == null) { return new PersistentTreeMap<>(comp, null, 0); }
+        PersistentTreeMap<K,V> map = new PersistentTreeMap<>(comp, null, 0);
+        for (Map.Entry<K,V> entry : kvPairs) {
             if (entry != null) {
                 map = map.assoc(entry.getKey(), entry.getValue());
             }

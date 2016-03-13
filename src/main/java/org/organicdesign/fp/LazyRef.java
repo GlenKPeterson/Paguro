@@ -5,7 +5,7 @@ import org.organicdesign.fp.function.Function0;
 /**
  Lazily initialize a value (and free the initialization resources) on the first call to get().
  Subsequent calls to get() cheaply return the previously initialized value.  This class is thread-safe if the producer
- function and the value it produces are pure and free from side effects.
+ function and the value it produces are free from side effects.
  */
 public class LazyRef<T> {
     private Function0<T> producer;
@@ -14,11 +14,11 @@ public class LazyRef<T> {
     private LazyRef(Function0<T> p) { producer = p; }
 
     /**
-     * Use this function to produce a value on the first call to get().  Delete the pointer to this function when that
-     * first call completes, but remember the value to return with all subsequent calls to get().
-     * @param producer will produce the desired value when called.
-     * @param <T>
-     * @return
+     Construct a LazyRef from the given initialization function.
+
+     @param producer a zero-argument function that produces the desired value when called.
+
+     @return a LazyRef with the given producer.
      */
     public static <T> LazyRef<T> of(Function0<T> producer) {
         if (producer == null) {
@@ -28,8 +28,10 @@ public class LazyRef<T> {
     }
 
     /**
-     The first call to this method initializes the value this class wraps and releases the initialization resources.
-     Subsequent calls return the precomputed value.
+     The first call to this method calls the initialization function, caches the result, and hands
+     the initialization function reference to the garbage collector so that initialization resources
+     can be freed.  Subsequent calls return the precomputed value.
+
      @return the same value every time it is called.
      */
     // This whole method is synchronized on the advice of Goetz2006 p. 347

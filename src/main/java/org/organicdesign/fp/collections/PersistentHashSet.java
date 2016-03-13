@@ -35,10 +35,18 @@ public class PersistentHashSet<E> implements ImSet<E> {
         return new PersistentHashSet<>(PersistentHashMap.empty(eq));
     }
 
-    public static <E>  PersistentHashSet<E> of(Iterable<E> init) {
+    /**
+     Returns a new PersistentHashSet of the values.  The vararg version of this method is
+     {@link org.organicdesign.fp.StaticImports#set(Object...)}   If the input contains duplicate
+     elements, later values overwrite earlier ones.
+
+     @param elements The items to put into a vector.
+     @return a new PersistentHashSet of the given elements.
+     */
+    public static <E>  PersistentHashSet<E> of(Iterable<E> elements) {
         PersistentHashSet<E> empty = empty();
         TransientHashSet<E> ret = empty.asTransient();
-        for (E e : init) {
+        for (E e : elements) {
             ret = ret.put(e);
         }
         return ret.persistent();

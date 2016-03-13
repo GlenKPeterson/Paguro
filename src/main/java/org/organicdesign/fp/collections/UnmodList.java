@@ -24,10 +24,8 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 /**
- * An unmodifiable version of {@link java.util.List} which formalizes the return type of
- * Collections.unmodifiableList()
- *
- * {@inheritDoc}
+ An unmodifiable version of {@link java.util.List} which formalizes the return type of
+ Collections.unmodifiableList()
  */
 public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
 
@@ -85,7 +83,6 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
      If you truly need a one-shot contains test, iterate the list manually, or override the
      deprecation warning, but include a description of why you need to use a List instead of some
      kind of Set or Map!
-     {@inheritDoc}
      */
     @Deprecated
     @Override default boolean contains(Object o) {
@@ -95,7 +92,11 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
         return false;
     }
 
-    /** {@inheritDoc} */
+    /**
+     The default implementation of this method has O(this.size() + that.size()) or O(n) performance.
+     So even though contains() is impossible to implement efficiently for Lists, containsAll()
+     has a decent implementation (brute force would be O(this.size() * that.size()) or O(n^2) ).
+     */
     @Override default boolean containsAll(Collection<?> c) {
         return UnmodSortedCollection.super.containsAll(c);
     }
@@ -105,9 +106,8 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
 //int	hashCode()
 
     /**
-     * The default implementation of this method has O(this.size()) performance.
-     *
-     * {@inheritDoc}
+     The default implementation of this method has O(this.size()) performance.  If you call this
+     much, you probably want to use a Map&lt;Integer,T&gt; instead for O(1) performance.
      */
     @Override default int indexOf(Object o) {
         for (int i = 0; i < size(); i++) {
@@ -118,17 +118,13 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
         return -1;
     }
 
-    /** {@inheritDoc} */
+    /** A convenience method to check if size is 0 */
     @Override default boolean isEmpty() { return size() == 0; }
 
-    /** {@inheritDoc} */
+    /** A convenience method to get a listIterator. */
     @Override default UnmodSortedIterator<E> iterator() { return listIterator(0); }
 
-    /**
-     * The default implementation of this method has O(this.size()) performance.
-     *
-     * {@inheritDoc}
-     */
+    /** The default implementation of this method has O(this.size()) performance. */
     @Override default int lastIndexOf(Object o) {
         for (int i = size() - 1; i > -1; i--) {
             if (Objects.equals(get(i), o)) {

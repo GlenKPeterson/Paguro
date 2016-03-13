@@ -60,7 +60,10 @@ public interface ImSortedMap<K,V> extends UnmodSortedMap<K,V> {
 
 // public  K	lastKey()
 
-    /** Return the elements in this map from the start element (inclusive) to the end element (exclusive) */
+    /**
+     Return the elements in this map from the start element (inclusive) to the end element
+     (exclusive)
+     */
     @Override
     ImSortedMap<K,V> subMap(K fromKey, K toKey);
 
@@ -95,15 +98,32 @@ public interface ImSortedMap<K,V> extends UnmodSortedMap<K,V> {
 //                return containsAll(that);
 //            }
 //
-//            @Override public String toString() { return UnmodIterable.toString("ImMapOrd.values.UnCollectionOrd", this); }
+//            @Override public String toString() {
+//                return UnmodIterable.toString("ImMapOrd.values.UnCollectionOrd", this);
+//            }
 //        };
 //    }
 
-    /** Returns a new map with the given key/value added */
+    /**
+     Returns a new map with the given key/value added.  If the key exists in this map, the new value
+     overwrites the old one.  If the key exists with the same value (based on the address of that
+     value in memory, not an equals test), the old map is returned unchanged.
+
+     @param key the key used to look up the value.  In the case of a duplicate key, later values
+     overwrite the earlier ones.  The resulting map can contain zero or one null key (if your
+     comparator knows how to sort nulls) and any number of null values.
+
+     @param val the value to store in this key.
+
+     @return a new PersistentTreeMap of the specified comparator and the given key/value pairs
+
+     */
     ImSortedMap<K,V> assoc(K key, V val);
 
     /** Returns a new map with an immutable copy of the given entry added */
-    default ImSortedMap<K,V> assoc(Map.Entry<K,V> entry) { return assoc(entry.getKey(), entry.getValue()); }
+    default ImSortedMap<K,V> assoc(Map.Entry<K,V> entry) {
+        return assoc(entry.getKey(), entry.getValue());
+    }
 
     /** Returns a new map with the given key/value removed */
     ImSortedMap<K,V> without(K key);

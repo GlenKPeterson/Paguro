@@ -123,14 +123,22 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
     }
 
     /**
-     Returns a new PersistentHashMap of the given keys and their paired values, skipping any null
-     Entries.
-     */
-    public static <K,V> PersistentHashMap<K,V> of(Iterable<Map.Entry<K,V>> es) {
-        if (es == null) { return empty(); }
+     Returns a new PersistentHashMap of the given keys and their paired values.  There is also a
+     varargs version of this method: {@link org.organicdesign.fp.StaticImports#map(Map.Entry...)}.  Use
+     the {@link org.organicdesign.fp.StaticImports#tup(Object, Object)} method to define key/value
+     pairs briefly and easily.
+
+     @param kvPairs Key/value pairs (to go into the map).  In the case of a duplicate key, later
+     values in the input list overwrite the earlier ones.  The resulting map can contain zero or one
+     null key and any number of null values.  Null k/v pairs will be silently ignored.
+
+     @return a new PersistentHashMap of the given key/value pairs
+      */
+    public static <K,V> PersistentHashMap<K,V> of(Iterable<Map.Entry<K,V>> kvPairs) {
+        if (kvPairs == null) { return empty(); }
         PersistentHashMap<K,V> m = empty();
         TransientHashMap<K,V> map = m.asTransient();
-        for (Map.Entry<K,V> entry : es) {
+        for (Map.Entry<K,V> entry : kvPairs) {
             if (entry != null) {
                 map = map.assoc(entry.getKey(), entry.getValue());
             }
