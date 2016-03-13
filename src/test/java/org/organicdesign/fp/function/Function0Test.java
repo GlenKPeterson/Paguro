@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.concurrent.Callable;
 
 import static org.junit.Assert.*;
-import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
+import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 @RunWith(JUnit4.class)
 public class Function0Test {

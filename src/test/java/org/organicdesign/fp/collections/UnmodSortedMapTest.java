@@ -15,7 +15,7 @@ import java.util.TreeMap;
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.*;
 import static org.organicdesign.fp.collections.Equator.defaultComparator;
-import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
+import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class UnmodSortedMapTest {
     static class TestMap<K, V> implements UnmodSortedMap<K,V> {

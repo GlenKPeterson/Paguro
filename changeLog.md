@@ -1,6 +1,7 @@
-**2016-03-13 Release 1.0**:
+**2016-03-13 Release 1.0.1**:
  - Improved some documentation of the toMap methods, used K and V for the key and value types.
  - Otherwise, this has performed well without changes for 4 months - it's stable.
+ - Added test dependency on TestUtils project instead of duplicating that code here.
 
 **2015-11-22 0.12.1**:
  - Renamed overloaded toString() methods on FunctionUtils to mapToString() and arrayToString().

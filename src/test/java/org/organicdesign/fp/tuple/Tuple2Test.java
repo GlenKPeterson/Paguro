@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.*;
-import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
+import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class Tuple2Test {
     @Rule

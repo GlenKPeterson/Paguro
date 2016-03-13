@@ -31,7 +31,7 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.vec;
-import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
+import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 @RunWith(JUnit4.class)
 public class PersistentVectorTest {

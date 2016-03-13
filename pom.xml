@@ -35,7 +35,7 @@ http://mvnrepository.com/artifact/org.organicdesign/UncleJim
 	-->
 	<groupId>org.organicdesign</groupId>
 	<artifactId>UncleJim</artifactId>
-	<version>1.0</version>
+	<version>1.0.1</version>
 	<packaging>jar</packaging>
 
 	<name>UncleJim</name>
@@ -62,7 +62,6 @@ http://mvnrepository.com/artifact/org.organicdesign/UncleJim
 			<name>Glen K. Peterson</name>
 			<email>glen@organicdesign.org</email>
 			<organization>PlanBase Inc.</organization>
-			<organizationUrl>http://glenpeterson.blogspot.com/</organizationUrl>
 		</developer>
 	</developers>
 	<scm>
@@ -173,6 +172,12 @@ http://mvnrepository.com/artifact/org.organicdesign/UncleJim
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.organicdesign.testUtils</groupId>
+			<artifactId>TestUtils</artifactId>
+			<version>0.0.4</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

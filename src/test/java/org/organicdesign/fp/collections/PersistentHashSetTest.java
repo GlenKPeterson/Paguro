@@ -10,7 +10,7 @@ import java.util.Set;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.vec;
-import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
+import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class PersistentHashSetTest {
     @Test

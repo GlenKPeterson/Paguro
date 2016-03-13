@@ -301,8 +301,8 @@ public class TupleGenerator {
                  "import org.junit.Test;\n" +
                  "\n" +
                  "import static org.junit.Assert.assertEquals;\n" +
-                 "import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;\n" +
-                 "import static org.organicdesign.fp.testUtils.EqualsContract.equalsSameHashCode;\n" +
+                 "import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;\n" +
+                 "import static org.organicdesign.testUtils.EqualsContract.equalsSameHashCode;\n" +
                  generatedWarning() +
                  "public class Tuple" + i + "Test {\n" +
                  "    @Test public void constructionAndAccess() {\n" +

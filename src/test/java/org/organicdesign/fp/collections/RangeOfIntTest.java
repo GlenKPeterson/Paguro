@@ -1,7 +1,7 @@
 package org.organicdesign.fp.collections;
 
 import org.junit.Test;
-import org.organicdesign.fp.testUtils.EqualsContract;
+import org.organicdesign.testUtils.EqualsContract;
 
 import java.math.BigInteger;
 import java.util.Arrays;

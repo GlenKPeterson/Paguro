@@ -50,7 +50,7 @@ import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.FunctionUtils.*;
 import static org.organicdesign.fp.StaticImports.*;
-import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
+import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 @RunWith(JUnit4.class)
 public class FunctionUtilsTest {

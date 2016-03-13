@@ -3,7 +3,7 @@ package org.organicdesign.fp;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
-import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
+import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class OptionTest {
 

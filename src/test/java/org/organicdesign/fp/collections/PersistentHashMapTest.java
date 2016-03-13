@@ -38,8 +38,8 @@ import java.util.Set;
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.FunctionUtils.ordinal;
 import static org.organicdesign.fp.StaticImports.*;
-import static org.organicdesign.fp.testUtils.EqualsContract.equalsDistinctHashCode;
-import static org.organicdesign.fp.testUtils.EqualsContract.equalsSameHashCode;
+import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
+import static org.organicdesign.testUtils.EqualsContract.equalsSameHashCode;
 
 @RunWith(JUnit4.class)
 public class PersistentHashMapTest {
