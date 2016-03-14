@@ -24,6 +24,9 @@ dependency:tree
 Release: just type:
 mvn clean deploy
 
+If gpg complains, set the gpg.passphrase or update the server/password in ~/.m2/settings.xml
+by running mvn -encrypt-master-password to encrypt the Sonatype password (not GPG).
+
 Full release instructions (they can change):
 http://central.sonatype.org/pages/apache-maven.html
 
@@ -157,7 +160,7 @@ http://mvnrepository.com/artifact/org.organicdesign/UncleJim
 			<plugin>
 				<groupId>org.sonatype.plugins</groupId>
 				<artifactId>nexus-staging-maven-plugin</artifactId>
-				<version>1.6.3</version>
+				<version>1.6.6</version>
 				<extensions>true</extensions>
 				<configuration>
 					<serverId>ossrh</serverId>
