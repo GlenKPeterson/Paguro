@@ -2,7 +2,7 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") p
 
 #Features
 
-* [Immutable collections](src/main/java/org/organicdesign/fp/collections) - type-safe generic versions of Clojure's immutable collections - arguably the best immutable collection implementations on the JVM.
+* [Immutable collections](src/main/java/org/organicdesign/fp/collections) - type-safe generic Java versions of Clojure's immutable collections - arguably the best immutable collection implementations on the JVM.
 * [Functional transformations](src/main/java/org/organicdesign/fp/xform/Transformable.java#L42) are a simplified immutable alternative to Java 8 Streams, wrapping checked exceptions and avoiding primitives (you can still use Java 8 streams if you want to).
 * [Brief collection constructors](src/main/java/org/organicdesign/fp/StaticImports.java#L36) are like a tiny, type-safe data definition language:
   * `vec("one", "two", "three")` - an immutable vector/list of three strings
