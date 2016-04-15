@@ -21,7 +21,6 @@ import org.junit.runners.JUnit4;
 import org.organicdesign.fp.FunctionUtils;
 
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -179,7 +178,8 @@ public class PersistentVectorTest {
         PersistentVector.ofIter(Collections.unmodifiableList(oneList)).get(Integer.MAX_VALUE); }
 
     @Test public void addSeveralItems() throws NoSuchAlgorithmException {
-        final int SEVERAL = SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
+        System.out.println("addSeveral start");
+        final int SEVERAL = 100; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
         PersistentVector<Integer> is = PersistentVector.empty();
         for (int j = 0; j < SEVERAL; j++){
             is = is.append(j);
