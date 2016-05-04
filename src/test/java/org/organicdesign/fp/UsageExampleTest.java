@@ -36,6 +36,8 @@ public class UsageExampleTest {
     // specifying ANY types explicitly
     // Part 1 of 3
     @Test public void dataDefinitionPart1() {
+        // In this example, we're going to define some people, then look up Jane by her email address.
+        // This first line is a JUnit test to verify that "Jane" is the name of the person we find.
         assertEquals("Jane",
                      // Define some people with lists of email addresses on the
                      // fly.  vec() makes a List, tup() makes a Tuple
