@@ -25,7 +25,7 @@ Available from the [Maven Repository](http://mvnrepository.com/artifact/org.orga
 <dependency>
         <groupId>org.organicdesign</groupId>
         <artifactId>UncleJim</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.2</version>
 </dependency>
 ```
 

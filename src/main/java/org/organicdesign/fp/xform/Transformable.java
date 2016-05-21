@@ -168,7 +168,7 @@ public interface Transformable<T> {
      Realize a thread-safe immutable list to access items quickly O(log32 n) by index.
      */
     default ImList<T> toImList() {
-        return foldLeft(PersistentVector.empty(), PersistentVector::append);
+        return PersistentVector.fromXform(this);
     }
 
     /**

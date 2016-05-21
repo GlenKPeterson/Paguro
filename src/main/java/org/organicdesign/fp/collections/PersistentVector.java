@@ -11,6 +11,8 @@
 /* rich Jul 5, 2007 */
 package org.organicdesign.fp.collections;
 
+import org.organicdesign.fp.xform.Transformable;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -38,6 +40,18 @@ public class PersistentVector<E> implements ImList<E> {
     private static final int MAX_NODE_LENGTH = 1 << NODE_LENGTH_POW_2;// 0b00000000000000000000000000100000 = 0x20 = 32
 //    private static final int HIGH_BITS = -MAX_NODE_LENGTH;            // 0b11111111111111111111111111100000
     private static final int LOW_BITS = MAX_NODE_LENGTH - 1;          // 0b00000000000000000000000000011111 = 0x1f
+
+    /**
+     This allows us to perform a mutable transform without making the mutable vector visible.
+     It's a performance optimization for Transformable.toImList() which made a roughly 5x
+     performance improvement across the board!
+     @param trans the transformable to foldLeft internally using a MutableVector.
+     @return the collected ImList
+     */
+    public static <T> ImList<T> fromXform(Transformable<T> trans) {
+        return trans.foldLeft(emptyTransientVector(),
+                              MutableVector<T>::append).persistent();
+    }
 
     // Java shift operator review:
     // The signed left shift operator "<<" shifts a bit pattern to the left, and

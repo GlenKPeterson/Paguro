@@ -1,3 +1,6 @@
+**2016-03-13 Release 1.0.2**:
+ - Improved speed of Transformable.toImList() by about 5x by using the Mutable version of the persistent vector internally.  This is thanks to a discussion with Peter Niederwieser @pniederw.  Thank you Peter!
+
 **2016-03-13 Release 1.0.1**:
  - Improved some documentation of the toMap methods, used K and V for the key and value types.
  - Otherwise, this has performed well without changes for 4 months - it's stable.
