@@ -139,7 +139,7 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
 
     /** {@inheritDoc}  Subclasses should override this when they can do so more efficiently. */
     @Override default UnmodListIterator<E> listIterator(int index) {
-        if ( (index < 0) || (index >= size()) ) {
+        if ( (index < 0) || (index > size()) ) {
             throw new IndexOutOfBoundsException("Expected an index between 0 and " + size() +
                                                 " but found: " + index);
         }

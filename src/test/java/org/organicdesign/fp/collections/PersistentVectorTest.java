@@ -56,6 +56,10 @@ public class PersistentVectorTest {
                                vec((Integer) null));
     }
 
+    @Test public void emptyListIterator() {
+        UnmodListTest.listIteratorTest(Collections.emptyList(), PersistentVector.empty());
+    }
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void emptyEx00() { PersistentVector.empty().get(Integer.MIN_VALUE); }
     @Test(expected = IndexOutOfBoundsException.class)
@@ -342,5 +346,14 @@ public class PersistentVectorTest {
 
         List<Integer> tList = Arrays.asList(test);
         UnmodListTest.listIteratorTest(tList, pv2);
+    }
+
+    @Test public void testConcat() throws Exception {
+        PersistentVector<String> pv = PersistentVector.ofIter(Arrays.asList("1st", "2nd", "3rd"));
+        pv = pv.concat(Arrays.asList("4th", "5th", "6th"));
+        assertEquals(6, pv.size());
+        assertEquals(PersistentVector.ofIter(Arrays.asList("1st", "2nd", "3rd", "4th", "5th",
+                                                           "6th")),
+                     pv);
     }
 }

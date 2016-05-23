@@ -15,6 +15,7 @@ import org.organicdesign.fp.xform.Transformable;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
 
 // TODO: http://functionaljava.googlecode.com/svn/artifacts/2.21/javadoc/fj/data/Seq.html
@@ -288,6 +289,10 @@ public class PersistentVector<E> implements ImList<E> {
 
     /** {@inheritDoc} */
     @Override public UnmodListIterator<E> listIterator(int index) {
+        if( (index < 0) || (index > size) ) {
+            // To match ArrayList and other java.util.List expectations
+            throw new IndexOutOfBoundsException("Index: " + index);
+        }
         return new UnmodListIterator<E>() {
             private int i = index;
             private int base = i - (i % MAX_NODE_LENGTH);
@@ -300,6 +305,11 @@ public class PersistentVector<E> implements ImList<E> {
 
             /** {@inheritDoc} */
             @Override public E next() {
+                if (i >= size) {
+                    // To match ArrayList and other java.util.List expectations
+                    // If we didn't catch this, it would be an ArrayIndexOutOfBoundsException.
+                    throw new NoSuchElementException();
+                }
                 if (i - base == MAX_NODE_LENGTH) {
                     array = leafNodeArrayFor(i);
                     base += MAX_NODE_LENGTH;
@@ -311,9 +321,19 @@ public class PersistentVector<E> implements ImList<E> {
             @Override public int nextIndex() { return i; }
             /** {@inheritDoc} */
             @Override public E previous() {
+                // To match contract of ListIterator and implementation of ArrayList
+                if (i < 1) {
+                    // To match ArrayList and other java.util.List expectations.
+                    throw new NoSuchElementException();
+                }
                 if (i - base == 0) {
+//                    System.out.println("i - base was zero");
                     array = leafNodeArrayFor(i - 1);
                     base -= MAX_NODE_LENGTH;
+                } else if (i == size) {
+                    // Can start with index past array.
+                    array = leafNodeArrayFor(i - 1);
+                    base = i - (i % MAX_NODE_LENGTH);
                 }
                 return array[--i & LOW_BITS];
             }

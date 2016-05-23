@@ -16,6 +16,7 @@ package org.organicdesign.fp.collections;
 
 import org.junit.Test;
 import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.function.Function0;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import java.util.Arrays;
@@ -124,115 +125,134 @@ public class UnmodListTest {
     }
 
     // TODO: This belongs in testUtils
+    public static <T extends Throwable> void assertEx(Function0<?> f, String beforeText,
+                                                      Class<T> exType) {
+        try {
+            f.apply();
+        } catch (Throwable t) {
+            if (!exType.isInstance(t)) {
+                fail("Expected " + beforeText + " to throw " + exType.getSimpleName() +
+                     " but threw " + t);
+            }
+            return;
+        }
+        fail("Expected " + beforeText + " to throw " + exType.getSimpleName());
+    }
+
+    private static <A,B> void assertLiEq(ListIterator<A> a, ListIterator<B> b, String afterText) {
+        assertEquals("a.hasNext should equal b.hasNext " + afterText,
+                     a.hasNext(), b.hasNext());
+        assertEquals("a.hasPrevious should equal b.hasPrevious " + afterText,
+                     a.hasPrevious(), b.hasPrevious());
+        assertEquals("a.nextIndex should equal b.nextIndex " + afterText,
+                     a.nextIndex(), b.nextIndex());
+        assertEquals("a.previousIndex should equal b.previousIndex " + afterText,
+                     a.previousIndex(), b.previousIndex());
+    }
+
+    // TODO: This belongs in testUtils
     /**
      Call with two ListIterators to test that they are equal
      @param aList the reference iterator
      @param bList the iterator under test.
      */
     public static <A,B> void listIteratorTest(List<A> aList, List<B> bList) {
-        for (int i = 0; i < aList.size(); i++) {
+
+        assertEx(() -> aList.listIterator(-1), "aList.listIterator(-1)",
+                 IndexOutOfBoundsException.class);
+        assertEx(() -> bList.listIterator(-1), "bList.listIterator(-1)",
+                 IndexOutOfBoundsException.class);
+
+        assertEx(() -> aList.listIterator(aList.size() + 1), "aList.listIterator(aList.size() + 1)",
+                 IndexOutOfBoundsException.class);
+        assertEx(() -> bList.listIterator(aList.size() + 1), "bList.listIterator(aList.size() + 1)",
+                 IndexOutOfBoundsException.class);
+
+        for (int i = 0; i <= aList.size(); i++) {
             ListIterator<A> a = aList.listIterator(i);
             ListIterator<B> b = bList.listIterator(i);
 
-            assertEquals("a.hasNext should initially equal b.hasNext (started at " + i + ")",
-                         a.hasNext(), b.hasNext());
-            assertEquals("a.hasPrevious should initially equal b.hasPrevious" +
-                         " (started at " + i + ")",
-                         a.hasPrevious(), b.hasPrevious());
-            assertEquals("a.nextIndex should initially equal b.nextIndex (started at " + i + ")",
-                         a.nextIndex(), b.nextIndex());
-            assertEquals("a.previousIndex should initially equal b.previousIndex" +
-                         " (started at " + i + ")",
-                         a.previousIndex(), b.previousIndex());
+            assertLiEq(a, b, "at start (i = " + i + ")");
 
             while (a.hasNext()) {
                 assertTrue("When a has a next, b should too (started at " + i + ")", b.hasNext());
 
-                assertEquals("a.nextIndex should equal b.nextIndex before calling next()" +
-                             " (started at " + i + ")",
-                             a.nextIndex(), b.nextIndex());
-                assertEquals("a.previousIndex should equal b.previousIndex before calling next()" +
-                             " (started at " + i + ")",
-                             a.previousIndex(), b.previousIndex());
-
                 assertEquals("a.next should equal b.next (started at " + i + ")",
                              a.next(), b.next());
 
-                assertEquals("a.nextIndex should equal b.nextIndex after calling next()" +
-                             " (started at " + i + ")",
-                             a.nextIndex(), b.nextIndex());
-                assertEquals("a.previousIndex should equal b.previousIndex after calling next()" +
-                             " (started at " + i + ")",
-                             a.previousIndex(), b.previousIndex());
+                assertLiEq(a, b, "after calling next()");
             }
             assertFalse("When a has no next, b shouldn't either (started at " + i + ")",
                         b.hasNext());
 
-            assertEquals("a.hasPrevious should equal b.hasPrevious after the last item" +
-                         " (started at " + i + ")",
-                         a.hasPrevious(), b.hasPrevious());
-            assertEquals("a.nextIndex should equal b.nextIndex after the last item" +
-                         " (started at " + i + ")",
-                         a.nextIndex(), b.nextIndex());
-            assertEquals("a.previousIndex should equal b.previousIndex after the last item" +
-                         " (started at " + i + ")",
-                         a.previousIndex(), b.previousIndex());
+            assertLiEq(a, b, "after the last item");
+
+            assertEx(a::next, "a.next() after the last item", NoSuchElementException.class);
+            assertEx(b::next, "b.next() after the last item", NoSuchElementException.class);
 
             while (a.hasPrevious()) {
                 assertTrue("When a hasPrevious, b should too. (started at " + i + ")",
                            b.hasPrevious());
 
-                assertEquals("a.nextIndex should equal b.nextIndex before calling previous()" +
-                             " (started at " + i + ")",
-                             a.nextIndex(), b.nextIndex());
-                assertEquals("a.previousIndex should equal b.previousIndex before calling" +
-                             " previous() (started at " + i + ")",
-                             a.previousIndex(), b.previousIndex());
-
                 assertEquals("a.previous should equal b.previous (started at " + i + ")",
                              a.previous(), b.previous());
 
-                assertEquals("a.nextIndex should equal b.nextIndex after calling previous()" +
-                             " (started at " + i + ")",
-                             a.nextIndex(), b.nextIndex());
-                assertEquals("a.previousIndex should equal b.previousIndex after calling" +
-                             " previous() (started at " + i + ")",
-                             a.previousIndex(), b.previousIndex());
+                assertLiEq(a, b, "after calling previous()");
             }
             assertFalse("When a has no previous, b shouldn't either (started at " + i + ")",
                         b.hasPrevious());
 
-            assertEquals("a.hasPrevious should equal b.hasPrevious before first item" +
-                         " (started at " + i + ")",
-                         a.hasPrevious(), b.hasPrevious());
-            assertEquals("a.nextIndex should equal b.nextIndex before first item" +
-                         " (started at " + i + ")",
-                         a.nextIndex(), b.nextIndex());
-            assertEquals("a.previousIndex should equal b.previousIndex before first item" +
-                         " (started at " + i + ")",
-                         a.previousIndex(), b.previousIndex());
+            assertLiEq(a, b, "before first item");
+
+            assertEx(a::previous, "a.previous() before first item", NoSuchElementException.class);
+            assertEx(b::previous, "b.previous() before first item", NoSuchElementException.class);
+        }
+
+        // Check that indexing works when we start with the previous, then switch to the next()
+        for (int i = 0; i <= aList.size(); i++) {
+            ListIterator<A> a = aList.listIterator(i);
+            ListIterator<B> b = bList.listIterator(i);
+
+            assertLiEq(a, b, "at start (i = " + i + ")");
+
+            while (a.hasPrevious()) {
+                assertTrue("When a hasPrevious, b should too. (started at " + i + ")",
+                           b.hasPrevious());
+
+                assertEquals("a.previous should equal b.previous (started at " + i + ")",
+                             a.previous(), b.previous());
+
+                assertLiEq(a, b, "after calling previous()");
+            }
+            assertFalse("When a has no previous, b shouldn't either (started at " + i + ")",
+                        b.hasPrevious());
+
+            assertLiEq(a, b, "before first item");
+
+            assertEx(a::previous, "a.previous()", NoSuchElementException.class);
+            assertEx(b::previous, "b.previous()", NoSuchElementException.class);
+
+            while (a.hasNext()) {
+                assertTrue("When a has a next, b should too (started at " + i + ")", b.hasNext());
+
+                assertEquals("a.next should equal b.next (started at " + i + ")",
+                             a.next(), b.next());
+
+                assertLiEq(a, b, "after calling next()");
+            }
+            assertFalse("When a has no next, b shouldn't either (started at " + i + ")",
+                        b.hasNext());
+
+            assertLiEq(a, b, "after the last item");
+
+            assertEx(a::next, "a.next()", NoSuchElementException.class);
+            assertEx(b::next, "b.next()", NoSuchElementException.class);
         }
     }
 
     @Test public void listIteratorTest() {
         listIteratorTest(Arrays.asList(sticksAndStones), unList);
     }
-
-    @Test (expected = IndexOutOfBoundsException.class)
-    public void listIterEx01() { unList.listIterator(-1); }
-
-    @Test (expected = IndexOutOfBoundsException.class)
-    public void listIterEx02() { unList.listIterator(unList.size()); }
-
-    @Test (expected = NoSuchElementException.class)
-    public void listIterEx03() {
-        ListIterator<String> li = unList.listIterator(unList.size() - 1);
-        li.next();
-        li.next();
-    }
-
-    @Test (expected = NoSuchElementException.class)
-    public void listIterEx04() { unList.listIterator(0).previous(); }
 
     @Test public void subList() {
         List<String> a = Arrays.asList(sticksAndStones);

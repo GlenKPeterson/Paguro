@@ -15,6 +15,7 @@ package org.organicdesign.fp.collections;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  An efficient (in both time and memory) implementation of List.  If you want to compare a RangeOfInt
@@ -238,16 +239,28 @@ public class RangeOfInt implements UnmodList<Integer> {
      Java expects similar behavior.
      */
     @Override public UnmodListIterator<Integer> listIterator(final int startIdx) {
+        if( (startIdx < 0) || (startIdx > size) ) {
+            // To match ArrayList and other java.util.List expectations
+            throw new IndexOutOfBoundsException("Index: " + startIdx);
+        }
         return new UnmodListIterator<Integer>() {
             int val = start + startIdx;
             @Override public boolean hasNext() { return val < end; }
             @Override public Integer next() {
+                if (val >= end) {
+                    // To match ArrayList and other java.util.List expectations
+                    throw new NoSuchElementException();
+                }
                 Integer t = val;
                 val = val + 1;
                 return t;
             }
             @Override public boolean hasPrevious() { return val > start; }
             @Override public Integer previous() {
+                if (val <= start) {
+                    // To match ArrayList and other java.util.List expectations
+                    throw new NoSuchElementException();
+                }
                 val = val - 1;
                 return val;
             }

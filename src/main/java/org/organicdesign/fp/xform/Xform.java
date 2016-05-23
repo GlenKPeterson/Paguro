@@ -516,7 +516,7 @@ public abstract class Xform<A> implements UnmodIterable<A> {
 
     /** The number of items to drop from the beginning of the output. */
     @Override public Xform<A> drop(long n) {
-        if (n < 0) { throw new IllegalArgumentException("Can't drop less than one item."); }
+        if (n < 0) { throw new IllegalArgumentException("Can't drop less than zero items."); }
         return new DropDesc<>(this, n);
     }
 

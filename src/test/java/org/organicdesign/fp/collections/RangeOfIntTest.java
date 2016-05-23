@@ -7,7 +7,6 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.ListIterator;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.collections.RangeOfInt.LIST_EQUATOR;
@@ -160,37 +159,8 @@ public class RangeOfIntTest {
     }
 
     @Test public void ListIteratorTest() {
-        ListIterator<Integer> a = Arrays.asList(-2, -1, 0, 1, 2, 3, 4).listIterator();
-        UnmodListIterator<Integer> b = RangeOfInt.of(-2, 5).listIterator();
-
-        while (a.hasNext()) {
-            assertTrue(b.hasNext());
-
-            assertEquals(a.nextIndex(), b.nextIndex());
-            assertEquals(a.previousIndex(), b.previousIndex());
-
-            assertEquals(a.next(), b.next());
-
-            assertEquals(a.nextIndex(), b.nextIndex());
-            assertEquals(a.previousIndex(), b.previousIndex());
-        }
-        assertFalse(b.hasNext());
-
-        assertEquals(a.nextIndex(), b.nextIndex());
-        assertEquals(a.previousIndex(), b.previousIndex());
-
-        while (a.hasPrevious()) {
-            assertTrue(b.hasPrevious());
-
-            assertEquals(a.nextIndex(), b.nextIndex());
-            assertEquals(a.previousIndex(), b.previousIndex());
-
-            assertEquals(a.previous(), b.previous());
-
-            assertEquals(a.nextIndex(), b.nextIndex());
-            assertEquals(a.previousIndex(), b.previousIndex());
-        }
-        assertFalse(b.hasPrevious());
+        UnmodListTest.listIteratorTest(Arrays.asList(-2, -1, 0, 1, 2, 3, 4),
+                                       RangeOfInt.of(-2, 5));
     }
 
     @Test public void equatorTest() {

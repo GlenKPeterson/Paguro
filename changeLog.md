@@ -1,4 +1,11 @@
-**2016-03-13 Release 1.0.2**:
+**2016-03-23 Release 1.0.3**:
+ - Fixed error message for Xform.drop() to "Can't drop less than zero items #6." Thanks @pniederw
+ - Fixed "Wrong bounds check in UnmodList.listIterator #7." Thanks @pniederw
+ - Fixed "PersistentVector can't handle reverse iteration starting from last element #8."  Thanks @pniederw
+ - Fixed RangeOfInt.listIterator and UnmodList and improved tests for same issues as above.
+ - Improved test coverage of PersistentVector a little bit.
+
+**2016-03-22 Release 1.0.2**:
  - Improved speed of Transformable.toImList() by about 5x by using the Mutable version of the persistent vector internally.  This is thanks to a discussion with Peter Niederwieser @pniederw.  Thank you Peter!
 
 **2016-03-13 Release 1.0.1**:
