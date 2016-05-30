@@ -2,7 +2,7 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") p
 
 #What's New?
 
-2016-05-28 @pakoito is making good progress on his [Java7 back-port of UncleJim](https://github.com/pakoito/UncleJim).  That's a big effort, but may be on hold as we [consider instead converting UncleJim to Kotlin which both works on Android and compiles to Java 6](https://github.com/GlenKPeterson/UncleJim/issues/5#issuecomment-222507088).  That might be the best for Java 6, 7, 8, and Kotlin developers!?
+2016-05-28 @pakoito is making good progress on his [Java7 back-port of UncleJim](https://github.com/pakoito/UncleJim).  We may [consider instead converting UncleJim to Kotlin which both works on Android and compiles to Java 6](https://github.com/GlenKPeterson/UncleJim/issues/5#issuecomment-222507088). 
 
 #Features
 
