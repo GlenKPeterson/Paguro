@@ -1,5 +1,9 @@
 UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") provides type-safe versions of Clojure's immutable collections and a few other tools to make functional programming in Java a little easier.
 
+#What's New?
+
+2016-05-28 @pakoito is making good progress on his [Java7 back-port of UncleJim](https://github.com/pakoito/UncleJim)
+
 #Features
 
 * [Immutable collections](src/main/java/org/organicdesign/fp/collections) - type-safe generic Java versions of Clojure's immutable collections - arguably the best immutable collection implementations on the JVM.
