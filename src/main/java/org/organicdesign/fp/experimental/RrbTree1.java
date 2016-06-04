@@ -131,15 +131,15 @@ public class RrbTree1<E> implements ImList<E> {
         return newItems;
     }
 
-    @SuppressWarnings("unchecked")
-    private static <T> T[] replaceInArrayAt(T replacedItem, T[] origItems, int idx) {
-        // Make an array that big enough.  It's too bad that the JVM bothers to
-        // initialize this with nulls.
-        T[] newItems = (T[]) new Object[origItems.length];
-        System.arraycopy(origItems, 0, newItems, 0, idx);
-        newItems[idx] = replacedItem;
-        return newItems;
-    }
+//    @SuppressWarnings("unchecked")
+//    private static <T> T[] replaceInArrayAt(T replacedItem, T[] origItems, int idx) {
+//        // Make an array that big enough.  It's too bad that the JVM bothers to
+//        // initialize this with nulls.
+//        T[] newItems = (T[]) new Object[origItems.length];
+//        System.arraycopy(origItems, 0, newItems, 0, idx);
+//        newItems[idx] = replacedItem;
+//        return newItems;
+//    }
 
     private static RrbTree1 EMPTY_RRB_TREE =
             new RrbTree1<>(emptyArray(), 0, NodeLeaf.emptyNodeLeaf(), 0);
@@ -399,12 +399,13 @@ public class RrbTree1<E> implements ImList<E> {
         @Override public T get(int i) {
 //            System.out.println("  NodeRadix.get(" + i + ")");
             // Find the node indexed by the high bits (for this height).
-            // Call get with the remaining bits to the right (we've used up the high bits).
             int nodeIdx = i >> shift;
 //            System.out.println("    nodeIdx: " + nodeIdx);
 //            System.out.println("    shift: " + shift);
 //            System.out.println("    shift (binary): " + Integer.toBinaryString(shift));
 
+
+            // Call get with the remaining bits to the right (we've used up the high bits).
             int shifter = -1 << shift;
 
 //            System.out.println("    shifter (binary): " + Integer.toBinaryString(shift));
