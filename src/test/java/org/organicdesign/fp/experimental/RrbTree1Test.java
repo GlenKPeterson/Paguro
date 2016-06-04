@@ -65,6 +65,11 @@ public class RrbTree1Test {
         RrbTree1<Integer> is = RrbTree1.empty();
         for (int j = 0; j < SEVERAL; j++){
             is = is.append(j);
+            assertEquals(j + 1, is.size());
+            assertEquals(Integer.valueOf(j), is.get(j));
+            for (int k = 0; k <= j; k++) {
+                assertEquals(Integer.valueOf(k), is.get(k));
+            }
         }
         assertEquals(SEVERAL, is.size());
         for (int j = 0; j < SEVERAL; j++){
@@ -107,8 +112,10 @@ public class RrbTree1Test {
         Integer[] test = new Integer[len];
 
         for (int i = 0; i < len; i++) {
-            pv2 = pv2.append(len - i);
-            test[i] = len - i;
+            int testVal = len - 1;
+            pv2 = pv2.append(testVal);
+            assertEquals(Integer.valueOf(testVal), pv2.get(i));
+            test[i] = testVal;
         }
         assertArrayEquals(test, pv2.toArray());
 

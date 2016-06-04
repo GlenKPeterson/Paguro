@@ -104,7 +104,7 @@ public class RrbTree1<E> implements ImList<E> {
     }
 
     private static <T> T[] insertIntoArrayAt(T item, T[] items, int idx) {
-        return insertIntoArrayAt(item, items, idx);
+        return insertIntoArrayAt(item, items, idx, null);
     }
 
     @SuppressWarnings("unchecked")
@@ -188,6 +188,7 @@ public class RrbTree1<E> implements ImList<E> {
     }
 
     @Override  public E get(int i) {
+//        System.out.println("get(" + i + ")");
         if ( (i < 0) || (i > size) ) {
             throw new IndexOutOfBoundsException("Index: " + i + " size: " + size);
         }
@@ -198,6 +199,9 @@ public class RrbTree1<E> implements ImList<E> {
             }
             i -= focus.length;
         }
+//        System.out.println("  focusStartIndex: " + focusStartIndex);
+//        System.out.println("  focus.length: " + focus.length);
+//        System.out.println("  adjusted index: " + i);
         return root.get(i);
     }
 
@@ -376,7 +380,7 @@ public class RrbTree1<E> implements ImList<E> {
             return new NodeLeaf<>(insertIntoArrayAt(item, items, i));
         }
 
-        @Override public String toString() { return "NodeLeaf(items.length="+ items.length + ")"; }
+        @Override public String toString() { return "NodeLeaf("+ Arrays.toString(items) + ")"; }
     }
 
     // Contains a left-packed tree of exactly 32-item nodes.
@@ -393,9 +397,26 @@ public class RrbTree1<E> implements ImList<E> {
 //            new Exception().printStackTrace();
         }
         @Override public T get(int i) {
+//            System.out.println("  NodeRadix.get(" + i + ")");
             // Find the node indexed by the high bits (for this height).
             // Call get with the remaining bits to the right (we've used up the high bits).
-            return nodes[i >> shift].get(i & (-1 << shift));
+            int nodeIdx = i >> shift;
+//            System.out.println("    nodeIdx: " + nodeIdx);
+//            System.out.println("    shift: " + shift);
+//            System.out.println("    shift (binary): " + Integer.toBinaryString(shift));
+
+            int shifter = -1 << shift;
+
+//            System.out.println("    shifter (binary): " + Integer.toBinaryString(shift));
+
+            int invShifter = ~shifter;
+//            System.out.println("    invShifter (binary): " + Integer.toBinaryString(invShifter));
+
+//            System.out.println("             i (binary): " + Integer.toBinaryString(invShifter));
+            int subNodeIdx = i & invShifter;
+//            System.out.println("    subNodeIdx (binary): " + Integer.toBinaryString(subNodeIdx));
+//            System.out.println("    subNodeIdx: " + subNodeIdx);
+            return nodes[nodeIdx].get(subNodeIdx);
         }
         @Override public int maxIndex() {
             int lastNodeIdx = nodes.length - 1;
