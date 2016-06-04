@@ -17,6 +17,7 @@ import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.UnmodSortedIterable;
 import org.organicdesign.fp.tuple.Tuple2;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
 
@@ -77,10 +78,12 @@ public class RrbTree1<E> implements ImList<E> {
     private static <T> T[] singleElementArray(T elem) { return (T[]) new Object[] { elem }; }
 
     @SuppressWarnings("unchecked")
-    private static <T> T[] insertIntoArrayAt(T item, T[] items, int idx) {
+    private static <T> T[] insertIntoArrayAt(T item, T[] items, int idx, Class<T> tClass) {
         // Make an array that's one bigger.  It's too bad that the JVM bothers to
         // initialize this with nulls.
-        T[] newItems = (T[]) new Object[items.length + 1];
+
+        T[] newItems = (T[]) ( (tClass == null) ? new Object[items.length + 1]
+                                                : Array.newInstance(tClass, items.length + 1) );
 
         // If we aren't inserting at the first item, array-copy the items before the insert
         // point.
@@ -98,6 +101,10 @@ public class RrbTree1<E> implements ImList<E> {
         }
 
         return newItems;
+    }
+
+    private static <T> T[] insertIntoArrayAt(T item, T[] items, int idx) {
+        return insertIntoArrayAt(item, items, idx);
     }
 
     @SuppressWarnings("unchecked")
@@ -121,6 +128,16 @@ public class RrbTree1<E> implements ImList<E> {
             System.arraycopy(origItems, idx, newItems, idx + insertedItems.length,
                              origItems.length - idx);
         }
+        return newItems;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> T[] replaceInArrayAt(T replacedItem, T[] origItems, int idx) {
+        // Make an array that big enough.  It's too bad that the JVM bothers to
+        // initialize this with nulls.
+        T[] newItems = (T[]) new Object[origItems.length];
+        System.arraycopy(origItems, 0, newItems, 0, idx);
+        newItems[idx] = replacedItem;
         return newItems;
     }
 
@@ -252,7 +269,10 @@ public class RrbTree1<E> implements ImList<E> {
         /** Inserts an item at the given index */
 //        @Override public Node<T> insert(int i, T item);
         Node<T> append(T item);
-        boolean canAddOneMore();
+        /** Returns true if this node's array is not full */
+        boolean thisNodeHasCapacity();
+        /** Returns true if this strict-Radix tree can take another 32 items. */
+        boolean hasRadixCapacity();
         Tuple2<? extends Node<T>,? extends Node<T>> splitAt(int i);
 
         // Because we want to append/insert into the focus as much as possible, we will treat
@@ -282,9 +302,11 @@ public class RrbTree1<E> implements ImList<E> {
         }
         // If we want to add one more to an existing leaf node, it must already be part of a
         // relaxed tree.
-        @Override public boolean canAddOneMore() {
+        @Override public boolean thisNodeHasCapacity() {
             return items.length < MAX_NODE_LENGTH;
         }
+
+        @Override public boolean hasRadixCapacity() { return false; }
 
         /**
          This is a Relaxed operation.  Performing it on an Exact Radix node causes it and all
@@ -329,7 +351,7 @@ public class RrbTree1<E> implements ImList<E> {
                  (oldFocus.length == RADIX_NODE_LENGTH) &&
                  (index == RADIX_NODE_LENGTH) ) {
 
-                return new NodeRadix<>(RADIX_NODE_LENGTH,
+                return new NodeRadix<>(NODE_LENGTH_POW_2,
                                        (NodeLeaf<T>[]) new NodeLeaf[] { this,
                                                                         new NodeLeaf<>(oldFocus)});
             }
@@ -345,7 +367,7 @@ public class RrbTree1<E> implements ImList<E> {
 
 //        @Override
         public NodeLeaf<T> insert(int i, T item) {
-            if (!canAddOneMore()) {
+            if (!thisNodeHasCapacity()) {
                 throw new IllegalStateException("Called insert, but can't add one more!" +
                                                 "  Parent should have called split first.");
             }
@@ -353,6 +375,8 @@ public class RrbTree1<E> implements ImList<E> {
             // Return our new node.
             return new NodeLeaf<>(insertIntoArrayAt(item, items, i));
         }
+
+        @Override public String toString() { return "NodeLeaf(items.length="+ items.length + ")"; }
     }
 
     // Contains a left-packed tree of exactly 32-item nodes.
@@ -363,7 +387,11 @@ public class RrbTree1<E> implements ImList<E> {
         // These are the child nodes
         Node<T>[] nodes;
         // Constructor
-        NodeRadix(int s, Node<T>[] ns) { shift = s; nodes = ns; }
+        NodeRadix(int s, Node<T>[] ns) {
+            shift = s; nodes = ns;
+            System.out.println("new NodeRadix(" + shift + ", " + Arrays.toString(ns) + ")");
+//            new Exception().printStackTrace();
+        }
         @Override public T get(int i) {
             // Find the node indexed by the high bits (for this height).
             // Call get with the remaining bits to the right (we've used up the high bits).
@@ -373,8 +401,12 @@ public class RrbTree1<E> implements ImList<E> {
             int lastNodeIdx = nodes.length - 1;
             return (lastNodeIdx << NODE_LENGTH_POW_2) + nodes[lastNodeIdx].maxIndex();
         }
-        @Override public boolean canAddOneMore() {
+        @Override public boolean thisNodeHasCapacity() {
             return nodes.length < RADIX_NODE_LENGTH;
+        }
+
+        @Override public boolean hasRadixCapacity() {
+            return thisNodeHasCapacity() || nodes[nodes.length - 1].hasRadixCapacity();
         }
 
         @Override
@@ -384,7 +416,51 @@ public class RrbTree1<E> implements ImList<E> {
         }
 
         @Override
-        public RrbTree1.Node<T> pushFocus(T[] oldFocus, int index) {
+        public Node<T> pushFocus(T[] oldFocus, int index) {
+            // It's a radix-compatible addition if the focus being pushed is of
+            // RADIX_NODE_LENGTH and the index it's pushed to falls on the final leaf-node boundary.
+            //
+            // TODO: I think we could support this on any leaf-node boundary if the children of this
+            // node are leaves and this node is not full, but for now we'll just punt to a
+            // RelaxedNode when that happens, which can only be within the last 32 leaf nodes
+            // so it's a small corner-case optimization.
+            if ( (oldFocus.length == RADIX_NODE_LENGTH) &&
+                 (index == maxIndex()) ) {
+
+                System.out.println("Radix pushFocus(" + Arrays.toString(oldFocus) + ", " + index + ")");
+                System.out.println("  nodes.length: " + nodes.length);
+                System.out.println("  shift: " + shift);
+
+                // If the proper sub-node can take the additional array, let it!
+                int subNodeIndex = index >> shift;
+                System.out.println("  subNodeIndex: " + subNodeIndex);
+
+                if ( (subNodeIndex == nodes.length) &&
+                    (nodes[0] instanceof NodeLeaf) &&
+                     (nodes.length < RADIX_NODE_LENGTH) ) {
+
+                    NodeLeaf<T> newNode = new NodeLeaf<>(oldFocus);
+                    Node<T>[] newNodes = (Node<T>[]) insertIntoArrayAt(newNode, nodes, subNodeIndex, Node.class);
+                    // This could allow cheap radix inserts on any leaf-node boundary...
+                    return new NodeRadix<>(shift, newNodes);
+                }
+                throw new UnsupportedOperationException("Not implemented yet");
+
+//                // TODO: Implement
+//                Node<T> subNode = nodes[subNodeIndex];
+//                if (subNode.hasRadixCapacity()) {
+//                    Node<T>[] newNodes = replaceInArrayAt(subNode.pushFocus(oldFocus, (index & (-1 << shift))), nodes, subNodeIndex);
+//                    return new NodeRadix<>(shift, newNodes);
+//                }
+//
+//                throw new UnsupportedOperationException("Not implemented yet");
+
+//                // If we have room for one more, pop it in there!
+//                if (nodes.length < RADIX_NODE_LENGTH) {
+//                    insertIntoArrayAt(t, focus, focus.length);
+//                }
+            }
+
             // TODO: Implement
             throw new UnsupportedOperationException("Not implemented yet");
         }
@@ -396,7 +472,7 @@ public class RrbTree1<E> implements ImList<E> {
 
         @Override public NodeRadix<T> append(T item) {
             Node<T> last = nodes[nodes.length - 1];
-            if (last.canAddOneMore()) {
+            if (last.thisNodeHasCapacity()) {
                 // Make a copy of our node array
                 Node<T>[] newNodes = Arrays.copyOf(nodes, nodes.length);
                 // Replace the last node with the updated one.
@@ -415,6 +491,7 @@ public class RrbTree1<E> implements ImList<E> {
                 return new NodeRadix<>(shift, newNodes);
             }
         }
+        @Override public String toString() { return "NodeRadix(nodes.length="+ nodes.length + ")"; }
     }
 
     // Contains a relaxed tree of nodes that average around 32 items each.
@@ -457,7 +534,7 @@ public class RrbTree1<E> implements ImList<E> {
 
         @Override public Node<T> append(T item) {
             Node<T> last = nodes[nodes.length - 1];
-            if (last.canAddOneMore()) {
+            if (last.thisNodeHasCapacity()) {
                 // Make a copy of our node array
                 Node<T>[] newNodes = Arrays.copyOf(nodes, nodes.length);
                 // Replace the last node with the updated one.
@@ -482,14 +559,18 @@ public class RrbTree1<E> implements ImList<E> {
         }
 
 
-        @Override public boolean canAddOneMore() {
+        @Override public boolean thisNodeHasCapacity() {
             return nodes.length < MAX_NODE_LENGTH;
         }
+
+        @Override public boolean hasRadixCapacity() { return false; }
 
         @Override
         public RrbTree1.Node<T> pushFocus(T[] oldFocus, int index) {
             // TODO: Implement
             throw new UnsupportedOperationException("Not Implemented Yet");
         }
+
+        @Override public String toString() { return "NodeRelaxed(nodes.length="+ nodes.length + ")"; }
     }
 }
