@@ -438,7 +438,17 @@ public class RrbTree1<E> implements ImList<E> {
         }
         @Override public int maxIndex() {
             int lastNodeIdx = nodes.length - 1;
-            return (lastNodeIdx << NODE_LENGTH_POW_2) + nodes[lastNodeIdx].maxIndex();
+            System.out.println("    NodeRadix.maxIndex()");
+            System.out.println("      nodes.length:" + nodes.length);
+            System.out.println("      shift:" + shift);
+            System.out.println("      RADIX_NODE_LENGTH:" + RADIX_NODE_LENGTH);
+
+            // Add up all the full nodes (only the last can be partial)
+            int shiftedLength = lastNodeIdx << shift;
+            System.out.println("      shifed length:" + shiftedLength);
+            int partialNodeSize = nodes[lastNodeIdx].maxIndex();
+            System.out.println("      Remainder:" + partialNodeSize);
+            return shiftedLength + partialNodeSize;
         }
         @Override public boolean thisNodeHasCapacity() {
             return nodes.length < RADIX_NODE_LENGTH;
@@ -456,10 +466,11 @@ public class RrbTree1<E> implements ImList<E> {
 
         @Override
         public Node<T> pushFocus(T[] oldFocus, int index) {
+
             // It's a radix-compatible addition if the focus being pushed is of
             // RADIX_NODE_LENGTH and the index it's pushed to falls on the final leaf-node boundary.
             //
-            // TODO: I think we could support this on any leaf-node boundary if the children of this
+            // TODO: I think we could support this on ANY leaf-node boundary if the children of this
             // node are leaves and this node is not full, but for now we'll just punt to a
             // RelaxedNode when that happens, which can only be within the last 32 leaf nodes
             // so it's a small corner-case optimization.
@@ -497,8 +508,11 @@ public class RrbTree1<E> implements ImList<E> {
                     // Add a new leaf node
                     Node<T> newNode = new NodeLeaf<>(oldFocus);
 
-                    // Make a skinny branch of a tree by walking up from the leaf node until we have
-                    // another node the same level as this one that we can make into a sibling.
+                    // Make a skinny branch of a tree by walking up from the leaf node until our
+                    // new branch is at the same level as the old one.  We have to build evenly
+                    // (like hotels in Monopoly) in order to keep the tree balanced.  Even height,
+                    // but left-packed (the lower indices must all be filled before adding new
+                    // nodes to the right).
                     int newShift = 0;
                     while (newShift < shift) {
                         newShift += NODE_LENGTH_POW_2;
@@ -530,10 +544,15 @@ public class RrbTree1<E> implements ImList<E> {
 //                }
             }
 
+            // First time I got here, index > maxIndex.
+            // With a radix of 4, index: 20, maxIndex: 8
+            // I think maxIndex() may be wrong!
+
             System.out.println("  oldFocus.length: " + oldFocus.length);
             System.out.println("  index: " + index);
             System.out.println("  maxIndex(): " + maxIndex());
             System.out.println("  nodes.length: " + nodes.length);
+            System.out.println("  this: " + this);
 
             // TODO: Implement
             throw new UnsupportedOperationException("Not implemented yet");
