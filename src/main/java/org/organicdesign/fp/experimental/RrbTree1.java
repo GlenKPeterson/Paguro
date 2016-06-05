@@ -438,16 +438,16 @@ public class RrbTree1<E> implements ImList<E> {
         }
         @Override public int maxIndex() {
             int lastNodeIdx = nodes.length - 1;
-            System.out.println("    NodeRadix.maxIndex()");
-            System.out.println("      nodes.length:" + nodes.length);
-            System.out.println("      shift:" + shift);
-            System.out.println("      RADIX_NODE_LENGTH:" + RADIX_NODE_LENGTH);
+//            System.out.println("    NodeRadix.maxIndex()");
+//            System.out.println("      nodes.length:" + nodes.length);
+//            System.out.println("      shift:" + shift);
+//            System.out.println("      RADIX_NODE_LENGTH:" + RADIX_NODE_LENGTH);
 
             // Add up all the full nodes (only the last can be partial)
             int shiftedLength = lastNodeIdx << shift;
-            System.out.println("      shifed length:" + shiftedLength);
+//            System.out.println("      shifed length:" + shiftedLength);
             int partialNodeSize = nodes[lastNodeIdx].maxIndex();
-            System.out.println("      Remainder:" + partialNodeSize);
+//            System.out.println("      Remainder:" + partialNodeSize);
             return shiftedLength + partialNodeSize;
         }
         @Override public boolean thisNodeHasCapacity() {
@@ -485,13 +485,15 @@ public class RrbTree1<E> implements ImList<E> {
                 int subNodeIndex = highBits(index);
                 System.out.println("  subNodeIndex: " + subNodeIndex);
 
+                // Regardless of what else happens, we're going to add a new node, so make it here.
+                Node<T> newNode = new NodeLeaf<>(oldFocus);
+
                 if ( (subNodeIndex == nodes.length) &&
                     (nodes[0] instanceof NodeLeaf) &&
                      (nodes.length < RADIX_NODE_LENGTH) ) {
 
                     System.out.println("Adding a node to the existing array");
 
-                    NodeLeaf<T> newNode = new NodeLeaf<>(oldFocus);
                     Node<T>[] newNodes = (Node<T>[]) insertIntoArrayAt(newNode, nodes, subNodeIndex, Node.class);
                     // This could allow cheap radix inserts on any leaf-node boundary...
                     return new NodeRadix<>(shift, newNodes);
@@ -504,9 +506,6 @@ public class RrbTree1<E> implements ImList<E> {
                     }
 
                     // TODO: The following may work for the above special case as well!
-
-                    // Add a new leaf node
-                    Node<T> newNode = new NodeLeaf<>(oldFocus);
 
                     // Make a skinny branch of a tree by walking up from the leaf node until our
                     // new branch is at the same level as the old one.  We have to build evenly
@@ -543,10 +542,6 @@ public class RrbTree1<E> implements ImList<E> {
 //                    insertIntoArrayAt(t, focus, focus.length);
 //                }
             }
-
-            // First time I got here, index > maxIndex.
-            // With a radix of 4, index: 20, maxIndex: 8
-            // I think maxIndex() may be wrong!
 
             System.out.println("  oldFocus.length: " + oldFocus.length);
             System.out.println("  index: " + index);
