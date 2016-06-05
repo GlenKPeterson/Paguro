@@ -61,7 +61,7 @@ public class RrbTree1Test {
 
     @Test public void addSeveralItems() throws NoSuchAlgorithmException {
         System.out.println("addSeveral start");
-        final int SEVERAL = 10000; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
+        final int SEVERAL = 100; //0; //0; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
         RrbTree1<Integer> is = RrbTree1.empty();
         for (int j = 0; j < SEVERAL; j++){
             is = is.append(j);

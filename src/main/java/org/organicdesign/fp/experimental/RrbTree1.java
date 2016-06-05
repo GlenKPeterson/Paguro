@@ -135,15 +135,20 @@ public class RrbTree1<E> implements ImList<E> {
         return newItems;
     }
 
-//    @SuppressWarnings("unchecked")
-//    private static <T> T[] replaceInArrayAt(T replacedItem, T[] origItems, int idx) {
-//        // Make an array that big enough.  It's too bad that the JVM bothers to
-//        // initialize this with nulls.
-//        T[] newItems = (T[]) new Object[origItems.length];
-//        System.arraycopy(origItems, 0, newItems, 0, idx);
-//        newItems[idx] = replacedItem;
-//        return newItems;
-//    }
+    @SuppressWarnings("unchecked")
+    private static <T> T[] replaceInArrayAt(T replacedItem, T[] origItems, int idx, Class<T> tClass) {
+        // Make an array that big enough.  It's too bad that the JVM bothers to
+        // initialize this with nulls.
+        T[] newItems = (T[]) ( (tClass == null) ? new Object[origItems.length]
+                                                : Array.newInstance(tClass, origItems.length) );
+        System.arraycopy(origItems, 0, newItems, 0, origItems.length);
+        newItems[idx] = replacedItem;
+        return newItems;
+    }
+
+    private static <T> T[] replaceInArrayAt(T replacedItem, T[] origItems, int idx) {
+        return replaceInArrayAt(replacedItem, origItems, idx, null);
+    }
 
     private static RrbTree1 EMPTY_RRB_TREE =
             new RrbTree1<>(emptyArray(), 0, NodeLeaf.emptyNodeLeaf(), 0);
@@ -385,7 +390,10 @@ public class RrbTree1<E> implements ImList<E> {
             return new NodeLeaf<>(insertIntoArrayAt(item, items, i));
         }
 
-        @Override public String toString() { return "NodeLeaf("+ Arrays.toString(items) + ")"; }
+        @Override public String toString() {
+//            return "NodeLeaf("+ Arrays.toString(items) + ")";
+            return Arrays.toString(items);
+        }
     }
 
     // Contains a left-packed tree of exactly 32-item nodes.
@@ -399,7 +407,7 @@ public class RrbTree1<E> implements ImList<E> {
         // Constructor
         NodeRadix(int s, Node<T>[] ns) {
             shift = s; nodes = ns;
-            System.out.println("new NodeRadix(" + shift + ", " + Arrays.toString(ns) + ")");
+            System.out.println("    new Radix" + shift + Arrays.toString(ns));
 //            new Exception().printStackTrace();
         }
 
@@ -466,6 +474,10 @@ public class RrbTree1<E> implements ImList<E> {
 
         @Override
         public Node<T> pushFocus(T[] oldFocus, int index) {
+            System.out.println("Radix pushFocus(" + Arrays.toString(oldFocus) + ", " + index + ")");
+            System.out.println("  this: " + this);
+//            System.out.println("  nodes.length: " + nodes.length);
+//            System.out.println("  shift: " + shift);
 
             // It's a radix-compatible addition if the focus being pushed is of
             // RADIX_NODE_LENGTH and the index it's pushed to falls on the final leaf-node boundary.
@@ -477,56 +489,55 @@ public class RrbTree1<E> implements ImList<E> {
             if ( (oldFocus.length == RADIX_NODE_LENGTH) &&
                  (index == maxIndex()) ) {
 
-                System.out.println("Radix pushFocus(" + Arrays.toString(oldFocus) + ", " + index + ")");
-                System.out.println("  nodes.length: " + nodes.length);
-                System.out.println("  shift: " + shift);
-
                 // If the proper sub-node can take the additional array, let it!
                 int subNodeIndex = highBits(index);
                 System.out.println("  subNodeIndex: " + subNodeIndex);
 
-                // Regardless of what else happens, we're going to add a new node, so make it here.
+                Node<T> lastNode = nodes[nodes.length - 1];
+                if (lastNode.hasRadixCapacity()) {
+                    System.out.println("  Pushing the focus down to a lower-level node with capacity.");
+                    Node<T> newNode = lastNode.pushFocus(oldFocus, lowBits(index));
+                    Node<T>[] newArray = replaceInArrayAt(newNode, nodes, nodes.length - 1, Node.class);
+                    return new NodeRadix<>(shift, newArray);
+                }
+                // Regardless of what else happens, we're going to add a new node.
                 Node<T> newNode = new NodeLeaf<>(oldFocus);
 
-                if ( (subNodeIndex == nodes.length) &&
-                    (nodes[0] instanceof NodeLeaf) &&
-                     (nodes.length < RADIX_NODE_LENGTH) ) {
+                // Make a skinny branch of a tree by walking up from the leaf node until our
+                // new branch is at the same level as the old one.  We have to build evenly
+                // (like hotels in Monopoly) in order to keep the tree balanced.  Even height,
+                // but left-packed (the lower indices must all be filled before adding new
+                // nodes to the right).
+                int newShift = NODE_LENGTH_POW_2;
 
-                    System.out.println("Adding a node to the existing array");
+                // If we've got space in our array, we just have to add skinny-branch nodes up to
+                // the level below ours.  But if we don't have space, we have to add a
+                // single-element radix node at the same level as ours here too.
+                int maxShift = (nodes.length < RADIX_NODE_LENGTH) ? shift : shift + 1;
 
+                // Make the skinny-branch of single-element radix nodes:
+                while (newShift < maxShift) {
+                    System.out.println("  Adding a skinny branch node...");
+                    Node<T>[] newArray = (Node<T>[]) Array.newInstance(newNode.getClass(), 1);
+                    newArray[0] = newNode;
+                    newNode = new NodeRadix<>(newShift, newArray);
+                    newShift += NODE_LENGTH_POW_2;
+                }
+
+                if ( (nodes.length < RADIX_NODE_LENGTH) ) {
+                    System.out.println("  Adding a node to the existing array");
                     Node<T>[] newNodes = (Node<T>[]) insertIntoArrayAt(newNode, nodes, subNodeIndex, Node.class);
                     // This could allow cheap radix inserts on any leaf-node boundary...
                     return new NodeRadix<>(shift, newNodes);
-                }
-
-                if (nodes.length == RADIX_NODE_LENGTH) {
-                    Node<T> lastNode = nodes[nodes.length - 1];
-                    if (lastNode.hasRadixCapacity()) {
-                        return pushFocus(oldFocus, lowBits(index));
-                    }
-
-                    // TODO: The following may work for the above special case as well!
-
-                    // Make a skinny branch of a tree by walking up from the leaf node until our
-                    // new branch is at the same level as the old one.  We have to build evenly
-                    // (like hotels in Monopoly) in order to keep the tree balanced.  Even height,
-                    // but left-packed (the lower indices must all be filled before adding new
-                    // nodes to the right).
-                    int newShift = 0;
-                    while (newShift < shift) {
-                        newShift += NODE_LENGTH_POW_2;
-                        Node<T>[] newArray = (Node<T>[]) Array.newInstance(newNode.getClass(), 1);
-                        newArray[0] = newNode;
-                        newNode = new NodeRadix<>(newShift, newArray);
-                    }
-
+                } else {
+                    System.out.println("  Adding a level to the Radix tree");
                     return new NodeRadix(shift + NODE_LENGTH_POW_2,
                                          (Node<T>[]) new Node[] { this, newNode });
                 }
 
-                System.out.println("  nodes.length: " + nodes.length);
-
-                throw new UnsupportedOperationException("Not implemented yet");
+//                System.out.println("  nodes.length: " + nodes.length);
+//
+//                throw new UnsupportedOperationException("Not implemented yet");
 
 //                // TODO: Implement
 //                Node<T> subNode = nodes[subNodeIndex];
@@ -550,7 +561,7 @@ public class RrbTree1<E> implements ImList<E> {
             System.out.println("  this: " + this);
 
             // TODO: Implement
-            throw new UnsupportedOperationException("Not implemented yet");
+            throw new UnsupportedOperationException("Relaxed (non-append) node insertion not implemented yet");
         }
 
 //        @Override public Tuple2<NodeRadix<T>,NodeRadix<T>> split() {
@@ -580,7 +591,8 @@ public class RrbTree1<E> implements ImList<E> {
             }
         }
         @Override public String toString() {
-            return "NodeRadix(nodes.length="+ nodes.length + ", shift=" + shift + ")";
+//            return "NodeRadix(nodes.length="+ nodes.length + ", shift=" + shift + ")";
+            return "Radix" + shift + Arrays.toString(nodes);
         }
     }
 
