@@ -50,10 +50,14 @@ public class RrbTree1<E> implements ImList<E> {
 
     // There's bit shifting going on here because it's a very fast operation.
     // Shifting right by 5 is eons faster than dividing by 32.
-    private static final int NODE_LENGTH_POW_2 = 5;
+    // TODO: Change to 5.
+    private static final int NODE_LENGTH_POW_2 = 2; // 2 for testing now, 5 for real later.
     private static final int RADIX_NODE_LENGTH = 1 << NODE_LENGTH_POW_2;// 0b00000000000000000000000000100000 = 0x20 = 32
-    private static final int MINIMUM_DEGREE = RADIX_NODE_LENGTH / 2;// 0b00000000000000000000000000100000 = 0x20 = 32
-    private static final int MAX_NODE_LENGTH = (MINIMUM_DEGREE * 2) - 1;// 0b00000000000000000000000000100000 = 0x20 = 32
+
+    // (MinDegree + MaxDegree) / 2 should equal Radix so that they have the same average node size
+    // to make the index guessing easier.
+    private static final int MINIMUM_DEGREE = RADIX_NODE_LENGTH * 2 / 3;
+    private static final int MAX_NODE_LENGTH = (MINIMUM_DEGREE * 2) - 1;
 
     // In the PersistentVector, this is called the tail, but here it can be at
     // Other areas of the tree besides the tail.
@@ -212,6 +216,7 @@ public class RrbTree1<E> implements ImList<E> {
      @return a new RRB-Tree with the item appended.
      */
     @Override  public RrbTree1<E> append(E t) {
+        System.out.println("=== append(" + t + ") ===");
         // If our focus isn't set up for appends or if it's full, insert it into the data structure
         // where it belongs.  Then make a new focus
         if ( ( (focusStartIndex < root.maxIndex()) && (focus.length > 0) ) ||
@@ -387,6 +392,7 @@ public class RrbTree1<E> implements ImList<E> {
     private static class NodeRadix<T> implements Node<T> {
         // This is the number of levels below this node (height) times NODE_LENGTH
         // For speed, we calculate it as height << NODE_LENGTH_POW_2
+        // TODO: Can we store shift at the top-level NodeRadix only?
         int shift;
         // These are the child nodes
         Node<T>[] nodes;
@@ -396,16 +402,21 @@ public class RrbTree1<E> implements ImList<E> {
             System.out.println("new NodeRadix(" + shift + ", " + Arrays.toString(ns) + ")");
 //            new Exception().printStackTrace();
         }
-        @Override public T get(int i) {
-//            System.out.println("  NodeRadix.get(" + i + ")");
-            // Find the node indexed by the high bits (for this height).
-            int nodeIdx = i >> shift;
-//            System.out.println("    nodeIdx: " + nodeIdx);
-//            System.out.println("    shift: " + shift);
-//            System.out.println("    shift (binary): " + Integer.toBinaryString(shift));
 
+        /**
+         Returns the high bits which we use to index into our array.  This is the simplicity (and
+         speed) of Radix indexing.  When everything works, this can be inlined for performance.
+         This could maybe yield a good guess for Relaxed nodes?
+         */
+        private int highBits(int i) { return i >> shift; }
 
-            // Call get with the remaining bits to the right (we've used up the high bits).
+        /**
+         Returns the low bits of the index (the part Radix sub-nodes need to know about).
+         This helps make this data structure simple and fast.  When everything works, this can
+         be inlined for performance.
+         DO NOT use this for Relaxed nodes - they use subtraction instead!
+         */
+        private int lowBits(int i) {
             int shifter = -1 << shift;
 
 //            System.out.println("    shifter (binary): " + Integer.toBinaryString(shift));
@@ -414,10 +425,16 @@ public class RrbTree1<E> implements ImList<E> {
 //            System.out.println("    invShifter (binary): " + Integer.toBinaryString(invShifter));
 
 //            System.out.println("             i (binary): " + Integer.toBinaryString(invShifter));
-            int subNodeIdx = i & invShifter;
+            return  i & invShifter;
 //            System.out.println("    subNodeIdx (binary): " + Integer.toBinaryString(subNodeIdx));
 //            System.out.println("    subNodeIdx: " + subNodeIdx);
-            return nodes[nodeIdx].get(subNodeIdx);
+        }
+
+        @Override public T get(int i) {
+//            System.out.println("  NodeRadix.get(" + i + ")");
+            // Find the node indexed by the high bits (for this height).
+            // Send the low bits on to our sub-nodes.
+            return nodes[highBits(i)].get(lowBits(i));
         }
         @Override public int maxIndex() {
             int lastNodeIdx = nodes.length - 1;
@@ -454,18 +471,48 @@ public class RrbTree1<E> implements ImList<E> {
                 System.out.println("  shift: " + shift);
 
                 // If the proper sub-node can take the additional array, let it!
-                int subNodeIndex = index >> shift;
+                int subNodeIndex = highBits(index);
                 System.out.println("  subNodeIndex: " + subNodeIndex);
 
                 if ( (subNodeIndex == nodes.length) &&
                     (nodes[0] instanceof NodeLeaf) &&
                      (nodes.length < RADIX_NODE_LENGTH) ) {
 
+                    System.out.println("Adding a node to the existing array");
+
                     NodeLeaf<T> newNode = new NodeLeaf<>(oldFocus);
                     Node<T>[] newNodes = (Node<T>[]) insertIntoArrayAt(newNode, nodes, subNodeIndex, Node.class);
                     // This could allow cheap radix inserts on any leaf-node boundary...
                     return new NodeRadix<>(shift, newNodes);
                 }
+
+                if (nodes.length == RADIX_NODE_LENGTH) {
+                    Node<T> lastNode = nodes[nodes.length - 1];
+                    if (lastNode.hasRadixCapacity()) {
+                        return pushFocus(oldFocus, lowBits(index));
+                    }
+
+                    // TODO: The following may work for the above special case as well!
+
+                    // Add a new leaf node
+                    Node<T> newNode = new NodeLeaf<>(oldFocus);
+
+                    // Make a skinny branch of a tree by walking up from the leaf node until we have
+                    // another node the same level as this one that we can make into a sibling.
+                    int newShift = 0;
+                    while (newShift < shift) {
+                        newShift += NODE_LENGTH_POW_2;
+                        Node<T>[] newArray = (Node<T>[]) Array.newInstance(newNode.getClass(), 1);
+                        newArray[0] = newNode;
+                        newNode = new NodeRadix<>(newShift, newArray);
+                    }
+
+                    return new NodeRadix(shift + NODE_LENGTH_POW_2,
+                                         (Node<T>[]) new Node[] { this, newNode });
+                }
+
+                System.out.println("  nodes.length: " + nodes.length);
+
                 throw new UnsupportedOperationException("Not implemented yet");
 
 //                // TODO: Implement
@@ -482,6 +529,11 @@ public class RrbTree1<E> implements ImList<E> {
 //                    insertIntoArrayAt(t, focus, focus.length);
 //                }
             }
+
+            System.out.println("  oldFocus.length: " + oldFocus.length);
+            System.out.println("  index: " + index);
+            System.out.println("  maxIndex(): " + maxIndex());
+            System.out.println("  nodes.length: " + nodes.length);
 
             // TODO: Implement
             throw new UnsupportedOperationException("Not implemented yet");
@@ -513,7 +565,9 @@ public class RrbTree1<E> implements ImList<E> {
                 return new NodeRadix<>(shift, newNodes);
             }
         }
-        @Override public String toString() { return "NodeRadix(nodes.length="+ nodes.length + ")"; }
+        @Override public String toString() {
+            return "NodeRadix(nodes.length="+ nodes.length + ", shift=" + shift + ")";
+        }
     }
 
     // Contains a relaxed tree of nodes that average around 32 items each.
