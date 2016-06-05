@@ -15,8 +15,8 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") p
 
 UncleJim takes advantages of Java's type inferencing.  It eschews void return types, arrays, primatives, and checked exceptions in lambdas.  It can decrease the amount of code you need to write by a factor of at 2x-3x.  Using functional transfomrations instead of loops focuses you on choosing the right collections which leads to more readable code AND better Big O complexity/scalability.
 
-[![Build Status](https://travis-ci.org/GlenKPeterson/UncleJim.svg?branch=master)](https://travis-ci.org/GlenKPeterson/UncleJim)
-[![Code Coverage](http://codecov.io/github/GlenKPeterson/UncleJim/coverage.svg?branch=master)](http://codecov.io/github/GlenKPeterson/UncleJim?branch=master)
+[![Build Status](https://travis-ci.org/GlenKPeterson/UncleJim.svg?branch=2016-05-22_RRB-Tree)](https://travis-ci.org/GlenKPeterson/UncleJim)
+[![Code Coverage](http://codecov.io/github/GlenKPeterson/UncleJim/coverage.svg?branch=2016-05-22_RRB-Tree)](http://codecov.io/github/GlenKPeterson/UncleJim?branch=2016-05-22_RRB-Tree)
 
 [![Join the chat at https://gitter.im/GlenKPeterson/UncleJim](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/GlenKPeterson/UncleJim?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 

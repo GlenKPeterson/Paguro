@@ -580,6 +580,7 @@ public class RrbTree1<E> implements ImList<E> {
             throw new UnsupportedOperationException("Relaxed (non-append) node insertion not implemented yet");
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public Node<T> replace(int idx, T t) {
 //            System.out.println("  NodeRadix.get(" + i + ")");
