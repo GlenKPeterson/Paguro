@@ -221,7 +221,7 @@ public class RrbTree1<E> implements ImList<E> {
      @return a new RRB-Tree with the item appended.
      */
     @Override  public RrbTree1<E> append(E t) {
-        System.out.println("=== append(" + t + ") ===");
+//        System.out.println("=== append(" + t + ") ===");
         // If our focus isn't set up for appends or if it's full, insert it into the data structure
         // where it belongs.  Then make a new focus
         if ( ( (focusStartIndex < root.maxIndex()) && (focus.length > 0) ) ||
@@ -265,17 +265,27 @@ public class RrbTree1<E> implements ImList<E> {
      Replace the item at the given index.  Note: i.replace(i.size(), o) used to be equivalent to
      i.concat(o), but it probably won't be for the RRB tree implementation, so this will change too.
 
-     @param idx the index where the value should be stored.
+     @param i the index where the value should be stored.
      @param t   the value to store
      @return a new ImList with the replaced item
      */
     @Override
-    public ImList<E> replace(int idx, E t) {
-        // TODO: Implement
-        throw new UnsupportedOperationException("Not Implemented Yet");
+    public ImList<E> replace(int i, E t) {
+        if ( (i < 0) || (i > size) ) {
+            throw new IndexOutOfBoundsException("Index: " + i + " size: " + size);
+        }
+        if (i >= focusStartIndex) {
+            int focusOffset = i - focusStartIndex;
+            if (focusOffset < focus.length) {
+                return new RrbTree1<>(replaceInArrayAt(t, focus, focusOffset),
+                                      focusStartIndex, root, size);
+            }
+            i -= focus.length;
+        }
+        return new RrbTree1<>(focus, focusStartIndex, root.replace(i, t), size);
     }
 
-    private static interface Node<T> {
+    private interface Node<T> {
         /** Return the item at the given index */
         T get(int i);
         /** Highest index returnable by this node */
@@ -293,6 +303,8 @@ public class RrbTree1<E> implements ImList<E> {
         // the insert or append of a single item as a degenerate case.  Instead, the primary way
         // to add to the internal data structure will be to push the entire focus array into it
         Node<T> pushFocus(T[] oldFocus, int index);
+
+        Node<T> replace(int idx, T t);
     }
 
     private static class NodeLeaf<T> implements Node<T> {
@@ -346,6 +358,7 @@ public class RrbTree1<E> implements ImList<E> {
 
 
         // I think this can only be called when the root node is a leaf.
+        @SuppressWarnings("unchecked")
         @Override public Node<T> pushFocus(T[] oldFocus, int index) {
             if (oldFocus.length == 0) {
                 throw new IllegalStateException("Never call this with an empty focus!");
@@ -379,7 +392,12 @@ public class RrbTree1<E> implements ImList<E> {
             throw new UnsupportedOperationException("Not implemented yet!");
         }
 
-//        @Override
+        @Override
+        public Node<T> replace(int idx, T t) {
+            return new NodeLeaf<>(replaceInArrayAt(t, items, idx));
+        }
+
+        //        @Override
         public NodeLeaf<T> insert(int i, T item) {
             if (!thisNodeHasCapacity()) {
                 throw new IllegalStateException("Called insert, but can't add one more!" +
@@ -407,8 +425,7 @@ public class RrbTree1<E> implements ImList<E> {
         // Constructor
         NodeRadix(int s, Node<T>[] ns) {
             shift = s; nodes = ns;
-            System.out.println("    new Radix" + shift + Arrays.toString(ns));
-//            new Exception().printStackTrace();
+//            System.out.println("    new Radix" + shift + Arrays.toString(ns));
         }
 
         /**
@@ -472,12 +489,11 @@ public class RrbTree1<E> implements ImList<E> {
             throw new UnsupportedOperationException("Not implemented yet");
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public Node<T> pushFocus(T[] oldFocus, int index) {
-            System.out.println("Radix pushFocus(" + Arrays.toString(oldFocus) + ", " + index + ")");
-            System.out.println("  this: " + this);
-//            System.out.println("  nodes.length: " + nodes.length);
-//            System.out.println("  shift: " + shift);
+//            System.out.println("Radix pushFocus(" + Arrays.toString(oldFocus) + ", " + index + ")");
+//            System.out.println("  this: " + this);
 
             // It's a radix-compatible addition if the focus being pushed is of
             // RADIX_NODE_LENGTH and the index it's pushed to falls on the final leaf-node boundary.
@@ -491,11 +507,11 @@ public class RrbTree1<E> implements ImList<E> {
 
                 // If the proper sub-node can take the additional array, let it!
                 int subNodeIndex = highBits(index);
-                System.out.println("  subNodeIndex: " + subNodeIndex);
+//                System.out.println("  subNodeIndex: " + subNodeIndex);
 
                 Node<T> lastNode = nodes[nodes.length - 1];
                 if (lastNode.hasRadixCapacity()) {
-                    System.out.println("  Pushing the focus down to a lower-level node with capacity.");
+//                    System.out.println("  Pushing the focus down to a lower-level node with capacity.");
                     Node<T> newNode = lastNode.pushFocus(oldFocus, lowBits(index));
                     Node<T>[] newArray = replaceInArrayAt(newNode, nodes, nodes.length - 1, Node.class);
                     return new NodeRadix<>(shift, newArray);
@@ -517,7 +533,7 @@ public class RrbTree1<E> implements ImList<E> {
 
                 // Make the skinny-branch of single-element radix nodes:
                 while (newShift < maxShift) {
-                    System.out.println("  Adding a skinny branch node...");
+//                    System.out.println("  Adding a skinny branch node...");
                     Node<T>[] newArray = (Node<T>[]) Array.newInstance(newNode.getClass(), 1);
                     newArray[0] = newNode;
                     newNode = new NodeRadix<>(newShift, newArray);
@@ -525,14 +541,14 @@ public class RrbTree1<E> implements ImList<E> {
                 }
 
                 if ( (nodes.length < RADIX_NODE_LENGTH) ) {
-                    System.out.println("  Adding a node to the existing array");
+//                    System.out.println("  Adding a node to the existing array");
                     Node<T>[] newNodes = (Node<T>[]) insertIntoArrayAt(newNode, nodes, subNodeIndex, Node.class);
                     // This could allow cheap radix inserts on any leaf-node boundary...
                     return new NodeRadix<>(shift, newNodes);
                 } else {
-                    System.out.println("  Adding a level to the Radix tree");
+//                    System.out.println("  Adding a level to the Radix tree");
                     return new NodeRadix(shift + NODE_LENGTH_POW_2,
-                                         (Node<T>[]) new Node[] { this, newNode });
+                                         new Node[] { this, newNode });
                 }
 
 //                System.out.println("  nodes.length: " + nodes.length);
@@ -562,6 +578,16 @@ public class RrbTree1<E> implements ImList<E> {
 
             // TODO: Implement
             throw new UnsupportedOperationException("Relaxed (non-append) node insertion not implemented yet");
+        }
+
+        @Override
+        public Node<T> replace(int idx, T t) {
+//            System.out.println("  NodeRadix.get(" + i + ")");
+            // Find the node indexed by the high bits (for this height).
+            // Send the low bits on to our sub-nodes.
+            int thisNodeIdx = highBits(idx);
+            Node<T> newNode = nodes[thisNodeIdx].replace(lowBits(idx), t);
+            return new NodeRadix<>(shift, replaceInArrayAt(newNode, nodes, thisNodeIdx, Node.class));
         }
 
 //        @Override public Tuple2<NodeRadix<T>,NodeRadix<T>> split() {
@@ -669,6 +695,12 @@ public class RrbTree1<E> implements ImList<E> {
 
         @Override
         public RrbTree1.Node<T> pushFocus(T[] oldFocus, int index) {
+            // TODO: Implement
+            throw new UnsupportedOperationException("Not Implemented Yet");
+        }
+
+        @Override
+        public Node<T> replace(int idx, T t) {
             // TODO: Implement
             throw new UnsupportedOperationException("Not Implemented Yet");
         }
