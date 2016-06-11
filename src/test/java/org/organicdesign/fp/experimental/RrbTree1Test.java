@@ -13,19 +13,37 @@
 // limitations under the License.
 package org.organicdesign.fp.experimental;
 
-import org.junit.Test;
-import org.organicdesign.fp.collections.ImList;
-import org.organicdesign.fp.collections.UnmodListTest;
-
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.Test;
+import org.organicdesign.fp.collections.ImList;
+import org.organicdesign.fp.collections.UnmodListTest;
+
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 public class RrbTree1Test {
+    @Test
+    public void insert() {
+        final int SEVERAL = 100; //0; //0; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
+        RrbTree1<Integer> is = RrbTree1.empty();
+        for (int j = 0; j < SEVERAL; j++){
+            is = is.insert(0, j);
+            assertEquals(j + 1, is.size());
+            assertEquals(Integer.valueOf(j), is.get(0));
+            for (int k = 0; k <= j; k++) {
+                assertEquals(Integer.valueOf(k - j - 1), is.get(k));
+            }
+        }
+        assertEquals(SEVERAL, is.size());
+        for (int j = 0; j < SEVERAL; j++){
+            assertEquals(Integer.valueOf(SEVERAL - j - 1), is.get(j));
+        }
+    }
+
     @Test
     public void basics() {
         RrbTree1<Integer> rrb = RrbTree1.empty();

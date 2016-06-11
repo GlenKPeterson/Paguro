@@ -13,13 +13,13 @@
 // limitations under the License.
 package org.organicdesign.fp.experimental;
 
-import org.organicdesign.fp.collections.ImList;
-import org.organicdesign.fp.collections.UnmodSortedIterable;
-import org.organicdesign.fp.tuple.Tuple2;
-
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
+
+import org.organicdesign.fp.collections.ImList;
+import org.organicdesign.fp.collections.UnmodSortedIterable;
+import org.organicdesign.fp.tuple.Tuple2;
 
 import static org.organicdesign.fp.StaticImports.tup;
 
@@ -227,7 +227,7 @@ public class RrbTree1<E> implements ImList<E> {
         if ( ( (focusStartIndex < root.maxIndex()) && (focus.length > 0) ) ||
              (focus.length >= RADIX_NODE_LENGTH) ) {
             // TODO: Does focusStartIndex only work for the root node, or is it translated as it goes down?
-            Node<E> newRoot = root.pushFocus(focus, focusStartIndex);
+            Node<E> newRoot = root.pushFocus(focusStartIndex, focus);
             E[] newFocus = singleElementArray(t);
             return new RrbTree1<>(newFocus, size, newRoot, size + 1);
         }
@@ -238,26 +238,26 @@ public class RrbTree1<E> implements ImList<E> {
 
     /**
      I would have called this insert and reversed the order or parameters.
-     @param t the item to insert
      @param idx the insertion point
+     @param element the item to insert
      @return a new RRB-Tree with the item inserted.
      */
-    public RrbTree1<E> insert(E t, int idx) {
+    public RrbTree1<E> insert(int idx, E element) {
         if (focus.length >= RADIX_NODE_LENGTH) {
-            Node<E> newRoot = root.pushFocus(focus, focusStartIndex);
-            E[] newFocus = singleElementArray(t);
+            Node<E> newRoot = root.pushFocus(focusStartIndex, focus);
+            E[] newFocus = singleElementArray(element);
             return new RrbTree1<>(newFocus, idx, newRoot, size + 1);
         }
 
         int diff = idx - focusStartIndex;
 
         if ( (diff >= 0) && (diff < focus.length) ) {
-            E[] newFocus = insertIntoArrayAt(t, focus, diff);
+            E[] newFocus = insertIntoArrayAt(element, focus, diff);
             return new RrbTree1<>(newFocus, focusStartIndex, root, size + 1);
         }
 
-        Node<E> newRoot = root.pushFocus(focus, focusStartIndex);
-        E[] newFocus = singleElementArray(t);
+        Node<E> newRoot = root.pushFocus(focusStartIndex, focus);
+        E[] newFocus = singleElementArray(element);
         return new RrbTree1<>(newFocus, idx, newRoot, size + 1);
     }
 
@@ -267,10 +267,10 @@ public class RrbTree1<E> implements ImList<E> {
 
      @param i the index where the value should be stored.
      @param t   the value to store
-     @return a new ImList with the replaced item
+     @return a new RrbTree1 with the replaced item
      */
     @Override
-    public ImList<E> replace(int i, E t) {
+    public RrbTree1<E> replace(int i, E t) {
         if ( (i < 0) || (i > size) ) {
             throw new IndexOutOfBoundsException("Index: " + i + " size: " + size);
         }
@@ -302,7 +302,7 @@ public class RrbTree1<E> implements ImList<E> {
         // Because we want to append/insert into the focus as much as possible, we will treat
         // the insert or append of a single item as a degenerate case.  Instead, the primary way
         // to add to the internal data structure will be to push the entire focus array into it
-        Node<T> pushFocus(T[] oldFocus, int index);
+        Node<T> pushFocus(int index, T[] oldFocus);
 
         Node<T> replace(int idx, T t);
     }
@@ -359,7 +359,7 @@ public class RrbTree1<E> implements ImList<E> {
 
         // I think this can only be called when the root node is a leaf.
         @SuppressWarnings("unchecked")
-        @Override public Node<T> pushFocus(T[] oldFocus, int index) {
+        @Override public Node<T> pushFocus(int index, T[] oldFocus) {
             if (oldFocus.length == 0) {
                 throw new IllegalStateException("Never call this with an empty focus!");
             }
@@ -491,7 +491,7 @@ public class RrbTree1<E> implements ImList<E> {
 
         @SuppressWarnings("unchecked")
         @Override
-        public Node<T> pushFocus(T[] oldFocus, int index) {
+        public Node<T> pushFocus(int index, T[] oldFocus) {
 //            System.out.println("Radix pushFocus(" + Arrays.toString(oldFocus) + ", " + index + ")");
 //            System.out.println("  this: " + this);
 
@@ -512,7 +512,7 @@ public class RrbTree1<E> implements ImList<E> {
                 Node<T> lastNode = nodes[nodes.length - 1];
                 if (lastNode.hasRadixCapacity()) {
 //                    System.out.println("  Pushing the focus down to a lower-level node with capacity.");
-                    Node<T> newNode = lastNode.pushFocus(oldFocus, lowBits(index));
+                    Node<T> newNode = lastNode.pushFocus(lowBits(index), oldFocus);
                     Node<T>[] newArray = replaceInArrayAt(newNode, nodes, nodes.length - 1, Node.class);
                     return new NodeRadix<>(shift, newArray);
                 }
@@ -695,7 +695,7 @@ public class RrbTree1<E> implements ImList<E> {
         @Override public boolean hasRadixCapacity() { return false; }
 
         @Override
-        public RrbTree1.Node<T> pushFocus(T[] oldFocus, int index) {
+        public RrbTree1.Node<T> pushFocus(int index, T[] oldFocus) {
             // TODO: Implement
             throw new UnsupportedOperationException("Not Implemented Yet");
         }

@@ -1,9 +1,5 @@
 package org.organicdesign.fp.collections;
 
-import org.junit.Test;
-import org.organicdesign.fp.FunctionUtils;
-import org.organicdesign.fp.tuple.Tuple2;
-
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -11,6 +7,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import org.junit.Test;
+import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.tuple.Tuple2;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.*;

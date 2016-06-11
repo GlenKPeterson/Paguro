@@ -18,7 +18,7 @@
       <profile default="true" name="Default" enabled="false">
         <processorPath useClasspath="true" />
       </profile>
-      <profile default="false" name="Annotation profile for UncleJim" enabled="true">
+      <profile default="false" name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -233,6 +233,17 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: org.organicdesign.testUtils:TestUtils:0.0.4">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/organicdesign/testUtils/TestUtils/0.0.4/TestUtils-0.0.4.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/org/organicdesign/testUtils/TestUtils/0.0.4/TestUtils-0.0.4-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/organicdesign/testUtils/TestUtils/0.0.4/TestUtils-0.0.4-sources.jar!/" />
       </SOURCES>
     </library>
   </component>
