@@ -35,7 +35,7 @@ public class RrbTree1Test {
             assertEquals(j + 1, is.size());
             assertEquals(Integer.valueOf(j), is.get(0));
             for (int k = 0; k <= j; k++) {
-                assertEquals(Integer.valueOf(k - j - 1), is.get(k));
+                assertEquals(Integer.valueOf(j - k), is.get(k));
             }
         }
         assertEquals(SEVERAL, is.size());

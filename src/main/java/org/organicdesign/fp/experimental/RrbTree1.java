@@ -243,20 +243,28 @@ public class RrbTree1<E> implements ImList<E> {
      @return a new RRB-Tree with the item inserted.
      */
     public RrbTree1<E> insert(int idx, E element) {
+        System.out.println("insert(int " + idx + ", E " + element + ")");
+
+        // If the focus is full, push it into the tree and make a new one with the new element.
         if (focus.length >= RADIX_NODE_LENGTH) {
             Node<E> newRoot = root.pushFocus(focusStartIndex, focus);
             E[] newFocus = singleElementArray(element);
             return new RrbTree1<>(newFocus, idx, newRoot, size + 1);
         }
 
+        // If the index is within the focus, add the item there.
         int diff = idx - focusStartIndex;
+        System.out.println("diff: " + diff);
 
         if ( (diff >= 0) && (diff < focus.length) ) {
+            System.out.println("new focus...");
             E[] newFocus = insertIntoArrayAt(element, focus, diff);
             return new RrbTree1<>(newFocus, focusStartIndex, root, size + 1);
         }
 
-        Node<E> newRoot = root.pushFocus(focusStartIndex, focus);
+        // Here we are left with an insert somewhere else than the current focus.
+        Node<E> newRoot = focus.length > 0 ? root.pushFocus(focusStartIndex, focus)
+                                           : root;
         E[] newFocus = singleElementArray(element);
         return new RrbTree1<>(newFocus, idx, newRoot, size + 1);
     }
