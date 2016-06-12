@@ -508,11 +508,11 @@ public class RrbTree1<E> implements ImList<E> {
             return thisNodeHasCapacity() || nodes[nodes.length - 1].hasStrictCapacity();
         }
 
-        // TODO: Very unsure about this implementation!
         @Override public boolean hasRelaxedCapacity(int index, int size) {
             if ( (size < MIN_NODE_LENGTH) || (size > MAX_NODE_LENGTH) ) {
                 throw new IllegalArgumentException("Bad size: " + size);
             }
+            // TODO: Very unsure about this implementation!
             return highBits(index) == nodes.length - 1;
         }
 
@@ -533,12 +533,8 @@ public class RrbTree1<E> implements ImList<E> {
 //                System.out.println("  subNodeIndex: " + subNodeIndex);
 
             // It's a strict-compatible addition if the focus being pushed is of
-            // RADIX_NODE_LENGTH and the index it's pushed to falls on the final leaf-node boundary.
-            //
-            // TODO: I think we could support this on ANY leaf-node boundary if the children of this
-            // node are leaves and this node is not full, but for now we'll just punt to a
-            // RelaxedNode when that happens, which can only be within the last 32 leaf nodes
-            // so it's a small corner-case optimization.
+            // RADIX_NODE_LENGTH and the index it's pushed to falls on the final leaf-node boundary
+            // and the children of this node are leaves and this node is not full.
             if (oldFocus.length == RADIX_NODE_LENGTH) {
 
                 if (index == maxIndex()) {
