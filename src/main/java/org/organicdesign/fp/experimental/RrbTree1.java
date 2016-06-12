@@ -377,24 +377,26 @@ public class RrbTree1<E> implements ImList<E> {
             if (items.length == 0) {
                 return new NodeLeaf<>(oldFocus);
             }
-            // If we there is room for the entire focus to fit into this node, just stick it in
-            // there!
-            if ( (items.length + oldFocus.length) < MAX_NODE_LENGTH ) {
-                return new NodeLeaf<>(spliceIntoArrayAt(oldFocus, items, index));
-            }
             if ( (items.length == RADIX_NODE_LENGTH) &&
                  (oldFocus.length == RADIX_NODE_LENGTH) &&
-                 (index == RADIX_NODE_LENGTH) ) {
+                 ((index == RADIX_NODE_LENGTH) || (index == 0)) ) {
 
-                return new NodeRadix<>(NODE_LENGTH_POW_2,
-                                       (NodeLeaf<T>[]) new NodeLeaf[] { this,
-                                                                        new NodeLeaf<>(oldFocus)});
+                NodeLeaf<T>[] newNodes = (index == RADIX_NODE_LENGTH) ? new NodeLeaf[] { this,
+                                                                                         new NodeLeaf<>(oldFocus)}
+                                                                      : new NodeLeaf[] { new NodeLeaf<>(oldFocus),
+                                                                                         this };
+                return new NodeRadix<>(NODE_LENGTH_POW_2, newNodes);
             }
 
             System.out.println("pushFocus(" + Arrays.toString(oldFocus) + ", " + index + ")");
             System.out.println("  items.length: " + items.length);
             System.out.println("  oldFocus.length: " + oldFocus.length);
 
+//            // If we there is room for the entire focus to fit into this node, just stick it in
+//            // there!
+//            if ( (items.length + oldFocus.length) < MAX_NODE_LENGTH ) {
+//                return new NodeLeaf<>(spliceIntoArrayAt(oldFocus, items, index));
+//            }
             // Ugh, we have to chop it across 2 arrays.
             // TODO: Gets complicated!
             throw new UnsupportedOperationException("Not implemented yet!");
