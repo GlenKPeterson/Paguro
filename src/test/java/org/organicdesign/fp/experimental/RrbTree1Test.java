@@ -14,6 +14,7 @@
 package org.organicdesign.fp.experimental;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -30,12 +31,15 @@ public class RrbTree1Test {
     public void insert() {
         final int SEVERAL = 100; //0; //0; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
         RrbTree1<Integer> is = RrbTree1.empty();
+        ArrayList<Integer> control = new ArrayList<>();
         for (int j = 0; j < SEVERAL; j++){
             is = is.insert(0, j);
+            control.add(0, j);
             assertEquals(j + 1, is.size());
             assertEquals(Integer.valueOf(j), is.get(0));
+            System.out.println(" ==" + is);
             for (int k = 0; k <= j; k++) {
-                assertEquals(Integer.valueOf(j - k), is.get(k));
+                assertEquals("Checking index: " + k + " for size=" + control.size(), control.get(k), is.get(k));
             }
         }
         assertEquals(SEVERAL, is.size());
