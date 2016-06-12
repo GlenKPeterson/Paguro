@@ -38,15 +38,12 @@ import static org.organicdesign.fp.StaticImports.tup;
 public class RrbTree1<E> implements ImList<E> {
 
     // Definitions:
-    // Radix: technically refers to the width of all the nodes in the tree, which presumes
-    //        a uniform width (and sort of suggests a power of 2 to take advantage of bit shifting
-    //        which is a key performance reason for the uniform width.  However, for brevity,
-    //        I'm going to have Radix nodes which have all the same leaf widths and are perfectly
-    //        left-filled and packed up to the last full node.  The size of each node is
-    //        RADIX_NODE_LENGTH.
-    // Relaxed: In this case refers to "Relaxed Radix" which means the nodes are of somewhat varying
-    //          sizes.  The sizes range from MINIMUM_DEGREE (as defined by Cormen et al) to
-    //          MAX_NODE_LENGTH.
+    // Strict: Short for "Strict Radix: meaning that all sub-nodes are a uniform width of exactly RADIX_NODE_LENGTH
+    //        (Use a power of 2 to take advantage of bit shifting which is a key performance reason for the uniform
+    //        width).  Strict nodes have leaf widths of exactly RADIX_NODE_LENGTH and are left-filled and packed up to
+    //        the last full node.
+    // Relaxed: In this case refers to "Relaxed Radix" which means the nodes are of somewhat varying sizes.  The sizes
+    //          range from MIN_NODE_LENGTH (Cormen et al calls this "Minimum Degree") to MAX_NODE_LENGTH.
 
     // There's bit shifting going on here because it's a very fast operation.
     // Shifting right by 5 is eons faster than dividing by 32.
@@ -54,10 +51,10 @@ public class RrbTree1<E> implements ImList<E> {
     private static final int NODE_LENGTH_POW_2 = 2; // 2 for testing now, 5 for real later.
     private static final int RADIX_NODE_LENGTH = 1 << NODE_LENGTH_POW_2;// 0b00000000000000000000000000100000 = 0x20 = 32
 
-    // (MinDegree + MaxDegree) / 2 should equal Radix so that they have the same average node size
-    // to make the index guessing easier.
-    private static final int MINIMUM_DEGREE = RADIX_NODE_LENGTH * 2 / 3;
-    private static final int MAX_NODE_LENGTH = (MINIMUM_DEGREE * 2) - 1;
+    // (MIN_NODE_LENGTH + MAX_NODE_LENGTH) / 2 should equal RADIX_NODE_LENGTH so that they have the same average node
+    // size to make the index guessing easier.
+    private static final int MIN_NODE_LENGTH = RADIX_NODE_LENGTH * 2 / 3;
+    private static final int MAX_NODE_LENGTH = (RADIX_NODE_LENGTH * 4 / 3) - 1;
 
     // In the PersistentVector, this is called the tail, but here it can be at
     // Other areas of the tree besides the tail.
@@ -151,7 +148,7 @@ public class RrbTree1<E> implements ImList<E> {
     }
 
     private static RrbTree1 EMPTY_RRB_TREE =
-            new RrbTree1<>(emptyArray(), 0, NodeLeaf.emptyNodeLeaf(), 0);
+            new RrbTree1<>(emptyArray(), 0, Leaf.emptyLeaf(), 0);
 
     /**
      This is the public factory method.
@@ -304,7 +301,16 @@ public class RrbTree1<E> implements ImList<E> {
         /** Returns true if this node's array is not full */
         boolean thisNodeHasCapacity();
         /** Returns true if this strict-Radix tree can take another 32 items. */
-        boolean hasRadixCapacity();
+        boolean hasStrictCapacity();
+
+        /**
+         Can we put focus at the given index without reshuffling nodes?
+         @param index the index we want to insert at
+         @param size the number of items to insert.  Must be MIN_NODE_LENGTH <= size <= MAX_NODE_LENGTH
+         @return true if we can do so without otherwise adjusting the tree.
+         */
+        boolean hasRelaxedCapacity(int index, int size);
+
         Tuple2<? extends Node<T>,? extends Node<T>> splitAt(int i);
 
         // Because we want to append/insert into the focus as much as possible, we will treat
@@ -315,24 +321,22 @@ public class RrbTree1<E> implements ImList<E> {
         Node<T> replace(int idx, T t);
     }
 
-    private static class NodeLeaf<T> implements Node<T> {
-        private static final NodeLeaf EMPTY_NODE_LEAF = new NodeLeaf<>(EMPTY_ARRAY);
+    private static class Leaf<T> implements Node<T> {
+        private static final Leaf EMPTY_LEAF = new Leaf<>(EMPTY_ARRAY);
         @SuppressWarnings("unchecked")
-        private static final <T> NodeLeaf<T> emptyNodeLeaf() {
-            return (NodeLeaf<T>) EMPTY_NODE_LEAF;
-        }
+        private static final <T> Leaf<T> emptyLeaf() { return (Leaf<T>) EMPTY_LEAF; }
 
         T[] items;
-        // It can only be Radix if items.length == RADIX_NODE_LENGTH and if its parents
-        // are radix.
-//        boolean isRadix;
-        NodeLeaf(T[] ts) { items = ts; }
+        // It can only be Strict if items.length == RADIX_NODE_LENGTH and if its parents
+        // are strict.
+//        boolean isStrict;
+        Leaf(T[] ts) { items = ts; }
         @Override public T get(int i) { return items[i]; }
         @Override public int maxIndex() { return items.length; }
         @Override public Node<T> append(T item) {
             T[] newItems = Arrays.copyOf(items, items.length + 1);
             newItems[items.length] = item;
-            return new NodeLeaf<>(newItems);
+            return new Leaf<>(newItems);
         }
         // If we want to add one more to an existing leaf node, it must already be part of a
         // relaxed tree.
@@ -340,28 +344,36 @@ public class RrbTree1<E> implements ImList<E> {
             return items.length < MAX_NODE_LENGTH;
         }
 
-        @Override public boolean hasRadixCapacity() { return false; }
+        @Override public boolean hasStrictCapacity() { return false; }
+
+        @Override public boolean hasRelaxedCapacity(int index, int size) {
+            if ( (size < MIN_NODE_LENGTH) || (size > MAX_NODE_LENGTH) ) {
+                throw new IllegalArgumentException("Bad size: " + size);
+                // + " MIN_NODE_LENGTH=" + MIN_NODE_LENGTH + " MAX_NODE_LENGTH=" + MAX_NODE_LENGTH);
+            }
+            return items.length < MAX_NODE_LENGTH;
+        }
 
         /**
-         This is a Relaxed operation.  Performing it on an Exact Radix node causes it and all
+         This is a Relaxed operation.  Performing it on a Strict node causes it and all
          ancestors to become Relaxed Radix.  The parent should only split when
-         size < MINIMUM_DEGREE during a slice operation.
+         size < MIN_NODE_LENGTH during a slice operation.
 
          @param i the index to split before.
          @return Two new nodes.
          */
-        @Override  public Tuple2<NodeLeaf<T>,NodeLeaf<T>> splitAt(int i) {
+        @Override  public Tuple2<Leaf<T>,Leaf<T>> splitAt(int i) {
             // TODO: if we split for an insert-when-full, one side of the split should be bigger in preparation for the insert.
             if (i == 0) {
-                return tup(emptyNodeLeaf(), this);
+                return tup(emptyLeaf(), this);
             }
             if (i == items.length) {
                 // Not sure this can possibly be called, but just in case...
-                return tup(this, emptyNodeLeaf());
+                return tup(this, emptyLeaf());
             }
 
-            return tup(new NodeLeaf<>(Arrays.copyOf(items, i)),
-                       new NodeLeaf<>(Arrays.copyOfRange(items, i, items.length - i)));
+            return tup(new Leaf<>(Arrays.copyOf(items, i)),
+                       new Leaf<>(Arrays.copyOfRange(items, i, items.length - i)));
         }
 
         // I think this can only be called when the root node is a leaf.
@@ -370,25 +382,25 @@ public class RrbTree1<E> implements ImList<E> {
             if (oldFocus.length == 0) {
                 throw new IllegalStateException("Never call this with an empty focus!");
             }
-            // We put the empty LeafNode as the root of the empty vector and it stays there
+            // We put the empty Leaf as the root of the empty vector and it stays there
             // until the first call to this method, at which point, the oldFocus becomes the
             // new root.
             if (items.length == 0) {
-                return new NodeLeaf<>(oldFocus);
+                return new Leaf<>(oldFocus);
             }
 
-            // Try first to yield a radix node.  For a leaf like this, that means both this node and the pushed
+            // Try first to yield a Strict node.  For a leaf like this, that means both this node and the pushed
             // focus are RADIX_NODE_LENGTH.  It also means the old focus is being pushed at either the beginning or
             // the end of this node (not anywhere in-between).
             if ( (items.length == RADIX_NODE_LENGTH) &&
                  (oldFocus.length == RADIX_NODE_LENGTH) &&
                  ((index == RADIX_NODE_LENGTH) || (index == 0)) ) {
 
-                NodeLeaf<T>[] newNodes = (index == RADIX_NODE_LENGTH) ? new NodeLeaf[] { this,
-                                                                                         new NodeLeaf<>(oldFocus)}
-                                                                      : new NodeLeaf[] { new NodeLeaf<>(oldFocus),
+                Leaf<T>[] newNodes = (index == RADIX_NODE_LENGTH) ? new Leaf[] { this,
+                                                                                         new Leaf<>(oldFocus)}
+                                                                      : new Leaf[] { new Leaf<>(oldFocus),
                                                                                          this };
-                return new NodeRadix<>(NODE_LENGTH_POW_2, newNodes);
+                return new Strict<>(NODE_LENGTH_POW_2, newNodes);
             }
 
             System.out.println("pushFocus(" + Arrays.toString(oldFocus) + ", " + index + ")");
@@ -398,7 +410,7 @@ public class RrbTree1<E> implements ImList<E> {
 //            // If we there is room for the entire focus to fit into this node, just stick it in
 //            // there!
 //            if ( (items.length + oldFocus.length) < MAX_NODE_LENGTH ) {
-//                return new NodeLeaf<>(spliceIntoArrayAt(oldFocus, items, index));
+//                return new Leaf<>(spliceIntoArrayAt(oldFocus, items, index));
 //            }
             // Ugh, we have to chop it across 2 arrays.
             // TODO: Gets complicated!
@@ -407,49 +419,49 @@ public class RrbTree1<E> implements ImList<E> {
 
         @Override
         public Node<T> replace(int idx, T t) {
-            return new NodeLeaf<>(replaceInArrayAt(t, items, idx));
+            return new Leaf<>(replaceInArrayAt(t, items, idx));
         }
 
         //        @Override
-        public NodeLeaf<T> insert(int i, T item) {
+        public Leaf<T> insert(int i, T item) {
             if (!thisNodeHasCapacity()) {
                 throw new IllegalStateException("Called insert, but can't add one more!" +
                                                 "  Parent should have called split first.");
             }
 
             // Return our new node.
-            return new NodeLeaf<>(insertIntoArrayAt(item, items, i));
+            return new Leaf<>(insertIntoArrayAt(item, items, i));
         }
 
         @Override public String toString() {
-//            return "NodeLeaf("+ Arrays.toString(items) + ")";
+//            return "Leaf("+ Arrays.toString(items) + ")";
             return Arrays.toString(items);
         }
     }
 
     // Contains a left-packed tree of exactly 32-item nodes.
-    private static class NodeRadix<T> implements Node<T> {
+    private static class Strict<T> implements Node<T> {
         // This is the number of levels below this node (height) times NODE_LENGTH
         // For speed, we calculate it as height << NODE_LENGTH_POW_2
-        // TODO: Can we store shift at the top-level NodeRadix only?
+        // TODO: Can we store shift at the top-level Strict only?
         int shift;
         // These are the child nodes
         Node<T>[] nodes;
         // Constructor
-        NodeRadix(int s, Node<T>[] ns) {
+        Strict(int s, Node<T>[] ns) {
             shift = s; nodes = ns;
-//            System.out.println("    new Radix" + shift + Arrays.toString(ns));
+//            System.out.println("    new Strict" + shift + Arrays.toString(ns));
         }
 
         /**
          Returns the high bits which we use to index into our array.  This is the simplicity (and
-         speed) of Radix indexing.  When everything works, this can be inlined for performance.
+         speed) of Strict indexing.  When everything works, this can be inlined for performance.
          This could maybe yield a good guess for Relaxed nodes?
          */
         private int highBits(int i) { return i >> shift; }
 
         /**
-         Returns the low bits of the index (the part Radix sub-nodes need to know about).
+         Returns the low bits of the index (the part Strict sub-nodes need to know about).
          This helps make this data structure simple and fast.  When everything works, this can
          be inlined for performance.
          DO NOT use this for Relaxed nodes - they use subtraction instead!
@@ -469,14 +481,14 @@ public class RrbTree1<E> implements ImList<E> {
         }
 
         @Override public T get(int i) {
-//            System.out.println("  NodeRadix.get(" + i + ")");
+//            System.out.println("  Strict.get(" + i + ")");
             // Find the node indexed by the high bits (for this height).
             // Send the low bits on to our sub-nodes.
             return nodes[highBits(i)].get(lowBits(i));
         }
         @Override public int maxIndex() {
             int lastNodeIdx = nodes.length - 1;
-//            System.out.println("    NodeRadix.maxIndex()");
+//            System.out.println("    Strict.maxIndex()");
 //            System.out.println("      nodes.length:" + nodes.length);
 //            System.out.println("      shift:" + shift);
 //            System.out.println("      RADIX_NODE_LENGTH:" + RADIX_NODE_LENGTH);
@@ -492,8 +504,16 @@ public class RrbTree1<E> implements ImList<E> {
             return nodes.length < RADIX_NODE_LENGTH;
         }
 
-        @Override public boolean hasRadixCapacity() {
-            return thisNodeHasCapacity() || nodes[nodes.length - 1].hasRadixCapacity();
+        @Override public boolean hasStrictCapacity() {
+            return thisNodeHasCapacity() || nodes[nodes.length - 1].hasStrictCapacity();
+        }
+
+        // TODO: Very unsure about this implementation!
+        @Override public boolean hasRelaxedCapacity(int index, int size) {
+            if ( (size < MIN_NODE_LENGTH) || (size > MAX_NODE_LENGTH) ) {
+                throw new IllegalArgumentException("Bad size: " + size);
+            }
+            return highBits(index) == nodes.length - 1;
         }
 
         @Override
@@ -505,10 +525,14 @@ public class RrbTree1<E> implements ImList<E> {
         @SuppressWarnings("unchecked")
         @Override
         public Node<T> pushFocus(int index, T[] oldFocus) {
-//            System.out.println("Radix pushFocus(" + Arrays.toString(oldFocus) + ", " + index + ")");
+//            System.out.println("Strict pushFocus(" + Arrays.toString(oldFocus) + ", " + index + ")");
 //            System.out.println("  this: " + this);
 
-            // It's a radix-compatible addition if the focus being pushed is of
+            // If the proper sub-node can take the additional array, let it!
+            int subNodeIndex = highBits(index);
+//                System.out.println("  subNodeIndex: " + subNodeIndex);
+
+            // It's a strict-compatible addition if the focus being pushed is of
             // RADIX_NODE_LENGTH and the index it's pushed to falls on the final leaf-node boundary.
             //
             // TODO: I think we could support this on ANY leaf-node boundary if the children of this
@@ -516,20 +540,17 @@ public class RrbTree1<E> implements ImList<E> {
             // RelaxedNode when that happens, which can only be within the last 32 leaf nodes
             // so it's a small corner-case optimization.
             if (oldFocus.length == RADIX_NODE_LENGTH) {
-                // If the proper sub-node can take the additional array, let it!
-                int subNodeIndex = highBits(index);
-//                System.out.println("  subNodeIndex: " + subNodeIndex);
 
                 if (index == maxIndex()) {
                     Node<T> lastNode = nodes[nodes.length - 1];
-                    if (lastNode.hasRadixCapacity()) {
+                    if (lastNode.hasStrictCapacity()) {
 //                    System.out.println("  Pushing the focus down to a lower-level node with capacity.");
                         Node<T> newNode = lastNode.pushFocus(lowBits(index), oldFocus);
-                        Node<T>[] newArray = replaceInArrayAt(newNode, nodes, nodes.length - 1, Node.class);
-                        return new NodeRadix<>(shift, newArray);
+                        Node<T>[] newNodes = replaceInArrayAt(newNode, nodes, nodes.length - 1, Node.class);
+                        return new Strict<>(shift, newNodes);
                     }
                     // Regardless of what else happens, we're going to add a new node.
-                    Node<T> newNode = new NodeLeaf<>(oldFocus);
+                    Node<T> newNode = new Leaf<>(oldFocus);
 
                     // Make a skinny branch of a tree by walking up from the leaf node until our
                     // new branch is at the same level as the old one.  We have to build evenly
@@ -540,47 +561,28 @@ public class RrbTree1<E> implements ImList<E> {
 
                     // If we've got space in our array, we just have to add skinny-branch nodes up to
                     // the level below ours.  But if we don't have space, we have to add a
-                    // single-element radix node at the same level as ours here too.
+                    // single-element strict node at the same level as ours here too.
                     int maxShift = (nodes.length < RADIX_NODE_LENGTH) ? shift : shift + 1;
 
-                    // Make the skinny-branch of single-element radix nodes:
+                    // Make the skinny-branch of single-element strict nodes:
                     while (newShift < maxShift) {
 //                    System.out.println("  Adding a skinny branch node...");
-                        Node<T>[] newArray = (Node<T>[]) Array.newInstance(newNode.getClass(), 1);
-                        newArray[0] = newNode;
-                        newNode = new NodeRadix<>(newShift, newArray);
+                        Node<T>[] newNodes = (Node<T>[]) Array.newInstance(newNode.getClass(), 1);
+                        newNodes[0] = newNode;
+                        newNode = new Strict<>(newShift, newNodes);
                         newShift += NODE_LENGTH_POW_2;
                     }
 
                     if ((nodes.length < RADIX_NODE_LENGTH)) {
 //                    System.out.println("  Adding a node to the existing array");
                         Node<T>[] newNodes = (Node<T>[]) insertIntoArrayAt(newNode, nodes, subNodeIndex, Node.class);
-                        // This could allow cheap radix inserts on any leaf-node boundary...
-                        return new NodeRadix<>(shift, newNodes);
+                        // This could allow cheap strict inserts on any leaf-node boundary...
+                        return new Strict<>(shift, newNodes);
                     } else {
-//                    System.out.println("  Adding a level to the Radix tree");
-                        return new NodeRadix(shift + NODE_LENGTH_POW_2,
+//                    System.out.println("  Adding a level to the Strict tree");
+                        return new Strict(shift + NODE_LENGTH_POW_2,
                                              new Node[]{this, newNode});
                     }
-
-//                System.out.println("  nodes.length: " + nodes.length);
-//
-//                throw new UnsupportedOperationException("Not implemented yet");
-
-//                // TODO: Implement
-//                Node<T> subNode = nodes[subNodeIndex];
-//                if (subNode.hasRadixCapacity()) {
-//                    Node<T>[] newNodes = replaceInArrayAt(subNode.pushFocus(oldFocus, (index & (-1 << shift))), nodes, subNodeIndex);
-//                    return new NodeRadix<>(shift, newNodes);
-//                }
-//
-//                throw new UnsupportedOperationException("Not implemented yet");
-
-//                // If we have room for one more, pop it in there!
-//                if (nodes.length < RADIX_NODE_LENGTH) {
-//                    insertIntoArrayAt(t, focus, focus.length);
-//                }
-                    // end if index == maxIndex()
                 } else if ( (shift == NODE_LENGTH_POW_2) &&
                             (lowBits(index) == 0) &&
                             (nodes.length < RADIX_NODE_LENGTH) ) {
@@ -590,44 +592,44 @@ public class RrbTree1<E> implements ImList<E> {
                     //    Inserting *between* existing leaf nodes (or before or after)
                     //    Have room for at least one more leaf child
                     // That makes it free and legal to insert a new RADIX_NODE_LENGTH leaf node and still yield a
-                    // NodeRadix (as opposed to NodeRelaxed).
+                    // Strict (as opposed to Relaxed).
 
                     // Regardless of what else happens, we're going to add a new node.
-                    Node<T> newNode = new NodeLeaf<>(oldFocus);
+                    Node<T> newNode = new Leaf<>(oldFocus);
 
                     Node<T>[] newNodes = (Node<T>[]) insertIntoArrayAt(newNode, nodes, subNodeIndex, Node.class);
-                    // This allows cheap radix inserts on any leaf-node boundary...
-                    return new NodeRadix<>(shift, newNodes);
+                    // This allows cheap strict inserts on any leaf-node boundary...
+                    return new Strict<>(shift, newNodes);
                 }
             } // end if oldFocus.length == RADIX_NODE_LENGTH
 
-            System.out.println("  oldFocus.length: " + oldFocus.length);
-            System.out.println("  index: " + index);
-            System.out.println("  maxIndex(): " + maxIndex());
-            System.out.println("  nodes.length: " + nodes.length);
-            System.out.println("  this: " + this);
-
-            // TODO: Implement
-            throw new UnsupportedOperationException("Relaxed (non-append) node insertion not implemented yet");
+            // Here we're going to yield a Relaxed Radix node, so punt to that (slower) logic.
+            System.out.println("Yield a Relaxed node.");
+            int[] startIndicies = new int[nodes.length];
+            for (int i = 0; i < startIndicies.length; i++) {
+                startIndicies[i] = (i << shift);
+            }
+            System.out.println("Start indicies: " + Arrays.toString(startIndicies));
+            return new Relaxed<>(startIndicies, nodes).pushFocus(index, oldFocus);
         }
 
         @SuppressWarnings("unchecked")
         @Override
         public Node<T> replace(int idx, T t) {
-//            System.out.println("  NodeRadix.get(" + i + ")");
+//            System.out.println("  Strict.get(" + i + ")");
             // Find the node indexed by the high bits (for this height).
             // Send the low bits on to our sub-nodes.
             int thisNodeIdx = highBits(idx);
             Node<T> newNode = nodes[thisNodeIdx].replace(lowBits(idx), t);
-            return new NodeRadix<>(shift, replaceInArrayAt(newNode, nodes, thisNodeIdx, Node.class));
+            return new Strict<>(shift, replaceInArrayAt(newNode, nodes, thisNodeIdx, Node.class));
         }
 
-//        @Override public Tuple2<NodeRadix<T>,NodeRadix<T>> split() {
-//            NodeRadix<T> right = new NodeRadix<T>(shift, new NodeRadix[0]);
+//        @Override public Tuple2<Strict<T>,Strict<T>> split() {
+//            Strict<T> right = new Strict<T>(shift, new Strict[0]);
 //            return tup(this, right);
 //        }
 
-        @Override public NodeRadix<T> append(T item) {
+        @Override public Strict<T> append(T item) {
             Node<T> last = nodes[nodes.length - 1];
             if (last.thisNodeHasCapacity()) {
                 // Make a copy of our node array
@@ -635,7 +637,7 @@ public class RrbTree1<E> implements ImList<E> {
                 // Replace the last node with the updated one.
                 newNodes[nodes.length - 1] = last.append(item);
                 // Return new, updated node.
-                return new NodeRadix<>(shift, newNodes);
+                return new Strict<>(shift, newNodes);
             }
             if (nodes.length >= RADIX_NODE_LENGTH) {
                 throw new UnsupportedOperationException("This I think can only happen to the root node.");
@@ -643,51 +645,83 @@ public class RrbTree1<E> implements ImList<E> {
                 // Make a larger copy of our node array
                 Node<T>[] newNodes = Arrays.copyOf(nodes, nodes.length + 1);
                 // Add a new node at the end of it.
-                newNodes[nodes.length] = new NodeLeaf<>(singleElementArray(item));
+                newNodes[nodes.length] = new Leaf<>(singleElementArray(item));
                 // Return new, updated node.
-                return new NodeRadix<>(shift, newNodes);
+                return new Strict<>(shift, newNodes);
             }
         }
         @Override public String toString() {
-//            return "NodeRadix(nodes.length="+ nodes.length + ", shift=" + shift + ")";
-            return "Radix" + shift + Arrays.toString(nodes);
+//            return "Strict(nodes.length="+ nodes.length + ", shift=" + shift + ")";
+            return "Strict" + shift + Arrays.toString(nodes);
         }
     }
 
     // Contains a relaxed tree of nodes that average around 32 items each.
-    private class NodeRelaxed<T> implements Node<T> {
-        // TODO: Long-term, assume the first index is zero and only store subsequent ones.
-        // For now, we store them all for safety.
-        int[] startIndices;
+    private static class Relaxed<T> implements Node<T> {
+        // The max index stored in each sub-node.  This is a separate array so it can be retrieved in a single
+        // memory fetch.
+        int[] endIndices;
+        // The sub nodes
         Node<T>[] nodes;
 
         // Constructor
-        NodeRelaxed(int[] is, Node<T>[] ns) { startIndices = is; nodes = ns; }
+        Relaxed(int[] is, Node<T>[] ns) { endIndices = is; nodes = ns; }
 
-
-        @Override public T get(int i) {
-            // TODO: This is really slow and therefore wrong:
-            int idx = 0;
-            for (int test : startIndices) {
-                if (test < i) {
-                    idx = test;
-                } else {
-                    break;
-                }
-            }
-            return nodes[idx].get(i - idx);
-        }
 
         @Override public int maxIndex() {
-            return startIndices[startIndices.length - 1];
+            return endIndices[endIndices.length - 1];
         }
 
-        @Override public Tuple2<NodeRelaxed<T>,NodeRelaxed<T>> splitAt(int i) {
+        /**
+         Converts the index of an item into the index of the sub-node containing that item.
+         @param index The index of the item in the entire tree
+         @return The index of the branch of the tree (the sub-node and its ancestors) the item resides in.
+         */
+        private int subNodeIndex(int index) {
+            // Index range: 0 to maxIndex()
+            // Result Range: 0 to startIndices.length
+            // liner interpolation: index/maxIndex() = result/startIndices.length
+            //                      result = index * startIndices.length / maxIndex();
+//            int guess = index * startIndices.length / maxIndex();
+//            int guessedItem = startIndices[guess];
+//            while (guessedItem > (index + MIN_NODE_LENGTH)) {
+//                guessedItem = startIndices[--guess];
+//            }
+//            while (guessedItem < index) {
+//                guessedItem = startIndices[++guess];
+//            }
+
+            // TODO: This is really slow.  Do linear interpolation instead.
+            for (int i = 0; i < endIndices.length; i++) {
+                if (index <= endIndices[i]) {
+                    return i;
+                }
+            }
+            throw new IllegalStateException("Should be unreachable!");
+        }
+
+        /**
+         Converts the index of an item into the index to pass to the sub-node containing that item.
+         @param index The index of the item in the entire tree
+         @param subNodeIndex the index into this node's array of sub-nodes.
+         @return The index to pass to the sub-branch the item resides in
+         */
+        private int subNodeAdjustedIndex(int index, int subNodeIndex) {
+            return (subNodeIndex == 0) ? 0
+                                       : index - endIndices[subNodeIndex - 1];
+        }
+
+        @Override public T get(int index) {
+            int subNodeIndex = subNodeIndex(index);
+            return nodes[subNodeIndex].get(subNodeAdjustedIndex(index, subNodeIndex));
+        }
+
+        @Override public Tuple2<Relaxed<T>,Relaxed<T>> splitAt(int i) {
 //            int midpoint = nodes.length >> 1; // Shift-right one is the same as dividing by 2.
-            NodeRelaxed<T> left = new NodeRelaxed<>(Arrays.copyOf(startIndices, i),
+            Relaxed<T> left = new Relaxed<>(Arrays.copyOf(endIndices, i),
                                                     Arrays.copyOf(nodes, i));
             // I checked this at javaRepl and indeed this starts from the correct item.
-            NodeRelaxed<T> right = new NodeRelaxed<>(Arrays.copyOfRange(startIndices, i, nodes.length),
+            Relaxed<T> right = new Relaxed<>(Arrays.copyOfRange(endIndices, i, nodes.length),
                                                      Arrays.copyOfRange(nodes, i, nodes.length));
             return tup(left, right);
         }
@@ -700,7 +734,7 @@ public class RrbTree1<E> implements ImList<E> {
                 // Replace the last node with the updated one.
                 newNodes[nodes.length - 1] = last.append(item);
                 // Return new, updated node.
-                return new NodeRelaxed<>(startIndices, newNodes);
+                return new Relaxed<>(endIndices, newNodes);
             }
             if (nodes.length >= MAX_NODE_LENGTH) {
                 throw new UnsupportedOperationException("This I think can only happen to the root node.");
@@ -714,19 +748,90 @@ public class RrbTree1<E> implements ImList<E> {
                 // Append the item to the right node and add that at the new end position.
                 newNodes[nodes.length] = splitNodes._2().append(item);
                 // Return new, updated node.
-                return new NodeRelaxed<>(startIndices, newNodes);
+                return new Relaxed<>(endIndices, newNodes);
             }
         }
-
 
         @Override public boolean thisNodeHasCapacity() {
             return nodes.length < MAX_NODE_LENGTH;
         }
 
-        @Override public boolean hasRadixCapacity() { return false; }
+        // TODO: Not sure about this...
+        @Override public boolean hasStrictCapacity() { return false; }
 
-        @Override
-        public RrbTree1.Node<T> pushFocus(int index, T[] oldFocus) {
+        @Override public boolean hasRelaxedCapacity(int index, int size) {
+            if ( (size < MIN_NODE_LENGTH) || (size > MAX_NODE_LENGTH) ) {
+                throw new IllegalArgumentException("Bad size: " + size);
+            }
+            if (thisNodeHasCapacity()) { return true; }
+            int subNodeIndex = subNodeIndex(index);
+            return nodes[subNodeIndex].hasRelaxedCapacity(subNodeAdjustedIndex(index, subNodeIndex), size);
+        }
+
+        @Override public Node<T> pushFocus(int index, T[] oldFocus) {
+            int subNodeIndex = subNodeIndex(index);
+
+            Node<T> subNode = nodes[subNodeIndex];
+
+            // Does the subNode have space enough to handle it?
+            if (subNode.hasRelaxedCapacity(subNodeAdjustedIndex(index, subNodeIndex), oldFocus.length)) {
+//                    System.out.println("  Pushing the focus down to a lower-level node with capacity.");
+                Node<T> newNode = subNode.pushFocus(subNodeAdjustedIndex(index, subNodeIndex), oldFocus);
+                // Make a copy of our nodesArray, replacing the old node at subNodeIndex with the new.
+                Node<T>[] newNodes = replaceInArrayAt(newNode, nodes, subNodeIndex, Node.class);
+                // Increment endIndicies for the changed item and all items to the right.
+                int[] newEndIndices = new int[endIndices.length];
+                if (subNodeIndex > 0) {
+                    System.arraycopy(endIndices, 0, newEndIndices, 0, subNodeIndex - 1);
+                }
+                for (int i = subNodeIndex; i < endIndices.length; i++) {
+                    newEndIndices[i] = endIndices[i] + oldFocus.length;
+                }
+                return new Relaxed<>(newEndIndices, newNodes);
+            }
+
+            // TODO: Not finished - working here!
+
+            // Regardless of what else happens, we're going to add a new node.
+//            Node<T> newNode = new Leaf<>(oldFocus);
+//
+//            // Make a skinny branch of a tree by walking up from the leaf node until our
+//            // new branch is at the same level as the old one.  We have to build evenly
+//            // (like hotels in Monopoly) in order to keep the tree balanced.
+//            int newShift = NODE_LENGTH_POW_2;
+//
+//            // If we've got space in our array, we just have to add skinny-branch nodes up to
+//            // the level below ours.  But if we don't have space, we have to add a
+//            // single-element strict node at the same level as ours here too.
+//            int maxShift = (nodes.length < RADIX_NODE_LENGTH) ? shift : shift + 1;
+//
+//            // Make the skinny-branch of single-element strict nodes:
+//            while (newShift < maxShift) {
+////                    System.out.println("  Adding a skinny branch node...");
+//                Node<T>[] newNodes = (Node<T>[]) Array.newInstance(newNode.getClass(), 1);
+//                newNodes[0] = newNode;
+//                newNode = new Strict<>(newShift, newNodes);
+//                newShift += NODE_LENGTH_POW_2;
+//            }
+//
+//            if ((nodes.length < RADIX_NODE_LENGTH)) {
+////                    System.out.println("  Adding a node to the existing array");
+//                Node<T>[] newNodes = (Node<T>[]) insertIntoArrayAt(newNode, nodes, subNodeIndex, Node.class);
+//                // This could allow cheap strict inserts on any leaf-node boundary...
+//                return new Strict<>(shift, newNodes);
+//            } else {
+////                    System.out.println("  Adding a level to the Strict tree");
+//                return new Strict(shift + NODE_LENGTH_POW_2,
+//                                     new Node[]{this, newNode});
+//            }
+
+
+
+            System.out.println("  oldFocus.length: " + oldFocus.length);
+            System.out.println("  index: " + index);
+            System.out.println("  maxIndex(): " + maxIndex());
+            System.out.println("  nodes.length: " + nodes.length);
+            System.out.println("  this: " + this);
             // TODO: Implement
             throw new UnsupportedOperationException("Not Implemented Yet");
         }
@@ -737,6 +842,6 @@ public class RrbTree1<E> implements ImList<E> {
             throw new UnsupportedOperationException("Not Implemented Yet");
         }
 
-        @Override public String toString() { return "NodeRelaxed(nodes.length="+ nodes.length + ")"; }
+        @Override public String toString() { return "Relaxed(nodes.length="+ nodes.length + ")"; }
     }
 }
