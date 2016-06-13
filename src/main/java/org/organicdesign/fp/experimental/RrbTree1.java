@@ -704,7 +704,7 @@ public class RrbTree1<E> implements ImList<E> {
 
             // TODO: This is really slow.  Do linear interpolation instead.
             for (int i = 0; i < endIndices.length; i++) {
-                if (index <= endIndices[i]) {
+                if (index < endIndices[i]) {
                     return i;
                 }
             }
