@@ -41,6 +41,7 @@ public class RrbTree1Test {
             for (int k = 0; k <= j; k++) {
                 assertEquals("Checking index: " + k + " for size=" + control.size(), control.get(k), is.get(k));
             }
+//            System.out.println(is);
         }
         assertEquals(SEVERAL, is.size());
         for (int j = 0; j < SEVERAL; j++){
@@ -95,7 +96,7 @@ public class RrbTree1Test {
     public void emptyEx04() { RrbTree1.empty().get(Integer.MAX_VALUE); }
 
     @Test public void addSeveralItems() throws NoSuchAlgorithmException {
-        System.out.println("addSeveral start");
+//        System.out.println("addSeveral start");
         final int SEVERAL = 100; //0; //0; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
         RrbTree1<Integer> is = RrbTree1.empty();
         for (int j = 0; j < SEVERAL; j++){

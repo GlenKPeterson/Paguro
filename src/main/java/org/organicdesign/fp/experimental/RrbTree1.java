@@ -246,7 +246,7 @@ public class RrbTree1<E> implements ImList<E> {
      @return a new RRB-Tree with the item inserted.
      */
     public RrbTree1<E> insert(int idx, E element) {
-        System.out.println("insert(int " + idx + ", E " + element + ")");
+//        System.out.println("insert(int " + idx + ", E " + element + ")");
 
         // If the focus is full, push it into the tree and make a new one with the new element.
         if (focus.length >= RADIX_NODE_LENGTH) {
@@ -297,7 +297,7 @@ public class RrbTree1<E> implements ImList<E> {
     }
 
     @Override public String toString() {
-        return "RrbTree(fsi=" + focusStartIndex + " focus=" + Arrays.toString(focus) + " root=" + root + ")";
+        return "RrbTree(fsi=" + focusStartIndex + " focus=" + Arrays.toString(focus) + "\n        root=" + root + ")";
     }
 
     private interface Node<T> {
@@ -615,12 +615,12 @@ public class RrbTree1<E> implements ImList<E> {
             } // end if oldFocus.length == RADIX_NODE_LENGTH
 
             // Here we're going to yield a Relaxed Radix node, so punt to that (slower) logic.
-            System.out.println("Yield a Relaxed node.");
+//            System.out.println("Yield a Relaxed node.");
             int[] endIndices = new int[nodes.length];
             for (int i = 0; i < endIndices.length; i++) {
                 endIndices[i] = (i + 1) << shift;
             }
-            System.out.println("End indices: " + Arrays.toString(endIndices));
+//            System.out.println("End indices: " + Arrays.toString(endIndices));
             return new Relaxed<>(endIndices, nodes).pushFocus(index, oldFocus);
         }
 
@@ -774,7 +774,7 @@ public class RrbTree1<E> implements ImList<E> {
         }
 
         @Override public boolean thisNodeHasCapacity() {
-            System.out.println("thisNodeHasCapacity(): nodes.length=" + nodes.length + " MAX_NODE_LENGTH=" + MAX_NODE_LENGTH + " MIN_NODE_LENGTH=" + MIN_NODE_LENGTH + " RADIX_NODE_LENGTH=" + RADIX_NODE_LENGTH);
+//            System.out.println("thisNodeHasCapacity(): nodes.length=" + nodes.length + " MAX_NODE_LENGTH=" + MAX_NODE_LENGTH + " MIN_NODE_LENGTH=" + MIN_NODE_LENGTH + " RADIX_NODE_LENGTH=" + RADIX_NODE_LENGTH);
             return nodes.length < MAX_NODE_LENGTH;
         }
 
@@ -794,14 +794,14 @@ public class RrbTree1<E> implements ImList<E> {
         }
 
         @Override public Node<T> pushFocus(int index, T[] oldFocus) {
-            System.out.println("Relaxed pushFocus(" + Arrays.toString(oldFocus) + ", " + index + ")");
-            System.out.println("  this: " + this);
+//            System.out.println("Relaxed pushFocus(" + Arrays.toString(oldFocus) + ", " + index + ")");
+//            System.out.println("  this: " + this);
 
             int subNodeIndex = subNodeIndex(index);
 
             Node<T> subNode = nodes[subNodeIndex];
 
-            System.out.println("  subNode: " + subNode);
+//            System.out.println("  subNode: " + subNode);
             int subNodeAdjustedIndex = subNodeAdjustedIndex(index, subNodeIndex);
 
             // Does the subNode have space enough to handle it?
@@ -830,17 +830,17 @@ public class RrbTree1<E> implements ImList<E> {
                 Node<T> node1 = split._1();
                 Node<T> node2 = split._2();
 
-                System.out.println("Split node1: " + node1);
-                System.out.println("Split node2: " + node2);
+//                System.out.println("Split node1: " + node1);
+//                System.out.println("Split node2: " + node2);
 
                 Relaxed<T> newRelaxed = new Relaxed<>(new int[] {node1.maxIndex(), node1.maxIndex() + node2.maxIndex()},
                                                       (Node<T>[]) new Node[] {node1, node2});
-                System.out.println("newRelaxed3: " + newRelaxed);
+//                System.out.println("newRelaxed3: " + newRelaxed);
                 return newRelaxed.pushFocus(index, oldFocus);
             }
 
             if (subNode instanceof Leaf) {
-                System.out.println("Leaf!");
+//                System.out.println("Leaf!");
                 if (subNodeAdjustedIndex == 0) {
                     // Just add a new leaf
                     Leaf<T> newNode = new Leaf<>(oldFocus);
@@ -856,7 +856,7 @@ public class RrbTree1<E> implements ImList<E> {
                         newEndIndices[i] = endIndices[i - 1] + oldFocus.length;
                     }
                     Relaxed<T> newRelaxed = new Relaxed<>(newEndIndices, newNodes);
-                    System.out.println("newRelaxed1: " + newRelaxed);
+//                    System.out.println("newRelaxed1: " + newRelaxed);
                     return newRelaxed;
                 }
 //                if (subNodeAdjustedIndex == subNode.maxIndex()) {
@@ -892,18 +892,17 @@ public class RrbTree1<E> implements ImList<E> {
 //                                                               : 0];
 //            int newIdx = index - prevNodeMaxIdx;
 
-            // TODO: Figure out optimal place to split
             // For now, split at half of maxIndex.
-            System.out.println("About to split: " + subNode);
-            System.out.println("Split at: " + (subNode.maxIndex() >> 1));
+//            System.out.println("About to split: " + subNode);
+//            System.out.println("Split at: " + (subNode.maxIndex() >> 1));
 
             Tuple2<Node<T>,Node<T>> newSubNode = subNode.split();
 
             Node<T> node1 = newSubNode._1();
             Node<T> node2 = newSubNode._2();
 
-            System.out.println("Split node1: " + node1);
-            System.out.println("Split node2: " + node2);
+//            System.out.println("Split node1: " + node1);
+//            System.out.println("Split node2: " + node2);
 
             Node<T>[] newNodes = (Node<T>[]) new Node[nodes.length + 1];
 
@@ -937,7 +936,7 @@ public class RrbTree1<E> implements ImList<E> {
             }
 
             Relaxed<T> newRelaxed = new Relaxed<>(newEndIndices, newNodes);
-            System.out.println("newRelaxed2: " + newRelaxed);
+//            System.out.println("newRelaxed2: " + newRelaxed);
             return newRelaxed.pushFocus(index, oldFocus);
 
 //
@@ -994,7 +993,7 @@ public class RrbTree1<E> implements ImList<E> {
         }
 
         @Override public String toString() {
-            return "Relaxed(endIndicies=" + Arrays.toString(endIndices) + " nodes=" + Arrays.toString(nodes) + ")";
+            return "Relaxed(endIndicies=" + Arrays.toString(endIndices) + " nodes=" + Arrays.toString(nodes).replaceAll(", Relaxed\\(", ",\n           Relaxed(") + ")";
 //            return "Relaxed(nodes.length="+ nodes.length + ")";
         }
     }
