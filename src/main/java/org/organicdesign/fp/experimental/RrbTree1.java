@@ -257,10 +257,10 @@ public class RrbTree1<E> implements ImList<E> {
 
         // If the index is within the focus, add the item there.
         int diff = idx - focusStartIndex;
-        System.out.println("diff: " + diff);
+//        System.out.println("diff: " + diff);
 
         if ( (diff >= 0) && (diff < focus.length) ) {
-            System.out.println("new focus...");
+//            System.out.println("new focus...");
             E[] newFocus = insertIntoArrayAt(element, focus, diff);
             return new RrbTree1<>(newFocus, focusStartIndex, root, size + 1);
         }
@@ -321,7 +321,7 @@ public class RrbTree1<E> implements ImList<E> {
          */
         boolean hasRelaxedCapacity(int index, int size);
 
-        Tuple2<Node<T>,Node<T>> splitAt(int i);
+        Tuple2<Node<T>,Node<T>> split();
 
         // Because we want to append/insert into the focus as much as possible, we will treat
         // the insert or append of a single item as a degenerate case.  Instead, the primary way
@@ -369,22 +369,22 @@ public class RrbTree1<E> implements ImList<E> {
          ancestors to become Relaxed Radix.  The parent should only split when
          size < MIN_NODE_LENGTH during a slice operation.
 
-         @param i the index to split before.
          @return Two new nodes.
          */
-        @Override  public Tuple2<Node<T>,Node<T>> splitAt(int i) {
-            System.out.println("Leaf.splitAt(" + i + ")");
-            // TODO: if we split for an insert-when-full, one side of the split should be bigger in preparation for the insert.
-            if (i == 0) {
-                return tup(emptyLeaf(), this);
-            }
-            if (i == items.length) {
-                // Not sure this can possibly be called, but just in case...
-                return tup(this, emptyLeaf());
-            }
-
-            return tup(new Leaf<>(Arrays.copyOf(items, i)),
-                       new Leaf<>(Arrays.copyOfRange(items, i, items.length - i)));
+        @Override  public Tuple2<Node<T>,Node<T>> split() {
+            throw new UnsupportedOperationException("Not Implemented Yet");
+//            System.out.println("Leaf.splitAt(" + i + ")");
+//            // TODO: if we split for an insert-when-full, one side of the split should be bigger in preparation for the insert.
+//            if (i == 0) {
+//                return tup(emptyLeaf(), this);
+//            }
+//            if (i == items.length) {
+//                // Not sure this can possibly be called, but just in case...
+//                return tup(this, emptyLeaf());
+//            }
+//
+//            return tup(new Leaf<>(Arrays.copyOf(items, i)),
+//                       new Leaf<>(Arrays.copyOfRange(items, i, items.length - i)));
         }
 
         // I think this can only be called when the root node is a leaf.
@@ -531,8 +531,8 @@ public class RrbTree1<E> implements ImList<E> {
         }
 
         @Override
-        public Tuple2<Node<T>,Node<T>> splitAt(int i) {
-            System.out.println("Strict.splitAt(" + i + ")");
+        public Tuple2<Node<T>,Node<T>> split() {
+//            System.out.println("Strict.splitAt(" + i + ")");
             // TODO: Implement
             throw new UnsupportedOperationException("Not implemented yet");
         }
@@ -723,22 +723,27 @@ public class RrbTree1<E> implements ImList<E> {
         }
 
         @Override public T get(int index) {
-            System.out.println("Relaxed.get(" + index + ")");
+//            System.out.println("Relaxed.get(" + index + ")");
             int subNodeIndex = subNodeIndex(index);
-            System.out.println("subNodeIndex: " + subNodeIndex);
-            System.out.println("subNodeAdjustedIndex(index, subNodeIndex): " + subNodeAdjustedIndex(index, subNodeIndex));
+//            System.out.println("subNodeIndex: " + subNodeIndex);
+//            System.out.println("subNodeAdjustedIndex(index, subNodeIndex): " + subNodeAdjustedIndex(index, subNodeIndex));
 
             return nodes[subNodeIndex].get(subNodeAdjustedIndex(index, subNodeIndex));
         }
 
-        @Override public Tuple2<Node<T>,Node<T>> splitAt(int i) {
-            System.out.println("Relaxed.splitAt(" + i + ")");
-//            int midpoint = nodes.length >> 1; // Shift-right one is the same as dividing by 2.
-            Relaxed<T> left = new Relaxed<>(Arrays.copyOf(endIndices, i),
-                                                    Arrays.copyOf(nodes, i));
+        @Override public Tuple2<Node<T>,Node<T>> split() {
+//            System.out.println("Relaxed.splitAt(" + i + ")");
+            int midpoint = nodes.length >> 1; // Shift-right one is the same as dividing by 2.
+            Relaxed<T> left = new Relaxed<>(Arrays.copyOf(endIndices, midpoint),
+                                                    Arrays.copyOf(nodes, midpoint));
+            int[] rightEndIndices = new int[nodes.length - midpoint];
+            int leftEndIdx = endIndices[midpoint - 1];
+            for (int j = 0; j < rightEndIndices.length; j++) {
+                rightEndIndices[j] = endIndices[midpoint + j] - leftEndIdx;
+            }
             // I checked this at javaRepl and indeed this starts from the correct item.
-            Relaxed<T> right = new Relaxed<>(Arrays.copyOfRange(endIndices, i, nodes.length),
-                                                     Arrays.copyOfRange(nodes, i, nodes.length));
+            Relaxed<T> right = new Relaxed<>(rightEndIndices,
+                                             Arrays.copyOfRange(nodes, midpoint, nodes.length));
             return tup(left, right);
         }
 
@@ -758,7 +763,7 @@ public class RrbTree1<E> implements ImList<E> {
                 // Make a larger copy of our node array
                 Node<T>[] newNodes = Arrays.copyOf(nodes, nodes.length + 1);
                 // Split the last node into two. (Shift-right one is the same as dividing by 2.)
-                Tuple2<? extends Node<T>,? extends Node<T>> splitNodes = last.splitAt(last.maxIndex() >> 1);
+                Tuple2<? extends Node<T>,? extends Node<T>> splitNodes = last.split();
                 // Put the left split node where the old node was
                 newNodes[nodes.length - 1] = splitNodes._1();
                 // Append the item to the right node and add that at the new end position.
@@ -773,8 +778,11 @@ public class RrbTree1<E> implements ImList<E> {
             return nodes.length < MAX_NODE_LENGTH;
         }
 
-        // TODO: Not sure about this...
-        @Override public boolean hasStrictCapacity() { return false; }
+        // I don't think this should ever be called.  Should this throw an exception instead?
+        @Override public boolean hasStrictCapacity() {
+            throw new UnsupportedOperationException("I don't think this should ever be called.");
+//            return false;
+        }
 
         @Override public boolean hasRelaxedCapacity(int index, int size) {
             if ( (size < MIN_NODE_LENGTH) || (size > MAX_NODE_LENGTH) ) {
@@ -811,6 +819,24 @@ public class RrbTree1<E> implements ImList<E> {
                     newEndIndices[i] = endIndices[i] + oldFocus.length;
                 }
                 return new Relaxed<>(newEndIndices, newNodes);
+            }
+
+            // I think this is a root node thing.
+            if (!thisNodeHasCapacity()) {
+                // TODO: Figure out optimal place to split
+                // For now, split at half of maxIndex.
+                Tuple2<Node<T>,Node<T>> split = split();
+
+                Node<T> node1 = split._1();
+                Node<T> node2 = split._2();
+
+                System.out.println("Split node1: " + node1);
+                System.out.println("Split node2: " + node2);
+
+                Relaxed<T> newRelaxed = new Relaxed<>(new int[] {node1.maxIndex(), node1.maxIndex() + node2.maxIndex()},
+                                                      (Node<T>[]) new Node[] {node1, node2});
+                System.out.println("newRelaxed3: " + newRelaxed);
+                return newRelaxed.pushFocus(index, oldFocus);
             }
 
             if (subNode instanceof Leaf) {
@@ -860,64 +886,59 @@ public class RrbTree1<E> implements ImList<E> {
                 throw new UnsupportedOperationException("Not implemented yet");
             }
 
-            if (this.thisNodeHasCapacity()) {
-                int prevNodeMaxIdx = endIndices[(subNodeIndex > 0) ? subNodeIndex - 1
-                                                                   : 0];
-                int newIdx = index - prevNodeMaxIdx;
+            // Here we have capacity and it's not a leaf, so we have to split the appropriate sub-node.
 
-                // TODO: Figure out optimal place to split
-                // For now, split at half of maxIndex.
-                Tuple2<Node<T>,Node<T>> newSubNode = subNode.splitAt(subNode.maxIndex() >> 1);
+//            int prevNodeMaxIdx = endIndices[(subNodeIndex > 0) ? subNodeIndex - 1
+//                                                               : 0];
+//            int newIdx = index - prevNodeMaxIdx;
 
-                Node<T> node1 = newSubNode._1();
-                Node<T> node2 = newSubNode._2();
+            // TODO: Figure out optimal place to split
+            // For now, split at half of maxIndex.
+            System.out.println("About to split: " + subNode);
+            System.out.println("Split at: " + (subNode.maxIndex() >> 1));
 
-                System.out.println("Split node1: " + node1);
-                System.out.println("Split node2: " + node2);
+            Tuple2<Node<T>,Node<T>> newSubNode = subNode.split();
 
-                if (node1.maxIndex() < newIdx) {
-                    node1 = node1.pushFocus(newIdx, oldFocus);
-                } else {
-                    node2 = node2.pushFocus(newIdx - node1.maxIndex(), oldFocus);
-                }
+            Node<T> node1 = newSubNode._1();
+            Node<T> node2 = newSubNode._2();
 
-                System.out.println("Split node1: " + node1);
-                System.out.println("Split node2: " + node2);
+            System.out.println("Split node1: " + node1);
+            System.out.println("Split node2: " + node2);
 
+            Node<T>[] newNodes = (Node<T>[]) new Node[nodes.length + 1];
 
-                Node<T>[] newNodes = (Node<T>[]) new Node[nodes.length + 2];
+            // If we aren't inserting at the first item, array-copy the nodes before the insert
+            // point.
+            if (subNodeIndex > 0) {
+                System.arraycopy(nodes, 0, newNodes, 0, subNodeIndex);
+            }
 
-                // If we aren't inserting at the first item, array-copy the nodes before the insert
-                // point.
-                if (subNodeIndex > 0) {
-                    System.arraycopy(nodes, 0, newNodes, 0, subNodeIndex);
-                }
+            // Insert the new item.
+            newNodes[subNodeIndex] = node1;
+            newNodes[subNodeIndex + 1] = node2;
 
-                // Insert the new item.
-                newNodes[subNodeIndex] = node1;
-                newNodes[subNodeIndex + 1] = node2;
+            // If we aren't inserting at the last item, array-copy the nodes after the insert
+            // point.
+            if (subNodeIndex < nodes.length) {
+                System.arraycopy(nodes, subNodeIndex + 1, newNodes, subNodeIndex + 2, nodes.length - subNodeIndex - 1);
+            }
 
-                // If we aren't inserting at the last item, array-copy the nodes after the insert
-                // point.
-                if (subNodeIndex < nodes.length) {
-                    System.arraycopy(nodes, subNodeIndex, newNodes, subNodeIndex + 2, nodes.length - subNodeIndex);
-                }
+            int[] newEndIndices = new int[endIndices.length + 1];
+            int prevEndIdx = 0;
+            if (subNodeIndex > 0) {
+                System.arraycopy(endIndices, 0, newEndIndices, 0, subNodeIndex - 1);
+                prevEndIdx = endIndices[subNodeIndex - 1];
+            }
 
-                int[] newEndIndices = new int[endIndices.length + 1];
-                int prevEndIdx = 0;
-                if (subNodeIndex > 0) {
-                    System.arraycopy(endIndices, 0, newEndIndices, 0, subNodeIndex - 1);
-                    prevEndIdx = endIndices[subNodeIndex - 1];
-                }
+            for (int i = subNodeIndex; i < newEndIndices.length; i++) {
+                // TODO: Calculate instead of loading into memory.  See splitAt calculation above.
+                prevEndIdx += newNodes[i].maxIndex();
+                newEndIndices[i] = prevEndIdx;
+            }
 
-                for (int i = subNodeIndex; i < newEndIndices.length; i++) {
-                    prevEndIdx += newNodes[i].maxIndex();
-                    newEndIndices[i] = prevEndIdx;
-                }
-
-                Relaxed<T> newRelaxed = new Relaxed<>(newEndIndices, newNodes);
-                System.out.println("newRelaxed2: " + newRelaxed);
-                return newRelaxed;
+            Relaxed<T> newRelaxed = new Relaxed<>(newEndIndices, newNodes);
+            System.out.println("newRelaxed2: " + newRelaxed);
+            return newRelaxed.pushFocus(index, oldFocus);
 
 //
 //                // Regardless of what else happens, we're going to add a new node.
@@ -954,17 +975,16 @@ public class RrbTree1<E> implements ImList<E> {
 //                                         new Node[]{this, newNode});
 //                }
 
-            }
 
             // TODO: Not finished - working here!
 
-            System.out.println("  oldFocus.length: " + oldFocus.length);
-            System.out.println("  index: " + index);
-            System.out.println("  maxIndex(): " + maxIndex());
-            System.out.println("  nodes.length: " + nodes.length);
-            System.out.println("  this: " + this);
-            // TODO: Implement
-            throw new UnsupportedOperationException("Not Implemented Yet");
+//            System.out.println("  oldFocus.length: " + oldFocus.length);
+//            System.out.println("  index: " + index);
+//            System.out.println("  maxIndex(): " + maxIndex());
+//            System.out.println("  nodes.length: " + nodes.length);
+//            System.out.println("  this: " + this);
+//            // TODO: Implement
+//            throw new UnsupportedOperationException("Not Implemented Yet");
         }
 
         @Override
@@ -974,7 +994,7 @@ public class RrbTree1<E> implements ImList<E> {
         }
 
         @Override public String toString() {
-            return "Relaxed(nodes=" + Arrays.toString(nodes) + " endIndicies=" + Arrays.toString(endIndices);
+            return "Relaxed(endIndicies=" + Arrays.toString(endIndices) + " nodes=" + Arrays.toString(nodes) + ")";
 //            return "Relaxed(nodes.length="+ nodes.length + ")";
         }
     }

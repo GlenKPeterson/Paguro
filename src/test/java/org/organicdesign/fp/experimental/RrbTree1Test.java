@@ -37,7 +37,7 @@ public class RrbTree1Test {
             control.add(0, j);
             assertEquals(j + 1, is.size());
             assertEquals(Integer.valueOf(j), is.get(0));
-            System.out.println(" ==" + is);
+//            System.out.println(" ==" + is);
             for (int k = 0; k <= j; k++) {
                 assertEquals("Checking index: " + k + " for size=" + control.size(), control.get(k), is.get(k));
             }
