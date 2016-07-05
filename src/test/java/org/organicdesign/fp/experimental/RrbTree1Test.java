@@ -13,22 +13,23 @@
 // limitations under the License.
 package org.organicdesign.fp.experimental;
 
+import org.junit.Test;
+import org.organicdesign.fp.collections.ImList;
+import org.organicdesign.fp.collections.UnmodListTest;
+
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import org.junit.Test;
-import org.organicdesign.fp.collections.ImList;
-import org.organicdesign.fp.collections.UnmodListTest;
+import java.util.Random;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 public class RrbTree1Test {
     @Test
-    public void insert() {
+    public void insertAtZero() {
         final int SEVERAL = 100; //0; //0; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
         RrbTree1<Integer> is = RrbTree1.empty();
         ArrayList<Integer> control = new ArrayList<>();
@@ -46,6 +47,34 @@ public class RrbTree1Test {
         assertEquals(SEVERAL, is.size());
         for (int j = 0; j < SEVERAL; j++){
             assertEquals(Integer.valueOf(SEVERAL - j - 1), is.get(j));
+        }
+    }
+
+    @Test
+    public void insertRandom() {
+        Random rand = new Random();
+        final int SEVERAL = 100; //0; //0; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
+        RrbTree1<Integer> is = RrbTree1.empty();
+        ArrayList<Integer> control = new ArrayList<>();
+        for (int j = 0; j < SEVERAL; j++){
+            int idx = rand.nextInt(is.size() + 1);
+            is = is.insert(idx, j);
+            control.add(idx, j);
+            assertEquals(j + 1, is.size());
+            assertEquals(Integer.valueOf(j), is.get(idx));
+            System.out.println("  control:" + control);
+            System.out.println("  ===test:" + is);
+            for (int k = 0; k <= j; k++) {
+                System.out.println("  control[" + k + "]:" + control.get(k) + " test[" + k + "]:" + is.get(k));
+            }
+            for (int k = 0; k <= j; k++) {
+                assertEquals("Checking index: " + k + " for size=" + control.size(), control.get(k), is.get(k));
+            }
+//            System.out.println(is);
+        }
+        assertEquals(SEVERAL, is.size());
+        for (int j = 0; j < SEVERAL; j++){
+            assertEquals(control.get(j), is.get(j));
         }
     }
 

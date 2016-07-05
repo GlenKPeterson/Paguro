@@ -13,13 +13,13 @@
 // limitations under the License.
 package org.organicdesign.fp.experimental;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.List;
-
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.UnmodSortedIterable;
 import org.organicdesign.fp.tuple.Tuple2;
+
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.organicdesign.fp.StaticImports.tup;
 
@@ -108,29 +108,29 @@ public class RrbTree1<E> implements ImList<E> {
         return insertIntoArrayAt(item, items, idx, null);
     }
 
-//    @SuppressWarnings("unchecked")
-//    private static <T> T[] spliceIntoArrayAt(T[] insertedItems, T[] origItems, int idx, Class<T> tClass) {
-//        // Make an array that big enough.  It's too bad that the JVM bothers to
-//        // initialize this with nulls.
-//        T[] newItems = (T[]) Array.newInstance(tClass, insertedItems.length + origItems.length);
-//
-//        // If we aren't inserting at the first item, array-copy the items before the insert
-//        // point.
-//        if (idx > 0) {
-//            System.arraycopy(origItems, 0, newItems, 0, idx);
-//        }
-//
-//        // Insert the new items
-//        System.arraycopy(insertedItems, 0, newItems, idx, insertedItems.length);
-//
-//        // If we aren't inserting at the last item, array-copy the items after the insert
-//        // point.
-//        if (idx < origItems.length) {
-//            System.arraycopy(origItems, idx, newItems, idx + insertedItems.length,
-//                             origItems.length - idx);
-//        }
-//        return newItems;
-//    }
+    @SuppressWarnings("unchecked")
+    private static <T> T[] spliceIntoArrayAt(T[] insertedItems, T[] origItems, int idx, Class<T> tClass) {
+        // Make an array that big enough.  It's too bad that the JVM bothers to
+        // initialize this with nulls.
+        T[] newItems = (T[]) Array.newInstance(tClass, insertedItems.length + origItems.length);
+
+        // If we aren't inserting at the first item, array-copy the items before the insert
+        // point.
+        if (idx > 0) {
+            System.arraycopy(origItems, 0, newItems, 0, idx);
+        }
+
+        // Insert the new items
+        System.arraycopy(insertedItems, 0, newItems, idx, insertedItems.length);
+
+        // If we aren't inserting at the last item, array-copy the items after the insert
+        // point.
+        if (idx < origItems.length) {
+            System.arraycopy(origItems, idx, newItems, idx + insertedItems.length,
+                             origItems.length - idx);
+        }
+        return newItems;
+    }
 
     @SuppressWarnings("unchecked")
     private static <T> T[] replaceInArrayAt(T replacedItem, T[] origItems, int idx, Class<T> tClass) {
@@ -259,7 +259,7 @@ public class RrbTree1<E> implements ImList<E> {
         int diff = idx - focusStartIndex;
 //        System.out.println("diff: " + diff);
 
-        if ( (diff >= 0) && (diff < focus.length) ) {
+        if ( (diff >= 0) && (diff <= focus.length) ) {
 //            System.out.println("new focus...");
             E[] newFocus = insertIntoArrayAt(element, focus, diff);
             return new RrbTree1<>(newFocus, focusStartIndex, root, size + 1);
@@ -357,10 +357,11 @@ public class RrbTree1<E> implements ImList<E> {
         @Override public boolean hasStrictCapacity() { return false; }
 
         @Override public boolean hasRelaxedCapacity(int index, int size) {
-            if ( (size < MIN_NODE_LENGTH) || (size > MAX_NODE_LENGTH) ) {
-                throw new IllegalArgumentException("Bad size: " + size);
-                // + " MIN_NODE_LENGTH=" + MIN_NODE_LENGTH + " MAX_NODE_LENGTH=" + MAX_NODE_LENGTH);
-            }
+            // Appends and prepends need to be a good size, but random inserts do not.
+//            if ( (size < MIN_NODE_LENGTH) || (size > MAX_NODE_LENGTH) ) {
+//                throw new IllegalArgumentException("Bad size: " + size);
+//                // + " MIN_NODE_LENGTH=" + MIN_NODE_LENGTH + " MAX_NODE_LENGTH=" + MAX_NODE_LENGTH);
+//            }
             return (items.length + size) < MAX_NODE_LENGTH;
         }
 
@@ -414,9 +415,41 @@ public class RrbTree1<E> implements ImList<E> {
                 return new Strict<>(NODE_LENGTH_POW_2, newNodes);
             }
 
-            System.out.println("pushFocus(" + Arrays.toString(oldFocus) + ", " + index + ")");
-            System.out.println("  items.length: " + items.length);
-            System.out.println("  oldFocus.length: " + oldFocus.length);
+            if ((items.length + oldFocus.length) < MAX_NODE_LENGTH) {
+                return new Leaf<>(spliceIntoArrayAt(oldFocus, items, index, (Class<T>) items[0].getClass()));
+            }
+
+            // We should only get here when the root node is a leaf.
+            // Maybe we should be more circumspect with our array creation, but for now, just jam
+            // jam it into one big array, then split it up for simplicity
+            // TODO: Consider optimizing:
+            T[] newItems = spliceIntoArrayAt(oldFocus, items, index, (Class<T>) items[0].getClass());
+
+            System.out.println("    newItems: " + Arrays.toString(newItems));
+
+            // Shift right one is divide-by 2.
+            int splitPoint = newItems.length >> 1;
+            System.out.println("    splitPoint: " + splitPoint);
+            T[] left = (T[]) new Object[splitPoint];
+            T[] right = (T[]) new Object[newItems.length - splitPoint];
+            // original array, offset, newArray, offset, length
+            System.arraycopy(newItems, 0, left, 0, splitPoint);
+            System.out.println("    left: " + Arrays.toString(left));
+
+            System.arraycopy(newItems, splitPoint, right, 0, right.length);
+            System.out.println("    right: " + Arrays.toString(right));
+
+            Arrays.copyOf(newItems, splitPoint);
+            Leaf<T> leftLeaf = new Leaf<>(left);
+            Leaf<T> rightLeaf = new Leaf<>(right);
+            // TODO: Could calculate the maxIndex values
+            Relaxed<T> newRelaxed = new Relaxed<>(new int[] { leftLeaf.maxIndex(), leftLeaf.maxIndex() + rightLeaf.maxIndex() },
+                                                  new Leaf[] { leftLeaf, rightLeaf });
+            System.out.println("    newRelaxed: " + newRelaxed);
+            return newRelaxed;
+//            System.out.println("pushFocus(" + index + ", " + Arrays.toString(oldFocus) + ")");
+//            System.out.println("  items: " + Arrays.toString(items));
+//            System.out.println("  oldFocus: " + Arrays.toString(oldFocus));
 
 //            // If we there is room for the entire focus to fit into this node, just stick it in
 //            // there!
@@ -424,8 +457,7 @@ public class RrbTree1<E> implements ImList<E> {
 //                return new Leaf<>(spliceIntoArrayAt(oldFocus, items, index));
 //            }
             // Ugh, we have to chop it across 2 arrays.
-            // TODO: Gets complicated!
-            throw new UnsupportedOperationException("Not implemented yet!");
+//            throw new UnsupportedOperationException("Not implemented yet!");
         }
 
         @Override
@@ -448,7 +480,7 @@ public class RrbTree1<E> implements ImList<E> {
 //            return "Leaf("+ Arrays.toString(items) + ")";
             return Arrays.toString(items);
         }
-    }
+    } // end class Leaf
 
     // Contains a left-packed tree of exactly 32-item nodes.
     private static class Strict<T> implements Node<T> {
@@ -708,7 +740,7 @@ public class RrbTree1<E> implements ImList<E> {
                     return i;
                 }
             }
-            throw new IllegalStateException("Should be unreachable!");
+            throw new IllegalStateException("Should be unreachable! index: " + index + " this: " + this.toString());
         }
 
         /**
@@ -723,10 +755,10 @@ public class RrbTree1<E> implements ImList<E> {
         }
 
         @Override public T get(int index) {
-//            System.out.println("Relaxed.get(" + index + ")");
+//            System.out.println("        Relaxed.get(" + index + ")");
             int subNodeIndex = subNodeIndex(index);
-//            System.out.println("subNodeIndex: " + subNodeIndex);
-//            System.out.println("subNodeAdjustedIndex(index, subNodeIndex): " + subNodeAdjustedIndex(index, subNodeIndex));
+//            System.out.println("        subNodeIndex: " + subNodeIndex);
+//            System.out.println("        subNodeAdjustedIndex(index, subNodeIndex): " + subNodeAdjustedIndex(index, subNodeIndex));
 
             return nodes[subNodeIndex].get(subNodeAdjustedIndex(index, subNodeIndex));
         }
