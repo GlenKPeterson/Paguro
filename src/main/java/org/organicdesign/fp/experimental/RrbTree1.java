@@ -194,7 +194,7 @@ public class RrbTree1<E> implements ImList<E> {
     }
 
     @Override  public E get(int i) {
-//        System.out.println("get(" + i + ")");
+        System.out.println("  get(" + i + ")");
         if ( (i < 0) || (i > size) ) {
             throw new IndexOutOfBoundsException("Index: " + i + " size: " + size);
         }
@@ -204,16 +204,16 @@ public class RrbTree1<E> implements ImList<E> {
         }
 
         if (i >= focusStartIndex) {
-//            System.out.println("  i>=focusStartIndex: " + focusStartIndex);
+            System.out.println("    i>=focusStartIndex: " + focusStartIndex);
             int focusOffset = i - focusStartIndex;
             if (focusOffset < focus.length) {
                 return focus[focusOffset];
             }
             i -= focus.length;
         }
-//        System.out.println("  focusStartIndex: " + focusStartIndex);
-//        System.out.println("  focus.length: " + focus.length);
-//        System.out.println("  adjusted index: " + i);
+        System.out.println("    focusStartIndex: " + focusStartIndex);
+        System.out.println("    focus.length: " + focus.length);
+        System.out.println("    adjusted index: " + i);
         return root.get(i);
     }
 
@@ -336,7 +336,7 @@ public class RrbTree1<E> implements ImList<E> {
         @SuppressWarnings("unchecked")
         private static final <T> Leaf<T> emptyLeaf() { return (Leaf<T>) EMPTY_LEAF; }
 
-        T[] items;
+        final T[] items;
         // It can only be Strict if items.length == RADIX_NODE_LENGTH and if its parents
         // are strict.
 //        boolean isStrict;
@@ -487,9 +487,9 @@ public class RrbTree1<E> implements ImList<E> {
         // This is the number of levels below this node (height) times NODE_LENGTH
         // For speed, we calculate it as height << NODE_LENGTH_POW_2
         // TODO: Can we store shift at the top-level Strict only?
-        int shift;
+        final int shift;
         // These are the child nodes
-        Node<T>[] nodes;
+        final Node<T>[] nodes;
         // Constructor
         Strict(int s, Node<T>[] ns) {
             shift = s; nodes = ns;
@@ -701,14 +701,41 @@ public class RrbTree1<E> implements ImList<E> {
 
     // Contains a relaxed tree of nodes that average around 32 items each.
     private static class Relaxed<T> implements Node<T> {
-        // The max index stored in each sub-node.  This is a separate array so it can be retrieved in a single
-        // memory fetch.
-        int[] endIndices;
+        // The max index stored in each sub-node.  This is a separate array so it can be retrieved
+        // in a single memory fetch.  Note that this is a 1-based index, or really a count, not a
+        // normal zero-based index.
+        final int[] endIndices;
         // The sub nodes
-        Node<T>[] nodes;
+        final Node<T>[] nodes;
 
         // Constructor
-        Relaxed(int[] is, Node<T>[] ns) { endIndices = is; nodes = ns; }
+        Relaxed(int[] is, Node<T>[] ns) {
+            endIndices = is;
+            nodes = ns;
+
+            // TODO: These are constraint validations to prevent implementation bugs - remove before shipping.
+            if (endIndices.length < 1) {
+                throw new IllegalArgumentException("endIndices.length < 1");
+            }
+            if (nodes.length < 1) {
+                throw new IllegalArgumentException("nodes.length < 1");
+            }
+            if (endIndices.length != nodes.length) {
+                throw new IllegalArgumentException("endIndices.length:" + endIndices.length +
+                                                   " != nodes.length:" + nodes.length);
+            }
+
+            int endIdx = 0;
+            for (int i = 0; i < nodes.length; i++) {
+                endIdx += nodes[i].maxIndex();
+                if (endIdx != endIndices[i]) {
+                    throw new IllegalArgumentException("nodes[" + i + "].maxIndex() was " +
+                                                       nodes[i].maxIndex() +
+                                                       " which is not compatable with endIndices[" +
+                                                       i + "] which was " + endIndices[i]);
+                }
+            }
+        }
 
 
         @Override public int maxIndex() {

@@ -62,10 +62,10 @@ public class RrbTree1Test {
             control.add(idx, j);
             assertEquals(j + 1, is.size());
             assertEquals(Integer.valueOf(j), is.get(idx));
-            System.out.println("  control:" + control);
-            System.out.println("  ===test:" + is);
+            System.out.println("control:" + control);
+            System.out.println("===test:" + is);
             for (int k = 0; k <= j; k++) {
-                System.out.println("  control[" + k + "]:" + control.get(k) + " test[" + k + "]:" + is.get(k));
+                System.out.println("control[" + k + "]:" + control.get(k) + " test[" + k + "]:" + is.get(k));
             }
             for (int k = 0; k <= j; k++) {
                 assertEquals("Checking index: " + k + " for size=" + control.size(), control.get(k), is.get(k));
