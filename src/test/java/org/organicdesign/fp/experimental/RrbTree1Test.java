@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -50,20 +49,27 @@ public class RrbTree1Test {
         }
     }
 
+    private int mutableRandIdx = 0;
+    private int[] myRands = new int[] {0, 0, 2, 2, 2, 3, 5, 1};
+    int myRand() { return myRands[mutableRandIdx++]; }
+
     @Test
     public void insertRandom() {
-        Random rand = new Random();
+//        Random rand = new Random();
         final int SEVERAL = 100; //0; //0; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
         RrbTree1<Integer> is = RrbTree1.empty();
         ArrayList<Integer> control = new ArrayList<>();
+        ArrayList<Integer> rands = new ArrayList<>();
         for (int j = 0; j < SEVERAL; j++){
-            int idx = rand.nextInt(is.size() + 1);
+            int idx = myRand(); //rand.nextInt(is.size() + 1);
+            rands.add(idx);
             is = is.insert(idx, j);
             control.add(idx, j);
             assertEquals(j + 1, is.size());
             assertEquals(Integer.valueOf(j), is.get(idx));
             System.out.println("control:" + control);
             System.out.println("===test:" + is);
+//            System.out.println("rands:" + rands);
             for (int k = 0; k <= j; k++) {
                 System.out.println("control[" + k + "]:" + control.get(k) + " test[" + k + "]:" + is.get(k));
             }

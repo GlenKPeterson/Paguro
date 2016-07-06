@@ -732,7 +732,9 @@ public class RrbTree1<E> implements ImList<E> {
                     throw new IllegalArgumentException("nodes[" + i + "].maxIndex() was " +
                                                        nodes[i].maxIndex() +
                                                        " which is not compatable with endIndices[" +
-                                                       i + "] which was " + endIndices[i]);
+                                                       i + "] which was " + endIndices[i] + "\n" +
+                    " endIndices: " + Arrays.toString(endIndices) +
+                                                       " nodes: " + Arrays.toString(nodes));
                 }
             }
         }
