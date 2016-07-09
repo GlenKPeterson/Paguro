@@ -874,7 +874,7 @@ public class RrbTree1<E> implements ImList<E> {
                 // Increment endIndicies for the changed item and all items to the right.
                 int[] newEndIndices = new int[endIndices.length];
                 if (subNodeIndex > 0) {
-                    System.arraycopy(endIndices, 0, newEndIndices, 0, subNodeIndex - 1);
+                    System.arraycopy(endIndices, 0, newEndIndices, 0, subNodeIndex);
                 }
                 for (int i = subNodeIndex; i < endIndices.length; i++) {
                     newEndIndices[i] = endIndices[i] + oldFocus.length;
