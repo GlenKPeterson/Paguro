@@ -194,7 +194,7 @@ public class RrbTree1<E> implements ImList<E> {
     }
 
     @Override  public E get(int i) {
-        System.out.println("  get(" + i + ")");
+//        System.out.println("  get(" + i + ")");
         if ( (i < 0) || (i > size) ) {
             throw new IndexOutOfBoundsException("Index: " + i + " size: " + size);
         }
@@ -204,16 +204,16 @@ public class RrbTree1<E> implements ImList<E> {
         }
 
         if (i >= focusStartIndex) {
-            System.out.println("    i>=focusStartIndex: " + focusStartIndex);
+//            System.out.println("    i>=focusStartIndex: " + focusStartIndex);
             int focusOffset = i - focusStartIndex;
             if (focusOffset < focus.length) {
                 return focus[focusOffset];
             }
             i -= focus.length;
         }
-        System.out.println("    focusStartIndex: " + focusStartIndex);
-        System.out.println("    focus.length: " + focus.length);
-        System.out.println("    adjusted index: " + i);
+//        System.out.println("    focusStartIndex: " + focusStartIndex);
+//        System.out.println("    focus.length: " + focus.length);
+//        System.out.println("    adjusted index: " + i);
         return root.get(i);
     }
 
@@ -246,7 +246,7 @@ public class RrbTree1<E> implements ImList<E> {
      @return a new RRB-Tree with the item inserted.
      */
     public RrbTree1<E> insert(int idx, E element) {
-//        System.out.println("insert(int " + idx + ", E " + element + ")");
+        System.out.println("insert(int " + idx + ", E " + element + ")");
 
         // If the focus is full, push it into the tree and make a new one with the new element.
         if (focus.length >= RADIX_NODE_LENGTH) {
@@ -257,14 +257,17 @@ public class RrbTree1<E> implements ImList<E> {
 
         // If the index is within the focus, add the item there.
         int diff = idx - focusStartIndex;
-//        System.out.println("diff: " + diff);
+        System.out.println("diff: " + diff);
 
         if ( (diff >= 0) && (diff <= focus.length) ) {
-//            System.out.println("new focus...");
+            System.out.println("new focus...");
             E[] newFocus = insertIntoArrayAt(element, focus, diff);
             return new RrbTree1<>(newFocus, focusStartIndex, root, size + 1);
         }
 
+        System.out.println("insert somewhere else than the current focus.");
+        System.out.println("focusStartIndex: " + focusStartIndex);
+        System.out.println("focus: " + Arrays.toString(focus));
         // Here we are left with an insert somewhere else than the current focus.
         Node<E> newRoot = focus.length > 0 ? root.pushFocus(focusStartIndex, focus)
                                            : root;
@@ -307,7 +310,7 @@ public class RrbTree1<E> implements ImList<E> {
         int maxIndex();
         /** Inserts an item at the given index */
 //        @Override public Node<T> insert(int i, T item);
-        Node<T> append(T item);
+//        Node<T> append(T item);
         /** Returns true if this node's array is not full */
         boolean thisNodeHasCapacity();
         /** Returns true if this strict-Radix tree can take another 32 items. */
@@ -343,11 +346,11 @@ public class RrbTree1<E> implements ImList<E> {
         Leaf(T[] ts) { items = ts; }
         @Override public T get(int i) { return items[i]; }
         @Override public int maxIndex() { return items.length; }
-        @Override public Node<T> append(T item) {
-            T[] newItems = Arrays.copyOf(items, items.length + 1);
-            newItems[items.length] = item;
-            return new Leaf<>(newItems);
-        }
+//        @Override public Node<T> append(T item) {
+//            T[] newItems = Arrays.copyOf(items, items.length + 1);
+//            newItems[items.length] = item;
+//            return new Leaf<>(newItems);
+//        }
         // If we want to add one more to an existing leaf node, it must already be part of a
         // relaxed tree.
         @Override public boolean thisNodeHasCapacity() {
@@ -672,27 +675,27 @@ public class RrbTree1<E> implements ImList<E> {
 //            return tup(this, right);
 //        }
 
-        @Override public Strict<T> append(T item) {
-            Node<T> last = nodes[nodes.length - 1];
-            if (last.thisNodeHasCapacity()) {
-                // Make a copy of our node array
-                Node<T>[] newNodes = Arrays.copyOf(nodes, nodes.length);
-                // Replace the last node with the updated one.
-                newNodes[nodes.length - 1] = last.append(item);
-                // Return new, updated node.
-                return new Strict<>(shift, newNodes);
-            }
-            if (nodes.length >= RADIX_NODE_LENGTH) {
-                throw new UnsupportedOperationException("This I think can only happen to the root node.");
-            } else {
-                // Make a larger copy of our node array
-                Node<T>[] newNodes = Arrays.copyOf(nodes, nodes.length + 1);
-                // Add a new node at the end of it.
-                newNodes[nodes.length] = new Leaf<>(singleElementArray(item));
-                // Return new, updated node.
-                return new Strict<>(shift, newNodes);
-            }
-        }
+//        @Override public Strict<T> append(T item) {
+//            Node<T> last = nodes[nodes.length - 1];
+//            if (last.thisNodeHasCapacity()) {
+//                // Make a copy of our node array
+//                Node<T>[] newNodes = Arrays.copyOf(nodes, nodes.length);
+//                // Replace the last node with the updated one.
+//                newNodes[nodes.length - 1] = last.append(item);
+//                // Return new, updated node.
+//                return new Strict<>(shift, newNodes);
+//            }
+//            if (nodes.length >= RADIX_NODE_LENGTH) {
+//                throw new UnsupportedOperationException("This I think can only happen to the root node.");
+//            } else {
+//                // Make a larger copy of our node array
+//                Node<T>[] newNodes = Arrays.copyOf(nodes, nodes.length + 1);
+//                // Add a new node at the end of it.
+//                newNodes[nodes.length] = new Leaf<>(singleElementArray(item));
+//                // Return new, updated node.
+//                return new Strict<>(shift, newNodes);
+//            }
+//        }
         @Override public String toString() {
 //            return "Strict(nodes.length="+ nodes.length + ", shift=" + shift + ")";
             return "Strict" + shift + Arrays.toString(nodes);
@@ -769,6 +772,15 @@ public class RrbTree1<E> implements ImList<E> {
                     return i;
                 }
             }
+            // For an append just one element beyond the end of the existing data structure,
+            // just try to add it to the last node.  This might seem overly permissive to accept
+            // these as inserts or appends without differentiating between the two, but it flows
+            // naturally with this data structure and I think makes it easier to use without
+            // encouraging user programming errors.
+            // Hopefully this still leads to a relatively balanced tree...
+            if (index == endIndices[endIndices.length - 1]) {
+                return endIndices.length - 1;
+            }
             throw new IllegalStateException("Should be unreachable! index: " + index + " this: " + this.toString());
         }
 
@@ -808,31 +820,31 @@ public class RrbTree1<E> implements ImList<E> {
             return tup(left, right);
         }
 
-        @Override public Node<T> append(T item) {
-            Node<T> last = nodes[nodes.length - 1];
-            if (last.thisNodeHasCapacity()) {
-                // Make a copy of our node array
-                Node<T>[] newNodes = Arrays.copyOf(nodes, nodes.length);
-                // Replace the last node with the updated one.
-                newNodes[nodes.length - 1] = last.append(item);
-                // Return new, updated node.
-                return new Relaxed<>(endIndices, newNodes);
-            }
-            if (nodes.length >= MAX_NODE_LENGTH) {
-                throw new UnsupportedOperationException("This I think can only happen to the root node.");
-            } else {
-                // Make a larger copy of our node array
-                Node<T>[] newNodes = Arrays.copyOf(nodes, nodes.length + 1);
-                // Split the last node into two. (Shift-right one is the same as dividing by 2.)
-                Tuple2<? extends Node<T>,? extends Node<T>> splitNodes = last.split();
-                // Put the left split node where the old node was
-                newNodes[nodes.length - 1] = splitNodes._1();
-                // Append the item to the right node and add that at the new end position.
-                newNodes[nodes.length] = splitNodes._2().append(item);
-                // Return new, updated node.
-                return new Relaxed<>(endIndices, newNodes);
-            }
-        }
+//        @Override public Node<T> append(T item) {
+//            Node<T> last = nodes[nodes.length - 1];
+//            if (last.thisNodeHasCapacity()) {
+//                // Make a copy of our node array
+//                Node<T>[] newNodes = Arrays.copyOf(nodes, nodes.length);
+//                // Replace the last node with the updated one.
+//                newNodes[nodes.length - 1] = last.append(item);
+//                // Return new, updated node.
+//                return new Relaxed<>(endIndices, newNodes);
+//            }
+//            if (nodes.length >= MAX_NODE_LENGTH) {
+//                throw new UnsupportedOperationException("This I think can only happen to the root node.");
+//            } else {
+//                // Make a larger copy of our node array
+//                Node<T>[] newNodes = Arrays.copyOf(nodes, nodes.length + 1);
+//                // Split the last node into two. (Shift-right one is the same as dividing by 2.)
+//                Tuple2<? extends Node<T>,? extends Node<T>> splitNodes = last.split();
+//                // Put the left split node where the old node was
+//                newNodes[nodes.length - 1] = splitNodes._1();
+//                // Append the item to the right node and add that at the new end position.
+//                newNodes[nodes.length] = splitNodes._2().append(item);
+//                // Return new, updated node.
+//                return new Relaxed<>(endIndices, newNodes);
+//            }
+//        }
 
         @Override public boolean thisNodeHasCapacity() {
 //            System.out.println("thisNodeHasCapacity(): nodes.length=" + nodes.length + " MAX_NODE_LENGTH=" + MAX_NODE_LENGTH + " MIN_NODE_LENGTH=" + MIN_NODE_LENGTH + " RADIX_NODE_LENGTH=" + RADIX_NODE_LENGTH);
