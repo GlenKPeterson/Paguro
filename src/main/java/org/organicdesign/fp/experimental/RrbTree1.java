@@ -308,9 +308,6 @@ public class RrbTree1<E> implements ImList<E> {
         T get(int i);
         /** Highest index returnable by this node */
         int maxIndex();
-        /** Inserts an item at the given index */
-//        @Override public Node<T> insert(int i, T item);
-//        Node<T> append(T item);
         /** Returns true if this node's array is not full */
         boolean thisNodeHasCapacity();
         /** Returns true if this strict-Radix tree can take another 32 items. */
@@ -346,11 +343,6 @@ public class RrbTree1<E> implements ImList<E> {
         Leaf(T[] ts) { items = ts; }
         @Override public T get(int i) { return items[i]; }
         @Override public int maxIndex() { return items.length; }
-//        @Override public Node<T> append(T item) {
-//            T[] newItems = Arrays.copyOf(items, items.length + 1);
-//            newItems[items.length] = item;
-//            return new Leaf<>(newItems);
-//        }
         // If we want to add one more to an existing leaf node, it must already be part of a
         // relaxed tree.
         @Override public boolean thisNodeHasCapacity() {
@@ -675,27 +667,6 @@ public class RrbTree1<E> implements ImList<E> {
 //            return tup(this, right);
 //        }
 
-//        @Override public Strict<T> append(T item) {
-//            Node<T> last = nodes[nodes.length - 1];
-//            if (last.thisNodeHasCapacity()) {
-//                // Make a copy of our node array
-//                Node<T>[] newNodes = Arrays.copyOf(nodes, nodes.length);
-//                // Replace the last node with the updated one.
-//                newNodes[nodes.length - 1] = last.append(item);
-//                // Return new, updated node.
-//                return new Strict<>(shift, newNodes);
-//            }
-//            if (nodes.length >= RADIX_NODE_LENGTH) {
-//                throw new UnsupportedOperationException("This I think can only happen to the root node.");
-//            } else {
-//                // Make a larger copy of our node array
-//                Node<T>[] newNodes = Arrays.copyOf(nodes, nodes.length + 1);
-//                // Add a new node at the end of it.
-//                newNodes[nodes.length] = new Leaf<>(singleElementArray(item));
-//                // Return new, updated node.
-//                return new Strict<>(shift, newNodes);
-//            }
-//        }
         @Override public String toString() {
 //            return "Strict(nodes.length="+ nodes.length + ", shift=" + shift + ")";
             return "Strict" + shift + Arrays.toString(nodes);
@@ -820,32 +791,6 @@ public class RrbTree1<E> implements ImList<E> {
             return tup(left, right);
         }
 
-//        @Override public Node<T> append(T item) {
-//            Node<T> last = nodes[nodes.length - 1];
-//            if (last.thisNodeHasCapacity()) {
-//                // Make a copy of our node array
-//                Node<T>[] newNodes = Arrays.copyOf(nodes, nodes.length);
-//                // Replace the last node with the updated one.
-//                newNodes[nodes.length - 1] = last.append(item);
-//                // Return new, updated node.
-//                return new Relaxed<>(endIndices, newNodes);
-//            }
-//            if (nodes.length >= MAX_NODE_LENGTH) {
-//                throw new UnsupportedOperationException("This I think can only happen to the root node.");
-//            } else {
-//                // Make a larger copy of our node array
-//                Node<T>[] newNodes = Arrays.copyOf(nodes, nodes.length + 1);
-//                // Split the last node into two. (Shift-right one is the same as dividing by 2.)
-//                Tuple2<? extends Node<T>,? extends Node<T>> splitNodes = last.split();
-//                // Put the left split node where the old node was
-//                newNodes[nodes.length - 1] = splitNodes._1();
-//                // Append the item to the right node and add that at the new end position.
-//                newNodes[nodes.length] = splitNodes._2().append(item);
-//                // Return new, updated node.
-//                return new Relaxed<>(endIndices, newNodes);
-//            }
-//        }
-
         @Override public boolean thisNodeHasCapacity() {
 //            System.out.println("thisNodeHasCapacity(): nodes.length=" + nodes.length + " MAX_NODE_LENGTH=" + MAX_NODE_LENGTH + " MIN_NODE_LENGTH=" + MIN_NODE_LENGTH + " RADIX_NODE_LENGTH=" + RADIX_NODE_LENGTH);
             return nodes.length < MAX_NODE_LENGTH;
@@ -867,7 +812,7 @@ public class RrbTree1<E> implements ImList<E> {
         }
 
         @Override public Node<T> pushFocus(int index, T[] oldFocus) {
-//            System.out.println("Relaxed pushFocus(" + Arrays.toString(oldFocus) + ", " + index + ")");
+//            System.out.println("Relaxed pushFocus(" + index + ", " + Arrays.toString(oldFocus) + ")");
 //            System.out.println("  this: " + this);
 
             int subNodeIndex = subNodeIndex(index);
@@ -956,8 +901,9 @@ public class RrbTree1<E> implements ImList<E> {
 //
 //                }
 
+                // TODO: Implement!
                 throw new UnsupportedOperationException("Not implemented yet");
-            }
+            } // end if subNode instanceof Leaf
 
             // Here we have capacity and it's not a leaf, so we have to split the appropriate sub-node.
 
@@ -1069,5 +1015,5 @@ public class RrbTree1<E> implements ImList<E> {
             return "Relaxed(endIndicies=" + Arrays.toString(endIndices) + " nodes=" + Arrays.toString(nodes).replaceAll(", Relaxed\\(", ",\n           Relaxed(") + ")";
 //            return "Relaxed(nodes.length="+ nodes.length + ")";
         }
-    }
-}
+    } // end class Relaxed
+} // end class RrbTree
