@@ -54,7 +54,8 @@ public class RrbTree1Test {
     private int mutableRandIdx = 0;
 //    private int[] myRands = new int[] {0, 0, 2, 2, 2, 3, 5, 1};
 //    private int[] myRands = new int[] {0, 1, 2, 1, 0, 5, 2};
-    private int[] myRands = new int[] {0, 0, 1, 2, 3, 0, 1, 5, 8, 2};
+//    private int[] myRands = new int[] {0, 0, 1, 2, 3, 0, 1, 5, 8, 2};
+    private int[] myRands = new int[] {0, 1, 2, 2, 3, 2, 0, 6, 5, 6, 9, 9, 5, 6, 14, 2, 12, 8, 15};
     private int myRand(int max) {
 //       return rand.nextInt(max);
 
@@ -73,13 +74,13 @@ public class RrbTree1Test {
         for (int j = 0; j < SEVERAL; j++){
             int idx = myRand(is.size() + 1); //rand.nextInt(is.size() + 1);
             rands.add(idx);
+            System.out.println("rands:" + rands); // print before blowing up...
             is = is.insert(idx, j);
             control.add(idx, j);
             assertEquals(j + 1, is.size());
             assertEquals(Integer.valueOf(j), is.get(idx));
             System.out.println("control:" + control);
             System.out.println("===test:" + is);
-            System.out.println("rands:" + rands);
             for (int k = 0; k <= j; k++) {
                 System.out.println("control[" + k + "]:" + control.get(k) + " test[" + k + "]:" + is.get(k));
             }
