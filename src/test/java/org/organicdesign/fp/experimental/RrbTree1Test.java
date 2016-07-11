@@ -13,6 +13,7 @@
 // limitations under the License.
 package org.organicdesign.fp.experimental;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.UnmodListTest;
@@ -50,29 +51,46 @@ public class RrbTree1Test {
         }
     }
 
-    Random rand = new Random();
-    private int mutableRandIdx = 0;
-//    private int[] myRands = new int[] {0, 0, 2, 2, 2, 3, 5, 1};
-//    private int[] myRands = new int[] {0, 1, 2, 1, 0, 5, 2};
-//    private int[] myRands = new int[] {0, 0, 1, 2, 3, 0, 1, 5, 8, 2};
-    private int[] myRands = new int[] {0, 1, 2, 2, 3, 2, 0, 6, 5, 6, 9, 9, 5, 6, 14, 2, 12, 8, 15};
-    private int myRand(int max) {
-//       return rand.nextInt(max);
-
-        // Don't want to modulo this - want to see this blow up to know that previous error
-        // condition was cleared.
-        return myRands[mutableRandIdx++]; // % myRands.length];
+    public <T> void randomInsertTest(int[] indices) {
+        RrbTree1<Integer> is = RrbTree1.empty();
+        ArrayList<Integer> control = new ArrayList<>();
+        for (int j = 0; j < indices.length; j++){
+            int idx = indices[j];
+            is = is.insert(idx, j);
+            control.add(idx, j);
+            assertEquals("size", j + 1, is.size());
+            assertEquals("item at " + idx, Integer.valueOf(j), is.get(idx));
+//            System.out.println("control:" + control);
+//            System.out.println("===test:" + is);
+            for (int k = 0; k <= j; k++) {
+                assertEquals("item at " + k + " still correct at size " + is.size(),
+                             control.get(k), is.get(k));
+//                System.out.println("control[" + k + "]:" + control.get(k) + " test[" + k + "]:" + is.get(k));
+            }
+        }
+//        assertEquals(indices.length, is.size());
+//        for (int j = 0; j < indices.length; j++){
+//            assertEquals(control.get(j), is.get(j));
+//        }
     }
 
+    @Test public void insertRandPrevFail() {
+        randomInsertTest(new int[] {0, 0, 2, 2, 2, 3, 5, 1});
+        randomInsertTest(new int[] {0, 1, 2, 1, 0, 5, 2});
+        randomInsertTest(new int[] {0, 0, 1, 2, 3, 0, 1, 5, 8, 2});
+//        randomInsertTest(new int[] {0, 1, 2, 2, 3, 2, 0, 6, 5, 6, 9, 9, 5, 6, 14, 2, 12, 8, 15});
+    }
+
+    Random rand = new java.security.SecureRandom();
     @Test
-//    @Ignore
+    @Ignore
     public void insertRandom() {
         final int SEVERAL = 100; //0; //0; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
         RrbTree1<Integer> is = RrbTree1.empty();
         ArrayList<Integer> control = new ArrayList<>();
         ArrayList<Integer> rands = new ArrayList<>();
         for (int j = 0; j < SEVERAL; j++){
-            int idx = myRand(is.size() + 1); //rand.nextInt(is.size() + 1);
+            int idx = rand.nextInt(is.size() + 1);
             rands.add(idx);
             System.out.println("rands:" + rands); // print before blowing up...
             is = is.insert(idx, j);
