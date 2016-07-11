@@ -51,7 +51,7 @@ public class RrbTree1Test {
         }
     }
 
-    public <T> void randomInsertTest(int[] indices) {
+    private void randomInsertTest(int[] indices) {
         RrbTree1<Integer> is = RrbTree1.empty();
         ArrayList<Integer> control = new ArrayList<>();
         for (int j = 0; j < indices.length; j++){
@@ -74,11 +74,17 @@ public class RrbTree1Test {
 //        }
     }
 
+    /**
+     Sequences of random inserts which previously failed.  So far, these are
+     */
     @Test public void insertRandPrevFail() {
         randomInsertTest(new int[] {0, 0, 2, 2, 2, 3, 5, 1});
         randomInsertTest(new int[] {0, 1, 2, 1, 0, 5, 2});
         randomInsertTest(new int[] {0, 0, 1, 2, 3, 0, 1, 5, 8, 2});
         randomInsertTest(new int[] {0, 1, 2, 2, 3, 2, 0, 6, 5, 6, 9, 9, 5, 6, 14, 2, 12, 8, 15});
+        randomInsertTest(new int[] {0, 0, 0, 3, 4, 4, 5, 3, 0, 7, 5, 1, 11, 9, 0, 2, 7, 11, 12, 7,
+                                    6, 10, 2, 15, 24, 11, 18, 24, 20, 29, 17, 26, 3, 26, 20, 18, 11,
+                                    17, 14, 3, 0, 40, 7, 41, 6, 40, 5});
     }
 
     Random rand = new java.security.SecureRandom();

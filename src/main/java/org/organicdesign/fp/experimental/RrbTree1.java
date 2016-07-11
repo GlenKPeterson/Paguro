@@ -320,9 +320,8 @@ public class RrbTree1<E> implements ImList<E> {
 
         /**
          Can we put focus at the given index without reshuffling nodes?
-         @param index the index we want to insert at
-         @param size the number of items to insert.  Must be
-                     MIN_NODE_LENGTH <= size < MAX_NODE_LENGTH
+         @param ndex the index we want to insert at
+         @param size the number of items to insert.  Must be size < MAX_NODE_LENGTH
          @return true if we can do so without otherwise adjusting the tree.
          */
         boolean hasRelaxedCapacity(int index, int size);
@@ -835,7 +834,9 @@ public class RrbTree1<E> implements ImList<E> {
         }
 
         @Override public boolean hasRelaxedCapacity(int index, int size) {
-            if ( (size < MIN_NODE_LENGTH) || (size > MAX_NODE_LENGTH) ) {
+// I think we can add any number of items (less than MAX_NODE_LENGTH)
+//            if ( (size < MIN_NODE_LENGTH) || (size > MAX_NODE_LENGTH) ) {
+            if (size > MAX_NODE_LENGTH) {
                 throw new IllegalArgumentException("Bad size: " + size);
             }
             if (thisNodeHasCapacity()) { return true; }
@@ -1040,7 +1041,7 @@ public class RrbTree1<E> implements ImList<E> {
             int[] newEndIndices = new int[endIndices.length + 1];
             int prevEndIdx = 0;
             if (subNodeIndex > 0) {
-                System.arraycopy(endIndices, 0, newEndIndices, 0, subNodeIndex - 1);
+                System.arraycopy(endIndices, 0, newEndIndices, 0, subNodeIndex);
                 prevEndIdx = endIndices[subNodeIndex - 1];
             }
 
