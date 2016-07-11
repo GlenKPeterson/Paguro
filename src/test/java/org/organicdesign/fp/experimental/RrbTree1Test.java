@@ -78,7 +78,7 @@ public class RrbTree1Test {
         randomInsertTest(new int[] {0, 0, 2, 2, 2, 3, 5, 1});
         randomInsertTest(new int[] {0, 1, 2, 1, 0, 5, 2});
         randomInsertTest(new int[] {0, 0, 1, 2, 3, 0, 1, 5, 8, 2});
-//        randomInsertTest(new int[] {0, 1, 2, 2, 3, 2, 0, 6, 5, 6, 9, 9, 5, 6, 14, 2, 12, 8, 15});
+        randomInsertTest(new int[] {0, 1, 2, 2, 3, 2, 0, 6, 5, 6, 9, 9, 5, 6, 14, 2, 12, 8, 15});
     }
 
     Random rand = new java.security.SecureRandom();
