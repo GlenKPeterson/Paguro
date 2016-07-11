@@ -13,7 +13,6 @@
 // limitations under the License.
 package org.organicdesign.fp.experimental;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.UnmodListTest;
@@ -89,7 +88,7 @@ public class RrbTree1Test {
 
     Random rand = new java.security.SecureRandom();
     @Test
-    @Ignore
+//    @Ignore
     public void insertRandom() {
         final int SEVERAL = 100; //0; //0; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
         RrbTree1<Integer> is = RrbTree1.empty();
@@ -98,17 +97,15 @@ public class RrbTree1Test {
         for (int j = 0; j < SEVERAL; j++){
             int idx = rand.nextInt(is.size() + 1);
             rands.add(idx);
-            System.out.println("rands:" + rands); // print before blowing up...
+//            System.out.println("rands:" + rands); // print before blowing up...
             is = is.insert(idx, j);
             control.add(idx, j);
             assertEquals(j + 1, is.size());
             assertEquals(Integer.valueOf(j), is.get(idx));
-            System.out.println("control:" + control);
-            System.out.println("===test:" + is);
+//            System.out.println("control:" + control);
+//            System.out.println("===test:" + is);
             for (int k = 0; k <= j; k++) {
-                System.out.println("control[" + k + "]:" + control.get(k) + " test[" + k + "]:" + is.get(k));
-            }
-            for (int k = 0; k <= j; k++) {
+//                System.out.println("control[" + k + "]:" + control.get(k) + " test[" + k + "]:" + is.get(k));
                 assertEquals("Checking index: " + k + " for size=" + control.size(), control.get(k), is.get(k));
             }
 //            System.out.println(is);
