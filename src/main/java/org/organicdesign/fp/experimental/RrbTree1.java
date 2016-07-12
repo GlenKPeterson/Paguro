@@ -745,41 +745,105 @@ public class RrbTree1<E> implements ImList<E> {
 
         /**
          Converts the index of an item into the index of the sub-node containing that item.
-         @param index The index of the item in the entire tree
-         @return The index of the branch of the tree (the sub-node and its ancestors) the item
-                 resides in.
+         @param desiredIdx The index of the item in the tree
+         @return The index of the immediate child of this node that the desired node resides in.
          */
-        private int subNodeIndex(int index) {
-            // Index range: 0 to maxIndex()
-            // Result Range: 0 to startIndices.length
-            // liner interpolation: index/maxIndex() = result/startIndices.length
-            //                      result = index * startIndices.length / maxIndex();
-//            int guess = index * startIndices.length / maxIndex();
-//            int guessedItem = startIndices[guess];
-//            while (guessedItem > (index + MIN_NODE_LENGTH)) {
-//                guessedItem = startIndices[--guess];
+        private int subNodeIndex(int desiredIdx) {
+            // For radix=4 this is actually faster, or at least as fast...
+//            for (int i = 0; i < endIndices.length; i++) {
+//                if (desiredIdx < endIndices[i]) {
+//                    return i;
+//                }
 //            }
-//            while (guessedItem < index) {
-//                guessedItem = startIndices[++guess];
+//            if (desiredIdx == maxIndex()) {
+//                return endIndices.length - 1;
 //            }
 
-            // TODO: This is really slow.  Do linear interpolation instead.
-            for (int i = 0; i < endIndices.length; i++) {
-                if (index < endIndices[i]) {
-                    return i;
-                }
-            }
-            // For an append just one element beyond the end of the existing data structure,
-            // just try to add it to the last node.  This might seem overly permissive to accept
-            // these as inserts or appends without differentiating between the two, but it flows
-            // naturally with this data structure and I think makes it easier to use without
-            // encouraging user programming errors.
-            // Hopefully this still leads to a relatively balanced tree...
-            if (index == endIndices[endIndices.length - 1]) {
+
+            // Index range: 0 to maxIndex - 1
+            // Result Range: 0 to endIndices.length - 1
+            // liner interpolation:
+            //     desiredIdx / maxIndex = endIdxSlot / endIndices.length
+            // solve for endIdxSlot
+            //     endIndices.length * (desiredIdx / maxIndex) =  endIdxSlot
+            // Put division last
+            //     endIdxSlot = endIndices.length * desiredIdx / maxIndex
+            //
+//            System.out.println("desiredIdx=" + desiredIdx);
+//            System.out.println(" endIndices=" + Arrays.toString(endIndices));
+            int guess = (endIndices.length * desiredIdx) / maxIndex();
+//            System.out.println(" guess=" + guess);
+            if (guess >= endIndices.length) {
+//                System.out.println("Guessed beyond end length - returning last item.");
                 return endIndices.length - 1;
             }
-            throw new IllegalStateException("Should be unreachable! index: " + index + " this: " +
-                                            this.toString());
+            int guessedEndIdx = endIndices[guess];
+//            System.out.println(" guessedEndIdx=" + guessedEndIdx);
+
+            // Now we must check the guess.  The endIndices we store are slightly misnamed because
+            // the max valid desiredIdx for a node is its endIndex - 1.  If our guess yields an
+            // endIndex
+            //  - less than the desiredIdx
+            //         Increment guess and check result again until greater, then return
+            //         that guess
+            //  - greater than (desiredIdx + MIN_NODE_SIZE)
+            //         Decrement guess and check result again until less, then return PREVIOUS guess
+            //  - equal to the desiredIdx (see note about maxIndex)
+            //         If desiredIdx == maxIndex Return guess
+            //         Else return guess + 1
+
+            // guessedEndIdx less than the desiredIdx
+            //         Increment guess and check result again until greater, then return
+            //         that guess
+            if (guessedEndIdx < desiredIdx) {
+                while (guess < (endIndices.length - 1)) {
+//                    System.out.println("    Too low.  Check higher...");
+                    guessedEndIdx = endIndices[++guess];
+                    if (guessedEndIdx >= desiredIdx) {
+//                        System.out.println("    RIGHT!");
+                        // See note in equal case below...
+                        return (guessedEndIdx == desiredIdx) ? guess + 1
+                                                             : guess;
+                    }
+//                    System.out.println("    ==== Guess higher...");
+                }
+                throw new IllegalStateException("Can we get here?  If so, how?");
+            } else if (guessedEndIdx > (desiredIdx + MIN_NODE_LENGTH)) {
+
+                // guessedEndIdx greater than (desiredIdx + MIN_NODE_LENGTH)
+                //         Decrement guess and check result again until less, then return PREVIOUS guess
+                while (guess > 0) {
+//                    System.out.println("    Maybe too high.  Check lower...");
+                    int nextGuess = guess - 1;
+                    guessedEndIdx = endIndices[nextGuess];
+
+                    if (guessedEndIdx <= desiredIdx) {
+//                        System.out.println("    RIGHT!");
+                        return guess;
+                    }
+//                    System.out.println("    ======= Guess lower...");
+                    guess = nextGuess;
+                }
+//                System.out.println("    Returning lower: " + guess);
+                return guess;
+            } else if (guessedEndIdx == desiredIdx) {
+                // guessedEndIdx equal to the desiredIdx (see note about maxIndex)
+                //         If desiredIdx == maxIndex Return guess
+                //         Else return guess + 1
+//                System.out.println("    Equal, so should be simple...");
+                // For an append just one element beyond the end of the existing data structure,
+                // just try to add it to the last node.  This might seem overly permissive to accept
+                // these as inserts or appends without differentiating between the two, but it flows
+                // naturally with this data structure and I think makes it easier to use without
+                // encouraging user programming errors.
+                // Hopefully this still leads to a relatively balanced tree...
+                int ret = (desiredIdx == maxIndex()) ? guess : guess + 1;
+//                System.out.println("    Returning: " + ret);
+                return ret;
+            } else {
+//                System.out.println("    First guess: " + guess);
+                return guess;
+            }
         }
 
         /**
@@ -846,7 +910,8 @@ public class RrbTree1<E> implements ImList<E> {
         }
 
         @Override public Node<T> pushFocus(int index, T[] oldFocus) {
-//            System.out.println("Relaxed pushFocus(index=" + index + ", oldFocus=" +
+//            System.out.println("===========\n" +
+//                               "Relaxed pushFocus(index=" + index + ", oldFocus=" +
 //                               Arrays.toString(oldFocus) + ")");
 //            System.out.println("  this: " + this);
 
@@ -919,7 +984,6 @@ public class RrbTree1<E> implements ImList<E> {
                     Leaf<T> newNode = new Leaf<>(oldFocus);
 
                     // If we aren't inserting before the existing leaf node, we're inserting after.
-                    // TODO: This if statement is untested (2016-07-10)
                     if (subNodeAdjustedIndex != 0) {
                         subNodeIndex++;
                     }
@@ -927,10 +991,12 @@ public class RrbTree1<E> implements ImList<E> {
                     newNodes = insertIntoArrayAt(newNode, nodes, subNodeIndex, Node.class);
                     // Increment endIndicies for the changed item and all items to the right.
                     newEndIndices = new int[endIndices.length + 1];
+                    int prevEndIdx = 0;
                     if (subNodeIndex > 0) {
-                        System.arraycopy(endIndices, 0, newEndIndices, 0, subNodeIndex - 1);
+                        System.arraycopy(endIndices, 0, newEndIndices, 0, subNodeIndex);
+                        prevEndIdx = newEndIndices[subNodeIndex - 1];
                     }
-                    newEndIndices[subNodeIndex] = oldFocus.length;
+                    newEndIndices[subNodeIndex] = prevEndIdx + oldFocus.length;
                     numToSkip = 1;
 //                    for (int i = subNodeIndex + 1; i < newEndIndices.length; i++) {
 //                        newEndIndices[i] = endIndices[i - 1] + oldFocus.length;
@@ -1003,10 +1069,6 @@ public class RrbTree1<E> implements ImList<E> {
             // Here we have capacity and it's not a leaf, so we have to split the appropriate
             // sub-node.
 
-//            int prevNodeMaxIdx = endIndices[(subNodeIndex > 0) ? subNodeIndex - 1
-//                                                               : 0];
-//            int newIdx = index - prevNodeMaxIdx;
-
             // For now, split at half of maxIndex.
 //            System.out.println("About to split: " + subNode);
 //            System.out.println("Split at: " + (subNode.maxIndex() >> 1));
@@ -1055,52 +1117,6 @@ public class RrbTree1<E> implements ImList<E> {
 //            System.out.println("newRelaxed2: " + newRelaxed);
             return newRelaxed.pushFocus(index, oldFocus);
 
-//
-//                // Regardless of what else happens, we're going to add a new node.
-//                Node<T> newNode = new Leaf<>(oldFocus);
-//
-//                // Make a skinny branch of a tree by walking up from the leaf node until our
-//                // new branch is at the same level as the old one.  We have to build evenly
-//                // (like hotels in Monopoly) in order to keep the tree balanced.
-//                int newHeight = 0;
-//
-//                // If we've got space in our array, we just have to add skinny-branch nodes up to
-//                // the level below ours.  But if we don't have space, we have to add a
-//                // single-element strict node at the same level as ours here too.
-//                int maxHeight = (nodes.length < MAX_NODE_LENGTH) ? height : height + 1;
-//
-//                // Make the skinny-branch of single-element strict nodes:
-//                while (newHeight < maxHeight) {
-//    //                    System.out.println("  Adding a skinny branch node...");
-//                    Node<T>[] newNodes = (Node<T>[]) Array.newInstance(newNode.getClass(), 1);
-//                    newNodes[0] = newNode;
-//                    int[] newEndIndices = new int[] { oldFocus.length };
-//                    newNode = new Relaxed<>(newHeight, newEndIndices, newNodes);
-//                    newHeight++;
-//                }
-//
-//                if ((nodes.length < STRICT_NODE_LENGTH)) {
-//    //                    System.out.println("  Adding a node to the existing array");
-//                    Node<T>[] newNodes = (Node<T>[]) insertIntoArrayAt(newNode, nodes,
-//                                                                       subNodeIndex, Node.class);
-//                    // This could allow cheap strict inserts on any leaf-node boundary...
-//                    return new Strict<>(shift, newNodes);
-//                } else {
-//    //                    System.out.println("  Adding a level to the Strict tree");
-//                    return new Strict(shift + NODE_LENGTH_POW_2,
-//                                         new Node[]{this, newNode});
-//                }
-
-
-            // TODO: Not finished - working here!
-
-//            System.out.println("  oldFocus.length: " + oldFocus.length);
-//            System.out.println("  index: " + index);
-//            System.out.println("  maxIndex(): " + maxIndex());
-//            System.out.println("  nodes.length: " + nodes.length);
-//            System.out.println("  this: " + this);
-//            // TODO: Implement
-//            throw new UnsupportedOperationException("Not Implemented Yet");
         }
 
         @Override

@@ -84,35 +84,42 @@ public class RrbTree1Test {
         randomInsertTest(new int[] {0, 0, 0, 3, 4, 4, 5, 3, 0, 7, 5, 1, 11, 9, 0, 2, 7, 11, 12, 7,
                                     6, 10, 2, 15, 24, 11, 18, 24, 20, 29, 17, 26, 3, 26, 20, 18, 11,
                                     17, 14, 3, 0, 40, 7, 41, 6, 40, 5});
+        randomInsertTest(new int[] {0, 0, 1, 2, 0, 1, 3, 4, 3, 1});
+        randomInsertTest(new int[] {0, 1, 0, 2, 0, 3, 1, 0, 0, 1, 7});
     }
 
     Random rand = new java.security.SecureRandom();
     @Test
 //    @Ignore
     public void insertRandom() {
-        final int SEVERAL = 100; //0; //0; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
+        final int SEVERAL = 1000; //0; //0; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
         RrbTree1<Integer> is = RrbTree1.empty();
         ArrayList<Integer> control = new ArrayList<>();
         ArrayList<Integer> rands = new ArrayList<>();
-        for (int j = 0; j < SEVERAL; j++){
-            int idx = rand.nextInt(is.size() + 1);
-            rands.add(idx);
-//            System.out.println("rands:" + rands); // print before blowing up...
-            is = is.insert(idx, j);
-            control.add(idx, j);
-            assertEquals(j + 1, is.size());
-            assertEquals(Integer.valueOf(j), is.get(idx));
+        try {
+            for (int j = 0; j < SEVERAL; j++) {
+                int idx = rand.nextInt(is.size() + 1);
+                rands.add(idx);
+                is = is.insert(idx, j);
+                control.add(idx, j);
+                assertEquals(j + 1, is.size());
+                assertEquals(Integer.valueOf(j), is.get(idx));
 //            System.out.println("control:" + control);
 //            System.out.println("===test:" + is);
-            for (int k = 0; k <= j; k++) {
-//                System.out.println("control[" + k + "]:" + control.get(k) + " test[" + k + "]:" + is.get(k));
-                assertEquals("Checking index: " + k + " for size=" + control.size(), control.get(k), is.get(k));
-            }
+//            for (int k = 0; k <= j; k++) {
+////                System.out.println("control[" + k + "]:" + control.get(k) + " test[" + k + "]:" + is.get(k));
+//                assertEquals("Checking index: " + k + " for size=" + control.size(), control.get(k), is.get(k));
+//            }
 //            System.out.println(is);
-        }
-        assertEquals(SEVERAL, is.size());
-        for (int j = 0; j < SEVERAL; j++){
-            assertEquals(control.get(j), is.get(j));
+            }
+            assertEquals(SEVERAL, is.size());
+            for (int j = 0; j < SEVERAL; j++) {
+                assertEquals(control.get(j), is.get(j));
+            }
+        } catch (Exception e) {
+            System.out.println("rands:" + rands); // print before blowing up...
+            // OK, now we can continue throwing exception.
+            throw e;
         }
     }
 
