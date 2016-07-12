@@ -26,6 +26,8 @@ import java.util.Random;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.organicdesign.fp.StaticImports.xform;
+import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class RrbTree1Test {
 
@@ -53,7 +55,7 @@ public class RrbTree1Test {
         }
     }
 
-    private void randomInsertTest(int[] indices) {
+    private RrbTree1<Integer> randomInsertTest(int[] indices) {
         RrbTree1<Integer> is = RrbTree1.empty();
         ArrayList<Integer> control = new ArrayList<>();
         for (int j = 0; j < indices.length; j++){
@@ -74,6 +76,7 @@ public class RrbTree1Test {
 //        for (int j = 0; j < indices.length; j++){
 //            assertEquals(control.get(j), is.get(j));
 //        }
+        return is;
     }
 
     /**
@@ -284,5 +287,55 @@ public class RrbTree1Test {
 
         List<Integer> tList = Arrays.asList(test);
         UnmodListTest.listIteratorTest(tList, pv2);
+    }
+
+    @Test public void equalsAndHashCode() {
+        List<Integer> control = Arrays.asList(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
+        RrbTree1<Integer> rrb1 =
+                xform(control).foldLeft(RrbTree1.<Integer>empty(),
+                                        (accum, item) -> accum.append(item));
+        RrbTree1<Integer> rrb2 =
+                xform(control).foldLeft(RrbTree1.<Integer>empty(),
+                                        (accum, item) -> accum.append(item));
+
+        List<Integer> other = Arrays.asList(1,3,2,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
+
+        equalsDistinctHashCode(control, rrb1, rrb2, other);
+    }
+
+    @Test public void coverageJunky() {
+        // I don't actually want toString() to return what it does now, but
+        // Check any way:
+//        int[] someRands =
+//                { 0, 1, 2, 1, 3, 2, 6, 1, 7, 4, 2, 7, 1, 1, 5, 5, 15, 9, 8, 10, 16, 11, 1, 7, 20,
+//                  14, 11, 18, 23, 9, 29, 2, 3, 3, 19, 31, 15, 32, 28, 3, 38, 35, 10, 37, 43, 5, 3,
+//                  12, 34, 8, 5, 47, 18, 3, 9, 36, 48, 14, 26, 52, 21, 58, 12, 11, 39, 39, 43, 52,
+//                  7, 7, 42, 69, 9, 29, 53, 30, 60, 0, 41, 59, 4, 55, 25, 67, 9, 27, 51, 32, 48,
+//                  46, 65, 19, 7, 73, 6, 11, 84, 29, 51, 40, 94, 83, 102, 90, 23, 58, 66, 83, 64,
+//                  40, 46, 100, 34, 82, 43, 52, 82, 93, 101, 18, 13, 23, 100, 118, 105, 92, 14, 64,
+//                  41, 41, 60, 65, 125, 126, 10, 120, 23, 98, 132, 91, 73, 48, 114, 57, 77, 145,
+//                  96, 30, 5, 22, 41, 79, 59, 56, 41, 70, 58, 147, 136, 93, 83, 52, 93, 99, 61, 34,
+//                  21, 34, 70, 1, 24, 78, 59, 167, 5, 19, 22, 42, 111, 111, 27, 4, 45, 12, 169, 40,
+//                  39, 90, 20, 6, 176, 160, 25, 2, 48, 18, 143, 56, 127, 188, 51, 85, 53, 17, 19,
+//                  17, 86, 122, 143, 51, 88, 166, 48, 92, 168, 114, 211, 189, 210, 9, 146, 185,
+//                  105, 72, 197, 100, 139, 161, 145, 63, 24, 227, 17, 82, 103, 141, 87, 225, 81,
+//                  63, 209, 220, 59, 121, 55, 49, 60, 153, 236, 123, 38, 48, 187, 196, 198, 240,
+//                  42, 146, 178, 14, 216, 62, 243, 164, 123, 61, 176, 257, 126, 173, 198, 73, 3,
+//                  75, 142, 73, 52, 175, 258, 67, 111, 75, 72, 58, 166, 190, 270, 117, 34, 137,
+//                  93, 73, 145, 102, 229, 156, 154, 119, 134, 114, 151, 207, 208, 124, 29, 130,
+//                  297, 45, 66, 50, 62, 118, 261, 217, 282, 162, 185, 225, 78, 101, 111, 313, 203,
+//                  243, 227, 225, 250, 5, 231, 218, 248, 280, 114, 3, 253, 177, 294, 240, 181, 0,
+//                  227, 325, 33, 124, 129, 276, 27, 93, 197, 71, 276, 93, 291, 59, 55, 344, 339, 4,
+//                  322, 229, 350, 105, 101, 119, 342, 134, 218, 55, 258, 205, 327, 298, 309, 27,
+//                  345, 41, 268, 33, 305, 270, 327, 191, 69, 289, 45, 284, 240, 317, 123, 171};
+
+        RrbTree1<Integer> rrb1 = randomInsertTest(new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 });
+        assertEquals("RrbTree(fsi=8 focus=[8]\n" +
+                     "        root=Strict2[[0, 1, 2, 3], [4, 5, 6, 7]])", rrb1.toString());
+
+        RrbTree1<Integer> rrb2 = randomInsertTest(new int[] { 0, 1, 2, 1, 3, 2, 6, 1, 7});
+        assertEquals("RrbTree(fsi=7 focus=[8]\n" +
+                     "        root=Relaxed(endIndicies=[4, 8] nodes=[[0, 7, 3, 5], [1, 4, 2, 6]]))",
+                     rrb2.toString());
     }
 }

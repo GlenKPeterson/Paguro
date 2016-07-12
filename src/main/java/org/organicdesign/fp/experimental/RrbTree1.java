@@ -24,16 +24,17 @@ import java.util.List;
 import static org.organicdesign.fp.StaticImports.tup;
 
 /**
- This is an experiment - DO NOT USE except to test.
  This is based on the paper, "RRB-Trees: Efficient Immutable Vectors" by Phil Bagwell and
  Tiark Rompf.  With some background from the Cormen, Leiserson, Rivest & Stein Algorithms book entry
  on B-Trees.  Also with an awareness of the Clojure PersistentVector by Rich Hickey.  All errors
  are by Glen Peterson.
 
- Priorities:
- append(item)
- get(index)
- insert(item, index)
+ Still TO-DO:
+  - More Testing
+  - Tuple2&lt;RrbTree1,RrbTree1&gt; split(int index)
+  - insert(int index, RrbTree1 other)
+  - Change radix from 4 to 32.
+  - Speed testing and optimization.
  */
 public class RrbTree1<E> implements ImList<E> {
 
@@ -362,10 +363,10 @@ public class RrbTree1<E> implements ImList<E> {
 
         @Override public boolean hasRelaxedCapacity(int index, int size) {
             // Appends and prepends need to be a good size, but random inserts do not.
-//            if ( (size < MIN_NODE_LENGTH) || (size >= MAX_NODE_LENGTH) ) {
-//                throw new IllegalArgumentException("Bad size: " + size);
-//              // + " MIN_NODE_LENGTH=" + MIN_NODE_LENGTH + " MAX_NODE_LENGTH=" + MAX_NODE_LENGTH);
-//            }
+            if ( (size < 1) || (size >= MAX_NODE_LENGTH) ) {
+                throw new IllegalArgumentException("Bad size: " + size);
+              // + " MIN_NODE_LENGTH=" + MIN_NODE_LENGTH + " MAX_NODE_LENGTH=" + MAX_NODE_LENGTH);
+            }
 //            System.out.println("Leaf.hasRelaxedCapacity(index=" + index + ", size=" + size + ")");
 //            System.out.println("   Leaf.items=" + Arrays.toString(items));
 //            System.out.println("   MAX_NODE_LENGTH=" + MAX_NODE_LENGTH);
@@ -564,7 +565,7 @@ public class RrbTree1<E> implements ImList<E> {
         }
 
         @Override public boolean hasRelaxedCapacity(int index, int size) {
-            if ( (size < 0) || (size >= MAX_NODE_LENGTH) ) {
+            if ( (size < 1) || (size >= MAX_NODE_LENGTH) ) {
                 throw new IllegalArgumentException("Bad size: " + size);
             }
             // It has relaxed capacity because a Relaxed node could have up to MAX_NODE_LENGTH nodes
@@ -897,7 +898,7 @@ public class RrbTree1<E> implements ImList<E> {
         @Override public boolean hasRelaxedCapacity(int index, int size) {
 // I think we can add any number of items (less than MAX_NODE_LENGTH)
 //            if ( (size < MIN_NODE_LENGTH) || (size > MAX_NODE_LENGTH) ) {
-            if (size > MAX_NODE_LENGTH) {
+            if ( (size < 1) || (size > MAX_NODE_LENGTH) ) {
                 throw new IllegalArgumentException("Bad size: " + size);
             }
             if (thisNodeHasCapacity()) { return true; }
