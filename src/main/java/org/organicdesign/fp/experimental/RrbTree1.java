@@ -372,7 +372,8 @@ public class RrbTree1<E> implements ImList<E> {
             return (items.length + size) < MAX_NODE_LENGTH;
         }
 
-        public Tuple2<Leaf<T>,Leaf<T>> spliceAndSplit(T[] oldFocus, int index) {
+        @SuppressWarnings("unchecked")
+        private Tuple2<Leaf<T>,Leaf<T>> spliceAndSplit(T[] oldFocus, int index) {
             // TODO: Consider optimizing:
             T[] newItems = spliceIntoArrayAt(oldFocus, items, index,
                                              (Class<T>) items[0].getClass());
@@ -487,17 +488,6 @@ public class RrbTree1<E> implements ImList<E> {
             return new Leaf<>(replaceInArrayAt(t, items, idx));
         }
 
-        //        @Override
-        public Leaf<T> insert(int i, T item) {
-            if (!thisNodeHasCapacity()) {
-                throw new IllegalStateException("Called insert, but can't add one more!" +
-                                                "  Parent should have called split first.");
-            }
-
-            // Return our new node.
-            return new Leaf<>(insertIntoArrayAt(item, items, i));
-        }
-
         @Override public String toString() {
 //            return "Leaf("+ Arrays.toString(items) + ")";
             return Arrays.toString(items);
@@ -574,14 +564,12 @@ public class RrbTree1<E> implements ImList<E> {
         }
 
         @Override public boolean hasRelaxedCapacity(int index, int size) {
-            if ( (size < MIN_NODE_LENGTH) || (size >= MAX_NODE_LENGTH) ) {
+            if ( (size < 0) || (size >= MAX_NODE_LENGTH) ) {
                 throw new IllegalArgumentException("Bad size: " + size);
             }
-            // TODO: Very unsure about this implementation!
-//            return highBits(index) == nodes.length - 1;
             // It has relaxed capacity because a Relaxed node could have up to MAX_NODE_LENGTH nodes
-            // and by definition this Strict node has no more than STRICT_NODE_LENGTH items.
-            return true;
+            // and by definition this Strict node has exactly STRICT_NODE_LENGTH items.
+            return size < MAX_NODE_LENGTH - STRICT_NODE_LENGTH;
         }
 
         @Override
@@ -676,8 +664,10 @@ public class RrbTree1<E> implements ImList<E> {
             // Here we're going to yield a Relaxed Radix node, so punt to that (slower) logic.
 //            System.out.println("Yield a Relaxed node.");
             int[] endIndices = new int[nodes.length];
+            int prevMaxIdx = 0;
             for (int i = 0; i < endIndices.length; i++) {
-                endIndices[i] = (i + 1) << shift;
+                prevMaxIdx = prevMaxIdx + nodes[i].maxIndex();
+                endIndices[i] = prevMaxIdx;
             }
 //            System.out.println("End indices: " + Arrays.toString(endIndices));
             return new Relaxed<>(endIndices, nodes).pushFocus(index, oldFocus);

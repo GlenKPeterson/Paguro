@@ -28,6 +28,9 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 public class RrbTree1Test {
+
+    private Random rand = new java.security.SecureRandom();
+
     @Test
     public void insertAtZero() {
         final int SEVERAL = 100; //0; //0; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
@@ -88,9 +91,7 @@ public class RrbTree1Test {
         randomInsertTest(new int[] {0, 1, 0, 2, 0, 3, 1, 0, 0, 1, 7});
     }
 
-    Random rand = new java.security.SecureRandom();
     @Test
-//    @Ignore
     public void insertRandom() {
         final int SEVERAL = 1000; //0; //0; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
         RrbTree1<Integer> is = RrbTree1.empty();
@@ -114,6 +115,36 @@ public class RrbTree1Test {
             }
             assertEquals(SEVERAL, is.size());
             for (int j = 0; j < SEVERAL; j++) {
+                assertEquals(control.get(j), is.get(j));
+            }
+        } catch (Exception e) {
+            System.out.println("rands:" + rands); // print before blowing up...
+            // OK, now we can continue throwing exception.
+            throw e;
+        }
+    }
+
+    @Test
+    public void insertRandomIntoStrict() {
+        final int SEVERAL = 100; //0; //0; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
+        RrbTree1<Integer> is = RrbTree1.empty();
+        ArrayList<Integer> control = new ArrayList<>();
+        ArrayList<Integer> rands = new ArrayList<>();
+        for (int i = 0; i < SEVERAL; i++) {
+            is = is.append(i);
+            control.add(i);
+        }
+        try {
+            for (int j = 0; j < SEVERAL; j++) {
+                int idx = rand.nextInt(is.size() + 1);
+                rands.add(idx);
+                is = is.insert(idx, j);
+                control.add(idx, j);
+                assertEquals(control.size(), is.size());
+                assertEquals(Integer.valueOf(j), is.get(idx));
+            }
+            assertEquals(control.size(), is.size());
+            for (int j = 0; j < is.size(); j++) {
                 assertEquals(control.get(j), is.get(j));
             }
         } catch (Exception e) {
