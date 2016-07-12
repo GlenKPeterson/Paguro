@@ -202,18 +202,40 @@ public class RrbTree1Test {
 
         ImList<Integer> pv2 = RrbTree1.empty();
         int len = 999;
-        Integer[] test = new Integer[len];
+        Integer[] control = new Integer[len];
+        // Build test vector
         for (int i = 0; i < len; i++) {
             pv2 = pv2.append(i);
-            test[i] = i;
+            control[i] = i;
         }
-        assertArrayEquals(test, pv2.toArray());
+        assertArrayEquals(control, pv2.toArray());
 
+        RrbTree1<Integer> rrb3 = RrbTree1.empty();
         for (int i = 0; i < len; i++) {
-            pv2 = pv2.replace(i, len - i);
-            test[i] = len - i;
+            rrb3 = rrb3.insert(0, len - 1 - i);
         }
-        assertArrayEquals(test, pv2.toArray());
+        assertArrayEquals(control, rrb3.toArray());
+
+        // Replace from end to start
+        for (int i = len - 1; i >= 0; i--) {
+            int replacement = len - i;
+            pv2 = pv2.replace(i, replacement);
+            rrb3 = rrb3.replace(i, replacement);
+            control[i] = replacement;
+        }
+        assertArrayEquals(control, pv2.toArray());
+        assertArrayEquals(control, rrb3.toArray());
+
+        // Replace in random order
+        for (int j = 0; j < len; j++) {
+            int idx = rand.nextInt(len);
+            int replacement = len - idx;
+            pv2 = pv2.replace(idx, replacement);
+            rrb3 = rrb3.replace(idx, replacement);
+            control[idx] = replacement;
+        }
+        assertArrayEquals(control, pv2.toArray());
+        assertArrayEquals(control, rrb3.toArray());
     }
 
     @Test public void listIterator() {

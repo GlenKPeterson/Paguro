@@ -283,24 +283,28 @@ public class RrbTree1<E> implements ImList<E> {
      Replace the item at the given index.  Note: i.replace(i.size(), o) used to be equivalent to
      i.concat(o), but it probably won't be for the RRB tree implementation, so this will change too.
 
-     @param i the index where the value should be stored.
-     @param t   the value to store
+     @param index the index where the value should be stored.
+     @param item   the value to store
      @return a new RrbTree1 with the replaced item
      */
     @Override
-    public RrbTree1<E> replace(int i, E t) {
-        if ( (i < 0) || (i > size) ) {
-            throw new IndexOutOfBoundsException("Index: " + i + " size: " + size);
+    public RrbTree1<E> replace(int index, E item) {
+//        System.out.println("replace(index=" + index + ", item=" + item + ")");
+        if ( (index < 0) || (index > size) ) {
+            throw new IndexOutOfBoundsException("Index: " + index + " size: " + size);
         }
-        if (i >= focusStartIndex) {
-            int focusOffset = i - focusStartIndex;
+        if (index >= focusStartIndex) {
+            int focusOffset = index - focusStartIndex;
             if (focusOffset < focus.length) {
-                return new RrbTree1<>(replaceInArrayAt(t, focus, focusOffset),
+                return new RrbTree1<>(replaceInArrayAt(item, focus, focusOffset),
                                       focusStartIndex, root, size);
             }
-            i -= focus.length;
+//            System.out.println("    Subtracting focus.length");
+            index -= focus.length;
         }
-        return new RrbTree1<>(focus, focusStartIndex, root.replace(i, t), size);
+//        System.out.println("    About to do replace with maybe-adjusted index=" + index);
+//        System.out.println("    this=" + this);
+        return new RrbTree1<>(focus, focusStartIndex, root.replace(index, item), size);
     }
 
     @Override public String toString() {
@@ -477,6 +481,9 @@ public class RrbTree1<E> implements ImList<E> {
 
         @Override
         public Node<T> replace(int idx, T t) {
+            if (idx >= maxIndex()) {
+                throw new IllegalArgumentException("Invalid index " + idx + " >= " + maxIndex());
+            }
             return new Leaf<>(replaceInArrayAt(t, items, idx));
         }
 
@@ -1119,10 +1126,12 @@ public class RrbTree1<E> implements ImList<E> {
 
         }
 
-        @Override
-        public Node<T> replace(int idx, T t) {
-            // TODO: Implement
-            throw new UnsupportedOperationException("Not Implemented Yet");
+        @Override public Node<T> replace(int index, T t) {
+            int subNodeIndex = subNodeIndex(index);
+            Node<T> alteredNode =
+                    nodes[subNodeIndex].replace(subNodeAdjustedIndex(index, subNodeIndex), t);
+            Node[] newNodes = replaceInArrayAt(alteredNode, nodes, subNodeIndex, Node.class);
+            return new Relaxed<>(endIndices, newNodes);
         }
 
         @Override public String toString() {
