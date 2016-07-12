@@ -14,6 +14,7 @@
 package org.organicdesign.fp.experimental;
 
 import org.organicdesign.fp.collections.ImList;
+import org.organicdesign.fp.collections.UnmodIterable;
 import org.organicdesign.fp.collections.UnmodSortedIterable;
 
 import java.lang.reflect.Array;
@@ -306,6 +307,10 @@ public class RrbTree1<E> implements ImList<E> {
     }
 
     @Override public String toString() {
+        return UnmodIterable.toString("RrbTree", this);
+    }
+
+    String debugString() {
         return "RrbTree(fsi=" + focusStartIndex + " focus=" + Arrays.toString(focus) + "\n" +
                "        root=" + root + ")";
     }

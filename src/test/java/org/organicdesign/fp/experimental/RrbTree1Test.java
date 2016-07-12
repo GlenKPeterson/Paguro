@@ -331,11 +331,15 @@ public class RrbTree1Test {
 
         RrbTree1<Integer> rrb1 = randomInsertTest(new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 });
         assertEquals("RrbTree(fsi=8 focus=[8]\n" +
-                     "        root=Strict2[[0, 1, 2, 3], [4, 5, 6, 7]])", rrb1.toString());
+                     "        root=Strict2[[0, 1, 2, 3], [4, 5, 6, 7]])", rrb1.debugString());
+
+        assertEquals("RrbTree(0,1,2,3,4,...)", rrb1.toString());
 
         RrbTree1<Integer> rrb2 = randomInsertTest(new int[] { 0, 1, 2, 1, 3, 2, 6, 1, 7});
         assertEquals("RrbTree(fsi=7 focus=[8]\n" +
                      "        root=Relaxed(endIndicies=[4, 8] nodes=[[0, 7, 3, 5], [1, 4, 2, 6]]))",
-                     rrb2.toString());
+                     rrb2.debugString());
+
+        assertEquals("RrbTree(0,7,3,5,1,...)", rrb2.toString());
     }
 }
