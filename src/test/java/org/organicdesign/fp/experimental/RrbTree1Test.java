@@ -58,25 +58,7 @@ public class RrbTree1Test {
     private RrbTree1<Integer> randomInsertTest(int[] indices) {
         RrbTree1<Integer> is = RrbTree1.empty();
         ArrayList<Integer> control = new ArrayList<>();
-        for (int j = 0; j < indices.length; j++){
-            int idx = indices[j];
-            is = is.insert(idx, j);
-            control.add(idx, j);
-            assertEquals("size", j + 1, is.size());
-            assertEquals("item at " + idx, Integer.valueOf(j), is.get(idx));
-//            System.out.println("control:" + control);
-//            System.out.println("===test:" + is);
-            for (int k = 0; k <= j; k++) {
-                assertEquals("item at " + k + " still correct at size " + is.size(),
-                             control.get(k), is.get(k));
-//                System.out.println("control[" + k + "]:" + control.get(k) + " test[" + k + "]:" + is.get(k));
-            }
-        }
-//        assertEquals(indices.length, is.size());
-//        for (int j = 0; j < indices.length; j++){
-//            assertEquals(control.get(j), is.get(j));
-//        }
-        return is;
+        return randomInsertTest2(is, control, indices);
     }
 
     /**
@@ -127,9 +109,44 @@ public class RrbTree1Test {
         }
     }
 
+    private RrbTree1<Integer> randomInsertTest2(RrbTree1<Integer> is, List<Integer> control, int[] indices) {
+        for (int j = 0; j < indices.length; j++){
+            int idx = indices[j];
+            is = is.insert(idx, j);
+            control.add(idx, j);
+            assertEquals("size", control.size(), is.size());
+            assertEquals("item at " + idx, control.get(idx), is.get(idx));
+//            System.out.println("control:" + control);
+//            System.out.println("===test:" + is);
+            for (int k = 0; k <= j; k++) {
+                assertEquals("item at " + k + " still correct at size " + is.size(),
+                             control.get(k), is.get(k));
+//                System.out.println("control[" + k + "]:" + control.get(k) + " test[" + k + "]:" + is.get(k));
+            }
+        }
+//        assertEquals(indices.length, is.size());
+//        for (int j = 0; j < indices.length; j++){
+//            assertEquals(control.get(j), is.get(j));
+//        }
+        return is;
+    }
+
+    final int SEVERAL = 100; //0; //0; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
+    /**
+     Sequences of random inserts which previously failed.  So far, these are
+     */
+    @Test public void randIntoStrictPrevFail() {
+        RrbTree1<Integer> is = RrbTree1.empty();
+        ArrayList<Integer> control = new ArrayList<>();
+        for (int i = 0; i < SEVERAL; i++) {
+            is = is.append(i);
+            control.add(i);
+        }
+        randomInsertTest2(is, control, new int[] {74, 45, 46, 50});
+    }
+
     @Test
     public void insertRandomIntoStrict() {
-        final int SEVERAL = 100; //0; //0; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
         RrbTree1<Integer> is = RrbTree1.empty();
         ArrayList<Integer> control = new ArrayList<>();
         ArrayList<Integer> rands = new ArrayList<>();
@@ -306,7 +323,15 @@ public class RrbTree1Test {
         equalsDistinctHashCode(control, rrb1, rrb2, shorter);
 
         List<Integer> hasNull = Arrays.asList(1,2,3,4,5,6,null,8,9,10,11,12,13,14,15,16,17,18,19,20);
-        equalsDistinctHashCode(control, rrb1, rrb2, hasNull);
+
+        RrbTree1<Integer> rrb3 =
+                xform(hasNull).foldLeft(RrbTree1.<Integer>empty(),
+                                        (accum, item) -> accum.append(item));
+        RrbTree1<Integer> rrb4 =
+                xform(hasNull).foldLeft(RrbTree1.<Integer>empty(),
+                                        (accum, item) -> accum.append(item));
+
+        equalsDistinctHashCode(rrb3, rrb4, hasNull, other);
     }
 
     @Test public void coverageJunky() {
