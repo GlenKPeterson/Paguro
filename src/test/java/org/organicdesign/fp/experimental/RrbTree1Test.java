@@ -13,16 +13,16 @@
 // limitations under the License.
 package org.organicdesign.fp.experimental;
 
-import org.junit.Test;
-import org.organicdesign.fp.collections.ImList;
-import org.organicdesign.fp.collections.UnmodListTest;
-
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+
+import org.junit.Test;
+import org.organicdesign.fp.collections.ImList;
+import org.organicdesign.fp.collections.UnmodListTest;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -301,6 +301,12 @@ public class RrbTree1Test {
         List<Integer> other = Arrays.asList(1,3,2,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
 
         equalsDistinctHashCode(control, rrb1, rrb2, other);
+
+        List<Integer> shorter = Arrays.asList(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19);
+        equalsDistinctHashCode(control, rrb1, rrb2, shorter);
+
+        List<Integer> hasNull = Arrays.asList(1,2,3,4,5,6,null,8,9,10,11,12,13,14,15,16,17,18,19,20);
+        equalsDistinctHashCode(control, rrb1, rrb2, hasNull);
     }
 
     @Test public void coverageJunky() {

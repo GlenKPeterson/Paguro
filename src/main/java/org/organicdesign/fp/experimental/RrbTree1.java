@@ -13,13 +13,13 @@
 // limitations under the License.
 package org.organicdesign.fp.experimental;
 
-import org.organicdesign.fp.collections.ImList;
-import org.organicdesign.fp.collections.UnmodIterable;
-import org.organicdesign.fp.collections.UnmodSortedIterable;
-
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
+
+import org.organicdesign.fp.collections.ImList;
+import org.organicdesign.fp.collections.UnmodIterable;
+import org.organicdesign.fp.collections.UnmodSortedIterable;
 
 /**
  This is based on the paper, "RRB-Trees: Efficient Immutable Vectors" by Phil Bagwell and
@@ -202,6 +202,7 @@ public class RrbTree1<E> implements ImList<E> {
             throw new IndexOutOfBoundsException("Index: " + i + " size: " + size);
         }
 
+        // This is a debugging assertion - can't be covered by a test.
         if ( (focusStartIndex < 0) || (focusStartIndex > size) ) {
             throw new IllegalStateException("focusStartIndex: " + focusStartIndex +
                                             " size: " + size);
