@@ -170,6 +170,9 @@
         <JavaCodeStyleSettings>
           <option name="DO_NOT_WRAP_AFTER_SINGLE_ANNOTATION" value="true" />
         </JavaCodeStyleSettings>
+        <MarkdownNavigatorCodeStyleSettings>
+          <option name="RIGHT_MARGIN" value="72" />
+        </MarkdownNavigatorCodeStyleSettings>
         <XML>
           <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
         </XML>

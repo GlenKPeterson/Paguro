@@ -110,10 +110,14 @@ public class RrbTree1Test {
     }
 
     private RrbTree1<Integer> randomInsertTest2(RrbTree1<Integer> is, List<Integer> control, int[] indices) {
+        assertEquals("inputSize (if this blows up, this test is being used incorrectly)", control.size(), is.size());
         for (int j = 0; j < indices.length; j++){
             int idx = indices[j];
+//            System.out.println("About to insert at=" + idx + " elem=" + j + " into=" + is.debugString());
             is = is.insert(idx, j);
             control.add(idx, j);
+//            System.out.println("control:" + control);
+//            System.out.println("===test:" + is.debugString());
             assertEquals("size", control.size(), is.size());
             assertEquals("item at " + idx, control.get(idx), is.get(idx));
 //            System.out.println("control:" + control);
@@ -132,6 +136,13 @@ public class RrbTree1Test {
     }
 
     final int SEVERAL = 100; //0; //0; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
+
+    private static <E> ArrayList<E> deepCopy(ArrayList<E> in) {
+        ArrayList<E> out = new ArrayList<E>();
+        out.addAll(in);
+        return out;
+    }
+
     /**
      Sequences of random inserts which previously failed.  So far, these are
      */
@@ -142,7 +153,10 @@ public class RrbTree1Test {
             is = is.append(i);
             control.add(i);
         }
-        randomInsertTest2(is, control, new int[] {74, 45, 46, 50});
+        randomInsertTest2(is, deepCopy(control), new int[] {74, 45, 46, 50});
+//        System.out.println("================= HERE ================");
+        randomInsertTest2(is, deepCopy(control), new int[] {25, 47, 19, 101, 21, 37, 7, 25, 23, 79, 21, 103, 44, 31, 32, 110,
+                                                            58, 55, 7, 72, 73, 115});
     }
 
     @Test

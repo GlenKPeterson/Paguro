@@ -334,7 +334,9 @@ public class RrbTree1<E> implements ImList<E> {
          */
         boolean hasRelaxedCapacity(int index, int size);
 
-        Node<T>[] split();
+        // I still wonder if this could be a leaf node, but all the cases I've worked on so far,
+        // it has to yield a Relaxed, so I'm using that as the return type for now.
+        Relaxed<T>[] split();
 
         // Because we want to append/insert into the focus as much as possible, we will treat
         // the insert or append of a single item as a degenerate case.  Instead, the primary way
@@ -405,7 +407,7 @@ public class RrbTree1<E> implements ImList<E> {
 
          @return Two new nodes.
          */
-        @Override  public Node<T>[] split() {
+        @Override  public Relaxed<T>[] split() {
             throw new UnsupportedOperationException("Not Implemented Yet");
 //            System.out.println("Leaf.splitAt(" + i + ")");
 //            // if we split for an insert-when-full, one side of the split should be bigger
@@ -557,9 +559,38 @@ public class RrbTree1<E> implements ImList<E> {
             return size < MAX_NODE_LENGTH - STRICT_NODE_LENGTH;
         }
 
-        @Override public Node<T>[] split() {
+        @SuppressWarnings("unchecked")
+        @Override public Relaxed<T>[] split() {
 //            System.out.println("Strict.splitAt(" + i + ")");
-            throw new UnsupportedOperationException("Not implemented yet");
+            int midpoint = nodes.length >> 1; // Shift-right one is the same as dividing by 2.
+            int[] leftEndIndices = new int[midpoint];
+            int prevMaxIdx = 0;
+            // We know all sub-nodes (except the last) have the same size because they are packed-left.
+            int subNodeSize = nodes[0].maxIndex();
+            for (int i = 0; i < midpoint; i++) {
+                prevMaxIdx += subNodeSize;
+                leftEndIndices[i] = prevMaxIdx;
+            }
+
+            Relaxed<T> left = new Relaxed<>(Arrays.copyOf(leftEndIndices, midpoint),
+                                            Arrays.copyOf(nodes, midpoint));
+            int[] rightEndIndices = new int[nodes.length - midpoint];
+            prevMaxIdx = 0;
+            for (int i = 0; i < rightEndIndices.length - 1; i++) {
+                // I don't see any way around asking each node it's length here.
+                // The last one may not be full.
+                prevMaxIdx += subNodeSize;
+                rightEndIndices[i] = prevMaxIdx;
+            }
+
+            // Fix final size (may not be packed)
+            prevMaxIdx += nodes[nodes.length - 1].maxIndex();
+            rightEndIndices[rightEndIndices.length - 1] = prevMaxIdx;
+
+            // I checked this at javaRepl and indeed this starts from the correct item.
+            Relaxed<T> right = new Relaxed<>(rightEndIndices,
+                                             Arrays.copyOfRange(nodes, midpoint, nodes.length));
+            return new Relaxed[] {left, right};
         }
 
         @SuppressWarnings("unchecked")
@@ -846,7 +877,7 @@ public class RrbTree1<E> implements ImList<E> {
         }
 
         @SuppressWarnings("unchecked")
-        @Override public Node<T>[] split() {
+        @Override public Relaxed<T>[] split() {
 //            System.out.println("Relaxed.splitAt(" + i + ")");
             int midpoint = nodes.length >> 1; // Shift-right one is the same as dividing by 2.
             Relaxed<T> left = new Relaxed<>(Arrays.copyOf(endIndices, midpoint),
@@ -859,7 +890,7 @@ public class RrbTree1<E> implements ImList<E> {
             // I checked this at javaRepl and indeed this starts from the correct item.
             Relaxed<T> right = new Relaxed<>(rightEndIndices,
                                              Arrays.copyOfRange(nodes, midpoint, nodes.length));
-            return new Node[] {left, right};
+            return new Relaxed[] {left, right};
         }
 
         private boolean thisNodeHasCapacity() {
@@ -923,18 +954,18 @@ public class RrbTree1<E> implements ImList<E> {
             // I think this is a root node thing.
             if (!thisNodeHasCapacity()) {
                 // For now, split at half of maxIndex.
-                Node<T>[] split = split();
+                Relaxed<T>[] split = split();
 
-                Node<T> node1 = split[0];
-                Node<T> node2 = split[1];
+//                Relaxed<T> node1 = split[0];
+//                Relaxed<T> node2 = split[1];
 
 //                System.out.println("Split node1: " + node1);
 //                System.out.println("Split node2: " + node2);
-                int max1 = node1.maxIndex();
+                int max1 = split[0].maxIndex();
                 Relaxed<T> newRelaxed =
                         new Relaxed<>(new int[] {max1,
-                                                 max1 + node2.maxIndex()},
-                                      (Node<T>[]) new Node[] {node1, node2});
+                                                 max1 + split[1].maxIndex()},
+                                      split);
 //                System.out.println("newRelaxed3: " + newRelaxed);
                 return newRelaxed.pushFocus(index, oldFocus);
             }
