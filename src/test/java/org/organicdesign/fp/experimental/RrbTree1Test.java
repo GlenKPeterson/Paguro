@@ -111,6 +111,7 @@ public class RrbTree1Test {
 
     private RrbTree1<Integer> randomInsertTest2(RrbTree1<Integer> is, List<Integer> control, int[] indices) {
         assertEquals("inputSize (if this blows up, this test is being used incorrectly)", control.size(), is.size());
+//        System.out.println("Before:" + is.debugString());
         for (int j = 0; j < indices.length; j++){
             int idx = indices[j];
 //            System.out.println("About to insert at=" + idx + " elem=" + j + " into=" + is.debugString());
@@ -123,7 +124,9 @@ public class RrbTree1Test {
 //            System.out.println("control:" + control);
 //            System.out.println("===test:" + is);
             for (int k = 0; k <= j; k++) {
-                assertEquals("item at " + k + " still correct at size " + is.size(),
+                assertEquals("Wrong item at " + k + ", but still correct size (" + is.size() + ")\n" +
+                        "control:\n" + control.toString() + "\n" +
+                        "test:\n" + is.debugString(0),
                              control.get(k), is.get(k));
 //                System.out.println("control[" + k + "]:" + control.get(k) + " test[" + k + "]:" + is.get(k));
             }
@@ -132,6 +135,7 @@ public class RrbTree1Test {
 //        for (int j = 0; j < indices.length; j++){
 //            assertEquals(control.get(j), is.get(j));
 //        }
+//        System.out.println("After:" + is.debugString());
         return is;
     }
 
@@ -375,15 +379,16 @@ public class RrbTree1Test {
 //                  345, 41, 268, 33, 305, 270, 327, 191, 69, 289, 45, 284, 240, 317, 123, 171};
 
         RrbTree1<Integer> rrb1 = randomInsertTest(new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 });
-        assertEquals("RrbTree(fsi=8 focus=[8]\n" +
-                     "        root=Strict2[[0, 1, 2, 3], [4, 5, 6, 7]])", rrb1.debugString());
+        assertEquals("RrbTree(size=9 fsi=8 focus=[8]\n" +
+                     "        root=Strict2([0, 1, 2, 3], [4, 5, 6, 7]))", rrb1.debugString(0));
 
         assertEquals("RrbTree(0,1,2,3,4,...)", rrb1.toString());
 
         RrbTree1<Integer> rrb2 = randomInsertTest(new int[] { 0, 1, 2, 1, 3, 2, 6, 1, 7});
-        assertEquals("RrbTree(fsi=7 focus=[8]\n" +
-                     "        root=Relaxed(endIndicies=[4, 8] nodes=[[0, 7, 3, 5], [1, 4, 2, 6]]))",
-                     rrb2.debugString());
+        assertEquals("RrbTree(size=9 fsi=7 focus=[8]\n" +
+                     "        root=Relaxed(endIndicies=[4, 8]\n" +
+                     "                     nodes=[[0, 7, 3, 5], [1, 4, 2, 6]]))",
+                     rrb2.debugString(0));
 
         assertEquals("RrbTree(0,7,3,5,1,...)", rrb2.toString());
     }

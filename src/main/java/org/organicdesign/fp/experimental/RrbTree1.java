@@ -34,6 +34,7 @@ import org.organicdesign.fp.collections.UnmodSortedIterable;
   - Change radix from 4 to 32.
   - Speed testing and optimization.
  */
+@SuppressWarnings("WeakerAccess")
 public class RrbTree1<E> implements ImList<E> {
 
     // Definitions:
@@ -150,6 +151,53 @@ public class RrbTree1<E> implements ImList<E> {
         return replaceInArrayAt(replacedItem, origItems, idx, null);
     }
 
+    private static StringBuilder indentSpace(int len) {
+        StringBuilder sB = new StringBuilder();
+        while (len >= 32) {
+            sB.append("                                ");
+            len -= 32;
+        }
+        while (len >= 16) {
+            sB.append("                ");
+            len -= 16;
+        }
+        while (len >= 8) {
+            sB.append("        ");
+            len -= 8;
+        }
+        while (len >= 4) {
+            sB.append("    ");
+            len -= 4;
+        }
+        while (len >= 2) {
+            sB.append("  ");
+            len -= 2;
+        }
+        while (len >= 1) {
+            sB.append(" ");
+            len -= 1;
+        }
+        return sB;
+    }
+
+    private static StringBuilder showSubNodes(StringBuilder sB, Node[] nodes, int nextIndent) {
+        boolean isFirst = true;
+        for (Node n : nodes) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                sB.append(",");
+                if (nodes[0] instanceof Leaf) {
+                    sB.append(" ");
+                } else {
+                    sB.append("\n").append(indentSpace(nextIndent));
+                }
+            }
+            sB.append(n.debugString(nextIndent));
+        }
+        return sB;
+    }
+
     private static final RrbTree1 EMPTY_RRB_TREE =
             new RrbTree1<>(emptyArray(), 0, Leaf.emptyLeaf(), 0);
 
@@ -249,6 +297,7 @@ public class RrbTree1<E> implements ImList<E> {
      @param element the item to insert
      @return a new RRB-Tree with the item inserted.
      */
+    @SuppressWarnings("WeakerAccess")
     public RrbTree1<E> insert(int idx, E element) {
 //        System.out.println("insert(int " + idx + ", E " + element + ")");
 
@@ -311,9 +360,11 @@ public class RrbTree1<E> implements ImList<E> {
         return UnmodIterable.toString("RrbTree", this);
     }
 
-    String debugString() {
-        return "RrbTree(fsi=" + focusStartIndex + " focus=" + Arrays.toString(focus) + "\n" +
-               "        root=" + root + ")";
+    String debugString(int indent) {
+        return "RrbTree(size=" + size +
+               " fsi=" + focusStartIndex +
+               " focus=" + Arrays.toString(focus) + "\n" +
+               indentSpace(indent + 8) + "root=" + root.debugString(indent + 13) + ")";
     }
 
     private interface Node<T> {
@@ -334,9 +385,10 @@ public class RrbTree1<E> implements ImList<E> {
          */
         boolean hasRelaxedCapacity(int index, int size);
 
-        // I still wonder if this could be a leaf node, but all the cases I've worked on so far,
-        // it has to yield a Relaxed, so I'm using that as the return type for now.
-        Relaxed<T>[] split();
+        // Splitting a strict node yields an invalid Relaxed node (too short).
+        // We don't yet split Leaf nodes.
+        // So this needs to only be implemented on Relaxed for now.
+//        Relaxed<T>[] split();
 
         // Because we want to append/insert into the focus as much as possible, we will treat
         // the insert or append of a single item as a degenerate case.  Instead, the primary way
@@ -344,6 +396,8 @@ public class RrbTree1<E> implements ImList<E> {
         Node<T> pushFocus(int index, T[] oldFocus);
 
         Node<T> replace(int idx, T t);
+
+        String debugString(int indent);
     }
 
     private static class Leaf<T> implements Node<T> {
@@ -400,29 +454,29 @@ public class RrbTree1<E> implements ImList<E> {
             return new Leaf[] {new Leaf<>(left), new Leaf<>(right)};
         }
 
-        /**
-         This is a Relaxed operation.  Performing it on a Strict node causes it and all
-         ancestors to become Relaxed Radix.  The parent should only split when
-         size < MIN_NODE_LENGTH during a slice operation.
-
-         @return Two new nodes.
-         */
-        @Override  public Relaxed<T>[] split() {
-            throw new UnsupportedOperationException("Not Implemented Yet");
-//            System.out.println("Leaf.splitAt(" + i + ")");
-//            // if we split for an insert-when-full, one side of the split should be bigger
-//                     in preparation for the insert.
-//            if (i == 0) {
-//                return tup(emptyLeaf(), this);
-//            }
-//            if (i == items.length) {
-//                // Not sure this can possibly be called, but just in case...
-//                return tup(this, emptyLeaf());
-//            }
+//        /**
+//         This is a Relaxed operation.  Performing it on a Strict node causes it and all
+//         ancestors to become Relaxed Radix.  The parent should only split when
+//         size < MIN_NODE_LENGTH during a slice operation.
 //
-//            return tup(new Leaf<>(Arrays.copyOf(items, i)),
-//                       new Leaf<>(Arrays.copyOfRange(items, i, items.length - i)));
-        }
+//         @return Two new nodes.
+//         */
+//        @Override  public Relaxed<T>[] split() {
+//            throw new UnsupportedOperationException("Not Implemented Yet");
+////            System.out.println("Leaf.splitAt(" + i + ")");
+////            // if we split for an insert-when-full, one side of the split should be bigger
+////                     in preparation for the insert.
+////            if (i == 0) {
+////                return tup(emptyLeaf(), this);
+////            }
+////            if (i == items.length) {
+////                // Not sure this can possibly be called, but just in case...
+////                return tup(this, emptyLeaf());
+////            }
+////
+////            return tup(new Leaf<>(Arrays.copyOf(items, i)),
+////                       new Leaf<>(Arrays.copyOfRange(items, i, items.length - i)));
+//        }
 
         // I think this can only be called when the root node is a leaf.
         @SuppressWarnings("unchecked")
@@ -479,6 +533,10 @@ public class RrbTree1<E> implements ImList<E> {
 
         @Override public String toString() {
 //            return "Leaf("+ Arrays.toString(items) + ")";
+            return Arrays.toString(items);
+        }
+
+        @Override public String debugString(int indent) {
             return Arrays.toString(items);
         }
     } // end class Leaf
@@ -559,38 +617,54 @@ public class RrbTree1<E> implements ImList<E> {
             return size < MAX_NODE_LENGTH - STRICT_NODE_LENGTH;
         }
 
-        @SuppressWarnings("unchecked")
-        @Override public Relaxed<T>[] split() {
-//            System.out.println("Strict.splitAt(" + i + ")");
-            int midpoint = nodes.length >> 1; // Shift-right one is the same as dividing by 2.
-            int[] leftEndIndices = new int[midpoint];
+//        @SuppressWarnings("unchecked")
+//        @Override public Relaxed<T>[] split() {
+////            System.out.println("Strict.splitAt(" + i + ")");
+//            int midpoint = nodes.length >> 1; // Shift-right one is the same as dividing by 2.
+//            int[] leftEndIndices = new int[midpoint];
+//            int prevMaxIdx = 0;
+//            // We know all sub-nodes (except the last) have the same size because they are packed-left.
+//            int subNodeSize = nodes[0].maxIndex();
+//            for (int i = 0; i < midpoint; i++) {
+//                prevMaxIdx += subNodeSize;
+//                leftEndIndices[i] = prevMaxIdx;
+//            }
+//
+//            Relaxed<T> left = new Relaxed<>(Arrays.copyOf(leftEndIndices, midpoint),
+//                                            Arrays.copyOf(nodes, midpoint));
+//            int[] rightEndIndices = new int[nodes.length - midpoint];
+//            prevMaxIdx = 0;
+//            for (int i = 0; i < rightEndIndices.length - 1; i++) {
+//                // I don't see any way around asking each node it's length here.
+//                // The last one may not be full.
+//                prevMaxIdx += subNodeSize;
+//                rightEndIndices[i] = prevMaxIdx;
+//            }
+//
+//            // Fix final size (may not be packed)
+//            prevMaxIdx += nodes[nodes.length - 1].maxIndex();
+//            rightEndIndices[rightEndIndices.length - 1] = prevMaxIdx;
+//
+//            // I checked this at javaRepl and indeed this starts from the correct item.
+//            Relaxed<T> right = new Relaxed<>(rightEndIndices,
+//                                             Arrays.copyOfRange(nodes, midpoint, nodes.length));
+//            return new Relaxed[] {left, right};
+//        }
+        Relaxed<T> relax() {
+            int[] newEndIndices = new int[nodes.length];
             int prevMaxIdx = 0;
             // We know all sub-nodes (except the last) have the same size because they are packed-left.
             int subNodeSize = nodes[0].maxIndex();
-            for (int i = 0; i < midpoint; i++) {
+            for (int i = 0; i < nodes.length - 1; i++) {
                 prevMaxIdx += subNodeSize;
-                leftEndIndices[i] = prevMaxIdx;
+                newEndIndices[i] = prevMaxIdx;
             }
 
-            Relaxed<T> left = new Relaxed<>(Arrays.copyOf(leftEndIndices, midpoint),
-                                            Arrays.copyOf(nodes, midpoint));
-            int[] rightEndIndices = new int[nodes.length - midpoint];
-            prevMaxIdx = 0;
-            for (int i = 0; i < rightEndIndices.length - 1; i++) {
-                // I don't see any way around asking each node it's length here.
-                // The last one may not be full.
-                prevMaxIdx += subNodeSize;
-                rightEndIndices[i] = prevMaxIdx;
-            }
-
-            // Fix final size (may not be packed)
+            // Final node may not be packed, so it could have a different size
             prevMaxIdx += nodes[nodes.length - 1].maxIndex();
-            rightEndIndices[rightEndIndices.length - 1] = prevMaxIdx;
+            newEndIndices[newEndIndices.length - 1] = prevMaxIdx;
 
-            // I checked this at javaRepl and indeed this starts from the correct item.
-            Relaxed<T> right = new Relaxed<>(rightEndIndices,
-                                             Arrays.copyOfRange(nodes, midpoint, nodes.length));
-            return new Relaxed[] {left, right};
+            return new Relaxed<>(newEndIndices, nodes);
         }
 
         @SuppressWarnings("unchecked")
@@ -707,13 +781,37 @@ public class RrbTree1<E> implements ImList<E> {
 //            return "Strict(nodes.length="+ nodes.length + ", shift=" + shift + ")";
             return "Strict" + shift + Arrays.toString(nodes);
         }
+
+        @Override public String debugString(int indent) {
+            StringBuilder sB = new StringBuilder() // indentSpace(indent)
+                    .append("Strict").append(shift).append("(");
+            return showSubNodes(sB, nodes, indent + sB.length())
+                    .append(")")
+                    .toString();
+        }
     }
 
     // Contains a relaxed tree of nodes that average around 32 items each.
     private static class Relaxed<T> implements Node<T> {
+        @SuppressWarnings("unchecked")
+        static <T> Relaxed<T> replaceInRelaxedAt(int[] is, Node<T>[] ns, Node<T> newNode, int subNodeIndex,
+                                                 int insertSize) {
+            Node<T>[] newNodes = replaceInArrayAt(newNode, ns, subNodeIndex, Node.class);
+            // Increment endIndicies for the changed item and all items to the right.
+            int[] newEndIndices = new int[is.length];
+            if (subNodeIndex > 0) {
+                System.arraycopy(is, 0, newEndIndices, 0, subNodeIndex);
+            }
+            for (int i = subNodeIndex; i < is.length; i++) {
+                newEndIndices[i] = is[i] + insertSize;
+            }
+            return new Relaxed<>(newEndIndices, newNodes);
+        }
+
         // The max index stored in each sub-node.  This is a separate array so it can be retrieved
         // in a single memory fetch.  Note that this is a 1-based index, or really a count, not a
         // normal zero-based index.
+        // TODO: Rename this to "cumulativeSizes" or "totalSubNodeSizes" because that's what they are!
         final int[] endIndices;
         // The sub nodes
         final Node<T>[] nodes;
@@ -748,7 +846,6 @@ public class RrbTree1<E> implements ImList<E> {
                 }
             }
         }
-
 
         @Override public int maxIndex() {
             return endIndices[endIndices.length - 1];
@@ -877,7 +974,7 @@ public class RrbTree1<E> implements ImList<E> {
         }
 
         @SuppressWarnings("unchecked")
-        @Override public Relaxed<T>[] split() {
+        Relaxed<T>[] split() {
 //            System.out.println("Relaxed.splitAt(" + i + ")");
             int midpoint = nodes.length >> 1; // Shift-right one is the same as dividing by 2.
             Relaxed<T> left = new Relaxed<>(Arrays.copyOf(endIndices, midpoint),
@@ -921,6 +1018,7 @@ public class RrbTree1<E> implements ImList<E> {
 
         @SuppressWarnings("unchecked")
         @Override public Node<T> pushFocus(int index, T[] oldFocus) {
+            // TODO: Review this entire method.
 //            System.out.println("===========\n" +
 //                               "Relaxed pushFocus(index=" + index + ", oldFocus=" +
 //                               Arrays.toString(oldFocus) + ")");
@@ -939,16 +1037,7 @@ public class RrbTree1<E> implements ImList<E> {
                 Node<T> newNode = subNode.pushFocus(subNodeAdjustedIndex, oldFocus);
                 // Make a copy of our nodesArray, replacing the old node at subNodeIndex with the
                 // new node
-                Node<T>[] newNodes = replaceInArrayAt(newNode, nodes, subNodeIndex, Node.class);
-                // Increment endIndicies for the changed item and all items to the right.
-                int[] newEndIndices = new int[endIndices.length];
-                if (subNodeIndex > 0) {
-                    System.arraycopy(endIndices, 0, newEndIndices, 0, subNodeIndex);
-                }
-                for (int i = subNodeIndex; i < endIndices.length; i++) {
-                    newEndIndices[i] = endIndices[i] + oldFocus.length;
-                }
-                return new Relaxed<>(newEndIndices, newNodes);
+                return replaceInRelaxedAt(endIndices, nodes, newNode, subNodeIndex, oldFocus.length);
             }
 
             // I think this is a root node thing.
@@ -1073,19 +1162,30 @@ public class RrbTree1<E> implements ImList<E> {
 //                System.out.println("newNodes=" + Arrays.toString(newNodes));
 //                System.out.println("newEndIndices=" + Arrays.toString(newEndIndices));
                 return new Relaxed<>(newEndIndices, newNodes);
-            } // end if subNode instanceof Leaf
+                // end if subNode instanceof Leaf
+            } else if (subNode instanceof Strict) {
+//                System.out.println("Converting Strict to Relaxed...");
+//                System.out.println("Before: " + subNode.debugString(8));
+                Relaxed<T> relaxed = ((Strict) subNode).relax();
+//                System.out.println("After: " + relaxed.debugString(7));
+//                System.out.println();
+                Node<T> newNode = relaxed.pushFocus(subNodeAdjustedIndex, oldFocus);
+                return replaceInRelaxedAt(endIndices, nodes, newNode, subNodeIndex, oldFocus.length);
+            }
 
-            // Here we have capacity and it's not a leaf, so we have to split the appropriate
+            // Here we have capacity and the full sub-node is not a leaf or strict, so we have to split the appropriate
             // sub-node.
 
             // For now, split at half of maxIndex.
-//            System.out.println("About to split: " + subNode);
+//            System.out.println("Splitting from:\n" + this.debugString(0));
+//            System.out.println("About to split:\n" + subNode.debugString(0));
 //            System.out.println("Split at: " + (subNode.maxIndex() >> 1));
+//            System.out.println("To insert: " + Arrays.toString(oldFocus));
 
-            Node<T>[] newSubNode = subNode.split();
+            Relaxed<T>[] newSubNode = ((Relaxed<T>) subNode).split();
 
-            Node<T> node1 = newSubNode[0];
-            Node<T> node2 = newSubNode[1];
+            Relaxed<T> node1 = newSubNode[0];
+            Relaxed<T> node2 = newSubNode[1];
 
 //            System.out.println("Split node1: " + node1);
 //            System.out.println("Split node2: " + node2);
@@ -1123,9 +1223,10 @@ public class RrbTree1<E> implements ImList<E> {
             }
 
             Relaxed<T> newRelaxed = new Relaxed<>(newEndIndices, newNodes);
-//            System.out.println("newRelaxed2: " + newRelaxed);
-            return newRelaxed.pushFocus(index, oldFocus);
+//            System.out.println("newRelaxed2:\n" + newRelaxed.debugString(0));
 
+            return newRelaxed.pushFocus(index, oldFocus);
+//            System.out.println("Parent after:" + after.debugString(0));
         }
 
         @SuppressWarnings("unchecked")
@@ -1141,6 +1242,18 @@ public class RrbTree1<E> implements ImList<E> {
             return "Relaxed(endIndicies=" + Arrays.toString(endIndices) +
                    " nodes=" + Arrays.toString(nodes)
                                      .replaceAll(", Relaxed\\(", ",\n           Relaxed(") + ")";
+        }
+
+        @Override public String debugString(int indent) {
+            StringBuilder sB = new StringBuilder() // indentSpace(indent)
+                    .append("Relaxed(");
+            int nextIndent = indent + sB.length();
+            sB.append("endIndicies=").append(Arrays.toString(endIndices)).append("\n")
+              .append(indentSpace(nextIndent)).append("nodes=[");
+            // + 6 for "nodes="
+            return showSubNodes(sB, nodes, nextIndent + 6)
+                    .append("])")
+                    .toString();
         }
     } // end class Relaxed
 } // end class RrbTree
