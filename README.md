@@ -65,11 +65,13 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
 
 * [Class/Interface Hierarchy](inheritanceHierarchy.pdf) (PDF)
 
-* [Comparison with Traditional Java and Java 8 Streams](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java#L22)
+* Get started now by following the [Usage Tips](https://github.com/GlenKPeterson/UncleJim/wiki/Usage-Tips)
 
 * For complete API documentation, please build the javadoc: `mvn javadoc:javadoc`
 
 * [JimTrainer self-guided training](https://github.com/GlenKPeterson/JimTrainer) consists of a few short problem-sets for learning UncleJim
+
+* [Comparison with Traditional Java and Java 8 Streams](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java#L22)
 
 * A summary of recent updates is in the [Change Log](changeLog.md)
 
