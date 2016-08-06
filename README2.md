@@ -119,6 +119,27 @@ a,b,c...
 
 None of those are simple uses of interpose.
 
+###Mirroring Clojure's seq (sequence abstraction)
+
+UncleJim tried two alternatives.  One was based on the Clojure idea of a sequence: immutable, lazy, and cached.  The signature looked something like this:
+
+```java
+interface Sequence1<T> {
+    Option<T> first();
+    Sequence1<T> rest();
+}
+```
+
+Unfortunately, at 30 Million items it was at least 30x slower than using Iterators.  Another attempt was a single-shot, but still thread-safe, sequence that wraps each item in an Option.  You would check whether that Option is None to see if you've passed the last element or not.  This attempt was only about 3x slower than native iterators.
+
+```java
+interface Sequence2<T> {
+    Option<T> next();
+}
+```
+
+Ultimately, Transformable took the place of a sequence abstraction in UncleJim.  It's safe, easy to use, and about 98% as fast as native Java iteration.  If you really need to pretend you have a Sequence1, Transformable has `take(1)` and `drop(1)` that you can use like `first()` and `rest()` in a pinch.  That said, everything you could do with Sequence1 you can do faster and just as clearly with Transformable.  Presumably, this is why Clojure now has Transducers.
+
 #Motivation
 
 ##Executive summary
