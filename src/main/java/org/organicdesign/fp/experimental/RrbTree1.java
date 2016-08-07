@@ -31,6 +31,7 @@ import org.organicdesign.fp.collections.UnmodSortedIterable;
   - More Testing
   - Tuple2&lt;RrbTree1,RrbTree1&gt; split(int index)
   - insert(int index, RrbTree1 other)
+  - remove(int index)
   - Change radix from 4 to 32.
   - Speed testing and optimization.
  */
@@ -356,6 +357,24 @@ public class RrbTree1<E> implements ImList<E> {
         return new RrbTree1<>(focus, focusStartIndex, root.replace(index, item), size);
     }
 
+//    /**
+//     Divides this RRB-Tree such that every index less-than the given index ends up in the left-hand tree
+//     and the indexed item and all subsequent ones end up in the right-hand tree.
+//
+//     @param index the split point (excluded from the left-tree, included in the right one)
+//     @return two new sub-trees as determined by the split point
+//     */
+//    public Tuple2<RrbTree1<E>,RrbTree1<E>> split(int index) {
+//        // Push the focus before splitting.
+//        Node<E> newRoot = (focus.length > 0) ? root.pushFocus(focusStartIndex, focus)
+//                                             : root;
+//
+//
+//
+//        // If a leaf-node is split, the fragments become the new focus for each side of the split.
+//        // Otherwise, the focus can be left empty, or the last node of each side can be made into the focus.
+//    }
+
     @Override public String toString() {
         return UnmodIterable.toString("RrbTree", this);
     }
@@ -384,6 +403,8 @@ public class RrbTree1<E> implements ImList<E> {
          @return true if we can do so without otherwise adjusting the tree.
          */
         boolean hasRelaxedCapacity(int index, int size);
+
+//        Tuple4<Node<T>,T[],Node<T>,T[]> splitAt(int index);
 
         // Splitting a strict node yields an invalid Relaxed node (too short).
         // We don't yet split Leaf nodes.
@@ -429,6 +450,10 @@ public class RrbTree1<E> implements ImList<E> {
 //            System.out.println("   MAX_NODE_LENGTH=" + MAX_NODE_LENGTH);
             return (items.length + size) < MAX_NODE_LENGTH;
         }
+
+//        @Override public Tuple4<Node<T>,T[],Node<T>,T[]> splitAt(int index) {
+//
+//        }
 
         @SuppressWarnings("unchecked")
         private Leaf<T>[] spliceAndSplit(T[] oldFocus, int index) {
@@ -650,6 +675,16 @@ public class RrbTree1<E> implements ImList<E> {
 //                                             Arrays.copyOfRange(nodes, midpoint, nodes.length));
 //            return new Relaxed[] {left, right};
 //        }
+
+        //        @Override public Tuple2<Strict<T>,Strict<T>> split() {
+        //            Strict<T> right = new Strict<T>(shift, new Strict[0]);
+        //            return tup(this, right);
+        //        }
+
+//        @Override public Tuple4<Node<T>,T[],Node<T>,T[]> splitAt(int index) {
+//
+//        }
+
         Relaxed<T> relax() {
             int[] newEndIndices = new int[nodes.length];
             int prevMaxIdx = 0;
@@ -771,11 +806,6 @@ public class RrbTree1<E> implements ImList<E> {
             Node<T> newNode = nodes[thisNodeIdx].replace(lowBits(idx), t);
             return new Strict<>(shift, replaceInArrayAt(newNode, nodes, thisNodeIdx, Node.class));
         }
-
-//        @Override public Tuple2<Strict<T>,Strict<T>> split() {
-//            Strict<T> right = new Strict<T>(shift, new Strict[0]);
-//            return tup(this, right);
-//        }
 
         @Override public String toString() {
 //            return "Strict(nodes.length="+ nodes.length + ", shift=" + shift + ")";
@@ -973,23 +1003,6 @@ public class RrbTree1<E> implements ImList<E> {
             return nodes[subNodeIndex].get(subNodeAdjustedIndex(index, subNodeIndex));
         }
 
-        @SuppressWarnings("unchecked")
-        Relaxed<T>[] split() {
-//            System.out.println("Relaxed.splitAt(" + i + ")");
-            int midpoint = nodes.length >> 1; // Shift-right one is the same as dividing by 2.
-            Relaxed<T> left = new Relaxed<>(Arrays.copyOf(endIndices, midpoint),
-                                                    Arrays.copyOf(nodes, midpoint));
-            int[] rightEndIndices = new int[nodes.length - midpoint];
-            int leftEndIdx = endIndices[midpoint - 1];
-            for (int j = 0; j < rightEndIndices.length; j++) {
-                rightEndIndices[j] = endIndices[midpoint + j] - leftEndIdx;
-            }
-            // I checked this at javaRepl and indeed this starts from the correct item.
-            Relaxed<T> right = new Relaxed<>(rightEndIndices,
-                                             Arrays.copyOfRange(nodes, midpoint, nodes.length));
-            return new Relaxed[] {left, right};
-        }
-
         private boolean thisNodeHasCapacity() {
 //            System.out.println("thisNodeHasCapacity(): nodes.length=" + nodes.length +
 //                               " MAX_NODE_LENGTH=" + MAX_NODE_LENGTH +
@@ -1015,6 +1028,27 @@ public class RrbTree1<E> implements ImList<E> {
             return nodes[subNodeIndex].hasRelaxedCapacity(subNodeAdjustedIndex(index, subNodeIndex),
                                                           size);
         }
+
+        @SuppressWarnings("unchecked")
+        Relaxed<T>[] split() {
+//            System.out.println("Relaxed.splitAt(" + i + ")");
+            int midpoint = nodes.length >> 1; // Shift-right one is the same as dividing by 2.
+            Relaxed<T> left = new Relaxed<>(Arrays.copyOf(endIndices, midpoint),
+                                                    Arrays.copyOf(nodes, midpoint));
+            int[] rightEndIndices = new int[nodes.length - midpoint];
+            int leftEndIdx = endIndices[midpoint - 1];
+            for (int j = 0; j < rightEndIndices.length; j++) {
+                rightEndIndices[j] = endIndices[midpoint + j] - leftEndIdx;
+            }
+            // I checked this at javaRepl and indeed this starts from the correct item.
+            Relaxed<T> right = new Relaxed<>(rightEndIndices,
+                                             Arrays.copyOfRange(nodes, midpoint, nodes.length));
+            return new Relaxed[] {left, right};
+        }
+
+//        @Override public Tuple4<Node<T>,T[],Node<T>,T[]> splitAt(int index) {
+//
+//        }
 
         @SuppressWarnings("unchecked")
         @Override public Node<T> pushFocus(int index, T[] oldFocus) {
