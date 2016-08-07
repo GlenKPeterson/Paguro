@@ -386,7 +386,7 @@ public class RrbTree1Test {
 
         RrbTree1<Integer> rrb2 = randomInsertTest(new int[] { 0, 1, 2, 1, 3, 2, 6, 1, 7});
         assertEquals("RrbTree(size=9 fsi=7 focus=[8]\n" +
-                     "        root=Relaxed(endIndicies=[4, 8]\n" +
+                     "        root=Relaxed(cumulativeSizes=[4, 8]\n" +
                      "                     nodes=[[0, 7, 3, 5], [1, 4, 2, 6]]))",
                      rrb2.debugString(0));
 

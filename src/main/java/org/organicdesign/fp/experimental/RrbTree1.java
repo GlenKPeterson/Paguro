@@ -281,8 +281,8 @@ public class RrbTree1<E> implements ImList<E> {
 //        System.out.println("=== append(" + t + ") ===");
         // If our focus isn't set up for appends or if it's full, insert it into the data structure
         // where it belongs.  Then make a new focus
-        if ( ( (focusStartIndex < root.maxIndex()) && (focus.length > 0) ) ||
-             (focus.length >= STRICT_NODE_LENGTH) ) {
+        if (((focusStartIndex < root.size()) && (focus.length > 0) ) ||
+            (focus.length >= STRICT_NODE_LENGTH) ) {
             Node<E> newRoot = root.pushFocus(focusStartIndex, focus);
             E[] newFocus = singleElementArray(t);
             return new RrbTree1<>(newFocus, size, newRoot, size + 1);
@@ -389,8 +389,8 @@ public class RrbTree1<E> implements ImList<E> {
     private interface Node<T> {
         /** Return the item at the given index */
         T get(int i);
-        /** Highest index returnable by this node */
-        int maxIndex();
+        /** Number of items stored in this node */
+        int size();
 //        /** Returns true if this node's array is not full */
 //        boolean thisNodeHasCapacity();
         /** Returns true if this strict-Radix tree can take another 32 items. */
@@ -432,7 +432,7 @@ public class RrbTree1<E> implements ImList<E> {
 //        boolean isStrict;
         Leaf(T[] ts) { items = ts; }
         @Override public T get(int i) { return items[i]; }
-        @Override public int maxIndex() { return items.length; }
+        @Override public int size() { return items.length; }
         // If we want to add one more to an existing leaf node, it must already be part of a
         // relaxed tree.
 //        public boolean thisNodeHasCapacity() { return items.length < MAX_NODE_LENGTH; }
@@ -451,57 +451,63 @@ public class RrbTree1<E> implements ImList<E> {
             return (items.length + size) < MAX_NODE_LENGTH;
         }
 
-//        @Override public Tuple4<Node<T>,T[],Node<T>,T[]> splitAt(int index) {
-//
+        /**
+         Only call this if the array actually needs to be split (0 &lt; splitPoint &lt; orig.length).
+         @param orig array to split
+         @param splitIndex items less than this index go in the left, equal or greater in the right.
+         @return a 2D array of leftItems then rightItems
+         */
+        @SuppressWarnings("unchecked")
+        private T[][] splitArray(T[] orig, int splitIndex) {
+            if (splitIndex < 1) {
+                throw new IllegalArgumentException("Called split when splitIndex < 1");
+            }
+            if (splitIndex > orig.length - 1) {
+                throw new IllegalArgumentException("Called split when splitIndex > orig.length - 1");
+            }
+            int rightLength = orig.length - splitIndex;
+            T[][] split = (T[][]) new Object[][] {new Object[splitIndex],
+                                                  new Object[rightLength]};
+            // original array, offset, newArray, offset, length
+            System.arraycopy(orig, 0, split[0], 0, splitIndex);
+//            System.out.println("    left: " + Arrays.toString(left));
+
+            System.arraycopy(orig, splitIndex, split[1], 0, rightLength);
+//            System.out.println("    right: " + Arrays.toString(right));
+            return split;
+        }
+
+////        @Override
+//        public Tuple4<Node<T>,T[],Node<T>,T[]> splitAt(int splitIndex) {
+//            if (splitIndex < 1) {
+//                throw new IllegalArgumentException("Called splitAt when splitIndex < 1");
+//            }
+//            if (splitIndex > items.length - 1) {
+//                throw new IllegalArgumentException("Called splitAt when splitIndex > orig.length - 1");
+//            }
+////            // Should we just ensure that the split is between 1 and items.length (exclusive)?
+////            if (splitIndex == 0) {
+////                return Tuple4.of(null, null, null, items);
+////            }
+////            if (splitIndex == items.length) {
+////                return Tuple4.of(null, items, null, null);
+////            }
+//            T[][] split = splitArray(items, splitIndex);
+//            return Tuple4.of(null, split[0], null, split[1]);
 //        }
 
         @SuppressWarnings("unchecked")
-        private Leaf<T>[] spliceAndSplit(T[] oldFocus, int index) {
+        private Leaf<T>[] spliceAndSplit(T[] oldFocus, int splitIndex) {
             // Consider optimizing:
-            T[] newItems = spliceIntoArrayAt(oldFocus, items, index,
+            T[] newItems = spliceIntoArrayAt(oldFocus, items, splitIndex,
                                              (Class<T>) items[0].getClass());
 
 //            System.out.println("    newItems: " + Arrays.toString(newItems));
-
             // Shift right one is divide-by 2.
-            int splitPoint = newItems.length >> 1;
-//            System.out.println("    splitPoint: " + splitPoint);
-            T[] left = (T[]) new Object[splitPoint];
-            T[] right = (T[]) new Object[newItems.length - splitPoint];
-            // original array, offset, newArray, offset, length
-            System.arraycopy(newItems, 0, left, 0, splitPoint);
-//            System.out.println("    left: " + Arrays.toString(left));
+            T[][] split = splitArray(newItems, newItems.length >> 1);
 
-            System.arraycopy(newItems, splitPoint, right, 0, right.length);
-//            System.out.println("    right: " + Arrays.toString(right));
-
-            Arrays.copyOf(newItems, splitPoint);
-            return new Leaf[] {new Leaf<>(left), new Leaf<>(right)};
+            return new Leaf[] {new Leaf<>(split[0]), new Leaf<>(split[1])};
         }
-
-//        /**
-//         This is a Relaxed operation.  Performing it on a Strict node causes it and all
-//         ancestors to become Relaxed Radix.  The parent should only split when
-//         size < MIN_NODE_LENGTH during a slice operation.
-//
-//         @return Two new nodes.
-//         */
-//        @Override  public Relaxed<T>[] split() {
-//            throw new UnsupportedOperationException("Not Implemented Yet");
-////            System.out.println("Leaf.splitAt(" + i + ")");
-////            // if we split for an insert-when-full, one side of the split should be bigger
-////                     in preparation for the insert.
-////            if (i == 0) {
-////                return tup(emptyLeaf(), this);
-////            }
-////            if (i == items.length) {
-////                // Not sure this can possibly be called, but just in case...
-////                return tup(this, emptyLeaf());
-////            }
-////
-////            return tup(new Leaf<>(Arrays.copyOf(items, i)),
-////                       new Leaf<>(Arrays.copyOfRange(items, i, items.length - i)));
-//        }
 
         // I think this can only be called when the root node is a leaf.
         @SuppressWarnings("unchecked")
@@ -542,16 +548,16 @@ public class RrbTree1<E> implements ImList<E> {
             Leaf<T>[] res = spliceAndSplit(oldFocus, index);
             Leaf<T> leftLeaf = res[0];
             Leaf<T> rightLeaf = res[1];
-            int leftMax = leftLeaf.maxIndex();
-            return new Relaxed<>(new int[] { leftMax,
-                                             leftMax + rightLeaf.maxIndex() },
-                                 new Leaf[] { leftLeaf, rightLeaf });
+            int leftSize = leftLeaf.size();
+            return new Relaxed<>(new int[] { leftSize,
+                                             leftSize + rightLeaf.size() },
+                                 res);
         }
 
         @Override
         public Node<T> replace(int idx, T t) {
-            if (idx >= maxIndex()) {
-                throw new IllegalArgumentException("Invalid index " + idx + " >= " + maxIndex());
+            if (idx >= size()) {
+                throw new IllegalArgumentException("Invalid index " + idx + " >= " + size());
             }
             return new Leaf<>(replaceInArrayAt(t, items, idx));
         }
@@ -613,9 +619,9 @@ public class RrbTree1<E> implements ImList<E> {
             // Send the low bits on to our sub-nodes.
             return nodes[highBits(i)].get(lowBits(i));
         }
-        @Override public int maxIndex() {
+        @Override public int size() {
             int lastNodeIdx = nodes.length - 1;
-//            System.out.println("    Strict.maxIndex()");
+//            System.out.println("    Strict.size()");
 //            System.out.println("      nodes.length:" + nodes.length);
 //            System.out.println("      shift:" + shift);
 //            System.out.println("      STRICT_NODE_LENGTH:" + STRICT_NODE_LENGTH);
@@ -623,7 +629,7 @@ public class RrbTree1<E> implements ImList<E> {
             // Add up all the full nodes (only the last can be partial)
             int shiftedLength = lastNodeIdx << shift;
 //            System.out.println("      shifed length:" + shiftedLength);
-            int partialNodeSize = nodes[lastNodeIdx].maxIndex();
+            int partialNodeSize = nodes[lastNodeIdx].size();
 //            System.out.println("      Remainder:" + partialNodeSize);
             return shiftedLength + partialNodeSize;
         }
@@ -646,32 +652,32 @@ public class RrbTree1<E> implements ImList<E> {
 //        @Override public Relaxed<T>[] split() {
 ////            System.out.println("Strict.splitAt(" + i + ")");
 //            int midpoint = nodes.length >> 1; // Shift-right one is the same as dividing by 2.
-//            int[] leftEndIndices = new int[midpoint];
-//            int prevMaxIdx = 0;
+//            int[] leftCumSizes = new int[midpoint];
+//            int cumulativeSize = 0;
 //            // We know all sub-nodes (except the last) have the same size because they are packed-left.
-//            int subNodeSize = nodes[0].maxIndex();
+//            int subNodeSize = nodes[0].size();
 //            for (int i = 0; i < midpoint; i++) {
-//                prevMaxIdx += subNodeSize;
-//                leftEndIndices[i] = prevMaxIdx;
+//                cumulativeSize += subNodeSize;
+//                leftCumSizes[i] = cumulativeSize;
 //            }
 //
-//            Relaxed<T> left = new Relaxed<>(Arrays.copyOf(leftEndIndices, midpoint),
+//            Relaxed<T> left = new Relaxed<>(Arrays.copyOf(leftCumSizes, midpoint),
 //                                            Arrays.copyOf(nodes, midpoint));
-//            int[] rightEndIndices = new int[nodes.length - midpoint];
-//            prevMaxIdx = 0;
-//            for (int i = 0; i < rightEndIndices.length - 1; i++) {
+//            int[] rightCumSizes = new int[nodes.length - midpoint];
+//            cumulativeSize = 0;
+//            for (int i = 0; i < rightCumSizes.length - 1; i++) {
 //                // I don't see any way around asking each node it's length here.
 //                // The last one may not be full.
-//                prevMaxIdx += subNodeSize;
-//                rightEndIndices[i] = prevMaxIdx;
+//                cumulativeSize += subNodeSize;
+//                rightCumSizes[i] = cumulativeSize;
 //            }
 //
 //            // Fix final size (may not be packed)
-//            prevMaxIdx += nodes[nodes.length - 1].maxIndex();
-//            rightEndIndices[rightEndIndices.length - 1] = prevMaxIdx;
+//            cumulativeSize += nodes[nodes.length - 1].size();
+//            rightCumSizes[rightCumSizes.length - 1] = cumulativeSize;
 //
 //            // I checked this at javaRepl and indeed this starts from the correct item.
-//            Relaxed<T> right = new Relaxed<>(rightEndIndices,
+//            Relaxed<T> right = new Relaxed<>(rightCumSizes,
 //                                             Arrays.copyOfRange(nodes, midpoint, nodes.length));
 //            return new Relaxed[] {left, right};
 //        }
@@ -681,25 +687,29 @@ public class RrbTree1<E> implements ImList<E> {
         //            return tup(this, right);
         //        }
 
-//        @Override public Tuple4<Node<T>,T[],Node<T>,T[]> splitAt(int index) {
+//        @Override
+//        public Tuple4<Node<T>,T[],Node<T>,T[]> splitAt(int splitIndex) {
+//            if ( (splitIndex < 0) || (splitIndex > size() + 2) ) {
+//                throw new IllegalArgumentException("Bad splitIndex: " + splitIndex);
+//            }
 //
 //        }
 
         Relaxed<T> relax() {
-            int[] newEndIndices = new int[nodes.length];
-            int prevMaxIdx = 0;
+            int[] newCumSizes = new int[nodes.length];
+            int cumulativeSize = 0;
             // We know all sub-nodes (except the last) have the same size because they are packed-left.
-            int subNodeSize = nodes[0].maxIndex();
+            int subNodeSize = nodes[0].size();
             for (int i = 0; i < nodes.length - 1; i++) {
-                prevMaxIdx += subNodeSize;
-                newEndIndices[i] = prevMaxIdx;
+                cumulativeSize += subNodeSize;
+                newCumSizes[i] = cumulativeSize;
             }
 
             // Final node may not be packed, so it could have a different size
-            prevMaxIdx += nodes[nodes.length - 1].maxIndex();
-            newEndIndices[newEndIndices.length - 1] = prevMaxIdx;
+            cumulativeSize += nodes[nodes.length - 1].size();
+            newCumSizes[newCumSizes.length - 1] = cumulativeSize;
 
-            return new Relaxed<>(newEndIndices, nodes);
+            return new Relaxed<>(newCumSizes, nodes);
         }
 
         @SuppressWarnings("unchecked")
@@ -718,7 +728,7 @@ public class RrbTree1<E> implements ImList<E> {
             // and the children of this node are leaves and this node is not full.
             if (oldFocus.length == STRICT_NODE_LENGTH) {
 
-                if (index == maxIndex()) {
+                if (index == size()) {
                     Node<T> lastNode = nodes[nodes.length - 1];
                     if (lastNode.hasStrictCapacity()) {
 //                    System.out.println("  Pushing focus down to lower-level node with capacity.");
@@ -786,14 +796,14 @@ public class RrbTree1<E> implements ImList<E> {
 
             // Here we're going to yield a Relaxed Radix node, so punt to that (slower) logic.
 //            System.out.println("Yield a Relaxed node.");
-            int[] endIndices = new int[nodes.length];
-            int prevMaxIdx = 0;
-            for (int i = 0; i < endIndices.length; i++) {
-                prevMaxIdx = prevMaxIdx + nodes[i].maxIndex();
-                endIndices[i] = prevMaxIdx;
+            int[] cumulativeSizes = new int[nodes.length];
+            int cumulativeSize = 0;
+            for (int i = 0; i < cumulativeSizes.length; i++) {
+                cumulativeSize = cumulativeSize + nodes[i].size();
+                cumulativeSizes[i] = cumulativeSize;
             }
-//            System.out.println("End indices: " + Arrays.toString(endIndices));
-            return new Relaxed<>(endIndices, nodes).pushFocus(index, oldFocus);
+//            System.out.println("End indices: " + Arrays.toString(cumulativeSizes));
+            return new Relaxed<>(cumulativeSizes, nodes).pushFocus(index, oldFocus);
         }
 
         @SuppressWarnings("unchecked")
@@ -827,135 +837,136 @@ public class RrbTree1<E> implements ImList<E> {
         static <T> Relaxed<T> replaceInRelaxedAt(int[] is, Node<T>[] ns, Node<T> newNode, int subNodeIndex,
                                                  int insertSize) {
             Node<T>[] newNodes = replaceInArrayAt(newNode, ns, subNodeIndex, Node.class);
-            // Increment endIndicies for the changed item and all items to the right.
-            int[] newEndIndices = new int[is.length];
+            // Increment newCumSizes for the changed item and all items to the right.
+            int[] newCumSizes = new int[is.length];
             if (subNodeIndex > 0) {
-                System.arraycopy(is, 0, newEndIndices, 0, subNodeIndex);
+                System.arraycopy(is, 0, newCumSizes, 0, subNodeIndex);
             }
             for (int i = subNodeIndex; i < is.length; i++) {
-                newEndIndices[i] = is[i] + insertSize;
+                newCumSizes[i] = is[i] + insertSize;
             }
-            return new Relaxed<>(newEndIndices, newNodes);
+            return new Relaxed<>(newCumSizes, newNodes);
         }
 
-        // The max index stored in each sub-node.  This is a separate array so it can be retrieved
-        // in a single memory fetch.  Note that this is a 1-based index, or really a count, not a
-        // normal zero-based index.
-        // TODO: Rename this to "cumulativeSizes" or "totalSubNodeSizes" because that's what they are!
-        final int[] endIndices;
+        // Holds the size of each sub-node and plus all nodes to its left.  You could think of this as maxIndex + 1.
+        // This is a separate array so it can be retrieved in a single memory fetch.  Note that this is a 1-based count,
+        // not a zero-based index.
+        final int[] cumulativeSizes;
         // The sub nodes
         final Node<T>[] nodes;
 
         // Constructor
         Relaxed(int[] is, Node<T>[] ns) {
-            endIndices = is;
+            cumulativeSizes = is;
             nodes = ns;
 
             // Consider removing constraint validations before shipping for performance
-            if (endIndices.length < 1) {
-                throw new IllegalArgumentException("endIndices.length < 1");
+            if (cumulativeSizes.length < 1) {
+                throw new IllegalArgumentException("cumulativeSizes.length < 1");
             }
             if (nodes.length < 1) {
                 throw new IllegalArgumentException("nodes.length < 1");
             }
-            if (endIndices.length != nodes.length) {
-                throw new IllegalArgumentException("endIndices.length:" + endIndices.length +
+            if (cumulativeSizes.length != nodes.length) {
+                throw new IllegalArgumentException("cumulativeSizes.length:" + cumulativeSizes.length +
                                                    " != nodes.length:" + nodes.length);
             }
 
-            int endIdx = 0;
+            int cumulativeSize = 0;
             for (int i = 0; i < nodes.length; i++) {
-                endIdx += nodes[i].maxIndex();
-                if (endIdx != endIndices[i]) {
-                    throw new IllegalArgumentException("nodes[" + i + "].maxIndex() was " +
-                                                       nodes[i].maxIndex() +
-                                                       " which is not compatable with endIndices[" +
-                                                       i + "] which was " + endIndices[i] + "\n" +
-                    " endIndices: " + Arrays.toString(endIndices) +
+                cumulativeSize += nodes[i].size();
+                if (cumulativeSize != cumulativeSizes[i]) {
+                    throw new IllegalArgumentException("nodes[" + i + "].size() was " +
+                                                       nodes[i].size() +
+                                                       " which is not compatable with cumulativeSizes[" +
+                                                       i + "] which was " + cumulativeSizes[i] + "\n" +
+                                                       " cumulativeSizes: " + Arrays.toString(cumulativeSizes) +
                                                        " nodes: " + Arrays.toString(nodes));
                 }
             }
         }
 
-        @Override public int maxIndex() {
-            return endIndices[endIndices.length - 1];
+        @Override public int size() {
+            return cumulativeSizes[cumulativeSizes.length - 1];
         }
 
         /**
          Converts the index of an item into the index of the sub-node containing that item.
-         @param desiredIdx The index of the item in the tree
+         @param treeIndex The index of the item in the tree
          @return The index of the immediate child of this node that the desired node resides in.
          */
-        private int subNodeIndex(int desiredIdx) {
+        private int subNodeIndex(int treeIndex) {
             // For radix=4 this is actually faster, or at least as fast...
-//            for (int i = 0; i < endIndices.length; i++) {
-//                if (desiredIdx < endIndices[i]) {
+//            for (int i = 0; i < cumulativeSizes.length; i++) {
+//                if (treeIndex < cumulativeSizes[i]) {
 //                    return i;
 //                }
 //            }
-//            if (desiredIdx == maxIndex()) {
-//                return endIndices.length - 1;
+//            if (treeIndex == size()) {
+//                return cumulativeSizes.length - 1;
 //            }
 
-
-            // Index range: 0 to maxIndex - 1
-            // Result Range: 0 to endIndices.length - 1
+            // treeSize = cumulativeSizes[cumulativeSizes.length - 1]
+            // range of sub-node indices: 0 to cumulativeSizes.length - 1
+            // range of tree indices: 0 to treeSize
             // liner interpolation:
-            //     desiredIdx / maxIndex = endIdxSlot / endIndices.length
+            //     treeIndex / treeSize ~= subNodeIndex / cumulativeSizes.length
             // solve for endIdxSlot
-            //     endIndices.length * (desiredIdx / maxIndex) =  endIdxSlot
+            //     cumulativeSizes.length * (treeIndex / treeSize) =  subNodeIndex
             // Put division last
-            //     endIdxSlot = endIndices.length * desiredIdx / maxIndex
+            //     subNodeIndex = cumulativeSizes.length * treeIndex / treeSize
             //
-//            System.out.println("desiredIdx=" + desiredIdx);
-//            System.out.println(" endIndices=" + Arrays.toString(endIndices));
-            int guess = (endIndices.length * desiredIdx) / maxIndex();
-//            System.out.println(" guess=" + guess);
-            if (guess >= endIndices.length) {
-//                System.out.println("Guessed beyond end length - returning last item.");
-                return endIndices.length - 1;
-            }
-            int guessedEndIdx = endIndices[guess];
-//            System.out.println(" guessedEndIdx=" + guessedEndIdx);
+            // Now guess the sub-node index (quickly).
 
-            // Now we must check the guess.  The endIndices we store are slightly misnamed because
-            // the max valid desiredIdx for a node is its endIndex - 1.  If our guess yields an
-            // endIndex
-            //  - less than the desiredIdx
+
+//            System.out.println("treeIndex=" + treeIndex);
+//            System.out.println(" cumulativeSizes=" + Arrays.toString(cumulativeSizes));
+            int guess = (cumulativeSizes.length * treeIndex) / size();
+//            System.out.println(" guess=" + guess);
+            if (guess >= cumulativeSizes.length) {
+//                System.out.println("Guessed beyond end length - returning last item.");
+                return cumulativeSizes.length - 1;
+            }
+            int guessedCumSize = cumulativeSizes[guess];
+//            System.out.println(" guessedCumSize=" + guessedCumSize);
+
+            // Now we must check the guess.  The cumulativeSizes we store are slightly misnamed because
+            // the max valid treeIndex for a node is its size - 1.  If our guessedCumSize is
+            //  - less than the treeIndex
             //         Increment guess and check result again until greater, then return
             //         that guess
-            //  - greater than (desiredIdx + MIN_NODE_SIZE)
+            //  - greater than (treeIndex + MIN_NODE_SIZE)
             //         Decrement guess and check result again until less, then return PREVIOUS guess
-            //  - equal to the desiredIdx (see note about maxIndex)
-            //         If desiredIdx == maxIndex Return guess
+            //  - equal to the treeIndex (see note about size)
+            //         If treeIndex == size Return guess
             //         Else return guess + 1
 
-            // guessedEndIdx less than the desiredIdx
+            // guessedCumSize less than the treeIndex
             //         Increment guess and check result again until greater, then return
             //         that guess
-            if (guessedEndIdx < desiredIdx) {
-                while (guess < (endIndices.length - 1)) {
+            if (guessedCumSize < treeIndex) {
+                while (guess < (cumulativeSizes.length - 1)) {
 //                    System.out.println("    Too low.  Check higher...");
-                    guessedEndIdx = endIndices[++guess];
-                    if (guessedEndIdx >= desiredIdx) {
+                    guessedCumSize = cumulativeSizes[++guess];
+                    if (guessedCumSize >= treeIndex) {
 //                        System.out.println("    RIGHT!");
                         // See note in equal case below...
-                        return (guessedEndIdx == desiredIdx) ? guess + 1
+                        return (guessedCumSize == treeIndex) ? guess + 1
                                                              : guess;
                     }
 //                    System.out.println("    ==== Guess higher...");
                 }
                 throw new IllegalStateException("Can we get here?  If so, how?");
-            } else if (guessedEndIdx > (desiredIdx + MIN_NODE_LENGTH)) {
+            } else if (guessedCumSize > (treeIndex + MIN_NODE_LENGTH)) {
 
-                // guessedEndIdx greater than (desiredIdx + MIN_NODE_LENGTH)
+                // guessedCumSize greater than (treeIndex + MIN_NODE_LENGTH)
                 //         Decrement guess and check result again until less, then return PREVIOUS guess
                 while (guess > 0) {
 //                    System.out.println("    Maybe too high.  Check lower...");
                     int nextGuess = guess - 1;
-                    guessedEndIdx = endIndices[nextGuess];
+                    guessedCumSize = cumulativeSizes[nextGuess];
 
-                    if (guessedEndIdx <= desiredIdx) {
+                    if (guessedCumSize <= treeIndex) {
 //                        System.out.println("    RIGHT!");
                         return guess;
                     }
@@ -964,9 +975,9 @@ public class RrbTree1<E> implements ImList<E> {
                 }
 //                System.out.println("    Returning lower: " + guess);
                 return guess;
-            } else if (guessedEndIdx == desiredIdx) {
-                // guessedEndIdx equal to the desiredIdx (see note about maxIndex)
-                //         If desiredIdx == maxIndex Return guess
+            } else if (guessedCumSize == treeIndex) {
+                // guessedCumSize equal to the treeIndex (see note about size)
+                //         If treeIndex == size Return guess
                 //         Else return guess + 1
 //                System.out.println("    Equal, so should be simple...");
                 // For an append just one element beyond the end of the existing data structure,
@@ -975,7 +986,7 @@ public class RrbTree1<E> implements ImList<E> {
                 // naturally with this data structure and I think makes it easier to use without
                 // encouraging user programming errors.
                 // Hopefully this still leads to a relatively balanced tree...
-                return (desiredIdx == maxIndex()) ? guess : guess + 1;
+                return (treeIndex == size()) ? guess : guess + 1;
             } else {
 //                System.out.println("    First guess: " + guess);
                 return guess;
@@ -990,7 +1001,7 @@ public class RrbTree1<E> implements ImList<E> {
          */
         private int subNodeAdjustedIndex(int index, int subNodeIndex) {
             return (subNodeIndex == 0) ? index
-                                       : index - endIndices[subNodeIndex - 1];
+                                       : index - cumulativeSizes[subNodeIndex - 1];
         }
 
         @Override public T get(int index) {
@@ -1033,15 +1044,15 @@ public class RrbTree1<E> implements ImList<E> {
         Relaxed<T>[] split() {
 //            System.out.println("Relaxed.splitAt(" + i + ")");
             int midpoint = nodes.length >> 1; // Shift-right one is the same as dividing by 2.
-            Relaxed<T> left = new Relaxed<>(Arrays.copyOf(endIndices, midpoint),
+            Relaxed<T> left = new Relaxed<>(Arrays.copyOf(cumulativeSizes, midpoint),
                                                     Arrays.copyOf(nodes, midpoint));
-            int[] rightEndIndices = new int[nodes.length - midpoint];
-            int leftEndIdx = endIndices[midpoint - 1];
-            for (int j = 0; j < rightEndIndices.length; j++) {
-                rightEndIndices[j] = endIndices[midpoint + j] - leftEndIdx;
+            int[] rightCumSizes = new int[nodes.length - midpoint];
+            int leftCumSizes = cumulativeSizes[midpoint - 1];
+            for (int j = 0; j < rightCumSizes.length; j++) {
+                rightCumSizes[j] = cumulativeSizes[midpoint + j] - leftCumSizes;
             }
             // I checked this at javaRepl and indeed this starts from the correct item.
-            Relaxed<T> right = new Relaxed<>(rightEndIndices,
+            Relaxed<T> right = new Relaxed<>(rightCumSizes,
                                              Arrays.copyOfRange(nodes, midpoint, nodes.length));
             return new Relaxed[] {left, right};
         }
@@ -1071,12 +1082,12 @@ public class RrbTree1<E> implements ImList<E> {
                 Node<T> newNode = subNode.pushFocus(subNodeAdjustedIndex, oldFocus);
                 // Make a copy of our nodesArray, replacing the old node at subNodeIndex with the
                 // new node
-                return replaceInRelaxedAt(endIndices, nodes, newNode, subNodeIndex, oldFocus.length);
+                return replaceInRelaxedAt(cumulativeSizes, nodes, newNode, subNodeIndex, oldFocus.length);
             }
 
             // I think this is a root node thing.
             if (!thisNodeHasCapacity()) {
-                // For now, split at half of maxIndex.
+                // For now, split at half of size.
                 Relaxed<T>[] split = split();
 
 //                Relaxed<T> node1 = split[0];
@@ -1084,10 +1095,10 @@ public class RrbTree1<E> implements ImList<E> {
 
 //                System.out.println("Split node1: " + node1);
 //                System.out.println("Split node2: " + node2);
-                int max1 = split[0].maxIndex();
+                int max1 = split[0].size();
                 Relaxed<T> newRelaxed =
                         new Relaxed<>(new int[] {max1,
-                                                 max1 + split[1].maxIndex()},
+                                                 max1 + split[1].size()},
                                       split);
 //                System.out.println("newRelaxed3: " + newRelaxed);
                 return newRelaxed.pushFocus(index, oldFocus);
@@ -1105,13 +1116,13 @@ public class RrbTree1<E> implements ImList<E> {
 //                System.out.println("Leaf!");
 
                 final Node<T>[] newNodes;
-                final int[] newEndIndices;
+                final int[] newCumSizes;
                 final int numToSkip;
 
                 //  If the focus is big enough to be its own leaf and the index is on a leaf
                 // boundary, make it one.
                 if ( (oldFocus.length >= MIN_NODE_LENGTH) &&
-                     (subNodeAdjustedIndex == 0 || subNodeAdjustedIndex == subNode.maxIndex()) ) {
+                     (subNodeAdjustedIndex == 0 || subNodeAdjustedIndex == subNode.size()) ) {
 
 //                    System.out.println("Insert-between");
                     // Just add a new leaf
@@ -1123,17 +1134,17 @@ public class RrbTree1<E> implements ImList<E> {
                     }
 
                     newNodes = insertIntoArrayAt(newNode, nodes, subNodeIndex, Node.class);
-                    // Increment endIndicies for the changed item and all items to the right.
-                    newEndIndices = new int[endIndices.length + 1];
-                    int prevEndIdx = 0;
+                    // Increment newCumSizes for the changed item and all items to the right.
+                    newCumSizes = new int[cumulativeSizes.length + 1];
+                    int cumulativeSize = 0;
                     if (subNodeIndex > 0) {
-                        System.arraycopy(endIndices, 0, newEndIndices, 0, subNodeIndex);
-                        prevEndIdx = newEndIndices[subNodeIndex - 1];
+                        System.arraycopy(cumulativeSizes, 0, newCumSizes, 0, subNodeIndex);
+                        cumulativeSize = newCumSizes[subNodeIndex - 1];
                     }
-                    newEndIndices[subNodeIndex] = prevEndIdx + oldFocus.length;
+                    newCumSizes[subNodeIndex] = cumulativeSize + oldFocus.length;
                     numToSkip = 1;
-//                    for (int i = subNodeIndex + 1; i < newEndIndices.length; i++) {
-//                        newEndIndices[i] = endIndices[i - 1] + oldFocus.length;
+//                    for (int i = subNodeIndex + 1; i < newCumSizes.length; i++) {
+//                        newCumSizes[i] = cumulativeSizes[i - 1] + oldFocus.length;
 //                    }
                 } else {
                     // Grab the array from the existing leaf node, make the insert, and yield two
@@ -1146,34 +1157,34 @@ public class RrbTree1<E> implements ImList<E> {
 
                     newNodes = new Node[nodes.length + 1];
 
-//                    System.out.println("old endIndices=" + Arrays.toString(endIndices));
+//                    System.out.println("old cumulativeSizes=" + Arrays.toString(cumulativeSizes));
 
-                    // Increment endIndicies for the changed item and all items to the right.
-                    newEndIndices = new int[endIndices.length + 1];
-                    int prevMaxIdx = 0;
+                    // Increment newCumSizes for the changed item and all items to the right.
+                    newCumSizes = new int[cumulativeSizes.length + 1];
+                    int leftSize = 0;
 //                    System.out.println("subNodeIndex=" + subNodeIndex);
 
-                    // Copy nodes and endIndices before split
+                    // Copy nodes and cumulativeSizes before split
                     if (subNodeIndex > 0) {
                         //               src,srcPos,dest,destPos,length
                         System.arraycopy(nodes, 0, newNodes, 0, subNodeIndex);
                         //               src,   srcPos, dest,    destPos, length
-                        System.arraycopy(endIndices, 0, newEndIndices, 0, subNodeIndex);
-//                        System.out.println("start of newEndIndices=" + Arrays.toString(newEndIndices));
+                        System.arraycopy(cumulativeSizes, 0, newCumSizes, 0, subNodeIndex);
+//                        System.out.println("start of newCumSizes=" + Arrays.toString(newCumSizes));
 
-                        prevMaxIdx = endIndices[subNodeIndex - 1];
-//                        System.out.println("prevMaxIdx=" + prevMaxIdx);
+                        leftSize = cumulativeSizes[subNodeIndex - 1];
+//                        System.out.println("cumulativeSize=" + cumulativeSize);
                     }
 
-                    // Copy split nodes and endIndices
+                    // Copy split nodes and cumulativeSizes
                     newNodes[subNodeIndex] = leftLeaf;
                     newNodes[subNodeIndex + 1] = rightLeaf;
-                    prevMaxIdx += leftLeaf.maxIndex();
-                    newEndIndices[subNodeIndex] = prevMaxIdx;
-                    newEndIndices[subNodeIndex + 1] = prevMaxIdx + rightLeaf.maxIndex();
+                    leftSize += leftLeaf.size();
+                    newCumSizes[subNodeIndex] = leftSize;
+                    newCumSizes[subNodeIndex + 1] = leftSize + rightLeaf.size();
 
 //                    System.out.println("continued newNodes=" + Arrays.toString(newNodes));
-//                    System.out.println("continued endIndices=" + Arrays.toString(newEndIndices));
+//                    System.out.println("continued cumulativeSizes=" + Arrays.toString(newCumSizes));
 
 
                     if (subNodeIndex < (nodes.length - 1)) {
@@ -1184,18 +1195,18 @@ public class RrbTree1<E> implements ImList<E> {
                     }
                     numToSkip = 2;
                 }
-                for (int i = subNodeIndex + numToSkip; i < newEndIndices.length; i++) {
+                for (int i = subNodeIndex + numToSkip; i < newCumSizes.length; i++) {
 //                    System.out.println("i=" + i);
 //                    System.out.println("numToSkip=" + numToSkip);
 //                    System.out.println("oldFocus.length=" + oldFocus.length);
-//                    System.out.println("endIndices[i - 1]=" + endIndices[i - 1]);
-                    newEndIndices[i] = endIndices[i - 1] + oldFocus.length;
-//                    System.out.println("newEndIndices so far=" + Arrays.toString(newEndIndices));
+//                    System.out.println("cumulativeSizes[i - 1]=" + cumulativeSizes[i - 1]);
+                    newCumSizes[i] = cumulativeSizes[i - 1] + oldFocus.length;
+//                    System.out.println("newCumSizes so far=" + Arrays.toString(newCumSizes));
                 }
 
 //                System.out.println("newNodes=" + Arrays.toString(newNodes));
-//                System.out.println("newEndIndices=" + Arrays.toString(newEndIndices));
-                return new Relaxed<>(newEndIndices, newNodes);
+//                System.out.println("newCumSizes=" + Arrays.toString(newCumSizes));
+                return new Relaxed<>(newCumSizes, newNodes);
                 // end if subNode instanceof Leaf
             } else if (subNode instanceof Strict) {
 //                System.out.println("Converting Strict to Relaxed...");
@@ -1204,16 +1215,16 @@ public class RrbTree1<E> implements ImList<E> {
 //                System.out.println("After: " + relaxed.debugString(7));
 //                System.out.println();
                 Node<T> newNode = relaxed.pushFocus(subNodeAdjustedIndex, oldFocus);
-                return replaceInRelaxedAt(endIndices, nodes, newNode, subNodeIndex, oldFocus.length);
+                return replaceInRelaxedAt(cumulativeSizes, nodes, newNode, subNodeIndex, oldFocus.length);
             }
 
             // Here we have capacity and the full sub-node is not a leaf or strict, so we have to split the appropriate
             // sub-node.
 
-            // For now, split at half of maxIndex.
+            // For now, split at half of size.
 //            System.out.println("Splitting from:\n" + this.debugString(0));
 //            System.out.println("About to split:\n" + subNode.debugString(0));
-//            System.out.println("Split at: " + (subNode.maxIndex() >> 1));
+//            System.out.println("Split at: " + (subNode.size() >> 1));
 //            System.out.println("To insert: " + Arrays.toString(oldFocus));
 
             Relaxed<T>[] newSubNode = ((Relaxed<T>) subNode).split();
@@ -1243,20 +1254,20 @@ public class RrbTree1<E> implements ImList<E> {
                                  nodes.length - subNodeIndex - 1);
             }
 
-            int[] newEndIndices = new int[endIndices.length + 1];
-            int prevEndIdx = 0;
+            int[] newCumSizes = new int[cumulativeSizes.length + 1];
+            int cumulativeSize = 0;
             if (subNodeIndex > 0) {
-                System.arraycopy(endIndices, 0, newEndIndices, 0, subNodeIndex);
-                prevEndIdx = endIndices[subNodeIndex - 1];
+                System.arraycopy(cumulativeSizes, 0, newCumSizes, 0, subNodeIndex);
+                cumulativeSize = cumulativeSizes[subNodeIndex - 1];
             }
 
-            for (int i = subNodeIndex; i < newEndIndices.length; i++) {
+            for (int i = subNodeIndex; i < newCumSizes.length; i++) {
                 // TODO: Calculate instead of loading into memory.  See splitAt calculation above.
-                prevEndIdx += newNodes[i].maxIndex();
-                newEndIndices[i] = prevEndIdx;
+                cumulativeSize += newNodes[i].size();
+                newCumSizes[i] = cumulativeSize;
             }
 
-            Relaxed<T> newRelaxed = new Relaxed<>(newEndIndices, newNodes);
+            Relaxed<T> newRelaxed = new Relaxed<>(newCumSizes, newNodes);
 //            System.out.println("newRelaxed2:\n" + newRelaxed.debugString(0));
 
             return newRelaxed.pushFocus(index, oldFocus);
@@ -1269,11 +1280,11 @@ public class RrbTree1<E> implements ImList<E> {
             Node<T> alteredNode =
                     nodes[subNodeIndex].replace(subNodeAdjustedIndex(index, subNodeIndex), t);
             Node<T>[] newNodes = replaceInArrayAt(alteredNode, nodes, subNodeIndex, Node.class);
-            return new Relaxed<>(endIndices, newNodes);
+            return new Relaxed<>(cumulativeSizes, newNodes);
         }
 
         @Override public String toString() {
-            return "Relaxed(endIndicies=" + Arrays.toString(endIndices) +
+            return "Relaxed(cumulativeSizes=" + Arrays.toString(cumulativeSizes) +
                    " nodes=" + Arrays.toString(nodes)
                                      .replaceAll(", Relaxed\\(", ",\n           Relaxed(") + ")";
         }
@@ -1282,7 +1293,7 @@ public class RrbTree1<E> implements ImList<E> {
             StringBuilder sB = new StringBuilder() // indentSpace(indent)
                     .append("Relaxed(");
             int nextIndent = indent + sB.length();
-            sB.append("endIndicies=").append(Arrays.toString(endIndices)).append("\n")
+            sB.append("cumulativeSizes=").append(Arrays.toString(cumulativeSizes)).append("\n")
               .append(indentSpace(nextIndent)).append("nodes=[");
             // + 6 for "nodes="
             return showSubNodes(sB, nodes, nextIndent + 6)
