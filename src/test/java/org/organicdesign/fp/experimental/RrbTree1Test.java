@@ -23,6 +23,7 @@ import java.util.Random;
 import org.junit.Test;
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.UnmodListTest;
+import org.organicdesign.fp.tuple.Tuple2;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -259,6 +260,33 @@ public class RrbTree1Test {
     // TODO: Think about what exception to expect.
     @Test(expected = Exception.class)
     public void putEx() { RrbTree1.empty().replace(1, "Hello"); }
+
+    // TODO: Fix this.
+    @Test public void splitTest() {
+        RrbTree1<Integer> is = RrbTree1.empty();
+        ArrayList<Integer> control = new ArrayList<>();
+//        int splitIndex = rand.nextInt(is.size() + 1);
+        for (int i = 0; i < SEVERAL; i++) {
+            is = is.append(i);
+            control.add(i);
+        }
+        int splitIndex = 29; //rand.nextInt(is.size() + 1);
+        System.out.println("splitIndex=" + splitIndex);
+//        System.out.println("empty=" + RrbTree1.empty().debugString(6));
+        try {
+            Tuple2<RrbTree1<Integer>,RrbTree1<Integer>> split = is.split(splitIndex);
+            System.out.println("leftSplit=" + split._1().debugString(10));
+            System.out.println("rightSplit=" + split._2().debugString(11));
+            List<Integer> leftControl = control.subList(0,splitIndex);
+            List<Integer> rightControl = control.subList(splitIndex, control.size());
+            assertEquals(leftControl, split._1());
+            assertEquals(rightControl, split._2());
+        } catch (Exception e) {
+            System.out.println("splitIndex:" + splitIndex); // print before blowing up...
+            // OK, now we can continue throwing exception.
+            throw e;
+        }
+    }
 
     @Test public void replace() {
         RrbTree1<String> pv = RrbTree1.empty();

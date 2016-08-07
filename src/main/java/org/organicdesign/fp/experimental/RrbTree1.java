@@ -20,6 +20,8 @@ import java.util.List;
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.UnmodIterable;
 import org.organicdesign.fp.collections.UnmodSortedIterable;
+import org.organicdesign.fp.tuple.Tuple2;
+import org.organicdesign.fp.tuple.Tuple4;
 
 /**
  This is based on the paper, "RRB-Trees: Efficient Immutable Vectors" by Phil Bagwell and
@@ -199,8 +201,12 @@ public class RrbTree1<E> implements ImList<E> {
         return sB;
     }
 
+    private static final Leaf EMPTY_LEAF = new Leaf<>(EMPTY_ARRAY);
+    @SuppressWarnings("unchecked")
+    private static final <T> Leaf<T> emptyLeaf() { return (Leaf<T>) EMPTY_LEAF; }
+
     private static final RrbTree1 EMPTY_RRB_TREE =
-            new RrbTree1<>(emptyArray(), 0, Leaf.emptyLeaf(), 0);
+            new RrbTree1<>(emptyArray(), 0, emptyLeaf(), 0);
 
     /**
      This is the public factory method.
@@ -357,23 +363,32 @@ public class RrbTree1<E> implements ImList<E> {
         return new RrbTree1<>(focus, focusStartIndex, root.replace(index, item), size);
     }
 
-//    /**
-//     Divides this RRB-Tree such that every index less-than the given index ends up in the left-hand tree
-//     and the indexed item and all subsequent ones end up in the right-hand tree.
-//
-//     @param index the split point (excluded from the left-tree, included in the right one)
-//     @return two new sub-trees as determined by the split point
-//     */
-//    public Tuple2<RrbTree1<E>,RrbTree1<E>> split(int index) {
-//        // Push the focus before splitting.
-//        Node<E> newRoot = (focus.length > 0) ? root.pushFocus(focusStartIndex, focus)
-//                                             : root;
-//
-//
-//
-//        // If a leaf-node is split, the fragments become the new focus for each side of the split.
-//        // Otherwise, the focus can be left empty, or the last node of each side can be made into the focus.
-//    }
+    /**
+     Divides this RRB-Tree such that every index less-than the given index ends up in the left-hand tree
+     and the indexed item and all subsequent ones end up in the right-hand tree.
+
+     @param splitIndex the split point (excluded from the left-tree, included in the right one)
+     @return two new sub-trees as determined by the split point.  If the point is 0 or this.size() one tree will be
+     empty (but never null).
+     */
+    public Tuple2<RrbTree1<E>,RrbTree1<E>> split(int splitIndex) {
+        // Push the focus before splitting.
+        Node<E> newRoot = (focus.length > 0) ? root.pushFocus(focusStartIndex, focus)
+                                             : root;
+
+        // If a leaf-node is split, the fragments become the new focus for each side of the split.
+        // Otherwise, the focus can be left empty, or the last node of each side can be made into the focus.
+        SplitNode<E> split = newRoot.splitAt(splitIndex);
+        
+        E[] leftFocus = split.leftFocus();
+        Node<E> left = split.left();
+
+        E[] rightFocus = split.rightFocus();
+        Node<E> right = split.right();
+
+        return Tuple2.of(new RrbTree1<>(leftFocus, left.size(), left, left.size() + leftFocus.length),
+                         new RrbTree1<>(rightFocus, 0, right, right.size() + rightFocus.length));
+    }
 
     @Override public String toString() {
         return UnmodIterable.toString("RrbTree", this);
@@ -383,7 +398,7 @@ public class RrbTree1<E> implements ImList<E> {
         return "RrbTree(size=" + size +
                " fsi=" + focusStartIndex +
                " focus=" + Arrays.toString(focus) + "\n" +
-               indentSpace(indent + 8) + "root=" + root.debugString(indent + 13) + ")";
+               indentSpace(indent + 8) + "root=" + (root == null ? "null" : root.debugString(indent + 13)) + ")";
     }
 
     private interface Node<T> {
@@ -404,7 +419,7 @@ public class RrbTree1<E> implements ImList<E> {
          */
         boolean hasRelaxedCapacity(int index, int size);
 
-//        Tuple4<Node<T>,T[],Node<T>,T[]> splitAt(int index);
+        SplitNode<T> splitAt(int splitIndex);
 
         // Splitting a strict node yields an invalid Relaxed node (too short).
         // We don't yet split Leaf nodes.
@@ -421,11 +436,22 @@ public class RrbTree1<E> implements ImList<E> {
         String debugString(int indent);
     }
 
-    private static class Leaf<T> implements Node<T> {
-        private static final Leaf EMPTY_LEAF = new Leaf<>(EMPTY_ARRAY);
-        @SuppressWarnings("unchecked")
-        private static final <T> Leaf<T> emptyLeaf() { return (Leaf<T>) EMPTY_LEAF; }
+    private static class SplitNode<T> extends Tuple4<Node<T>,T[],Node<T>,T[]> {
+        SplitNode(Node<T> ln, T[] lf, Node<T> rn, T[] rf) { super(ln, lf, rn, rf); }
+        public Node<T> left() { return _1; }
+        public T[] leftFocus() { return _2; }
+        public Node<T> right() { return _3; }
+        public T[] rightFocus() { return _4; }
 
+        @Override public String toString() {
+            return "SplitNode(left=" + left().debugString(15) + ",\n" +
+                   "          leftFocus=" + Arrays.toString(leftFocus()) + ",\n" +
+                   "          right=" + right().debugString(15) + ",\n" +
+                   "          rightFocus=" + Arrays.toString(rightFocus()) + ")";
+        }
+    }
+
+    private static class Leaf<T> implements Node<T> {
         final T[] items;
         // It can only be Strict if items.length == STRICT_NODE_LENGTH and if its parents
         // are strict.
@@ -477,24 +503,24 @@ public class RrbTree1<E> implements ImList<E> {
             return split;
         }
 
-////        @Override
-//        public Tuple4<Node<T>,T[],Node<T>,T[]> splitAt(int splitIndex) {
-//            if (splitIndex < 1) {
-//                throw new IllegalArgumentException("Called splitAt when splitIndex < 1");
+        @Override
+        public SplitNode<T> splitAt(int splitIndex) {
+            if (splitIndex < 1) {
+                throw new IllegalArgumentException("Called splitAt when splitIndex < 1");
+            }
+            if (splitIndex > items.length - 1) {
+                throw new IllegalArgumentException("Called splitAt when splitIndex > orig.length - 1");
+            }
+//            // Should we just ensure that the split is between 1 and items.length (exclusive)?
+//            if (splitIndex == 0) {
+//                return Tuple4.of(null, null, null, items);
 //            }
-//            if (splitIndex > items.length - 1) {
-//                throw new IllegalArgumentException("Called splitAt when splitIndex > orig.length - 1");
+//            if (splitIndex == items.length) {
+//                return Tuple4.of(null, items, null, null);
 //            }
-////            // Should we just ensure that the split is between 1 and items.length (exclusive)?
-////            if (splitIndex == 0) {
-////                return Tuple4.of(null, null, null, items);
-////            }
-////            if (splitIndex == items.length) {
-////                return Tuple4.of(null, items, null, null);
-////            }
-//            T[][] split = splitArray(items, splitIndex);
-//            return Tuple4.of(null, split[0], null, split[1]);
-//        }
+            T[][] split = splitArray(items, splitIndex);
+            return new SplitNode<>(emptyLeaf(), split[0], emptyLeaf(), split[1]);
+        }
 
         @SuppressWarnings("unchecked")
         private Leaf<T>[] spliceAndSplit(T[] oldFocus, int splitIndex) {
@@ -650,7 +676,7 @@ public class RrbTree1<E> implements ImList<E> {
 
 //        @SuppressWarnings("unchecked")
 //        @Override public Relaxed<T>[] split() {
-////            System.out.println("Strict.splitAt(" + i + ")");
+////            System.out.println("Strict.split(" + i + ")");
 //            int midpoint = nodes.length >> 1; // Shift-right one is the same as dividing by 2.
 //            int[] leftCumSizes = new int[midpoint];
 //            int cumulativeSize = 0;
@@ -687,13 +713,21 @@ public class RrbTree1<E> implements ImList<E> {
         //            return tup(this, right);
         //        }
 
-//        @Override
-//        public Tuple4<Node<T>,T[],Node<T>,T[]> splitAt(int splitIndex) {
-//            if ( (splitIndex < 0) || (splitIndex > size() + 2) ) {
-//                throw new IllegalArgumentException("Bad splitIndex: " + splitIndex);
-//            }
-//
-//        }
+        @Override
+        public SplitNode<T> splitAt(int splitIndex) {
+            int size = size();
+            if ( (splitIndex < 0) || (splitIndex > size) ) {
+                throw new IllegalArgumentException("Bad splitIndex: " + splitIndex);
+            }
+            if (splitIndex == 0) {
+                return new SplitNode<>(emptyLeaf(), emptyArray(), this, emptyArray());
+            }
+            if (splitIndex == size) {
+                return new SplitNode<>(this, emptyArray(), emptyLeaf(), emptyArray());
+            }
+
+            return relax().splitAt(splitIndex);
+        }
 
         Relaxed<T> relax() {
             int[] newCumSizes = new int[nodes.length];
@@ -856,8 +890,8 @@ public class RrbTree1<E> implements ImList<E> {
         final Node<T>[] nodes;
 
         // Constructor
-        Relaxed(int[] is, Node<T>[] ns) {
-            cumulativeSizes = is;
+        Relaxed(int[] szs, Node<T>[] ns) {
+            cumulativeSizes = szs;
             nodes = ns;
 
             // Consider removing constraint validations before shipping for performance
@@ -879,9 +913,9 @@ public class RrbTree1<E> implements ImList<E> {
                     throw new IllegalArgumentException("nodes[" + i + "].size() was " +
                                                        nodes[i].size() +
                                                        " which is not compatable with cumulativeSizes[" +
-                                                       i + "] which was " + cumulativeSizes[i] + "\n" +
-                                                       " cumulativeSizes: " + Arrays.toString(cumulativeSizes) +
-                                                       " nodes: " + Arrays.toString(nodes));
+                                                       i + "] which was " + cumulativeSizes[i] +
+                                                       "\n\tcumulativeSizes=" + Arrays.toString(cumulativeSizes) +
+                                                       "\n\tnodes=" + Arrays.toString(nodes));
                 }
             }
         }
@@ -1057,9 +1091,102 @@ public class RrbTree1<E> implements ImList<E> {
             return new Relaxed[] {left, right};
         }
 
-//        @Override public Tuple4<Node<T>,T[],Node<T>,T[]> splitAt(int index) {
-//
-//        }
+        @SuppressWarnings("unchecked")
+        @Override
+        public SplitNode<T> splitAt(int splitIndex) {
+            int size = size();
+            if ( (splitIndex < 0) || (splitIndex > size) ) {
+                throw new IllegalArgumentException("Bad splitIndex: " + splitIndex);
+            }
+            if (splitIndex == 0) {
+                return new SplitNode<>(emptyLeaf(), emptyArray(), emptyLeaf(), emptyArray());
+            }
+            if (splitIndex == size) {
+                return new SplitNode<>(this, emptyArray(), emptyLeaf(), emptyArray());
+            }
+
+            int subNodeIndex = subNodeIndex(splitIndex);
+            Node<T> subNode = nodes[subNodeIndex];
+            int subNodeAdjustedIndex = subNodeAdjustedIndex(splitIndex, subNodeIndex);
+
+            SplitNode<T> split = subNode.splitAt(subNodeAdjustedIndex);
+
+            System.out.println("split=" + split);
+
+            // TODO: if there's a focus, does it mean we have one less node somewhere?
+
+            final Node<T> left;
+            final Node<T> splitLeft = split.left();
+            if (subNodeIndex == 1) {
+                // If we have a single node, it doesn't need a parent.
+                left = splitLeft;
+            } else {
+                boolean haveLeft = (splitLeft.size() > 0);
+                int numLeftItems = subNodeIndex + (haveLeft ? 1 : 0);
+                if ( !haveLeft && (numLeftItems == 1) ) {
+                    left = nodes[0];
+                } else {
+                    int[] leftCumSizes = new int[numLeftItems];
+                    Node<T>[] leftNodes = (Node<T>[]) new Node[numLeftItems];
+                    //                      src, srcPos,    dest,destPos, length
+                    System.arraycopy(cumulativeSizes, 0, leftCumSizes, 0, numLeftItems);
+                    if (haveLeft) {
+                        int cumulativeSize = (numLeftItems > 1) ? leftCumSizes[numLeftItems - 2] : 0;
+                        leftCumSizes[numLeftItems - 1] = cumulativeSize + splitLeft.size();
+                    }
+                    System.out.println("leftCumSizes=" + Arrays.toString(leftCumSizes));
+                    // Copy one less item if we are going to add the split one in a moment.
+                    // I could have written:
+                    //     haveLeft ? numLeftItems - 1
+                    //              : numLeftItems
+                    // but that's always equal to subNodeIndex.
+                    System.arraycopy(nodes, 0, leftNodes, 0, subNodeIndex);
+                    if (haveLeft) {
+                        leftNodes[numLeftItems - 1] = splitLeft;
+                    }
+                    left = new Relaxed<>(leftCumSizes, leftNodes);
+                }
+            }
+
+            final Node<T> right;
+            final Node<T> splitRight = split.right();
+            if (subNodeIndex == nodes.length - 1) {
+                // If we have a single node, it doesn't need a parent.
+                right = splitRight;
+            } else {
+                boolean haveRight = (splitRight.size() > 0);
+                int numRightItems = (cumulativeSizes.length - subNodeIndex) - (haveRight ? 0 : 1);
+                if ( !haveRight && (numRightItems == 1) ) {
+                    right = nodes[nodes.length - 1];
+                } else {
+                    int[] rightCumSizes = new int[numRightItems];
+                    Node<T>[] rightNodes = (Node<T>[]) new Node[numRightItems];
+
+                    int cumulativeSize = splitRight.size();
+                    System.out.println("splitRight.size()=" + splitRight.size());
+                    int firstItem = 0;
+                    if (haveRight) {
+                        rightCumSizes[0] = cumulativeSize;
+                        firstItem = 1;
+                    }
+                    int sizeDiff = cumulativeSize - cumulativeSizes[subNodeIndex];
+                    System.out.println("sizeDiff=" + sizeDiff);
+                    System.out.println("subNodeIndex=" + subNodeIndex);
+                    System.out.println("numRightItems=" + numRightItems);
+                    for (int i = firstItem; i < numRightItems; i++) {
+                        rightCumSizes[i] = rightCumSizes[i + subNodeIndex] + sizeDiff;
+                    }
+                    System.out.println("rightCumSizes=" + Arrays.toString(rightCumSizes));
+
+                    //                 src,       srcPos, dest, destPos, length
+                    System.arraycopy(nodes, subNodeIndex, rightNodes, 0, numRightItems);
+                    right = new Relaxed<>(rightCumSizes, rightNodes);
+                }
+            }
+
+            return new SplitNode<>(left, split.leftFocus(),
+                                   right, split.rightFocus());
+        }
 
         @SuppressWarnings("unchecked")
         @Override public Node<T> pushFocus(int index, T[] oldFocus) {
@@ -1070,10 +1197,7 @@ public class RrbTree1<E> implements ImList<E> {
 //            System.out.println("  this: " + this);
 
             int subNodeIndex = subNodeIndex(index);
-
             Node<T> subNode = nodes[subNodeIndex];
-
-//            System.out.println("  subNode: " + subNode);
             int subNodeAdjustedIndex = subNodeAdjustedIndex(index, subNodeIndex);
 
             // 1st choice: insert into the subNode if it has enought space enough to handle it
