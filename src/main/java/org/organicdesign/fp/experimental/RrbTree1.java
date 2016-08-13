@@ -23,6 +23,8 @@ import org.organicdesign.fp.collections.UnmodSortedIterable;
 import org.organicdesign.fp.tuple.Tuple2;
 import org.organicdesign.fp.tuple.Tuple4;
 
+interface Indented { String indentedStr(int indent); }
+
 /**
  This is based on the paper, "RRB-Trees: Efficient Immutable Vectors" by Phil Bagwell and
  Tiark Rompf.  With some background from the Cormen, Leiserson, Rivest & Stein Algorithms book entry
@@ -38,7 +40,7 @@ import org.organicdesign.fp.tuple.Tuple4;
   - Speed testing and optimization.
  */
 @SuppressWarnings("WeakerAccess")
-public class RrbTree1<E> implements ImList<E> {
+public class RrbTree1<E> implements ImList<E>, Indented {
 
     // Definitions:
     // Strict: Short for "Strict Radix."  Strict nodes have leaf widths of exactly
@@ -196,10 +198,13 @@ public class RrbTree1<E> implements ImList<E> {
                     sB.append("\n").append(indentSpace(nextIndent));
                 }
             }
-            sB.append(n.debugString(nextIndent));
+            sB.append(n.indentedStr(nextIndent));
         }
         return sB;
     }
+
+    private static void debug(String txt, Indented obj) { System.out.println(txt + obj.indentedStr(txt.length())); }
+    private static void debug(String txt) { System.out.println(txt); }
 
     private static final Leaf EMPTY_LEAF = new Leaf<>(EMPTY_ARRAY);
     @SuppressWarnings("unchecked")
@@ -394,14 +399,14 @@ public class RrbTree1<E> implements ImList<E> {
         return UnmodIterable.toString("RrbTree", this);
     }
 
-    String debugString(int indent) {
+    @Override public String indentedStr(int indent) {
         return "RrbTree(size=" + size +
                " fsi=" + focusStartIndex +
                " focus=" + Arrays.toString(focus) + "\n" +
-               indentSpace(indent + 8) + "root=" + (root == null ? "null" : root.debugString(indent + 13)) + ")";
+               indentSpace(indent + 8) + "root=" + (root == null ? "null" : root.indentedStr(indent + 13)) + ")";
     }
 
-    private interface Node<T> {
+    private interface Node<T> extends Indented {
         /** Return the item at the given index */
         T get(int i);
         /** Number of items stored in this node */
@@ -432,11 +437,9 @@ public class RrbTree1<E> implements ImList<E> {
         Node<T> pushFocus(int index, T[] oldFocus);
 
         Node<T> replace(int idx, T t);
-
-        String debugString(int indent);
     }
 
-    private static class SplitNode<T> extends Tuple4<Node<T>,T[],Node<T>,T[]> {
+    private static class SplitNode<T> extends Tuple4<Node<T>,T[],Node<T>,T[]> implements Indented {
         SplitNode(Node<T> ln, T[] lf, Node<T> rn, T[] rf) { super(ln, lf, rn, rf); }
         public Node<T> left() { return _1; }
         public T[] leftFocus() { return _2; }
@@ -444,19 +447,19 @@ public class RrbTree1<E> implements ImList<E> {
         public T[] rightFocus() { return _4; }
         public int size() { return _1.size() + _2.length + _3.size() + _4.length; }
 
-        public String debugString(int indent) {
+        @Override public String indentedStr(int indent) {
             StringBuilder sB = new StringBuilder() // indentSpace(indent)
                     .append("SplitNode(");
             int nextIndent = indent + sB.length();
             String nextIndentStr = indentSpace(nextIndent).toString();
-            return sB.append("left=").append(left().debugString(nextIndent + 5)).append(",\n")
+            return sB.append("left=").append(left().indentedStr(nextIndent + 5)).append(",\n")
                      .append(nextIndentStr).append("leftFocus=").append(Arrays.toString(leftFocus())).append(",\n")
-                     .append(nextIndentStr).append("right=").append(right().debugString(nextIndent + 6)).append(",\n")
+                     .append(nextIndentStr).append("right=").append(right().indentedStr(nextIndent + 6)).append(",\n")
                      .append(nextIndentStr).append("rightFocus=").append(Arrays.toString(rightFocus())).append(")")
                      .toString();
         }
 
-        @Override public String toString() { return debugString(0); }
+        @Override public String toString() { return indentedStr(0); }
     }
 
     private static class Leaf<T> implements Node<T> {
@@ -601,7 +604,7 @@ public class RrbTree1<E> implements ImList<E> {
             return Arrays.toString(items);
         }
 
-        @Override public String debugString(int indent) {
+        @Override public String indentedStr(int indent) {
             return Arrays.toString(items);
         }
     } // end class Leaf
@@ -865,7 +868,7 @@ public class RrbTree1<E> implements ImList<E> {
             return "Strict" + shift + Arrays.toString(nodes);
         }
 
-        @Override public String debugString(int indent) {
+        @Override public String indentedStr(int indent) {
             StringBuilder sB = new StringBuilder() // indentSpace(indent)
                     .append("Strict").append(shift).append("(");
             return showSubNodes(sB, nodes, indent + sB.length())
@@ -1116,7 +1119,7 @@ public class RrbTree1<E> implements ImList<E> {
             }
 
 //            System.out.println("==========================");
-//            System.out.println("before=" + this.debugString(7));
+//            System.out.println("before=" + this.indentedStr(7));
 
             int subNodeIndex = subNodeIndex(splitIndex);
             Node<T> subNode = nodes[subNodeIndex];
@@ -1124,26 +1127,26 @@ public class RrbTree1<E> implements ImList<E> {
 
             SplitNode<T> split = subNode.splitAt(subNodeAdjustedIndex);
 
-            System.out.println("--------------------------");
-            System.out.println("before=" + this.debugString(7));
-            System.out.println("splitIndex=" + splitIndex);
-            System.out.println("nodes.length=" + nodes.length);
-            System.out.println("subNodeIndex=" + subNodeIndex);
-            System.out.println("subNode=" + subNode.debugString(8));
-            System.out.println("split=" + split);
+            debug("--------------------------");
+            debug("before=", this);
+            debug("splitIndex=" + splitIndex);
+            debug("nodes.length=" + nodes.length);
+            debug("subNodeIndex=" + subNodeIndex);
+            debug("subNode=", subNode);
+            debug("split=", split);
 
             // TODO: if there's a focus, does it mean we have one less node somewhere?
 
             final Node<T> left;
             final Node<T> splitLeft = split.left();
             if (subNodeIndex == 0) {
-                System.out.println("If we have a single left node, it doesn't need a parent.");
+                debug("If we have a single left node, it doesn't need a parent.");
                 left = splitLeft;
             } else {
                 boolean haveLeft = (splitLeft.size() > 0);
                 int numLeftItems = subNodeIndex + (haveLeft ? 1 : 0);
                 if ( !haveLeft && (numLeftItems == 1) ) {
-                    System.out.println("If the left node became a focus and there are no other lefts, no parent needed.");
+                    debug("If the left node became a focus and there are no other lefts, no parent needed.");
                     left = nodes[0];
                 } else {
                     int[] leftCumSizes = new int[numLeftItems];
@@ -1154,7 +1157,7 @@ public class RrbTree1<E> implements ImList<E> {
                         int cumulativeSize = (numLeftItems > 1) ? leftCumSizes[numLeftItems - 2] : 0;
                         leftCumSizes[numLeftItems - 1] = cumulativeSize + splitLeft.size();
                     }
-                    System.out.println("leftCumSizes=" + Arrays.toString(leftCumSizes));
+                    debug("leftCumSizes=" + Arrays.toString(leftCumSizes));
                     // Copy one less item if we are going to add the split one in a moment.
                     // I could have written:
                     //     haveLeft ? numLeftItems - 1
@@ -1171,14 +1174,14 @@ public class RrbTree1<E> implements ImList<E> {
             final Node<T> right;
             final Node<T> splitRight = split.right();
             if (subNodeIndex == (nodes.length - 1)) {
-                System.out.println("If we have a single right node, it doesn't need a parent.");
+                debug("If we have a single right node, it doesn't need a parent.");
                 right = splitRight;
             } else {
-                System.out.println("splitRight.size()=" + splitRight.size());
+                debug("splitRight.size()=" + splitRight.size());
                 boolean haveRightSubNode = (splitRight.size() > 0);
-                System.out.println("haveRightSubNode=" + haveRightSubNode);
-                int numRightNodes = (cumulativeSizes.length - subNodeIndex - 1);
-                System.out.println("numRightNodes=" + numRightNodes);
+                debug("haveRightSubNode=" + haveRightSubNode);
+                int numRightNodes = (cumulativeSizes.length - subNodeIndex - 2);
+                debug("numRightNodes=" + numRightNodes);
                 if (numRightNodes == 1) {
                     right = nodes[nodes.length - 1];
                 } else {
@@ -1204,7 +1207,7 @@ public class RrbTree1<E> implements ImList<E> {
 
             SplitNode<T> ret = new SplitNode<>(left, split.leftFocus(),
                                                right, split.rightFocus());
-            System.out.println("RETURNING=" + ret.debugString(10));
+            debug("RETURNING=", ret);
             if (this.size() != ret.size()) {
                 throw new IllegalStateException("Split on " + this.size() + " items returned " + ret.size() + " items");
             }
@@ -1358,9 +1361,9 @@ public class RrbTree1<E> implements ImList<E> {
                 // end if subNode instanceof Leaf
             } else if (subNode instanceof Strict) {
 //                System.out.println("Converting Strict to Relaxed...");
-//                System.out.println("Before: " + subNode.debugString(8));
+//                System.out.println("Before: " + subNode.indentedStr(8));
                 Relaxed<T> relaxed = ((Strict) subNode).relax();
-//                System.out.println("After: " + relaxed.debugString(7));
+//                System.out.println("After: " + relaxed.indentedStr(7));
 //                System.out.println();
                 Node<T> newNode = relaxed.pushFocus(subNodeAdjustedIndex, oldFocus);
                 return replaceInRelaxedAt(cumulativeSizes, nodes, newNode, subNodeIndex, oldFocus.length);
@@ -1370,8 +1373,8 @@ public class RrbTree1<E> implements ImList<E> {
             // sub-node.
 
             // For now, split at half of size.
-//            System.out.println("Splitting from:\n" + this.debugString(0));
-//            System.out.println("About to split:\n" + subNode.debugString(0));
+//            System.out.println("Splitting from:\n" + this.indentedStr(0));
+//            System.out.println("About to split:\n" + subNode.indentedStr(0));
 //            System.out.println("Split at: " + (subNode.size() >> 1));
 //            System.out.println("To insert: " + Arrays.toString(oldFocus));
 
@@ -1416,10 +1419,10 @@ public class RrbTree1<E> implements ImList<E> {
             }
 
             Relaxed<T> newRelaxed = new Relaxed<>(newCumSizes, newNodes);
-//            System.out.println("newRelaxed2:\n" + newRelaxed.debugString(0));
+//            debug("newRelaxed2:\n" + newRelaxed.indentedStr(0));
 
             return newRelaxed.pushFocus(index, oldFocus);
-//            System.out.println("Parent after:" + after.debugString(0));
+//            debug("Parent after:" + after.indentedStr(0));
         }
 
         @SuppressWarnings("unchecked")
@@ -1437,7 +1440,7 @@ public class RrbTree1<E> implements ImList<E> {
                                      .replaceAll(", Relaxed\\(", ",\n           Relaxed(") + ")";
         }
 
-        @Override public String debugString(int indent) {
+        @Override public String indentedStr(int indent) {
             StringBuilder sB = new StringBuilder() // indentSpace(indent)
                     .append("Relaxed(");
             int nextIndent = indent + sB.length();

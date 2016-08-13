@@ -112,14 +112,14 @@ public class RrbTree1Test {
 
     private RrbTree1<Integer> randomInsertTest2(RrbTree1<Integer> is, List<Integer> control, int[] indices) {
         assertEquals("inputSize (if this blows up, this test is being used incorrectly)", control.size(), is.size());
-//        System.out.println("Before:" + is.debugString());
+//        System.out.println("Before:" + is.indentedStr());
         for (int j = 0; j < indices.length; j++){
             int idx = indices[j];
-//            System.out.println("About to insert at=" + idx + " elem=" + j + " into=" + is.debugString());
+//            System.out.println("About to insert at=" + idx + " elem=" + j + " into=" + is.indentedStr());
             is = is.insert(idx, j);
             control.add(idx, j);
 //            System.out.println("control:" + control);
-//            System.out.println("===test:" + is.debugString());
+//            System.out.println("===test:" + is.indentedStr());
             assertEquals("size", control.size(), is.size());
             assertEquals("item at " + idx, control.get(idx), is.get(idx));
 //            System.out.println("control:" + control);
@@ -127,7 +127,7 @@ public class RrbTree1Test {
             for (int k = 0; k <= j; k++) {
                 assertEquals("Wrong item at " + k + ", but still correct size (" + is.size() + ")\n" +
                         "control:\n" + control.toString() + "\n" +
-                        "test:\n" + is.debugString(0),
+                        "test:\n" + is.indentedStr(0),
                              control.get(k), is.get(k));
 //                System.out.println("control[" + k + "]:" + control.get(k) + " test[" + k + "]:" + is.get(k));
             }
@@ -136,7 +136,7 @@ public class RrbTree1Test {
 //        for (int j = 0; j < indices.length; j++){
 //            assertEquals(control.get(j), is.get(j));
 //        }
-//        System.out.println("After:" + is.debugString());
+//        System.out.println("After:" + is.indentedStr());
         return is;
     }
 
@@ -272,11 +272,11 @@ public class RrbTree1Test {
         }
         int splitIndex = 29; //rand.nextInt(is.size() + 1);
         System.out.println("splitIndex=" + splitIndex);
-//        System.out.println("empty=" + RrbTree1.empty().debugString(6));
+//        System.out.println("empty=" + RrbTree1.empty().indentedStr(6));
         try {
             Tuple2<RrbTree1<Integer>,RrbTree1<Integer>> split = is.split(splitIndex);
-            System.out.println("leftSplit=" + split._1().debugString(10));
-            System.out.println("rightSplit=" + split._2().debugString(11));
+            System.out.println("leftSplit=" + split._1().indentedStr(10));
+            System.out.println("rightSplit=" + split._2().indentedStr(11));
             List<Integer> leftControl = control.subList(0,splitIndex);
             List<Integer> rightControl = control.subList(splitIndex, control.size());
             assertEquals(leftControl, split._1());
@@ -408,7 +408,7 @@ public class RrbTree1Test {
 
         RrbTree1<Integer> rrb1 = randomInsertTest(new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 });
         assertEquals("RrbTree(size=9 fsi=8 focus=[8]\n" +
-                     "        root=Strict2([0, 1, 2, 3], [4, 5, 6, 7]))", rrb1.debugString(0));
+                     "        root=Strict2([0, 1, 2, 3], [4, 5, 6, 7]))", rrb1.indentedStr(0));
 
         assertEquals("RrbTree(0,1,2,3,4,...)", rrb1.toString());
 
@@ -416,7 +416,7 @@ public class RrbTree1Test {
         assertEquals("RrbTree(size=9 fsi=7 focus=[8]\n" +
                      "        root=Relaxed(cumulativeSizes=[4, 8]\n" +
                      "                     nodes=[[0, 7, 3, 5], [1, 4, 2, 6]]))",
-                     rrb2.debugString(0));
+                     rrb2.indentedStr(0));
 
         assertEquals("RrbTree(0,7,3,5,1,...)", rrb2.toString());
     }
