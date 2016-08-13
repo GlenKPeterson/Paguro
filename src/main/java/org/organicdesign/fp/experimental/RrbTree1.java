@@ -1180,7 +1180,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
                 debug("splitRight.size()=" + splitRight.size());
                 boolean haveRightSubNode = (splitRight.size() > 0);
                 debug("haveRightSubNode=" + haveRightSubNode);
-                int numRightNodes = (cumulativeSizes.length - subNodeIndex - 2);
+                int numRightNodes = (cumulativeSizes.length - subNodeIndex) - 1; //(splitRight.size() > 0 ? 2 : 1); // -2 when splitRight.size() > 0
                 debug("numRightNodes=" + numRightNodes);
                 if (numRightNodes == 1) {
                     right = nodes[nodes.length - 1];
@@ -1191,7 +1191,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
                     Node<T>[] rightNodes = (Node<T>[]) new Node[numRightNodes];
 
                     //                 src,       srcPos, dest, destPos, length
-                    System.arraycopy(nodes, subNodeIndex, rightNodes, 0, numRightNodes);
+                    System.arraycopy(nodes, subNodeIndex + 1, rightNodes, 0, numRightNodes);
 
                     int cumulativeSize = 0;
 
