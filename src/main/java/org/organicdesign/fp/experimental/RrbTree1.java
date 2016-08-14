@@ -724,6 +724,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
         //            return tup(this, right);
         //        }
 
+        @SuppressWarnings("unchecked")
         @Override
         public SplitNode<T> splitAt(int splitIndex) {
             int size = size();
@@ -737,8 +738,60 @@ public class RrbTree1<E> implements ImList<E>, Indented {
                 return new SplitNode<>(this, emptyArray(), emptyLeaf(), emptyArray());
             }
 
-            // TODO: Only the right-hand part of a split needs to relax!
-            return relax().splitAt(splitIndex);
+            //            System.out.println("==========================");
+            //            System.out.println("before=" + this.indentedStr(7));
+
+            int subNodeIndex = highBits(splitIndex);
+            Node<T> subNode = nodes[subNodeIndex];
+            int subNodeAdjustedIndex = lowBits(splitIndex);
+
+            SplitNode<T> split = subNode.splitAt(subNodeAdjustedIndex);
+
+            //            debug("--------------------------");
+            //            debug("before=", this);
+            //            debug("splitIndex=" + splitIndex);
+            //            debug("nodes.length=" + nodes.length);
+            //            debug("subNodeIndex=" + subNodeIndex);
+            ////            debug("subNode=", subNode);
+            //            debug("split=", split);
+
+            final Node<T> left;
+            final Node<T> splitLeft = split.left();
+            if (subNodeIndex == 0) {
+                //                debug("If we have a single left node, it doesn't need a parent.");
+                left = splitLeft;
+            } else {
+                boolean haveLeft = (splitLeft.size() > 0);
+                int numLeftItems = subNodeIndex + (haveLeft ? 1 : 0);
+                if ( !haveLeft && (numLeftItems == 1) ) {
+                    //                    debug("If the left node became a focus and there are no other lefts, no parent needed.");
+                    left = nodes[0];
+                } else {
+                    Node<T>[] leftNodes = (Node<T>[]) new Node[numLeftItems];
+                    //                    debug("leftCumSizes=" + Arrays.toString(leftCumSizes));
+                    // Copy one less item if we are going to add the split one in a moment.
+                    // I could have written:
+                    //     haveLeft ? numLeftItems - 1
+                    //              : numLeftItems
+                    // but that's always equal to subNodeIndex.
+                    System.arraycopy(nodes, 0, leftNodes, 0, subNodeIndex);
+                    if (haveLeft) {
+                        leftNodes[numLeftItems - 1] = splitLeft;
+                    }
+                    left = new Strict<>(shift, leftNodes);
+                }
+            }
+
+            final Node<T> right = Relaxed.fixRight(nodes, split.right(), subNodeIndex);
+
+            SplitNode<T> ret = new SplitNode<>(left, split.leftFocus(),
+                                               right, split.rightFocus());
+            //            debug("RETURNING=", ret);
+            if (this.size() != ret.size()) {
+                throw new IllegalStateException("Split on " + this.size() + " items returned " + ret.size() + " items");
+            }
+
+            return ret;
         }
 
         Relaxed<T> relax() {
@@ -892,6 +945,62 @@ public class RrbTree1<E> implements ImList<E>, Indented {
                 newCumSizes[i] = is[i] + insertSize;
             }
             return new Relaxed<>(newCumSizes, newNodes);
+        }
+
+        @SuppressWarnings("unchecked")
+        public static <T> Node<T> fixRight(Node<T>[] origNodes, Node<T> splitRight, int subNodeIndex) {
+            Node<T> right;
+            if (subNodeIndex == (origNodes.length - 1)) {
+//                debug("If we have a single right node, it doesn't need a parent.");
+                right = splitRight;
+            } else {
+//                debug("splitRight.size()=" + splitRight.size());
+                boolean haveRightSubNode = splitRight.size() > 0;
+//                debug("haveRightSubNode=" + haveRightSubNode);
+                // If we have a rightSubNode, it's going to need a space in our new node array.
+                int numRightNodes = (origNodes.length - subNodeIndex) - (haveRightSubNode ? 0 : 1); //(splitRight.size() > 0 ? 2 : 1); // -2 when splitRight.size() > 0
+//                debug("numRightNodes=" + numRightNodes);
+                if ( !haveRightSubNode && (numRightNodes == 1)) {
+//                    debug("If the right node became a focus and there are no other lefts, no parent needed.");
+                    right = origNodes[origNodes.length - 1];
+                } else {
+                    // Here the first (leftmost) node of the right-hand side was turned into the focus
+                    // and we have additional right-hand origNodes to adjust the parent for.
+                    int[] rightCumSizes = new int[numRightNodes];
+                    Node<T>[] rightNodes = (Node<T>[]) new Node[numRightNodes];
+
+//                    System.out.println("origNodes=" + Arrays.toString(origNodes));
+//                    System.out.println("subNodeIndex=" + subNodeIndex);
+
+                    int cumulativeSize = 0;
+                    int destCopyStartIdx = 0;
+
+                    if (haveRightSubNode) {
+                        //                 src,       srcPos,          dest, destPos, length
+                        System.arraycopy(origNodes, subNodeIndex + 1, rightNodes, 1, numRightNodes - 1);
+
+                        rightNodes[0] = splitRight;
+                        cumulativeSize = splitRight.size();
+                        rightCumSizes[0] = cumulativeSize;
+                        destCopyStartIdx = 1;
+                    } else {
+                        //                 src,       srcPos,          dest, destPos, length
+                        System.arraycopy(origNodes, subNodeIndex + 1, rightNodes, 0, numRightNodes);
+                    }
+
+//                    System.out.println("rightNodes=" + Arrays.toString(rightNodes));
+
+                    // For relaxed nodes, we could calculate from previous cumulativeSizes instead of calling .size()
+                    // on each one.  For strict, we could just add a strict amount.  For now, this works.
+                    for (int i = destCopyStartIdx; i < numRightNodes; i++) {
+                        cumulativeSize += rightNodes[i].size();
+                        rightCumSizes[i] = cumulativeSize;
+                    }
+
+                    right = new Relaxed<>(rightCumSizes, rightNodes);
+                }
+            }
+            return right;
         }
 
         // Holds the size of each sub-node and plus all nodes to its left.  You could think of this as maxIndex + 1.
@@ -1089,7 +1198,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
 
         @SuppressWarnings("unchecked")
         Relaxed<T>[] split() {
-//            System.out.println("Relaxed.splitAt(" + i + ")");
+//            System.out.println("Relaxed.split(" + i + ")");
             int midpoint = nodes.length >> 1; // Shift-right one is the same as dividing by 2.
             Relaxed<T> left = new Relaxed<>(Arrays.copyOf(cumulativeSizes, midpoint),
                                                     Arrays.copyOf(nodes, midpoint));
@@ -1135,8 +1244,6 @@ public class RrbTree1<E> implements ImList<E>, Indented {
 ////            debug("subNode=", subNode);
 //            debug("split=", split);
 
-            // TODO: if there's a focus, does it mean we have one less node somewhere?
-
             final Node<T> left;
             final Node<T> splitLeft = split.left();
             if (subNodeIndex == 0) {
@@ -1171,57 +1278,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
                 }
             }
 
-            final Node<T> right;
-            final Node<T> splitRight = split.right();
-            if (subNodeIndex == (nodes.length - 1)) {
-//                debug("If we have a single right node, it doesn't need a parent.");
-                right = splitRight;
-            } else {
-//                debug("splitRight.size()=" + splitRight.size());
-                boolean haveRightSubNode = splitRight.size() > 0;
-//                debug("haveRightSubNode=" + haveRightSubNode);
-                // If we have a rightSubNode, it's going to need a space in our new node array.
-                int numRightNodes = (cumulativeSizes.length - subNodeIndex) - (haveRightSubNode ? 0 : 1); //(splitRight.size() > 0 ? 2 : 1); // -2 when splitRight.size() > 0
-//                debug("numRightNodes=" + numRightNodes);
-                if ( !haveRightSubNode && (numRightNodes == 1)) {
-//                    debug("If the right node became a focus and there are no other lefts, no parent needed.");
-                    right = nodes[nodes.length - 1];
-                } else {
-                    // Here the first (leftmost) node of the right-hand side was turned into the focus
-                    // and we have additional right-hand nodes to adjust the parent for.
-                    int[] rightCumSizes = new int[numRightNodes];
-                    Node<T>[] rightNodes = (Node<T>[]) new Node[numRightNodes];
-
-//                    System.out.println("nodes=" + Arrays.toString(nodes));
-//                    System.out.println("subNodeIndex=" + subNodeIndex);
-
-                    int cumulativeSize = 0;
-                    int destCopyStartIdx = 0;
-
-                    if (haveRightSubNode) {
-                        //                 src,       srcPos,          dest, destPos, length
-                        System.arraycopy(nodes, subNodeIndex + 1, rightNodes, 1, numRightNodes - 1);
-
-                        rightNodes[0] = splitRight;
-                        cumulativeSize = splitRight.size();
-                        rightCumSizes[0] = cumulativeSize;
-                        destCopyStartIdx = 1;
-                    } else {
-                        //                 src,       srcPos,          dest, destPos, length
-                        System.arraycopy(nodes, subNodeIndex + 1, rightNodes, 0, numRightNodes);
-                    }
-
-//                    System.out.println("rightNodes=" + Arrays.toString(rightNodes));
-
-                    // TODO: Calculate (from previous cumulativeSizes) instead of calling .size()
-                    for (int i = destCopyStartIdx; i < numRightNodes; i++) {
-                        cumulativeSize += rightNodes[i].size();
-                        rightCumSizes[i] = cumulativeSize;
-                    }
-
-                    right = new Relaxed<>(rightCumSizes, rightNodes);
-                }
-            }
+            final Node<T> right = fixRight(nodes, split.right(), subNodeIndex);
 
             SplitNode<T> ret = new SplitNode<>(left, split.leftFocus(),
                                                right, split.rightFocus());
