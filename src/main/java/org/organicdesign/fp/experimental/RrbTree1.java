@@ -737,7 +737,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
                 return new SplitNode<>(this, emptyArray(), emptyLeaf(), emptyArray());
             }
 
-            // TODO: Only the right-hand part of a split needs to relax.  I think...
+            // TODO: Only the right-hand part of a split needs to relax!
             return relax().splitAt(splitIndex);
         }
 
@@ -1127,26 +1127,26 @@ public class RrbTree1<E> implements ImList<E>, Indented {
 
             SplitNode<T> split = subNode.splitAt(subNodeAdjustedIndex);
 
-            debug("--------------------------");
-            debug("before=", this);
-            debug("splitIndex=" + splitIndex);
-            debug("nodes.length=" + nodes.length);
-            debug("subNodeIndex=" + subNodeIndex);
-            debug("subNode=", subNode);
-            debug("split=", split);
+//            debug("--------------------------");
+//            debug("before=", this);
+//            debug("splitIndex=" + splitIndex);
+//            debug("nodes.length=" + nodes.length);
+//            debug("subNodeIndex=" + subNodeIndex);
+////            debug("subNode=", subNode);
+//            debug("split=", split);
 
             // TODO: if there's a focus, does it mean we have one less node somewhere?
 
             final Node<T> left;
             final Node<T> splitLeft = split.left();
             if (subNodeIndex == 0) {
-                debug("If we have a single left node, it doesn't need a parent.");
+//                debug("If we have a single left node, it doesn't need a parent.");
                 left = splitLeft;
             } else {
                 boolean haveLeft = (splitLeft.size() > 0);
                 int numLeftItems = subNodeIndex + (haveLeft ? 1 : 0);
                 if ( !haveLeft && (numLeftItems == 1) ) {
-                    debug("If the left node became a focus and there are no other lefts, no parent needed.");
+//                    debug("If the left node became a focus and there are no other lefts, no parent needed.");
                     left = nodes[0];
                 } else {
                     int[] leftCumSizes = new int[numLeftItems];
@@ -1157,7 +1157,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
                         int cumulativeSize = (numLeftItems > 1) ? leftCumSizes[numLeftItems - 2] : 0;
                         leftCumSizes[numLeftItems - 1] = cumulativeSize + splitLeft.size();
                     }
-                    debug("leftCumSizes=" + Arrays.toString(leftCumSizes));
+//                    debug("leftCumSizes=" + Arrays.toString(leftCumSizes));
                     // Copy one less item if we are going to add the split one in a moment.
                     // I could have written:
                     //     haveLeft ? numLeftItems - 1
@@ -1174,15 +1174,17 @@ public class RrbTree1<E> implements ImList<E>, Indented {
             final Node<T> right;
             final Node<T> splitRight = split.right();
             if (subNodeIndex == (nodes.length - 1)) {
-                debug("If we have a single right node, it doesn't need a parent.");
+//                debug("If we have a single right node, it doesn't need a parent.");
                 right = splitRight;
             } else {
-                debug("splitRight.size()=" + splitRight.size());
-                boolean haveRightSubNode = (splitRight.size() > 0);
-                debug("haveRightSubNode=" + haveRightSubNode);
-                int numRightNodes = (cumulativeSizes.length - subNodeIndex) - 1; //(splitRight.size() > 0 ? 2 : 1); // -2 when splitRight.size() > 0
-                debug("numRightNodes=" + numRightNodes);
-                if (numRightNodes == 1) {
+//                debug("splitRight.size()=" + splitRight.size());
+                boolean haveRightSubNode = splitRight.size() > 0;
+//                debug("haveRightSubNode=" + haveRightSubNode);
+                // If we have a rightSubNode, it's going to need a space in our new node array.
+                int numRightNodes = (cumulativeSizes.length - subNodeIndex) - (haveRightSubNode ? 0 : 1); //(splitRight.size() > 0 ? 2 : 1); // -2 when splitRight.size() > 0
+//                debug("numRightNodes=" + numRightNodes);
+                if ( !haveRightSubNode && (numRightNodes == 1)) {
+//                    debug("If the right node became a focus and there are no other lefts, no parent needed.");
                     right = nodes[nodes.length - 1];
                 } else {
                     // Here the first (leftmost) node of the right-hand side was turned into the focus
@@ -1190,13 +1192,29 @@ public class RrbTree1<E> implements ImList<E>, Indented {
                     int[] rightCumSizes = new int[numRightNodes];
                     Node<T>[] rightNodes = (Node<T>[]) new Node[numRightNodes];
 
-                    //                 src,       srcPos, dest, destPos, length
-                    System.arraycopy(nodes, subNodeIndex + 1, rightNodes, 0, numRightNodes);
+//                    System.out.println("nodes=" + Arrays.toString(nodes));
+//                    System.out.println("subNodeIndex=" + subNodeIndex);
 
                     int cumulativeSize = 0;
+                    int destCopyStartIdx = 0;
+
+                    if (haveRightSubNode) {
+                        //                 src,       srcPos,          dest, destPos, length
+                        System.arraycopy(nodes, subNodeIndex + 1, rightNodes, 1, numRightNodes - 1);
+
+                        rightNodes[0] = splitRight;
+                        cumulativeSize = splitRight.size();
+                        rightCumSizes[0] = cumulativeSize;
+                        destCopyStartIdx = 1;
+                    } else {
+                        //                 src,       srcPos,          dest, destPos, length
+                        System.arraycopy(nodes, subNodeIndex + 1, rightNodes, 0, numRightNodes);
+                    }
+
+//                    System.out.println("rightNodes=" + Arrays.toString(rightNodes));
 
                     // TODO: Calculate (from previous cumulativeSizes) instead of calling .size()
-                    for (int i = 0; i < numRightNodes; i++) {
+                    for (int i = destCopyStartIdx; i < numRightNodes; i++) {
                         cumulativeSize += rightNodes[i].size();
                         rightCumSizes[i] = cumulativeSize;
                     }
@@ -1207,7 +1225,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
 
             SplitNode<T> ret = new SplitNode<>(left, split.leftFocus(),
                                                right, split.rightFocus());
-            debug("RETURNING=", ret);
+//            debug("RETURNING=", ret);
             if (this.size() != ret.size()) {
                 throw new IllegalStateException("Split on " + this.size() + " items returned " + ret.size() + " items");
             }

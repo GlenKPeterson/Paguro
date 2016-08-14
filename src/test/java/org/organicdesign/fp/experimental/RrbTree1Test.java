@@ -261,6 +261,31 @@ public class RrbTree1Test {
     @Test(expected = Exception.class)
     public void putEx() { RrbTree1.empty().replace(1, "Hello"); }
 
+
+    static <T> void testSplit(ArrayList<T> control, RrbTree1<T> test, int splitIndex) {
+        Tuple2<RrbTree1<T>,RrbTree1<T>> split = test.split(splitIndex);
+//        System.out.println("leftSplit=" + split._1().indentedStr(10));
+//        System.out.println("rightSplit=" + split._2().indentedStr(11));
+        List<T> leftControl = control.subList(0,splitIndex);
+        List<T> rightControl = control.subList(splitIndex, control.size());
+        List<T> leftSplit = split._1();
+        List<T> rightSplit = split._2();
+        assertEquals("leftControl:" + leftControl + " != " + " leftSplit:" + leftSplit,
+                     leftControl, leftSplit);
+        assertEquals("rightControl:" + rightControl + " != " + " rightSplit:" + rightSplit,
+                     rightControl, rightSplit);
+    }
+
+    @Test public void splitTestPrevFail() {
+        RrbTree1<Integer> is = RrbTree1.empty();
+        ArrayList<Integer> control = new ArrayList<>();
+        for (int i = 0; i < SEVERAL; i++) {
+            is = is.append(i);
+            control.add(i);
+        }
+        testSplit(control, is, 29);
+    }
+
     // TODO: Fix this.
     @Test public void splitTest() {
         RrbTree1<Integer> is = RrbTree1.empty();
@@ -274,15 +299,9 @@ public class RrbTree1Test {
         System.out.println("splitIndex=" + splitIndex);
 //        System.out.println("empty=" + RrbTree1.empty().indentedStr(6));
         try {
-            Tuple2<RrbTree1<Integer>,RrbTree1<Integer>> split = is.split(splitIndex);
-            System.out.println("leftSplit=" + split._1().indentedStr(10));
-            System.out.println("rightSplit=" + split._2().indentedStr(11));
-            List<Integer> leftControl = control.subList(0,splitIndex);
-            List<Integer> rightControl = control.subList(splitIndex, control.size());
-            assertEquals(leftControl, split._1());
-            assertEquals(rightControl, split._2());
+            testSplit(control, is, splitIndex);
         } catch (Exception e) {
-            System.out.println("splitIndex:" + splitIndex); // print before blowing up...
+            System.out.println("bad splitIndex:" + splitIndex); // print before blowing up...
             // OK, now we can continue throwing exception.
             throw e;
         }
