@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.UnmodListTest;
@@ -274,9 +273,9 @@ public class RrbTree1Test {
         List<T> rightControl = control.subList(splitIndex, control.size());
         RrbTree1<T> leftSplit = split._1();
         RrbTree1<T> rightSplit = split._2();
-        System.out.println("splitIndex=" + splitIndex);
-        System.out.println("left=" + leftSplit.indentedStr(5));
-        System.out.println("right=" + rightSplit.indentedStr(6));
+//        System.out.println("splitIndex=" + splitIndex);
+//        System.out.println("left=" + leftSplit.indentedStr(5));
+//        System.out.println("right=" + rightSplit.indentedStr(6));
         assertEquals("leftControl:" + leftControl + "\n doesn't equal leftSplit:" + leftSplit,
                      leftControl, leftSplit);
         assertEquals("rightControl:" + rightControl + "\n doesn't equal rightSplit:" + rightSplit,
@@ -316,7 +315,6 @@ public class RrbTree1Test {
     }
 
     // TODO: Fix this!
-    @Ignore
     @Test public void relaxedSplitTest() {
         RrbTree1<Integer> is = RrbTree1.empty();
         ArrayList<Integer> control = new ArrayList<>();
@@ -330,7 +328,7 @@ public class RrbTree1Test {
                 control.add(idx, j);
             }
             assertEquals(SEVERAL, is.size());
-            System.out.println("is:" + is.indentedStr(3));
+//            System.out.println("is:" + is.indentedStr(3));
             for (int j = 1; j <= SEVERAL; j++) {
                 splitIndex = j; // So we have it when exception is thrown.
                 testSplit(control, is, splitIndex);

@@ -185,13 +185,46 @@ public class RrbTree1<E> implements ImList<E>, Indented {
         return sB;
     }
 
+    private static <T> String arrayString(T[] items) {
+        StringBuilder sB = new StringBuilder("[");
+        boolean isFirst = true;
+        for (T item : items) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                sB.append(" ");
+            }
+            if (item instanceof String) {
+                sB.append("\"").append(item).append("\"");
+            } else {
+                sB.append(item);
+            }
+        }
+        return sB.append("]").toString();
+    }
+
+    // TODO: We need one of these for each type of primitive for pretty-printing without commas.
+    private static String arrayString(int[] items) {
+        StringBuilder sB = new StringBuilder("[");
+        boolean isFirst = true;
+        for (int item : items) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                sB.append(" ");
+            }
+            sB.append(item);
+        }
+        return sB.append("]").toString();
+    }
+
     private static StringBuilder showSubNodes(StringBuilder sB, Node[] nodes, int nextIndent) {
         boolean isFirst = true;
         for (Node n : nodes) {
             if (isFirst) {
                 isFirst = false;
             } else {
-                sB.append(",");
+//                sB.append(" ");
                 if (nodes[0] instanceof Leaf) {
                     sB.append(" ");
                 } else {
@@ -332,7 +365,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
 
 //        System.out.println("insert somewhere other than the current focus.");
 //        System.out.println("focusStartIndex: " + focusStartIndex);
-//        System.out.println("focus: " + Arrays.toString(focus));
+//        System.out.println("focus: " + arrayString(focus));
         // Here we are left with an insert somewhere else than the current focus.
         Node<E> newRoot = focus.length > 0 ? root.pushFocus(focusStartIndex, focus)
                                            : root;
@@ -405,7 +438,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
     @Override public String indentedStr(int indent) {
         return "RrbTree(size=" + size +
                " fsi=" + focusStartIndex +
-               " focus=" + Arrays.toString(focus) + "\n" +
+               " focus=" + arrayString(focus) + "\n" +
                indentSpace(indent + 8) + "root=" + (root == null ? "null" : root.indentedStr(indent + 13)) + ")";
     }
 
@@ -456,9 +489,9 @@ public class RrbTree1<E> implements ImList<E>, Indented {
             int nextIndent = indent + sB.length();
             String nextIndentStr = indentSpace(nextIndent).toString();
             return sB.append("left=").append(left().indentedStr(nextIndent + 5)).append(",\n")
-                     .append(nextIndentStr).append("leftFocus=").append(Arrays.toString(leftFocus())).append(",\n")
+                     .append(nextIndentStr).append("leftFocus=").append(arrayString(leftFocus())).append(",\n")
                      .append(nextIndentStr).append("right=").append(right().indentedStr(nextIndent + 6)).append(",\n")
-                     .append(nextIndentStr).append("rightFocus=").append(Arrays.toString(rightFocus())).append(")")
+                     .append(nextIndentStr).append("rightFocus=").append(arrayString(rightFocus())).append(")")
                      .toString();
         }
 
@@ -486,7 +519,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
               // + " MIN_NODE_LENGTH=" + MIN_NODE_LENGTH + " MAX_NODE_LENGTH=" + MAX_NODE_LENGTH);
             }
 //            System.out.println("Leaf.hasRelaxedCapacity(index=" + index + ", size=" + size + ")");
-//            System.out.println("   Leaf.items=" + Arrays.toString(items));
+//            System.out.println("   Leaf.items=" + arrayString(items));
 //            System.out.println("   MAX_NODE_LENGTH=" + MAX_NODE_LENGTH);
             return (items.length + size) < MAX_NODE_LENGTH;
         }
@@ -510,10 +543,10 @@ public class RrbTree1<E> implements ImList<E>, Indented {
                                                   new Object[rightLength]};
             // original array, offset, newArray, offset, length
             System.arraycopy(orig, 0, split[0], 0, splitIndex);
-//            System.out.println("    left: " + Arrays.toString(left));
+//            System.out.println("    left: " + arrayString(left));
 
             System.arraycopy(orig, splitIndex, split[1], 0, rightLength);
-//            System.out.println("    right: " + Arrays.toString(right));
+//            System.out.println("    right: " + arrayString(right));
             return split;
         }
 
@@ -542,7 +575,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
             T[] newItems = spliceIntoArrayAt(oldFocus, items, splitIndex,
                                              (Class<T>) items[0].getClass());
 
-//            System.out.println("    newItems: " + Arrays.toString(newItems));
+//            System.out.println("    newItems: " + arrayString(newItems));
             // Shift right one is divide-by 2.
             T[][] split = splitArray(newItems, newItems.length >> 1);
 
@@ -603,12 +636,12 @@ public class RrbTree1<E> implements ImList<E>, Indented {
         }
 
         @Override public String toString() {
-//            return "Leaf("+ Arrays.toString(items) + ")";
-            return Arrays.toString(items);
+//            return "Leaf("+ arrayString(items) + ")";
+            return arrayString(items);
         }
 
         @Override public String indentedStr(int indent) {
-            return Arrays.toString(items);
+            return arrayString(items);
         }
     } // end class Leaf
 
@@ -623,7 +656,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
         // Constructor
         Strict(int s, Node<T>[] ns) {
             shift = s; nodes = ns;
-//            System.out.println("    new Strict" + shift + Arrays.toString(ns));
+//            System.out.println("    new Strict" + shift + arrayString(ns));
         }
 
         /**
@@ -771,7 +804,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
                     left = nodes[0];
                 } else {
                     Node<T>[] leftNodes = (Node<T>[]) new Node[numLeftItems];
-                    //                    debug("leftCumSizes=" + Arrays.toString(leftCumSizes));
+                    //                    debug("leftCumSizes=" + arrayString(leftCumSizes));
                     // Copy one less item if we are going to add the split one in a moment.
                     // I could have written:
                     //     haveLeft ? numLeftItems - 1
@@ -817,7 +850,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
         @SuppressWarnings("unchecked")
         @Override
         public Node<T> pushFocus(int index, T[] oldFocus) {
-//            System.out.println("Strict pushFocus(" + Arrays.toString(oldFocus) +
+//            System.out.println("Strict pushFocus(" + arrayString(oldFocus) +
 //                               ", " + index + ")");
 //            System.out.println("  this: " + this);
 
@@ -904,7 +937,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
                 cumulativeSize = cumulativeSize + nodes[i].size();
                 cumulativeSizes[i] = cumulativeSize;
             }
-//            System.out.println("End indices: " + Arrays.toString(cumulativeSizes));
+//            System.out.println("End indices: " + arrayString(cumulativeSizes));
             return new Relaxed<>(cumulativeSizes, nodes).pushFocus(index, oldFocus);
         }
 
@@ -921,7 +954,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
 
         @Override public String toString() {
 //            return "Strict(nodes.length="+ nodes.length + ", shift=" + shift + ")";
-            return "Strict" + shift + Arrays.toString(nodes);
+            return "Strict" + shift + arrayString(nodes);
         }
 
         @Override public String indentedStr(int indent) {
@@ -972,7 +1005,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
                     int[] rightCumSizes = new int[numRightNodes];
                     Node<T>[] rightNodes = (Node<T>[]) new Node[numRightNodes];
 
-//                    System.out.println("origNodes=" + Arrays.toString(origNodes));
+//                    System.out.println("origNodes=" + arrayString(origNodes));
 //                    System.out.println("subNodeIndex=" + subNodeIndex);
 
                     int cumulativeSize = 0;
@@ -991,7 +1024,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
                         System.arraycopy(origNodes, subNodeIndex + 1, rightNodes, 0, numRightNodes);
                     }
 
-//                    System.out.println("rightNodes=" + Arrays.toString(rightNodes));
+//                    System.out.println("rightNodes=" + arrayString(rightNodes));
 
                     // For relaxed nodes, we could calculate from previous cumulativeSizes instead of calling .size()
                     // on each one.  For strict, we could just add a strict amount.  For now, this works.
@@ -1038,8 +1071,8 @@ public class RrbTree1<E> implements ImList<E>, Indented {
                                                        nodes[i].size() +
                                                        " which is not compatable with cumulativeSizes[" +
                                                        i + "] which was " + cumulativeSizes[i] +
-                                                       "\n\tcumulativeSizes=" + Arrays.toString(cumulativeSizes) +
-                                                       "\n\tnodes=" + Arrays.toString(nodes));
+                                                       "\n\tcumulativeSizes=" + arrayString(cumulativeSizes) +
+                                                       "\n\tnodes=" + arrayString(nodes));
                 }
             }
         }
@@ -1078,7 +1111,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
 
 
 //            System.out.println("treeIndex=" + treeIndex);
-//            System.out.println(" cumulativeSizes=" + Arrays.toString(cumulativeSizes));
+//            System.out.println(" cumulativeSizes=" + arrayString(cumulativeSizes));
             int guess = (cumulativeSizes.length * treeIndex) / size();
 //            System.out.println(" guess=" + guess);
             if (guess >= cumulativeSizes.length) {
@@ -1267,7 +1300,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
                         int cumulativeSize = (numLeftItems > 1) ? leftCumSizes[numLeftItems - 2] : 0;
                         leftCumSizes[numLeftItems - 1] = cumulativeSize + splitLeft.size();
                     }
-//                    debug("leftCumSizes=" + Arrays.toString(leftCumSizes));
+//                    debug("leftCumSizes=" + arrayString(leftCumSizes));
                     // Copy one less item if we are going to add the split one in a moment.
                     // I could have written:
                     //     haveLeft ? numLeftItems - 1
@@ -1287,7 +1320,14 @@ public class RrbTree1<E> implements ImList<E>, Indented {
                                                right, split.rightFocus());
 //            debug("RETURNING=", ret);
             if (this.size() != ret.size()) {
-                throw new IllegalStateException("Split on " + this.size() + " items returned " + ret.size() + " items");
+                throw new IllegalStateException("Split on " + this.size() + " items returned " +
+                                                ret.size() + " items\n" +
+                                                "original=" + this.indentedStr(9) + "\n" +
+                                                "splitIndex=" + splitIndex + "\n" +
+                                                "leftFocus=" + arrayString(split.leftFocus()) + "\n" +
+                                                "left=" + left.indentedStr(5) + "\n" +
+                                                "rightFocus=" + arrayString(split.rightFocus()) + "\n" +
+                                                "right=" + right.indentedStr(6));
             }
 
             return ret;
@@ -1298,7 +1338,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
             // TODO: Review this entire method.
 //            System.out.println("===========\n" +
 //                               "Relaxed pushFocus(index=" + index + ", oldFocus=" +
-//                               Arrays.toString(oldFocus) + ")");
+//                               arrayString(oldFocus) + ")");
 //            System.out.println("  this: " + this);
 
             int subNodeIndex = subNodeIndex(index);
@@ -1386,7 +1426,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
 
                     newNodes = new Node[nodes.length + 1];
 
-//                    System.out.println("old cumulativeSizes=" + Arrays.toString(cumulativeSizes));
+//                    System.out.println("old cumulativeSizes=" + arrayString(cumulativeSizes));
 
                     // Increment newCumSizes for the changed item and all items to the right.
                     newCumSizes = new int[cumulativeSizes.length + 1];
@@ -1399,7 +1439,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
                         System.arraycopy(nodes, 0, newNodes, 0, subNodeIndex);
                         //               src,   srcPos, dest,    destPos, length
                         System.arraycopy(cumulativeSizes, 0, newCumSizes, 0, subNodeIndex);
-//                        System.out.println("start of newCumSizes=" + Arrays.toString(newCumSizes));
+//                        System.out.println("start of newCumSizes=" + arrayString(newCumSizes));
 
                         leftSize = cumulativeSizes[subNodeIndex - 1];
 //                        System.out.println("cumulativeSize=" + cumulativeSize);
@@ -1412,15 +1452,15 @@ public class RrbTree1<E> implements ImList<E>, Indented {
                     newCumSizes[subNodeIndex] = leftSize;
                     newCumSizes[subNodeIndex + 1] = leftSize + rightLeaf.size();
 
-//                    System.out.println("continued newNodes=" + Arrays.toString(newNodes));
-//                    System.out.println("continued cumulativeSizes=" + Arrays.toString(newCumSizes));
+//                    System.out.println("continued newNodes=" + arrayString(newNodes));
+//                    System.out.println("continued cumulativeSizes=" + arrayString(newCumSizes));
 
 
                     if (subNodeIndex < (nodes.length - 1)) {
                         //               src,srcPos,dest,destPos,length
                         System.arraycopy(nodes, subNodeIndex + 1, newNodes, subNodeIndex + 2,
                                          nodes.length - subNodeIndex - 1);
-//                        System.out.println("completed newNodes=" + Arrays.toString(newNodes));
+//                        System.out.println("completed newNodes=" + arrayString(newNodes));
                     }
                     numToSkip = 2;
                 }
@@ -1430,11 +1470,11 @@ public class RrbTree1<E> implements ImList<E>, Indented {
 //                    System.out.println("oldFocus.length=" + oldFocus.length);
 //                    System.out.println("cumulativeSizes[i - 1]=" + cumulativeSizes[i - 1]);
                     newCumSizes[i] = cumulativeSizes[i - 1] + oldFocus.length;
-//                    System.out.println("newCumSizes so far=" + Arrays.toString(newCumSizes));
+//                    System.out.println("newCumSizes so far=" + arrayString(newCumSizes));
                 }
 
-//                System.out.println("newNodes=" + Arrays.toString(newNodes));
-//                System.out.println("newCumSizes=" + Arrays.toString(newCumSizes));
+//                System.out.println("newNodes=" + arrayString(newNodes));
+//                System.out.println("newCumSizes=" + arrayString(newCumSizes));
                 return new Relaxed<>(newCumSizes, newNodes);
                 // end if subNode instanceof Leaf
             } else if (subNode instanceof Strict) {
@@ -1454,7 +1494,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
 //            System.out.println("Splitting from:\n" + this.indentedStr(0));
 //            System.out.println("About to split:\n" + subNode.indentedStr(0));
 //            System.out.println("Split at: " + (subNode.size() >> 1));
-//            System.out.println("To insert: " + Arrays.toString(oldFocus));
+//            System.out.println("To insert: " + arrayString(oldFocus));
 
             Relaxed<T>[] newSubNode = ((Relaxed<T>) subNode).split();
 
@@ -1512,22 +1552,18 @@ public class RrbTree1<E> implements ImList<E>, Indented {
             return new Relaxed<>(cumulativeSizes, newNodes);
         }
 
-        @Override public String toString() {
-            return "Relaxed(cumulativeSizes=" + Arrays.toString(cumulativeSizes) +
-                   " nodes=" + Arrays.toString(nodes)
-                                     .replaceAll(", Relaxed\\(", ",\n           Relaxed(") + ")";
-        }
-
         @Override public String indentedStr(int indent) {
             StringBuilder sB = new StringBuilder() // indentSpace(indent)
                     .append("Relaxed(");
             int nextIndent = indent + sB.length();
-            sB.append("cumulativeSizes=").append(Arrays.toString(cumulativeSizes)).append("\n")
+            sB.append("cumulativeSizes=").append(arrayString(cumulativeSizes)).append("\n")
               .append(indentSpace(nextIndent)).append("nodes=[");
             // + 6 for "nodes="
             return showSubNodes(sB, nodes, nextIndent + 7)
                     .append("])")
                     .toString();
         }
+
+        @Override public String toString() { return indentedStr(0); }
     } // end class Relaxed
 } // end class RrbTree
