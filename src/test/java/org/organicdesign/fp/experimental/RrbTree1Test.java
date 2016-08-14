@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.UnmodListTest;
@@ -261,21 +262,24 @@ public class RrbTree1Test {
     @Test(expected = Exception.class)
     public void putEx() { RrbTree1.empty().replace(1, "Hello"); }
 
-
-    static <T> void testSplit(ArrayList<T> control, RrbTree1<T> test, int splitIndex) {
+    private static <T> void testSplit(ArrayList<T> control, RrbTree1<T> test, int splitIndex) {
+        if ( (splitIndex < 1) && (splitIndex > control.size()) ) {
+            throw new IllegalArgumentException("Constraint violation failed: 1 <= splitIndex <= size");
+        }
+//        System.out.println("test=" + test.indentedStr(5));
         Tuple2<RrbTree1<T>,RrbTree1<T>> split = test.split(splitIndex);
 //        System.out.println("leftSplit=" + split._1().indentedStr(10));
 //        System.out.println("rightSplit=" + split._2().indentedStr(11));
-        List<T> leftControl = control.subList(0,splitIndex);
+        List<T> leftControl = control.subList(0, splitIndex);
         List<T> rightControl = control.subList(splitIndex, control.size());
         RrbTree1<T> leftSplit = split._1();
         RrbTree1<T> rightSplit = split._2();
         System.out.println("splitIndex=" + splitIndex);
         System.out.println("left=" + leftSplit.indentedStr(5));
         System.out.println("right=" + rightSplit.indentedStr(6));
-        assertEquals("leftControl:" + leftControl + " != " + " leftSplit:" + leftSplit,
+        assertEquals("leftControl:" + leftControl + "\n doesn't equal leftSplit:" + leftSplit,
                      leftControl, leftSplit);
-        assertEquals("rightControl:" + rightControl + " != " + " rightSplit:" + rightSplit,
+        assertEquals("rightControl:" + rightControl + "\n doesn't equal rightSplit:" + rightSplit,
                      rightControl, rightSplit);
     }
 
@@ -289,8 +293,7 @@ public class RrbTree1Test {
         testSplit(control, is, 29);
     }
 
-    // TODO: Fix this.
-    @Test public void splitTest() {
+    @Test public void strictSplitTest() {
         RrbTree1<Integer> is = RrbTree1.empty();
         ArrayList<Integer> control = new ArrayList<>();
 //        int splitIndex = rand.nextInt(is.size() + 1);
@@ -309,6 +312,33 @@ public class RrbTree1Test {
                 // OK, now we can continue throwing exception.
                 throw e;
             }
+        }
+    }
+
+    // TODO: Fix this!
+    @Ignore
+    @Test public void relaxedSplitTest() {
+        RrbTree1<Integer> is = RrbTree1.empty();
+        ArrayList<Integer> control = new ArrayList<>();
+        ArrayList<Integer> rands = new ArrayList<>();
+        int splitIndex = 0;
+        try {
+            for (int j = 0; j < SEVERAL; j++) {
+                int idx = rand.nextInt(is.size() + 1);
+                rands.add(idx);
+                is = is.insert(idx, j);
+                control.add(idx, j);
+            }
+            assertEquals(SEVERAL, is.size());
+            System.out.println("is:" + is.indentedStr(3));
+            for (int j = 1; j <= SEVERAL; j++) {
+                splitIndex = j; // So we have it when exception is thrown.
+                testSplit(control, is, splitIndex);
+            }
+        } catch (Exception e) {
+            System.out.println("splitIndex:" + splitIndex + " rands:" + rands); // print before blowing up...
+            // OK, now we can continue throwing exception.
+            throw e;
         }
     }
 

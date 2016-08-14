@@ -377,6 +377,9 @@ public class RrbTree1<E> implements ImList<E>, Indented {
      empty (but never null).
      */
     public Tuple2<RrbTree1<E>,RrbTree1<E>> split(int splitIndex) {
+        if ( (splitIndex < 1) && (splitIndex > size) ) {
+            throw new IllegalArgumentException("Constraint violation failed: 1 <= splitIndex <= size");
+        }
         // Push the focus before splitting.
         Node<E> newRoot = (focus.length > 0) ? root.pushFocus(focusStartIndex, focus)
                                              : root;
