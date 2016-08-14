@@ -3,7 +3,7 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") p
 **Notice:** This project will be renamed to "Paguro" which is short for the Latin "Paguroidea", the name of the Hermit Crab Superfamily in Biology.  These collections grow by adding a new shell, leaving the insides the same, much the way Hermit Crabs trade up to a new shell when they grow.  Plus, hermit crabs are cute.
 
 ![Hermit Crab](https://c7.staticflickr.com/8/7413/12171498934_2934c7ef28_n.jpg)
-Photo by [Rushin](https://www.flickr.com/people/rushen/)
+Photo by [Rushen](https://www.flickr.com/photos/rushen/12171498934/in/photostream/)
 
 #Features
 
