@@ -156,6 +156,68 @@ public class RrbTree1<E> implements ImList<E>, Indented {
         return replaceInArrayAt(replacedItem, origItems, idx, null);
     }
 
+    /**
+     Only call this if the array actually needs to be split (0 &lt; splitPoint &lt; orig.length).
+     @param orig array to split
+     @param splitIndex items less than this index go in the left, equal or greater in the right.
+     @return a 2D array of leftItems then rightItems
+     */
+    private static <T> Tuple2<T[],T[]> splitArray(T[] orig, int splitIndex) { //, Class<T> tClass) {
+        if (splitIndex < 1) {
+            throw new IllegalArgumentException("Called split when splitIndex < 1");
+        }
+        if (splitIndex > orig.length - 1) {
+            throw new IllegalArgumentException("Called split when splitIndex > orig.length - 1");
+        }
+
+        // NOTE:
+        // I sort of suspect that generic 2D array creation where the two arrays are of a different
+        // length is not possible in Java, or if it is, it's not likely to be much faster than
+        // what we have here.  I'd just copy the Arrays.copyOf code everywhere this function is used
+        // if you want more speed.
+//        int rightLength = orig.length - splitIndex;
+//        Class<T> tClass = (Class<T>) orig.getClass().getComponentType();
+//        Tuple2<T[],T[]> split = Tuple2.of((T[]) Array.newInstance(tClass, splitIndex),
+//                                          (T[]) Array.newInstance(tClass, rightLength));
+//
+        Tuple2<T[],T[]> split = Tuple2.of(Arrays.copyOf(orig, splitIndex),
+                                          Arrays.copyOfRange(orig, splitIndex, orig.length));
+
+//        // original array, offset, newArray, offset, length
+//        System.arraycopy(orig, 0, split._1(), 0, splitIndex);
+////            System.out.println("    left: " + arrayString(left));
+//
+//        System.arraycopy(orig, splitIndex, split._2(), 0, rightLength);
+////            System.out.println("    right: " + arrayString(right));
+        return split;
+    }
+
+    /**
+     Only call this if the array actually needs to be split (0 &lt; splitPoint &lt; orig.length).
+     @param orig array to split
+     @param splitIndex items less than this index go in the left, equal or greater in the right.
+     @return a 2D array of leftItems then rightItems
+     */
+    private static int[][] splitArray(int[] orig, int splitIndex) {
+        // This function started an exact duplicate of the one above, but for ints.
+        if (splitIndex < 1) {
+            throw new IllegalArgumentException("Called split when splitIndex < 1");
+        }
+        if (splitIndex > orig.length - 1) {
+            throw new IllegalArgumentException("Called split when splitIndex > orig.length - 1");
+        }
+        int rightLength = orig.length - splitIndex;
+        int[][] split = new int[][] {new int[splitIndex],
+                                     new int[rightLength]};
+        // original array, offset, newArray, offset, length
+        System.arraycopy(orig, 0, split[0], 0, splitIndex);
+//            System.out.println("    left: " + arrayString(left));
+
+        System.arraycopy(orig, splitIndex, split[1], 0, rightLength);
+//            System.out.println("    right: " + arrayString(right));
+        return split;
+    }
+
     private static StringBuilder indentSpace(int len) {
         StringBuilder sB = new StringBuilder();
         while (len >= 32) {
@@ -524,32 +586,6 @@ public class RrbTree1<E> implements ImList<E>, Indented {
             return (items.length + size) < MAX_NODE_LENGTH;
         }
 
-        /**
-         Only call this if the array actually needs to be split (0 &lt; splitPoint &lt; orig.length).
-         @param orig array to split
-         @param splitIndex items less than this index go in the left, equal or greater in the right.
-         @return a 2D array of leftItems then rightItems
-         */
-        @SuppressWarnings("unchecked")
-        private T[][] splitArray(T[] orig, int splitIndex) {
-            if (splitIndex < 1) {
-                throw new IllegalArgumentException("Called split when splitIndex < 1");
-            }
-            if (splitIndex > orig.length - 1) {
-                throw new IllegalArgumentException("Called split when splitIndex > orig.length - 1");
-            }
-            int rightLength = orig.length - splitIndex;
-            T[][] split = (T[][]) new Object[][] {new Object[splitIndex],
-                                                  new Object[rightLength]};
-            // original array, offset, newArray, offset, length
-            System.arraycopy(orig, 0, split[0], 0, splitIndex);
-//            System.out.println("    left: " + arrayString(left));
-
-            System.arraycopy(orig, splitIndex, split[1], 0, rightLength);
-//            System.out.println("    right: " + arrayString(right));
-            return split;
-        }
-
         @Override
         public SplitNode<T> splitAt(int splitIndex) {
 //            if (splitIndex < 1) {
@@ -565,8 +601,8 @@ public class RrbTree1<E> implements ImList<E>, Indented {
             if (splitIndex == items.length) {
                 return new SplitNode<>(emptyLeaf(), items, emptyLeaf(), emptyArray());
             }
-            T[][] split = splitArray(items, splitIndex);
-            return new SplitNode<>(emptyLeaf(), split[0], emptyLeaf(), split[1]);
+            Tuple2<T[],T[]> split = splitArray(items, splitIndex);
+            return new SplitNode<>(emptyLeaf(), split._1(), emptyLeaf(), split._2());
         }
 
         @SuppressWarnings("unchecked")
@@ -577,9 +613,9 @@ public class RrbTree1<E> implements ImList<E>, Indented {
 
 //            System.out.println("    newItems: " + arrayString(newItems));
             // Shift right one is divide-by 2.
-            T[][] split = splitArray(newItems, newItems.length >> 1);
+            Tuple2<T[],T[]> split = splitArray(newItems, newItems.length >> 1);
 
-            return new Leaf[] {new Leaf<>(split[0]), new Leaf<>(split[1])};
+            return new Leaf[] {new Leaf<>(split._1()), new Leaf<>(split._2())};
         }
 
         // I think this can only be called when the root node is a leaf.
@@ -1268,8 +1304,24 @@ public class RrbTree1<E> implements ImList<E>, Indented {
 
             int subNodeIndex = subNodeIndex(splitIndex);
             Node<T> subNode = nodes[subNodeIndex];
-            int subNodeAdjustedIndex = subNodeAdjustedIndex(splitIndex, subNodeIndex);
 
+//            System.out.println("subNodeIndex=" + subNodeIndex);
+            if ( (subNodeIndex > 0) && (splitIndex == cumulativeSizes[subNodeIndex - 1]) ) {
+//                System.out.println("FALLS ON AN EXISTING NODE BOUNDARY");
+                Tuple2<Node<T>[],Node<T>[]> splitNodes = splitArray(nodes, subNodeIndex);
+
+                int[][] splitCumSizes = splitArray(cumulativeSizes, subNodeIndex);
+                int[] leftCumSizes = splitCumSizes[0];
+                int[] rightCumSizes = splitCumSizes[1];
+                int bias = leftCumSizes[leftCumSizes.length - 1];
+                for (int i = 0; i < rightCumSizes.length; i++) {
+                    rightCumSizes[i] = rightCumSizes[i] - bias;
+                }
+                return new SplitNode<>(new Relaxed<>(leftCumSizes, splitNodes._1()), emptyArray(),
+                                       new Relaxed<>(rightCumSizes, splitNodes._2()), emptyArray());
+            }
+
+            int subNodeAdjustedIndex = subNodeAdjustedIndex(splitIndex, subNodeIndex);
             SplitNode<T> split = subNode.splitAt(subNodeAdjustedIndex);
 
 //            debug("--------------------------");

@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.UnmodListTest;
@@ -315,8 +314,6 @@ public class RrbTree1Test {
         }
     }
 
-    // TODO: Fix this!
-    @Ignore
     @Test public void relaxedSplitTest() {
         RrbTree1<Integer> is = RrbTree1.empty();
         ArrayList<Integer> control = new ArrayList<>();
