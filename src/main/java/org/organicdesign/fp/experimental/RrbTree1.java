@@ -516,19 +516,19 @@ public class RrbTree1<E> implements ImList<E>, Indented {
 
         @Override
         public SplitNode<T> splitAt(int splitIndex) {
-            if (splitIndex < 1) {
-                throw new IllegalArgumentException("Called splitAt when splitIndex < 1");
-            }
-            if (splitIndex > items.length - 1) {
-                throw new IllegalArgumentException("Called splitAt when splitIndex > orig.length - 1");
-            }
-//            // Should we just ensure that the split is between 1 and items.length (exclusive)?
-//            if (splitIndex == 0) {
-//                return Tuple4.of(null, null, null, items);
+//            if (splitIndex < 1) {
+//                throw new IllegalArgumentException("Called splitAt when splitIndex < 1");
 //            }
-//            if (splitIndex == items.length) {
-//                return Tuple4.of(null, items, null, null);
+//            if (splitIndex > items.length - 1) {
+//                throw new IllegalArgumentException("Called splitAt when splitIndex > orig.length - 1");
 //            }
+            // Should we just ensure that the split is between 1 and items.length (exclusive)?
+            if (splitIndex == 0) {
+                return new SplitNode<>(emptyLeaf(), emptyArray(), emptyLeaf(), items);
+            }
+            if (splitIndex == items.length) {
+                return new SplitNode<>(emptyLeaf(), items, emptyLeaf(), emptyArray());
+            }
             T[][] split = splitArray(items, splitIndex);
             return new SplitNode<>(emptyLeaf(), split[0], emptyLeaf(), split[1]);
         }

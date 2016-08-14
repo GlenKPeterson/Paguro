@@ -268,8 +268,11 @@ public class RrbTree1Test {
 //        System.out.println("rightSplit=" + split._2().indentedStr(11));
         List<T> leftControl = control.subList(0,splitIndex);
         List<T> rightControl = control.subList(splitIndex, control.size());
-        List<T> leftSplit = split._1();
-        List<T> rightSplit = split._2();
+        RrbTree1<T> leftSplit = split._1();
+        RrbTree1<T> rightSplit = split._2();
+        System.out.println("splitIndex=" + splitIndex);
+        System.out.println("left=" + leftSplit.indentedStr(5));
+        System.out.println("right=" + rightSplit.indentedStr(6));
         assertEquals("leftControl:" + leftControl + " != " + " leftSplit:" + leftSplit,
                      leftControl, leftSplit);
         assertEquals("rightControl:" + rightControl + " != " + " rightSplit:" + rightSplit,
@@ -295,15 +298,17 @@ public class RrbTree1Test {
             is = is.append(i);
             control.add(i);
         }
-        int splitIndex = 29; //rand.nextInt(is.size() + 1);
-        System.out.println("splitIndex=" + splitIndex);
+        for (int splitIndex = 1; splitIndex <= SEVERAL; splitIndex++) {
+//            int splitIndex = i; //rand.nextInt(is.size() + 1);
+//            System.out.println("splitIndex=" + splitIndex);
 //        System.out.println("empty=" + RrbTree1.empty().indentedStr(6));
-        try {
-            testSplit(control, is, splitIndex);
-        } catch (Exception e) {
-            System.out.println("bad splitIndex:" + splitIndex); // print before blowing up...
-            // OK, now we can continue throwing exception.
-            throw e;
+            try {
+                testSplit(control, is, splitIndex);
+            } catch (Exception e) {
+                System.out.println("Bad splitIndex:" + splitIndex); // print before blowing up...
+                // OK, now we can continue throwing exception.
+                throw e;
+            }
         }
     }
 
