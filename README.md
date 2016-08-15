@@ -1,12 +1,13 @@
 UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") provides type-safe versions of Clojure's immutable collections and a few other tools to make functional programming in Java a little easier.
 
 #News
-**Notice:** This project will soon be renamed to "Paguro" which is short for the Latin "Paguroidea", the name of the Hermit Crab superfamily in Biology.  These collections grow by adding a new shell, leaving the insides the same, much the way Hermit Crabs trade up to a new shell when they grow.  Plus, hermit crabs are cute.
+###Renaming
+This project will soon be renamed to "Paguro" which is short for the Latin "Paguroidea", the name of the Hermit Crab superfamily in Biology.  These collections grow by adding a new shell, leaving the insides the same, much the way Hermit Crabs trade up to a new shell when they grow.  Plus, hermit crabs are cute.
 
 ![Hermit Crab](https://c7.staticflickr.com/8/7413/12171498934_2934c7ef28_n.jpg)
 Photo by [Rushen](https://www.flickr.com/photos/rushen/12171498934/in/photostream/)
 
-##RRB-Tree
+###RRB-Tree
 Current development is centered around an Apache-licensed all-Java RRB-Tree.  Read the [recent status](https://github.com/GlenKPeterson/UncleJim/issues/4#issuecomment-239825939) or check out the [latest version of the code](https://github.com/GlenKPeterson/UncleJim/blob/2016-05-22_RRB-Tree/src/main/java/org/organicdesign/fp/experimental/RrbTree1.java).
 
 #Features
