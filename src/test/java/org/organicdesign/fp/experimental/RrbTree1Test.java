@@ -261,6 +261,16 @@ public class RrbTree1Test {
     @Test(expected = Exception.class)
     public void putEx() { RrbTree1.empty().replace(1, "Hello"); }
 
+    private static boolean isPrime(int num) {
+        return false;
+//            if (num < 2) return false;
+//            if (num == 2) return true;
+//            if (num % 2 == 0) return false;
+//            for (int i = 3; i * i <= num; i += 2)
+//                if (num % i == 0) return false;
+//            return true;
+    }
+
     private static <T> void testSplit(ArrayList<T> control, RrbTree1<T> test, int splitIndex) {
         if ( (splitIndex < 1) && (splitIndex > control.size()) ) {
             throw new IllegalArgumentException("Constraint violation failed: 1 <= splitIndex <= size");
@@ -273,9 +283,12 @@ public class RrbTree1Test {
         List<T> rightControl = control.subList(splitIndex, control.size());
         RrbTree1<T> leftSplit = split._1();
         RrbTree1<T> rightSplit = split._2();
-//        System.out.println("splitIndex=" + splitIndex);
-//        System.out.println("left=" + leftSplit.indentedStr(5));
-//        System.out.println("right=" + rightSplit.indentedStr(6));
+        if (isPrime(splitIndex)) {
+            System.out.println("original=\n" + test.indentedStr(0));
+            System.out.println("splitIndex=" + splitIndex);
+            System.out.println("left=\n" + leftSplit.indentedStr(0));
+            System.out.println("right=\n" + rightSplit.indentedStr(0));
+        }
         assertEquals("leftControl:" + leftControl + "\n doesn't equal leftSplit:" + leftSplit,
                      leftControl, leftSplit);
         assertEquals("rightControl:" + rightControl + "\n doesn't equal rightSplit:" + rightSplit,

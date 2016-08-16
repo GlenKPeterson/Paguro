@@ -33,11 +33,17 @@ interface Indented { String indentedStr(int indent); }
 
  Still TO-DO:
   - More Testing
-  - Tuple2&lt;RrbTree1,RrbTree1&gt; split(int index)
-  - insert(int index, RrbTree1 other)
+  - join(RrbTree1 other)
   - remove(int index)
   - Change radix from 4 to 32.
   - Speed testing and optimization.
+
+ History (what little I know):
+ 1972: B-Tree: Rudolf Bayer and Ed McCreight
+ 1998: Purely Functional Data Structures: Chris Okasaki
+ 2007: Clojure's Persistent Vector (and HashMap) implementations: Rich Hickey
+ 2012: RRB-Tree: Phil Bagwell and Tiark Rompf
+
  */
 @SuppressWarnings("WeakerAccess")
 public class RrbTree1<E> implements ImList<E>, Indented {
@@ -481,6 +487,9 @@ public class RrbTree1<E> implements ImList<E>, Indented {
 
         // If a leaf-node is split, the fragments become the new focus for each side of the split.
         // Otherwise, the focus can be left empty, or the last node of each side can be made into the focus.
+
+        // TODO: Do not abbreviate the returned tree at a lower level, or we can get left with a short-leg
+        // TODO: Instead, remove single parent nodes until we are left with a leaf, or a node with multiple children.
         SplitNode<E> split = newRoot.splitAt(splitIndex);
         
         E[] leftFocus = split.leftFocus();
@@ -699,27 +708,35 @@ public class RrbTree1<E> implements ImList<E>, Indented {
          Returns the high bits which we use to index into our array.  This is the simplicity (and
          speed) of Strict indexing.  When everything works, this can be inlined for performance.
          This could maybe yield a good guess for Relaxed nodes?
+
+         Shifting right by a number is equivalent to dividing by: 2 raised to the power of that number.
+         i >> n is equivalent to i / (2^n)
          */
         private int highBits(int i) { return i >> shift; }
 
         /**
-         Returns the low bits of the index (the part Strict sub-nodes need to know about).
-         This helps make this data structure simple and fast.  When everything works, this can
-         be inlined for performance.
-         DO NOT use this for Relaxed nodes - they use subtraction instead!
+         Returns the low bits of the index (the part Strict sub-nodes need to know about).  This only works because
+         the leaf nodes are all the same size and that size is a power of 2 (the radix).  All branch must have the same
+         radix (branching factor or number of immediate sub-nodes).
+
+         Bit shifting is faster than addition or multiplication, but perhaps more importantly, it means we don't have
+         to store the sizes of the nodes which means we don't have to fetch those sizes from memory or use up cache
+         space.  All of this helps make this data structure simple and fast.
+
+         When everything works, this function can be inlined for performance (if that even helps).
+         Contrast this with how Relaxed nodes work: they use subtraction instead!
          */
         private int lowBits(int i) {
+            // Little trick: -1 in binary is all ones: 0b11111111111111111111111111111111
+            // We shift it left, filling the right-most bits with zeros and creating a bit-mask with ones on the left
+            // and zeros on the right
             int shifter = -1 << shift;
 
-//            System.out.println("    shifter (binary): " + Integer.toBinaryString(shift));
-
+            // Now we take the inverse so our bit-mask has zeros on the left and ones on the right
             int invShifter = ~shifter;
-//            System.out.println("    invShifter (binary): " + Integer.toBinaryString(invShifter));
 
-//            System.out.println("             i (binary): " + Integer.toBinaryString(invShifter));
+            // Finally, we bitwise-and the mask with the index to leave only the low bits.
             return  i & invShifter;
-//            System.out.println("    subNodeIdx (binary): " + Integer.toBinaryString(subNodeIdx));
-//            System.out.println("    subNodeIdx: " + subNodeIdx);
         }
 
         @Override public T get(int i) {
