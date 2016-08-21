@@ -262,13 +262,13 @@ public class RrbTree1Test {
     public void putEx() { RrbTree1.empty().replace(1, "Hello"); }
 
     private static boolean isPrime(int num) {
-//        return false;
-        if (num < 2) return false;
-        if (num == 2) return true;
-        if (num % 2 == 0) return false;
-        for (int i = 3; i * i <= num; i += 2)
-            if (num % i == 0) return false;
-        return true;
+        return false;
+//        if (num < 2) return false;
+//        if (num == 2) return true;
+//        if (num % 2 == 0) return false;
+//        for (int i = 3; i * i <= num; i += 2)
+//            if (num % i == 0) return false;
+//        return true;
     }
 
     private static <T> void testSplit(ArrayList<T> control, RrbTree1<T> test, int splitIndex) {
