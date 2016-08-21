@@ -852,23 +852,18 @@ public class RrbTree1<E> implements ImList<E>, Indented {
             } else {
                 boolean haveLeft = (splitLeft.size() > 0);
                 int numLeftItems = subNodeIndex + (haveLeft ? 1 : 0);
-                if ( !haveLeft && (numLeftItems == 1) ) {
-                    //                    debug("If the left node became a focus and there are no other lefts, no parent needed.");
-                    left = nodes[0];
-                } else {
-                    Node<T>[] leftNodes = (Node<T>[]) new Node[numLeftItems];
-                    //                    debug("leftCumSizes=" + arrayString(leftCumSizes));
-                    // Copy one less item if we are going to add the split one in a moment.
-                    // I could have written:
-                    //     haveLeft ? numLeftItems - 1
-                    //              : numLeftItems
-                    // but that's always equal to subNodeIndex.
-                    System.arraycopy(nodes, 0, leftNodes, 0, subNodeIndex);
-                    if (haveLeft) {
-                        leftNodes[numLeftItems - 1] = splitLeft;
-                    }
-                    left = new Strict<>(shift, leftNodes);
+                Node<T>[] leftNodes = (Node<T>[]) new Node[numLeftItems];
+                //                    debug("leftCumSizes=" + arrayString(leftCumSizes));
+                // Copy one less item if we are going to add the split one in a moment.
+                // I could have written:
+                //     haveLeft ? numLeftItems - 1
+                //              : numLeftItems
+                // but that's always equal to subNodeIndex.
+                System.arraycopy(nodes, 0, leftNodes, 0, subNodeIndex);
+                if (haveLeft) {
+                    leftNodes[numLeftItems - 1] = splitLeft;
                 }
+                left = new Strict<>(shift, leftNodes);
             }
 
             final Node<T> right = Relaxed.fixRight(nodes, split.right(), subNodeIndex);
