@@ -1347,30 +1347,25 @@ public class RrbTree1<E> implements ImList<E>, Indented {
             } else {
                 boolean haveLeft = (splitLeft.size() > 0);
                 int numLeftItems = subNodeIndex + (haveLeft ? 1 : 0);
-                if ( !haveLeft && (numLeftItems == 1) ) {
-//                    debug("If the left node became a focus and there are no other lefts, no parent needed.");
-                    left = nodes[0];
-                } else {
-                    int[] leftCumSizes = new int[numLeftItems];
-                    Node<T>[] leftNodes = (Node<T>[]) new Node[numLeftItems];
-                    //                      src, srcPos,    dest,destPos, length
-                    System.arraycopy(cumulativeSizes, 0, leftCumSizes, 0, numLeftItems);
-                    if (haveLeft) {
-                        int cumulativeSize = (numLeftItems > 1) ? leftCumSizes[numLeftItems - 2] : 0;
-                        leftCumSizes[numLeftItems - 1] = cumulativeSize + splitLeft.size();
-                    }
-//                    debug("leftCumSizes=" + arrayString(leftCumSizes));
-                    // Copy one less item if we are going to add the split one in a moment.
-                    // I could have written:
-                    //     haveLeft ? numLeftItems - 1
-                    //              : numLeftItems
-                    // but that's always equal to subNodeIndex.
-                    System.arraycopy(nodes, 0, leftNodes, 0, subNodeIndex);
-                    if (haveLeft) {
-                        leftNodes[numLeftItems - 1] = splitLeft;
-                    }
-                    left = new Relaxed<>(leftCumSizes, leftNodes);
+                int[] leftCumSizes = new int[numLeftItems];
+                Node<T>[] leftNodes = (Node<T>[]) new Node[numLeftItems];
+                //                      src, srcPos,    dest,destPos, length
+                System.arraycopy(cumulativeSizes, 0, leftCumSizes, 0, numLeftItems);
+                if (haveLeft) {
+                    int cumulativeSize = (numLeftItems > 1) ? leftCumSizes[numLeftItems - 2] : 0;
+                    leftCumSizes[numLeftItems - 1] = cumulativeSize + splitLeft.size();
                 }
+//                    debug("leftCumSizes=" + arrayString(leftCumSizes));
+                // Copy one less item if we are going to add the split one in a moment.
+                // I could have written:
+                //     haveLeft ? numLeftItems - 1
+                //              : numLeftItems
+                // but that's always equal to subNodeIndex.
+                System.arraycopy(nodes, 0, leftNodes, 0, subNodeIndex);
+                if (haveLeft) {
+                    leftNodes[numLeftItems - 1] = splitLeft;
+                }
+                left = new Relaxed<>(leftCumSizes, leftNodes);
             }
 
             final Node<T> right = fixRight(nodes, split.right(), subNodeIndex);
