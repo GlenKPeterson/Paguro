@@ -14,6 +14,10 @@
 
 package org.organicdesign.fp;
 
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Map;
+
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.ImMap;
 import org.organicdesign.fp.collections.ImSet;
@@ -28,10 +32,6 @@ import org.organicdesign.fp.tuple.Tuple2;
 import org.organicdesign.fp.tuple.Tuple3;
 import org.organicdesign.fp.xform.Transformable;
 import org.organicdesign.fp.xform.Xform;
-
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Map;
 
 /**
  <p>A mini data definition language composed of vec(), tup(), map(), set(), plus xform() which makes
@@ -170,9 +170,30 @@ public final class StaticImports {
         return PersistentVector.ofIter(Arrays.asList(items));
     }
 
-    /**
-     If you need to wrap a regular Java collection or other iterable outside this project to perform
-     a transformation on it, this method is the most convenient, efficient way to do so.
-     */
+    /** Wrap a regular Java collection or other iterable outside this project to perform a transformation on it. */
     public static <T> Transformable<T> xform(Iterable<T> iterable) { return Xform.of(iterable); }
+
+    // TODO: Enable this to make Maps, Strings, and StringBuilders work like other collections.
+//    /** Wrap a Java.util.Map to perform a transformation on it. */
+//    public static <K,V> Transformable<Map.Entry<K,V>> xform(Map<K,V> map) { return Xform.of(map.entrySet()); }
+//
+//    /** Wrap a String to perform a transformation on it. */
+//    public static Transformable<Character> xform(CharSequence seq) {
+//        //noinspection Convert2Lambda
+//        return Xform.of(new Iterable<Character>() {
+//            @Override public Iterator<Character> iterator() {
+//                return new Iterator<Character>() {
+//                    private int idx = 0;
+//                    @Override public boolean hasNext() { return idx < seq.length(); }
+//
+//                    @Override public Character next() {
+//                        int nextIdx = idx + 1;
+//                        Character c = seq.charAt(idx);
+//                        idx = nextIdx;
+//                        return c;
+//                    }
+//                };
+//            }
+//        });
+//    }
 }
