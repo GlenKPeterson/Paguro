@@ -1049,45 +1049,40 @@ public class RrbTree1<E> implements ImList<E>, Indented {
                 // If we have a rightSubNode, it's going to need a space in our new node array.
                 int numRightNodes = (origNodes.length - subNodeIndex) - (haveRightSubNode ? 0 : 1); //(splitRight.size() > 0 ? 2 : 1); // -2 when splitRight.size() > 0
 //                debug("numRightNodes=" + numRightNodes);
-                if ( !haveRightSubNode && (numRightNodes == 1)) {
-//                    debug("If the right node became a focus and there are no other lefts, no parent needed.");
-                    right = origNodes[origNodes.length - 1];
-                } else {
-                    // Here the first (leftmost) node of the right-hand side was turned into the focus
-                    // and we have additional right-hand origNodes to adjust the parent for.
-                    int[] rightCumSizes = new int[numRightNodes];
-                    Node<T>[] rightNodes = (Node<T>[]) new Node[numRightNodes];
+                // Here the first (leftmost) node of the right-hand side was turned into the focus
+                // and we have additional right-hand origNodes to adjust the parent for.
+                int[] rightCumSizes = new int[numRightNodes];
+                Node<T>[] rightNodes = (Node<T>[]) new Node[numRightNodes];
 
 //                    System.out.println("origNodes=" + arrayString(origNodes));
 //                    System.out.println("subNodeIndex=" + subNodeIndex);
 
-                    int cumulativeSize = 0;
-                    int destCopyStartIdx = 0;
+                int cumulativeSize = 0;
+                int destCopyStartIdx = 0;
 
-                    if (haveRightSubNode) {
-                        //                 src,       srcPos,          dest, destPos, length
-                        System.arraycopy(origNodes, subNodeIndex + 1, rightNodes, 1, numRightNodes - 1);
+                if (haveRightSubNode) {
+                    //                 src,       srcPos,          dest, destPos, length
+                    System.arraycopy(origNodes, subNodeIndex + 1, rightNodes, 1, numRightNodes - 1);
 
-                        rightNodes[0] = splitRight;
-                        cumulativeSize = splitRight.size();
-                        rightCumSizes[0] = cumulativeSize;
-                        destCopyStartIdx = 1;
-                    } else {
-                        //                 src,       srcPos,          dest, destPos, length
-                        System.arraycopy(origNodes, subNodeIndex + 1, rightNodes, 0, numRightNodes);
-                    }
+                    rightNodes[0] = splitRight;
+                    cumulativeSize = splitRight.size();
+                    rightCumSizes[0] = cumulativeSize;
+                    destCopyStartIdx = 1;
+                } else {
+                    //                 src,       srcPos,          dest, destPos, length
+                    System.arraycopy(origNodes, subNodeIndex + 1, rightNodes, 0, numRightNodes);
+                }
 
 //                    System.out.println("rightNodes=" + arrayString(rightNodes));
 
-                    // For relaxed nodes, we could calculate from previous cumulativeSizes instead of calling .size()
-                    // on each one.  For strict, we could just add a strict amount.  For now, this works.
-                    for (int i = destCopyStartIdx; i < numRightNodes; i++) {
-                        cumulativeSize += rightNodes[i].size();
-                        rightCumSizes[i] = cumulativeSize;
-                    }
-
-                    right = new Relaxed<>(rightCumSizes, rightNodes);
+                // For relaxed nodes, we could calculate from previous cumulativeSizes instead of calling .size()
+                // on each one.  For strict, we could just add a strict amount.  For now, this works.
+                for (int i = destCopyStartIdx; i < numRightNodes; i++) {
+                    cumulativeSize += rightNodes[i].size();
+                    rightCumSizes[i] = cumulativeSize;
                 }
+
+                right = new Relaxed<>(rightCumSizes, rightNodes);
             }
             return right;
         }
