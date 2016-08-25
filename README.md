@@ -8,7 +8,7 @@ All collection implementations will soon implement Serializable.  Making Paguro/
  - The way hashcodes are computed for all tuples will be changed.  Essentially, this computation had a "wart" for compatibility with java.util.Map.Entry which will be removed.
  - Default Equator and Comparator singleton implementations will become Enums instead of lambdas.
  - All other potentially Serializable singletons will be converted to enums for clean and efficient serialization and deserialization.
- - The function interfaces (Function0, Function1, etc.) *may* implement Serializable.
+ - The function interfaces (Function0, Function1, etc.) will not implement Serializable (these interfaces are general and Serializable is too much for implementers to think about and often irrelevant).
  - Issues?  Questions?  Please provide feedback on the [Serialization enhancement request](https://github.com/GlenKPeterson/UncleJim/issues/10)
 
 ###Renaming
