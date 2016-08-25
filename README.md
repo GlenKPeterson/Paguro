@@ -21,7 +21,7 @@ Photo by [Rushen](https://www.flickr.com/photos/rushen/12171498934/in/photostrea
 ####Renaming Timeline
  - 2016-08-14: This notice appeared
  - 2016-09: The project name will change on GitHub and name-change notices will be added to the POM
- - 2016-10: The Maven artifact name will change - this will be the only change clients need to make.
+ - 2016-11: The Maven artifact name will change - this will be the only change clients need to make.
 
 Package names will NOT change.
 
@@ -50,7 +50,7 @@ Available from the [Maven Repository](http://mvnrepository.com/artifact/org.orga
 ```xml
 <dependency>
         <groupId>org.organicdesign</groupId>
-        <!-- NOTE: artifactId will change to "Paguro" in October 2016 -->
+        <!-- NOTE: artifactId will change to "Paguro" in November 2016 -->
         <artifactId>UncleJim</artifactId>
         <version>1.0.3</version>
 </dependency>
