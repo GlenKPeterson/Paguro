@@ -8,9 +8,9 @@ This project will soon be renamed to "Paguro" (pronounced, "pah-GOO-row") which 
 Photo by [Rushen](https://www.flickr.com/photos/rushen/12171498934/in/photostream/)
 
 ####Renaming Timeline
- - August 2016: This notice appeared
- - September 2016: The project name will change on GitHub and name-change notices will be added to the POM
- - October 2016: The Maven artifact name will change - this will be the only change clients need to make.
+ - 2016-08-14: This notice appeared
+ - 2016-09: The project name will change on GitHub and name-change notices will be added to the POM
+ - 2016-10: The Maven artifact name will change - this will be the only change clients need to make.
  - Package names will NOT change.
 
 #Features
