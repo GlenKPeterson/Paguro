@@ -50,7 +50,7 @@ Available from the [Maven Repository](http://mvnrepository.com/artifact/org.orga
 ```xml
 <dependency>
         <groupId>org.organicdesign</groupId>
-        <!-- NOTE: artifactId will change to "Paguro" in September/October 2016 -->
+        <!-- NOTE: artifactId will change to "Paguro" in October 2016 -->
         <artifactId>UncleJim</artifactId>
         <version>1.0.3</version>
 </dependency>
