@@ -1,6 +1,16 @@
 UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") provides type-safe versions of Clojure's immutable collections and a few other tools to make functional programming in Java a little easier.
 
 #News
+
+###Serializable
+All collection implementations will soon implement Serializable.  Making Paguro/UncleJim Serializable will require some minor, but potentially breaking changes:
+ - Tuple2 will no longer implement UnmodMap.UnEntry.  Instead, a Serializable sub-class of Tuple2 will.
+ - The way hashcodes are computed for all tuples will be changed.  Essentially, this computation had a "wart" for compatibility with java.util.Map.Entry which will be removed.
+ - Default Equator and Comparator singleton implementations will become Enums instead of lambdas.
+ - All other potentially Serializable singletons will be converted to enums for clean and efficient serialization and deserialization.
+ - The function interfaces (Function0, Function1, etc.) *may* implement Serializable.
+ - Issues?  Questions?  Please provide feedback on the [Serialization enhancement request](https://github.com/GlenKPeterson/UncleJim/issues/10)
+
 ###Renaming
 This project will soon be renamed to "Paguro" (pronounced, "pah-GOO-row") which is short for the Latin "Paguroidea" - the name of the Hermit Crab superfamily in Biology.  These collections grow by adding a new shell, leaving the insides the same, much the way Hermit Crabs trade up to a new shell when they grow.  Plus, hermit crabs are cute.
 
@@ -116,14 +126,7 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
 2. Implement an RRB-Tree
 3. Make a Java 7 branch (and/or Java 6) and release (Maven artifact will be called Paguro-Java7 or similar).
 
-### 1. Serializable
-All collection implementations will implement Serializable.  This will contain some minor, but potentially breaking changes
- - Tuple2 will no longer implement UnmodMap.UnEntry.  Instead a sub-class of Tuple2 will.
- - The way hashcodes are computed for all tuples will be changed.  It had a "wart" for compatibility with java.util.Map.Entry which will be removed.
- - Default Equator and Comparator singleton implementations will become Enums instead of lambdas.
- - All other singletons will be converted to enums for clean and efficient serialization.
-
-### 2. RRB-Tree
+### RRB-Tree
 Current development is centered around an Apache-licensed all-Java RRB-Tree.  Read the [recent status](https://github.com/GlenKPeterson/UncleJim/issues/4#issuecomment-239825939) or check out the [latest version of the code](https://github.com/GlenKPeterson/UncleJim/blob/2016-05-22_RRB-Tree/src/main/java/org/organicdesign/fp/experimental/RrbTree1.java).
 
 As Norm Zeck pointed out by sending me [Ropes: an Alternative to Strings](http://citeseer.ist.psu.edu/viewdoc/download?doi=10.1.1.14.9450&rep=rep1&type=pdf), an RRB-Tree might make a great implementation of *both* String and StringBuilder.  We might want to add a Char8 (UTF-8 Character class pronounced "crate") and make Str8 (UTF-8 String pronounced "straight") a sub-class of RRB-Tree.  Just a thought.
