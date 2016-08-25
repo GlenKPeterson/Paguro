@@ -22,7 +22,8 @@ Photo by [Rushen](https://www.flickr.com/photos/rushen/12171498934/in/photostrea
  - 2016-08-14: This notice appeared
  - 2016-09: The project name will change on GitHub and name-change notices will be added to the POM
  - 2016-10: The Maven artifact name will change - this will be the only change clients need to make.
- - Package names will NOT change.
+
+Package names will NOT change.
 
 #Features
 
