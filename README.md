@@ -7,6 +7,7 @@ This project will soon be renamed to "Paguro" (pronounced, "pah-GOO-row") which 
 ![Hermit Crab](https://c7.staticflickr.com/8/7413/12171498934_2934c7ef28_n.jpg)
 Photo by [Rushen](https://www.flickr.com/photos/rushen/12171498934/in/photostream/)
 
+####Renaming Timeline
  - August 2016: This notice appeared
  - September 2016: The project name will change on GitHub and name-change notices will be added to the POM
  - October 2016: The Maven artifact name will change - this will be the only change clients need to make.
