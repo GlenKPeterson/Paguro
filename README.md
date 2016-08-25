@@ -8,8 +8,9 @@ All collection implementations will soon implement Serializable.  Making Paguro/
  - The way hashcodes are computed for all tuples will be changed.  Essentially, this computation had a "wart" for compatibility with java.util.Map.Entry which will be removed.
  - Default Equator and Comparator singleton implementations will become Enums instead of lambdas.
  - All other potentially Serializable singletons will be converted to enums for clean and efficient serialization and deserialization.
- - The function interfaces (Function0, Function1, etc.) will not implement Serializable (these interfaces are general and Serializable is too much for implementers to think about and often irrelevant).
- - Issues?  Questions?  Please provide feedback on the [Serialization enhancement request](https://github.com/GlenKPeterson/UncleJim/issues/10)
+ - The function interfaces (Function0, Function1, etc.) will *not* implement Serializable.  These interfaces are general and Serializable is too much for implementers to think about (and often irrelevant).
+
+Issues?  Questions?  Please provide feedback on the [Serialization enhancement request](https://github.com/GlenKPeterson/UncleJim/issues/10)
 
 ###Renaming
 This project will soon be renamed to "Paguro" (pronounced, "pah-GOO-row") which is short for the Latin "Paguroidea" - the name of the Hermit Crab superfamily in Biology.  These collections grow by adding a new shell, leaving the insides the same, much the way Hermit Crabs trade up to a new shell when they grow.  Plus, hermit crabs are cute.
