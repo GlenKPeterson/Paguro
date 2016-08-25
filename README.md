@@ -7,8 +7,27 @@ This project will soon be renamed to "Paguro" (pronounced, "pah-GOO-row") which 
 ![Hermit Crab](https://c7.staticflickr.com/8/7413/12171498934_2934c7ef28_n.jpg)
 Photo by [Rushen](https://www.flickr.com/photos/rushen/12171498934/in/photostream/)
 
-###RRB-Tree
+ - August 2016: This notice appeared
+ - September 2016: The project name will change on GitHub and name-change notices will be added to the POM
+ - October 2016: The Maven artifact name will change - this will be the only change clients need to make.
+ - Package names will NOT change.
+
+#Priorities (as of 2016-08-25)
+1. Make collections implement Serializable.
+2. Implement an RRB-Tree
+3. Make a Java 7 branch (and/or Java 6) and release (Maven artifact will be called Paguro-Java7 or similar).
+
+### 1. Serializable
+All collection implementations will implement Serializable.  This will contain some minor, but potentially breaking changes
+ - Tuple2 will no longer implement UnmodMap.UnEntry.  Instead a sub-class of Tuple2 will.
+ - The way hashcodes are computed for all tuples will be changed.  It had a "wart" for compatibility with java.util.Map.Entry which will be removed.
+ - Default Equator and Comparator singleton implementations will become Enums instead of lambdas.
+ - All other singletons will be converted to enums for clean and efficient serialization.
+
+### 2. RRB-Tree
 Current development is centered around an Apache-licensed all-Java RRB-Tree.  Read the [recent status](https://github.com/GlenKPeterson/UncleJim/issues/4#issuecomment-239825939) or check out the [latest version of the code](https://github.com/GlenKPeterson/UncleJim/blob/2016-05-22_RRB-Tree/src/main/java/org/organicdesign/fp/experimental/RrbTree1.java).
+
+As Norm Zeck pointed out by sending me [Ropes: an Alternative to Strings](http://citeseer.ist.psu.edu/viewdoc/download?doi=10.1.1.14.9450&rep=rep1&type=pdf), an RRB-Tree might make a great implementation of *both* String and StringBuilder.  We might want to add a Char8 (UTF-8 Character class pronounced "crate") and make Str8 (UTF-8 String pronounced "straight") a sub-class of RRB-Tree.  Just a thought.
 
 #Features
 
