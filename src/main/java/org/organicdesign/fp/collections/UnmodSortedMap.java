@@ -105,7 +105,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
                 // Collection<Map.Entry<K,V>> which is essentially an Iterable with a size().
                 if ( !(o instanceof Set) ) { return false; }
 
-                // If you're using UncleJim, then you should have passed us a sortedSet.
+                // If you're using Paguro, then you should have passed us a sortedSet.
                 if ( (o instanceof UnmodSet) &&
                      !(o instanceof UnmodSortedSet) ) {
                     return false;
@@ -202,7 +202,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
                 // Collection<Map.Entry<K,V>> which is essentially an Iterable with a size().
                 if ( !(o instanceof Set) ) { return false; }
 
-                // If you're using UncleJim, then you should have passed us a sortedSet.
+                // If you're using Paguro, then you should have passed us a sortedSet.
                 if ( (o instanceof UnmodSet) &&
                      !(o instanceof UnmodSortedSet) ) {
                     return false;
@@ -297,7 +297,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
 //                // Collection<Map.Entry<K,V>> which is essentially an Iterable with a size().
 //                if ( !(o instanceof Collection) ) { return false; }
 //
-//                // If you're using UncleJim, then you should have passed us a sortedSet.
+//                // If you're using Paguro, then you should have passed us a sortedSet.
 //                if ( (o instanceof UnmodCollection) &&
 //                     !(o instanceof UnmodSortedCollection) ) {
 //                    return false;

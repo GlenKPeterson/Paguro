@@ -1,5 +1,5 @@
 #Notice
-Read [README.md](README.md) before this file as that is the official introduction to UncleJim.
+Read [README.md](README.md) before this file as that is the official introduction to Paguro/UncleJim.
 This file contains additional information for contributors, or maybe people who are considering opening an issue.
 
 #Additional features:
@@ -121,7 +121,7 @@ None of those are simple uses of interpose.
 
 ###Mirroring Clojure's seq (sequence abstraction)
 
-UncleJim tried two alternatives.  One was based on the Clojure idea of a sequence: immutable, lazy, and cached.  The signature looked something like this:
+Paguro/UncleJim tried two alternatives.  One was based on the Clojure idea of a sequence: immutable, lazy, and cached.  The signature looked something like this:
 
 ```java
 interface Sequence1<T> {
@@ -138,7 +138,7 @@ interface Sequence2<T> {
 }
 ```
 
-Ultimately, Transformable took the place of a sequence abstraction in UncleJim.  It's safe, easy to use, and about 98% as fast as native Java iteration.  If you really need to pretend you have a Sequence1, Transformable has `take(1)` and `drop(1)` that you can use like `first()` and `rest()` in a pinch.  That said, everything you could do with Sequence1 you can do faster and just as clearly with Transformable.  Presumably, this is why Clojure now has Transducers.
+Ultimately, Transformable took the place of a sequence abstraction in Paguro.  It's safe, easy to use, and about 98% as fast as native Java iteration.  If you really need to pretend you have a Sequence1, Transformable has `take(1)` and `drop(1)` that you can use like `first()` and `rest()` in a pinch.  That said, everything you could do with Sequence1 you can do faster and just as clearly with Transformable.  Presumably, this is why Clojure now has Transducers.
 
 #Motivation
 

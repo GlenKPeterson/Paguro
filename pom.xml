@@ -43,7 +43,7 @@ http://mvnrepository.com/artifact/org.organicdesign/UncleJim
 	<packaging>jar</packaging>
 
 	<!-- NOTE: name will change to "Paguro" soon! -->
-	<name>UncleJim</name>
+	<name>Paguro (The Project Formerly Known as UncleJim)</name>
 	<description>Immutable Clojure collections and a Transformation abstraction for Java 8+, immutably, type-safely, and with good performance.  Soon to be renamed, "Paguro".</description>
 	<url>https://github.com/GlenKPeterson/UncleJim</url>
 

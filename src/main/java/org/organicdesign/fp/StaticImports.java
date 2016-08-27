@@ -58,7 +58,7 @@ import java.util.Map;
  dangerous) way.</p>
 
  <p>If you're used to Clojure/JSON, you'll find that what's a map (dictionary) in those languages
- usually becomes a tuple in UncleJim. A true map data structure in a type-safe language is
+ usually becomes a tuple in Paguro. A true map data structure in a type-safe language is
  homogeneous, meaning that every member is of the same type (or a descendant of a common ancestor).
  Tuples are designed to contain unrelated data types and enforce those types.</p>
 

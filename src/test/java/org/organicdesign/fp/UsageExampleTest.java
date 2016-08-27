@@ -241,7 +241,7 @@ public class UsageExampleTest {
         ImList<Integer> v = vec(4, 5);
 
         // Add more numbers at the beginning.  "precat" is short for "prepend version of
-        // concatenate" or "add-to-beginning".  UnmodIterable is the primary bridge between UncleJim
+        // concatenate" or "add-to-beginning".  UnmodIterable is the primary bridge between Paguro
         // and traditional Java.  It extends Iterable, but adds transformations and deprecates the
         // remove() method of the iterator it provides.
         UnmodIterable<Integer> u1 = v.precat(vec(1, 2, 3));
