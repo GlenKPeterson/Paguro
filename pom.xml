@@ -39,12 +39,11 @@ http://mvnrepository.com/artifact/org.organicdesign/UncleJim
 	<groupId>org.organicdesign</groupId>
 	<!-- NOTE: artifactId will change to "Paguro" in November 2016 -->
 	<artifactId>UncleJim</artifactId>
-	<version>1.0.3</version>
+	<version>1.1.0</version>
 	<packaging>jar</packaging>
 
-	<!-- NOTE: name will change to "Paguro" soon! -->
-	<name>Paguro (The Project Formerly Known as UncleJim)</name>
-	<description>Immutable Clojure collections and a Transformation abstraction for Java 8+, immutably, type-safely, and with good performance.  Soon to be renamed, "Paguro".</description>
+	<name>Paguro (formerly known as "UncleJim" - artifact name will officially change November 2016)</name>
+	<description>Immutable Clojure collections and a Transformation abstraction for Java 8+, immutably, type-safely, and with good performance.</description>
 	<url>https://github.com/GlenKPeterson/UncleJim</url>
 
 	<licenses>

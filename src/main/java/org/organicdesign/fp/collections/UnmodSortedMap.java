@@ -13,13 +13,13 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
-import org.organicdesign.fp.tuple.Tuple2;
-
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+
+import org.organicdesign.fp.tuple.Tuple2;
 
 /** An unmodifiable SortedMap. */
 public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, UnmodSortedIterable<UnmodMap.UnEntry<K,V>> {
@@ -59,7 +59,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
             @SuppressWarnings("unchecked")
             @Override public Comparator<Entry<K,V>> comparator() {
                 if (parentMap.comparator() == null) {
-                    return (a, b) -> Equator.ComparisonContext.DEFAULT_COMPARATOR
+                    return (a, b) -> Equator.ComparisonContext.Comp.DEFAULT
                                                         .compare((Comparable) a.getKey(),
                                                                  (Comparable) b.getKey());
                     // This may be more flexible, but from what I can tell, nothing else in the

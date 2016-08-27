@@ -34,32 +34,56 @@ public interface Equator<T> {
 
     // ============================================= Static ========================================
 
-    Equator<Object> DEFAULT_EQUATOR = new Equator<Object>() {
-        @Override public int hash(Object o) {
-            return (o == null) ? 0 : o.hashCode();
-        }
+    // Enums are serializable and lambdas are not.  Therefore enums make better singletons.
+    enum Equat implements Equator<Object> {
+        DEFAULT {
+            @Override public int hash(Object o) {
+                return (o == null) ? 0 : o.hashCode();
+            }
 
-        @Override public boolean eq(Object o1, Object o2) {
-            if (o1 == null) { return (o2 == null); }
-            return o1.equals(o2);
+            @Override public boolean eq(Object o1, Object o2) {
+                if (o1 == null) { return (o2 == null); }
+                return o1.equals(o2);
+            }
         }
-    };
+    }
+
+    /**
+     Use Equat.DEFAULT instead.
+     Being an enum, it's serializable and makes a better singleton.
+     Deprecated as of 1.1.0, 2016-08-27
+     */
+    @Deprecated
+    Equator<Object> DEFAULT_EQUATOR = Equat.DEFAULT;
 
     @SuppressWarnings("unchecked")
-    static <T> Equator<T> defaultEquator() { return (Equator<T>) DEFAULT_EQUATOR; }
+    static <T> Equator<T> defaultEquator() { return (Equator<T>) Equat.DEFAULT; }
 
+    // Enums are serializable and lambdas are not.  Therefore enums make better singletons.
     @SuppressWarnings("ConstantConditions")
-    Comparator<Comparable<Object>> DEFAULT_COMPARATOR =
-            (o1, o2) -> {
+    enum Comp implements Comparator<Comparable<Object>> {
+        DEFAULT {
+            @Override
+            public int compare(Comparable<Object> o1, Comparable<Object> o2) {
                 if (o1 == o2) { return 0; }
                 if (o1 == null) {
                     return - (o2.compareTo(o1));
                 }
                 return o1.compareTo(o2);
-            };
+            }
+        }
+    }
+
+    /**
+     Use Comp.DEFAULT instead.
+     Being an enum, it's serializable and makes a better singleton.
+     Deprecated as of 1.1.0, 2016-08-27
+     */
+    @Deprecated
+    Comparator<Comparable<Object>> DEFAULT_COMPARATOR = Comp.DEFAULT;
 
     @SuppressWarnings("unchecked")
-    static <T> Comparator<T> defaultComparator() { return (Comparator<T>) DEFAULT_COMPARATOR; }
+    static <T> Comparator<T> defaultComparator() { return (Comparator<T>) Comp.DEFAULT; }
 
     /**
      Implement compare() and hash() and you get a 100% compatible eq() for free.
@@ -79,25 +103,31 @@ public interface Equator<T> {
 
         @Override default boolean eq(T o1, T o2) { return compare(o1, o2) == 0; }
 
-        ComparisonContext<Comparable<Object>> DEFAULT_CONTEXT =
-                new ComparisonContext<Comparable<Object>>() {
-            @Override public int hash(Comparable<Object> o) {
-                return (o == null) ? 0 : o.hashCode();
-            }
-            @SuppressWarnings("ConstantConditions")
-            @Override public int compare(Comparable<Object> o1, Comparable<Object> o2) {
-                if (o1 == o2) { return 0; }
-                if (o1 == null) {
-                    return - (o2.compareTo(o1));
+        // Enums are serializable and lambdas are not.  Therefore enums make better singletons.
+        enum CompCtx implements ComparisonContext<Comparable<Object>> {
+            DEFAULT {
+                @Override public int hash(Comparable<Object> o) { return (o == null) ? 0 : o.hashCode(); }
+                @SuppressWarnings("ConstantConditions")
+                @Override public int compare(Comparable<Object> o1, Comparable<Object> o2) {
+                    if (o1 == o2) { return 0; }
+                    if (o1 == null) {
+                        return - (o2.compareTo(o1));
+                    }
+                    return o1.compareTo(o2);
                 }
-                return o1.compareTo(o2);
             }
-        };
+        }
+
+        /**
+         Use CompCtx.DEFAULT instead.
+         Being an enum, it's serializable and makes a better singleton.
+         Deprecated as of 1.1.0, 2016-08-27
+         */
+        @Deprecated
+        ComparisonContext<Comparable<Object>> DEFAULT_CONTEXT = CompCtx.DEFAULT;
 
         @SuppressWarnings("unchecked")
-        static <T> ComparisonContext<T> defCompCtx() {
-            return (ComparisonContext<T>) DEFAULT_CONTEXT;
-        }
+        static <T> ComparisonContext<T> defCompCtx() { return (ComparisonContext<T>) CompCtx.DEFAULT; }
     }
 
     // ========================================= Instance =========================================

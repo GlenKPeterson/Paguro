@@ -8,8 +8,6 @@
 /* rich May 20, 2006 */
 package org.organicdesign.fp.collections;
 
-import org.organicdesign.fp.Option;
-
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Map;
@@ -17,6 +15,8 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.SortedMap;
 import java.util.Stack;
+
+import org.organicdesign.fp.Option;
 
 /**
  Persistent Red Black Tree. Note that instances of this class are constant values
@@ -373,7 +373,7 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V> {
      Returns the comparator used to order the keys in this map, or null if it uses Function2.DEFAULT_COMPARATOR
      (for compatibility with java.util.SortedMap).
      */
-    @Override public Comparator<? super K> comparator() { return (comp == Equator.DEFAULT_COMPARATOR) ? null : comp; }
+    @Override public Comparator<? super K> comparator() { return (comp == Equator.Comp.DEFAULT) ? null : comp; }
 
 //    /** Returns true if the map contains the given key. */
 //    @SuppressWarnings("unchecked")
