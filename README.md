@@ -3,9 +3,15 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") p
 #News
 
 ##Serializable
-All collection implementations now implement Serializable.  This requires code using UncleJim to make some changes:
+First, an apology.  I did not think about serialization at all when I put this together.
+Fixing this oversight properly required some breaking changes, most notably,
+I'd made Tuple2 implement Map.Entry.  Tuple2 is meant to be extensible.  Making something
+Serializable adds a lot of unnecessary complexity (See Josh Bloch's items 74-78 for details).
+The only reasonable solution was to add a new sub-class of Tuple2 called KeyVal which implements
+Map.Entry and UnmodMap.UnEntry and is serializable.  This in turn required a different helper
+function in StaticImports: kv() instead of tup().  If you declare maps, you'll have to make a bunch
+of manual changes and I'm sorry for that.
 
-Syntax for creating a map has changed (sorted maps changed similarly)
 **OLD:**
 ```java
 map(tup("one",1), tup("two",2))
@@ -14,7 +20,9 @@ map(tup("one",1), tup("two",2))
 ```java
 map(kv("one",1), kv("two",2))
 ```
-Unless you use this project extensively, this is likely the only change you will notice.
+
+The good news is that all collection implementations now implement Serializable.
+Unless you use this project extensively, the map creation syntax is the only change you are likely to notice.
 
 Anything that used to be implemented as an anonymous class, object, or lambda is now
 implemented as a serializable enum or sub-class.  As a result, the following constants have moved.
@@ -48,6 +56,12 @@ IDENTITY  is now  Const.IDENTITY
 ACCEPT    is now  ConstBool.ACCEPT
 REJECT    is now  ConstBool.REJECT
 
+Search for usages of
+map(tup(
+.toImMap(... tup(
+and replace them with
+map(kv(
+.toImMap(... kv(
 ```
 
  - Tuple2 will no longer implement UnmodMap.UnEntry.  Instead, a new class KeyVal was created for this purpose as a Serializable sub-class of Tuple2.
