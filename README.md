@@ -2,13 +2,59 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") p
 
 #News
 
-###Serializable
-All collection implementations will soon implement Serializable.  Making Paguro/UncleJim Serializable will require some minor, but potentially breaking changes:
- - Tuple2 will no longer implement UnmodMap.UnEntry.  Instead, a Serializable sub-class of Tuple2 will.
- - The way hashcodes are computed for all tuples will be changed.  Essentially, this computation had a "wart" for compatibility with java.util.Map.Entry which will be removed.
- - Default Equator and Comparator singleton implementations will become Enums instead of lambdas.
- - All other potentially Serializable singletons will be converted to enums for clean and efficient serialization and deserialization.
- - The function interfaces (Function0, Function1, etc.) will *not* implement Serializable.  These interfaces are general and Serializable is too much for implementers to think about (and often irrelevant).
+##Serializable
+All collection implementations now implement Serializable.  This requires code using UncleJim to make some changes:
+
+Syntax for creating a map has changed (sorted maps changed similarly)
+**OLD:**
+```java
+map(tup("one",1), tup("two",2))
+```
+**NEW:**
+```java
+map(kv("one",1), kv("two",2))
+```
+Unless you use this project extensively, this is likely the only change you will notice.
+
+Anything that used to be implemented as an anonymous class, object, or lambda is now
+implemented as a serializable enum or sub-class.  As a result, the following constants have moved.
+The easiest way to make this change is to use a static import for the new fields.
+```java
+import static org.organicdesign.fp.function.Function1..*;
+```
+**Becomes:**
+```java
+import static org.organicdesign.fp.function.Function1.ConstBool.*;
+```
+
+##### List of changes:
+```
+org.organicdesign.fp.function.Function0:
+NULL       // Old
+Const.NULL // New
+
+// New serializable sub-class for functions that always return the same value.
+Constant
+
+
+org.organicdesign.fp.function.Function1
+IDENTITY       // Old
+Const.IDENTITY // New
+
+ACCEPT           // Old
+ConstBool.ACCEPT // New
+
+REJECT           // Old
+ConstBool.REJECT // New
+```
+
+ - Tuple2 will no longer implement UnmodMap.UnEntry.  Instead, a new class KeyVal was created for this purpose as a Serializable sub-class of Tuple2.
+ - The way hashcodes are computed for all tuples changed.  This computation had a "wart" for compatibility with java.util.Map.Entry which was removed.
+ - Default Equator and Comparator singleton implementations became Enums instead of lambdas (the old fields are deprecated but still there).
+
+The function interfaces (Function0, Function1, etc.) will *not* implement Serializable.
+These interfaces are general and Serializable is too much for implementers to think about (and often irrelevant).
+However, the constants in those interfaces have been changed to implement Serializable.
 
 Issues?  Questions?  Please provide feedback on the [Serialization enhancement request](https://github.com/GlenKPeterson/UncleJim/issues/10)
 

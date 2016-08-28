@@ -14,6 +14,7 @@
 
 package org.organicdesign.fp.function;
 
+import java.io.Serializable;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 
@@ -47,33 +48,36 @@ public interface Function0<U> extends Supplier<U>, Callable<U> {
     @Override default U call() throws Exception { return applyEx(); }
 
     // ========================================== Static ==========================================
-    public static final Function0<Object> NULL = new Function0<Object>() {
-        @Override
-        public Object applyEx() throws Exception {
-            return null;
+    // Enums are serializable.  Anonymous classes and lambdas are not.
+    enum Const implements Function0<Object> {
+        NULL {
+            @Override public Object applyEx() throws Exception { return null; }
         }
-    };
+    }
 
-    // TODO: Would this be better as a sub-class?  I kind of think so.
+    /** Use {@link Const.NULL} instead because it's serializable. */
+    @Deprecated
+    Function0<Object> NULL = Const.NULL;
+
     /**
      Wraps a value in a constant function.  If you need to "memoize" some really expensive
      operation, use it to wrap a LazyRef.
      */
-    static <K> Function0<K> constantFunction(final K k) {
-        return new Function0<K>() {
-            @Override public K applyEx() {
-                return k;
-            }
-            @Override public int hashCode() { return (k == null) ? 0 : k.hashCode(); }
-            @Override public boolean equals(Object o) {
-                if (this == o) { return true; }
-                if ( (o == null) || !(o instanceof Supplier) ) { return false; }
-                return k.equals(((Supplier) o).get());
-            }
-            @Override public String toString() { return "() -> " + k; };
-        };
+    class Constant<K> implements Function0<K>, Serializable {
+        private static final long serialVersionUID = 201608281356L;
+        private final K k;
+        Constant(K theK) { k = theK; }
+        @Override public K applyEx() { return k; }
+        @Override public int hashCode() { return (k == null) ? 0 : k.hashCode(); }
+        @Override public boolean equals(Object o) {
+            if (this == o) { return true; }
+            if ( (o == null) || !(o instanceof Constant) ) { return false; }
+            return k.equals(((Constant) o).get());
+        }
+        @Override public String toString() { return "() -> " + k; };
     }
 
+    static <K> Function0<K> constantFunction(final K k) { return new Constant<>(k); }
 //    /**
 //     Use only on pure functions with no side effects.
 //     In this case, that means a constant function (always returns the same value).

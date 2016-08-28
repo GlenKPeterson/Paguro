@@ -17,6 +17,8 @@ This release also contains the following non-breaking changes:
  - Deprecated Equator.DEFAULT_EQUATOR use Equator.Equat.DEFAULT instead.
  - Deprecated Equator.DEFAULT_COMPARATOR use Equator.Comp.DEFAULT instead.
 
+Note: Xform is NOT serializable.  I don't know yet whether that's good or bad.
+
 **2016-03-23 Release 1.0.3**:
  - Fixed error message for Xform.drop() to "Can't drop less than zero items #6." Thanks @pniederw
  - Fixed "Wrong bounds check in UnmodList.listIterator #7." Thanks @pniederw

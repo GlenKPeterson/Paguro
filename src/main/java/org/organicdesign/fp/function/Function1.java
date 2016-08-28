@@ -14,17 +14,17 @@
 
 package org.organicdesign.fp.function;
 
-import org.organicdesign.fp.Option;
-import org.organicdesign.fp.collections.UnmodIterable;
-import org.organicdesign.fp.xform.Transformable;
-import org.organicdesign.fp.xform.Xform;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
+import org.organicdesign.fp.Option;
+import org.organicdesign.fp.collections.UnmodIterable;
+import org.organicdesign.fp.xform.Transformable;
+import org.organicdesign.fp.xform.Xform;
 
 /**
  This is like Java 8's java.util.function.Function, but retrofitted to turn checked exceptions
@@ -33,65 +33,88 @@ import java.util.function.Function;
 @FunctionalInterface
 public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
     // ========================================== Static ==========================================
-    Function1<Object,Object> IDENTITY = new Function1<Object,Object>() {
+    enum Const implements Function1<Object,Object> {
+        IDENTITY {
+            @Override
+            public Object applyEx(Object t) throws Exception {
+                return t;
+            }
 
-        @Override
-        public Object applyEx(Object t) throws Exception {
-            return t;
+            @SuppressWarnings({"unchecked", "TypeParameterExplicitlyExtendsObject"})
+            @Override
+            public <S> Function1<S,Object> compose(Function1<? super S,? extends Object> f) {
+                // Composing any function with the identity function has no effect on the original
+                // function (by definition of identity) - just return it.
+                return (Function1<S,Object>) f;
+            }
         }
+    }
+    enum ConstBool implements Function1<Object,Boolean> {
+        /**
+         A predicate that always returns true.  Use accept() for a type-safe version of this predicate.
+         */
+        ACCEPT {
+            @Override public Boolean applyEx (Object ignored) throws Exception {
+                return Boolean.TRUE;
+            }
+        },
 
-        @SuppressWarnings({"unchecked", "TypeParameterExplicitlyExtendsObject"})
-        @Override
-        public <S> Function1<S,Object> compose(Function1<? super S, ? extends Object> f) {
-            // Composing any function with the identity function has no effect on the original
-            // function (by definition of identity) - just return it.
-            return (Function1<S,Object>) f;
+        /**
+         A predicate that always returns false. Use ConstBool.REJECT for a type-safe version of this predicate.
+         */
+        REJECT {
+            @Override public Boolean applyEx (Object ignored) throws Exception {
+                return Boolean.FALSE;
+            }
         }
-    };
+    }
+
+    /** Use {@link Const.IDENTITY} instead. */
+    @Deprecated
+    Function1<Object,Object> IDENTITY = Const.IDENTITY;
 
     @SuppressWarnings("unchecked")
-    static <V> Function1<V,V> identity() { return (Function1<V,V>) IDENTITY; }
+    static <V> Function1<V,V> identity() { return (Function1<V,V>) Const.IDENTITY; }
 
     static <S> Function1<S,Boolean> or(Function1<S,Boolean> a, Function1<S,Boolean> b) {
-        return  a == ACCEPT ? a : // If any are true, all are true.  No composition necessary.
-                a == REJECT ? b : // return whatever b is.
-                b == ACCEPT ? b : // If any are true, all are true.
-                b == REJECT ? a : // Just amounts to if a else false, no composition necessary.
-                (S s) -> (a.apply(s) == Boolean.TRUE) || (b.apply(s) == Boolean.TRUE); // compose
+        // Composition is not necessary in every case:
+        return a == ConstBool.ACCEPT ? a : // If any are true, all are true.
+               a == ConstBool.REJECT ? b : // return whatever b is.
+               b == ConstBool.ACCEPT ? b : // If any are true, all are true.
+               b == ConstBool.REJECT ? a : // Just amounts to if a else false.
+               (S s) -> (a.apply(s) == Boolean.TRUE) || (b.apply(s) == Boolean.TRUE); // compose
     }
 
     static <S> Function1<S,Boolean> and(Function1<S,Boolean> a, Function1<S,Boolean> b) {
-        return  a == ACCEPT ? b : // return whatever b is.
-                a == REJECT ? a : // if any are false, all are false.  No composition necessary.
-                b == ACCEPT ? a : // Just amounts to if a else false, no composition necessary.
-                b == REJECT ? b : // If any are false, all are false.
-                (S s) -> (a.apply(s) == Boolean.TRUE) && (b.apply(s) == Boolean.TRUE); // compose
+        // Composition is not necessary in every case:
+        return a == ConstBool.ACCEPT ? b : // return whatever b is.
+               a == ConstBool.REJECT ? a : // if any are false, all are false.
+               b == ConstBool.ACCEPT ? a : // Just amounts to if a else false.
+               b == ConstBool.REJECT ? b : // If any are false, all are false.
+               (S s) -> (a.apply(s) == Boolean.TRUE) && (b.apply(s) == Boolean.TRUE); // compose
     }
 
     static <S> Function1<S,Boolean> negate(Function1<? super S,Boolean> a) {
-        return  a == ACCEPT ? reject() :
-                a == REJECT ? accept() :
-                        (S s) -> (a.apply(s) == Boolean.TRUE) ? Boolean.FALSE : Boolean.TRUE;
+        return a == ConstBool.ACCEPT ? reject() :
+               a == ConstBool.REJECT ? accept() :
+               (S s) -> (a.apply(s) == Boolean.TRUE) ? Boolean.FALSE : Boolean.TRUE;
     }
 
-    /**
-     A predicate that always returns true.  Use accept() for a type-safe version of this predicate.
-     */
-    Function1<Object,Boolean> ACCEPT = t -> Boolean.TRUE;
+    /** Use {@link ConstBool.ACCEPT} instead */
+    @Deprecated
+    Function1<Object,Boolean> ACCEPT = ConstBool.ACCEPT;
 
-    /**
-     A predicate that always returns false. Use reject() for a type-safe version of this predicate.
-     */
-    Function1<Object,Boolean> REJECT = t -> Boolean.FALSE;
+    /** Use {@link ConstBool.REJECT} instead */
+    @Deprecated
+    Function1<Object,Boolean> REJECT = ConstBool.REJECT;
 
-    /** Returns a type-safe version of the ACCEPT predicate. */
+    /** Returns a type-safe version of the ConstBool.ACCEPT predicate. */
     @SuppressWarnings("unchecked")
-    static <T> Function1<T,Boolean> accept() { return (Function1<T,Boolean>) ACCEPT; }
+    static <T> Function1<T,Boolean> accept() { return (Function1<T,Boolean>) ConstBool.ACCEPT; }
 
-    /** Returns a type-safe version of the REJECT predicate. */
+    /** Returns a type-safe version of the ConstBool.REJECT predicate. */
     @SuppressWarnings("unchecked")
-    static <T> Function1<T,Boolean> reject() { return (Function1<T,Boolean>) REJECT; }
-
+    static <T> Function1<T,Boolean> reject() { return (Function1<T,Boolean>) ConstBool.REJECT; }
 
     /**
      Composes multiple functions into a single function to potentially minimize trips through
@@ -139,7 +162,7 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
         }
         final List<Function1<V,V>> out = new ArrayList<>();
         for (Function1<V,V> f : in) {
-            if ((f == null) || (f == IDENTITY)) {
+            if ((f == null) || (f == Const.IDENTITY)) {
                 continue;
             }
             out.add(f);
@@ -181,22 +204,22 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
                 (in instanceof UnmodIterable) ? (UnmodIterable<Function1<T,Boolean>>) in
                                      : Xform.of(in);
 
-        return v.filter(p -> (p != null) && (p != ACCEPT))
+        return v.filter(p -> (p != null) && (p != ConstBool.ACCEPT))
                 .foldLeft(accept(),
-                          (accum, p) -> (p == REJECT) ? p : and(accum, p),
-                          accum -> accum == REJECT);
+                          (accum, p) -> (p == reject()) ? p : and(accum, p),
+                          accum -> accum == reject());
     }
 
     /**
      Composes multiple predicates into a single predicate to potentially minimize trips through
      the source data.  The resultant predicate will loop through the predicates for each item in
      the source, but for few predicates and many source items, that takes less memory.  Considers
-     no predicate to mean "reject all."  Use only accept()/ACCEPT and reject()/REJECT since
+     no predicate to mean "reject all."  Use only accept()/ConstBool.ACCEPT and ConstBool.REJECT since
      function comparison is done by reference.
 
-     @param in the predicates to test in order.  Nulls and REJECT predicates are ignored.  Any
+     @param in the predicates to test in order.  Nulls and ConstBool.REJECT predicates are ignored.  Any
      ACCEPT predicate will cause this entire method to return the ACCEPT predicate.
-     No predicates means REJECT.
+     No predicates means ConstBool.REJECT.
 
      @param <T> the type of object to predicate on.
 
@@ -210,10 +233,10 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
                 (in instanceof UnmodIterable) ? (UnmodIterable<Function1<T,Boolean>>) in
                                      : Xform.of(in);
 
-        return v.filter(p -> (p != null) && (p != REJECT))
+        return v.filter(p -> (p != null) && (p != ConstBool.REJECT))
                 .foldLeft(reject(),
-                          (accum, p) -> (p == ACCEPT) ? p : or(accum, p),
-                          accum -> accum == ACCEPT);
+                          (accum, p) -> (p == ConstBool.ACCEPT) ? p : or(accum, p),
+                          accum -> accum == ConstBool.ACCEPT);
     }
 
     enum BooleanCombiner {
@@ -273,7 +296,7 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
 
     @SuppressWarnings("unchecked")
     default <S> Function1<S,U> compose(final Function1<? super S, ? extends T> f) {
-        if (f == IDENTITY) {
+        if (f == Const.IDENTITY) {
             // This violates type safety, but makes sense - composing any function with the
             // identity function should return the original function unchanged.  If you mess up the
             // types, then that's your problem.  With generics and type erasure this may be the

@@ -1,19 +1,22 @@
 package org.organicdesign.fp.function;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import org.organicdesign.fp.collections.ImList;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.organicdesign.fp.collections.ImList;
+
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.organicdesign.fp.FunctionUtils.ordinal;
 import static org.organicdesign.fp.StaticImports.vec;
+import static org.organicdesign.fp.function.Function1.Const.IDENTITY;
+import static org.organicdesign.fp.function.Function1.ConstBool.ACCEPT;
+import static org.organicdesign.fp.function.Function1.ConstBool.REJECT;
 
 @RunWith(JUnit4.class)
 public class Function1Test {
@@ -46,81 +49,81 @@ public class Function1Test {
     };
 
     @Test public void composePredicatesWithAnd() {
-        assertEquals(Function1.ACCEPT, Function1.and(null));
-        assertEquals(Function1.ACCEPT, Function1.and(vec()));
-        assertEquals(Function1.ACCEPT, Function1.and(Collections.emptyList()));
+        assertEquals(ACCEPT, Function1.and(null));
+        assertEquals(ACCEPT, Function1.and(vec()));
+        assertEquals(ACCEPT, Function1.and(Collections.emptyList()));
 
-        assertEquals(Function1.REJECT,
+        assertEquals(REJECT,
                      Function1.and(vec(Function1.reject(),
                                        NOT_PROCESSED)));
 
-        assertEquals(Function1.REJECT,
+        assertEquals(REJECT,
                      Function1.and(vec(null, null, null, Function1.reject(),
                                        NOT_PROCESSED)));
 
-        assertEquals(Function1.REJECT,
+        assertEquals(REJECT,
                      Function1.and(Arrays.asList(null, null, null, Function1.reject(),
                                                  NOT_PROCESSED)));
 
-        assertEquals(Function1.REJECT,
+        assertEquals(REJECT,
                      Function1.and(vec(Function1.accept(),
                                        Function1.accept(),
                                        Function1.accept(),
                                        Function1.reject(),
                                        NOT_PROCESSED)));
 
-        assertEquals(Function1.REJECT,
+        assertEquals(REJECT,
                      Function1.and(vec(Function1.reject(),
                                        Function1.accept(),
                                        Function1.accept(),
                                        Function1.accept())));
 
-        assertEquals(Function1.ACCEPT,
+        assertEquals(ACCEPT,
                      Function1.and(vec(Function1.accept())));
     }
 
     @Test public void composePredicatesWithOr() {
-        assertEquals(Function1.REJECT, Function1.or(null));
+        assertEquals(REJECT, Function1.or(null));
 
-        assertEquals(Function1.ACCEPT,
+        assertEquals(ACCEPT,
                      Function1.or(vec(Function1.accept(),
                                       NOT_PROCESSED)));
 
-        assertEquals(Function1.ACCEPT,
+        assertEquals(ACCEPT,
                      Function1.or(vec(null, null, null, Function1.accept(),
                                       NOT_PROCESSED)));
 
-        assertEquals(Function1.ACCEPT,
+        assertEquals(ACCEPT,
                      Function1.or(Arrays.asList(null, null, null, Function1.accept(),
                                                 NOT_PROCESSED)));
 
-        assertEquals(Function1.ACCEPT,
+        assertEquals(ACCEPT,
                      Function1.or(vec(Function1.reject(),
                                       Function1.reject(),
                                       Function1.reject(),
                                       Function1.accept(),
                                       NOT_PROCESSED)));
 
-        assertEquals(Function1.ACCEPT,
+        assertEquals(ACCEPT,
                      Function1.or(vec(Function1.accept(),
                                       Function1.reject(),
                                       Function1.reject(),
                                       Function1.reject())));
 
-        assertEquals(Function1.REJECT,
+        assertEquals(REJECT,
                      Function1.or(vec(Function1.reject())));
     }
 
     @Test public void compose() {
-        assertEquals(Function1.IDENTITY,
+        assertEquals(IDENTITY,
                      Function1.compose((Iterable<Function1<String,String>>) null));
 
-        assertEquals(Function1.IDENTITY, Function1.compose(vec(null, null, null)));
+        assertEquals(IDENTITY, Function1.compose(vec(null, null, null)));
 
-        assertEquals(Function1.IDENTITY, Function1.compose(vec(null, Function1.identity(), null)));
+        assertEquals(IDENTITY, Function1.compose(vec(null, Function1.identity(), null)));
 
-        assertEquals(Function1.ACCEPT, Function1.compose(vec(null, Function1.identity(), null,
-                                                             Function1.accept())));
+        assertEquals(ACCEPT, Function1.compose(vec(null, Function1.identity(), null,
+                                                   Function1.accept())));
 
         Function1<Integer,String> intToStr = new Function1<Integer, String>() {
             @Override
@@ -172,8 +175,8 @@ public class Function1Test {
         Integer[] oneToNineArray = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         ImList<Integer> oneToNine = vec(oneToNineArray);
 
-        assertEquals(Function1.ACCEPT, Function1.or(Function1.accept(), (Integer i) -> i < 6));
-        assertEquals(Function1.ACCEPT, Function1.or((Integer i) -> i < 6, Function1.accept()));
+        assertEquals(ACCEPT, Function1.or(Function1.accept(), (Integer i) -> i < 6));
+        assertEquals(ACCEPT, Function1.or((Integer i) -> i < 6, Function1.accept()));
 
         assertArrayEquals(oneToNineArray,
                           oneToNine.filter(Function1.or(i -> i < 3,
@@ -214,8 +217,8 @@ public class Function1Test {
                                    .toArray());
 
         // and(a, b)
-        assertEquals(Function1.REJECT, Function1.and(Function1.reject(), (Integer i) -> i < 6));
-        assertEquals(Function1.REJECT, Function1.and((Integer i) -> i < 6, Function1.reject()));
+        assertEquals(REJECT, Function1.and(Function1.reject(), (Integer i) -> i < 6));
+        assertEquals(REJECT, Function1.and((Integer i) -> i < 6, Function1.reject()));
 
         assertArrayEquals(new Integer[]{},
                           oneToNine.filter(Function1.and((i) -> i > 2,
@@ -254,8 +257,8 @@ public class Function1Test {
                                    .toMutableList()
                                    .toArray());
 
-        assertEquals(Function1.REJECT, Function1.negate(Function1.accept()));
-        assertEquals(Function1.ACCEPT, Function1.negate(Function1.reject()));
+        assertEquals(REJECT, Function1.negate(Function1.accept()));
+        assertEquals(ACCEPT, Function1.negate(Function1.reject()));
 
         assertArrayEquals(new Integer[]{1, 2},
                           oneToNine.filter(Function1.negate(i -> i > 2))
