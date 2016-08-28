@@ -233,7 +233,7 @@ public class TupleGenerator {
                  "    @Override\n" +
                  "    public int hashCode() {\n" +
                  "        int ret = 0;\n" +
-                 "        if (_1 != null) { ret = _1.hashCode(); }\n" +
+                 "        if (_1 != null) { ret = _1.hashCode(); }\n");
         for (int l = 2; l <= i; l++) {
             fr.write("        if (_" + l + " != null) { ret = ret + _" + l + ".hashCode(); }\n");
         }
@@ -363,7 +363,7 @@ public class TupleGenerator {
     }
 
     public static void main(String... args) throws IOException {
-        for (int i = 3; i <= 12; i++) {
+        for (int i = 2; i <= 12; i++) {
             genTuple(i);
             genTupleTest(i);
         }

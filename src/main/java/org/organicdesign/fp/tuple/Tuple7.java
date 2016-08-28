@@ -1,4 +1,4 @@
-// Copyright 2015 PlanBase Inc. & Glen Peterson
+// Copyright 2016 PlanBase Inc. & Glen Peterson
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -91,11 +91,9 @@ public class Tuple7<A,B,C,D,E,F,G> {
 
     @Override
     public int hashCode() {
-        // First 2 fields match Tuple2 which implements java.util.Map.Entry as part of the map
-        // contract and therefore must match java.util.HashMap.Node.hashCode().
         int ret = 0;
         if (_1 != null) { ret = _1.hashCode(); }
-        if (_2 != null) { ret = ret ^ _2.hashCode(); }
+        if (_2 != null) { ret = ret + _2.hashCode(); }
         if (_3 != null) { ret = ret + _3.hashCode(); }
         if (_4 != null) { ret = ret + _4.hashCode(); }
         if (_5 != null) { ret = ret + _5.hashCode(); }
