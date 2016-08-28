@@ -58,6 +58,9 @@ Rich Hickey for Clojure
 - Then `mvn clean test` on UncleJim
 
 #To Do
+ - Xform.MapDesc is not serializable.
+ - Test serialization of transient versions of collections (HashSet)
+ - Think about adding xform(String)
  - Change UnmodIterable.hashCode(item) to UnmodIterable.calcHashCode(item) to avoid confusion with
  the instance method of the same name (but different arity).
  - Remove empty() and EMPTY from all interfaces except maybe UnmodIterator.
