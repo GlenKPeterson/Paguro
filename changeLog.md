@@ -14,6 +14,7 @@ This release contains the following **breaking changes** in order to make more t
 This release also contains the following non-breaking changes:
  - Made serializable: Persistent- HashMap, HashSet, TreeMap, TreeSet, Vector.  RangeOfInt,
  default Equator, default Comparator, default ComparisonContext.
+ Thanks @sblommers for spotting this issue and writing the key unit test!
  - Deprecated Equator.DEFAULT_EQUATOR use Equator.Equat.DEFAULT instead.
  - Deprecated Equator.DEFAULT_COMPARATOR use Equator.Comp.DEFAULT instead.
 

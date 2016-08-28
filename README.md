@@ -23,6 +23,7 @@ map(kv("one",1), kv("two",2))
 
 The good news is that all collection implementations now implement Serializable.
 Unless you use this project extensively, the map creation syntax is the only change you are likely to notice.
+Thanks @sblommers for spotting this issue and writing the key unit test!
 
 Anything that used to be implemented as an anonymous class, object, or lambda is now
 implemented as a serializable enum or sub-class.  As a result, the following constants have moved.
