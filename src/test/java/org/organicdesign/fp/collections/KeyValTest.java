@@ -11,13 +11,13 @@ import static org.junit.Assert.*;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
-public class KeyValuePairTest {
+public class KeyValTest {
     @Rule
     public ExpectedException thrown= ExpectedException.none();
 
     @Test
     public void constructionAndAccess() {
-        KeyValuePair<Integer,String> a = new KeyValuePair<>(7, "Hello");
+        KeyVal<Integer,String> a = new KeyVal<>(7, "Hello");
 
         assertEquals(new Integer(7), a._1());
         assertEquals(new Integer(7), a.getKey());
@@ -28,7 +28,7 @@ public class KeyValuePairTest {
         assertEquals(a, a);
         assertEquals(a.hashCode(), a.hashCode());
 
-        KeyValuePair<Integer,String> b = KeyValuePair.of(5, "hello");
+        KeyVal<Integer,String> b = KeyVal.of(5, "hello");
 
         assertEquals(new Integer(5), b._1());
         assertEquals(new Integer(5), b.getKey());
@@ -43,7 +43,7 @@ public class KeyValuePairTest {
         assertFalse(b.equals(a));
         assertNotEquals(a.hashCode(), b.hashCode());
 
-        KeyValuePair<Integer,String> c = new KeyValuePair<>(7, null);
+        KeyVal<Integer,String> c = new KeyVal<>(7, null);
 
         assertEquals(new Integer(7), c._1());
         assertEquals(new Integer(7), c.getKey());
@@ -61,7 +61,7 @@ public class KeyValuePairTest {
         assertNotEquals(c.hashCode(), a.hashCode());
         assertNotEquals(c.hashCode(), b.hashCode());
 
-        KeyValuePair<Integer,String> d = KeyValuePair.of(null, "Hello");
+        KeyVal<Integer,String> d = KeyVal.of(null, "Hello");
 
         assertEquals(null, d._1());
         assertEquals(null, d.getKey());
@@ -85,7 +85,7 @@ public class KeyValuePairTest {
         assertNotEquals(d.hashCode(), b.hashCode());
         assertNotEquals(d.hashCode(), c.hashCode());
 
-        assertEquals("kv(\"hi\",3)", new KeyValuePair<>("hi", 3).toString());
+        assertEquals("kv(\"hi\",3)", new KeyVal<>("hi", 3).toString());
 
 
         Map<Integer,String> realMap = new HashMap<>();
@@ -93,21 +93,21 @@ public class KeyValuePairTest {
         Map.Entry<Integer,String> realEntry = realMap.entrySet().iterator().next();
 
         equalsDistinctHashCode(a,
-                               KeyValuePair.of(realEntry),
+                               KeyVal.of(realEntry),
                                realEntry,
-                               new KeyValuePair<>(7, "hello"));
+                               new KeyVal<>(7, "hello"));
 
         assertEquals(a, serializeDeserialize(a));
         assertEquals(b, serializeDeserialize(b));
         assertEquals(c, serializeDeserialize(c));
         assertEquals(d, serializeDeserialize(d));
-        assertEquals(realEntry, serializeDeserialize(new KeyValuePair<>(realEntry)));
+        assertEquals(realEntry, serializeDeserialize(new KeyVal<>(realEntry)));
     }
 
     @SuppressWarnings("deprecation")
     @Test
     public void modification() {
-        KeyValuePair<Integer,String> t = KeyValuePair.of(19, "World");
+        KeyVal<Integer,String> t = KeyVal.of(19, "World");
         thrown.expect(UnsupportedOperationException.class);
         t.setValue("Boom!");
     }

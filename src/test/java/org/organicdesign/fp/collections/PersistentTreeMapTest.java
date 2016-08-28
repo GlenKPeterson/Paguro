@@ -622,7 +622,7 @@ public class PersistentTreeMapTest {
 
     @Test public void testImMap0() {
         int max = 0;
-        Map<Integer,String> b = vec((KeyValuePair<Integer,String>) null)
+        Map<Integer,String> b = vec((KeyVal<Integer,String>) null)
                 .filter(t -> t != null)
                 .toImSortedMap(Equator.defaultComparator(), Function1.identity());
         FunctionUtilsTest.mapHelper(b, max);
@@ -630,12 +630,12 @@ public class PersistentTreeMapTest {
         assertEquals(b, c);
         assertEquals(c, b);
         assertEquals(b.hashCode(), c.hashCode());
-        FunctionUtilsTest.mapHelperOdd(vec((KeyValuePair<Integer,String>) null)
+        FunctionUtilsTest.mapHelperOdd(vec((KeyVal<Integer,String>) null)
                                                .filter(t -> t != null)
                                                .toImSortedMap(Equator.defaultComparator(),
                                                               Function1.identity()),
                                        max);
-        FunctionUtilsTest.mapHelperEven(vec((KeyValuePair<Integer,String>) null)
+        FunctionUtilsTest.mapHelperEven(vec((KeyVal<Integer,String>) null)
                                                 .filter(t -> t != null)
                                                 .toImSortedMap(Equator.defaultComparator(),
                                                                Function1.identity()),

@@ -191,7 +191,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V>, Serializable {
 
     @Override public Option<UnmodMap.UnEntry<K,V>> entry(K key) {
         if (key == null) {
-            return hasNull ? Option.of(new KeyValuePair<>(null, nullValue)) : Option.none();
+            return hasNull ? Option.of(new KeyVal<>(null, nullValue)) : Option.none();
         }
         if (root == null) {
             return Option.none();
@@ -258,7 +258,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V>, Serializable {
                 @Override public UnEntry<K,V> next(){
                     if (!seen) {
                         seen = true;
-                        return new KeyValuePair<>(null, nullValue);
+                        return new KeyVal<>(null, nullValue);
                     } else {
                         return rootIter.next();
                     }
@@ -377,7 +377,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V>, Serializable {
         @Override public Option<UnEntry<K,V>> entry(K key) {
             ensureEditable();
             if (key == null) {
-                return hasNull ? Option.of(new KeyValuePair<>(null, nullValue)) : Option.none();
+                return hasNull ? Option.of(new KeyVal<>(null, nullValue)) : Option.none();
             }
             if (root == null) {
                 return Option.none();
@@ -411,7 +411,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V>, Serializable {
                     @Override public UnEntry<K,V> next(){
                         if (!seen) {
                             seen = true;
-                            return new KeyValuePair<>(null, nullValue);
+                            return new KeyVal<>(null, nullValue);
                         } else {
                             return rootIter.next();
                         }
@@ -837,7 +837,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V>, Serializable {
             if(keyOrNull == null)
                 return ((INode) valOrNode).find(shift + 5, hash, key);
             if(equator.eq(key, keyOrNull))
-                return new KeyValuePair<>(keyOrNull, (V) valOrNode);
+                return new KeyVal<>(keyOrNull, (V) valOrNode);
             return null;
         }
 
@@ -1057,7 +1057,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V>, Serializable {
             if(idx < 0)
                 return null;
             if(equator.eq(key, k(array, idx)))
-                return new KeyValuePair<>(k(array, idx), v(array, idx + 1));
+                return new KeyVal<>(k(array, idx), v(array, idx + 1));
             return null;
         }
 
@@ -1360,7 +1360,7 @@ public static void main(String[] args){
                 int i = mutableIndex;
                 mutableIndex = i + 2;
                 if (array[i] != null) {
-                    nextEntry = new KeyValuePair<>(k(array, i), v(array, i+1));
+                    nextEntry = new KeyVal<>(k(array, i), v(array, i + 1));
                     return true;
                 } else {
                     INode<K,V> node = iNode(array, i + 1);

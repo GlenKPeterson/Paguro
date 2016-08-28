@@ -38,7 +38,7 @@ import org.organicdesign.fp.collections.ImMap;
 import org.organicdesign.fp.collections.ImSet;
 import org.organicdesign.fp.collections.ImSortedMap;
 import org.organicdesign.fp.collections.ImSortedSet;
-import org.organicdesign.fp.collections.KeyValuePair;
+import org.organicdesign.fp.collections.KeyVal;
 import org.organicdesign.fp.collections.UnmodCollection;
 import org.organicdesign.fp.collections.UnmodList;
 import org.organicdesign.fp.collections.UnmodListTest;
@@ -59,7 +59,7 @@ public class FunctionUtilsTest {
     @Test public void stringifyTest() {
         assertEquals("null", stringify(null));
         assertEquals("\"Hello\"", stringify("Hello"));
-        assertEquals("kv(\"a\",3)", stringify(KeyValuePair.of("a", 3)));
+        assertEquals("kv(\"a\",3)", stringify(KeyVal.of("a", 3)));
     }
 
     @Test (expected = UnsupportedOperationException.class)

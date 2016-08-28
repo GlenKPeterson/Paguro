@@ -81,12 +81,12 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
 
             @Override public Entry<K,V> first() {
                 K key = parentMap.firstKey();
-                return new KeyValuePair<>(key, parentMap.get(key));
+                return new KeyVal<>(key, parentMap.get(key));
             }
 
             @Override public Entry<K,V> last() {
                 K key = parentMap.lastKey();
-                return new KeyValuePair<>(key, parentMap.get(key));
+                return new KeyVal<>(key, parentMap.get(key));
             }
 
             @Override public int hashCode() { return UnmodIterable.hashCode(this); }

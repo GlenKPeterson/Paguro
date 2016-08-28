@@ -23,7 +23,7 @@ import org.organicdesign.fp.collections.ImMap;
 import org.organicdesign.fp.collections.ImSet;
 import org.organicdesign.fp.collections.ImSortedMap;
 import org.organicdesign.fp.collections.ImSortedSet;
-import org.organicdesign.fp.collections.KeyValuePair;
+import org.organicdesign.fp.collections.KeyVal;
 import org.organicdesign.fp.collections.PersistentHashMap;
 import org.organicdesign.fp.collections.PersistentHashSet;
 import org.organicdesign.fp.collections.PersistentTreeMap;
@@ -75,10 +75,10 @@ public final class StaticImports {
     private StaticImports() { throw new UnsupportedOperationException("No instantiation"); }
 
     /**
-     Returns a new KeyValuePair of the given items (extends Tuple2 and implements Map.Entry, UnmodMap.UnEntry, and
+     Returns a new KeyVal of the given items (extends Tuple2 and implements Map.Entry, UnmodMap.UnEntry, and
      Serializable).
      */
-    public static <K,V> KeyValuePair<K,V> kv(K t, V u) { return new KeyValuePair<>(t, u); }
+    public static <K,V> KeyVal<K,V> kv(K t, V u) { return new KeyVal<>(t, u); }
 
     /**
      Returns a new PersistentHashMap of the given keys and their paired values.  Use the

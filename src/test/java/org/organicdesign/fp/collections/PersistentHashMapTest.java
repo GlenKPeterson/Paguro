@@ -436,9 +436,9 @@ public class PersistentHashMapTest {
 
         ImMap<String,Integer> m2 = map(kv("c", 1), kv("b", 2), kv("a", 3));
 
-        Set<Option<KeyValuePair<String,Integer>>> s = new HashSet<>(Arrays.asList(Option.of(kv("c", 1)),
-                                                                                  Option.of(kv("b", 2)),
-                                                                                  Option.of(kv("a", 3))));
+        Set<Option<KeyVal<String,Integer>>> s = new HashSet<>(Arrays.asList(Option.of(kv("c", 1)),
+                                                                            Option.of(kv("b", 2)),
+                                                                            Option.of(kv("a", 3))));
 
         UnmodIterable<UnmodMap.UnEntry<String,Integer>> seq = m2;
         Option o = seq.head();
@@ -1171,7 +1171,7 @@ public class PersistentHashMapTest {
     }
 
     public static class Result<A,B> {
-        List<KeyValuePair<A,B>> goodies;
+        List<KeyVal<A,B>> goodies;
         List<A> baddies;
         boolean hasNull;
     }
@@ -1182,7 +1182,7 @@ public class PersistentHashMapTest {
 
         assertEquals(result.goodies.size(), m.size());
 
-        for (KeyValuePair<A,B> t : result.goodies) {
+        for (KeyVal<A,B> t : result.goodies) {
             assertTrue(m.containsKey(t.getKey()));
             assertEquals(t.getValue(), m.get(t.getKey()));
             assertTrue(m.entry(t.getKey()).isSome());
@@ -1196,7 +1196,7 @@ public class PersistentHashMapTest {
         }
 
         int s = m.size();
-        for (KeyValuePair<A,B> t : result.goodies) {
+        for (KeyVal<A,B> t : result.goodies) {
             --s;
             m = m.without(t.getKey());
             assertFalse(m.containsKey(t.getKey()));
@@ -1206,7 +1206,7 @@ public class PersistentHashMapTest {
         }
         assertEquals(0, m.size());
 
-        for (KeyValuePair<A,B> t : result.goodies) {
+        for (KeyVal<A,B> t : result.goodies) {
             assertFalse(m.containsKey(t.getKey()));
             assertNull(m.get(t.getKey()));
         }

@@ -47,7 +47,7 @@ public class UnmodMapTest {
                 @Override public boolean hasNext() { return iter.hasNext(); }
 
                 @Override public UnEntry<K,V> next() {
-                    return new KeyValuePair<>(iter.next());
+                    return new KeyVal<>(iter.next());
                 }
             };
         }

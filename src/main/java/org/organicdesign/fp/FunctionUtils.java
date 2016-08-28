@@ -25,7 +25,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 
-import org.organicdesign.fp.collections.KeyValuePair;
+import org.organicdesign.fp.collections.KeyVal;
 import org.organicdesign.fp.collections.UnmodCollection;
 import org.organicdesign.fp.collections.UnmodIterable;
 import org.organicdesign.fp.collections.UnmodIterator;
@@ -592,7 +592,7 @@ public class FunctionUtils {
                     @Override public boolean hasNext() { return iter.hasNext(); }
 
                     @Override public UnEntry<K,V> next() {
-                        return new KeyValuePair<>(iter.next());
+                        return new KeyVal<>(iter.next());
                     }
                 };
             }
