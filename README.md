@@ -29,23 +29,25 @@ import static org.organicdesign.fp.function.Function1.ConstBool.*;
 
 ##### List of changes:
 ```
-org.organicdesign.fp.function.Function0:
-NULL       // Old
-Const.NULL // New
+org.organicdesign.fp.collections.Equator:
+DEFAULT_COMPARATOR  is now  Comp.DEFAULT
+DEFAULT_EQUATOR     is now  Equat.DEFAULT
+ComparisonContext   is now  org.organicdesign.fp.collections.ComparisonContext
+DEFAULT_CONTEXT     is now  org.organicdesign.fp.collections.ComparisonContext.CompCtx.DEFAULT
 
-// New serializable sub-class for functions that always return the same value.
+org.organicdesign.fp.collections.RangeOfInt:
+LIST_EQUATOR  is now Equat.LIST
+
+org.organicdesign.fp.function.Function0:
+NULL   is now   Const.NULL
+New serializable sub-class for functions that always return the same value.
 Constant
 
-
 org.organicdesign.fp.function.Function1
-IDENTITY       // Old
-Const.IDENTITY // New
+IDENTITY  is now  Const.IDENTITY
+ACCEPT    is now  ConstBool.ACCEPT
+REJECT    is now  ConstBool.REJECT
 
-ACCEPT           // Old
-ConstBool.ACCEPT // New
-
-REJECT           // Old
-ConstBool.REJECT // New
 ```
 
  - Tuple2 will no longer implement UnmodMap.UnEntry.  Instead, a new class KeyVal was created for this purpose as a Serializable sub-class of Tuple2.
