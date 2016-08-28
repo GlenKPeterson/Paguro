@@ -1,3 +1,22 @@
+**2016-08-27 Release 1.1.0**:
+This release contains the following **breaking changes** in order to make more things serializable without creating a (worse) mess:
+ - Hash codes of all tuples are now calculated by adding together the hash codes of all member items.
+   They used to bitwise-or the first two items for compatibility with Map.Entry.
+ - Tuple2 no longer implements Map.Entry or UnmodMap.UnEntry.  Instead, a new class KeyVal extends Tuple2, Map.Entry, UnmodMap.UnEntry, and Serializable.
+   The new KeyValuePair hashcode method is compatible with the *old* Tuple2 hashcode, but NOT with the *new* Tuple2 hashcode (or equals).
+ - Maps construction now requires KeyVals instead of Tuple2's.  StaticImports has a new helper method `kv(k,v)` for this.
+ - PersistentTreeMap now returns KeyVal's instead of UnEntry's.
+ - Removed PersistentTreeMap.EQUATOR - because I didn't see it used and it hadn't been tested.
+ - Moved ComparisonContext interface from inside the Equator interface, to it's own file: org.organicdesign.fp.ComparisonContext.
+ - Replaced Equator.ComparisonContext.DEFAULT_CONTEXT with ComparisonContext.CompCtx.DEFAULT
+ - KeyVal.toString() is now kv(k,v) like all the other Java toString methods.
+
+This release also contains the following non-breaking changes:
+ - Made serializable: Persistent- HashMap, HashSet, TreeMap, TreeSet, Vector.  RangeOfInt,
+ default Equator, default Comparator, default ComparisonContext.
+ - Deprecated Equator.DEFAULT_EQUATOR use Equator.Equat.DEFAULT instead.
+ - Deprecated Equator.DEFAULT_COMPARATOR use Equator.Comp.DEFAULT instead.
+
 **2016-03-23 Release 1.0.3**:
  - Fixed error message for Xform.drop() to "Can't drop less than zero items #6." Thanks @pniederw
  - Fixed "Wrong bounds check in UnmodList.listIterator #7." Thanks @pniederw

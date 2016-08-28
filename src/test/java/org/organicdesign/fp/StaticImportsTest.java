@@ -14,12 +14,18 @@
 
 package org.organicdesign.fp;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.Map;
+
 import org.junit.Test;
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.ImMap;
 import org.organicdesign.fp.collections.ImSet;
 import org.organicdesign.fp.collections.ImSortedMap;
 import org.organicdesign.fp.collections.ImSortedSet;
+import org.organicdesign.fp.collections.KeyValuePair;
 import org.organicdesign.fp.collections.PersistentHashMap;
 import org.organicdesign.fp.collections.PersistentHashSet;
 import org.organicdesign.fp.collections.PersistentTreeMap;
@@ -28,11 +34,6 @@ import org.organicdesign.fp.collections.PersistentVector;
 import org.organicdesign.fp.tuple.Tuple2;
 import org.organicdesign.fp.tuple.Tuple3;
 import org.organicdesign.fp.xform.Xform;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.organicdesign.fp.StaticImports.*;
@@ -60,7 +61,7 @@ public class StaticImportsTest {
         assertEquals(PersistentHashMap.EMPTY, map(new Map.Entry[0]));
         ImMap<String,Integer> phm = PersistentHashMap.<String,Integer>empty()
                 .assoc("Hi", 43);
-        assertEquals(phm, map(Tuple2.of("Hi", 43)));
+        assertEquals(phm, map(kv("Hi", 43)));
     }
 
     @SuppressWarnings({"NullArgumentToVariableArgMethod", "RedundantArrayCreation"})
@@ -75,10 +76,10 @@ public class StaticImportsTest {
 
     @Test public void testSortedMap() throws Exception {
         ImList<Map.Entry<String,Integer>> ls = PersistentVector.empty();
-        ls = ls.append(Tuple2.of("Hi", 1))
-               .append(Tuple2.of("Bye", -99))
-               .append(Tuple2.of("hi", 33))
-               .append(Tuple2.of("bye", -9999));
+        ls = ls.append(kv("Hi", 1))
+               .append(KeyValuePair.of("Bye", -99))
+               .append(new KeyValuePair<>("hi", 33))
+               .append(kv("bye", -9999));
         ImSortedMap<String,Integer> refMap =
                 PersistentTreeMap.ofComp(String.CASE_INSENSITIVE_ORDER, ls);
         ImSortedMap<String,Integer> testMap = sortedMap(String.CASE_INSENSITIVE_ORDER, ls);

@@ -11,12 +11,12 @@
 /* rich Jul 5, 2007 */
 package org.organicdesign.fp.collections;
 
-import org.organicdesign.fp.xform.Transformable;
-
 import java.io.Serializable;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
+
+import org.organicdesign.fp.xform.Transformable;
 
 // TODO: http://functionaljava.googlecode.com/svn/artifacts/2.21/javadoc/fj/data/Seq.html
 // TODO: https://sourcegraph.com/github.com/functionaljava/functionaljava@627d9dfa6725bcb301361477fcbc50c6efe77f61/.tree/core/src/main/java/fj/data/Seq.java
@@ -33,7 +33,10 @@ import java.util.concurrent.atomic.AtomicReference;
  @author Rich Hickey (Primary author)
  @author Glen Peterson (Java-centric editor)
  */
-public class PersistentVector<E> implements ImList<E> {
+public class PersistentVector<E> implements ImList<E>, Serializable {
+
+    // For serializable.  Make sure to change whenever internal data format changes.
+    private static final long serialVersionUID = 20160827174100L;
 
     // There's bit shifting going on here because it's a very fast operation.
     // Shifting right by 5 is aeons faster than dividing by 32.

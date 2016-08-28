@@ -167,6 +167,7 @@
         <option name="METHODS_ORDER_WEIGHT" value="7" />
         <option name="STATIC_INNER_CLASSES_ORDER_WEIGHT" value="3" />
         <option name="INNER_CLASSES_ORDER_WEIGHT" value="4" />
+        <option name="RIGHT_MARGIN" value="100" />
         <option name="JD_ALIGN_PARAM_COMMENTS" value="false" />
         <option name="JD_ALIGN_EXCEPTION_COMMENTS" value="false" />
         <option name="JD_DO_NOT_WRAP_ONE_LINE_COMMENTS" value="true" />
@@ -217,7 +218,7 @@
       <module fileurl="file://$PROJECT_DIR$/Paguro.iml" filepath="$PROJECT_DIR$/Paguro.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="false" assert-keyword="true" jdk-15="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="VcsDirectoryMappings">

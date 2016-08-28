@@ -13,23 +13,6 @@
 
 package org.organicdesign.fp;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import org.organicdesign.fp.collections.ImList;
-import org.organicdesign.fp.collections.ImMap;
-import org.organicdesign.fp.collections.ImSet;
-import org.organicdesign.fp.collections.ImSortedMap;
-import org.organicdesign.fp.collections.ImSortedSet;
-import org.organicdesign.fp.collections.UnmodCollection;
-import org.organicdesign.fp.collections.UnmodList;
-import org.organicdesign.fp.collections.UnmodListTest;
-import org.organicdesign.fp.collections.UnmodMap;
-import org.organicdesign.fp.collections.UnmodSet;
-import org.organicdesign.fp.collections.UnmodSortedMap;
-import org.organicdesign.fp.collections.UnmodSortedSet;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayDeque;
@@ -46,6 +29,24 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.organicdesign.fp.collections.ImList;
+import org.organicdesign.fp.collections.ImMap;
+import org.organicdesign.fp.collections.ImSet;
+import org.organicdesign.fp.collections.ImSortedMap;
+import org.organicdesign.fp.collections.ImSortedSet;
+import org.organicdesign.fp.collections.KeyValuePair;
+import org.organicdesign.fp.collections.UnmodCollection;
+import org.organicdesign.fp.collections.UnmodList;
+import org.organicdesign.fp.collections.UnmodListTest;
+import org.organicdesign.fp.collections.UnmodMap;
+import org.organicdesign.fp.collections.UnmodSet;
+import org.organicdesign.fp.collections.UnmodSortedMap;
+import org.organicdesign.fp.collections.UnmodSortedSet;
+
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.FunctionUtils.*;
@@ -54,6 +55,12 @@ import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 @RunWith(JUnit4.class)
 public class FunctionUtilsTest {
+
+    @Test public void stringifyTest() {
+        assertEquals("null", stringify(null));
+        assertEquals("\"Hello\"", stringify("Hello"));
+        assertEquals("kv(\"a\",3)", stringify(KeyValuePair.of("a", 3)));
+    }
 
     @Test (expected = UnsupportedOperationException.class)
     public void instantiationEx() throws Throwable {
@@ -746,9 +753,9 @@ public class FunctionUtilsTest {
         assertEquals(FunctionUtils.EMPTY_UNMOD_MAP,
                      FunctionUtils.unmodMap(Collections.emptyMap()));
 
-        ImMap<Integer,String> imMap = map(tup(1, ordinal(1)),
-                                          tup(2, ordinal(2)),
-                                          tup(3, ordinal(3)));
+        ImMap<Integer,String> imMap = map(kv(1, ordinal(1)),
+                                          kv(2, ordinal(2)),
+                                          kv(3, ordinal(3)));
 
         assertTrue(imMap == FunctionUtils.unmodMap(imMap));
 
@@ -829,9 +836,9 @@ public class FunctionUtilsTest {
         assertEquals(FunctionUtils.EMPTY_UNMOD_SORTED_MAP,
                      FunctionUtils.unmodSortedMap(Collections.emptySortedMap()));
 
-        ImSortedMap<Integer,String> imMap = sortedMap((a, b) -> a - b, vec(tup(1, ordinal(1)),
-                                                                           tup(2, ordinal(2)),
-                                                                           tup(3, ordinal(3))));
+        ImSortedMap<Integer,String> imMap = sortedMap((a, b) -> a - b, vec(kv(1, ordinal(1)),
+                                                                           kv(2, ordinal(2)),
+                                                                           kv(3, ordinal(3))));
         assertTrue(imMap == FunctionUtils.unmodSortedMap(imMap));
 
         final UnmodSortedMap<Integer,String> ts;

@@ -14,17 +14,14 @@
 
 package org.organicdesign.fp.tuple;
 
-import org.organicdesign.fp.collections.UnmodMap;
-
-import java.util.Map.Entry;
 import java.util.Objects;
 
 /**
- Holds 2 items of potentially different types, and implements Map.Entry (and UnmodMap.UnEntry
- (there is no ImMap.ImEntry)).  Designed to let you easily create immutable subclasses (to give your
+ Holds 2 items of potentially different types. Designed to let you easily create immutable subclasses (to give your
  data structures meaningful names) with correct equals(), hashCode(), and toString() methods.
+ A sub-class, @{link org.organicdesign.fp.collections.KeyValuePair} now implements Map.Entry, UnMap.UnEntry, and Serializable.
  */
-public class Tuple2<A,B> implements Entry<A,B>, UnmodMap.UnEntry<A,B> {
+public class Tuple2<A,B> {
     // Fields are protected so that sub-classes can make accessor methods with meaningful names.
     protected final A _1;
     protected final B _2;
@@ -62,27 +59,16 @@ public class Tuple2<A,B> implements Entry<A,B>, UnmodMap.UnEntry<A,B> {
     public boolean equals(Object other) {
         // Cheapest operation first...
         if (this == other) { return true; }
-        if (!(other instanceof Entry)) { return false; }
+        if (!(other instanceof Tuple2)) { return false; }
         // Details...
-        final Entry that = (Entry) other;
-        return Objects.equals(_1, that.getKey()) && Objects.equals(_2, that.getValue());
+        final Tuple2 that = (Tuple2) other;
+        return Objects.equals(_1, that._1()) && Objects.equals(_2, that._2());
     }
 
     @Override
     public int hashCode() {
         // This is specified in java.util.Map as part of the map contract.
-        return  (_1 == null ? 0 : _1.hashCode()) ^
+        return  (_1 == null ? 0 : _1.hashCode()) +
                 (_2 == null ? 0 : _2.hashCode());
-    }
-
-    // Inherited from Map.Entry
-    /** Returns the first field of the tuple.  To implement Map.Entry. */
-    @Override public A getKey() { return _1; }
-    /** Returns the second field of the tuple.  To implement Map.Entry. */
-    @Override public B getValue() { return _2; }
-    /** This method is required to implement Map.Entry, but calling it only issues an exception */
-    @SuppressWarnings("deprecation")
-    @Override @Deprecated public B setValue(B value) {
-        throw new UnsupportedOperationException("Tuple2 is immutable");
     }
 }

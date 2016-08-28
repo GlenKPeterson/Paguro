@@ -52,7 +52,7 @@ Available from the [Maven Repository](http://mvnrepository.com/artifact/org.orga
         <groupId>org.organicdesign</groupId>
         <!-- NOTE: artifactId will change to "Paguro" in November 2016 -->
         <artifactId>UncleJim</artifactId>
-        <version>1.0.3</version>
+        <version>1.1.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -73,7 +73,7 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
 
         // For each address, produce a key/value pair
         // of email and person (Tuple2 implements Map.Entry)
-                                 .map(email -> tup(email, person)))
+                                 .map(email -> kv(email, person)))
 
         // toImMap() collects the results to key/value pairs and puts
         // them in an immutable map.  We already have pairs, so pass

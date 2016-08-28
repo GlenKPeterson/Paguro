@@ -9,10 +9,11 @@
 
 package org.organicdesign.fp.collections;
 
-import org.organicdesign.fp.Option;
-
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.SortedSet;
+
+import org.organicdesign.fp.Option;
 
 /**
  A wrapper that turns a PersistentTreeMap into a set.
@@ -20,7 +21,10 @@ import java.util.SortedSet;
  This file is a derivative work based on a Clojure collection licensed under the Eclipse Public
  License 1.0 Copyright Rich Hickey
  */
-public class PersistentTreeSet<E> implements ImSortedSet<E> {
+public class PersistentTreeSet<E> implements ImSortedSet<E>, Serializable {
+
+    // For serializable.  Make sure to change whenever internal data format changes.
+    private static final long serialVersionUID = 20160827174100L;
 
     /**
      Be extremely careful with this because it uses the default comparator, which only works for items that implement

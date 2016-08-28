@@ -14,10 +14,6 @@
 
 package org.organicdesign.fp.collections;
 
-import org.junit.Test;
-import org.organicdesign.fp.FunctionUtils;
-import org.organicdesign.fp.tuple.Tuple2;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -27,7 +23,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.junit.Test;
+import org.organicdesign.fp.FunctionUtils;
+
 import static org.junit.Assert.*;
+import static org.organicdesign.fp.StaticImports.kv;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class UnmodMapTest {
@@ -47,8 +47,7 @@ public class UnmodMapTest {
                 @Override public boolean hasNext() { return iter.hasNext(); }
 
                 @Override public UnEntry<K,V> next() {
-                    Entry<K,V> next = iter.next();
-                    return Tuple2.of(next.getKey(), next.getValue());
+                    return new KeyValuePair<>(iter.next());
                 }
             };
         }
@@ -61,9 +60,9 @@ public class UnmodMapTest {
     }
 
     TestMap<String,Integer> unMap = new TestMap<>(Arrays.asList(
-            Tuple2.of("a", 1),
-            Tuple2.of("b", 2),
-            Tuple2.of("c", 3)));
+            kv("a", 1),
+            kv("b", 2),
+            kv("c", 3)));
 
     @Test public void containsValue() {
         Map<String,Integer> mm = new HashMap<>();

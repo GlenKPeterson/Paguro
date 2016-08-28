@@ -14,18 +14,6 @@
 
 package org.organicdesign.fp;
 
-import org.organicdesign.fp.collections.UnmodCollection;
-import org.organicdesign.fp.collections.UnmodIterable;
-import org.organicdesign.fp.collections.UnmodIterator;
-import org.organicdesign.fp.collections.UnmodList;
-import org.organicdesign.fp.collections.UnmodListIterator;
-import org.organicdesign.fp.collections.UnmodMap;
-import org.organicdesign.fp.collections.UnmodSet;
-import org.organicdesign.fp.collections.UnmodSortedIterator;
-import org.organicdesign.fp.collections.UnmodSortedMap;
-import org.organicdesign.fp.collections.UnmodSortedSet;
-import org.organicdesign.fp.tuple.Tuple2;
-
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -36,6 +24,18 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
+
+import org.organicdesign.fp.collections.KeyValuePair;
+import org.organicdesign.fp.collections.UnmodCollection;
+import org.organicdesign.fp.collections.UnmodIterable;
+import org.organicdesign.fp.collections.UnmodIterator;
+import org.organicdesign.fp.collections.UnmodList;
+import org.organicdesign.fp.collections.UnmodListIterator;
+import org.organicdesign.fp.collections.UnmodMap;
+import org.organicdesign.fp.collections.UnmodSet;
+import org.organicdesign.fp.collections.UnmodSortedIterator;
+import org.organicdesign.fp.collections.UnmodSortedMap;
+import org.organicdesign.fp.collections.UnmodSortedSet;
 
 /**
  A dumping ground for utility functions that aren't useful enough to belong in StaticImports.
@@ -51,6 +51,12 @@ public class FunctionUtils {
     // I don't want any instances of this class.
     private FunctionUtils() {
         throw new UnsupportedOperationException("No instantiation");
+    }
+
+    public static String stringify(Object o) {
+        if (o == null) { return "null"; }
+        if (o instanceof String) { return "\"" + o + "\""; }
+        return o.toString();
     }
 
     /** Returns a String showing the type and first few elements of a map */
@@ -586,8 +592,7 @@ public class FunctionUtils {
                     @Override public boolean hasNext() { return iter.hasNext(); }
 
                     @Override public UnEntry<K,V> next() {
-                        Entry<K,V> entry = iter.next();
-                        return Tuple2.of(entry.getKey(), entry.getValue());
+                        return new KeyValuePair<>(iter.next());
                     }
                 };
             }

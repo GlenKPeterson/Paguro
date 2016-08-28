@@ -8,6 +8,7 @@
 /* rich May 20, 2006 */
 package org.organicdesign.fp.collections;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Map;
@@ -31,12 +32,31 @@ import org.organicdesign.fp.Option;
  @author Glen Peterson (Java-centric editor)
  */
 
-public class PersistentTreeMap<K,V> implements ImSortedMap<K,V> {
+public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
 
-    // TODO: Replace with Mutable.Ref, or make methods return Tuple2.
-    private class Box<E> {
+    // For serializable.  Make sure to change whenever internal data format changes.
+    private static final long serialVersionUID = 20160827174100L;
+
+    // Is there a better way to do this?
+    private class Box<E> implements Serializable {
+
+        // For serializable.  Make sure to change whenever internal data format changes.
+        private static final long serialVersionUID = 20160827174100L;
+
         public E val;
         public Box(E val) { this.val = val; }
+    }
+
+    private static class KeyComparator<K> implements Comparator<Entry<K,?>>, Serializable {
+        private static final long serialVersionUID = 20160827174100L;
+
+        private final Comparator<? super K> wrappedComparator;
+
+        private KeyComparator(Comparator<? super K> c) { wrappedComparator = c; }
+
+        @Override public int compare(Entry<K,?> a, Entry<K,?> b) {
+            return wrappedComparator.compare(a.getKey(), b.getKey());
+        }
     }
 
     private final Comparator<? super K> comp;
@@ -127,7 +147,7 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V> {
         // This may be faster, but I haven't timed it.
 
         // Preserve comparator!
-        ImSortedSet<Entry<K,V>> ret = PersistentTreeSet.ofComp((a, b) -> comp.compare(a.getKey(), b.getKey()));
+        ImSortedSet<Entry<K,V>> ret = PersistentTreeSet.ofComp(new KeyComparator<>(comp));
 
         UnmodIterator<UnEntry<K,V>> iter = this.iterator();
         while (iter.hasNext()) { ret = ret.put(iter.next()); }
@@ -137,19 +157,19 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V> {
     /** This is correct, but O(n). */
     @Override public int hashCode() { return (size() == 0) ? 0 : UnmodIterable.hashCode(entrySet()); }
 
-    public static final Equator<SortedMap> EQUATOR = new Equator<SortedMap>() {
-        @Override
-        public int hash(SortedMap kvSortedMap) {
-            return UnmodIterable.hashCode(kvSortedMap.entrySet());
-        }
-
-        @Override
-        public boolean eq(SortedMap o1, SortedMap o2) {
-            if (o1 == o2) { return true; }
-            if ( o1.size() != o2.size() ) { return false; }
-            return UnmodSortedIterable.equals(UnmodSortedIterable.castFromSortedMap(o1), UnmodSortedIterable.castFromSortedMap(o2));
-        }
-    };
+//    public static final Equator<SortedMap> EQUATOR = new Equator<SortedMap>() {
+//        @Override
+//        public int hash(SortedMap kvSortedMap) {
+//            return UnmodIterable.hashCode(kvSortedMap.entrySet());
+//        }
+//
+//        @Override
+//        public boolean eq(SortedMap o1, SortedMap o2) {
+//            if (o1 == o2) { return true; }
+//            if ( o1.size() != o2.size() ) { return false; }
+//            return UnmodSortedIterable.equals(UnmodSortedIterable.castFromSortedMap(o1), UnmodSortedIterable.castFromSortedMap(o2));
+//        }
+//    };
 
     /**
      When comparing against a SortedMap, this is correct and O(n) fast, but BEWARE! It is also compatible with
@@ -254,7 +274,7 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V> {
         for (UnEntry<K,V> entry : this) {
             if (i > 0) { sB.append(","); }
             if (i > 4) { break; }
-            sB.append("UnEntry(").append(entry.getKey()).append(",").append(entry.getValue()).append(")");
+            sB.append("kv(").append(entry.getKey()).append(",").append(entry.getValue()).append(")");
             i++;
         }
         if (i < size()) {
@@ -747,7 +767,10 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V> {
 //        private Reduced(A a) { val = a; }
 //    }
 
-    private static abstract class Node<K, V> implements UnEntry<K,V> {
+    private static abstract class Node<K, V> implements UnEntry<K,V>, Serializable {
+        // For serializable.  Make sure to change whenever internal data format changes.
+        private static final long serialVersionUID = 20160827174100L;
+
         final K key;
 
         Node(K key) { this.key = key; }
@@ -1112,7 +1135,11 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V> {
 //        }
 //    }
 
-    private static class NodeIterator<K, V> implements UnmodSortedIterator<UnEntry<K,V>> {
+    private static class NodeIterator<K, V> implements UnmodSortedIterator<UnEntry<K,V>>, Serializable {
+
+        // For serializable.  Make sure to change whenever internal data format changes.
+        private static final long serialVersionUID = 20160827174100L;
+
         private Stack<Node<K,V>> stack = new Stack<>();
         private final boolean asc;
 

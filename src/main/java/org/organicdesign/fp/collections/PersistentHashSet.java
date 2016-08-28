@@ -13,6 +13,7 @@
 
 package org.organicdesign.fp.collections;
 
+import java.io.Serializable;
 import java.util.Set;
 
 /**
@@ -21,7 +22,10 @@ import java.util.Set;
  This file is a derivative work based on a Clojure collection licensed under the Eclipse Public
  License 1.0 Copyright Rich Hickey
 */
-public class PersistentHashSet<E> implements ImSet<E> {
+public class PersistentHashSet<E> implements ImSet<E>, Serializable {
+
+    // For serializable.  Make sure to change whenever internal data format changes.
+    private static final long serialVersionUID = 20160827174100L;
 
     // If you don't put this here, it inherits EMPTY from UnmodSet, which does not have .equals()
     // defined.  UnmodSet.empty won't put() either.

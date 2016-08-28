@@ -10,15 +10,14 @@
 
 package org.organicdesign.fp.collections;
 
-import org.organicdesign.fp.FunctionUtils;
-import org.organicdesign.fp.Option;
-import org.organicdesign.fp.tuple.Tuple2;
-
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
+
+import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.Option;
 
 import static org.organicdesign.fp.FunctionUtils.emptyUnmodIterator;
 
@@ -34,7 +33,10 @@ import static org.organicdesign.fp.FunctionUtils.emptyUnmodIterator;
  This file is a derivative work based on a Clojure collection licensed under the Eclipse Public
  License 1.0 Copyright Rich Hickey
  */
-public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
+public class PersistentHashMap<K,V> implements ImMapTrans<K,V>, Serializable {
+
+    // For serializable.  Make sure to change whenever internal data format changes.
+    private static final long serialVersionUID = 20160827174100L;
 
 //    static private <K, V, R> R doKvreduce(Object[] array, Function3<R,K,V,R> f, R init) {
 //        for (int i = 0; i < array.length; i += 2) {
@@ -189,7 +191,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 
     @Override public Option<UnmodMap.UnEntry<K,V>> entry(K key) {
         if (key == null) {
-            return hasNull ? Option.of(Tuple2.of(null, nullValue)) : Option.none();
+            return hasNull ? Option.of(new KeyValuePair<>(null, nullValue)) : Option.none();
         }
         if (root == null) {
             return Option.none();
@@ -256,7 +258,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
                 @Override public UnEntry<K,V> next(){
                     if (!seen) {
                         seen = true;
-                        return Tuple2.of(null, nullValue);
+                        return new KeyValuePair<>(null, nullValue);
                     } else {
                         return rootIter.next();
                     }
@@ -375,7 +377,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         @Override public Option<UnEntry<K,V>> entry(K key) {
             ensureEditable();
             if (key == null) {
-                return hasNull ? Option.of(Tuple2.of(null, nullValue)) : Option.none();
+                return hasNull ? Option.of(new KeyValuePair<>(null, nullValue)) : Option.none();
             }
             if (root == null) {
                 return Option.none();
@@ -409,7 +411,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
                     @Override public UnEntry<K,V> next(){
                         if (!seen) {
                             seen = true;
-                            return Tuple2.of(null, nullValue);
+                            return new KeyValuePair<>(null, nullValue);
                         } else {
                             return rootIter.next();
                         }
@@ -835,7 +837,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
             if(keyOrNull == null)
                 return ((INode) valOrNode).find(shift + 5, hash, key);
             if(equator.eq(key, keyOrNull))
-                return Tuple2.of(keyOrNull, (V) valOrNode);
+                return new KeyValuePair<>(keyOrNull, (V) valOrNode);
             return null;
         }
 
@@ -1055,7 +1057,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
             if(idx < 0)
                 return null;
             if(equator.eq(key, k(array, idx)))
-                return Tuple2.of(k(array, idx), v(array, idx + 1));
+                return new KeyValuePair<>(k(array, idx), v(array, idx + 1));
             return null;
         }
 
@@ -1358,7 +1360,7 @@ public static void main(String[] args){
                 int i = mutableIndex;
                 mutableIndex = i + 2;
                 if (array[i] != null) {
-                    nextEntry = Tuple2.of(k(array, i), v(array, i+1));
+                    nextEntry = new KeyValuePair<>(k(array, i), v(array, i+1));
                     return true;
                 } else {
                     INode<K,V> node = iNode(array, i + 1);

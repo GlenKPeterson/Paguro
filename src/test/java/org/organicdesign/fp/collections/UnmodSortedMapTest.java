@@ -1,9 +1,5 @@
 package org.organicdesign.fp.collections;
 
-import org.junit.Test;
-import org.organicdesign.fp.FunctionUtils;
-import org.organicdesign.fp.tuple.Tuple2;
-
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -11,6 +7,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import org.junit.Test;
+import org.organicdesign.fp.FunctionUtils;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.*;
@@ -69,8 +68,7 @@ public class UnmodSortedMapTest {
                 @Override public boolean hasNext() { return iter.hasNext(); }
 
                 @Override public UnEntry<K,V> next() {
-                    Entry<K,V> entry = iter.next();
-                    return Tuple2.of(entry.getKey(), entry.getValue());
+                    return new KeyValuePair<>(iter.next());
                 }
             };
         }
@@ -135,14 +133,14 @@ public class UnmodSortedMapTest {
         Comparator<? super Map.Entry<String,Integer>> testComp0 = testEntSet.comparator();
         assert testComp0 != null;
         assertTrue("D".compareTo("d") < 0);
-        assertTrue(testComp0.compare(Tuple2.of("D", 3), Tuple2.of("d", -1)) < 0);
+        assertTrue(testComp0.compare(kv("D", 3), kv("d", -1)) < 0);
 
         Comparator<? super Map.Entry<String,Integer>> testComp =
                 new TestMap<>(refMap, String.CASE_INSENSITIVE_ORDER).entrySet().comparator();
 
         assertEquals(0, String.CASE_INSENSITIVE_ORDER.compare("D", "d"));
         assert testComp != null;
-        assertEquals(0, testComp.compare(Tuple2.of("D", 3), Tuple2.of("d", -1)));
+        assertEquals(0, testComp.compare(kv("D", 3), kv("d", -1)));
 
 //        UnmodMapTest.TestEntry<String,Integer>[] testEntries =
 //                (UnmodMapTest.TestEntry<String,Integer>[]) new UnmodMapTest.TestEntry[] {

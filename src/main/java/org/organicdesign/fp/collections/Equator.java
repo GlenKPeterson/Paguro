@@ -29,6 +29,12 @@ import java.util.Comparator;
  an equator's .hashCode() or .equals() methods because those are for comparing *Equators* and are
  inherited from java.lang.Object.  I'd deprecate those methods, but you can't do that on an
  interface.
+
+ A common mistake is to implement an Equator, ComparisonContext, or Comparator as an anonymous class
+ or lambda, then be surprised when it is can't be serialized, or is deserialized as null.  These
+ one-off classes are often singletons, which are easiest to serialize as enums.  If your
+ implementation requires generic type parameters, observe how {@link #defaultEquator()} tricks
+ the type system into using generic type parameters (correctly) with an enum.
  */
 public interface Equator<T> {
 
@@ -86,49 +92,12 @@ public interface Equator<T> {
     static <T> Comparator<T> defaultComparator() { return (Comparator<T>) Comp.DEFAULT; }
 
     /**
-     Implement compare() and hash() and you get a 100% compatible eq() for free.
-    */
-    interface ComparisonContext<T> extends Equator<T>, Comparator<T> {
-        /** Returns true if the first object is less than the second. */
-        default boolean lt(T o1, T o2) { return compare(o1, o2) < 0; }
-
-        /** Returns true if the first object is less than or equal to the second. */
-        default boolean lte(T o1, T o2) { return compare(o1, o2) <= 0; }
-
-        /** Returns true if the first object is greater than the second. */
-        default boolean gt(T o1, T o2) { return compare(o1, o2) > 0; }
-
-        /** Returns true if the first object is greater than or equal to the second. */
-        default boolean gte(T o1, T o2) { return compare(o1, o2) >= 0; }
-
-        @Override default boolean eq(T o1, T o2) { return compare(o1, o2) == 0; }
-
-        // Enums are serializable and lambdas are not.  Therefore enums make better singletons.
-        enum CompCtx implements ComparisonContext<Comparable<Object>> {
-            DEFAULT {
-                @Override public int hash(Comparable<Object> o) { return (o == null) ? 0 : o.hashCode(); }
-                @SuppressWarnings("ConstantConditions")
-                @Override public int compare(Comparable<Object> o1, Comparable<Object> o2) {
-                    if (o1 == o2) { return 0; }
-                    if (o1 == null) {
-                        return - (o2.compareTo(o1));
-                    }
-                    return o1.compareTo(o2);
-                }
-            }
-        }
-
-        /**
-         Use CompCtx.DEFAULT instead.
-         Being an enum, it's serializable and makes a better singleton.
-         Deprecated as of 1.1.0, 2016-08-27
-         */
-        @Deprecated
-        ComparisonContext<Comparable<Object>> DEFAULT_CONTEXT = CompCtx.DEFAULT;
-
-        @SuppressWarnings("unchecked")
-        static <T> ComparisonContext<T> defCompCtx() { return (ComparisonContext<T>) CompCtx.DEFAULT; }
-    }
+     Use ComparisonContext.CompCtx.DEFAULT instead.
+     Being an enum, it's serializable and makes a better singleton.
+     Deprecated as of version 1.1.0, 2016-08-27
+     */
+    @Deprecated
+    ComparisonContext<Comparable<Object>> DEFAULT_CONTEXT = ComparisonContext.CompCtx.DEFAULT;
 
     // ========================================= Instance =========================================
     /**

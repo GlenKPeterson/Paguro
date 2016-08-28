@@ -14,11 +14,16 @@
 
 package org.organicdesign.fp;
 
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Map;
+
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.ImMap;
 import org.organicdesign.fp.collections.ImSet;
 import org.organicdesign.fp.collections.ImSortedMap;
 import org.organicdesign.fp.collections.ImSortedSet;
+import org.organicdesign.fp.collections.KeyValuePair;
 import org.organicdesign.fp.collections.PersistentHashMap;
 import org.organicdesign.fp.collections.PersistentHashSet;
 import org.organicdesign.fp.collections.PersistentTreeMap;
@@ -28,10 +33,6 @@ import org.organicdesign.fp.tuple.Tuple2;
 import org.organicdesign.fp.tuple.Tuple3;
 import org.organicdesign.fp.xform.Transformable;
 import org.organicdesign.fp.xform.Xform;
-
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Map;
 
 /**
  <p>A mini data definition language composed of vec(), tup(), map(), set(), plus xform() which makes
@@ -74,8 +75,14 @@ public final class StaticImports {
     private StaticImports() { throw new UnsupportedOperationException("No instantiation"); }
 
     /**
+     Returns a new KeyValuePair of the given items (extends Tuple2 and implements Map.Entry, UnmodMap.UnEntry, and
+     Serializable).
+     */
+    public static <K,V> KeyValuePair<K,V> kv(K t, V u) { return new KeyValuePair<>(t, u); }
+
+    /**
      Returns a new PersistentHashMap of the given keys and their paired values.  Use the
-     {@link StaticImports#tup(Object, Object)} method to define those key/value pairs briefly and
+     {@link StaticImports#kv(Object, Object)} method to define those key/value pairs briefly and
      easily.  This data definition method is one of the three methods in this project that support
      varargs.
 

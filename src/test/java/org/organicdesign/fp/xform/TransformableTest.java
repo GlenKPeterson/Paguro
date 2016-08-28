@@ -1,13 +1,5 @@
 package org.organicdesign.fp.xform;
 
-import org.junit.Test;
-import org.organicdesign.fp.collections.ImMap;
-import org.organicdesign.fp.collections.ImSortedMap;
-import org.organicdesign.fp.collections.PersistentHashMap;
-import org.organicdesign.fp.collections.PersistentTreeMap;
-import org.organicdesign.fp.collections.UnmodSortedIterable;
-import org.organicdesign.fp.tuple.Tuple2;
-
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -19,6 +11,14 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
+import org.junit.Test;
+import org.organicdesign.fp.collections.ImMap;
+import org.organicdesign.fp.collections.ImSortedMap;
+import org.organicdesign.fp.collections.KeyValuePair;
+import org.organicdesign.fp.collections.PersistentHashMap;
+import org.organicdesign.fp.collections.PersistentTreeMap;
+import org.organicdesign.fp.collections.UnmodSortedIterable;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -55,7 +55,7 @@ public class TransformableTest {
             control.put(i, ordinal(i));
         }
         Transformable<Integer> trans = Xform.of(items);
-        assertEquals(control, trans.toMutableSortedMap(comp, i -> Tuple2.of(i, ordinal(i))));
+        assertEquals(control, trans.toMutableSortedMap(comp, i -> new KeyValuePair<>(i, ordinal(i))));
     }
 
     @Test public void testToImMap() throws Exception {
@@ -76,7 +76,7 @@ public class TransformableTest {
             control = control.assoc(i, ordinal(i));
         }
         Transformable<Integer> trans = Xform.of(items);
-        assertEquals(control, trans.toImSortedMap(comp, i -> Tuple2.of(i, ordinal(i))));
+        assertEquals(control, trans.toImSortedMap(comp, i -> KeyValuePair.of(i, ordinal(i))));
     }
 
     @Test public void testToMutableSortedSet() throws Exception {

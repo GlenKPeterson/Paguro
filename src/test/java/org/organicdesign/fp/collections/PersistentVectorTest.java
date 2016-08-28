@@ -14,12 +14,6 @@
 
 package org.organicdesign.fp.collections;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import org.organicdesign.fp.FunctionUtils;
-
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,8 +22,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.organicdesign.fp.FunctionUtils;
+
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.vec;
+import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 @RunWith(JUnit4.class)
@@ -192,6 +193,32 @@ public class PersistentVectorTest {
         for (int j = 0; j < SEVERAL; j++){
             assertEquals(Integer.valueOf(j), is.get(j));
         }
+    }
+
+    @Test public void serializationTest() throws Exception {
+        ImList<Integer> empty1 = serializeDeserialize(PersistentVector.empty());
+        ImList<Integer> empty2 = PersistentVector.ofIter(Collections.emptyList());
+        ImList<Integer> empty3 = PersistentVector.ofIter(new ArrayList<>());
+        ImList<Integer> empty4 = vec();
+
+        equalsDistinctHashCode(empty1, empty2, empty3,
+                               vec(1));
+
+        equalsDistinctHashCode(empty2, empty3, empty4,
+                               vec((Integer) null));
+
+        System.out.println("addSeveral start");
+        final int SEVERAL = 100; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
+        PersistentVector<Integer> is = PersistentVector.empty();
+        for (int j = 0; j < SEVERAL; j++){
+            is = is.append(j);
+        }
+        PersistentVector<Integer> pv = serializeDeserialize(is);
+        assertEquals(SEVERAL, pv.size());
+        for (int j = 0; j < SEVERAL; j++){
+            assertEquals(Integer.valueOf(j), pv.get(j));
+        }
+
     }
 
     @Test

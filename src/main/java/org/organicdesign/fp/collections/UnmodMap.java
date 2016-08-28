@@ -13,8 +13,6 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
-import org.organicdesign.fp.tuple.Tuple2;
-
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
@@ -45,7 +43,8 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
         }
 
         static <K,V> UnEntry<K,V> entryToUnEntry(Map.Entry<K,V> entry) {
-            return Tuple2.of(entry.getKey(), entry.getValue());
+            // Consider timing a class that just wraps the entry instead of duplicating it.
+            return new KeyValuePair<>(entry);
         }
 
         static <K,V>
