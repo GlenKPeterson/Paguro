@@ -8,7 +8,7 @@ In the next release of UncleJim/Paguro, all collection implementations will impl
 Issues?  Questions?  Provide feedback on the [Serialization enhancement request](https://github.com/GlenKPeterson/UncleJim/issues/10)
 
 ###Renaming
-This project will soon be renamed to "Paguro" (pronounced, "pah-GUH-row" rhymes with "furrow" and "borough") which is short for the Latin "Paguroidea" - the name of the Hermit Crab superfamily in Biology.  These collections grow by adding a new shell, leaving the insides the same, much the way Hermit Crabs trade up to a new shell when they grow.  Plus, hermit crabs are cute.
+This project will soon be renamed to "Paguro" ("pah-GUH-row" rhymes with "furrow") which is short for the Latin "Paguroidea" - the name of the Hermit Crab superfamily in Biology.  These collections grow by adding a new shell, leaving the insides the same, much the way Hermit Crabs trade up to a new shell when they grow.  Plus, hermit crabs are cute.
 
 ![Hermit Crab](https://c7.staticflickr.com/8/7413/12171498934_2934c7ef28_n.jpg)
 Photo by [Rushen](https://www.flickr.com/photos/rushen/12171498934/in/photostream/)
