@@ -2,55 +2,70 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") p
 
 #News
 
-##Serializable
-First, an apology.  I did not think about serialization at all when I put this together.
-Fixing this oversight properly required some breaking changes, most notably,
-I'd made Tuple2 implement Map.Entry.  Tuple2 is meant to be extensible.  Making something
-Serializable adds a lot of unnecessary complexity (See Josh Bloch's items 74-78 for details).
-The only reasonable solution was to add a new sub-class of Tuple2 called KeyVal which implements
-Map.Entry and UnmodMap.UnEntry and is serializable.  This in turn required a different helper
-function in StaticImports: kv() instead of tup().  If you declare maps, you'll have to make a bunch
-of manual changes and I'm sorry for that.
+##UncleJim 2.0: Serializable
+Making this project properly Serializable required some breaking changes.
+Most notably, Tuple2 no longer implements Map.Entry.
+Tuple2 is meant to be extensible and making something Serializable adds a lot of unnecessary complexity for subclasses (See Josh Bloch's items 74-78 for details).
+A new sub-class of Tuple2 called KeyVal implements Map.Entry, UnmodMap.UnEntry, and Serializable.
+This in turn required a different helper function in StaticImports: `kv()` instead of `tup()`.
+If you declare maps, you'll have to make the following manual changes:
 
-**OLD:**
 ```java
-map(tup("one",1), tup("two",2))
-```
-**NEW:**
-```java
-map(kv("one",1), kv("two",2))
+// Obsolete:
+map(tup("one",1),
+    tup("two",2))
+
+// New syntax:
+map(kv("one",1),
+    kv("two",2))
 ```
 
-The good news is that all collection implementations now implement Serializable.
-Unless you use this project extensively, the map creation syntax is the only change you are likely to notice.
+If you transform things into maps, you may need to make changes as follows:
+
+```java
+// Obsolete:
+someCollection.toImMap(x -> tup(x.k, x.v))
+
+// New syntax:
+someCollection.toImMap(x -> kv(x.k, x.v))
+
+
+// Obsolete (and contrived).  Also see note about changed static imports below.
+vec(vec("three", 3), vec("four, 4)).toImMap(IDENTITY)
+
+// New syntax:
+vec(kv("three", 3), kv("four, 4)).toImMap(IDENTITY)
+```
+
+Unless you use this project extensively, these are the only changes you are likely to notice.
 Thanks @sblommers for spotting this issue and writing the key unit test!
 
 Anything that used to be implemented as an anonymous class, object, or lambda is now
-implemented as a serializable enum or sub-class.  As a result, the following constants have moved.
-The easiest way to make this change is to use a static import for the new fields.
+implemented as an enum or serializable sub-class.  As a result, the following constants have moved.
+The easiest way to make this change is to use a static import for the new fields.  For example:
 ```java
+// Obsolete:
 import static org.organicdesign.fp.function.Function1..*;
-```
-**Becomes:**
-```java
+
+// New:
 import static org.organicdesign.fp.function.Function1.ConstBool.*;
 ```
 
 ##### List of changes:
 ```
 org.organicdesign.fp.collections.Equator:
-DEFAULT_COMPARATOR  is now  Comp.DEFAULT
-DEFAULT_EQUATOR     is now  Equat.DEFAULT
-ComparisonContext   is now  org.organicdesign.fp.collections.ComparisonContext
-DEFAULT_CONTEXT     is now  org.organicdesign.fp.collections.ComparisonContext.CompCtx.DEFAULT
+DEFAULT_COMPARATOR   is now   Comp.DEFAULT
+DEFAULT_EQUATOR      is now   Equat.DEFAULT
+ComparisonContext   moved to  org.organicdesign.fp.collections.ComparisonContext
+DEFAULT_CONTEXT      is now   org.organicdesign.fp.collections.ComparisonContext.CompCtx.DEFAULT
 
 org.organicdesign.fp.collections.RangeOfInt:
 LIST_EQUATOR  is now Equat.LIST
 
 org.organicdesign.fp.function.Function0:
 NULL   is now   Const.NULL
-New serializable sub-class for functions that always return the same value.
-Constant
+New serializable sub-class for functions that always return the same value:
+Constant (Function0.Constant)
 
 org.organicdesign.fp.function.Function1
 IDENTITY  is now  Const.IDENTITY
@@ -65,9 +80,10 @@ map(kv(
 .toImMap(... kv(
 ```
 
- - Tuple2 will no longer implement UnmodMap.UnEntry.  Instead, a new class KeyVal was created for this purpose as a Serializable sub-class of Tuple2.
- - The way hashcodes are computed for all tuples changed.  This computation had a "wart" for compatibility with java.util.Map.Entry which was removed.
- - Default Equator and Comparator singleton implementations became Enums instead of lambdas (the old fields are deprecated but still there).
+#### Additional changes
+ - Tuple2 no longer implements Map.Entry.  Instead, a new Serializable subclass, KeyVal, was created for this purpose.
+ - Tuple hashcodes are now the addition of the hashcodes of each item in the tuple.
+   They used to bitwise-or the first two items (and add the rest) for compatibility with Map.Entry.
 
 The function interfaces (Function0, Function1, etc.) will *not* implement Serializable.
 These interfaces are general and Serializable is too much for implementers to think about (and often irrelevant).
@@ -115,7 +131,7 @@ Available from the [Maven Repository](http://mvnrepository.com/artifact/org.orga
         <groupId>org.organicdesign</groupId>
         <!-- NOTE: artifactId will change to "Paguro" in November 2016 -->
         <artifactId>UncleJim</artifactId>
-        <version>1.1.0-SNAPSHOT</version>
+        <version>2.0.0</version>
 </dependency>
 ```
 
@@ -162,7 +178,7 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
 
 * [Comparison with Traditional Java and Java 8 Streams](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java#L22)
 
-* A summary of recent updates is in the [Change Log](changeLog.md)
+* A summary of recent updates is in the [Change Log](CHANGE_LOG.md)
 
 #Manifesto
 
