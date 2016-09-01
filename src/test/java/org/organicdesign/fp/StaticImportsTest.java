@@ -57,7 +57,7 @@ public class StaticImportsTest {
     @SuppressWarnings({"NullArgumentToVariableArgMethod", "RedundantArrayCreation", "unchecked"})
     @Test public void testMap() throws Exception {
         assertEquals(PersistentHashMap.EMPTY, map());
-        assertEquals(PersistentHashMap.EMPTY, map(null));
+        assertEquals(PersistentHashMap.EMPTY, map((Map.Entry[]) null));
         assertEquals(PersistentHashMap.EMPTY, map(new Map.Entry[0]));
         ImMap<String,Integer> phm = PersistentHashMap.<String,Integer>empty()
                 .assoc("Hi", 43);
@@ -67,7 +67,7 @@ public class StaticImportsTest {
     @SuppressWarnings({"NullArgumentToVariableArgMethod", "RedundantArrayCreation"})
     @Test public void testSet() throws Exception {
         assertEquals(PersistentHashSet.EMPTY, set());
-        assertEquals(PersistentHashSet.EMPTY, set(null));
+        assertEquals(PersistentHashSet.EMPTY, set((Map.Entry[]) null));
         assertEquals(PersistentHashSet.EMPTY, set(new Object[0]));
         ImSet<String> phm = PersistentHashSet.<String>empty()
                 .put("Hi");
@@ -130,7 +130,7 @@ public class StaticImportsTest {
     @SuppressWarnings({"NullArgumentToVariableArgMethod", "RedundantArrayCreation"})
     @Test public void testVec() throws Exception {
         assertEquals(PersistentVector.EMPTY, vec());
-        assertEquals(PersistentVector.EMPTY, vec(null));
+        assertEquals(PersistentVector.EMPTY, vec((Map.Entry[]) null));
         assertEquals(PersistentVector.EMPTY, vec(new Map.Entry[0]));
         ImList<String> ls = PersistentVector.<String>empty()
                 .append("Hi");

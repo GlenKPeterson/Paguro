@@ -461,7 +461,7 @@ public class PersistentVector<E> implements ImList<E>, Serializable {
     @Override public boolean equals(Object other) {
         if (this == other) { return true; }
         if ( !(other instanceof List) ) { return false; }
-        List that = (List) other;
+        List<?> that = (List) other;
         return (this.size() == that.size()) &&
                 UnmodSortedIterable.equals(this, UnmodSortedIterable.castFromList(that));
     }

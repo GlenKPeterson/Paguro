@@ -96,7 +96,8 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
 
 
     /**
-     Returns a new PersistentTreeMap of the given comparable keys and their paired values, skipping any null Entries.
+     Returns a new PersistentTreeMap of the given comparable keys and their paired values, skipping
+     any null Entries.
      */
     public static <K extends Comparable<K>,V> PersistentTreeMap<K,V>
     of(Iterable<Map.Entry<K,V>> es) {
@@ -137,8 +138,9 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
     }
 
     /**
-     Returns a view of the mappings contained in this map.  The set should actually contain UnmodMap.Entry items, but that
-     return signature is illegal in Java, so you'll just have to remember.
+     Returns a view of the mappings contained in this map.  The set should actually contain
+     UnmodMap.Entry items, but that return signature is illegal in Java, so you'll just have to
+     remember.
      */
     @Override public ImSortedSet<Entry<K,V>> entrySet() {
         // This is the pretty way to do it.
@@ -155,7 +157,9 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
     }
 
     /** This is correct, but O(n). */
-    @Override public int hashCode() { return (size() == 0) ? 0 : UnmodIterable.hashCode(entrySet()); }
+    @Override public int hashCode() {
+        return (size() == 0) ? 0 : UnmodIterable.hashCode(entrySet());
+    }
 
 //    public static final Equator<SortedMap> EQUATOR = new Equator<SortedMap>() {
 //        @Override
@@ -172,10 +176,11 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
 //    };
 
     /**
-     When comparing against a SortedMap, this is correct and O(n) fast, but BEWARE! It is also compatible with
-     java.util.Map which unfortunately means equality as defined by this method (and java.util.AbstractMap) is not
-     commutative when comparing ordered and unordered maps (it is also O(n log n) slow).  The Equator defined by this
-     class prevents comparison with unordered Maps.
+     When comparing against a SortedMap, this is correct and O(n) fast, but BEWARE! It is also
+     compatible with java.util.Map which unfortunately means equality as defined by this method
+     (and java.util.AbstractMap) is not commutative when comparing ordered and unordered maps (it is
+     also O(n log n) slow).  The Equator defined by this class prevents comparison with unordered
+     Maps.
      */
     @Override public boolean equals(Object other) {
         if (this == other) { return true; }
@@ -185,14 +190,16 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
         // what it currently is (most politely called "compatible with existing API's").
         if ( !(other instanceof Map) ) { return false; }
 
-        Map that = (Map) other;
+        Map<?,?> that = (Map) other;
 
         if (size != that.size()) { return false; }
 
-        // Yay, this makes sense, and we can compare these with O(n) efficiency while still maintaining compatibility
-        // with java.util.Map.
+        // Yay, this makes sense, and we can compare these with O(n) efficiency while still
+        // maintaining compatibility with java.util.Map.
         if (other instanceof SortedMap) {
-            return UnmodSortedIterable.equals(this, UnmodSortedIterable.castFromSortedMap((SortedMap) other));
+            return UnmodSortedIterable.equals(this,
+                                              UnmodSortedIterable.castFromSortedMap(
+                                                      (SortedMap<?,?>) other));
         }
 
         // This makes no sense and takes O(n log n) or something.

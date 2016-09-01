@@ -55,7 +55,7 @@ public interface Function0<U> extends Supplier<U>, Callable<U> {
         }
     }
 
-    /** Use {@link Const.NULL} instead because it's serializable. */
+    /** Use {@link Const#NULL} instead because it's serializable. */
     @Deprecated
     Function0<Object> NULL = Const.NULL;
 

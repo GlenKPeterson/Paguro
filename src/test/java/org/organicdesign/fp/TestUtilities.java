@@ -18,6 +18,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Iterator;
+
+import static org.junit.Assert.*;
 
 /**
  If these prove useful over time, they will be moved to the TestUtils project instead.
@@ -55,5 +58,18 @@ public class TestUtilities {
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static <T> void compareIterators(Iterator<T> control, Iterator<? extends T> test) {
+        int i = 0;
+        while (control.hasNext()) {
+            assertTrue("Control[" + i + "] had next, but test didn't", test.hasNext());
+            T cNext = control.next();
+            T tNext = test.next();
+            assertEquals("Control[" + i + "]=" + cNext + " didn't equal test[" + i + "]=" + tNext,
+                         cNext, tNext);
+            i++;
+        }
+        assertFalse("Test[" + i + "] had extra elements", test.hasNext());
     }
 }

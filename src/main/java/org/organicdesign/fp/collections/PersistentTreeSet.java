@@ -145,7 +145,7 @@ public class PersistentTreeSet<E> implements ImSortedSet<E>, Serializable {
     @Override public boolean equals(Object other) {
         if (this == other) { return true; }
         if ( !(other instanceof SortedSet) ) { return false; }
-        SortedSet that = ((SortedSet) other);
+        SortedSet<?> that = (SortedSet) other;
 
         if (size() != that.size()) { return false; }
         return UnmodSortedIterable.equals(this, UnmodSortedIterable.castFromSortedSet(that));

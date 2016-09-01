@@ -69,7 +69,7 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
         }
     }
 
-    /** Use {@link Const.IDENTITY} instead. */
+    /** Use {@link Const#IDENTITY} instead. */
     @Deprecated
     Function1<Object,Object> IDENTITY = Const.IDENTITY;
 
@@ -100,11 +100,11 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
                (S s) -> (a.apply(s) == Boolean.TRUE) ? Boolean.FALSE : Boolean.TRUE;
     }
 
-    /** Use {@link ConstBool.ACCEPT} instead */
+    /** Use {@link ConstBool#ACCEPT} instead */
     @Deprecated
     Function1<Object,Boolean> ACCEPT = ConstBool.ACCEPT;
 
-    /** Use {@link ConstBool.REJECT} instead */
+    /** Use {@link ConstBool#REJECT} instead */
     @Deprecated
     Function1<Object,Boolean> REJECT = ConstBool.REJECT;
 

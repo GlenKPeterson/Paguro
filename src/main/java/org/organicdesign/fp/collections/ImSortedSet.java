@@ -13,8 +13,6 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
-import java.util.Comparator;
-
 /** An immutable sorted set interface */
 public interface ImSortedSet<E> extends ImSet<E>, UnmodSortedSet<E> {
     /** {@inheritDoc} */
@@ -26,20 +24,7 @@ public interface ImSortedSet<E> extends ImSet<E>, UnmodSortedSet<E> {
     /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     @Override default ImSortedSet<E> headSet(E toElement) {
-        Comparator<? super E> comparator = comparator();
-        if (comparator == null) {
-            // By the rules of the constructor type signature, we either need a comparator,
-            // or we need to accept only Comparable items into this collection, so this cast should
-            // always work.
-            Comparable<E> last = (Comparable<E>) last();
-            if (last.compareTo(toElement) < 0) {
-                return this;
-            }
-        } else if (comparator.compare(last(), toElement) < 0) {
-            return this;
-        }
-        // All other cases are trivial.
-        return subSet(first(), toElement);
+        return (ImSortedSet<E>) UnmodSortedSet.super.headSet(toElement);
     }
 
     /**
