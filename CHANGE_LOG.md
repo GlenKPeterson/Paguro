@@ -1,3 +1,8 @@
+## 2016-09-01 Release 2.0.1
+ - Made UnmodSortedIterable.castFrom... methods generic and serializable (and wrote tests for same).
+ - Fixed some Javadoc link errors.
+ - Bumped version number.
+
 ## 2016-08-27 Release 2.0.0: Serializable
 This is a major release due to the following **breaking changes** in order to make more things serializable without creating a mess:
  - Hash codes of all tuples are now calculated by adding together the hash codes of all member items.
