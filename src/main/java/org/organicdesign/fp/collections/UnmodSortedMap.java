@@ -13,6 +13,7 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
@@ -32,18 +33,23 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
      remember.
      */
     @Override default UnmodSortedSet<Entry<K,V>> entrySet() {
-        UnmodSortedMap<K,V> parentMap = this;
-        return new UnmodSortedSet<Entry<K,V>>() {
+        class Implementation<K1,V1> implements UnmodSortedSet<Entry<K1,V1>>, Serializable {
+            // For serializable.  Make sure to change whenever internal data format changes.
+            private static final long serialVersionUID = 20160901201600L;
+
+            private final UnmodSortedMap<K1,V1> parentMap;
+            private Implementation(UnmodSortedMap<K1,V1> pm) { parentMap = pm; }
+
             @Override public int size() { return parentMap.size(); }
 
             @SuppressWarnings("unchecked")
             @Override public boolean contains(Object o) {
                 if ( !(o instanceof Entry) ) { return false; }
-                return containsKey(((Entry<K, V>) o).getKey());
+                return containsKey(((Entry<K1,V1>) o).getKey());
             }
 
             @SuppressWarnings("unchecked")
-            @Override public UnmodSortedIterator<Entry<K,V>> iterator() {
+            @Override public UnmodSortedIterator<Entry<K1,V1>> iterator() {
                 // Converting from
                 // UnmodSortedIterator<UnEntry<K,V>> to
                 // UnmodSortedIterator<Entry<K,V>>
@@ -55,7 +61,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
             }
 
             @SuppressWarnings("unchecked")
-            @Override public Comparator<Entry<K,V>> comparator() {
+            @Override public Comparator<Entry<K1,V1>> comparator() {
                 if (parentMap.comparator() == null) {
                     return (a, b) -> ComparisonContext.Comp.DEFAULT
                                                         .compare((Comparable) a.getKey(),
@@ -70,22 +76,22 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
                 return (o1, o2) -> parentMap.comparator().compare(o1.getKey(), o2.getKey());
             }
 
-            @Override public UnmodSortedSet<Entry<K,V>> subSet(Entry<K,V> fromElement,
-                                                               Entry<K,V> toElement) {
+            @Override public UnmodSortedSet<Entry<K1,V1>> subSet(Entry<K1,V1> fromElement,
+                                                                 Entry<K1,V1> toElement) {
                 return parentMap.subMap(fromElement.getKey(), toElement.getKey()).entrySet();
             }
 
-            @Override public UnmodSortedSet<Entry<K,V>> tailSet(Entry<K,V> fromElement) {
+            @Override public UnmodSortedSet<Entry<K1,V1>> tailSet(Entry<K1,V1> fromElement) {
                 return parentMap.tailMap(fromElement.getKey()).entrySet();
             }
 
-            @Override public Entry<K,V> first() {
-                K key = parentMap.firstKey();
+            @Override public Entry<K1,V1> first() {
+                K1 key = parentMap.firstKey();
                 return new KeyVal<>(key, parentMap.get(key));
             }
 
-            @Override public Entry<K,V> last() {
-                K key = parentMap.lastKey();
+            @Override public Entry<K1,V1> last() {
+                K1 key = parentMap.lastKey();
                 return new KeyVal<>(key, parentMap.get(key));
             }
 
@@ -109,7 +115,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
                     return false;
                 }
 
-                Set<Map.Entry<K,V>> that = (Set<Map.Entry<K,V>>) o;
+                Set<Map.Entry<K1,V1>> that = (Set<Map.Entry<K1,V1>>) o;
                 if (that.size() != this.size()) { return false; }
 
                 // Here we are again.  The default implementation of EntrySet.equals() is in
@@ -135,6 +141,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
                 return UnmodIterable.toString("UnmodSortedMap.entrySet", this);
             }
         };
+        return new Implementation<>(this);
     }
 
 // public  K	firstKey()

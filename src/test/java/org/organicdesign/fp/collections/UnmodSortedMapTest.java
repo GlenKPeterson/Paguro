@@ -1,8 +1,8 @@
 package org.organicdesign.fp.collections;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
@@ -13,11 +13,14 @@ import org.organicdesign.fp.FunctionUtils;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.*;
+import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 import static org.organicdesign.fp.collections.Equator.defaultComparator;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class UnmodSortedMapTest {
-    static class TestMap<K, V> implements UnmodSortedMap<K,V> {
+    static class TestMap<K, V> implements UnmodSortedMap<K,V>, Serializable {
+
+        private static final long serialVersionUID = 20160901201600L;
 
 //        static <K, V> SortedMap<K,V> dup(SortedMap<K,V> in) {
 //            SortedMap<K,V> out = new TreeMap<>(in.comparator());
@@ -63,14 +66,7 @@ public class UnmodSortedMapTest {
         public K lastKey() { return inner.lastKey(); }
 
         @Override public UnmodSortedIterator<UnEntry<K,V>> iterator() {
-            return new UnmodSortedIterator<UnEntry<K,V>>() {
-                Iterator<Entry<K,V>> iter = inner.entrySet().iterator();
-                @Override public boolean hasNext() { return iter.hasNext(); }
-
-                @Override public UnEntry<K,V> next() {
-                    return new KeyVal<>(iter.next());
-                }
-            };
+            return UnmodSortedIterable.castFromSortedMap(inner).iterator();
         }
     }
 
@@ -110,7 +106,7 @@ public class UnmodSortedMapTest {
     final static TestMap<String,Integer> testMap = new TestMap<>(refMap, null);
 
     @SuppressWarnings("unchecked")
-    @Test public void entrySet() {
+    @Test public void entrySetTest() {
 
         Set<Map.Entry<String,Integer>> refEntSet = refMap.entrySet();
         UnmodSortedSet<Map.Entry<String,Integer>> testEntSet = testMap.entrySet();
@@ -129,6 +125,12 @@ public class UnmodSortedMapTest {
         assertTrue(testEntSet.contains(clemKey));
 
         UnmodListTest.iteratorTest(refEntSet.iterator(), testEntSet.iterator());
+
+        UnmodListTest.iteratorTest(refEntSet.iterator(), serializeDeserialize(testEntSet).iterator());
+
+        // I can't fix TreeMap, so I guess this is good enough.
+        // java.io.NotSerializableException: java.util.TreeMap$EntryIterator
+//        UnmodListTest.iteratorTest(refEntSet.iterator(), serializeDeserialize(testEntSet.iterator()));
 
         Comparator<? super Map.Entry<String,Integer>> testComp0 = testEntSet.comparator();
         assert testComp0 != null;

@@ -922,6 +922,8 @@ public class FunctionUtilsTest {
         assertFalse(ts.values().isEmpty());
 
         equalsDistinctHashCode(ts.entrySet(), m2.entrySet(), sm.entrySet(), m3.entrySet());
+        // TODO: FunctionUtils methods are not serializable!
+//        equalsDistinctHashCode(serializeDeserialize(ts.entrySet()), m2.entrySet(), sm.entrySet(), m3.entrySet());
         equalsDistinctHashCode(ts.keySet(), m2.keySet(), sm.keySet(), m3.keySet());
 
         Assert.assertEquals(m3, m3);
