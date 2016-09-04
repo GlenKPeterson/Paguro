@@ -355,6 +355,8 @@ public class UnmodSortedMapTest {
         assertTrue(testKeySet.contains(clemKey.getKey()));
 
         UnmodListTest.iteratorTest(refKeySet.iterator(), testKeySet.iterator());
+        UnmodListTest.iteratorTest(refKeySet.iterator(),
+                                   serializeDeserialize(testKeySet).iterator());
 
         Comparator<? super String> testComp0 = testKeySet.comparator();
         assert testComp0 != null;
@@ -523,6 +525,9 @@ public class UnmodSortedMapTest {
         assertTrue(testValColl.contains(clemKey.getValue()));
 
         UnmodListTest.iteratorTest(refValColl.iterator(), testValColl.iterator());
+
+        UnmodListTest.iteratorTest(refValColl.iterator(),
+                                   serializeDeserialize(testValColl).iterator());
 
         equalsDistinctHashCode(testValColl,
                                testMap.values(),

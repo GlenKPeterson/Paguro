@@ -46,6 +46,19 @@ import static org.organicdesign.testUtils.EqualsContract.equalsSameHashCode;
 
 @RunWith(JUnit4.class)
 public class PersistentHashMapTest {
+    static <K,V> void mapIterTest(Map<K,V> c, Iterator<? extends Map.Entry<K,V>> test) {
+        Map<K,V> control = new HashMap<>();
+        control.putAll(c);
+        while (test.hasNext()) {
+            Map.Entry<K,V> testEnt = test.next();
+            assertTrue(control.containsKey(testEnt.getKey()));
+            V controlVal = control.get(testEnt.getKey());
+            assertEquals(controlVal, testEnt.getValue());
+            control.remove(testEnt.getKey());
+        }
+        assertEquals(0, control.size());
+    }
+
     @Test public void iter() {
         assertFalse(PersistentHashMap.empty().iterator().hasNext());
 
@@ -58,15 +71,14 @@ public class PersistentHashMapTest {
 //        System.out.println("class: " + iter.getClass());
         assertFalse(iter.hasNext());
 
-        PersistentHashMap<String,Integer> m2 = PersistentHashMap.of(Arrays.asList(kv(null, 2),
-                                                                                  kv("three", 3)));
-        UnmodIterator<UnmodMap.UnEntry<String,Integer>> iter2 = m2.iterator();
-        assertTrue(iter2.hasNext());
-        assertEquals(kv(null, 2), iter2.next());
+        Map<String,Integer> control = new HashMap<>();
+        control.put(null, 2);
+        control.put("three", 3);
+        PersistentHashMap<String,Integer> m2 = PersistentHashMap.of(control.entrySet());
 
-        assertTrue(iter2.hasNext());
-        assertEquals(kv("three", 3), iter2.next());
-        assertFalse(iter2.hasNext());
+        mapIterTest(control, m2.iterator());
+        mapIterTest(control, serializeDeserialize(m2).iterator());
+//        mapIterTest(control, serializeDeserialize(m2.iterator()));
     }
 
     @Test(expected = NoSuchElementException.class)
@@ -633,22 +645,17 @@ public class PersistentHashMapTest {
                                           kv("b", 2),
                                           kv("c", 1))).keySet());
 
-
+        Map<String,Integer> control = new HashMap<>();
+        control.put("c", 3);
+        control.put("b", 2);
+        control.put("a", 1);
         PersistentHashMap<String,Integer> m2 = PersistentHashMap.of(vec(kv("c", 3)))
                         .assoc("b", 2)
                         .assoc("a", 1);
-        UnmodIterator<UnmodMap.UnEntry<String,Integer>> iter = m2.iterator();
-        UnmodMap.UnEntry<String,Integer> next = iter.next();
-        assertEquals("a", next.getKey());
-        assertEquals(Integer.valueOf(1), next.getValue());
 
-        next = iter.next();
-        assertEquals("b", next.getKey());
-        assertEquals(Integer.valueOf(2), next.getValue());
-
-        next = iter.next();
-        assertEquals("c", next.getKey());
-        assertEquals(Integer.valueOf(3), next.getValue());
+        mapIterTest(control, m2.iterator());
+        mapIterTest(control, serializeDeserialize(m2).iterator());
+//        mapIterTest(control, serializeDeserialize(m2.iterator()));
     }
 
     @Test public void hashCodeAndEquals() {
@@ -765,20 +772,25 @@ public class PersistentHashMapTest {
     }
 
     @Test public void without2() {
-        Set<Integer> control = new HashSet<>();
+        HashMap<Integer,String> control = new HashMap<>();
         PersistentHashMap<Integer,String> m = PersistentHashMap.empty();
         int MAX = 20000;
         for (int i = 0; i < MAX; i++) {
-            m = m.assoc(i, ordinal(i));
-            control.add(i);
+            String ord = ordinal(i);
+            m = m.assoc(i, ord);
+            control.put(i, ord);
         }
         assertEquals(control.size(), m.size());
+
+        mapIterTest(control, m.iterator());
+        mapIterTest(control, serializeDeserialize(m).iterator());
+//        mapIterTest(control, serializeDeserialize(m.iterator()));
 
         while (control.size() > 0) {
             assertEquals(control.size(), m.size());
 
             // This yields a somewhat random integer from those that are left.
-            int r = control.iterator().next();
+            int r = control.keySet().iterator().next();
 
             // Make sure we get out what we put in.
             assertEquals(ordinal(r), m.get(r));

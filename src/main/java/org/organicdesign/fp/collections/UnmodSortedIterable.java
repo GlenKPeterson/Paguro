@@ -3,7 +3,6 @@ package org.organicdesign.fp.collections;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -53,7 +52,7 @@ public interface UnmodSortedIterable<T> extends UnmodIterable<T> {
             /** Returns items in a guaranteed order. */
             @Override
             public UnmodSortedIterator<S> iterator() {
-                return new UnmodSortedIterator.Implementation<>(ss.iterator());
+                return new UnmodSortedIterator.Wrapper<>(ss.iterator());
             }
         }
         return new Implementation<>(s);
@@ -78,7 +77,7 @@ public interface UnmodSortedIterable<T> extends UnmodIterable<T> {
             /** Returns items in a guaranteed order. */
             @Override
             public UnmodSortedIterator<S> iterator() {
-                return new UnmodSortedIterator.Implementation<>(ss.iterator());
+                return new UnmodSortedIterator.Wrapper<>(ss.iterator());
             }
         }
         return new Implementation<>(s);
@@ -109,18 +108,19 @@ public interface UnmodSortedIterable<T> extends UnmodIterable<T> {
 //    }
 
     static <K,V> UnmodSortedIterable<UnmodMap.UnEntry<K,V>> castFromSortedMap(SortedMap<K,V> sm) {
-        class MapIterator<K1,V1> implements UnmodSortedIterator<UnmodMap.UnEntry<K1,V1>>, Serializable {
-            // For serializable.  Make sure to change whenever internal data format changes.
-            private static final long serialVersionUID = 20160903174100L;
-
-            private final Iterator<Map.Entry<K1,V1>> iter;
-            MapIterator(Iterable<Map.Entry<K1,V1>> i) { iter = i.iterator(); }
-
-            @Override public boolean hasNext() { return iter.hasNext(); }
-            @Override public UnmodMap.UnEntry<K1,V1> next() {
-                return new KeyVal<>(iter.next());
-            }
-        }
+//        class MapIterator<K1,V1> implements UnmodSortedIterator<UnmodMap.UnEntry<K1,V1>>,
+//                  Serializable {
+//            // For serializable.  Make sure to change whenever internal data format changes.
+//            private static final long serialVersionUID = 20160903174100L;
+//
+//            private final Iterator<Map.Entry<K1,V1>> iter;
+//            MapIterator(Iterable<Map.Entry<K1,V1>> i) { iter = i.iterator(); }
+//
+//            @Override public boolean hasNext() { return iter.hasNext(); }
+//            @Override public UnmodMap.UnEntry<K1,V1> next() {
+//                return new KeyVal<>(iter.next());
+//            }
+//        }
 
         class Implementation<K1,V1> implements UnmodSortedIterable<UnmodMap.UnEntry<K1,V1>>,
                 Serializable {
@@ -131,9 +131,8 @@ public interface UnmodSortedIterable<T> extends UnmodIterable<T> {
             private Implementation(SortedMap<K1,V1> s) { m = s; }
 
             /** Returns items in a guaranteed order. */
-            @Override
-            public UnmodSortedIterator<UnmodMap.UnEntry<K1,V1>> iterator() {
-                return new MapIterator<>(m.entrySet());
+            @Override public UnmodSortedIterator<UnmodMap.UnEntry<K1,V1>> iterator() {
+                return new UnmodMap.UnEntry.EntryToUnEntrySortedIter<>(m.entrySet().iterator());
             }
         }
         return new Implementation<>(sm);

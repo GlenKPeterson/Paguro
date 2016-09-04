@@ -72,6 +72,10 @@ IDENTITY  is now  Const.IDENTITY
 ACCEPT    is now  ConstBool.ACCEPT
 REJECT    is now  ConstBool.REJECT
 
+org.organicdesign.fp.collections.UnmodMap.UnEntry.entryToUnEntry(Map.Entry<K,V> entry)
+is now
+org.organicdesign.fp.collections.KeyVal.of(Map.Entry<K,V> entry)
+
 Search for usages of
 map(tup(
 .toImMap(... tup(
@@ -82,12 +86,23 @@ map(kv(
 
 #### Additional changes
  - Tuple2 no longer implements Map.Entry.  Instead, a new Serializable subclass, KeyVal, was created for this purpose.
+ - Removed UnmodMap.UnEntry.entryToUnEntry(Map.Entry<K,V> entry).
  - Tuple hashcodes are now the addition of the hashcodes of each item in the tuple.
    They used to bitwise-or the first two items (and add the rest) for compatibility with Map.Entry.
+ - PersistentHashMap.ArrayNode, .BitMapIndexNode, .HashCollisionNode, and .NodeIter are now all private (were public or package).
+   There should never have been any reason to use or access these.
+ - Added ImSetTrans&lt;E&gt; interface and exposed the Transient Set implementation.
+ - Found some opportunities to use transient implementations more efficiently.
 
-The function interfaces (Function0, Function1, etc.) will *not* implement Serializable.
-These interfaces are general and Serializable is too much for implementers to think about (and often irrelevant).
-However, the constants in those interfaces have been changed to implement Serializable.
+#### What's *NOT* Serializable?
+ - The function interfaces (Function0, Function1, etc.) will *NOT* implement Serializable.
+    These interfaces are general and Serializable is too much for implementers to think about (and often irrelevant).
+    However, the *constants* and *singletons* in those interfaces have been changed to implement
+    Serializable.
+ - Iterators are *NOT* serializable.  They aren't in java.util.Collections either.
+   If you need an iterator to be serializable for some reason, open an issue and we'll discuss it.
+ - Transformable is not serializable.  Open an issue to discuss.
+ - Transient-HashSet, -HashMap, and -Vector are not Serializable.  Open an issue to discuss.
 
 Issues?  Questions?  Please provide feedback on the [Serialization enhancement request](https://github.com/GlenKPeterson/UncleJim/issues/10)
 

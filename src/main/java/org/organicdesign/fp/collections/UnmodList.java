@@ -13,8 +13,6 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
-import org.organicdesign.fp.function.Function2;
-
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -22,6 +20,8 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
+
+import org.organicdesign.fp.function.Function2;
 
 /**
  An unmodifiable version of {@link java.util.List} which formalizes the return type of
@@ -143,9 +143,14 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
             throw new IndexOutOfBoundsException("Expected an index between 0 and " + size() +
                                                 " but found: " + index);
         }
-        return new UnmodListIterator<E>() {
+        class Impl implements UnmodListIterator<E> {
+            //, Serializable {
+            // For serializable.  Make sure to change whenever internal data format changes.
+            // private static final long serialVersionUID = 20160903104400L;
+
             private final int sz = size();
-            private int idx = index;
+            private int idx;
+            private Impl(int index) { idx = index; }
             @Override public boolean hasNext() { return (idx < sz); }
 
             @Override public E next() {
@@ -154,7 +159,7 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
                 // our internal data.
                 int i = idx;
                 // Throw based on value in register
-                if (i >= size()) { throw new NoSuchElementException(); }
+                if (i >= sz) { throw new NoSuchElementException(); }
                 // Store incremented register value back to memory.  Note that this is the
                 // next index value we will access.
                 idx = i + 1;
@@ -180,6 +185,7 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
 
             @Override public int nextIndex() { return idx; }
         };
+        return new Impl(index);
     }
 
     /** Not allowed - this is supposed to be unmodifiable */

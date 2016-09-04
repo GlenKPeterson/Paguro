@@ -14,19 +14,6 @@
 
 package org.organicdesign.fp.xform;
 
-import org.organicdesign.fp.collections.ImList;
-import org.organicdesign.fp.collections.ImMap;
-import org.organicdesign.fp.collections.ImSet;
-import org.organicdesign.fp.collections.ImSortedMap;
-import org.organicdesign.fp.collections.ImSortedSet;
-import org.organicdesign.fp.collections.PersistentHashMap;
-import org.organicdesign.fp.collections.PersistentHashSet;
-import org.organicdesign.fp.collections.PersistentTreeMap;
-import org.organicdesign.fp.collections.PersistentTreeSet;
-import org.organicdesign.fp.collections.PersistentVector;
-import org.organicdesign.fp.function.Function1;
-import org.organicdesign.fp.function.Function2;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -38,6 +25,21 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
+import org.organicdesign.fp.collections.ImList;
+import org.organicdesign.fp.collections.ImMap;
+import org.organicdesign.fp.collections.ImMapTrans;
+import org.organicdesign.fp.collections.ImSet;
+import org.organicdesign.fp.collections.ImSetTrans;
+import org.organicdesign.fp.collections.ImSortedMap;
+import org.organicdesign.fp.collections.ImSortedSet;
+import org.organicdesign.fp.collections.PersistentHashMap;
+import org.organicdesign.fp.collections.PersistentHashSet;
+import org.organicdesign.fp.collections.PersistentTreeMap;
+import org.organicdesign.fp.collections.PersistentTreeSet;
+import org.organicdesign.fp.collections.PersistentVector;
+import org.organicdesign.fp.function.Function1;
+import org.organicdesign.fp.function.Function2;
 
 /**
  Represents transformations to be carried out on a collection.  The to___() methods were formerly
@@ -184,8 +186,9 @@ public interface Transformable<T> {
      @return An immutable map
      */
     default <K,V> ImMap<K,V> toImMap(Function1<? super T,Map.Entry<K,V>> f1) {
-        return foldLeft((ImMap<K, V>) PersistentHashMap.<K, V>empty(),
-                        (ts, t) -> ts.assoc(f1.apply(t)));
+        return foldLeft(PersistentHashMap.<K,V>empty().asTransient(),
+                        (ImMapTrans<K,V> ts, T t) -> (ImMapTrans<K,V>) ts.assoc(f1.apply(t)))
+                .persistent();
     }
 
     /**
@@ -196,7 +199,8 @@ public interface Transformable<T> {
      @return An immutable set (with duplicates removed)
      */
     default ImSet<T> toImSet() {
-        return foldLeft(PersistentHashSet.empty(), PersistentHashSet::put);
+        return foldLeft(PersistentHashSet.<T>empty().asTransient(),
+                        ImSetTrans::put).persistent();
     }
 
     /**

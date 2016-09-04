@@ -21,7 +21,8 @@ import java.util.Set;
 import java.util.SortedMap;
 
 /** An unmodifiable SortedMap. */
-public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, UnmodSortedIterable<UnmodMap.UnEntry<K,V>> {
+public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>,
+        UnmodSortedIterable<UnmodMap.UnEntry<K,V>> {
 
     // ========================================= Instance =========================================
 
@@ -33,23 +34,23 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
      remember.
      */
     @Override default UnmodSortedSet<Entry<K,V>> entrySet() {
-        class Implementation<K1,V1> implements UnmodSortedSet<Entry<K1,V1>>, Serializable {
+        class Implementation implements UnmodSortedSet<Entry<K,V>>, Serializable {
             // For serializable.  Make sure to change whenever internal data format changes.
             private static final long serialVersionUID = 20160901201600L;
 
-            private final UnmodSortedMap<K1,V1> parentMap;
-            private Implementation(UnmodSortedMap<K1,V1> pm) { parentMap = pm; }
+            private final UnmodSortedMap<K,V> parentMap;
+            private Implementation(UnmodSortedMap<K,V> pm) { parentMap = pm; }
 
             @Override public int size() { return parentMap.size(); }
 
             @SuppressWarnings("unchecked")
             @Override public boolean contains(Object o) {
                 if ( !(o instanceof Entry) ) { return false; }
-                return containsKey(((Entry<K1,V1>) o).getKey());
+                return containsKey(((Entry<K,V>) o).getKey());
             }
 
             @SuppressWarnings("unchecked")
-            @Override public UnmodSortedIterator<Entry<K1,V1>> iterator() {
+            @Override public UnmodSortedIterator<Entry<K,V>> iterator() {
                 // Converting from
                 // UnmodSortedIterator<UnEntry<K,V>> to
                 // UnmodSortedIterator<Entry<K,V>>
@@ -57,11 +58,14 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
                 // (is an) Entry.  But Java's type system doesn't know that because (I think)
                 // it's a higher kinded type.  Thanks to type erasure, we can forget about all
                 // that and cast it to a base type then suppress the unchecked warning.
+                //
+                // Hmm... It's possible for this to return an Entry if the wrapped collection
+                // uses them...  Not sure how much that matters.
                 return (UnmodSortedIterator) parentMap.iterator();
             }
 
             @SuppressWarnings("unchecked")
-            @Override public Comparator<Entry<K1,V1>> comparator() {
+            @Override public Comparator<Entry<K,V>> comparator() {
                 if (parentMap.comparator() == null) {
                     return (a, b) -> ComparisonContext.Comp.DEFAULT
                                                         .compare((Comparable) a.getKey(),
@@ -76,22 +80,22 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
                 return (o1, o2) -> parentMap.comparator().compare(o1.getKey(), o2.getKey());
             }
 
-            @Override public UnmodSortedSet<Entry<K1,V1>> subSet(Entry<K1,V1> fromElement,
-                                                                 Entry<K1,V1> toElement) {
+            @Override public UnmodSortedSet<Entry<K,V>> subSet(Entry<K,V> fromElement,
+                                                                 Entry<K,V> toElement) {
                 return parentMap.subMap(fromElement.getKey(), toElement.getKey()).entrySet();
             }
 
-            @Override public UnmodSortedSet<Entry<K1,V1>> tailSet(Entry<K1,V1> fromElement) {
+            @Override public UnmodSortedSet<Entry<K,V>> tailSet(Entry<K,V> fromElement) {
                 return parentMap.tailMap(fromElement.getKey()).entrySet();
             }
 
-            @Override public Entry<K1,V1> first() {
-                K1 key = parentMap.firstKey();
+            @Override public Entry<K,V> first() {
+                K key = parentMap.firstKey();
                 return new KeyVal<>(key, parentMap.get(key));
             }
 
-            @Override public Entry<K1,V1> last() {
-                K1 key = parentMap.lastKey();
+            @Override public Entry<K,V> last() {
+                K key = parentMap.lastKey();
                 return new KeyVal<>(key, parentMap.get(key));
             }
 
@@ -115,7 +119,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
                     return false;
                 }
 
-                Set<Map.Entry<K1,V1>> that = (Set<Map.Entry<K1,V1>>) o;
+                Set<Map.Entry<K,V>> that = (Set<Map.Entry<K,V>>) o;
                 if (that.size() != this.size()) { return false; }
 
                 // Here we are again.  The default implementation of EntrySet.equals() is in
@@ -141,7 +145,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
                 return UnmodIterable.toString("UnmodSortedMap.entrySet", this);
             }
         };
-        return new Implementation<>(this);
+        return new Implementation(this);
     }
 
 // public  K	firstKey()
@@ -156,17 +160,18 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
 
     /** Returns a view of the keys contained in this map. */
     @Override default UnmodSortedSet<K> keySet() {
-        UnmodSortedMap<K,V> parentMap = this;
-        return new UnmodSortedSet<K>() {
+        class KeySet implements UnmodSortedSet<K>, Serializable {
+            // For serializable.  Make sure to change whenever internal data format changes.
+            private static final long serialVersionUID = 20160903174100L;
+
+            private final UnmodSortedMap<K,V> parentMap;
+            private KeySet(UnmodSortedMap<K,V> m) { parentMap = m; }
+
             @SuppressWarnings("SuspiciousMethodCalls")
             @Override public boolean contains(Object o) { return parentMap.containsKey(o); }
 
             @Override public UnmodSortedIterator<K> iterator() {
-                return new UnmodSortedIterator<K>() {
-                    Iterator<UnEntry<K,V>> iter = parentMap.iterator();
-                    @Override public boolean hasNext() { return iter.hasNext(); }
-                    @Override public K next() { return iter.next().getKey(); }
-                };
+                return new UnEntry.UnmodSortedKeyIter<>(parentMap.iterator());
             }
 
             @Override public int size() { return parentMap.size(); }
@@ -184,14 +189,10 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
                                                         : parentMap.comparator();
             }
 
-            @Override public K first() {
-                return parentMap.firstKey();
-            }
+            @Override public K first() { return parentMap.firstKey(); }
 
             @Override
-            public K last() {
-                return parentMap.lastKey();
-            }
+            public K last() { return parentMap.lastKey(); }
 
             @Override public int hashCode() { return UnmodIterable.hashCode(this); }
 
@@ -248,7 +249,8 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
                 return UnmodIterable.toString("UnmodSortedMap.entrySet", this);
             }
 
-        };
+        }
+        return new KeySet(this);
     }
 
 // public  K	lastKey()
@@ -271,54 +273,42 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
      {@inheritDoc}
      */
     @SuppressWarnings("deprecation")
-    @Override default UnmodList<V> values() {
-        return map((UnEntry<K,V> entry) -> entry.getValue())
-                .toImList();
-//        UnmodSortedMap<K,V> parentMap = this;
-//        return new UnmodSortedCollection<V>() {
-//            @Override public UnmodSortedIterator<V> iterator() {
-//                return new UnmodSortedIterator<V>() {
-//                    Iterator<UnEntry<K,V>> iter = parentMap.iterator();
-//                    @Override public boolean hasNext() { return iter.hasNext(); }
-//                    @Override public V next() { return iter.next().getValue(); }
-//                };
-//            }
-//            @Override public int size() { return parentMap.size(); }
-//
-//            @SuppressWarnings("SuspiciousMethodCalls")
-//            @Override public boolean contains(Object o) { return parentMap.containsValue(o); }
-//
-//            @Override public int hashCode() { return UnmodIterable.hashCode(this); }
-//
-//            @SuppressWarnings("unchecked")
-//            @Override public boolean equals(Object o) {
-//                if (this == o) { return true; }
-//
-//                // java.util.SortedMap.entrySet() returns just a Set, not a SortedSet, even though
-//                // the order is guaranteed to be the same as the SortedMap it came from as
-//                // guaranteed by the comparator (which seems more like a SortedSet, but no-one
-//                // asked me).  So we have to accept a Set here for equals 'cause Java might
-//                // hand us one.  All of this could have been avoided if SortedMap extended
-//                // Collection<Map.Entry<K,V>> which is essentially an Iterable with a size().
-//                if ( !(o instanceof Collection) ) { return false; }
-//
-//                // If you're using Paguro, then you should have passed us a sortedSet.
-//                if ( (o instanceof UnmodCollection) &&
-//                     !(o instanceof UnmodSortedCollection) ) {
-//                    return false;
-//                }
-//
-//                Collection<V> that = (Collection<V>) o;
-//                if (that.size() != this.size()) { return false; }
-//
-//                return UnmodSortedIterable.equals(this,
-//                                                  UnmodSortedIterable.castFromCollection(that));
-//            }
-//            @Override public String toString() {
-//                return UnmodIterable.toString("UnmodSortedMap.entrySet", this);
-//            }
-//
-//        };
+    @Override default UnmodSortedCollection<V> values() {
+//        return map((UnEntry<K,V> entry) -> entry.getValue())
+//                .toImList();
+        class Impl implements UnmodSortedCollection<V>, Serializable {
+            // For serializable.  Make sure to change whenever internal data format changes.
+            private static final long serialVersionUID = 20160903104400L;
+
+            private final UnmodMap<K,V> parent;
+            private Impl(UnmodMap<K,V> p) { parent = p; }
+
+            @SuppressWarnings("SuspiciousMethodCalls")
+            @Override public boolean contains(Object o) { return parent.containsValue(o); }
+            @Override public UnmodSortedIterator<V> iterator() {
+                return new UnEntry.UnmodSortedValIter<>(parent.iterator());
+            }
+            @Override public int size() { return parent.size(); }
+
+            @Override public int hashCode() {
+                return UnmodIterable.hashCode(this);
+            }
+
+            @Override public boolean equals(Object o) {
+                if (this == o) { return true; }
+
+                // This seems pretty wacky.  Not at all sure if I should be implementing this.
+                if ( !(o instanceof UnmodSortedCollection) ) {
+                    return false;
+                }
+                return UnmodSortedIterable.equals(this, (UnmodSortedCollection) o);
+            }
+
+            @Override public String toString() {
+                return UnmodIterable.toString("UnmodSortedMap.values", this);
+            }
+        };
+        return new Impl(this);
     }
 
 // Methods inherited from interface java.util.Map

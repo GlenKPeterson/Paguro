@@ -1,4 +1,4 @@
-/**
+/*
  *   Copyright (c) Rich Hickey. All rights reserved.
  *   The use and distribution terms for this software are covered by the
  *   Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
@@ -47,22 +47,22 @@ public class PersistentHashSet<E> implements ImSet<E>, Serializable {
      @param elements The items to put into a vector.
      @return a new PersistentHashSet of the given elements.
      */
-    public static <E>  PersistentHashSet<E> of(Iterable<E> elements) {
+    public static <E> PersistentHashSet<E> of(Iterable<E> elements) {
         PersistentHashSet<E> empty = empty();
-        TransientHashSet<E> ret = empty.asTransient();
+        ImSetTrans<E> ret = empty.asTransient();
         for (E e : elements) {
-            ret = ret.put(e);
+            ret.put(e);
         }
-        return ret.persistent();
+        return (PersistentHashSet<E>) ret.persistent();
     }
 
-    public static <E>  PersistentHashSet<E> ofEq(Equator<E> eq, Iterable<E> init) {
+    public static <E> PersistentHashSet<E> ofEq(Equator<E> eq, Iterable<E> init) {
         PersistentHashSet<E> empty = empty(eq);
-        TransientHashSet<E> ret = empty.asTransient();
+        ImSetTrans<E> ret = empty.asTransient();
         for (E e : init) {
-            ret = ret.put(e);
+            ret.put(e);
         }
-        return ret.persistent();
+        return (PersistentHashSet<E>) ret.persistent();
     }
 
     @SuppressWarnings("unchecked")
@@ -118,20 +118,18 @@ public class PersistentHashSet<E> implements ImSet<E>, Serializable {
 
     @Override public int size() { return impl.size(); }
 
-    private TransientHashSet<E> asTransient() {
+    public ImSetTrans<E> asTransient() {
         return new TransientHashSet<>(impl.asTransient());
     }
 
-    static final class TransientHashSet<E> implements ImSet<E> {
+    private static final class TransientHashSet<E> implements ImSetTrans<E> {
         ImMapTrans<E,E> impl;
 
-        TransientHashSet(ImMapTrans<E,E> impl) {
-            this.impl = impl;
-        }
+        TransientHashSet(ImMapTrans<E,E> impl) { this.impl = impl; }
 
         @Override public int size() { return impl.size(); }
 
-        @Override public TransientHashSet<E> put(E val) {
+        @Override public ImSetTrans<E> put(E val) {
             ImMapTrans<E,E> m = impl.assoc(val, val);
             if (m != impl) this.impl = m;
             return this;
@@ -154,13 +152,13 @@ public class PersistentHashSet<E> implements ImSet<E>, Serializable {
          */
         @Override public boolean isEmpty() { return impl.isEmpty(); }
 
-        @Override public TransientHashSet<E> without(E key) {
+        @Override public ImSetTrans<E> without(E key) {
             ImMapTrans<E,E> m = impl.without(key);
             if (m != impl) this.impl = m;
             return this;
         }
 
-        public PersistentHashSet<E> persistent() {
+        @Override  public PersistentHashSet<E> persistent() {
             return new PersistentHashSet<>(impl.persistent());
         }
     }
