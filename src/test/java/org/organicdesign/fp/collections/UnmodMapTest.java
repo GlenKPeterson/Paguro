@@ -25,6 +25,7 @@ import java.util.TreeMap;
 
 import org.junit.Test;
 import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.TestUtilities;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.kv;
@@ -147,9 +148,9 @@ public class UnmodMapTest {
         assertTrue(refEntSet.contains(clemKey));
         assertTrue(testEntSet.contains(clemKey));
 
-        UnmodListTest.iteratorTest(refEntSet.iterator(), testEntSet.iterator());
+        TestUtilities.iteratorTest(refEntSet.iterator(), testEntSet.iterator());
 
-        UnmodListTest.iteratorTest(refEntSet.iterator(),
+        TestUtilities.iteratorTest(refEntSet.iterator(),
                                    serializeDeserialize(testEntSet).iterator());
 
         equalsDistinctHashCode(testEntSet, refEntSet, testMap.entrySet(), uneqMap.entrySet());
@@ -174,9 +175,9 @@ public class UnmodMapTest {
         assertTrue(refKeySet.contains(clemKey.getKey()));
         assertTrue(testKeySet.contains(clemKey.getKey()));
 
-        UnmodListTest.iteratorTest(refKeySet.iterator(), testKeySet.iterator());
+        TestUtilities.iteratorTest(refKeySet.iterator(), testKeySet.iterator());
 
-        UnmodListTest.iteratorTest(refKeySet.iterator(),
+        TestUtilities.iteratorTest(refKeySet.iterator(),
                                    serializeDeserialize(testKeySet).iterator());
 
         equalsDistinctHashCode(testKeySet, refKeySet, testMap.keySet(), uneqMap.keySet());
@@ -202,7 +203,7 @@ public class UnmodMapTest {
         assertTrue(refValues.contains(clemKey.getValue()));
         assertTrue(testValues.contains(clemKey.getValue()));
 
-        UnmodListTest.iteratorTest(refValues.iterator(), testValues.iterator());
+        TestUtilities.iteratorTest(refValues.iterator(), testValues.iterator());
 
 //        System.out.println("uneqMap.values(): " + uneqMap.values());
 //        System.out.println("uneqMap.values() class: " + uneqMap.values().getClass().getCanonicalName());
@@ -331,7 +332,7 @@ public class UnmodMapTest {
         map.put("bee", 88);
         map.put("caterpillar", 77);
 
-        UnmodListTest.iteratorTest(map.entrySet().iterator(),
+        TestUtilities.iteratorTest(map.entrySet().iterator(),
                                    UnmodMap.UnEntry.entryIterToUnEntryUnIter(map.entrySet()
                                                                                 .iterator()));
     }

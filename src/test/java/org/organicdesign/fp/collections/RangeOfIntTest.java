@@ -160,7 +160,7 @@ public class RangeOfIntTest {
     }
 
     @Test public void ListIteratorTest() {
-        UnmodListTest.listIteratorTest(Arrays.asList(-2, -1, 0, 1, 2, 3, 4),
+        TestUtilities.listIteratorTest(Arrays.asList(-2, -1, 0, 1, 2, 3, 4),
                                        RangeOfInt.of(-2, 5));
     }
 

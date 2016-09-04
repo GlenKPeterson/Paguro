@@ -15,6 +15,7 @@
 package org.organicdesign.fp.collections;
 
 import org.junit.Test;
+import org.organicdesign.fp.TestUtilities;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -102,7 +103,7 @@ public class ImListTest {
 
     @Test public void iteratorTest() {
         String[] fourScore = new String[] {"Four", "score", "and", "seven", "years", "ago..."};
-        UnmodListTest.listIteratorTest(Arrays.asList(fourScore),
+        TestUtilities.listIteratorTest(Arrays.asList(fourScore),
                                        new TestList<>(Arrays.asList(fourScore)));
     }
 }

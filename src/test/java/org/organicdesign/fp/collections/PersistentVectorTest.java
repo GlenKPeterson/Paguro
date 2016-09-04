@@ -27,9 +27,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.TestUtilities;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.vec;
+import static org.organicdesign.fp.TestUtilities.compareIterators;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
@@ -58,7 +60,7 @@ public class PersistentVectorTest {
     }
 
     @Test public void emptyListIterator() {
-        UnmodListTest.listIteratorTest(Collections.emptyList(), PersistentVector.empty());
+        TestUtilities.listIteratorTest(Collections.emptyList(), PersistentVector.empty());
     }
 
     @Test(expected = IndexOutOfBoundsException.class)
@@ -361,18 +363,29 @@ public class PersistentVectorTest {
     }
 
     @Test public void listIterator() {
-        PersistentVector<Integer> pv2 = PersistentVector.empty();
-        int len = 99;
-        Integer[] test = new Integer[len];
+        List<Integer> control = new ArrayList<>();
+        PersistentVector<Integer> test = PersistentVector.empty();
+        final int SOME = 200;
 
-        for (int i = 0; i < len; i++) {
-            pv2 = pv2.append(len - i);
-            test[i] = len - i;
+        for (int i = 0; i < SOME; i++) {
+            control.add(i);
+            test = test.append(i);
+            assertEquals(control.size(), test.size());
         }
-        assertArrayEquals(test, pv2.toArray());
 
-        List<Integer> tList = Arrays.asList(test);
-        UnmodListTest.listIteratorTest(tList, pv2);
+        PersistentVector<Integer> serTest = serializeDeserialize(test);
+
+        for (int i = 0; i < SOME; i++) {
+            assertEquals(control.get(i), test.get(i));
+            assertEquals(control.get(i), serTest.get(i));
+        }
+
+        compareIterators(control.iterator(), test.iterator());
+        compareIterators(control.iterator(), serTest.iterator());
+        assertArrayEquals(control.toArray(), test.toArray());
+
+        TestUtilities.listIteratorTest(control, test);
+        TestUtilities.listIteratorTest(control, serTest);
     }
 
     @Test public void testConcat() throws Exception {

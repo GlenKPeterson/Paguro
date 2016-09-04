@@ -14,19 +14,16 @@
 
 package org.organicdesign.fp.collections;
 
-import org.junit.Test;
-import org.organicdesign.fp.FunctionUtils;
-import org.organicdesign.fp.function.Function0;
-import org.organicdesign.fp.tuple.Tuple2;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.NoSuchElementException;
 import java.util.Set;
+
+import org.junit.Test;
+import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.TestUtilities;
+import org.organicdesign.fp.tuple.Tuple2;
 
 import static org.junit.Assert.*;
 
@@ -110,148 +107,8 @@ public class UnmodListTest {
         assertFalse(unList.containsAll(ls3));
     }
 
-    // TODO: This belongs in testUtils
-    /**
-     Call with two Iterators to test that they are equal
-     @param a the reference iterator
-     @param b the iterator under test.
-     */
-    public static <A,B> void iteratorTest(Iterator<A> a, Iterator<B> b) {
-        while (a.hasNext()) {
-            assertTrue("When a has a next, b should too", b.hasNext());
-            assertEquals("a.next should equal b.next", a.next(), b.next());
-        }
-        assertFalse("When a has no next, b shouldn't either", b.hasNext());
-    }
-
-    // TODO: This belongs in testUtils
-    public static <T extends Throwable> void assertEx(Function0<?> f, String beforeText,
-                                                      Class<T> exType) {
-        try {
-            f.apply();
-        } catch (Throwable t) {
-            if (!exType.isInstance(t)) {
-                fail("Expected " + beforeText + " to throw " + exType.getSimpleName() +
-                     " but threw " + t);
-            }
-            return;
-        }
-        fail("Expected " + beforeText + " to throw " + exType.getSimpleName());
-    }
-
-    private static <A,B> void assertLiEq(ListIterator<A> a, ListIterator<B> b, String afterText) {
-        assertEquals("a.hasNext should equal b.hasNext " + afterText,
-                     a.hasNext(), b.hasNext());
-        assertEquals("a.hasPrevious should equal b.hasPrevious " + afterText,
-                     a.hasPrevious(), b.hasPrevious());
-        assertEquals("a.nextIndex should equal b.nextIndex " + afterText,
-                     a.nextIndex(), b.nextIndex());
-        assertEquals("a.previousIndex should equal b.previousIndex " + afterText,
-                     a.previousIndex(), b.previousIndex());
-    }
-
-    // TODO: This belongs in testUtils
-    /**
-     Call with two ListIterators to test that they are equal
-     @param aList the reference iterator
-     @param bList the iterator under test.
-     */
-    public static <A,B> void listIteratorTest(List<A> aList, List<B> bList) {
-
-        assertEx(() -> aList.listIterator(-1), "aList.listIterator(-1)",
-                 IndexOutOfBoundsException.class);
-        assertEx(() -> bList.listIterator(-1), "bList.listIterator(-1)",
-                 IndexOutOfBoundsException.class);
-
-        assertEx(() -> aList.listIterator(aList.size() + 1), "aList.listIterator(aList.size() + 1)",
-                 IndexOutOfBoundsException.class);
-        assertEx(() -> bList.listIterator(aList.size() + 1), "bList.listIterator(aList.size() + 1)",
-                 IndexOutOfBoundsException.class);
-
-        for (int i = 0; i <= aList.size(); i++) {
-            ListIterator<A> a = aList.listIterator(i);
-            ListIterator<B> b = bList.listIterator(i);
-
-            assertLiEq(a, b, "at start (i = " + i + ")");
-
-            while (a.hasNext()) {
-                assertTrue("When a has a next, b should too (started at " + i + ")", b.hasNext());
-
-                assertEquals("a.next should equal b.next (started at " + i + ")",
-                             a.next(), b.next());
-
-                assertLiEq(a, b, "after calling next()");
-            }
-            assertFalse("When a has no next, b shouldn't either (started at " + i + ")",
-                        b.hasNext());
-
-            assertLiEq(a, b, "after the last item");
-
-            assertEx(a::next, "a.next() after the last item", NoSuchElementException.class);
-            assertEx(b::next, "b.next() after the last item", NoSuchElementException.class);
-
-            while (a.hasPrevious()) {
-                assertTrue("When a hasPrevious, b should too. (started at " + i + ")",
-                           b.hasPrevious());
-
-                assertEquals("a.previous should equal b.previous (started at " + i + ")",
-                             a.previous(), b.previous());
-
-                assertLiEq(a, b, "after calling previous()");
-            }
-            assertFalse("When a has no previous, b shouldn't either (started at " + i + ")",
-                        b.hasPrevious());
-
-            assertLiEq(a, b, "before first item");
-
-            assertEx(a::previous, "a.previous() before first item", NoSuchElementException.class);
-            assertEx(b::previous, "b.previous() before first item", NoSuchElementException.class);
-        }
-
-        // Check that indexing works when we start with the previous, then switch to the next()
-        for (int i = 0; i <= aList.size(); i++) {
-            ListIterator<A> a = aList.listIterator(i);
-            ListIterator<B> b = bList.listIterator(i);
-
-            assertLiEq(a, b, "at start (i = " + i + ")");
-
-            while (a.hasPrevious()) {
-                assertTrue("When a hasPrevious, b should too. (started at " + i + ")",
-                           b.hasPrevious());
-
-                assertEquals("a.previous should equal b.previous (started at " + i + ")",
-                             a.previous(), b.previous());
-
-                assertLiEq(a, b, "after calling previous()");
-            }
-            assertFalse("When a has no previous, b shouldn't either (started at " + i + ")",
-                        b.hasPrevious());
-
-            assertLiEq(a, b, "before first item");
-
-            assertEx(a::previous, "a.previous()", NoSuchElementException.class);
-            assertEx(b::previous, "b.previous()", NoSuchElementException.class);
-
-            while (a.hasNext()) {
-                assertTrue("When a has a next, b should too (started at " + i + ")", b.hasNext());
-
-                assertEquals("a.next should equal b.next (started at " + i + ")",
-                             a.next(), b.next());
-
-                assertLiEq(a, b, "after calling next()");
-            }
-            assertFalse("When a has no next, b shouldn't either (started at " + i + ")",
-                        b.hasNext());
-
-            assertLiEq(a, b, "after the last item");
-
-            assertEx(a::next, "a.next()", NoSuchElementException.class);
-            assertEx(b::next, "b.next()", NoSuchElementException.class);
-        }
-    }
-
     @Test public void listIteratorTest() {
-        listIteratorTest(Arrays.asList(sticksAndStones), unList);
+        TestUtilities.listIteratorTest(Arrays.asList(sticksAndStones), unList);
     }
 
     @Test public void subList() {

@@ -10,6 +10,7 @@ import java.util.TreeMap;
 
 import org.junit.Test;
 import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.TestUtilities;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.*;
@@ -124,9 +125,9 @@ public class UnmodSortedMapTest {
         assertTrue(refEntSet.contains(clemKey));
         assertTrue(testEntSet.contains(clemKey));
 
-        UnmodListTest.iteratorTest(refEntSet.iterator(), testEntSet.iterator());
+        TestUtilities.iteratorTest(refEntSet.iterator(), testEntSet.iterator());
 
-        UnmodListTest.iteratorTest(refEntSet.iterator(), serializeDeserialize(testEntSet).iterator());
+        TestUtilities.iteratorTest(refEntSet.iterator(), serializeDeserialize(testEntSet).iterator());
 
         // I can't fix TreeMap, so I guess this is good enough.
         // java.io.NotSerializableException: java.util.TreeMap$EntryIterator
@@ -354,8 +355,8 @@ public class UnmodSortedMapTest {
         assertTrue(refKeySet.contains(clemKey.getKey()));
         assertTrue(testKeySet.contains(clemKey.getKey()));
 
-        UnmodListTest.iteratorTest(refKeySet.iterator(), testKeySet.iterator());
-        UnmodListTest.iteratorTest(refKeySet.iterator(),
+        TestUtilities.iteratorTest(refKeySet.iterator(), testKeySet.iterator());
+        TestUtilities.iteratorTest(refKeySet.iterator(),
                                    serializeDeserialize(testKeySet).iterator());
 
         Comparator<? super String> testComp0 = testKeySet.comparator();
@@ -524,9 +525,9 @@ public class UnmodSortedMapTest {
         assertTrue(refValColl.contains(clemKey.getValue()));
         assertTrue(testValColl.contains(clemKey.getValue()));
 
-        UnmodListTest.iteratorTest(refValColl.iterator(), testValColl.iterator());
+        TestUtilities.iteratorTest(refValColl.iterator(), testValColl.iterator());
 
-        UnmodListTest.iteratorTest(refValColl.iterator(),
+        TestUtilities.iteratorTest(refValColl.iterator(),
                                    serializeDeserialize(testValColl).iterator());
 
         equalsDistinctHashCode(testValColl,

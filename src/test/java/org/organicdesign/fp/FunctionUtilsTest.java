@@ -41,7 +41,6 @@ import org.organicdesign.fp.collections.ImSortedSet;
 import org.organicdesign.fp.collections.KeyVal;
 import org.organicdesign.fp.collections.UnmodCollection;
 import org.organicdesign.fp.collections.UnmodList;
-import org.organicdesign.fp.collections.UnmodListTest;
 import org.organicdesign.fp.collections.UnmodMap;
 import org.organicdesign.fp.collections.UnmodSet;
 import org.organicdesign.fp.collections.UnmodSortedMap;
@@ -576,7 +575,7 @@ public class FunctionUtilsTest {
         assertTrue("An unmod iterable comes through unmodified",
                    oneTwoThree == unmodIterable(oneTwoThree));
 
-        UnmodListTest.iteratorTest(Arrays.asList(1,2,3).iterator(),
+        TestUtilities.iteratorTest(Arrays.asList(1, 2, 3).iterator(),
                                    unmodIterable(Arrays.asList(1,2,3)).iterator());
     }
 
@@ -603,7 +602,7 @@ public class FunctionUtilsTest {
         assertTrue("An unmod List comes through unmodified",
                    oneTwoThree == unmodList(oneTwoThree));
 
-        UnmodListTest.listIteratorTest(Arrays.asList(1,2,3), unmodList(Arrays.asList(1,2,3)));
+        TestUtilities.listIteratorTest(Arrays.asList(1, 2, 3), unmodList(Arrays.asList(1, 2, 3)));
     }
 
     @Test public void unListTest() {
@@ -628,7 +627,7 @@ public class FunctionUtilsTest {
             assertEquals(refList.get(i), testList.get(i));
         }
 
-        UnmodListTest.iteratorTest(refList.iterator(), testList.iterator());
+        TestUtilities.iteratorTest(refList.iterator(), testList.iterator());
     }
 
     @Test (expected = IndexOutOfBoundsException.class)
@@ -783,7 +782,7 @@ public class FunctionUtilsTest {
 
         assertFalse(ts.isEmpty());
 
-        UnmodListTest.iteratorTest(ts.iterator(), sm.entrySet().iterator());
+        TestUtilities.iteratorTest(ts.iterator(), sm.entrySet().iterator());
 
         assertEquals(ts.values().hashCode(), sm.values().hashCode());
         assertTrue(ts.values().equals(sm.values()));

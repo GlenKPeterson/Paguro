@@ -11,6 +11,10 @@
 /* rich Jul 5, 2007 */
 package org.organicdesign.fp.collections;
 
+import java.io.IOException;
+import java.io.InvalidObjectException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -32,10 +36,7 @@ import org.organicdesign.fp.xform.Transformable;
  @author Rich Hickey (Primary author)
  @author Glen Peterson (Java-centric editor)
  */
-public class PersistentVector<E> implements ImList<E>, Serializable {
-
-    // For serializable.  Make sure to change whenever internal data format changes.
-    private static final long serialVersionUID = 20160827174100L;
+public class PersistentVector<E> implements ImListTrans<E>, Serializable {
 
     // There's bit shifting going on here because it's a very fast operation.
     // Shifting right by 5 is aeons faster than dividing by 32.
@@ -64,7 +65,7 @@ public class PersistentVector<E> implements ImList<E>, Serializable {
     //
     // The bitwise | operator performs a bitwise inclusive OR operation
 
-    private static class Node implements Serializable {
+    private static class Node {
         // Every node in a Vector (Transient or Persistent) shares a single atomic reference value.
         // I'm not sure why this is on the node instead of on the vector.  You know, if we do that,
         // we don't need this class at all and could just use arrays instead.
@@ -96,26 +97,6 @@ public class PersistentVector<E> implements ImList<E>, Serializable {
     /** Returns the empty ImList (there only needs to be one) */
     @SuppressWarnings("unchecked")
     public static final <T> PersistentVector<T> empty() { return (PersistentVector<T>) EMPTY; }
-
-    // We could make this public someday.
-    @SuppressWarnings("unchecked")
-    private static final <T> TransientVector<T> emptyTransientVector() {
-        return (TransientVector<T>) EMPTY.asTransient();
-    }
-
-    // The number of items in this Vector.
-    private final int size;
-    private final int shift;
-    private final Node root;
-    private final E[] tail;
-
-    /** Constructor */
-    private PersistentVector(int z, int shift, Node root, E[] tail) {
-        size = z;
-        this.shift = shift;
-        this.root = root;
-        this.tail = tail;
-    }
 
     /**
      Public static factory method to create a vector from an Iterable.  A varargs version of this
@@ -151,11 +132,84 @@ public class PersistentVector<E> implements ImList<E>, Serializable {
 //        return ret;
 //    }
 
+    // We could make this public someday.
+    @SuppressWarnings("unchecked")
+    private static final <T> TransientVector<T> emptyTransientVector() {
+        return (TransientVector<T>) EMPTY.asTransient();
+    }
+
+    // ==================================== Instance Variables ====================================
+    // The number of items in this Vector.
+    private final int size;
+    private final int shift;
+    private final Node root;
+    private final E[] tail;
+
+    // ======================================= Constructor =======================================
+    /** Constructor */
+    private PersistentVector(int z, int shift, Node root, E[] tail) {
+        size = z;
+        this.shift = shift;
+        this.root = root;
+        this.tail = tail;
+    }
+
+    // ======================================= Serialization =======================================
+    // This class has a custom serialized form designed to be as small as possible.  It does not
+    // have the same internal structure as an instance of this class.
+
+    // For serializable.  Make sure to change whenever internal data format changes.
+    private static final long serialVersionUID = 20160904160500L;
+
+    // Check out Josh Bloch Item 78, p. 312 for an explanation of what's going on here.
+    private static class SerializationProxy<E> implements Serializable {
+        // For serializable.  Make sure to change whenever internal data format changes.
+        private static final long serialVersionUID = 20160904155600L;
+
+        private final int size;
+        private transient ImListTrans<E> vector;
+        SerializationProxy(ImListTrans<E> v) {
+            size = v.size();
+            vector = v;
+        }
+
+        // Taken from Josh Bloch Item 75, p. 298
+        private void writeObject(ObjectOutputStream s) throws IOException {
+            s.defaultWriteObject();
+            // Write out all elements in the proper order
+            for (E entry : vector) {
+                s.writeObject(entry);
+            }
+        }
+
+        @SuppressWarnings("unchecked")
+        private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
+            s.defaultReadObject();
+            vector = emptyTransientVector();
+            for (int i = 0; i < size; i++) {
+                vector.append((E) s.readObject());
+            }
+        }
+
+        private Object readResolve() { return vector.persistent(); }
+    }
+
+    private Object writeReplace() { return new SerializationProxy<>(this); }
+
+    private void readObject(java.io.ObjectInputStream in) throws IOException,
+            ClassNotFoundException {
+        throw new InvalidObjectException("Proxy required");
+    }
+
+    // ===================================== Instance Methods =====================================
+
     // IEditableCollection has this return ITransientCollection<E>,
     // not TransientVector<E> as this originally returned.
 //    @Override
     // We could make this public some day, maybe.
     public ImListTrans<E> asTransient() { return new TransientVector<>(this); }
+
+    @Override public ImListTrans<E> persistent() { return this; }
 
     // Returns the high (gt 5) bits of the index of the last item.
     // I think this is the index of the start of the last array in the tree.
