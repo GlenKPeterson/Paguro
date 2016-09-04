@@ -102,8 +102,9 @@ map(kv(
     Serializable.
  - Iterators are *NOT* serializable.  They aren't in java.util.Collections either.
    If you need an iterator to be serializable for some reason, open an issue and we'll discuss it.
- - Transformable is not serializable.  Open an issue to discuss.
- - Transient-HashSet, -HashMap, and -Vector are not Serializable.  Open an issue to discuss.
+ - Transformable is not serializable.
+ - Transient-HashSet, -HashMap, and -Vector are not Serializable.
+ - FunctionUtils.unmodifiable___() methods are not serializable (yet?).
 
 Issues?  Questions?  Provide feedback on the [Serialization enhancement request](https://github.com/GlenKPeterson/UncleJim/issues/10)
 
@@ -132,9 +133,9 @@ Package names will NOT change.
 * [Extensible, immutable tuples](src/main/java/org/organicdesign/fp/tuple) - use them for rapid prototyping, then later extend them to make your own lightweight, immutable Java classes with correct `equals()`, `hashCode()`, and `toString()` implementations.
 * [Lazy initialization](src/main/java/org/organicdesign/fp/LazyRef.java#L5) - LazyRef thread-safely performs initialization and frees initialization resources on first use.  Subsequent uses get the now-constant initialized value.
 * [Memoization](src/main/java/org/organicdesign/fp/function/Function3.java#L42) - Turns function calls into hashtable lookups to speed up slow functions over a limited range of inputs.
-* Tiny with no dependencies - The entire project fits in a 200K jar file that is compiled in the compact1 profile.
+* Tiny with no dependencies - The entire project fits in a 240K jar file that is compiled in the compact1 profile.
 
-UncleJim takes advantages of Java's type inferencing.  It eschews void return types, arrays, primatives, and checked exceptions in lambdas.  It can decrease the amount of code you need to write by a factor of at 2x-3x.  Using functional transfomrations instead of loops focuses you on choosing the right collections which leads to more readable code AND better Big O complexity/scalability.
+UncleJim takes advantage of Java's type inferencing.  It eschews void return types, arrays, primatives, and checked exceptions in lambdas.  It can decrease the amount of code you need to write by a factor of at 2x-3x.  Using functional transfomrations instead of loops focuses you on choosing the right collections which leads to more readable code AND better Big O complexity/scalability.
 
 [![Build Status](https://travis-ci.org/GlenKPeterson/UncleJim.svg?branch=master)](https://travis-ci.org/GlenKPeterson/UncleJim)
 [![Code Coverage](http://codecov.io/github/GlenKPeterson/UncleJim/coverage.svg?branch=master)](http://codecov.io/github/GlenKPeterson/UncleJim?branch=master)
