@@ -1,11 +1,11 @@
 package org.organicdesign.fp.function;
 
+import java.io.IOException;
+import java.util.concurrent.Callable;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-
-import java.io.IOException;
-import java.util.concurrent.Callable;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
@@ -64,6 +64,6 @@ public class Function0Test {
     }
 
     @Test public void testNull() {
-        assertNull(Function0.NULL.apply());
+        assertNull(Function0.Const.NULL.apply());
     }
 }

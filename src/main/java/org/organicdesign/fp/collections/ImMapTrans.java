@@ -1,10 +1,8 @@
 package org.organicdesign.fp.collections;
 
 /**
- Allows a map to be taken from transient to persistent.  This is NOT inherently thread-safe and calls to the
- asTransient() and persistent() methods need to be wrapped in a thread-safe manner.
- This bridges that gap to let PersistentHashSet know about the asTransient() method for accessing PersistentHashMap's
- inner transient class, which in turn, allows this class to implement keySet for PersistentHashMap.  Also allows
+ You could think of this as a builder for a PersistentHashMap.  It builds a little faster than the
+ persistent one.  This is inherently NOT thread-safe.
  */
 public interface ImMapTrans<K,V> extends ImMap<K,V> {
     ImMapTrans<K,V> asTransient();
@@ -12,6 +10,7 @@ public interface ImMapTrans<K,V> extends ImMap<K,V> {
     /** Returns the Equator used by this map for equals comparisons and hashCodes */
     Equator<K> equator();
 
+    /** Returns a persistent/immutable version of this transient map. */
     ImMapTrans<K,V> persistent();
 
     /** {@inheritDoc} */

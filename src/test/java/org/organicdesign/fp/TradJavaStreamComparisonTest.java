@@ -1,11 +1,5 @@
 package org.organicdesign.fp;
 
-import org.junit.Test;
-import org.organicdesign.fp.collections.ImList;
-import org.organicdesign.fp.collections.ImMap;
-import org.organicdesign.fp.collections.RangeOfInt;
-import org.organicdesign.fp.tuple.Tuple3;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,6 +8,12 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.junit.Test;
+import org.organicdesign.fp.collections.ImList;
+import org.organicdesign.fp.collections.ImMap;
+import org.organicdesign.fp.collections.RangeOfInt;
+import org.organicdesign.fp.tuple.Tuple3;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.*;
@@ -36,7 +36,7 @@ public class TradJavaStreamComparisonTest {
         // The Paguro way (3 lines of code):
         static final ImMap<Character,ColorVal> charToColorMapU =
                 vec(values())
-                        .toImMap(v -> tup(v.ch(), v));
+                        .toImMap(v -> kv(v.ch(), v));
 
         // Same thing in "traditional" Java (6 lines, plus closing braces):
         static final Map<Character,ColorVal> charToColorMapT;

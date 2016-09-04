@@ -77,7 +77,7 @@ public class TupleGenerator {
     }
 
     static String copyright() {
-        return "// Copyright 2015 PlanBase Inc. & Glen Peterson\n" +
+        return "// Copyright 2016 PlanBase Inc. & Glen Peterson\n" +
                "//\n" +
                "// Licensed under the Apache License, Version 2.0 (the \"License\");\n" +
                "// you may not use this file except in compliance with the License.\n" +
@@ -232,12 +232,9 @@ public class TupleGenerator {
                  "\n" +
                  "    @Override\n" +
                  "    public int hashCode() {\n" +
-                 "        // First 2 fields match Tuple2 which implements java.util.Map.Entry as part of the map\n" +
-                 "        // contract and therefore must match java.util.HashMap.Node.hashCode().\n" +
                  "        int ret = 0;\n" +
-                 "        if (_1 != null) { ret = _1.hashCode(); }\n" +
-                 "        if (_2 != null) { ret = ret ^ _2.hashCode(); }\n");
-        for (int l = 3; l <= i; l++) {
+                 "        if (_1 != null) { ret = _1.hashCode(); }\n");
+        for (int l = 2; l <= i; l++) {
             fr.write("        if (_" + l + " != null) { ret = ret + _" + l + ".hashCode(); }\n");
         }
         fr.write("        return ret;\n" +
@@ -366,7 +363,7 @@ public class TupleGenerator {
     }
 
     public static void main(String... args) throws IOException {
-        for (int i = 3; i <= 12; i++) {
+        for (int i = 2; i <= 12; i++) {
             genTuple(i);
             genTupleTest(i);
         }

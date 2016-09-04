@@ -13,6 +13,7 @@
 
 package org.organicdesign.fp.collections;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -30,32 +31,46 @@ import java.util.NoSuchElementException;
  item and a size.  To do that, Integer would need to implement something that defined what the
  next() and previous() values.  Currently limited to Integer.MIN_VALUE to Integer.MAX_VALUE.
  */
-// Note: In theory, this could implement both List<Integer> and Set<Integer>
-public class RangeOfInt implements UnmodList<Integer> {
+// Note: In theory, this could implement both List<Integer> and SortedSet<Integer>
+public class RangeOfInt implements UnmodList<Integer>, Serializable {
 
-    public static final Equator<List<Integer>> LIST_EQUATOR = new Equator<List<Integer>>() {
-        /**
-         This is an *inefficient* hash code for RangeOfInt, but it is compatible with List.
-         @param integers the list
-         @return a HashCode which is compatible with java.util.List of the same integers as
-         a range.
-         */
-        @Override public int hash(List<Integer> integers) {
-            return UnmodIterable.hashCode(integers);
-        }
+    // For serializable.  Make sure to change whenever internal data format changes.
+    private static final long serialVersionUID = 20160827174100L;
 
-        @Override
-        public boolean eq(List<Integer> o1, List<Integer> o2) {
-            if (o1 == o2) { return true; }
-            if ( (o1 == null) || (o2 == null) ) { return false; }
-            if ((o1 instanceof RangeOfInt) && (o2 instanceof RangeOfInt)) {
-                return o1.equals(o2);
+    // Enums are serializable and anonymous classes are not.  Therefore enums make better singletons.
+    public enum Equat implements Equator<List<Integer>> {
+        LIST {
+            /**
+             This is an *inefficient* hash code for RangeOfInt, but it is compatible with List.
+             @param integers the list
+             @return a HashCode which is compatible with java.util.List of the same integers as
+             a range.
+             */
+            @Override public int hash(List<Integer> integers) {
+                return UnmodIterable.hashCode(integers);
             }
-            return o1.size() == o2.size() &&
-                   UnmodSortedIterable.equals(UnmodSortedIterable.castFromList(o1),
-                                              UnmodSortedIterable.castFromList(o2));
+
+            @Override
+            public boolean eq(List<Integer> o1, List<Integer> o2) {
+                if (o1 == o2) { return true; }
+                if ( (o1 == null) || (o2 == null) ) { return false; }
+                if ((o1 instanceof RangeOfInt) && (o2 instanceof RangeOfInt)) {
+                    return o1.equals(o2);
+                }
+                return o1.size() == o2.size() &&
+                       UnmodSortedIterable.equals(UnmodSortedIterable.castFromList(o1),
+                                                  UnmodSortedIterable.castFromList(o2));
+            }
         }
-    };
+    }
+
+    /**
+     Use Equat.LIST instead.
+     Being an enum, it's serializable and makes a better singleton.
+     Deprecated as of 1.1.0, 2016-08-27
+     */
+    @Deprecated
+    public static final Equator<List<Integer>> LIST_EQUATOR = Equat.LIST;
 
     private final int start;
     private final int end;

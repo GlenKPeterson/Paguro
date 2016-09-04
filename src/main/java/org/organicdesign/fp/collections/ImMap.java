@@ -1,8 +1,8 @@
 package org.organicdesign.fp.collections;
 
-import org.organicdesign.fp.Option;
-
 import java.util.Map;
+
+import org.organicdesign.fp.Option;
 
 /** An immutable map with no guarantees about its ordering. */
 public interface ImMap<K,V> extends UnmodMap<K,V> {
@@ -17,8 +17,10 @@ public interface ImMap<K,V> extends UnmodMap<K,V> {
     ImMap<K,V> without(K key);
 
     /**
-     * Returns a view of the mappings contained in this map.  The set should actually contain UnmodMap.Entry items, but
-     * that return signature is illegal in Java, so you'll just have to remember. */
+     Returns a view of the mappings contained in this map.  The set should actually contain
+     UnmodMap.Entry items, but that return signature is illegal in Java, so you'll just have to
+     remember.
+     */
     @Override default ImSet<Map.Entry<K,V>> entrySet() {
         return map(e -> (Map.Entry<K,V>) e)
                 .toImSet();

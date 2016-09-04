@@ -23,6 +23,7 @@ import org.organicdesign.fp.tuple.Tuple2;
 import org.organicdesign.fp.tuple.Tuple3;
 
 import static org.junit.Assert.assertEquals;
+import static org.organicdesign.fp.StaticImports.kv;
 import static org.organicdesign.fp.StaticImports.tup;
 import static org.organicdesign.fp.StaticImports.vec;
 import static org.organicdesign.fp.UsageExampleTest.EmailType.HOME;
@@ -52,8 +53,7 @@ public class UsageExampleTest {
                              // emails.  map() the emails to email/person pairs
                              // while the person object is still in scope.
                              .flatMap(person -> person._3()
-                                                      .map(mail -> tup(mail,
-                                                                       person)))
+                                                      .map(mail -> kv(mail, person)))
 
                              // toImMap() expects a function that maps items to
                              // key/value pairs.  We already have pairs, so pass
@@ -115,7 +115,7 @@ public class UsageExampleTest {
                                                // Tuple2 implements Map.Entry making it easy to
                                                // create the pair right here.
                                                // Note: mail._2() is the address string
-                                               .map(mail -> tup(mail._2(), person)))
+                                               .map(mail -> kv(mail._2(), person)))
                         // Convert the result into an immutable map.  The function argument is
                         // normally used to convert data into key/value pairs, but we already have
                         // key/value pairs, so we just pass the identity function (returns its
@@ -124,11 +124,11 @@ public class UsageExampleTest {
 
         // Look at the map we just created
         assertEquals("PersistentHashMap(" +
-                     "Tuple2(a@b.c," +
+                     "kv(\"a@b.c\"," +
                      "Tuple3(Jane,Smith,PersistentVector(Tuple2(HOME,a@b.c),Tuple2(WORK,b@c.d))))," +
-                     "Tuple2(b@c.d," +
+                     "kv(\"b@c.d\"," +
                      "Tuple3(Jane,Smith,PersistentVector(Tuple2(HOME,a@b.c),Tuple2(WORK,b@c.d))))," +
-                     "Tuple2(c@d.e," +
+                     "kv(\"c@d.e\"," +
                      "Tuple3(Fred,Tase,PersistentVector(Tuple2(HOME,c@d.e)))))",
                      peopleByEmail.toString());
 
@@ -204,17 +204,17 @@ public class UsageExampleTest {
         // Another simplified type signature.  Descriptive method names are much easier to read.
         ImMap<String,Person> peopleByEmail =
                 people.flatMap(person -> person.emailAddrs()
-                                               .map(mail -> tup(mail.address(), person)))
+                                               .map(mail -> kv(mail.address(), person)))
                       .toImMap(Function1.identity());
 
         assertEquals("PersistentHashMap(" +
-                     "Tuple2(d@e.f," +
+                     "kv(\"d@e.f\"," +
                      "Person(Fred,Tase,PersistentVector(Email(HOME,c@d.e),Email(WORK,d@e.f))))," +
-                     "Tuple2(a@b.c," +
+                     "kv(\"a@b.c\"," +
                      "Person(Jane,Smith,PersistentVector(Email(HOME,a@b.c),Email(WORK,b@c.d))))," +
-                     "Tuple2(b@c.d," +
+                     "kv(\"b@c.d\"," +
                      "Person(Jane,Smith,PersistentVector(Email(HOME,a@b.c),Email(WORK,b@c.d))))," +
-                     "Tuple2(c@d.e," +
+                     "kv(\"c@d.e\"," +
                      "Person(Fred,Tase,PersistentVector(Email(HOME,c@d.e),Email(WORK,d@e.f)))))",
                      peopleByEmail.toString());
 

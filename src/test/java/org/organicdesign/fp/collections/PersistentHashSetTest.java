@@ -1,20 +1,35 @@
 package org.organicdesign.fp.collections;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 import org.junit.Test;
 import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.Option;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.vec;
+import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
+import static org.organicdesign.fp.collections.PersistentHashSetTest.Ctx.mod3Eq;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class PersistentHashSetTest {
+
+    public static <K> void setIterTest(Set<K> c, Iterator<? extends K> test) {
+        Set<K> control = new HashSet<>();
+        control.addAll(c);
+        while (test.hasNext()) {
+            K testK = test.next();
+            assertTrue(control.contains(testK));
+            control.remove(testK);
+        }
+        assertEquals(0, control.size());
+    }
+
     @Test
-    public void assocAndGet() {
+    public void assocAndGet() throws Exception {
         PersistentHashSet<String> s1 = PersistentHashSet.empty();
         assertTrue(s1.isEmpty());
 
@@ -48,13 +63,24 @@ public class PersistentHashSetTest {
         assertTrue(s3.contains(3));
         assertFalse(s3.contains(4));
 
+        // This makes no sense to me.  Order is not meant to be preserved.
+        // Not sure what I was thinking, but until it breaks, I won't worry.
         assertArrayEquals(new Integer[]{1, 2, 3}, s3.toArray());
 
         assertArrayEquals(new Integer[]{1, 2, 3},
                           PersistentHashSet.<Integer>empty().put(3).put(2).put(1).toArray());
+
+        PersistentHashSet<Integer> ser = serializeDeserialize(s3);
+        assertEquals(ser, s3);
+        assertArrayEquals(new Integer[]{1, 2, 3}, ser.toArray());
+
+        assertArrayEquals(new Integer[]{1, 2, 3},
+                          serializeDeserialize(PersistentHashSet.<Integer>empty().put(3).put(2).put(1))
+                                  .toArray());
+
     }
 
-    @Test public void moreAssoc() {
+    @Test public void moreAssoc() throws Exception {
         PersistentHashSet<String> s1 = PersistentHashSet.empty();
         s1 = s1.put("one");
         assertEquals(1, s1.size());
@@ -114,13 +140,20 @@ public class PersistentHashSetTest {
 
         PersistentHashSet<String> u = PersistentHashSet.empty();
         // System.out.println("Initial u: " + u);
-        for (String s : new String[] { "one", "two", "three", "four", "five" }) {
+        String[] vals = new String[] { "one", "two", "three", "four", "five" };
+        for (String s : vals) {
             // System.out.println("item.get(): " + s);
             u = u.put(s);
             assertTrue(u.contains(s));
             // System.out.println("u: " + u.toString());
         }
         // System.out.println("Final u: " + u);
+
+        PersistentHashSet<String> ser = serializeDeserialize(u);
+        assertEquals(u, ser);
+        for (String s : vals) {
+            assertTrue(ser.contains(s));
+        }
     }
 
     @Test public void disjoin() {
@@ -197,7 +230,7 @@ public class PersistentHashSetTest {
         assertTrue(s1.isEmpty());
     }
 
-    @Test public void longerSeq() {
+    @Test public void longerSeq() throws Exception {
         // This is an assumed to work mutable set - the "control" for this test.
         Set<Integer> set = new HashSet<>();
         // This is the map being tested.
@@ -214,8 +247,13 @@ public class PersistentHashSetTest {
             //noinspection ConstantConditions
             assertTrue(o.get() instanceof Integer);
         }
+
+        ImSet<Integer> ser = serializeDeserialize(accum);
+        assertEquals(accum, ser);
+
         for (int i = 0; i < MAX; i++) {
             assertTrue(accum.contains(i));
+            assertTrue(ser.contains(i));
         }
 
         UnmodIterable<Integer> seq = accum;
@@ -234,11 +272,49 @@ public class PersistentHashSetTest {
 //        println("accum: " + accum);
     }
 
-    @Test public void equator() {
-        Equator.ComparisonContext<Integer> mod3Eq = new Equator.ComparisonContext<Integer>() {
+    @Test public void transientTest() {
+        Set<Integer> control = new HashSet<>();
+        ImSetTrans<Integer> test = PersistentHashSet.<Integer>empty().asTransient();
+        assertEquals(control.size(), test.size());
+        assertEquals(control.contains(-1), test.contains(-1));
+
+        final int SOME = 2000;
+        for (int i = 0; i < SOME; i++) {
+            assertEquals(control.isEmpty(), test.isEmpty());
+            control.add(i);
+            test.put(i);
+            assertEquals(control.size(), test.size());
+        }
+
+        assertEquals(control.contains(-1), test.contains(-1));
+        assertEquals(control.contains(999), test.contains(999));
+
+        setIterTest(control, test.iterator());
+        // Reversed test.
+        setIterTest(test, control.iterator());
+        ImSet<Integer> persistent = test.persistent();
+
+        setIterTest(control, persistent.iterator());
+        setIterTest(control, serializeDeserialize(persistent).iterator());
+
+        // Have to go back to transient manually.  Not ideal, but I don't want to encourage this.
+        test = ((PersistentHashSet<Integer>) persistent).asTransient();
+
+        for (int i = 0; i < SOME; i++) {
+            control.remove(i);
+            test.without(i);
+            assertEquals(control.size(), test.size());
+        }
+    }
+
+    enum Ctx implements ComparisonContext<Integer> {
+        mod3Eq {
             @Override public int compare(Integer o1, Integer o2) { return (o1 % 3) - (o2 % 3); }
             @Override public int hash(Integer integer) { return integer % 3; }
-        };
+        }
+    }
+
+    @Test public void equator() throws Exception {
         PersistentHashSet<Integer> s1 = PersistentHashSet.ofEq(mod3Eq, vec(5, 2, 4, 1, 3));
 //        System.out.println("s1: " + s1);
         assertEquals(3, s1.size());
@@ -274,6 +350,8 @@ public class PersistentHashSetTest {
         assertEquals(0, s1.size());
 
         assertEquals(mod3Eq, s1.equator());
+
+        assertEquals(s1, serializeDeserialize(s1));
     }
 
     @Test public void equality() {

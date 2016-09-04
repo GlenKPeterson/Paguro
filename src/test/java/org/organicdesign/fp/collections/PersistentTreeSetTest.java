@@ -14,18 +14,19 @@
 
 package org.organicdesign.fp.collections;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import org.organicdesign.fp.FunctionUtils;
-
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.organicdesign.fp.FunctionUtils;
+
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.vec;
+import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 import static org.organicdesign.testUtils.EqualsContract.equalsSameHashCode;
 
@@ -192,6 +193,68 @@ public class PersistentTreeSetTest {
                           s2.subSet("the", "the").toArray());
 
         assertEquals(STR_LEN_COMP, s2.comparator());
+    }
+
+    @Test public void serializeEmptyTest() {
+        PersistentTreeSet<String> e = PersistentTreeSet.empty();
+        assertEquals(1, e.put("hello").size());
+        assertEquals(1, serializeDeserialize(e).put("hello").size());
+    }
+
+    @Test public void serializationTest() throws Exception {
+        PersistentTreeSet<String> s1 = serializeDeserialize(PersistentTreeSet.empty());
+        assertTrue(s1.isEmpty());
+
+        PersistentTreeSet<String> s2 = serializeDeserialize(s1.put("one"));
+        assertFalse(s2.isEmpty());
+
+        // Prove m1 unchanged
+        assertEquals(0, s1.size());
+        assertFalse(s1.contains("one"));
+
+        // Show m2 correct.
+        assertEquals(1, s2.size());
+
+        assertTrue(s2.contains("one"));
+        assertFalse(s2.contains("two"));
+
+        //noinspection EqualsWithItself
+        assertTrue(s1.equals(s1));
+
+        //noinspection EqualsWithItself
+        assertTrue(s2.equals(s2));
+        assertNotEquals(s1.hashCode(), s2.hashCode());
+        assertFalse(s1.equals(s2));
+        assertFalse(s2.equals(s1));
+
+        PersistentTreeSet<Integer> s3 = serializeDeserialize(PersistentTreeSet.<Integer>empty().put(1)).put(2).put(3);
+
+        assertEquals(3, s3.size());
+        assertTrue(s3.contains(1));
+        assertTrue(s3.contains(2));
+        assertTrue(s3.contains(3));
+        assertFalse(s3.contains(4));
+
+        assertArrayEquals(new Integer[]{1, 2, 3}, s3.toArray());
+
+        PersistentTreeSet<String> pts1 = PersistentTreeSet.of(Arrays.asList("hello", "an", "work", "b", "the"));
+        PersistentTreeSet<String> pts2 = serializeDeserialize(pts1);
+        assertEquals(pts1, pts2);
+
+        PersistentTreeSet<Integer> pts3 = PersistentTreeSet.empty();
+        pts3 = pts3.put(7).put(3).put(1).put(6).put(5).put(4).put(2);
+        PersistentTreeSet<Integer> pts4 = serializeDeserialize(pts3);
+        assertEquals(pts3, pts4);
+
+        UnmodSortedIterator<Integer> i3 = pts3.iterator();
+        UnmodSortedIterator<Integer> i4 = pts4.iterator();
+        while (i3.hasNext()) {
+            assertTrue(i4.hasNext());
+            Integer item3 = i3.next();
+            Integer item4 = i4.next();
+            assertEquals(item3, item4);
+        }
+        assertFalse(i4.hasNext());
     }
 
     @Test public void equality() {

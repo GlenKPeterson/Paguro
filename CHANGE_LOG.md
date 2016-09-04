@@ -1,26 +1,59 @@
-**2016-03-23 Release 1.0.3**:
+## 2016-09-01 Release 2.0.2
+ - Gave 5 main collections custom serialized forms (after reading Josh Bloch) so that we can change
+   the implementations later without breaking any clients who are using them for long-term storage.
+ - Decided *NOT* to make any itera**tors** serializable.
+ - Improved tests a bit, especially for serialization.
+
+## 2016-09-01 Release 2.0.1
+ - Made UnmodSortedIterable.castFrom... methods generic and serializable (and wrote tests for same).
+ - Fixed some Javadoc link errors.
+
+## 2016-08-27 Release 2.0.0: Serializable
+This is a major release due to the following **breaking changes** in order to make more things serializable without creating a mess:
+ - Hash codes of all tuples are now calculated by adding together the hash codes of all member items.
+   They used to bitwise-or the first two items for compatibility with Map.Entry.
+ - Tuple2 no longer implements Map.Entry or UnmodMap.UnEntry.  Instead, a new class KeyVal extends Tuple2, Map.Entry, UnmodMap.UnEntry, and Serializable.
+   The new KeyValuePair hashcode method is compatible with the *old* Tuple2 hashcode, but NOT with the *new* Tuple2 hashcode (or equals).
+ - Maps construction now requires KeyVals instead of Tuple2's.  StaticImports has a new helper method `kv(k,v)` for this.
+ - PersistentTreeMap now returns KeyVal's instead of UnEntry's.
+ - Removed PersistentTreeMap.EQUATOR - because I didn't see it used and it hadn't been tested.
+ - Moved ComparisonContext interface from inside the Equator interface, to it's own file: org.organicdesign.fp.ComparisonContext.
+ - Replaced Equator.ComparisonContext.DEFAULT_CONTEXT with ComparisonContext.CompCtx.DEFAULT
+ - KeyVal.toString() is now kv(k,v) like all the other Java toString methods.
+
+This release also contains the following non-breaking changes:
+ - Made serializable: Persistent- HashMap, HashSet, TreeMap, TreeSet, Vector.  RangeOfInt,
+ default Equator, default Comparator, default ComparisonContext.
+ Thanks @sblommers for spotting this issue and writing the key unit test!
+ - Deprecated Equator.DEFAULT_EQUATOR use Equator.Equat.DEFAULT instead.
+ - Deprecated Equator.DEFAULT_COMPARATOR use Equator.Comp.DEFAULT instead.
+
+Note: Xform is NOT serializable.  I don't know yet whether that's good or bad.
+
+## 2016-03-23 Release 1.0.3
  - Fixed error message for Xform.drop() to "Can't drop less than zero items #6." Thanks @pniederw
  - Fixed "Wrong bounds check in UnmodList.listIterator #7." Thanks @pniederw
  - Fixed "PersistentVector can't handle reverse iteration starting from last element #8."  Thanks @pniederw
  - Fixed RangeOfInt.listIterator and UnmodList and improved tests for same issues as above.
  - Improved test coverage of PersistentVector a little bit.
 
-**2016-03-22 Release 1.0.2**:
+## 2016-03-22 Release 1.0.2
  - Improved speed of Transformable.toImList() by about 5x by using the Mutable version of the persistent vector internally.  This is thanks to a discussion with Peter Niederwieser @pniederw.  Thank you Peter!
 
-**2016-03-13 Release 1.0.1**:
+## 2016-03-13 Release 1.0.1
  - Improved some documentation of the toMap methods, used K and V for the key and value types.
  - Otherwise, this has performed well without changes for 4 months - it's stable.
  - Added test dependency on TestUtils project instead of duplicating that code here.
 
-**2015-11-22 0.12.1**:
+## 2015-11-22 Release 0.12.1
  - Renamed overloaded toString() methods on FunctionUtils to mapToString() and arrayToString().
 
-**2015-11-16 0.12.0**:
+## 2015-11-16 Release 0.12.0
  - Removed Mutable class because it wasn't thread-safe.  Use java.util.concurrent.atomic.AtomicInteger and AtomicReference instead.
  - Added a comparator parameter to Transformable.toMutableSortedMap().
 
-**2015-11-15 0.11.0**: There are many changes in this point release, but unless you are writing your own collections by subclassing the Unmod interfaces, you probably won't notice.
+## 2015-11-15 Release 0.11.0
+There are many changes in this point release, but unless you are writing your own collections by subclassing the Unmod interfaces, you probably won't notice.
 The main push at this point is near 100% test coverage before a 1.0 release.
 
  - Deprecated UnmodList.contains().  See note there.  Maybe should have deprecated UnmodCollection.contains() instead?  This still functions the way java.util.List.contains() does, it's just an error to use it.
@@ -46,7 +79,8 @@ especially for implementing Map.keySet() and Map.entrySet().
  I could bring it back for the right reason.
  - Added tests, tests, tests.  CodeCov now reports 86%, IntelliJ 92% coverage.
 
-**2015-10-28 0.10.18**: Removed default implementation of UnmodSortedSet.tailSet() because correct implementation there was not possible.
+## 2015-10-28 Release 0.10.18
+Removed default implementation of UnmodSortedSet.tailSet() because correct implementation there was not possible.
 Fixed implementation of UnmodSortedSet.headSet() to be correct.
 Removed UnmodList.insert because it was O(n).
 Replacing it with a default implementation that's O(log2 n) will take time (a rough implementation is commented out).
@@ -54,7 +88,8 @@ Fixed some return types in UnmodSortedMap to be Unmod*Sorted*Sets/Collections in
 Changed which methods have default implementations in UnmodSortedMap to make it easier to subclass.
 Improved test coverage by maybe 5%.
 
-**2015-10-28 0.10.17**: Made UnmodList implement listIterator(int i)
+## 2015-10-28 Release 0.10.17
+Made UnmodList implement listIterator(int i)
 Made Collection.containsAll() convert to a Set to bring performance from O(n^2) to O(n).
 Made UnmodSet implement containsAll() because that's the highest level where we can do it really fast.
 Made default implementation of previousIndex() in UnmodListIterator because there is probably only one useful way to implement this method.

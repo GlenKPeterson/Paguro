@@ -14,15 +14,7 @@
 
 package org.organicdesign.fp.collections;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import org.organicdesign.fp.FunctionUtils;
-import org.organicdesign.fp.FunctionUtilsTest;
-import org.organicdesign.fp.Option;
-import org.organicdesign.fp.function.Function1;
-import org.organicdesign.fp.tuple.Tuple2;
-
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,35 +27,58 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.FunctionUtilsTest;
+import org.organicdesign.fp.Option;
+import org.organicdesign.fp.function.Function1;
+
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.FunctionUtils.ordinal;
 import static org.organicdesign.fp.StaticImports.*;
+import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
+import static org.organicdesign.fp.collections.PersistentHashMapTest.CompCtxt.BY_DATE;
+import static org.organicdesign.fp.collections.PersistentHashMapTest.CompCtxt.BY_INT;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 import static org.organicdesign.testUtils.EqualsContract.equalsSameHashCode;
 
 @RunWith(JUnit4.class)
 public class PersistentHashMapTest {
+    public static <K,V> void mapIterTest(Map<K,V> c, Iterator<? extends Map.Entry<K,V>> test) {
+        Map<K,V> control = new HashMap<>();
+        control.putAll(c);
+        while (test.hasNext()) {
+            Map.Entry<K,V> testEnt = test.next();
+            assertTrue(control.containsKey(testEnt.getKey()));
+            V controlVal = control.get(testEnt.getKey());
+            assertEquals(controlVal, testEnt.getValue());
+            control.remove(testEnt.getKey());
+        }
+        assertEquals(0, control.size());
+    }
+
     @Test public void iter() {
         assertFalse(PersistentHashMap.empty().iterator().hasNext());
 
-        PersistentHashMap<String,Integer> m1 = PersistentHashMap.of(Collections.singletonList(tup("one", 1)));
+        PersistentHashMap<String,Integer> m1 = PersistentHashMap.of(Collections.singletonList(kv("one", 1)));
         UnmodIterator<UnmodMap.UnEntry<String,Integer>> iter = m1.iterator();
         assertTrue(iter.hasNext());
 
-        assertEquals(tup("one", 1), iter.next());
+        assertEquals(kv("one", 1), iter.next());
 
 //        System.out.println("class: " + iter.getClass());
         assertFalse(iter.hasNext());
 
-        PersistentHashMap<String,Integer> m2 = PersistentHashMap.of(Arrays.asList(tup(null, 2),
-                                                                                  tup("three", 3)));
-        UnmodIterator<UnmodMap.UnEntry<String,Integer>> iter2 = m2.iterator();
-        assertTrue(iter2.hasNext());
-        assertEquals(tup(null, 2), iter2.next());
+        Map<String,Integer> control = new HashMap<>();
+        control.put(null, 2);
+        control.put("three", 3);
+        PersistentHashMap<String,Integer> m2 = PersistentHashMap.of(control.entrySet());
 
-        assertTrue(iter2.hasNext());
-        assertEquals(tup("three", 3), iter2.next());
-        assertFalse(iter2.hasNext());
+        mapIterTest(control, m2.iterator());
+        mapIterTest(control, serializeDeserialize(m2).iterator());
+//        mapIterTest(control, serializeDeserialize(m2.iterator()));
     }
 
     @Test(expected = NoSuchElementException.class)
@@ -237,6 +252,12 @@ public class PersistentHashMapTest {
         }
         assertEquals(NUM_ITEMS, m.size());
 
+        // Double-assoc shouldn't change anythings.
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            m = m.assoc(ordinal(i), i);
+            assertEquals(NUM_ITEMS, m.size());
+        }
+
         for (int i = 0; i < NUM_ITEMS; i++) {
             assertEquals(Integer.valueOf(i), m.get(ordinal(i)));
         }
@@ -283,6 +304,14 @@ public class PersistentHashMapTest {
             assertEquals(i + 2, m.size());
         }
         assertEquals(NUM_ITEMS + 1, m.size());
+
+        // Duplicate items
+        m = m.assoc(null, -1);
+        assertEquals(NUM_ITEMS + 1, m.size());
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            m = m.assoc(ordinal(i), i);
+            assertEquals(NUM_ITEMS + 1, m.size());
+        }
 
         for (int i = 0; i < NUM_ITEMS; i++) {
             assertEquals(Integer.valueOf(i), m.get(ordinal(i)));
@@ -427,15 +456,15 @@ public class PersistentHashMapTest {
     }
 
     @Test public void seq3() {
-        PersistentHashMap<String,Integer> m1 = PersistentHashMap.of(vec(tup("c", 1)));
-        assertEquals(Option.of(tup("c", 1)),
+        PersistentHashMap<String,Integer> m1 = PersistentHashMap.of(vec(kv("c", 1)));
+        assertEquals(Option.of(kv("c", 1)),
                      m1.head());
 
-        ImMap<String,Integer> m2 = map(tup("c", 1), tup("b", 2), tup("a", 3));
+        ImMap<String,Integer> m2 = map(kv("c", 1), kv("b", 2), kv("a", 3));
 
-        Set<Option<Tuple2<String,Integer>>> s = new HashSet<>(Arrays.asList(Option.of(tup("c", 1)),
-                                                                            Option.of(tup("b", 2)),
-                                                                            Option.of(tup("a", 3))));
+        Set<Option<KeyVal<String,Integer>>> s = new HashSet<>(Arrays.asList(Option.of(kv("c", 1)),
+                                                                            Option.of(kv("b", 2)),
+                                                                            Option.of(kv("a", 3))));
 
         UnmodIterable<UnmodMap.UnEntry<String,Integer>> seq = m2;
         Option o = seq.head();
@@ -459,17 +488,17 @@ public class PersistentHashMapTest {
 
     @Test public void seqMore() {
         PersistentHashMap<String,Integer> m1 = PersistentHashMap.of(
-                vec(tup("g", 1), tup("f", 2), tup("e", 3), tup("d", 4),
-                    tup("c", 5), tup("b", 6), tup("a", 7)));
+                vec(kv("g", 1), kv("f", 2), kv("e", 3), kv("d", 4),
+                    kv("c", 5), kv("b", 6), kv("a", 7)));
         // System.out.println("m1.toString(): " + m1.toString());
 
-        Set<UnmodMap.UnEntry<String,Integer>> s1 = new HashSet<>(Arrays.asList(tup("g", 1),
-                                                                           tup("f", 2),
-                                                                           tup("e", 3),
-                                                                           tup("d", 4),
-                                                                           tup("c", 5),
-                                                                           tup("b", 6),
-                                                                           tup("a", 7)));
+        Set<UnmodMap.UnEntry<String,Integer>> s1 = new HashSet<>(Arrays.asList(kv("g", 1),
+                                                                           kv("f", 2),
+                                                                           kv("e", 3),
+                                                                           kv("d", 4),
+                                                                           kv("c", 5),
+                                                                           kv("b", 6),
+                                                                           kv("a", 7)));
 
         // System.out.println("s1: " + s1);
 
@@ -542,7 +571,6 @@ public class PersistentHashMapTest {
         assertTrue(s1.containsKey("four"));
         assertFalse(s1.containsKey("five"));
 
-        // TODO: Right here!
         showSeq(s1);
         // System.out.println("Four: " + s1);
 
@@ -572,7 +600,7 @@ public class PersistentHashMapTest {
 
         for (int i = 0; i < MAX; i++) {
             String s = "Str" + i;
-            set.add(tup(s, i));
+            set.add(kv(s, i));
             accum = accum.assoc(s, accum.getOrElse(s, 0) + i);
 //            println("accum.size(): " + accum.size());
 //            println("accum: " + accum);
@@ -608,9 +636,9 @@ public class PersistentHashMapTest {
     @SuppressWarnings("deprecation")
     @Test public void unorderedOps() {
         PersistentHashMap<String,Integer> m1 = PersistentHashMap.of(
-                vec(tup("c", 1),
-                    tup("b", 2),
-                    tup("a", 3)));
+                vec(kv("c", 1),
+                    kv("b", 2),
+                    kv("a", 3)));
 
         // Prove m1 unchanged
         assertEquals(3, m1.size());
@@ -627,31 +655,26 @@ public class PersistentHashMapTest {
         assertTrue(m1.values().containsAll(values));
 
         assertEquals(new HashSet<>(Arrays.asList("a", "b", "c")),
-                     PersistentHashMap.of(vec(tup("a", 3),
-                                          tup("b", 2),
-                                          tup("c", 1))).keySet());
+                     PersistentHashMap.of(vec(kv("a", 3),
+                                          kv("b", 2),
+                                          kv("c", 1))).keySet());
 
-
-        PersistentHashMap<String,Integer> m2 = PersistentHashMap.of(vec(tup("c", 3)))
+        Map<String,Integer> control = new HashMap<>();
+        control.put("c", 3);
+        control.put("b", 2);
+        control.put("a", 1);
+        PersistentHashMap<String,Integer> m2 = PersistentHashMap.of(vec(kv("c", 3)))
                         .assoc("b", 2)
                         .assoc("a", 1);
-        UnmodIterator<UnmodMap.UnEntry<String,Integer>> iter = m2.iterator();
-        UnmodMap.UnEntry<String,Integer> next = iter.next();
-        assertEquals("a", next.getKey());
-        assertEquals(Integer.valueOf(1), next.getValue());
 
-        next = iter.next();
-        assertEquals("b", next.getKey());
-        assertEquals(Integer.valueOf(2), next.getValue());
-
-        next = iter.next();
-        assertEquals("c", next.getKey());
-        assertEquals(Integer.valueOf(3), next.getValue());
+        mapIterTest(control, m2.iterator());
+        mapIterTest(control, serializeDeserialize(m2).iterator());
+//        mapIterTest(control, serializeDeserialize(m2.iterator()));
     }
 
     @Test public void hashCodeAndEquals() {
-        ImMap<String,Integer> a= map(tup("one", 1), tup("two", 2), tup("three", 3));
-        ImMap<String,Integer> b= map(tup("one", 1), tup("two", 2), tup("three", 3));
+        ImMap<String,Integer> a= map(kv("one", 1), kv("two", 2), kv("three", 3));
+        ImMap<String,Integer> b= map(kv("one", 1), kv("two", 2), kv("three", 3));
 
         assertEquals(a.hashCode(), b.hashCode());
         assertFalse(a == b);
@@ -663,53 +686,53 @@ public class PersistentHashMapTest {
         assertEquals(a, b);
         assertEquals(b, a);
 
-        equalsDistinctHashCode(PersistentHashMap.of(vec(tup("one", 1)))
+        equalsDistinctHashCode(PersistentHashMap.of(vec(kv("one", 1)))
                                                 .assoc("two", 2).assoc("three", 3),
-                               PersistentHashMap.of(vec(tup("three", 3))).assoc("two", 2).assoc("one", 1),
-                               PersistentHashMap.of(vec(tup("two", 2), tup("three", 3), tup("one", 1))),
-                               PersistentHashMap.of(vec(tup("two", 2), tup("three", 3), tup("four", 4))));
+                               PersistentHashMap.of(vec(kv("three", 3))).assoc("two", 2).assoc("one", 1),
+                               PersistentHashMap.of(vec(kv("two", 2), kv("three", 3), kv("one", 1))),
+                               PersistentHashMap.of(vec(kv("two", 2), kv("three", 3), kv("four", 4))));
 
         Map<String,Integer> m = new HashMap<>();
         m.put("one", 1);
         m.put("two", 2);
         m.put("three", 3);
 
-        equalsDistinctHashCode(PersistentHashMap.of(vec(tup("one", 1), tup("two", 2), tup("three", 3))),
+        equalsDistinctHashCode(PersistentHashMap.of(vec(kv("one", 1), kv("two", 2), kv("three", 3))),
                                m,
                                FunctionUtils.unmodMap(m),
-                               PersistentHashMap.of(vec(tup("two", 2), tup("three", 3), tup("four", 4))));
+                               PersistentHashMap.of(vec(kv("two", 2), kv("three", 3), kv("four", 4))));
 
-        equalsDistinctHashCode(PersistentHashMap.of(vec(tup("one", 1)))
+        equalsDistinctHashCode(PersistentHashMap.of(vec(kv("one", 1)))
                                                 .assoc("two", 2).assoc("three", 3).assoc(null, 4),
-                               PersistentHashMap.of(vec(tup("three", 3)))
+                               PersistentHashMap.of(vec(kv("three", 3)))
                                                 .assoc("two", 2).assoc("one", 1).assoc(null, 4),
-                               PersistentHashMap.of(vec(tup("two", 2), tup("three", 3),
-                                                        tup("one", 1), tup(null, 4))),
-                               PersistentHashMap.of(vec(tup("zne", 1), tup("two", 2),
-                                                        tup("three", 3), tup(null,4))));
+                               PersistentHashMap.of(vec(kv("two", 2), kv("three", 3),
+                                                        kv("one", 1), kv(null, 4))),
+                               PersistentHashMap.of(vec(kv("zne", 1), kv("two", 2),
+                                                        kv("three", 3), kv(null,4))));
 
-        equalsDistinctHashCode(PersistentHashMap.of(vec(tup("one", 1)))
+        equalsDistinctHashCode(PersistentHashMap.of(vec(kv("one", 1)))
                                                 .assoc("two", 2).assoc("three", 3),
-                               PersistentHashMap.of(vec(tup("three", 3)))
+                               PersistentHashMap.of(vec(kv("three", 3)))
                                                 .assoc("two", 2).assoc("one", 1),
-                               PersistentHashMap.of(vec(tup("two", 2), tup("three", 3), tup("one", 1))),
-                               PersistentHashMap.of(vec(tup("one", 1), tup("two", 2), tup("three", 2))));
+                               PersistentHashMap.of(vec(kv("two", 2), kv("three", 3), kv("one", 1))),
+                               PersistentHashMap.of(vec(kv("one", 1), kv("two", 2), kv("three", 2))));
 
-        equalsSameHashCode(PersistentHashMap.of(vec(tup("one", 1)))
+        equalsSameHashCode(PersistentHashMap.of(vec(kv("one", 1)))
                                             .assoc("two", 2).assoc("three", 3),
-                           PersistentHashMap.of(vec(tup("three", 3)))
+                           PersistentHashMap.of(vec(kv("three", 3)))
                                             .assoc("two", 2).assoc("one", 1),
-                           PersistentHashMap.of(vec(tup("two", 2), tup("three", 3), tup("one", 1))),
-                           PersistentHashMap.of(vec(tup(1, "one"), tup(2, "two"), tup(3, "three"))));
+                           PersistentHashMap.of(vec(kv("two", 2), kv("three", 3), kv("one", 1))),
+                           PersistentHashMap.of(vec(kv(1, "one"), kv(2, "two"), kv(3, "three"))));
 
-        equalsSameHashCode(PersistentHashMap.of(vec(tup("one", 1)))
+        equalsSameHashCode(PersistentHashMap.of(vec(kv("one", 1)))
                                             .assoc("two", 2).assoc("three", 3).assoc(null, 4),
-                           PersistentHashMap.of(vec(tup("three", 3))).assoc(null, 4)
+                           PersistentHashMap.of(vec(kv("three", 3))).assoc(null, 4)
                                             .assoc("two", 2).assoc("one", 1),
-                           PersistentHashMap.of(vec(tup("two", 2), tup(null, 4), tup("three", 3),
-                                                    tup("one", 1))),
-                           PersistentHashMap.of(vec(tup(1, "one"), tup(2, "two"), tup(3, "three"),
-                                                    tup(4, null))));
+                           PersistentHashMap.of(vec(kv("two", 2), kv(null, 4), kv("three", 3),
+                                                    kv("one", 1))),
+                           PersistentHashMap.of(vec(kv(1, "one"), kv(2, "two"), kv(3, "three"),
+                                                    kv(4, null))));
     }
 
     public void friendlierArrayEq(Object[] a1, Object[] a2) {
@@ -729,54 +752,59 @@ public class PersistentHashMapTest {
     @Test public void testToString() {
         assertEquals("PersistentHashMap()",
                      PersistentHashMap.empty().toString());
-        assertEquals("PersistentHashMap(Tuple2(1,one))",
-                     PersistentHashMap.of(vec(tup(1, "one"))).toString());
+        assertEquals("PersistentHashMap(kv(1,\"one\"))",
+                     PersistentHashMap.of(vec(kv(1, "one"))).toString());
     }
 
     @Test public void without() {
-        PersistentHashMap<Integer,String> m = PersistentHashMap.of(vec(tup(1, "one")))
+        PersistentHashMap<Integer,String> m = PersistentHashMap.of(vec(kv(1, "one")))
                                                                .assoc(2, "two").assoc(3, "three");
 
         assertEquals(m, m.without(0));
 
-        assertEquals(PersistentHashMap.of(vec(tup(2, "two"))).assoc(3, "three"),
+        assertEquals(PersistentHashMap.of(vec(kv(2, "two"))).assoc(3, "three"),
                      m.without(1));
 
-        assertEquals(PersistentHashMap.of(vec(tup(1, "one"))).assoc(3, "three"),
+        assertEquals(PersistentHashMap.of(vec(kv(1, "one"))).assoc(3, "three"),
                      m.without(2));
 
-        assertEquals(PersistentHashMap.of(vec(tup(1, "one"))).assoc(2, "two"),
+        assertEquals(PersistentHashMap.of(vec(kv(1, "one"))).assoc(2, "two"),
                      m.without(3));
 
         assertEquals(m, m.without(4));
 
-        assertEquals(PersistentHashMap.of(vec(tup(3, "three"))),
+        assertEquals(PersistentHashMap.of(vec(kv(3, "three"))),
                      m.without(1).without(2));
 
-        assertEquals(PersistentHashMap.of(vec(tup(1, "one"))).assoc(3, "three"),
+        assertEquals(PersistentHashMap.of(vec(kv(1, "one"))).assoc(3, "three"),
                                           m.without(2));
 
-        assertEquals(PersistentHashMap.of(vec(tup(1, "one"))).assoc(2, "two"),
+        assertEquals(PersistentHashMap.of(vec(kv(1, "one"))).assoc(2, "two"),
                                           m.without(3));
 
         assertEquals(PersistentHashMap.EMPTY, PersistentHashMap.empty().without(4));
     }
 
     @Test public void without2() {
-        Set<Integer> control = new HashSet<>();
+        HashMap<Integer,String> control = new HashMap<>();
         PersistentHashMap<Integer,String> m = PersistentHashMap.empty();
         int MAX = 20000;
         for (int i = 0; i < MAX; i++) {
-            m = m.assoc(i, ordinal(i));
-            control.add(i);
+            String ord = ordinal(i);
+            m = m.assoc(i, ord);
+            control.put(i, ord);
         }
         assertEquals(control.size(), m.size());
+
+        mapIterTest(control, m.iterator());
+        mapIterTest(control, serializeDeserialize(m).iterator());
+//        mapIterTest(control, serializeDeserialize(m.iterator()));
 
         while (control.size() > 0) {
             assertEquals(control.size(), m.size());
 
             // This yields a somewhat random integer from those that are left.
-            int r = control.iterator().next();
+            int r = control.keySet().iterator().next();
 
             // Make sure we get out what we put in.
             assertEquals(ordinal(r), m.get(r));
@@ -791,7 +819,7 @@ public class PersistentHashMapTest {
     @SuppressWarnings("deprecation")
     @Test public void largerMap() {
         PersistentHashMap<Integer,String> m =
-                PersistentHashMap.of(vec(tup(1, "one")))
+                PersistentHashMap.of(vec(kv(1, "one")))
                                  .assoc(2, "two").assoc(3, "three").assoc(4, "four").assoc(5, "five")
                                  .assoc(6, "six").assoc(7, "seven").assoc(8, "eight").assoc(9, "nine").assoc(10, "ten")
                                  .assoc(11, "eleven").assoc(12, "twelve").assoc(13, "thirteen").assoc(14, "fourteen")
@@ -810,36 +838,63 @@ public class PersistentHashMapTest {
         m = m.assoc(20, "twenty again");
 
 //        System.out.println("m.keySet(): " + m.keySet());
+        PersistentHashMap<Integer,String> ser = serializeDeserialize(m);
 
-        assertEquals(new HashSet<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21)),
+        assertEquals(new HashSet<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+                                                 16, 17, 18, 19, 20, 21)),
                      m.keySet());
 
-        HashSet<String> values = new HashSet<>(Arrays.asList("one again", "two", "three", "four", "five", "six", "seven", "eight",
-                                                         "nine again", "ten again", "eleven again", "twelve", "thirteen",
-                                                         "fourteen",
-                                                         "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty again",
-                                                         "twenty one"));
+        assertEquals(new HashSet<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+                                                 16, 17, 18, 19, 20, 21)),
+                     ser.keySet());
+
+        assertEquals(new HashSet<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+                                                 16, 17, 18, 19, 20, 21)),
+                     serializeDeserialize(m.keySet()));
+
+        HashSet<String> values =
+                new HashSet<>(Arrays.asList("one again", "two", "three", "four", "five", "six",
+                                            "seven", "eight", "nine again", "ten again",
+                                            "eleven again", "twelve", "thirteen", "fourteen",
+                                            "fifteen", "sixteen", "seventeen", "eighteen",
+                                            "nineteen", "twenty again", "twenty one"));
         assertTrue(values.containsAll(m.values()));
         assertTrue(m.values().containsAll(values));
+
+        assertTrue(values.containsAll(ser.values()));
+        assertTrue(ser.values().containsAll(values));
+
+        assertEquals(m, ser);
     }
 
     @Test public void entrySet() {
-        PersistentHashMap<Integer,String> m =
-                PersistentHashMap.of(vec(tup(1, "one")))
+        Map<Integer,String> control = new HashMap<>();
+        control.put(3, "three");
+        control.put(5, "five");
+        control.put(2, "two");
+        control.put(1, "one");
+        control.put(4, "four");
+
+        PersistentHashMap<Integer,String> test =
+                PersistentHashMap.of(vec(kv(1, "one")))
                                  .assoc(2, "two").assoc(3, "three").assoc(4, "four").assoc(5, "five");
-        Set<Map.Entry<Integer,String>> s = new HashSet<>();
-        s.add(Tuple2.of(3, "three"));
-        s.add(Tuple2.of(5, "five"));
-        s.add(Tuple2.of(2, "two"));
-        s.add(Tuple2.of(1, "one"));
-        s.add(Tuple2.of(4, "four"));
-        assertEquals(s, m.entrySet());
+
+        assertEquals(control.entrySet(), test.entrySet());
+        assertEquals(control.entrySet(), serializeDeserialize(test).entrySet());
+        assertEquals(control.entrySet(), serializeDeserialize(test.entrySet()));
+
+        mapIterTest(control, test.iterator());
+        mapIterTest(control, serializeDeserialize(test).iterator());
+
+        mapIterTest(control, test.entrySet().iterator());
+        mapIterTest(control, serializeDeserialize(test).entrySet().iterator());
+        mapIterTest(control, serializeDeserialize(test.entrySet()).iterator());
     }
 
     @SuppressWarnings("deprecation")
     @Test public void values() {
         PersistentHashMap<Integer,String> m =
-                PersistentHashMap.of(vec(tup(4, "four")))
+                PersistentHashMap.of(vec(kv(4, "four")))
                                  .assoc(5, "five").assoc(2, "two").assoc(3, "three").assoc(1, "one");
         Set<String> s = new HashSet<>(Arrays.asList("four", "one", "five", "two", "three"));
 
@@ -874,10 +929,15 @@ public class PersistentHashMapTest {
         assertTrue(s.containsAll(m.values()));
         assertTrue(m.values().containsAll(s));
 
+        PersistentHashMap<Integer,String> ser = serializeDeserialize(m);
+
+        assertTrue(s.containsAll(ser.values()));
+        assertTrue(ser.values().containsAll(s));
+
 // values() takes its hashCode() and equals() implementations from java.lang.Object, so they are
 // both based on memory location instead of contents.
 //        equalsDistinctHashCode(m.values(),
-//                               PersistentHashMap.of(vec(tup(4, "four")))
+//                               PersistentHashMap.of(vec(kv(4, "four")))
 //                                                .assoc(2, "two").assoc(5, "five").assoc(1, "one").assoc(3, "three").values(),
 //                               s,
 //                               new HashSet<>(Arrays.asList("four", "one", "zippy", "two", "three")));
@@ -885,36 +945,37 @@ public class PersistentHashMapTest {
 //        assertTrue(m.values().equals(Arrays.asList("one", "two", "three", "four", "five")));
 
 //        assertNotEquals(0, m.values().hashCode());
-//        assertNotEquals(m.values().hashCode(), PersistentHashMap.of(vec(tup(4, "four")))
+//        assertNotEquals(m.values().hashCode(), PersistentHashMap.of(vec(kv(4, "four")))
 //                                                                .assoc(5, "five").hashCode());
 //        assertEquals(m.values().hashCode(),
-//                     PersistentHashMap.of(vec(tup(4, "four")))
+//                     PersistentHashMap.of(vec(kv(4, "four")))
 //                                      .assoc(2, "two").assoc(5, "five").assoc(1, "one").assoc(3, "three")
 //                                      .values()
 //                                      .hashCode());
 
     }
 
-    public static class Z {
+    public static class Z implements Serializable {
         public final LocalDateTime date;
         public final Integer integer;
         private Z(LocalDateTime d, Integer i) { date = d; integer = i; }
         public static Z of(LocalDateTime d, Integer i) { return new Z(d, i); }
     }
 
-    public static Equator.ComparisonContext<Z> BY_DATE = new Equator.ComparisonContext<Z>() {
-        @Override public int hash(Z z) { return z.date.hashCode(); }
-        @Override public int compare(Z z1, Z z2) { return z1.date.compareTo(z2.date); }
-    };
-
-    public static Equator.ComparisonContext<Z> BY_INT = new Equator.ComparisonContext<Z>() {
-        @Override public int hash(Z z) { return z.integer.hashCode(); }
-        @Override public int compare(Z z1, Z z2) {
-            return (z1.integer > z2.integer) ? 1 :
-                   (z1.integer < z2.integer) ? -1 :
-                    0;
-        }
-    };
+    enum CompCtxt implements ComparisonContext<Z> {
+        BY_DATE {
+            @Override public int hash(Z z) { return z.date.hashCode(); }
+            @Override public int compare(Z z1, Z z2) { return z1.date.compareTo(z2.date); }
+        },
+        BY_INT {
+            @Override public int hash(Z z) { return z.integer.hashCode(); }
+            @Override public int compare(Z z1, Z z2) {
+                return (z1.integer > z2.integer) ? 1 :
+                       (z1.integer < z2.integer) ? -1 :
+                       0;
+            }
+        };
+    }
 
     @Test public void testEquator() {
         Z z1 = Z.of(LocalDateTime.of(2015, 6, 13, 18, 38), 6);
@@ -927,21 +988,41 @@ public class PersistentHashMapTest {
         ImMap<Z,String> a0 = PersistentHashMap.ofEq(BY_DATE, null);
         assertEquals(PersistentHashMap.empty(BY_DATE), a0);
 
-        assertEquals(1, a0.assoc(tup(Z.of(LocalDateTime.of(2015, 6, 13, 18, 38), 6), "one"))
-                          .assoc(tup(Z.of(LocalDateTime.of(2015, 6, 13, 18, 38), 7), "one"))
+        assertEquals(1, a0.assoc(kv(Z.of(LocalDateTime.of(2015, 6, 13, 18, 38), 6), "one"))
+                          .assoc(kv(Z.of(LocalDateTime.of(2015, 6, 13, 18, 38), 7), "one"))
                           .size());
 
-        assertEquals(2, a0.assoc(tup(Z.of(LocalDateTime.of(2015, 6, 13, 18, 38), 6), "one"))
-                          .assoc(tup(Z.of(LocalDateTime.of(2015, 6, 13, 18, 39), 6), "one"))
+        assertEquals(2, a0.assoc(kv(Z.of(LocalDateTime.of(2015, 6, 13, 18, 38), 6), "one"))
+                          .assoc(kv(Z.of(LocalDateTime.of(2015, 6, 13, 18, 39), 6), "one"))
                           .size());
+
+        ImMap<Z,String> s0 = serializeDeserialize(a0);
+
+        assertEquals(1, s0.assoc(kv(Z.of(LocalDateTime.of(2015, 6, 13, 18, 38), 6), "one"))
+                          .assoc(kv(Z.of(LocalDateTime.of(2015, 6, 13, 18, 38), 7), "one"))
+                          .size());
+
+        assertEquals(2, s0.assoc(kv(Z.of(LocalDateTime.of(2015, 6, 13, 18, 38), 6), "one"))
+                          .assoc(kv(Z.of(LocalDateTime.of(2015, 6, 13, 18, 39), 6), "one"))
+                          .size());
+
+        assertEquals(1,
+                     serializeDeserialize(a0.assoc(kv(Z.of(LocalDateTime.of(2015, 6, 13, 18, 38), 6), "one"))
+                                            .assoc(kv(Z.of(LocalDateTime.of(2015, 6, 13, 18, 38), 7), "one")))
+                             .size());
+
+        assertEquals(2,
+                     serializeDeserialize(a0.assoc(kv(Z.of(LocalDateTime.of(2015, 6, 13, 18, 38), 6), "one"))
+                                            .assoc(kv(Z.of(LocalDateTime.of(2015, 6, 13, 18, 39), 6), "one")))
+                             .size());
 
         ImMap<Z,String> a = PersistentHashMap.ofEq(
                 BY_DATE,
-                vec(tup(z1, ordinal(z1.integer)),
-                    tup(z3, ordinal(z3.integer)),
+                vec(kv(z1, ordinal(z1.integer)),
+                    kv(z3, ordinal(z3.integer)),
                     null,
-                    tup(z5, ordinal(z5.integer)),
-                    tup(z6, ordinal(z6.integer))));
+                    kv(z5, ordinal(z5.integer)),
+                    kv(z6, ordinal(z6.integer))));
 
         assertTrue(a.containsKey(z1));
         assertFalse(a.containsKey(z2));
@@ -979,9 +1060,9 @@ public class PersistentHashMapTest {
 
         ImMap<Z,String> b = PersistentHashMap.ofEq(
                 BY_INT,
-                vec(tup(z2, ordinal(z2.integer)),
-                tup(z4, ordinal(z4.integer)),
-                tup(z6, ordinal(z6.integer))));
+                vec(kv(z2, ordinal(z2.integer)),
+                kv(z4, ordinal(z4.integer)),
+                kv(z6, ordinal(z6.integer))));
 
         assertFalse(b.containsKey(z1));
         assertTrue(b.containsKey(z2));
@@ -1011,29 +1092,31 @@ public class PersistentHashMapTest {
 
         b = b.assoc(z3, "added later");
         assertEquals(4, b.size());
-
+        assertEquals(b, serializeDeserialize(b));
     }
 
     @Test public void testImMap10() {
         int max = 10;
         Map<Integer,String> a =
-                map(tup(1, "One"), tup(2, "Two"), tup(3, "Three"), tup(4, "Four"), tup(5, "Five"),
-                    tup(6, "Six"), tup(7, "Seven"), tup(8, "Eight"), tup(9, "Nine"), tup(10, "Ten"));
+                map(kv(1, "One"), kv(2, "Two"), kv(3, "Three"), kv(4, "Four"), kv(5, "Five"),
+                    kv(6, "Six"), kv(7, "Seven"), kv(8, "Eight"), kv(9, "Nine"), kv(10, "Ten"));
         FunctionUtilsTest.mapHelper(a, max);
         Map<Integer,String> b = map(
-                tup(1, "One"), tup(2, "Two"), tup(3, "Three"),
-                tup(4, "Four"), tup(5, "Five"), tup(6, "Six"),
-                tup(7, "Seven"), tup(8, "Eight"), tup(9, "Nine"),
-                tup(10, "Ten"));
+                kv(1, "One"), kv(2, "Two"), kv(3, "Three"),
+                kv(4, "Four"), kv(5, "Five"), kv(6, "Six"),
+                kv(7, "Seven"), kv(8, "Eight"), kv(9, "Nine"),
+                kv(10, "Ten"));
         FunctionUtilsTest.mapHelper(b, max);
 
         Map<Integer,String> c =
                 PersistentHashMap.ofEq(Equator.defaultEquator(),
-                                       vec(tup(1, "One"), tup(2, "Two"), tup(3, "Three"),
-                                           tup(4, "Four"), tup(5, "Five"), tup(6, "Six"),
-                                           tup(7, "Seven"), tup(8, "Eight"), tup(9, "Nine"),
-                                           tup(10, "Ten")));
+                                       vec(kv(1, "One"), kv(2, "Two"), kv(3, "Three"),
+                                           kv(4, "Four"), kv(5, "Five"), kv(6, "Six"),
+                                           kv(7, "Seven"), kv(8, "Eight"), kv(9, "Nine"),
+                                           kv(10, "Ten")));
+
         assertEquals(a, b);
+        assertEquals(a, serializeDeserialize(b));
         assertEquals(b, a);
         assertEquals(a, c);
         assertEquals(c, a);
@@ -1041,15 +1124,15 @@ public class PersistentHashMapTest {
         assertEquals(c, b);
         assertEquals(a.hashCode(), b.hashCode());
         assertEquals(a.hashCode(), c.hashCode());
-        FunctionUtilsTest.mapHelperOdd(vec(tup(1, "One"), null, tup(3, "Three"),
-                                           null, tup(5, "Five"), null,
-                                           tup(7, "Seven"), null, tup(9, "Nine"), null)
+        FunctionUtilsTest.mapHelperOdd(vec(kv(1, "One"), null, kv(3, "Three"),
+                                           null, kv(5, "Five"), null,
+                                           kv(7, "Seven"), null, kv(9, "Nine"), null)
                                                .filter(t -> t != null)
                                                .toImMap(Function1.identity()),
                                        max);
         FunctionUtilsTest.mapHelperEven(
-                vec(null, tup(2, "Two"), null, tup(4, "Four"), null,
-                    tup(6, "Six"), null, tup(8, "Eight"), null, tup(10, "Ten"))
+                vec(null, kv(2, "Two"), null, kv(4, "Four"), null,
+                    kv(6, "Six"), null, kv(8, "Eight"), null, kv(10, "Ten"))
                         .filter(t -> t != null)
                         .toImMap(Function1.identity()), max);
     }
@@ -1060,13 +1143,13 @@ public class PersistentHashMapTest {
         ImMap<Z,String> a0 = PersistentHashMap.of(null);
         assertEquals(PersistentHashMap.EMPTY, a0);
 
-        Map<Integer,String> a = PersistentHashMap.of(vec(tup(1, "One"), tup(2, "Two"), null,
-                                                         tup(3, "Three")));
+        Map<Integer,String> a = PersistentHashMap.of(vec(kv(1, "One"), kv(2, "Two"), null,
+                                                         kv(3, "Three")));
         FunctionUtilsTest.mapHelper(a, max);
-        ImMap<Integer,String> b = map(tup(1, "One"), tup(2, "Two"), tup(3, "Three"));
+        ImMap<Integer,String> b = map(kv(1, "One"), kv(2, "Two"), kv(3, "Three"));
         FunctionUtilsTest.mapHelper(b, max);
         Map<Integer,String> c = PersistentHashMap.ofEq(Equator.defaultEquator(),
-                                                       vec(tup(1, "One"), tup(2, "Two"), tup(3, "Three")));
+                                                       vec(kv(1, "One"), kv(2, "Two"), kv(3, "Three")));
         assertEquals(a, b);
         assertEquals(b, a);
         assertEquals(a, c);
@@ -1075,11 +1158,11 @@ public class PersistentHashMapTest {
         assertEquals(c, b);
         assertEquals(a.hashCode(), b.hashCode());
         assertEquals(a.hashCode(), c.hashCode());
-        FunctionUtilsTest.mapHelperOdd(vec(tup(1, "One"), null, tup(3, "Three"))
+        FunctionUtilsTest.mapHelperOdd(vec(kv(1, "One"), null, kv(3, "Three"))
                                                .filter(t -> t != null)
                                                .toImMap(Function1.identity()),
                                        max);
-        FunctionUtilsTest.mapHelperEven(vec(null, tup(2, "Two"), null)
+        FunctionUtilsTest.mapHelperEven(vec(null, kv(2, "Two"), null)
                                                 .filter(t -> t != null)
                                                 .toImMap(Function1.identity()),
                                         max);
@@ -1087,12 +1170,12 @@ public class PersistentHashMapTest {
 
     @Test public void testImMap1() {
         int max = 1;
-        Map<Integer,String> a = map(tup(1, "One"));
+        Map<Integer,String> a = map(kv(1, "One"));
         FunctionUtilsTest.mapHelper(a, max);
-        Map<Integer,String> b = map(tup(1, "One"));
+        Map<Integer,String> b = map(kv(1, "One"));
         FunctionUtilsTest.mapHelper(b, max);
         Map<Integer,String> c = PersistentHashMap.ofEq(Equator.defaultEquator(),
-                                                       vec(tup(1, "One")));
+                                                       vec(kv(1, "One")));
         assertEquals(a, b);
         assertEquals(b, a);
         assertEquals(a, c);
@@ -1101,7 +1184,7 @@ public class PersistentHashMapTest {
         assertEquals(c, b);
         assertEquals(a.hashCode(), b.hashCode());
         assertEquals(a.hashCode(), c.hashCode());
-        FunctionUtilsTest.mapHelperOdd(map(tup(1, "One")), max);
+        FunctionUtilsTest.mapHelperOdd(map(kv(1, "One")), max);
         FunctionUtilsTest.mapHelperEven(vec((Map.Entry<Integer,String>) null)
                                                 .filter(t -> t != null)
                                                 .toImMap(Function1.identity()),
@@ -1121,7 +1204,7 @@ public class PersistentHashMapTest {
     }
 
     public static class Result<A,B> {
-        List<Tuple2<A,B>> goodies;
+        List<KeyVal<A,B>> goodies;
         List<A> baddies;
         boolean hasNull;
     }
@@ -1132,7 +1215,7 @@ public class PersistentHashMapTest {
 
         assertEquals(result.goodies.size(), m.size());
 
-        for (Tuple2<A,B> t : result.goodies) {
+        for (KeyVal<A,B> t : result.goodies) {
             assertTrue(m.containsKey(t.getKey()));
             assertEquals(t.getValue(), m.get(t.getKey()));
             assertTrue(m.entry(t.getKey()).isSome());
@@ -1146,7 +1229,7 @@ public class PersistentHashMapTest {
         }
 
         int s = m.size();
-        for (Tuple2<A,B> t : result.goodies) {
+        for (KeyVal<A,B> t : result.goodies) {
             --s;
             m = m.without(t.getKey());
             assertFalse(m.containsKey(t.getKey()));
@@ -1156,7 +1239,7 @@ public class PersistentHashMapTest {
         }
         assertEquals(0, m.size());
 
-        for (Tuple2<A,B> t : result.goodies) {
+        for (KeyVal<A,B> t : result.goodies) {
             assertFalse(m.containsKey(t.getKey()));
             assertNull(m.get(t.getKey()));
         }
@@ -1164,33 +1247,33 @@ public class PersistentHashMapTest {
 
     @Test public void testSkipNull() {
         Result<Integer,String> result = new Result<>();
-        result.goodies = Arrays.asList(tup(1, "one"), tup(2, "two"), tup(3, "three"),
-                                       tup(4, "four"));
+        result.goodies = Arrays.asList(kv(1, "one"), kv(2, "two"), kv(3, "three"),
+                                       kv(4, "four"));
         result.baddies = Arrays.asList(0, 5, Integer.MAX_VALUE, Integer.MIN_VALUE, null);
         result.hasNull = false;
 
-        verify(result, vec(tup(1, "one"), null, tup(2, "two"), null,
-                           tup(3, "three"), null, tup(4, "four"))
+        verify(result, vec(kv(1, "one"), null, kv(2, "two"), null,
+                           kv(3, "three"), null, kv(4, "four"))
                 .filter(t -> t != null)
                 .toImMap(Function1.identity()));
 
-        verify(result, vec(null, tup(1, "one"), null, tup(2, "two"),
-                           null, tup(3, "three"), null, tup(4, "four"), null)
+        verify(result, vec(null, kv(1, "one"), null, kv(2, "two"),
+                           null, kv(3, "three"), null, kv(4, "four"), null)
                 .filter(t -> t != null)
                 .toImMap(Function1.identity()));
 
         verify(result, PersistentHashMap.ofEq(
                 Equator.defaultEquator(),
-                vec(null, tup(1, "one"), null, tup(2, "two"), null,
-                    tup(3, "three"), null, tup(4, "four"), null)
+                vec(null, kv(1, "one"), null, kv(2, "two"), null,
+                    kv(3, "three"), null, kv(4, "four"), null)
                         .filter(t -> t != null)
                         .map(t -> (Map.Entry<Integer,String>) t)
                         .toImList()));
 
         verify(result, PersistentHashMap.ofEq(
                 Equator.defaultEquator(),
-                vec(tup(1, "one"), null, tup(2, "two"), null,
-                    tup(3, "three"), null, tup(4, "four"))
+                vec(kv(1, "one"), null, kv(2, "two"), null,
+                    kv(3, "three"), null, kv(4, "four"))
                         .filter(t -> t != null)
                         .map(t -> (Map.Entry<Integer,String>) t)
                         .toImList()));
@@ -1198,21 +1281,21 @@ public class PersistentHashMapTest {
 
     @Test public void withNull() {
         Result<Integer,String> result = new Result<>();
-        result.goodies = Arrays.asList(tup(null, "nada"), tup(2, "two"), tup(1, "one"));
+        result.goodies = Arrays.asList(kv(null, "nada"), kv(2, "two"), kv(1, "one"));
         result.baddies = Arrays.asList(0, 3, Integer.MAX_VALUE, Integer.MIN_VALUE);
         result.hasNull = true;
 
-        verify(result, PersistentHashMap.of(vec(tup(null, "nada"), tup(1, "one"), tup(2, "two"))));
+        verify(result, PersistentHashMap.of(vec(kv(null, "nada"), kv(1, "one"), kv(2, "two"))));
 
 
-        verify(result, PersistentHashMap.of(vec(tup(1, "one"), tup(2, "two"), tup(null, "nada"))));
+        verify(result, PersistentHashMap.of(vec(kv(1, "one"), kv(2, "two"), kv(null, "nada"))));
 
         verify(result, PersistentHashMap.<Integer,String>empty(Equator.defaultEquator())
                 .assoc(1, "one").assoc(null, "nada").assoc(2, "two"));
 
-        PersistentHashMap<Integer,String> h1 = PersistentHashMap.of(vec(tup(null, "nada"),
-                                                                        tup(1, "one"),
-                                                                        tup(2, "two")));
+        PersistentHashMap<Integer,String> h1 = PersistentHashMap.of(vec(kv(null, "nada"),
+                                                                        kv(1, "one"),
+                                                                        kv(2, "two")));
         // associating the same value with an existing null key is a no-op.
         assertTrue(h1 == h1.assoc(null, "nada"));
         assertEquals(h1, h1.assoc(null, "nada"));

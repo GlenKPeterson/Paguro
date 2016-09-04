@@ -1,4 +1,4 @@
-/**
+/*
  *   Copyright (c) Rich Hickey. All rights reserved.
  *   The use and distribution terms for this software are covered by the
  *   Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
@@ -10,15 +10,18 @@
 
 package org.organicdesign.fp.collections;
 
-import org.organicdesign.fp.FunctionUtils;
-import org.organicdesign.fp.Option;
-import org.organicdesign.fp.tuple.Tuple2;
-
+import java.io.IOException;
+import java.io.InvalidObjectException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
+
+import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.Option;
 
 import static org.organicdesign.fp.FunctionUtils.emptyUnmodIterator;
 
@@ -32,9 +35,9 @@ import static org.organicdesign.fp.FunctionUtils.emptyUnmodIterator;
  Any errors are my own (said Rich, but now says Glen 2015-06-06).
 
  This file is a derivative work based on a Clojure collection licensed under the Eclipse Public
- License 1.0 Copyright Rich Hickey
+ License 1.0 Copyright Rich Hickey.  Errors are Glen Peterson's.
  */
-public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
+public class PersistentHashMap<K,V> implements ImMapTrans<K,V>, Serializable {
 
 //    static private <K, V, R> R doKvreduce(Object[] array, Function3<R,K,V,R> f, R init) {
 //        for (int i = 0; i < array.length; i += 2) {
@@ -57,6 +60,34 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         public Object val;
         public Box(Object val) { this.val = val; }
     }
+
+    private static class Iter<K,V> implements UnmodIterator<UnEntry<K,V>> {
+//        , Serializable {
+//        // For serializable.  Make sure to change whenever internal data format changes.
+//        private static final long serialVersionUID = 20160903192900L;
+
+        private boolean seen = false;
+        private final UnmodIterator<UnEntry<K,V>> rootIter;
+        private final V nullValue;
+        private Iter(UnmodIterator<UnEntry<K,V>> ri, V nv) { rootIter = ri; nullValue = nv; }
+
+        @Override public boolean hasNext() {
+            if (!seen) {
+                return true;
+            } else {
+                return rootIter.hasNext();
+            }
+        }
+
+        @Override public UnEntry<K,V> next(){
+            if (!seen) {
+                seen = true;
+                return new KeyVal<>(null, nullValue);
+            } else {
+                return rootIter.next();
+            }
+        }
+    };
 
 //    private static final class Reduced {
 //        Object val;
@@ -116,7 +147,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         TransientHashMap<K,V> map = m.asTransient();
         for (Map.Entry<K,V> entry : es) {
             if (entry != null) {
-                map = map.assoc(entry.getKey(), entry.getValue());
+                map.assoc(entry.getKey(), entry.getValue());
             }
         }
         return map.persistent();
@@ -140,28 +171,80 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         TransientHashMap<K,V> map = m.asTransient();
         for (Map.Entry<K,V> entry : kvPairs) {
             if (entry != null) {
-                map = map.assoc(entry.getKey(), entry.getValue());
+                map.assoc(entry.getKey(), entry.getValue());
             }
         }
         return map.persistent();
     }
 
-    // ========================================= Instance =========================================
+    // ==================================== Instance Variables ====================================
     private final Equator<K> equator;
-    private final int count;
-    private final INode<K,V> root;
+    private final int size;
+    private transient final INode<K,V> root;
     private final boolean hasNull;
     private final V nullValue;
 
-    private PersistentHashMap(Equator<K> eq, int count, INode<K,V> root, boolean hasNull,
+    // ======================================== Constructor ========================================
+    private PersistentHashMap(Equator<K> eq, int sz, INode<K,V> root, boolean hasNull,
                               V nullValue) {
         this.equator = (eq == null) ? Equator.defaultEquator() : eq;
-        this.count = count;
+        this.size = sz;
         this.root = root;
         this.hasNull = hasNull;
         this.nullValue = nullValue;
     }
 
+    // ======================================= Serialization =======================================
+    // This class has a custom serialized form designed to be as small as possible.  It does not
+    // have the same internal structure as an instance of this class.
+
+    // For serializable.  Make sure to change whenever internal data format changes.
+    private static final long serialVersionUID = 20160903192900L;
+
+    // Check out Josh Bloch Item 78, p. 312 for an explanation of what's going on here.
+    private static class SerializationProxy<K,V> implements Serializable {
+        private final Equator<K> equator;
+        private final int size;
+        private transient ImMapTrans<K,V> theMap;
+        SerializationProxy(PersistentHashMap<K,V> phm) {
+            equator = phm.equator;
+            size = phm.size;
+            theMap = phm;
+        }
+
+        // Taken from Josh Bloch Item 75, p. 298
+        private void writeObject(ObjectOutputStream s) throws IOException {
+            s.defaultWriteObject();
+
+            // Write out all elements in the proper order
+            for (UnEntry<K,V> entry : theMap) {
+                s.writeObject(entry.getKey());
+                s.writeObject(entry.getValue());
+            }
+        }
+
+        private static final long serialVersionUID = 20160827174100L;
+
+        @SuppressWarnings("unchecked")
+        private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
+            s.defaultReadObject();
+            theMap = new PersistentHashMap<K,V>(equator, 0, null, false, null).asTransient();
+            for (int i = 0; i < size; i++) {
+                theMap.assoc((K) s.readObject(), (V) s.readObject());
+            }
+        }
+
+        private Object readResolve() { return theMap.persistent(); }
+    }
+
+    private Object writeReplace() { return new SerializationProxy<>(this); }
+
+    private void readObject(java.io.ObjectInputStream in) throws IOException,
+            ClassNotFoundException {
+        throw new InvalidObjectException("Proxy required");
+    }
+
+    // ===================================== Instance Methods =====================================
 //    /** Not sure I like this - could disappear. */
 //    boolean hasNull() { return hasNull; }
 
@@ -171,7 +254,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
     @Override public PersistentHashMap<K,V> assoc(K key, V val) {
         if(key == null) {
             if (hasNull && (val == nullValue)) { return this; }
-            return new PersistentHashMap<>(equator, hasNull ? count : count + 1, root, true, val);
+            return new PersistentHashMap<>(equator, hasNull ? size : size + 1, root, true, val);
         }
         Box addedLeaf = new Box(null);
         INode<K,V> newroot = (root == null ? BitmapIndexedNode.empty(equator) : root);
@@ -179,7 +262,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         if (newroot == root) {
             return this;
         }
-        return new PersistentHashMap<>(equator, addedLeaf.val == null ? count : count + 1, newroot,
+        return new PersistentHashMap<>(equator, addedLeaf.val == null ? size : size + 1, newroot,
                                        hasNull, nullValue);
     }
 
@@ -189,7 +272,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 
     @Override public Option<UnmodMap.UnEntry<K,V>> entry(K key) {
         if (key == null) {
-            return hasNull ? Option.of(Tuple2.of(null, nullValue)) : Option.none();
+            return hasNull ? Option.of(new KeyVal<>(null, nullValue)) : Option.none();
         }
         if (root == null) {
             return Option.none();
@@ -214,7 +297,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         if (that.size() != size()) { return false; }
 
         try {
-            for (Entry<K,V> e : entrySet()) {
+            for (Entry<K,V> e : this) {
                 K key = e.getKey();
                 V value = e.getValue();
                 if (value == null) {
@@ -238,33 +321,12 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 
     @Override public int hashCode() { return UnmodIterable.hashCode(this); }
 
-    // This is cut and pasted exactly to the Transient version of this class below.
+    // This identical to the Transient version of this class below.
     @Override public UnmodIterator<UnEntry<K,V>> iterator() {
         final UnmodIterator<UnEntry<K,V>> rootIter = (root == null) ? emptyUnmodIterator()
                                                                     : root.iterator();
-        if (hasNull) {
-            return new UnmodIterator<UnEntry<K,V>>() {
-                private boolean seen = false;
-                @Override public boolean hasNext() {
-                    if (!seen) {
-                        return true;
-                    } else {
-                        return rootIter.hasNext();
-                    }
-                }
-
-                @Override public UnEntry<K,V> next(){
-                    if (!seen) {
-                        seen = true;
-                        return Tuple2.of(null, nullValue);
-                    } else {
-                        return rootIter.next();
-                    }
-                }
-            };
-        } else {
-            return rootIter;
-        }
+        return (hasNull) ? new Iter<>(rootIter, nullValue)
+                         : rootIter;
     }
 
     @Override public final PersistentHashMap<K,V> persistent() { return this; }
@@ -306,7 +368,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 //    }
 
     /** {@inheritDoc} */
-    @Override public int size() { return count; }
+    @Override public int size() { return size; }
 
     /** {@inheritDoc} */
     @Override public String toString() { return UnmodIterable.toString("PersistentHashMap", this); }
@@ -314,13 +376,13 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
     @SuppressWarnings("unchecked")
     @Override public PersistentHashMap<K,V> without(K key){
         if(key == null)
-            return hasNull ? new PersistentHashMap<>(equator, count - 1, root, false, null) : this;
+            return hasNull ? new PersistentHashMap<>(equator, size - 1, root, false, null) : this;
         if(root == null)
             return this;
         INode<K,V> newroot = root.without(0, equator.hash(key), key);
         if(newroot == root)
             return this;
-        return new PersistentHashMap<>(equator, count - 1, newroot, hasNull, nullValue);
+        return new PersistentHashMap<>(equator, size - 1, newroot, hasNull, nullValue);
     }
 
     static final class TransientHashMap<K,V> implements ImMapTrans<K,V> {
@@ -333,7 +395,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         private final Box leafFlag = new Box(null);
 
         TransientHashMap(PersistentHashMap<K,V> m) {
-            this(m.equator(), new AtomicReference<>(Thread.currentThread()), m.root, m.count,
+            this(m.equator(), new AtomicReference<>(Thread.currentThread()), m.root, m.size,
                  m.hasNull, m.nullValue);
         }
 
@@ -375,7 +437,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         @Override public Option<UnEntry<K,V>> entry(K key) {
             ensureEditable();
             if (key == null) {
-                return hasNull ? Option.of(Tuple2.of(null, nullValue)) : Option.none();
+                return hasNull ? Option.of(new KeyVal<>(null, nullValue)) : Option.none();
             }
             if (root == null) {
                 return Option.none();
@@ -391,33 +453,12 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 //            return hasNull ? s.prepend((UnEntry<K,V>) Tuple2.of((K) null, nullValue)) : s;
 //        }
 
-        // This is an exact cut-and paste of the Persistent version of this class above.
+        // This is a duplicate of the same method in the Persistent version of this class above.
         @Override public UnmodIterator<UnEntry<K,V>> iterator() {
             final UnmodIterator<UnEntry<K,V>> rootIter = (root == null) ? emptyUnmodIterator()
                                                                         : root.iterator();
-            if (hasNull) {
-                return new UnmodIterator<UnEntry<K,V>>() {
-                    private boolean seen = false;
-                    @Override public boolean hasNext() {
-                        if (!seen) {
-                            return true;
-                        } else {
-                            return rootIter.hasNext();
-                        }
-                    }
-
-                    @Override public UnEntry<K,V> next(){
-                        if (!seen) {
-                            seen = true;
-                            return Tuple2.of(null, nullValue);
-                        } else {
-                            return rootIter.next();
-                        }
-                    }
-                };
-            } else {
-                return rootIter;
-            }
+            return (hasNull) ? new Iter<>(rootIter, nullValue)
+                             : rootIter;
         }
 
         @Override public final TransientHashMap<K,V> without(K key) {
@@ -456,7 +497,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         }
     }
 
-    private interface INode<K,V> extends Serializable {
+    private interface INode<K,V> {
         INode<K,V> assoc(int shift, int hash, K key, V val, Box addedLeaf);
 
         INode<K,V> without(int shift, int hash, K key);
@@ -482,7 +523,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         UnmodIterator<UnEntry<K,V>> iterator();
     }
 
-    final static class ArrayNode<K,V> implements INode<K,V>, UnmodIterable<UnEntry<K,V>> {
+    private final static class ArrayNode<K,V> implements INode<K,V>, UnmodIterable<UnEntry<K,V>> {
         private final Equator<K> equator;
         int count;
         final INode<K,V>[] array;
@@ -678,7 +719,11 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
             return UnmodIterable.toString("ArrayNode", this);
         }
 
-        static class Iter<K,V> implements UnmodIterator<UnEntry<K,V>> {
+        private static class Iter<K,V> implements UnmodIterator<UnEntry<K,V>> {
+//            , Serializable {
+//            // For serializable.  Make sure to change whenever internal data format changes.
+//            private static final long serialVersionUID = 20160903192900L;
+
             private final INode<K,V>[] array;
             private int i = 0;
             private UnmodIterator<UnEntry<K,V>> nestedIter;
@@ -718,7 +763,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
     } // end class ArrayNode<K,V>
 
     @SuppressWarnings("unchecked")
-    final static class BitmapIndexedNode<K,V> implements INode<K,V> {
+    private final static class BitmapIndexedNode<K,V> implements INode<K,V> {
 //        static final BitmapIndexedNode EMPTY = new BitmapIndexedNode(null, 0, new Object[0]);
 
         static final <K,V> BitmapIndexedNode<K,V> empty(Equator<K> e) {
@@ -835,7 +880,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
             if(keyOrNull == null)
                 return ((INode) valOrNode).find(shift + 5, hash, key);
             if(equator.eq(key, keyOrNull))
-                return Tuple2.of(keyOrNull, (V) valOrNode);
+                return new KeyVal<>(keyOrNull, (V) valOrNode);
             return null;
         }
 
@@ -1002,7 +1047,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         }
     }
 
-    final static class HashCollisionNode<K,V> implements INode<K,V>{
+    private final static class HashCollisionNode<K,V> implements INode<K,V>{
         private final Equator<K> equator;
         final int hash;
         int count;
@@ -1055,7 +1100,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
             if(idx < 0)
                 return null;
             if(equator.eq(key, k(array, idx)))
-                return Tuple2.of(k(array, idx), v(array, idx + 1));
+                return new KeyVal<>(k(array, idx), v(array, idx + 1));
             return null;
         }
 
@@ -1202,7 +1247,7 @@ public static void main(String[] args){
             map = map.without(words.get(rand.nextInt(words.size() / 2)));
             }
         long estimatedTime = System.nanoTime() - startTime;
-        System.out.println("count = " + map.count() + ", time: " + estimatedTime / 1000000);
+        System.out.println("size = " + map.size() + ", time: " + estimatedTime / 1000000);
 
         System.out.println("Building ht");
         startTime = System.nanoTime();
@@ -1216,7 +1261,7 @@ public static void main(String[] args){
             ht.remove(words.get(rand.nextInt(words.size() / 2)));
             }
         estimatedTime = System.nanoTime() - startTime;
-        System.out.println("count = " + ht.size() + ", time: " + estimatedTime / 1000000);
+        System.out.println("size = " + ht.size() + ", time: " + estimatedTime / 1000000);
 
         System.out.println("map lookup");
         startTime = System.nanoTime();
@@ -1313,21 +1358,23 @@ public static void main(String[] args){
         return 1 << mask(hash, shift);
     }
 
-    static final class NodeIter<K,V> implements UnmodIterator<UnEntry<K,V>> {
-        private static final UnEntry ABSENCE = new UnEntry() {
-            @Override public Object getKey() {
-                throw new UnsupportedOperationException("This class is a sentinel value.  If you" +
-                                                        " can see this, something is terribly" +
-                                                        " wrong.");
-            }
-            @Override public Object getValue() {
-                throw new UnsupportedOperationException("This class is a sentinel value.  If you" +
-                                                        " can see this, something is terribly" +
-                                                        " wrong.");
-            }
-        };
+    private static final class NodeIter<K,V> implements UnmodIterator<UnEntry<K,V>> {
+//        , Serializable {
+//        // For serializable.  Make sure to change whenever internal data format changes.
+//        private static final long serialVersionUID = 20160903192900L;
+
+        enum Absent implements UnEntry {
+            ENTRY {
+                @Override public Object getKey() {
+                    throw new UnsupportedOperationException("Should be Unreachable.");
+                }
+                @Override public Object getValue() {
+                    throw new UnsupportedOperationException("Should be Unreachable.");
+                }
+            };
+        }
         @SuppressWarnings("unchecked")
-        private static <K,V> UnEntry<K,V> absence() { return (UnEntry<K,V>) ABSENCE; }
+        private static <K,V> UnEntry<K,V> absence() { return (UnEntry<K,V>) Absent.ENTRY; }
 
         final Object[] array;
         private int mutableIndex = 0;
@@ -1358,7 +1405,7 @@ public static void main(String[] args){
                 int i = mutableIndex;
                 mutableIndex = i + 2;
                 if (array[i] != null) {
-                    nextEntry = Tuple2.of(k(array, i), v(array, i+1));
+                    nextEntry = new KeyVal<>(k(array, i), v(array, i + 1));
                     return true;
                 } else {
                     INode<K,V> node = iNode(array, i + 1);
@@ -1375,7 +1422,7 @@ public static void main(String[] args){
         }
 
         @Override public boolean hasNext(){
-            if (nextEntry != ABSENCE || nextIter != null) {
+            if (nextEntry != Absent.ENTRY || nextIter != null) {
                 return true;
             }
             return advance();
@@ -1383,7 +1430,7 @@ public static void main(String[] args){
 
         @Override public UnEntry<K,V> next(){
             UnEntry<K,V> ret = nextEntry;
-            if(ret != ABSENCE) {
+            if(ret != Absent.ENTRY) {
                 nextEntry = absence();
                 return ret;
             } else if(nextIter != null) {

@@ -14,24 +14,26 @@
 
 package org.organicdesign.fp.collections;
 
-import org.junit.Test;
-import org.organicdesign.fp.FunctionUtils;
-import org.organicdesign.fp.tuple.Tuple2;
-
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.junit.Test;
+import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.TestUtilities;
+
 import static org.junit.Assert.*;
+import static org.organicdesign.fp.StaticImports.kv;
+import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class UnmodMapTest {
-    static class TestMap<K,V> implements UnmodMap<K,V> {
+    static class TestMap<K,V> implements UnmodMap<K,V>, Serializable {
         private final Map<K,V> inner;
 
         TestMap(Iterable<Entry<K,V>> items) {
@@ -42,15 +44,7 @@ public class UnmodMapTest {
         }
 
         @Override public UnmodIterator<UnEntry<K,V>> iterator() {
-            Iterator<Entry<K,V>> iter = inner.entrySet().iterator();
-            return new UnmodIterator<UnEntry<K,V>>() {
-                @Override public boolean hasNext() { return iter.hasNext(); }
-
-                @Override public UnEntry<K,V> next() {
-                    Entry<K,V> next = iter.next();
-                    return Tuple2.of(next.getKey(), next.getValue());
-                }
-            };
+            return UnmodMap.UnEntry.entryIterToUnEntryUnIter(inner.entrySet().iterator());
         }
 
         @Override public int size() { return inner.size(); }
@@ -61,9 +55,9 @@ public class UnmodMapTest {
     }
 
     TestMap<String,Integer> unMap = new TestMap<>(Arrays.asList(
-            Tuple2.of("a", 1),
-            Tuple2.of("b", 2),
-            Tuple2.of("c", 3)));
+            kv("a", 1),
+            kv("b", 2),
+            kv("c", 3)));
 
     @Test public void containsValue() {
         Map<String,Integer> mm = new HashMap<>();
@@ -154,7 +148,10 @@ public class UnmodMapTest {
         assertTrue(refEntSet.contains(clemKey));
         assertTrue(testEntSet.contains(clemKey));
 
-        UnmodListTest.iteratorTest(refEntSet.iterator(), testEntSet.iterator());
+        TestUtilities.iteratorTest(refEntSet.iterator(), testEntSet.iterator());
+
+        TestUtilities.iteratorTest(refEntSet.iterator(),
+                                   serializeDeserialize(testEntSet).iterator());
 
         equalsDistinctHashCode(testEntSet, refEntSet, testMap.entrySet(), uneqMap.entrySet());
 
@@ -178,7 +175,10 @@ public class UnmodMapTest {
         assertTrue(refKeySet.contains(clemKey.getKey()));
         assertTrue(testKeySet.contains(clemKey.getKey()));
 
-        UnmodListTest.iteratorTest(refKeySet.iterator(), testKeySet.iterator());
+        TestUtilities.iteratorTest(refKeySet.iterator(), testKeySet.iterator());
+
+        TestUtilities.iteratorTest(refKeySet.iterator(),
+                                   serializeDeserialize(testKeySet).iterator());
 
         equalsDistinctHashCode(testKeySet, refKeySet, testMap.keySet(), uneqMap.keySet());
 
@@ -203,7 +203,7 @@ public class UnmodMapTest {
         assertTrue(refValues.contains(clemKey.getValue()));
         assertTrue(testValues.contains(clemKey.getValue()));
 
-        UnmodListTest.iteratorTest(refValues.iterator(), testValues.iterator());
+        TestUtilities.iteratorTest(refValues.iterator(), testValues.iterator());
 
 //        System.out.println("uneqMap.values(): " + uneqMap.values());
 //        System.out.println("uneqMap.values() class: " + uneqMap.values().getClass().getCanonicalName());
@@ -310,7 +310,7 @@ public class UnmodMapTest {
     }
 
     static Map.Entry<String,Integer> me = new TestEntry<>("Hello", 37);
-    static UnmodMap.UnEntry<String,Integer> ue = UnmodMap.UnEntry.entryToUnEntry(me);
+    static UnmodMap.UnEntry<String,Integer> ue = KeyVal.of(me);
 
     @Test public void unEntryTest() {
 
@@ -332,7 +332,7 @@ public class UnmodMapTest {
         map.put("bee", 88);
         map.put("caterpillar", 77);
 
-        UnmodListTest.iteratorTest(map.entrySet().iterator(),
+        TestUtilities.iteratorTest(map.entrySet().iterator(),
                                    UnmodMap.UnEntry.entryIterToUnEntryUnIter(map.entrySet()
                                                                                 .iterator()));
     }

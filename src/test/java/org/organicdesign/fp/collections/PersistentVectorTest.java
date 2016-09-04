@@ -14,12 +14,6 @@
 
 package org.organicdesign.fp.collections;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import org.organicdesign.fp.FunctionUtils;
-
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,8 +22,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.TestUtilities;
+
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.vec;
+import static org.organicdesign.fp.TestUtilities.compareIterators;
+import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 @RunWith(JUnit4.class)
@@ -57,7 +60,7 @@ public class PersistentVectorTest {
     }
 
     @Test public void emptyListIterator() {
-        UnmodListTest.listIteratorTest(Collections.emptyList(), PersistentVector.empty());
+        TestUtilities.listIteratorTest(Collections.emptyList(), PersistentVector.empty());
     }
 
     @Test(expected = IndexOutOfBoundsException.class)
@@ -182,7 +185,7 @@ public class PersistentVectorTest {
         PersistentVector.ofIter(Collections.unmodifiableList(oneList)).get(Integer.MAX_VALUE); }
 
     @Test public void addSeveralItems() throws NoSuchAlgorithmException {
-        System.out.println("addSeveral start");
+//        System.out.println("addSeveral start");
         final int SEVERAL = 100; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
         PersistentVector<Integer> is = PersistentVector.empty();
         for (int j = 0; j < SEVERAL; j++){
@@ -192,6 +195,32 @@ public class PersistentVectorTest {
         for (int j = 0; j < SEVERAL; j++){
             assertEquals(Integer.valueOf(j), is.get(j));
         }
+    }
+
+    @Test public void serializationTest() throws Exception {
+        ImList<Integer> empty1 = serializeDeserialize(PersistentVector.empty());
+        ImList<Integer> empty2 = PersistentVector.ofIter(Collections.emptyList());
+        ImList<Integer> empty3 = PersistentVector.ofIter(new ArrayList<>());
+        ImList<Integer> empty4 = vec();
+
+        equalsDistinctHashCode(empty1, empty2, empty3,
+                               vec(1));
+
+        equalsDistinctHashCode(empty2, empty3, empty4,
+                               vec((Integer) null));
+
+        System.out.println("addSeveral start");
+        final int SEVERAL = 100; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
+        PersistentVector<Integer> is = PersistentVector.empty();
+        for (int j = 0; j < SEVERAL; j++){
+            is = is.append(j);
+        }
+        PersistentVector<Integer> pv = serializeDeserialize(is);
+        assertEquals(SEVERAL, pv.size());
+        for (int j = 0; j < SEVERAL; j++){
+            assertEquals(Integer.valueOf(j), pv.get(j));
+        }
+
     }
 
     @Test
@@ -334,18 +363,29 @@ public class PersistentVectorTest {
     }
 
     @Test public void listIterator() {
-        PersistentVector<Integer> pv2 = PersistentVector.empty();
-        int len = 99;
-        Integer[] test = new Integer[len];
+        List<Integer> control = new ArrayList<>();
+        PersistentVector<Integer> test = PersistentVector.empty();
+        final int SOME = 200;
 
-        for (int i = 0; i < len; i++) {
-            pv2 = pv2.append(len - i);
-            test[i] = len - i;
+        for (int i = 0; i < SOME; i++) {
+            control.add(i);
+            test = test.append(i);
+            assertEquals(control.size(), test.size());
         }
-        assertArrayEquals(test, pv2.toArray());
 
-        List<Integer> tList = Arrays.asList(test);
-        UnmodListTest.listIteratorTest(tList, pv2);
+        PersistentVector<Integer> serTest = serializeDeserialize(test);
+
+        for (int i = 0; i < SOME; i++) {
+            assertEquals(control.get(i), test.get(i));
+            assertEquals(control.get(i), serTest.get(i));
+        }
+
+        compareIterators(control.iterator(), test.iterator());
+        compareIterators(control.iterator(), serTest.iterator());
+        assertArrayEquals(control.toArray(), test.toArray());
+
+        TestUtilities.listIteratorTest(control, test);
+        TestUtilities.listIteratorTest(control, serTest);
     }
 
     @Test public void testConcat() throws Exception {
@@ -356,4 +396,55 @@ public class PersistentVectorTest {
                                                            "6th")),
                      pv);
     }
+
+    @Test public void testTransient() {
+        List<Integer> control = new ArrayList<>();
+        ImListTrans<Integer> test = PersistentVector.<Integer>empty().asTransient();
+        final int SEVERAL = 2000; // more than 1024 so 3 levels deep.
+        for (int i = 0; i < SEVERAL; i++) {
+            control.add(i);
+            test.append(i);
+            assertEquals(control.size(), test.size());
+        }
+
+        for (int i = 0; i < SEVERAL; i++) {
+            assertEquals(control.get(i), test.get(i));
+        }
+
+        for (int i = 0; i < SEVERAL; i++) {
+            control.set(i, i + 10);
+            test.replace(i, i + 10);
+            assertEquals(control.size(), test.size());
+        }
+
+        for (int i = 0; i < SEVERAL; i++) {
+            assertEquals(control.get(i), test.get(i));
+        }
+    }
+
+    @Test public void testAddReplace() {
+        List<Integer> control = new ArrayList<>();
+        ImList<Integer> test = PersistentVector.empty();
+        final int SEVERAL = 2000; // more than 1024 so 3 levels deep.
+        for (int i = 0; i < SEVERAL; i++) {
+            control.add(i);
+            test = test.append(i);
+            assertEquals(control.size(), test.size());
+        }
+
+        for (int i = 0; i < SEVERAL; i++) {
+            assertEquals(control.get(i), test.get(i));
+        }
+
+        for (int i = 0; i < SEVERAL; i++) {
+            control.set(i, i + 10);
+            test = test.replace(i, i + 10);
+            assertEquals(control.size(), test.size());
+        }
+
+        for (int i = 0; i < SEVERAL; i++) {
+            assertEquals(control.get(i), test.get(i));
+        }
+    }
+
 }

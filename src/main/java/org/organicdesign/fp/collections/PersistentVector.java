@@ -11,16 +11,19 @@
 /* rich Jul 5, 2007 */
 package org.organicdesign.fp.collections;
 
-import org.organicdesign.fp.xform.Transformable;
-
+import java.io.IOException;
+import java.io.InvalidObjectException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
 
-// TODO: http://functionaljava.googlecode.com/svn/artifacts/2.21/javadoc/fj/data/Seq.html
-// TODO: https://sourcegraph.com/github.com/functionaljava/functionaljava@627d9dfa6725bcb301361477fcbc50c6efe77f61/.tree/core/src/main/java/fj/data/Seq.java
-// TODO: Theoretically even better? https://github.com/clojure/core.rrb-vector/blob/master/src/main/clojure/clojure/core/rrb_vector.clj
+import org.organicdesign.fp.xform.Transformable;
+
+// Consider replacing with RRB-Tree
+// https://github.com/clojure/core.rrb-vector/blob/master/src/main/clojure/clojure/core/rrb_vector.clj
 
 /**
  This started out as Rich Hickey's PersistentVector class from Clojure in late 2014.  Glen added
@@ -33,26 +36,20 @@ import java.util.concurrent.atomic.AtomicReference;
  @author Rich Hickey (Primary author)
  @author Glen Peterson (Java-centric editor)
  */
-public class PersistentVector<E> implements ImList<E> {
+public class PersistentVector<E> implements ImListTrans<E>, Serializable {
 
     // There's bit shifting going on here because it's a very fast operation.
     // Shifting right by 5 is aeons faster than dividing by 32.
     private static final int NODE_LENGTH_POW_2 = 5;
-    private static final int MAX_NODE_LENGTH = 1 << NODE_LENGTH_POW_2;// 0b00000000000000000000000000100000 = 0x20 = 32
-//    private static final int HIGH_BITS = -MAX_NODE_LENGTH;            // 0b11111111111111111111111111100000
-    private static final int LOW_BITS = MAX_NODE_LENGTH - 1;          // 0b00000000000000000000000000011111 = 0x1f
 
-    /**
-     This allows us to perform a mutable transform without making the mutable vector visible.
-     It's a performance optimization for Transformable.toImList() which made a roughly 5x
-     performance improvement across the board!
-     @param trans the transformable to foldLeft internally using a MutableVector.
-     @return the collected ImList
-     */
-    public static <T> ImList<T> fromXform(Transformable<T> trans) {
-        return trans.foldLeft(emptyTransientVector(),
-                              MutableVector<T>::append).persistent();
-    }
+    // 0b00000000000000000000000000100000 = 0x20 = 32
+    private static final int MAX_NODE_LENGTH = 1 << NODE_LENGTH_POW_2;
+    // 0b00000000000000000000000000011111 = 0x1f
+    private static final int LOW_BITS = MAX_NODE_LENGTH - 1;
+
+    /** Use {@link org.organicdesign.fp.xform.Transformable#toImList()} instead. */
+    @Deprecated
+    public static <T> ImList<T> fromXform(Transformable<T> trans) { return trans.toImList(); }
 
     // Java shift operator review:
     // The signed left shift operator "<<" shifts a bit pattern to the left, and
@@ -68,18 +65,18 @@ public class PersistentVector<E> implements ImList<E> {
     //
     // The bitwise | operator performs a bitwise inclusive OR operation
 
-    private static class Node implements Serializable {
+    private static class Node {
         // Every node in a Vector (Transient or Persistent) shares a single atomic reference value.
-        // I'm not sure why this is on the node instead of on the vector.  You know, if we do that, we don't need this
-        // class at all and could just use arrays instead.
+        // I'm not sure why this is on the node instead of on the vector.  You know, if we do that,
+        // we don't need this class at all and could just use arrays instead.
         transient public final AtomicReference<Thread> edit;
 
-        // This is either the data in the node (for a leaf node), or it's pointers to sub-nodes (for a branch node).
-        // We could probably have two separate classes: NodeLeaf and NodeBranch where NodeLeaf has T[] and NodeBranch
-        // has Node<T>[].
+        // This is either the data in the node (for a leaf node), or it's pointers to sub-nodes (for
+        // a branch node).  We could probably have two separate classes: NodeLeaf and NodeBranch
+        // where NodeLeaf has T[] and NodeBranch has Node<T>[].
         public final Object[] array;
 
-        public Node(AtomicReference<Thread> edit, Object[] array) {
+        Node(AtomicReference<Thread> edit, Object[] array) {
             this.edit = edit;
             this.array = array;
         }
@@ -101,34 +98,14 @@ public class PersistentVector<E> implements ImList<E> {
     @SuppressWarnings("unchecked")
     public static final <T> PersistentVector<T> empty() { return (PersistentVector<T>) EMPTY; }
 
-    // We could make this public someday.
-    @SuppressWarnings("unchecked")
-    private static final <T> MutableVector<T> emptyTransientVector() {
-        return (MutableVector<T>) EMPTY.asTransient();
-    }
-
-    // The number of items in this Vector.
-    private final int size;
-    private final int shift;
-    private final Node root;
-    private final E[] tail;
-
-    /** Constructor */
-    private PersistentVector(int z, int shift, Node root, E[] tail) {
-        size = z;
-        this.shift = shift;
-        this.root = root;
-        this.tail = tail;
-    }
-
     /**
      Public static factory method to create a vector from an Iterable.  A varargs version of this
      method is: {@link org.organicdesign.fp.StaticImports#vec(Object...)}.
      */
     static public <T> PersistentVector<T> ofIter(Iterable<T> items) {
-        MutableVector<T> ret = emptyTransientVector();
+        TransientVector<T> ret = emptyTransientVector();
         for (T item : items) {
-            ret = ret.append(item);
+            ret.append(item);
         }
         return ret.persistent();
     }
@@ -136,7 +113,7 @@ public class PersistentVector<E> implements ImList<E> {
 //    /** Public static factory method. */
 //    @SafeVarargs
 //    static public <T> PersistentVector<T> of(T... items) {
-//        MutableVector<T> ret = emptyTransientVector();
+//        TransientVector<T> ret = emptyTransientVector();
 //        for (T item : items) {
 //            ret = ret.append(item);
 //        }
@@ -155,17 +132,91 @@ public class PersistentVector<E> implements ImList<E> {
 //        return ret;
 //    }
 
+    // We could make this public someday.
+    @SuppressWarnings("unchecked")
+    private static final <T> TransientVector<T> emptyTransientVector() {
+        return (TransientVector<T>) EMPTY.asTransient();
+    }
+
+    // ==================================== Instance Variables ====================================
+    // The number of items in this Vector.
+    private final int size;
+    private final int shift;
+    private final Node root;
+    private final E[] tail;
+
+    // ======================================= Constructor =======================================
+    /** Constructor */
+    private PersistentVector(int z, int shift, Node root, E[] tail) {
+        size = z;
+        this.shift = shift;
+        this.root = root;
+        this.tail = tail;
+    }
+
+    // ======================================= Serialization =======================================
+    // This class has a custom serialized form designed to be as small as possible.  It does not
+    // have the same internal structure as an instance of this class.
+
+    // For serializable.  Make sure to change whenever internal data format changes.
+    private static final long serialVersionUID = 20160904160500L;
+
+    // Check out Josh Bloch Item 78, p. 312 for an explanation of what's going on here.
+    private static class SerializationProxy<E> implements Serializable {
+        // For serializable.  Make sure to change whenever internal data format changes.
+        private static final long serialVersionUID = 20160904155600L;
+
+        private final int size;
+        private transient ImListTrans<E> vector;
+        SerializationProxy(ImListTrans<E> v) {
+            size = v.size();
+            vector = v;
+        }
+
+        // Taken from Josh Bloch Item 75, p. 298
+        private void writeObject(ObjectOutputStream s) throws IOException {
+            s.defaultWriteObject();
+            // Write out all elements in the proper order
+            for (E entry : vector) {
+                s.writeObject(entry);
+            }
+        }
+
+        @SuppressWarnings("unchecked")
+        private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
+            s.defaultReadObject();
+            vector = emptyTransientVector();
+            for (int i = 0; i < size; i++) {
+                vector.append((E) s.readObject());
+            }
+        }
+
+        private Object readResolve() { return vector.persistent(); }
+    }
+
+    private Object writeReplace() { return new SerializationProxy<>(this); }
+
+    private void readObject(java.io.ObjectInputStream in) throws IOException,
+            ClassNotFoundException {
+        throw new InvalidObjectException("Proxy required");
+    }
+
+    // ===================================== Instance Methods =====================================
+
     // IEditableCollection has this return ITransientCollection<E>,
     // not TransientVector<E> as this originally returned.
 //    @Override
     // We could make this public some day, maybe.
-    private MutableVector<E> asTransient() { return new MutableVector<>(this); }
+    public ImListTrans<E> asTransient() { return new TransientVector<>(this); }
+
+    @Override public ImListTrans<E> persistent() { return this; }
 
     // Returns the high (gt 5) bits of the index of the last item.
     // I think this is the index of the start of the last array in the tree.
     final private int tailoff() {
         // ((size - 1) / 32) * 32
-        // (Size - 1) is an index into an array because size starts counting from 1 and array indicies start from 0.
+        // (Size - 1) is an index into an array because size starts counting from 1 and array
+        //            indices start from 0.
         // /32 *32 zeroes out the low 5 bits.
         return (size < MAX_NODE_LENGTH)
                 ? 0
@@ -175,11 +226,11 @@ public class PersistentVector<E> implements ImList<E> {
 
     /** Returns the array (of type E) from the leaf node indicated by the given index. */
     @SuppressWarnings("unchecked")
-    E[] leafNodeArrayFor(int i) {
-        // i is the index into this vector.  Each 5 bits represent an index into an array.
-        // The highest 5 bits (that are less than the shift value) are the index into the top-level array.
-        // The lowest 5 bits index the the leaf.  The guts of this method indexes into the array at each level,
-        // finally indexing into the leaf node.
+    private E[] leafNodeArrayFor(int i) {
+        // i is the index into this vector.  Each 5 bits represent an index into an array.  The
+        // highest 5 bits (that are less than the shift value) are the index into the top-level
+        // array. The lowest 5 bits index the the leaf.  The guts of this method indexes into the
+        // array at each level, finally indexing into the leaf node.
 
         if (i >= 0 && i < size) {
             if (i >= tailoff()) {
@@ -260,11 +311,11 @@ public class PersistentVector<E> implements ImList<E> {
      * @return a new PersistentVector with the additional items at the end.
      */
     @Override public PersistentVector<E> concat(Iterable<? extends E> items) {
-        MutableVector<E> result = this.asTransient();
+        ImListTrans<E> result = this.asTransient();
         for (E e : items) {
             result = result.append(e);
         }
-        return result.persistent();
+        return (PersistentVector<E>) result.persistent();
     }
 
     private Node pushTail(int level, Node parent, Node tailnode) {
@@ -439,7 +490,7 @@ public class PersistentVector<E> implements ImList<E> {
 //        }
 //    }
 
-    /** This is correct, but O(n).  This implementation is compatible with java.util.AbstractList. */
+    /** This is correct, but O(n). This implementation is compatible with java.util.AbstractList. */
     @Override public int hashCode() {
         int ret = 1;
         for (E item : this) {
@@ -458,14 +509,12 @@ public class PersistentVector<E> implements ImList<E> {
     @Override public boolean equals(Object other) {
         if (this == other) { return true; }
         if ( !(other instanceof List) ) { return false; }
-        List that = (List) other;
+        List<?> that = (List) other;
         return (this.size() == that.size()) &&
                 UnmodSortedIterable.equals(this, UnmodSortedIterable.castFromList(that));
     }
 
-    @Override public String toString() {
-        return UnmodIterable.toString("PersistentVector", this);
-    }
+    @Override public String toString() { return UnmodIterable.toString("PersistentVector", this); }
 
     private static Node doAssoc(int level, Node node, int i, Object val) {
         Node ret = new Node(node.edit, node.array.clone());
@@ -473,7 +522,9 @@ public class PersistentVector<E> implements ImList<E> {
             ret.array[i & LOW_BITS] = val;
         } else {
             int subidx = (i >>> level) & LOW_BITS;
-            ret.array[subidx] = doAssoc(level - NODE_LENGTH_POW_2, (Node) node.array[subidx], i, val);
+            ret.array[subidx] = doAssoc(level - NODE_LENGTH_POW_2,
+                                        (Node) node.array[subidx],
+                                        i, val);
         }
         return ret;
     }
@@ -493,13 +544,13 @@ public class PersistentVector<E> implements ImList<E> {
 //    }
 //
 //    /**
-//     * This is an early exit indicator for reduce operations.  Return one of these when you want the reduction to end.
-//     * It uses types, but not in a "traditional" way.
+//     * This is an early exit indicator for reduce operations.  Return one of these when you want
+//     * the reduction to end. It uses types, but not in a "traditional" way.
 //     */
 //    public static <A> Reduced<A> done(A a) { return new Reduced<>(a); }
 
     // Implements Counted through ITransientVector<E> -> Indexed<E> -> Counted.
-    private static final class MutableVector<F> {
+    private static final class TransientVector<F> implements ImListTrans<F> {
         // The number of items in this Vector.
         private int size;
 
@@ -510,9 +561,13 @@ public class PersistentVector<E> implements ImList<E> {
 
         private F[] tail;
 
-        private MutableVector(int c, int s, Node r, F[] t) { size = c; shift = s; root = r; tail = t; }
+        private TransientVector(int c, int s, Node r, F[] t) {
+            size = c; shift = s; root = r; tail = t;
+        }
 
-        private MutableVector(PersistentVector<F> v) { this(v.size, v.shift, editableRoot(v.root), editableTail(v.tail)); }
+        private TransientVector(PersistentVector<F> v) {
+            this(v.size, v.shift, editableRoot(v.root), editableTail(v.tail));
+        }
 
         private Node ensureEditable(Node node) {
             if (node.edit == root.edit)
@@ -528,13 +583,13 @@ public class PersistentVector<E> implements ImList<E> {
             //		tail = editableTail(tail);
         }
 
-        public int size() {
+        @Override  public int size() {
             ensureEditable();
             return size;
         }
 
         @SuppressWarnings("unchecked")
-        public PersistentVector<F> persistent() {
+        @Override  public PersistentVector<F> persistent() {
             ensureEditable();
             //		Thread owner = root.edit.get();
             //		if(owner != null && owner != Thread.currentThread())
@@ -548,7 +603,7 @@ public class PersistentVector<E> implements ImList<E> {
         }
 
         @SuppressWarnings("unchecked")
-        public MutableVector<F> append(F val) {
+        @Override  public ImListTrans<F> append(F val) {
             ensureEditable();
             int i = size;
             //room in tail?
@@ -604,7 +659,8 @@ public class PersistentVector<E> implements ImList<E> {
         // I think this is the index of the start of the last array in the tree.
         final private int tailoff() {
             // ((size - 1) / 32) * 32
-            // (Size - 1) is an index into an array because size starts counting from 1 and array indicies start from 0.
+            // (Size - 1) is an index into an array because size starts counting from 1 and array
+            //            indices start from 0.
             // /32 *32 zeroes out the low 5 bits.
             return (size < MAX_NODE_LENGTH)
                     ? 0
@@ -627,24 +683,32 @@ public class PersistentVector<E> implements ImList<E> {
 //            throw new IndexOutOfBoundsException();
 //        }
 
-//        @SuppressWarnings("unchecked")
-//        private F[] editableArrayFor(int i) {
-//            if (i >= 0 && i < size) {
-//                if (i >= tailoff())
-//                    return tail;
-//                Node node = root;
-//                for (int level = shift; level > 0; level -= NODE_LENGTH_POW_2)
-//                    node = ensureEditable((Node) node.array[(i >>> level) & LOW_BITS]);
-//                return (F[]) node.array;
-//            }
-//            throw new IndexOutOfBoundsException();
-//        }
+        @SuppressWarnings("unchecked")
+        private F[] editableArrayFor(int i) {
+            if (i >= 0 && i < size) {
+                if (i >= tailoff())
+                    return tail;
+                Node node = root;
+                for (int level = shift; level > 0; level -= NODE_LENGTH_POW_2)
+                    node = ensureEditable((Node) node.array[(i >>> level) & LOW_BITS]);
+                return (F[]) node.array;
+            }
+            throw new IndexOutOfBoundsException();
+        }
 
-//        public F nth(int i) {
-//            ensureEditable();
-//            F[] node = arrayFor(i);
-//            return node[i & LOW_BITS];
-//        }
+        @Override public F get(int i) {
+            ensureEditable();
+            F[] node = editableArrayFor(i);
+            return node[i & LOW_BITS];
+        }
+
+        @Override public ImListTrans<F> replace(int idx, F e) {
+            ensureEditable();
+            F[] node = editableArrayFor(idx);
+            node[idx & LOW_BITS] = e;
+            return this;
+        }
+
 //
 //        public F nth(int i, F notFound) {
 //            if (i >= 0 && i < size())
@@ -658,7 +722,7 @@ public class PersistentVector<E> implements ImList<E> {
 //        /** Convenience method for using any class that implements Number as a key. */
 //        public F nth(Number key, F notFound) { return nth(key.intValue(), notFound); }
 
-//        public MutableVector<F> insertAt(int i, F val) {
+//        public ImListTrans<F> insertAt(int i, F val) {
 //            ensureEditable();
 //            if (i >= 0 && i < size) {
 //                if (i >= tailoff()) {
@@ -674,12 +738,12 @@ public class PersistentVector<E> implements ImList<E> {
 //            throw new IndexOutOfBoundsException();
 //        }
 
-//        public MutableVector<F> assoc(int key, F val) {
+//        public ImListTrans<F> assoc(int key, F val) {
 //            //note - relies on ensureEditable in insertAt
 //            return insertAt(key, val);
 //        }
 //
-//        public MutableVector<F> assoc(Number key, F val) {
+//        public ImListTrans<F> assoc(Number key, F val) {
 //            return insertAt(key.intValue(), val);
 //        }
 
@@ -691,13 +755,14 @@ public class PersistentVector<E> implements ImList<E> {
 //                ret.array[i & LOW_BITS] = val;
 //            } else {
 //                int subidx = (i >>> level) & LOW_BITS;
-//                ret.array[subidx] = doAssoc(level - NODE_LENGTH_POW_2, (Node) node.array[subidx], i, val);
+//                ret.array[subidx] = doAssoc(level - NODE_LENGTH_POW_2,
+//                                            (Node) node.array[subidx], i, val);
 //            }
 //            return ret;
 //        }
 
 //        @SuppressWarnings("unchecked")
-//        public MutableVector<F> pop() {
+//        public ImListTrans<F> pop() {
 //            ensureEditable();
 //            if (size == 0)
 //                throw new IllegalStateException("Can't pop empty vector");
@@ -750,11 +815,11 @@ public class PersistentVector<E> implements ImList<E> {
 //            }
 //        }
 
-        static Node editableRoot(Node node) {
+        private static Node editableRoot(Node node) {
             return new Node(new AtomicReference<>(Thread.currentThread()), node.array.clone());
         }
         @SuppressWarnings("unchecked")
-        static <T> T[] editableTail(T[] tl) {
+        private static <T> T[] editableTail(T[] tl) {
             Object[] ret = new Object[MAX_NODE_LENGTH];
             System.arraycopy(tl, 0, ret, 0, tl.length);
             return (T[]) ret;
