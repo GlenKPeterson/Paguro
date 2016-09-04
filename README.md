@@ -2,18 +2,13 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") p
 
 #News
 
-###Serializable
-All collection implementations will soon implement Serializable.  Making Paguro/UncleJim Serializable will require some minor, but potentially breaking changes:
- - Tuple2 will no longer implement UnmodMap.UnEntry.  Instead, a Serializable sub-class of Tuple2 will.
- - The way hashcodes are computed for all tuples will be changed.  Essentially, this computation had a "wart" for compatibility with java.util.Map.Entry which will be removed.
- - Default Equator and Comparator singleton implementations will become Enums instead of lambdas.
- - All other potentially Serializable singletons will be converted to enums for clean and efficient serialization and deserialization.
- - The function interfaces (Function0, Function1, etc.) will *not* implement Serializable.  These interfaces are general and Serializable is too much for implementers to think about (and often irrelevant).
+##Serializable
+In the next release of UncleJim/Paguro, all collection implementations will implement Serializable and all singletons will be serializable.  These changes have been made in another branch where they are being tested for possible release September 3-4, 2016.  Please [familiarize yourself with these changes](https://github.com/GlenKPeterson/UncleJim/tree/2016-08-27_Serializable#serializable) because some of them will require minor changes to your code.
 
-Issues?  Questions?  Please provide feedback on the [Serialization enhancement request](https://github.com/GlenKPeterson/UncleJim/issues/10)
+Issues?  Questions?  Provide feedback on the [Serialization enhancement request](https://github.com/GlenKPeterson/UncleJim/issues/10)
 
 ###Renaming
-This project will soon be renamed to "Paguro" (pronounced, "pah-GOO-row") which is short for the Latin "Paguroidea" - the name of the Hermit Crab superfamily in Biology.  These collections grow by adding a new shell, leaving the insides the same, much the way Hermit Crabs trade up to a new shell when they grow.  Plus, hermit crabs are cute.
+This project will soon be renamed to "Paguro" ("pah-GUH-row" rhymes with "furrow") which is short for the Latin "Paguroidea" - the name of the Hermit Crab superfamily in Biology.  These collections grow by adding a new shell, leaving the insides the same, much the way Hermit Crabs trade up to a new shell when they grow.  Plus, hermit crabs are cute.
 
 ![Hermit Crab](https://c7.staticflickr.com/8/7413/12171498934_2934c7ef28_n.jpg)
 Photo by [Rushen](https://www.flickr.com/photos/rushen/12171498934/in/photostream/)
