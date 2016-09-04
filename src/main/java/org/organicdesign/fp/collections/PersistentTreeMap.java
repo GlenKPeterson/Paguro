@@ -8,6 +8,10 @@
 /* rich May 20, 2006 */
 package org.organicdesign.fp.collections;
 
+import java.io.IOException;
+import java.io.InvalidObjectException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Comparator;
@@ -34,9 +38,6 @@ import org.organicdesign.fp.Option;
 
 public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
 
-    // For serializable.  Make sure to change whenever internal data format changes.
-    private static final long serialVersionUID = 20160827174100L;
-
     // Is there a better way to do this?
     private class Box<E> implements Serializable {
 
@@ -46,54 +47,6 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
         public E val;
         public Box(E val) { this.val = val; }
     }
-
-    private static class KeyComparator<K> implements Comparator<Entry<K,?>>, Serializable {
-        private static final long serialVersionUID = 20160827174100L;
-
-        private final Comparator<? super K> wrappedComparator;
-
-        private KeyComparator(Comparator<? super K> c) { wrappedComparator = c; }
-
-        @Override public int compare(Entry<K,?> a, Entry<K,?> b) {
-            return wrappedComparator.compare(a.getKey(), b.getKey());
-        }
-    }
-
-    private final Comparator<? super K> comp;
-    private final Node<K,V> tree;
-    private final int size;
-
-    /**
-     Be extremely careful with this because it uses the default comparator, which only works for items that implement
-     Comparable (have a "natural ordering").  An attempt to use it with other items will blow up at runtime.  Either
-     a withComparator() method will be added, or this will be removed.
-     */
-    final static public PersistentTreeMap EMPTY = new PersistentTreeMap<>(Equator.defaultComparator(), null, 0);
-
-    /**
-     Be extremely careful with this because it uses the default comparator, which only works for items that implement
-     Comparable (have a "natural ordering").  An attempt to use it with other items will blow up at runtime.  Either
-     a withComparator() method will be added, or this will be removed.
-     */
-    @SuppressWarnings("unchecked")
-    public static <K extends Comparable<K>, V> PersistentTreeMap<K,V> empty() {
-        return (PersistentTreeMap<K,V>) EMPTY;
-    }
-
-    /** Returns a new empty PersistentTreeMap that will use the specified comparator. */
-    public static <K,V> PersistentTreeMap<K,V> empty(Comparator<? super K> c) {
-        return new PersistentTreeMap<>(c, null, 0);
-    }
-
-    private PersistentTreeMap(Comparator<? super K> c, Node<K,V> t, int n) {
-        comp = c; tree = t; size = n;
-    }
-
-//    /** Returns a new PersistentTreeMap of the given comparable keys and their paired values. */
-//    public static <K extends Comparable<K>,V> PersistentTreeMap<K,V> of() {
-//        return empty();
-//    }
-
 
     /**
      Returns a new PersistentTreeMap of the given comparable keys and their paired values, skipping
@@ -119,9 +72,9 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
      want to use a null key, make sure the comparator treats nulls correctly in all circumstances!
 
      @param kvPairs Key/value pairs (to go into the map).  In the case of a duplicate key, later
-     values in the input list overwrite the earlier ones.  The resulting map can contain zero or one
-     null key (if your comparator knows how to sort nulls) and any number of null values.  Null k/v
-     pairs will be silently ignored.
+     values in the input list overwrite the earlier ones.  The resulting map can contain zero or
+     one null key (if your comparator knows how to sort nulls) and any number of null values.  Null
+     k/v pairs will be silently ignored.
 
      @return a new PersistentTreeMap of the specified comparator and the given key/value pairs
      */
@@ -138,21 +91,152 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
     }
 
     /**
+     Be extremely careful with this because it uses the default comparator, which only works for
+     items that implement Comparable (have a "natural ordering").  An attempt to use it with other
+     items will blow up at runtime.  Either a withComparator() method will be added, or this will
+     be removed.
+     */
+    final static public PersistentTreeMap EMPTY =
+            new PersistentTreeMap<>(Equator.defaultComparator(), null, 0);
+
+    /**
+     Be extremely careful with this because it uses the default comparator, which only works for
+     items that implement Comparable (have a "natural ordering").  An attempt to use it with other
+     items will blow up at runtime.  Either a withComparator() method will be added, or this will
+     be removed.
+     */
+    @SuppressWarnings("unchecked")
+    public static <K extends Comparable<K>, V> PersistentTreeMap<K,V> empty() {
+        return (PersistentTreeMap<K,V>) EMPTY;
+    }
+
+    /** Returns a new empty PersistentTreeMap that will use the specified comparator. */
+    public static <K,V> PersistentTreeMap<K,V> empty(Comparator<? super K> c) {
+        return new PersistentTreeMap<>(c, null, 0);
+    }
+
+    /**
+     This would be private, except that PersistentTreeSet needs to check that the wrapped
+     comparator is serializable.
+     */
+    static final class KeyComparator<T> implements Comparator<Map.Entry<T,?>>, Serializable {
+        private static final long serialVersionUID = 20160827174100L;
+
+        private final Comparator<? super T> wrappedComparator;
+
+        private KeyComparator(Comparator<? super T> c) { wrappedComparator = c; }
+
+        @Override public int compare(Map.Entry<T,?> a, Map.Entry<T,?> b) {
+            return wrappedComparator.compare(a.getKey(), b.getKey());
+        }
+
+        @Override public String toString() {
+            return "KeyComparator(" + wrappedComparator + ")";
+        }
+
+        /**
+         This would be private, except that PersistentTreeSet needs to check that the wrapped
+         comparator is serializable.
+         */
+        Comparator<? super T> unwrap() { return wrappedComparator; }
+    }
+
+    // ==================================== Instance Variables ====================================
+    private final Comparator<? super K> comp;
+    private final transient Node<K,V> tree;
+    private final int size;
+
+    // ======================================== Constructor ========================================
+    private PersistentTreeMap(Comparator<? super K> c, Node<K,V> t, int n) {
+        if (c == null) {
+            throw new IllegalArgumentException("Comparator can't be null.");
+        }
+        comp = c; tree = t; size = n;
+    }
+
+//    /** Returns a new PersistentTreeMap of the given comparable keys and their paired values. */
+//    public static <K extends Comparable<K>,V> PersistentTreeMap<K,V> of() {
+//        return empty();
+//    }
+
+    // ======================================= Serialization =======================================
+    // This class has a custom serialized form designed to be as small as possible.  It does not
+    // have the same internal structure as an instance of this class.
+
+    // For serializable.  Make sure to change whenever internal data format changes.
+    private static final long serialVersionUID = 20160904095000L;
+
+    // Check out Josh Bloch Item 78, p. 312 for an explanation of what's going on here.
+    private static class SerializationProxy<K,V> implements Serializable {
+        // For serializable.  Make sure to change whenever internal data format changes.
+        private static final long serialVersionUID = 20160904095000L;
+
+        private final Comparator<? super K> comparator;
+        private final int size;
+        private transient PersistentTreeMap<K,V> theMap;
+        SerializationProxy(PersistentTreeMap<K,V> phm) {
+            comparator = phm.comp;
+            if ( !(comparator instanceof Serializable) ) {
+                throw new IllegalStateException("Comparator must equal serializable." +
+                                                "  Instead it was " + comparator);
+            }
+            size = phm.size;
+            theMap = phm;
+        }
+
+        // Taken from Josh Bloch Item 75, p. 298
+        private void writeObject(ObjectOutputStream s) throws IOException {
+            s.defaultWriteObject();
+
+            // Write out all elements in the proper order
+            for (UnEntry<K,V> entry : theMap) {
+                s.writeObject(entry.getKey());
+                s.writeObject(entry.getValue());
+            }
+        }
+
+        @SuppressWarnings("unchecked")
+        private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
+            s.defaultReadObject();
+            theMap = new PersistentTreeMap<>(comparator, null, 0);
+            for (int i = 0; i < size; i++) {
+                theMap = theMap.assoc((K) s.readObject(), (V) s.readObject());
+            }
+        }
+
+        private Object readResolve() { return theMap; }
+    }
+
+    private Object writeReplace() { return new SerializationProxy<>(this); }
+
+    private void readObject(java.io.ObjectInputStream in) throws IOException,
+            ClassNotFoundException {
+        throw new InvalidObjectException("Proxy required");
+    }
+
+    // ===================================== Instance Methods =====================================
+    /**
      Returns a view of the mappings contained in this map.  The set should actually contain
-     UnmodMap.Entry items, but that return signature is illegal in Java, so you'll just have to
+     UnmodMap.UnEntry items, but that return signature is illegal in Java, so you'll just have to
      remember.
      */
     @Override public ImSortedSet<Entry<K,V>> entrySet() {
         // This is the pretty way to do it.
-//        return this.foldLeft(ImSet.empty(), (accum, entry) -> accum.put(entry));
+//        return this.foldLeft(PersistentTreeSet.ofComp(new KeyComparator<>(comp)),
+//                             PersistentTreeSet::put);
 
         // This may be faster, but I haven't timed it.
 
         // Preserve comparator!
         ImSortedSet<Entry<K,V>> ret = PersistentTreeSet.ofComp(new KeyComparator<>(comp));
 
-        UnmodIterator<UnEntry<K,V>> iter = this.iterator();
-        while (iter.hasNext()) { ret = ret.put(iter.next()); }
+        // It is ABSOLUTELY CRITICAL to turn each item into a KeyVal.  What our iterator returns
+        // are actually huge chunks of the TreeMap which should not be serializable.  I don't know
+        // if we should change the iterator to wrap all these values, or if it's better to do it
+        // here.
+        for (Entry<K,V> entry : this) {
+            ret = ret.put(KeyVal.of(entry));
+        }
         return ret;
     }
 
@@ -171,7 +255,8 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
 //        public boolean eq(SortedMap o1, SortedMap o2) {
 //            if (o1 == o2) { return true; }
 //            if ( o1.size() != o2.size() ) { return false; }
-//            return UnmodSortedIterable.equals(UnmodSortedIterable.castFromSortedMap(o1), UnmodSortedIterable.castFromSortedMap(o2));
+//            return UnmodSortedIterable.equals(UnmodSortedIterable.castFromSortedMap(o1),
+//                                              UnmodSortedIterable.castFromSortedMap(o2));
 //        }
 //    };
 
@@ -243,8 +328,9 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
         K lastKey = last.getKey();
         int compFromKeyLastKey = comp.compare(fromKey, lastKey);
 
-        // If no intersect, return empty. We aren't checking the toKey vs. the firstKey() because that's a single pass
-        // through the iterator loop which is probably as cheap as checking here.
+        // If no intersect, return empty. We aren't checking the toKey vs. the firstKey() because
+        // that's a single pass through the iterator loop which is probably as cheap as checking
+        // here.
         if ( (diff == 0) || (compFromKeyLastKey > 0) )  {
             return new PersistentTreeMap<>(comp, null, 0);
         }
@@ -274,6 +360,12 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
         return ret;
     }
 
+    String debugStr() {
+        return "PersistentTreeMap(size=" + size +
+               " comp=" + comp +
+               " tree=" + tree + ")";
+    }
+
     /** Returns a string describing the first few items in this map (for debugging). */
     @Override public String toString() {
         StringBuilder sB = new StringBuilder("PersistentTreeMap(");
@@ -281,7 +373,8 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
         for (UnEntry<K,V> entry : this) {
             if (i > 0) { sB.append(","); }
             if (i > 4) { break; }
-            sB.append("kv(").append(entry.getKey()).append(",").append(entry.getValue()).append(")");
+            sB.append("kv(").append(entry.getKey()).append(",").append(entry.getValue())
+              .append(")");
             i++;
         }
         if (i < size()) {
@@ -311,7 +404,9 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
 //                if ( !(o instanceof UnmodSortedIterable) ) { return false; }
 //                return UnmodSortedIterable.equals(this, (UnmodSortedIterable) o);
 //            }
-//            @Override public String toString() { return UnmodSortedIterable.toString("ValueColl", this); }
+//            @Override public String toString() {
+//                return UnmodSortedIterable.toString("ValueColl", this);
+//            }
 //        }
 //        return new ValueColl<>(() -> this.iterator());
 //    }
@@ -333,8 +428,9 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
         K lastKey = last.getKey();
         int compFromKeyLastKey = comp.compare(fromKey, lastKey);
 
-        // If no intersect, return empty. We aren't checking the toKey vs. the firstKey() because that's a single pass
-        // through the iterator loop which is probably as cheap as checking here.
+        // If no intersect, return empty. We aren't checking the toKey vs. the firstKey() because
+        // that's a single pass through the iterator loop which is probably as cheap as checking
+        // here.
         if (compFromKeyLastKey > 0) {
             return new PersistentTreeMap<>(comp, null, 0);
         }
@@ -364,7 +460,7 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
 //    @Override public Sequence<UnEntry<K,V>> tail() {
 //        if (size() > 1) {
 //            return without(firstKey());
-////            // The iterator is designed to do this quickly.  It also prevents an infinite loop here.
+////            // The iterator is designed to do this quickly.  It also prevents an infinite loop.
 ////            UnmodIterator<UnEntry<K,V>> iter = this.iterator();
 ////            // Drop the head
 ////            iter.next();
@@ -378,7 +474,8 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
 //        PersistentTreeMap<K,V> ret = empty();
 //        for (; items != null; items = items.next().next()) {
 //            if (items.next() == null)
-//                throw new IllegalArgumentException(String.format("No value supplied for key: %s", items.head()));
+//                throw new IllegalArgumentException(String.format("No value supplied for key: %s",
+//                                                                 items.head()));
 //            ret = ret.assoc((K) items.head(), (V) RT.second(items));
 //        }
 //        return ret;
@@ -390,17 +487,20 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
 //        PersistentTreeMap<K,V> ret = new PersistentTreeMap<>(comp);
 //        for (; items != null; items = items.next().next()) {
 //            if (items.next() == null)
-//                throw new IllegalArgumentException(String.format("No value supplied for key: %s", items.head()));
+//                throw new IllegalArgumentException(String.format("No value supplied for key: %s",
+//                                                                 items.head()));
 //            ret = ret.assoc((K) items.head(), (V) RT.second(items));
 //        }
 //        return ret;
 //    }
 
     /**
-     Returns the comparator used to order the keys in this map, or null if it uses Function2.DEFAULT_COMPARATOR
-     (for compatibility with java.util.SortedMap).
+     Returns the comparator used to order the keys in this map, or null if it uses
+     Function2.DEFAULT_COMPARATOR (for compatibility with java.util.SortedMap).
      */
-    @Override public Comparator<? super K> comparator() { return (comp == Equator.Comp.DEFAULT) ? null : comp; }
+    @Override public Comparator<? super K> comparator() {
+        return (comp == Equator.Comp.DEFAULT) ? null : comp;
+    }
 
 //    /** Returns true if the map contains the given key. */
 //    @SuppressWarnings("unchecked")
@@ -562,7 +662,10 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
     /** Returns the number of key/value mappings in this map. */
     @Override public int size() { return size; }
 
-    /** Returns an Option of the key/value pair matching the given key, or Option.none() if the key is not found. */
+    /**
+     Returns an Option of the key/value pair matching the given key, or Option.none() if the key is
+     not found.
+     */
     @Override public Option<UnmodMap.UnEntry<K,V>> entry(K key) {
         Node<K,V> t = tree;
         while (t != null) {
@@ -604,7 +707,8 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
             found.val = t;
             return null;
         }
-        Node<K,V> ins = c < 0 ? add(t.left(), key, val, found) : add(t.right(), key, val, found);
+        Node<K,V> ins = add(c < 0 ? t.left() : t.right(),
+                            key, val, found);
         if (ins == null) //found below
             return null;
         if (c < 0)
@@ -620,7 +724,8 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
             found.val = t;
             return append(t.left(), t.right());
         }
-        Node<K,V> del = c < 0 ? remove(t.left(), key, found) : remove(t.right(), key, found);
+        Node<K,V> del = remove(c < 0 ? t.left() : t.right(),
+                               key, found);
         if (del == null && found.val == null) //not found below
             return null;
         if (c < 0) {
@@ -653,7 +758,8 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
                                red(left.key, left.val(), left.left(), app.left()),
                                red(right.key, right.val(), app.right(), right.right()));
                 else
-                    return red(left.key, left.val(), left.left(), red(right.key, right.val(), app, right.right()));
+                    return red(left.key, left.val(), left.left(),
+                               red(right.key, right.val(), app, right.right()));
             } else
                 return red(left.key, left.val(), left.left(), append(left.right(), right));
         } else if (right instanceof Red)
@@ -666,7 +772,8 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
                            black(left.key, left.val(), left.left(), app.left()),
                            black(right.key, right.val(), app.right(), right.right()));
             else
-                return balanceLeftDel(left.key, left.val(), left.left(), black(right.key, right.val(), app, right.right()));
+                return balanceLeftDel(left.key, left.val(), left.left(),
+                                      black(right.key, right.val(), app, right.right()));
         }
     }
 
@@ -681,7 +788,8 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
         else if (right instanceof Red && right.left() instanceof Black)
             return red(right.left().key, right.left().val(),
                        black(key, val, del, right.left().left()),
-                       rightBalance(right.key, right.val(), right.left().right(), right.right().redden()));
+                       rightBalance(right.key, right.val(), right.left().right(),
+                                    right.right().redden()));
         else
             throw new UnsupportedOperationException("Invariant violation");
     }
@@ -707,7 +815,8 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
                           Node<? extends K,? extends V> ins,
                           Node<? extends K,? extends V> right) {
         if (ins instanceof Red && ins.left() instanceof Red)
-            return red(ins.key, ins.val(), ins.left().blacken(), black(key, val, ins.right(), right));
+            return red(ins.key, ins.val(), ins.left().blacken(),
+                       black(key, val, ins.right(), right));
         else if (ins instanceof Red && ins.right() instanceof Red)
             return red(ins.right().key, ins.right().val(),
                        black(ins.key, ins.val(), ins.left(), ins.right().left()),
@@ -722,7 +831,8 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
                            Node<? extends K,? extends V> left,
                            Node<? extends K,? extends V> ins) {
         if (ins instanceof Red && ins.right() instanceof Red)
-            return red(ins.key, ins.val(), black(key, val, left, ins.left()), ins.right().blacken());
+            return red(ins.key, ins.val(), black(key, val, left, ins.left()),
+                       ins.right().blacken());
         else if (ins instanceof Red && ins.left() instanceof Red)
             return red(ins.left().key, ins.left().val(),
                        black(key, val, left, ins.left().left()),
@@ -774,9 +884,10 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
 //        private Reduced(A a) { val = a; }
 //    }
 
-    private static abstract class Node<K, V> implements UnEntry<K,V>, Serializable {
+    private static abstract class Node<K, V> implements UnEntry<K,V> {
+        //, Serializable {
         // For serializable.  Make sure to change whenever internal data format changes.
-        private static final long serialVersionUID = 20160827174100L;
+        // private static final long serialVersionUID = 20160827174100L;
 
         final K key;
 
@@ -810,9 +921,13 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
 
         abstract Node<K,V> redden();
 
-        Node<K,V> balanceLeft(Node<K,V> parent) { return black(parent.key, parent.val(), this, parent.right()); }
+        Node<K,V> balanceLeft(Node<K,V> parent) {
+            return black(parent.key, parent.val(), this, parent.right());
+        }
 
-        Node<K,V> balanceRight(Node<K,V> parent) { return black(parent.key, parent.val(), parent.left(), this); }
+        Node<K,V> balanceRight(Node<K,V> parent) {
+            return black(parent.key, parent.val(), parent.left(), this);
+        }
 
         abstract Node<K,V> replace(K key, V val, Node<K,V> left, Node<K,V> right);
 
@@ -850,28 +965,38 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
     } // end class Node.
 
     private static class Black<K, V> extends Node<K,V> {
-        public Black(K key) { super(key); }
+        Black(K key) { super(key); }
 
         @Override Node<K,V> addLeft(Node<K,V> ins) { return ins.balanceLeft(this); }
 
         @Override Node<K,V> addRight(Node<K,V> ins) { return ins.balanceRight(this); }
 
-        @Override Node<K,V> removeLeft(Node<K,V> del) { return balanceLeftDel(key, val(), del, right()); }
+        @Override Node<K,V> removeLeft(Node<K,V> del) {
+            return balanceLeftDel(key, val(), del, right());
+        }
 
-        @Override Node<K,V> removeRight(Node<K,V> del) { return balanceRightDel(key, val(), left(), del); }
+        @Override Node<K,V> removeRight(Node<K,V> del) {
+            return balanceRightDel(key, val(), left(), del);
+        }
 
         @Override Node<K,V> blacken() { return this; }
 
         @Override Node<K,V> redden() { return new Red<>(key); }
 
         @Override
-        Node<K,V> replace(K key, V val, Node<K,V> left, Node<K,V> right) { return black(key, val, left, right); }
+        Node<K,V> replace(K key, V val, Node<K,V> left, Node<K,V> right) {
+            return black(key, val, left, right);
+        }
+
+        @Override  public String toString() {
+            return "B(" + key + ")";
+        }
     }
 
     private static class BlackVal<K, V> extends Black<K,V> {
         final V val;
 
-        public BlackVal(K key, V val) {
+        BlackVal(K key, V val) {
             super(key);
             this.val = val;
         }
@@ -896,8 +1021,8 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
                    Objects.equals(val, that.getValue());
         }
 
-        @Override public String toString() {
-            return "BlackVal(" + key + "," + val + ")";
+        @Override  public String toString() {
+            return "BV(" + key + ":" + val + ")";
         }
     }
 
@@ -906,7 +1031,7 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
 
         final Node<K,V> right;
 
-        public BlackBranch(K key, Node<K,V> left, Node<K,V> right) {
+        BlackBranch(K key, Node<K,V> left, Node<K,V> right) {
             super(key);
             this.left = left;
             this.right = right;
@@ -921,12 +1046,15 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
         @Override
         Node<K,V> redden() { return new RedBranch<>(key, left, right); }
 
+        @Override  public String toString() {
+            return "BB(" + key + " left=" + left + " right=" + right + ")";
+        }
     }
 
     private static class BlackBranchVal<K, V> extends BlackBranch<K,V> {
         final V val;
 
-        public BlackBranchVal(K key, V val, Node<K,V> left, Node<K,V> right) {
+        BlackBranchVal(K key, V val, Node<K,V> left, Node<K,V> right) {
             super(key, left, right);
             this.val = val;
         }
@@ -951,13 +1079,14 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
                    Objects.equals(val, that.getValue());
         }
 
-        @Override public String toString() {
-            return "BlackBranchVal(" + key + "," + val + ")";
+        @Override  public String toString() {
+            return "BBV(" + key + ":" + val +
+                   " left=" + left + " right=" + right + ")";
         }
     }
 
     private static class Red<K, V> extends Node<K,V> {
-        public Red(K key) { super(key); }
+        Red(K key) { super(key); }
 
         @Override Node<K,V> addLeft(Node<K,V> ins) { return red(key, val(), ins, right()); }
 
@@ -973,14 +1102,19 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
         Node<K,V> redden() { throw new UnsupportedOperationException("Invariant violation"); }
 
         @Override
-        Node<K,V> replace(K key, V val, Node<K,V> left, Node<K,V> right) { return red(key, val, left, right); }
+        Node<K,V> replace(K key, V val, Node<K,V> left, Node<K,V> right) {
+            return red(key, val, left, right);
+        }
 
+        @Override  public String toString() {
+            return "R(" + key + ")";
+        }
     }
 
     private static class RedVal<K, V> extends Red<K,V> {
         final V val;
 
-        public RedVal(K key, V val) {
+        RedVal(K key, V val) {
             super(key);
             this.val = val;
         }
@@ -1005,8 +1139,8 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
                    Objects.equals(val, that.getValue());
         }
 
-        @Override public String toString() {
-            return "RedVal(" + key + "," + val + ")";
+        @Override  public String toString() {
+            return "RV(" + key + ":" + val + ")";
         }
     }
 
@@ -1015,7 +1149,7 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
 
         final Node<K,V> right;
 
-        public RedBranch(K key, Node<K,V> left, Node<K,V> right) {
+        RedBranch(K key, Node<K,V> left, Node<K,V> right) {
             super(key);
             this.left = left;
             this.right = right;
@@ -1027,7 +1161,8 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
 
         @Override Node<K,V> balanceLeft(Node<K,V> parent) {
             if (left instanceof Red)
-                return red(key, val(), left.blacken(), black(parent.key, parent.val(), right, parent.right()));
+                return red(key, val(), left.blacken(),
+                           black(parent.key, parent.val(), right, parent.right()));
             else if (right instanceof Red)
                 return red(right.key, right.val(), black(key, val(), left, right.left()),
                            black(parent.key, parent.val(), right.right(), parent.right()));
@@ -1038,22 +1173,29 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
 
         @Override Node<K,V> balanceRight(Node<K,V> parent) {
             if (right instanceof Red)
-                return red(key, val(), black(parent.key, parent.val(), parent.left(), left), right.blacken());
+                return red(key, val(),
+                           black(parent.key, parent.val(), parent.left(), left),
+                           right.blacken());
             else if (left instanceof Red)
-                return red(left.key, left.val(), black(parent.key, parent.val(), parent.left(), left.left()),
+                return red(left.key, left.val(),
+                           black(parent.key, parent.val(), parent.left(), left.left()),
                            black(key, val(), left.right(), right));
             else
                 return super.balanceRight(parent);
         }
 
         @Override Node<K,V> blacken() { return new BlackBranch<>(key, left, right); }
+
+        @Override  public String toString() {
+            return "RB(" + key + " left=" + left + " right=" + right + ")";
+        }
     }
 
 
     private static class RedBranchVal<K, V> extends RedBranch<K,V> {
         final V val;
 
-        public RedBranchVal(K key, V val, Node<K,V> left, Node<K,V> right) {
+        RedBranchVal(K key, V val, Node<K,V> left, Node<K,V> right) {
             super(key, left, right);
             this.val = val;
         }
@@ -1077,8 +1219,9 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
             return Objects.equals(key, that.getKey()) && Objects.equals(val, that.getValue());
         }
 
-        @Override public String toString() {
-            return "RedBranchVal(" + key + "," + val + ")";
+        @Override  public String toString() {
+            return "RBV(" + key + ":" + val +
+                   " left=" + left + " right=" + right + ")";
         }
     }
 
@@ -1142,10 +1285,15 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
 //        }
 //    }
 
-    private static class NodeIterator<K, V> implements UnmodSortedIterator<UnEntry<K,V>>, Serializable {
-
+    /**
+     This currently returns chunks of the inner tree structure that implement Map.Entry.
+     They are not serializable and should not be made so.  I can alter this to return nice,
+     neat, KeyVal objects which are serializable, but we've made it this far without so...
+     */
+    private static class NodeIterator<K, V> implements UnmodSortedIterator<UnEntry<K,V>> {
+        //, Serializable {
         // For serializable.  Make sure to change whenever internal data format changes.
-        private static final long serialVersionUID = 20160827174100L;
+        // private static final long serialVersionUID = 20160827174100L;
 
         private Stack<Node<K,V>> stack = new Stack<>();
         private final boolean asc;
@@ -1166,9 +1314,11 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
             return !stack.isEmpty();
         }
 
+        @SuppressWarnings("unchecked")
         @Override public UnmodMap.UnEntry<K,V> next() {
             Node<K,V> t = stack.pop();
             push(asc ? t.right() : t.left());
+
             return t;
         }
     }

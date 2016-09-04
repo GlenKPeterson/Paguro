@@ -24,6 +24,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.FunctionUtilsTest;
+import org.organicdesign.fp.TestUtilities;
 import org.organicdesign.fp.function.Function1;
 
 import static org.junit.Assert.*;
@@ -31,13 +32,14 @@ import static org.organicdesign.fp.FunctionUtils.ordinal;
 import static org.organicdesign.fp.StaticImports.kv;
 import static org.organicdesign.fp.StaticImports.vec;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
+import static org.organicdesign.fp.collections.PersistentTreeMap.empty;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 import static org.organicdesign.testUtils.EqualsContract.equalsSameHashCode;
 
 @RunWith(JUnit4.class)
 public class PersistentTreeMapTest {
     @Test public void assocAndGet() {
-        PersistentTreeMap<String,Integer> m1 = PersistentTreeMap.empty();
+        PersistentTreeMap<String,Integer> m1 = empty();
         PersistentTreeMap<String,Integer> m2 = m1.assoc("one", 1);
 
         // Prove m1 unchanged
@@ -241,11 +243,11 @@ public class PersistentTreeMapTest {
                      PersistentTreeMap.of(vec(kv(1, "one"))).assoc(2, "two").assoc(3, "three")
                                       .tailMap(3));
 
-        assertEquals(PersistentTreeMap.empty(),
+        assertEquals(empty(),
                      PersistentTreeMap.of(vec(kv(1, "one"))).assoc(2, "two").assoc(3, "three")
                                       .tailMap(4));
 
-        assertEquals(PersistentTreeMap.empty(),
+        assertEquals(empty(),
                      PersistentTreeMap.of(vec(kv(1, "one"))).assoc(2, "two").assoc(3, "three")
                                       .tailMap(999999999));
 
@@ -287,7 +289,7 @@ public class PersistentTreeMapTest {
         assertEquals(PersistentTreeMap.of(vec(kv(1, "one"))),
                      PersistentTreeMap.of(vec(kv(1, "one"))).assoc(2, "two").assoc(3, "three").subMap(1, 2));
 
-        assertEquals(PersistentTreeMap.empty(),
+        assertEquals(empty(),
                      PersistentTreeMap.of(vec(kv(1, "one"))).assoc(2, "two").assoc(3, "three").subMap(1, 1));
 
         assertEquals(PersistentTreeMap.of(vec(kv(2, "two"))).assoc(3, "three"),
@@ -296,7 +298,7 @@ public class PersistentTreeMapTest {
         assertEquals(PersistentTreeMap.of(vec(kv(3, "three"))),
                      PersistentTreeMap.of(vec(kv(1, "one"))).assoc(2, "two").assoc(3, "three").subMap(3, 4));
 
-        assertEquals(PersistentTreeMap.empty(),
+        assertEquals(empty(),
                      PersistentTreeMap.of(vec(kv(1, "one"))).assoc(2, "two").assoc(3, "three").subMap(4, 4));
 
         assertEquals(PersistentTreeMap.of(vec(kv(2, "two"))),
@@ -309,7 +311,7 @@ public class PersistentTreeMapTest {
 
     @Test public void testToString() {
         assertEquals("PersistentTreeMap()",
-                     PersistentTreeMap.empty().toString());
+                     empty().toString());
         assertEquals("PersistentTreeMap(kv(1,one))",
                      PersistentTreeMap.of(vec(kv(1, "one"))).toString());
         assertEquals("PersistentTreeMap(kv(1,one),kv(2,two))",
@@ -367,7 +369,13 @@ public class PersistentTreeMapTest {
     }
 
     @Test(expected = NoSuchElementException.class)
-    public void lastKeyEx() { PersistentTreeMap.empty().lastKey(); }
+    public void lastKeyEx() { empty().lastKey(); }
+
+    @Test public void serializeEmptyTest() {
+        PersistentTreeMap<String,Integer> e = empty();
+        assertEquals(1, e.assoc("hello", 99).size());
+        assertEquals(1, serializeDeserialize(e).assoc("hello", 99).size());
+    }
 
     @Test public void largerMap() throws Exception {
         PersistentTreeMap<Integer,String> m =
@@ -413,90 +421,133 @@ public class PersistentTreeMapTest {
 
     @Test public void biggerTreeMaps() throws Exception {
         int NUM_ITEMS = 300;
-        PersistentTreeMap<String,Integer> m = PersistentTreeMap.empty();
+        SortedMap<String,Integer> control = new TreeMap<>();
+        PersistentTreeMap<String,Integer> test = empty();
 
         for (int i = 0; i < NUM_ITEMS; i++) {
-            m = m.assoc(ordinal(i), i);
-            assertEquals(i + 1, m.size());
+            String ord = ordinal(i);
+            control.put(ord, i);
+            test = test.assoc(ord, i);
+            assertEquals(control.size(), test.size());
         }
-        assertEquals(NUM_ITEMS, m.size());
 
-        PersistentTreeMap<String,Integer> ser = serializeDeserialize(m);
-        assertEquals(m, ser);
+        assertTrue(UnmodSortedIterable.equals(UnmodSortedIterable.castFromSortedMap(control),
+                                              test));
+
+        assertTrue(UnmodSortedIterable.equals(UnmodSortedIterable.castFromSortedMap(control),
+                                              serializeDeserialize(test)));
+
+        assertEquals(NUM_ITEMS, test.size());
+
+        PersistentTreeMap<String,Integer> ser = serializeDeserialize(test);
+        assertEquals(test, ser);
 
         for (int i = 0; i < NUM_ITEMS; i++) {
-            assertEquals(Integer.valueOf(i), m.get(ordinal(i)));
+            assertEquals(Integer.valueOf(i), test.get(ordinal(i)));
             assertEquals(Integer.valueOf(i), ser.get(ordinal(i)));
         }
-        assertNull(m.get(ordinal(NUM_ITEMS)));
+        assertNull(test.get(ordinal(NUM_ITEMS)));
         assertNull(ser.get(ordinal(NUM_ITEMS)));
 
         for (int i = 0; i < NUM_ITEMS; i++) {
-            assertTrue(m.containsKey(ordinal(i)));
+            assertTrue(test.containsKey(ordinal(i)));
             assertTrue(ser.containsKey(ordinal(i)));
         }
 
-        assertFalse(m.containsKey(ordinal(NUM_ITEMS)));
+        assertFalse(test.containsKey(ordinal(NUM_ITEMS)));
         assertFalse(ser.containsKey(ordinal(NUM_ITEMS)));
 
         for (int i = 0; i < NUM_ITEMS; i++) {
             Integer i2 = Integer.valueOf(i);
-            assertTrue(m.containsValue(i2));
+            assertTrue(test.containsValue(i2));
             assertTrue(ser.containsValue(i2));
         }
-        assertFalse(m.containsValue(Integer.valueOf(NUM_ITEMS)));
+        assertFalse(test.containsValue(Integer.valueOf(NUM_ITEMS)));
         assertFalse(ser.containsValue(Integer.valueOf(NUM_ITEMS)));
 
         // If you remove a key that's not there, you should get back the original map.
-        assertTrue(m == m.without(ordinal(NUM_ITEMS)));
+        assertTrue(test == test.without(ordinal(NUM_ITEMS)));
         assertTrue(ser == ser.without(ordinal(NUM_ITEMS)));
 
         for (int i = 0; i < NUM_ITEMS; i++) {
-            assertEquals(NUM_ITEMS - i, m.size());
-            m = m.without(ordinal(i));
-            assertNull(m.get(ordinal(i)));
-            assertFalse(m.containsKey(ordinal(i)));
-            assertFalse(m.containsValue(Integer.valueOf(i)));
+            assertEquals(NUM_ITEMS - i, test.size());
+            test = test.without(ordinal(i));
+            assertNull(test.get(ordinal(i)));
+            assertFalse(test.containsKey(ordinal(i)));
+            assertFalse(test.containsValue(Integer.valueOf(i)));
         }
 
-        assertEquals(0, m.size());
+        assertEquals(0, test.size());
 
         // Because this map is sorted, building it in reverse is also a useful test.
         for (int i = NUM_ITEMS - 1; i >= 0; i--) {
-            m = m.assoc(ordinal(i), i);
-            assertEquals(NUM_ITEMS - i, m.size());
+            test = test.assoc(ordinal(i), i);
+            assertEquals(NUM_ITEMS - i, test.size());
         }
-        assertEquals(NUM_ITEMS, m.size());
+        assertEquals(NUM_ITEMS, test.size());
 
         for (int i = 0; i < NUM_ITEMS; i++) {
-            assertEquals(Integer.valueOf(i), m.get(ordinal(i)));
+            assertEquals(Integer.valueOf(i), test.get(ordinal(i)));
         }
-        assertNull(m.get(ordinal(NUM_ITEMS)));
+        assertNull(test.get(ordinal(NUM_ITEMS)));
 
         for (int i = 0; i < NUM_ITEMS; i++) {
-            assertTrue(m.containsKey(ordinal(i)));
+            assertTrue(test.containsKey(ordinal(i)));
         }
 
-        assertFalse(m.containsKey(ordinal(NUM_ITEMS)));
+        assertFalse(test.containsKey(ordinal(NUM_ITEMS)));
 
         for (int i = 0; i < NUM_ITEMS; i++) {
-            assertTrue(m.containsValue(Integer.valueOf(i)));
+            assertTrue(test.containsValue(Integer.valueOf(i)));
         }
-        assertFalse(m.containsValue(Integer.valueOf(NUM_ITEMS)));
+        assertFalse(test.containsValue(Integer.valueOf(NUM_ITEMS)));
 
         // If you remove a key that's not there, you should get back the original map.
-        assertTrue(m == m.without(ordinal(NUM_ITEMS)));
+        assertTrue(test == test.without(ordinal(NUM_ITEMS)));
 
         for (int i = 0; i < NUM_ITEMS; i++) {
-            assertEquals(NUM_ITEMS - i, m.size());
-            m = m.without(ordinal(i));
-            assertNull(m.get(ordinal(i)));
-            assertFalse(m.containsKey(ordinal(i)));
-            assertFalse(m.containsValue(Integer.valueOf(i)));
+            assertEquals(NUM_ITEMS - i, test.size());
+            test = test.without(ordinal(i));
+            assertNull(test.get(ordinal(i)));
+            assertFalse(test.containsKey(ordinal(i)));
+            assertFalse(test.containsValue(Integer.valueOf(i)));
         }
     }
 
     @Test public void entrySet() throws Exception {
+
+//        PersistentTreeMap<Integer,String> test = empty();
+//        System.out.println("test=" + test.debugStr());
+//        test = test.assoc(1, "one");
+//        System.out.println("test=" + test.debugStr());
+//        test = test.assoc(2, "two");
+//        System.out.println("test=" + test.debugStr());
+//        test = test.assoc(3, "three");
+//        System.out.println("test=" + test.debugStr());
+//        test = test.assoc(4, "four");
+//        System.out.println("test=" + test.debugStr());
+//        test = test.assoc(5, "five");
+//        System.out.println("test=" + test.debugStr());
+//
+//        for (Map.Entry<Integer,String> entry : test) {
+//            System.out.println("entry:" + entry);
+//        }
+//
+//        System.out.println("Now the entry SET...");
+//        for (Map.Entry<Integer,String> entry : test.entrySet()) {
+//            System.out.println("entry:" + entry);
+//        }
+//
+//        System.out.println("Now the SERIALIZED map then entrySet...");
+//        for (Map.Entry<Integer,String> entry : serializeDeserialize(test).entrySet()) {
+//            System.out.println("entry:" + entry);
+//        }
+//
+//        System.out.println("Now the SERIALIZED entry SET...");
+//        for (Map.Entry<Integer,String> entry : serializeDeserialize(test.entrySet())) {
+//            System.out.println("entry:" + entry);
+//        }
+
         PersistentTreeMap<Integer,String> m =
                 PersistentTreeMap.of(vec(kv(1, "one"))).assoc(2, "two").assoc(3, "three").assoc(4, "four").assoc(5, "five");
         ImSet<Map.Entry<Integer,String>> s =
@@ -506,9 +557,29 @@ public class PersistentTreeMapTest {
                                              kv(3, "three"),
                                              kv(4, "four"),
                                              kv(5, "five")));
+        SortedMap<Integer,String> control = new TreeMap<>();
+        control.put(1, "one");
+        control.put(2, "two");
+        control.put(3, "three");
+        control.put(4, "four");
+        control.put(5, "five");
+
+        TestUtilities.compareIterators(control.entrySet().iterator(), m.iterator());
+
+        TestUtilities.compareIterators(control.entrySet().iterator(),
+                                       serializeDeserialize(m).iterator());
+
+        TestUtilities.compareIterators(control.entrySet().iterator(),
+                                       m.entrySet().iterator());
+
+        TestUtilities.compareIterators(control.entrySet().iterator(),
+                                       serializeDeserialize(m.entrySet()).iterator());
+
         assertArrayEquals(s.toArray(),
-                          m.entrySet().map((u) -> kv(u.getKey(), u.getValue()))
-                           .toMutableList().toArray());
+                          m.entrySet()
+                           .map(Function1.identity())
+                           .toMutableList()
+                           .toArray());
 
         assertArrayEquals(s.toArray(),
                           serializeDeserialize(m).entrySet()
@@ -626,7 +697,7 @@ public class PersistentTreeMapTest {
                 .filter(t -> t != null)
                 .toImSortedMap(Equator.defaultComparator(), Function1.identity());
         FunctionUtilsTest.mapHelper(b, max);
-        Map<Integer,String> c = PersistentTreeMap.empty(Equator.defaultComparator());
+        Map<Integer,String> c = empty(Equator.defaultComparator());
         assertEquals(b, c);
         assertEquals(c, b);
         assertEquals(b.hashCode(), c.hashCode());

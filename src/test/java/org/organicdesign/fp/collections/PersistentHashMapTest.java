@@ -46,7 +46,7 @@ import static org.organicdesign.testUtils.EqualsContract.equalsSameHashCode;
 
 @RunWith(JUnit4.class)
 public class PersistentHashMapTest {
-    static <K,V> void mapIterTest(Map<K,V> c, Iterator<? extends Map.Entry<K,V>> test) {
+    public static <K,V> void mapIterTest(Map<K,V> c, Iterator<? extends Map.Entry<K,V>> test) {
         Map<K,V> control = new HashMap<>();
         control.putAll(c);
         while (test.hasNext()) {

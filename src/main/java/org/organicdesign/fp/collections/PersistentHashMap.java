@@ -237,7 +237,6 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V>, Serializable {
         private Object readResolve() { return theMap.persistent(); }
     }
 
-    // ===================================== Instance Methods =====================================
     private Object writeReplace() { return new SerializationProxy<>(this); }
 
     private void readObject(java.io.ObjectInputStream in) throws IOException,
@@ -245,6 +244,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V>, Serializable {
         throw new InvalidObjectException("Proxy required");
     }
 
+    // ===================================== Instance Methods =====================================
 //    /** Not sure I like this - could disappear. */
 //    boolean hasNull() { return hasNull; }
 

@@ -195,6 +195,12 @@ public class PersistentTreeSetTest {
         assertEquals(STR_LEN_COMP, s2.comparator());
     }
 
+    @Test public void serializeEmptyTest() {
+        PersistentTreeSet<String> e = PersistentTreeSet.empty();
+        assertEquals(1, e.put("hello").size());
+        assertEquals(1, serializeDeserialize(e).put("hello").size());
+    }
+
     @Test public void serializationTest() throws Exception {
         PersistentTreeSet<String> s1 = serializeDeserialize(PersistentTreeSet.empty());
         assertTrue(s1.isEmpty());
