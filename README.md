@@ -92,6 +92,7 @@ map(kv(
  - PersistentHashMap.ArrayNode, .BitMapIndexNode, .HashCollisionNode, and .NodeIter are now all private (were public or package).
    There should never have been any reason to use or access these.
  - Added ImSetTrans&lt;E&gt; interface and exposed the Transient Set implementation.
+ - Added ImListTrans&lt;E&gt; interface and exposed the Transient Vector implementation.
  - Found some opportunities to use transient implementations more efficiently.
 
 #### What's *NOT* Serializable?

@@ -383,4 +383,55 @@ public class PersistentVectorTest {
                                                            "6th")),
                      pv);
     }
+
+    @Test public void testTransient() {
+        List<Integer> control = new ArrayList<>();
+        ImListTrans<Integer> test = PersistentVector.<Integer>empty().asTransient();
+        final int SEVERAL = 2000; // more than 1024 so 3 levels deep.
+        for (int i = 0; i < SEVERAL; i++) {
+            control.add(i);
+            test.append(i);
+            assertEquals(control.size(), test.size());
+        }
+
+        for (int i = 0; i < SEVERAL; i++) {
+            assertEquals(control.get(i), test.get(i));
+        }
+
+        for (int i = 0; i < SEVERAL; i++) {
+            control.set(i, i + 10);
+            test.replace(i, i + 10);
+            assertEquals(control.size(), test.size());
+        }
+
+        for (int i = 0; i < SEVERAL; i++) {
+            assertEquals(control.get(i), test.get(i));
+        }
+    }
+
+    @Test public void testAddReplace() {
+        List<Integer> control = new ArrayList<>();
+        ImList<Integer> test = PersistentVector.empty();
+        final int SEVERAL = 2000; // more than 1024 so 3 levels deep.
+        for (int i = 0; i < SEVERAL; i++) {
+            control.add(i);
+            test = test.append(i);
+            assertEquals(control.size(), test.size());
+        }
+
+        for (int i = 0; i < SEVERAL; i++) {
+            assertEquals(control.get(i), test.get(i));
+        }
+
+        for (int i = 0; i < SEVERAL; i++) {
+            control.set(i, i + 10);
+            test = test.replace(i, i + 10);
+            assertEquals(control.size(), test.size());
+        }
+
+        for (int i = 0; i < SEVERAL; i++) {
+            assertEquals(control.get(i), test.get(i));
+        }
+    }
+
 }

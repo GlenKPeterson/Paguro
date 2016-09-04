@@ -27,6 +27,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.organicdesign.fp.collections.ImList;
+import org.organicdesign.fp.collections.ImListTrans;
 import org.organicdesign.fp.collections.ImMap;
 import org.organicdesign.fp.collections.ImMapTrans;
 import org.organicdesign.fp.collections.ImSet;
@@ -170,7 +171,8 @@ public interface Transformable<T> {
      Realize a thread-safe immutable list to access items quickly O(log32 n) by index.
      */
     default ImList<T> toImList() {
-        return PersistentVector.fromXform(this);
+        return foldLeft(PersistentVector.<T>empty().asTransient(),
+                        ImListTrans<T>::append).persistent();
     }
 
     /**
