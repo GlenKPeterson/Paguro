@@ -252,6 +252,12 @@ public class PersistentHashMapTest {
         }
         assertEquals(NUM_ITEMS, m.size());
 
+        // Double-assoc shouldn't change anythings.
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            m = m.assoc(ordinal(i), i);
+            assertEquals(NUM_ITEMS, m.size());
+        }
+
         for (int i = 0; i < NUM_ITEMS; i++) {
             assertEquals(Integer.valueOf(i), m.get(ordinal(i)));
         }
@@ -298,6 +304,14 @@ public class PersistentHashMapTest {
             assertEquals(i + 2, m.size());
         }
         assertEquals(NUM_ITEMS + 1, m.size());
+
+        // Duplicate items
+        m = m.assoc(null, -1);
+        assertEquals(NUM_ITEMS + 1, m.size());
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            m = m.assoc(ordinal(i), i);
+            assertEquals(NUM_ITEMS + 1, m.size());
+        }
 
         for (int i = 0; i < NUM_ITEMS; i++) {
             assertEquals(Integer.valueOf(i), m.get(ordinal(i)));
@@ -854,20 +868,27 @@ public class PersistentHashMapTest {
     }
 
     @Test public void entrySet() {
-        PersistentHashMap<Integer,String> m =
+        Map<Integer,String> control = new HashMap<>();
+        control.put(3, "three");
+        control.put(5, "five");
+        control.put(2, "two");
+        control.put(1, "one");
+        control.put(4, "four");
+
+        PersistentHashMap<Integer,String> test =
                 PersistentHashMap.of(vec(kv(1, "one")))
                                  .assoc(2, "two").assoc(3, "three").assoc(4, "four").assoc(5, "five");
-        Set<Map.Entry<Integer,String>> s = new HashSet<>();
-        s.add(kv(3, "three"));
-        s.add(kv(5, "five"));
-        s.add(kv(2, "two"));
-        s.add(kv(1, "one"));
-        s.add(kv(4, "four"));
-        assertEquals(s, m.entrySet());
 
-        assertEquals(s, serializeDeserialize(m).entrySet());
+        assertEquals(control.entrySet(), test.entrySet());
+        assertEquals(control.entrySet(), serializeDeserialize(test).entrySet());
+        assertEquals(control.entrySet(), serializeDeserialize(test.entrySet()));
 
-        assertEquals(s, serializeDeserialize(m.entrySet()));
+        mapIterTest(control, test.iterator());
+        mapIterTest(control, serializeDeserialize(test).iterator());
+
+        mapIterTest(control, test.entrySet().iterator());
+        mapIterTest(control, serializeDeserialize(test).entrySet().iterator());
+        mapIterTest(control, serializeDeserialize(test.entrySet()).iterator());
     }
 
     @SuppressWarnings("deprecation")

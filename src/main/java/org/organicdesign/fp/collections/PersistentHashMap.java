@@ -297,7 +297,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V>, Serializable {
         if (that.size() != size()) { return false; }
 
         try {
-            for (Entry<K,V> e : entrySet()) {
+            for (Entry<K,V> e : this) {
                 K key = e.getKey();
                 V value = e.getValue();
                 if (value == null) {

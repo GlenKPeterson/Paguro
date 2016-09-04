@@ -2,6 +2,7 @@ package org.organicdesign.fp.collections;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.junit.Test;
@@ -15,6 +16,18 @@ import static org.organicdesign.fp.collections.PersistentHashSetTest.Ctx.mod3Eq;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class PersistentHashSetTest {
+
+    public static <K> void setIterTest(Set<K> c, Iterator<? extends K> test) {
+        Set<K> control = new HashSet<>();
+        control.addAll(c);
+        while (test.hasNext()) {
+            K testK = test.next();
+            assertTrue(control.contains(testK));
+            control.remove(testK);
+        }
+        assertEquals(0, control.size());
+    }
+
     @Test
     public void assocAndGet() throws Exception {
         PersistentHashSet<String> s1 = PersistentHashSet.empty();
@@ -257,6 +270,41 @@ public class PersistentHashSetTest {
         assertTrue(set.isEmpty());
 
 //        println("accum: " + accum);
+    }
+
+    @Test public void transientTest() {
+        Set<Integer> control = new HashSet<>();
+        ImSetTrans<Integer> test = PersistentHashSet.<Integer>empty().asTransient();
+        assertEquals(control.size(), test.size());
+        assertEquals(control.contains(-1), test.contains(-1));
+
+        final int SOME = 2000;
+        for (int i = 0; i < SOME; i++) {
+            assertEquals(control.isEmpty(), test.isEmpty());
+            control.add(i);
+            test.put(i);
+            assertEquals(control.size(), test.size());
+        }
+
+        assertEquals(control.contains(-1), test.contains(-1));
+        assertEquals(control.contains(999), test.contains(999));
+
+        setIterTest(control, test.iterator());
+        // Reversed test.
+        setIterTest(test, control.iterator());
+        ImSet<Integer> persistent = test.persistent();
+
+        setIterTest(control, persistent.iterator());
+        setIterTest(control, serializeDeserialize(persistent).iterator());
+
+        // Have to go back to transient manually.  Not ideal, but I don't want to encourage this.
+        test = ((PersistentHashSet<Integer>) persistent).asTransient();
+
+        for (int i = 0; i < SOME; i++) {
+            control.remove(i);
+            test.without(i);
+            assertEquals(control.size(), test.size());
+        }
     }
 
     enum Ctx implements ComparisonContext<Integer> {

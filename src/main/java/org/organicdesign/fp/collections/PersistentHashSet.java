@@ -146,12 +146,6 @@ public class PersistentHashSet<E> implements ImSet<E>, Serializable {
             return impl.entry((E) key).isSome();
         }
 
-        /**
-         This is a convenience method inherited from Collection that returns true if size() == 0 (if this set contains no
-         elements).
-         */
-        @Override public boolean isEmpty() { return impl.isEmpty(); }
-
         @Override public ImSetTrans<E> without(E key) {
             ImMapTrans<E,E> m = impl.without(key);
             if (m != impl) this.impl = m;
