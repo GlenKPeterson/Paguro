@@ -13,7 +13,12 @@
 
 package org.organicdesign.fp.collections;
 
+import java.io.IOException;
+import java.io.InvalidObjectException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -23,9 +28,6 @@ import java.util.Set;
  License 1.0 Copyright Rich Hickey
 */
 public class PersistentHashSet<E> implements ImSet<E>, Serializable {
-
-    // For serializable.  Make sure to change whenever internal data format changes.
-    private static final long serialVersionUID = 20160827174100L;
 
     // If you don't put this here, it inherits EMPTY from UnmodSet, which does not have .equals()
     // defined.  UnmodSet.empty won't put() either.
@@ -70,10 +72,61 @@ public class PersistentHashSet<E> implements ImSet<E>, Serializable {
         return new PersistentHashSet<>((ImMapTrans<E,E>) map);
     }
 
+    // ==================================== Instance Variables ====================================
     private final ImMapTrans<E,E> impl;
 
+    // ======================================= Constructor =======================================
     private PersistentHashSet(ImMapTrans<E,E> i) { impl = i; }
 
+    // ======================================= Serialization =======================================
+    // This class has a custom serialized form designed to be as small as possible.  It does not
+    // have the same internal structure as an instance of this class.
+
+    // For serializable.  Make sure to change whenever internal data format changes.
+    private static final long serialVersionUID = 20160904155600L;
+
+    // Check out Josh Bloch Item 78, p. 312 for an explanation of what's going on here.
+    private static class SerializationProxy<K> implements Serializable {
+        // For serializable.  Make sure to change whenever internal data format changes.
+        private static final long serialVersionUID = 20160904155600L;
+
+        private final int size;
+        private transient ImMapTrans<K,K> theMap;
+        SerializationProxy(ImMapTrans<K,K> phm) {
+            size = phm.size();
+            theMap = phm;
+        }
+
+        // Taken from Josh Bloch Item 75, p. 298
+        private void writeObject(ObjectOutputStream s) throws IOException {
+            s.defaultWriteObject();
+            // Write out all elements in the proper order
+            for (Map.Entry<K,?> entry : theMap) {
+                s.writeObject(entry.getKey());
+            }
+        }
+
+        @SuppressWarnings("unchecked")
+        private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
+            s.defaultReadObject();
+            theMap = PersistentHashMap.<K,K>empty().asTransient();
+            for (int i = 0; i < size; i++) {
+                K k = (K) s.readObject();
+                theMap = theMap.assoc(k, k);
+            }
+        }
+
+        private Object readResolve() { return PersistentHashSet.ofMap(theMap.persistent()); }
+    }
+
+    private Object writeReplace() { return new SerializationProxy<>(impl); }
+
+    private void readObject(java.io.ObjectInputStream in) throws IOException,
+            ClassNotFoundException {
+        throw new InvalidObjectException("Proxy required");
+    }
+
+    // ===================================== Instance Methods =====================================
     @Override public boolean contains(Object key) {
         //noinspection SuspiciousMethodCalls
         return impl.containsKey(key);
