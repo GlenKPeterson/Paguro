@@ -2,7 +2,7 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") p
 
 #News
 
-##UncleJim 2.0: Serializable
+##2016-09-04 Release 2.0.2: Serializable
 Making this project properly Serializable required some breaking changes.
 Most notably, Tuple2 no longer implements Map.Entry.
 Tuple2 is meant to be extensible and making something Serializable adds a lot of unnecessary complexity for subclasses (See Josh Bloch's items 74-78 for details).
