@@ -1,7 +1,12 @@
+## 2016-09-01 Release 2.0.2
+ - Gave 5 main collections custom serialized forms (after reading Josh Bloch) so that we can change
+   the implementations later without breaking any clients who are using them for long-term storage.
+ - Decided *NOT* to make any itera**tors** serializable.
+ - Improved tests a bit, especially for serialization.
+
 ## 2016-09-01 Release 2.0.1
  - Made UnmodSortedIterable.castFrom... methods generic and serializable (and wrote tests for same).
  - Fixed some Javadoc link errors.
- - Bumped version number.
 
 ## 2016-08-27 Release 2.0.0: Serializable
 This is a major release due to the following **breaking changes** in order to make more things serializable without creating a mess:

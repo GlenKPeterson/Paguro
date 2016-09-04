@@ -185,7 +185,7 @@ public class PersistentVectorTest {
         PersistentVector.ofIter(Collections.unmodifiableList(oneList)).get(Integer.MAX_VALUE); }
 
     @Test public void addSeveralItems() throws NoSuchAlgorithmException {
-        System.out.println("addSeveral start");
+//        System.out.println("addSeveral start");
         final int SEVERAL = 100; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
         PersistentVector<Integer> is = PersistentVector.empty();
         for (int j = 0; j < SEVERAL; j++){
