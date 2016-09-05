@@ -3,110 +3,7 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") p
 #News
 
 ##2016-09-04 Release 2.0.2: Serializable
-Making this project properly Serializable required some breaking changes.
-Most notably, Tuple2 no longer implements Map.Entry.
-Tuple2 is meant to be extensible and making something Serializable adds a lot of unnecessary complexity for subclasses (See Josh Bloch's items 74-78 for details).
-A new sub-class of Tuple2 called KeyVal implements Map.Entry, UnmodMap.UnEntry, and Serializable.
-This in turn required a different helper function in StaticImports: `kv()` instead of `tup()`.
-If you declare maps, you'll have to make the following manual changes:
-
-```java
-// Obsolete:
-map(tup("one",1),
-    tup("two",2))
-
-// New syntax:
-map(kv("one",1),
-    kv("two",2))
-```
-
-If you transform things into maps, you may need to make changes as follows:
-
-```java
-// Obsolete:
-someCollection.toImMap(x -> tup(x.k, x.v))
-
-// New syntax:
-someCollection.toImMap(x -> kv(x.k, x.v))
-
-
-// Obsolete (and contrived).  Also see note about changed static imports below.
-vec(vec("three", 3), vec("four, 4)).toImMap(IDENTITY)
-
-// New syntax:
-vec(kv("three", 3), kv("four, 4)).toImMap(IDENTITY)
-```
-
-Unless you use this project extensively, these are the only changes you are likely to notice.
-Thanks @sblommers for spotting this issue and writing the key unit test!
-
-Anything that used to be implemented as an anonymous class, object, or lambda is now
-implemented as an enum or serializable sub-class.  As a result, the following constants have moved.
-The easiest way to make this change is to use a static import for the new fields.  For example:
-```java
-// Obsolete:
-import static org.organicdesign.fp.function.Function1..*;
-
-// New:
-import static org.organicdesign.fp.function.Function1.ConstBool.*;
-```
-
-##### List of changes:
-```
-org.organicdesign.fp.collections.Equator:
-DEFAULT_COMPARATOR   is now   Comp.DEFAULT
-DEFAULT_EQUATOR      is now   Equat.DEFAULT
-ComparisonContext   moved to  org.organicdesign.fp.collections.ComparisonContext
-DEFAULT_CONTEXT      is now   org.organicdesign.fp.collections.ComparisonContext.CompCtx.DEFAULT
-
-org.organicdesign.fp.collections.RangeOfInt:
-LIST_EQUATOR  is now Equat.LIST
-
-org.organicdesign.fp.function.Function0:
-NULL   is now   Const.NULL
-New serializable sub-class for functions that always return the same value:
-Constant (Function0.Constant)
-
-org.organicdesign.fp.function.Function1
-IDENTITY  is now  Const.IDENTITY
-ACCEPT    is now  ConstBool.ACCEPT
-REJECT    is now  ConstBool.REJECT
-
-org.organicdesign.fp.collections.UnmodMap.UnEntry.entryToUnEntry(Map.Entry<K,V> entry)
-is now
-org.organicdesign.fp.collections.KeyVal.of(Map.Entry<K,V> entry)
-
-Search for usages of
-map(tup(
-.toImMap(... tup(
-and replace them with
-map(kv(
-.toImMap(... kv(
-```
-
-#### Additional changes
- - Tuple2 no longer implements Map.Entry.  Instead, a new Serializable subclass, KeyVal, was created for this purpose.
- - Removed UnmodMap.UnEntry.entryToUnEntry(Map.Entry<K,V> entry).
- - Tuple hashcodes are now the addition of the hashcodes of each item in the tuple.
-   They used to bitwise-or the first two items (and add the rest) for compatibility with Map.Entry.
- - PersistentHashMap.ArrayNode, .BitMapIndexNode, .HashCollisionNode, and .NodeIter are now all private (were public or package).
-   There should never have been any reason to use or access these.
- - Added ImSetTrans&lt;E&gt; interface and exposed the Transient Set implementation.
- - Added ImListTrans&lt;E&gt; interface and exposed the Transient Vector implementation.
- - Found some opportunities to use transient implementations more efficiently.
-
-#### What's *NOT* Serializable?
- - The function interfaces (Function0, Function1, etc.) will *NOT* implement Serializable.
-    These interfaces are general and Serializable is too much for implementers to think about (and often irrelevant).
-    However, the *constants* and *singletons* in those interfaces have been changed to implement
-    Serializable.
- - Iterators are *NOT* serializable.  They aren't in java.util.Collections either.
-   If you need an iterator to be serializable for some reason, open an issue and we'll discuss it.
- - Transformable is not serializable.
- - Transient-HashSet, -HashMap, and -Vector are not Serializable.
- - FunctionUtils.unmodifiable___() methods are not serializable (yet?).
-
-Issues?  Questions?  Provide feedback on the [Serialization enhancement request](https://github.com/GlenKPeterson/UncleJim/issues/10)
+Making this project properly Serializable required some breaking changes.  Please see the [Upgrade Notes in the Change Log](https://github.com/GlenKPeterson/UncleJim/blob/master/CHANGE_LOG.md#upgrade-from-1x-to-2x) for details.
 
 ###Renaming
 This project will soon be renamed to "Paguro" ("pah-GUH-row" rhymes with "furrow") which is short for the Latin "Paguroidea" - the name of the Hermit Crab superfamily in Biology.  These collections grow by adding a new shell, leaving the insides the same, much the way Hermit Crabs trade up to a new shell when they grow.  Plus, hermit crabs are cute.
@@ -207,17 +104,21 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
 
 #FAQ
 
-##Q: How does this compare to PCollections?
+###Q: How does this compare to PCollections?
 
 [UncleJim is based on Clojure, theoretically faster and has additional features](https://github.com/GlenKPeterson/UncleJim/wiki/UncleJim-vs.-PCollections)
 
-##Q: Do these Transforms create intermediate collections between each operation (like the Scala collections)?
+###Q: Do these Transforms create intermediate collections between each operation (like the Scala collections)?
 
 [No](https://github.com/GlenKPeterson/UncleJim/wiki/How-do-%22Xforms%22---Transformations-work%3F)
 
-##Q: How does this compare to Streams and lambda expressions in JDK8?
+###Q: How does this compare to Streams and lambda expressions in JDK8?
 
 [Comparison](https://github.com/GlenKPeterson/UncleJim/wiki/Comparison-with-Streams-and-Lambdas-in-JDK8)
+
+###Q: Why Java instead of another/better JVM language?
+
+[Why Java?](https://github.com/GlenKPeterson/UncleJim/wiki/Why-is-Paguro-written-in-Java%3F)
 
 #Future Development Priorities (as of 2016-08-25)
 1. Make collections implement Serializable.
