@@ -264,7 +264,6 @@ public class PersistentTreeSet<E> implements ImSortedSet<E>, Serializable {
         return PersistentTreeSet.ofMap(impl.tailMap(fromElement));
     }
 
-//    // TODO: Ensure that KeySet is sorted.
 //    /** {@inheritDoc} */
 //    @Override public Sequence<E> tail() { return impl.without(first()).keySet().seq(); }
 

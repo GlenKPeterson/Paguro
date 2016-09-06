@@ -92,15 +92,15 @@ public class UsageExampleTest {
 
         // Everything has build-in toString() methods.  Collections show the first 3-5 elements.
         assertEquals("PersistentVector(" +
-                     "Tuple3(Jane,Smith,PersistentVector(Tuple2(HOME,\"a@b.c\")," +
+                     "Tuple3(\"Jane\",\"Smith\",PersistentVector(Tuple2(HOME,\"a@b.c\")," +
                      "Tuple2(WORK,\"b@c.d\")))," +
-                     "Tuple3(Fred,Tase,PersistentVector(Tuple2(HOME,\"c@d.e\"))))",
+                     "Tuple3(\"Fred\",\"Tase\",PersistentVector(Tuple2(HOME,\"c@d.e\"))))",
                      people.toString());
 
         // Inspect Jane's record:
         Tuple3<String,String,ImList<Tuple2<EmailType,String>>> jane = people.get(0);
 
-        assertEquals("Tuple3(Jane,Smith,PersistentVector(Tuple2(HOME,\"a@b.c\")," +
+        assertEquals("Tuple3(\"Jane\",\"Smith\",PersistentVector(Tuple2(HOME,\"a@b.c\")," +
                      "Tuple2(WORK,\"b@c.d\")))",
                      jane.toString());
 
@@ -126,13 +126,13 @@ public class UsageExampleTest {
         // Look at the map we just created
         assertEquals("PersistentHashMap(" +
                      "Tuple2(\"a@b.c\"," +
-                     "Tuple3(Jane,Smith,PersistentVector(Tuple2(HOME,\"a@b.c\")," +
+                     "Tuple3(\"Jane\",\"Smith\",PersistentVector(Tuple2(HOME,\"a@b.c\")," +
                      "Tuple2(WORK,\"b@c.d\"))))," +
                      "Tuple2(\"b@c.d\"," +
-                     "Tuple3(Jane,Smith,PersistentVector(Tuple2(HOME,\"a@b.c\")," +
+                     "Tuple3(\"Jane\",\"Smith\",PersistentVector(Tuple2(HOME,\"a@b.c\")," +
                      "Tuple2(WORK,\"b@c.d\"))))," +
                      "Tuple2(\"c@d.e\"," +
-                     "Tuple3(Fred,Tase,PersistentVector(Tuple2(HOME,\"c@d.e\")))))",
+                     "Tuple3(\"Fred\",\"Tase\",PersistentVector(Tuple2(HOME,\"c@d.e\")))))",
                      peopleByEmail.toString());
 
         // Prove that we can now look up Jane by her address
@@ -183,16 +183,16 @@ public class UsageExampleTest {
         // Notice that the tuples are smart enough to take their new names, Person and Email instead
         // of Tuple3 and Tuple2.  This aids readability when debugging.
         assertEquals("PersistentVector(" +
-                     "Person(Jane,Smith," +
+                     "Person(\"Jane\",\"Smith\"," +
                      "PersistentVector(Email(HOME,\"a@b.c\"),Email(WORK,\"b@c.d\")))," +
-                     "Person(Fred,Tase," +
+                     "Person(\"Fred\",\"Tase\"," +
                      "PersistentVector(Email(HOME,\"c@d.e\"),Email(WORK,\"d@e.f\"))))",
                      people.toString());
 
         // This type signature couldn't be simpler (or more descriptive):
         Person jane = people.get(0);
 
-        assertEquals("Person(Jane,Smith," +
+        assertEquals("Person(\"Jane\",\"Smith\"," +
                      "PersistentVector(Email(HOME,\"a@b.c\"),Email(WORK,\"b@c.d\")))",
                      jane.toString());
 
@@ -211,13 +211,13 @@ public class UsageExampleTest {
                       .toImMap(Function1.identity());
 
         assertEquals("PersistentHashMap(" +
-                     "Tuple2(\"d@e.f\",Person(Fred,Tase,PersistentVector(Email(HOME,\"c@d.e\")," +
+                     "Tuple2(\"d@e.f\",Person(\"Fred\",\"Tase\",PersistentVector(Email(HOME,\"c@d.e\")," +
                      "Email(WORK,\"d@e.f\"))))," +
-                     "Tuple2(\"a@b.c\",Person(Jane,Smith,PersistentVector(Email(HOME,\"a@b.c\")," +
+                     "Tuple2(\"a@b.c\",Person(\"Jane\",\"Smith\",PersistentVector(Email(HOME,\"a@b.c\")," +
                      "Email(WORK,\"b@c.d\"))))," +
-                     "Tuple2(\"b@c.d\",Person(Jane,Smith,PersistentVector(Email(HOME,\"a@b.c\")," +
+                     "Tuple2(\"b@c.d\",Person(\"Jane\",\"Smith\",PersistentVector(Email(HOME,\"a@b.c\")," +
                      "Email(WORK,\"b@c.d\"))))," +
-                     "Tuple2(\"c@d.e\",Person(Fred,Tase,PersistentVector(Email(HOME,\"c@d.e\")," +
+                     "Tuple2(\"c@d.e\",Person(\"Fred\",\"Tase\",PersistentVector(Email(HOME,\"c@d.e\")," +
                      "Email(WORK,\"d@e.f\")))))",
                      peopleByEmail.toString());
 

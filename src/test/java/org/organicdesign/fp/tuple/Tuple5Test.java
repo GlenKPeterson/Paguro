@@ -17,7 +17,7 @@ package org.organicdesign.fp.tuple;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
+import static org.organicdesign.fp.TestUtilities.serializeDeserialize;import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 import static org.organicdesign.testUtils.EqualsContract.equalsSameHashCode;
 
 // ======================================================================================
@@ -28,50 +28,59 @@ public class Tuple5Test {
     @Test public void constructionAndAccess() {
         Tuple5<String,String,String,String,String> a = Tuple5.of("1st","2nd","3rd","4th","5th");
 
+        Tuple5<String,String,String,String,String> ser = serializeDeserialize(a);
+
         assertEquals("1st", a._1());
         assertEquals("2nd", a._2());
         assertEquals("3rd", a._3());
         assertEquals("4th", a._4());
         assertEquals("5th", a._5());
 
-        equalsDistinctHashCode(a, Tuple5.of("1st","2nd","3rd","4th","5th"),
+        assertEquals("1st", ser._1());
+        assertEquals("2nd", ser._2());
+        assertEquals("3rd", ser._3());
+        assertEquals("4th", ser._4());
+        assertEquals("5th", ser._5());
+
+        equalsDistinctHashCode(a, ser,
                                Tuple5.of("1st","2nd","3rd","4th","5th"),
                                Tuple5.of("wrong","2nd","3rd","4th","5th"));
 
 
-        equalsDistinctHashCode(a, Tuple5.of("1st","2nd","3rd","4th","5th"),
+        equalsDistinctHashCode(a, ser,
                                Tuple5.of("1st","2nd","3rd","4th","5th"),
                                Tuple5.of("1st","wrong","3rd","4th","5th"));
 
 
-        equalsDistinctHashCode(a, Tuple5.of("1st","2nd","3rd","4th","5th"),
+        equalsDistinctHashCode(a, ser,
                                Tuple5.of("1st","2nd","3rd","4th","5th"),
                                Tuple5.of("1st","2nd","wrong","4th","5th"));
 
 
-        equalsDistinctHashCode(a, Tuple5.of("1st","2nd","3rd","4th","5th"),
+        equalsDistinctHashCode(a, ser,
                                Tuple5.of("1st","2nd","3rd","4th","5th"),
                                Tuple5.of("1st","2nd","3rd","wrong","5th"));
 
 
-        equalsDistinctHashCode(a, Tuple5.of("1st","2nd","3rd","4th","5th"),
+        equalsDistinctHashCode(a, ser,
                                Tuple5.of("1st","2nd","3rd","4th","5th"),
                                Tuple5.of("1st","2nd","3rd","4th","wrong"));
 
         equalsDistinctHashCode(Tuple5.of("1st",null,"3rd",null,"5th"),
-                               Tuple5.of("1st",null,"3rd",null,"5th"),
+                               serializeDeserialize(Tuple5.of("1st",null,"3rd",null,"5th")),
                                Tuple5.of("1st",null,"3rd",null,"5th"),
                                Tuple5.of("1st",null,"3rd",null,"wrong"));
 
         equalsDistinctHashCode(Tuple5.of(null,"2nd",null,"4th",null),
-                               Tuple5.of(null,"2nd",null,"4th",null),
+                               serializeDeserialize(Tuple5.of(null,"2nd",null,"4th",null)),
                                Tuple5.of(null,"2nd",null,"4th",null),
                                Tuple5.of(null,"2nd",null,"4th","wrong"));
 
-        equalsSameHashCode(a, Tuple5.of("1st","2nd","3rd","4th","5th"),
+        equalsSameHashCode(a, ser,
                            Tuple5.of("1st","2nd","3rd","4th","5th"),
                            Tuple5.of("2nd","1st","3rd","4th","5th"));
 
-        assertEquals("Tuple5(1st,2nd,3rd,4th,5th)", a.toString());
+        assertEquals("Tuple5(\"1st\",\"2nd\",\"3rd\",\"4th\",\"5th\")", a.toString());
+        assertEquals("Tuple5(\"1st\",\"2nd\",\"3rd\",\"4th\",\"5th\")", ser.toString());
     }
 }

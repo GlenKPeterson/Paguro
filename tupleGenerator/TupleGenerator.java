@@ -16,6 +16,8 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.StringBuilder;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
 public class TupleGenerator {
@@ -200,13 +202,13 @@ public class TupleGenerator {
                  "    @Override\n" +
                  "    public String toString() {\n" +
                  "        return getClass().getSimpleName() + \"(\" +\n" +
-                 "               _");
+                 "               stringify(_");
         isFirst = true;
         for (int l = 1; l <= i; l++) {
             if (isFirst) {
                 isFirst = false;
             } else {
-                if ((l % 4) == 0) {
+                if ((l % 3) == 0) {
                     fr.write(" + \",\" +\n" +
                              "               stringify(_");
                 } else {
@@ -379,18 +381,8 @@ public class TupleGenerator {
         }
         fr.write("));\n" +
                  "\n" +
-                 "        assertEquals(\"Tuple" + i + "(");
-        List<String> strs = new ArrayList<String>(i);
-        for (int j = 1; j <= i; j++) {
-            strs.add("\"" + ordinal(j) + "\"");
-        }
-        String ords = commas(fr, strs);
-        fr.write(ords);
-        fr.write(")\", a.toString());\n" +
-
-                 "        assertEquals(\"Tuple" + i + "(");
-        fr.write(ords);
-        fr.write(")\", ser.toString());\n" +
+                 "        assertEquals(\"Tuple" + i + "(" + tupleTestParams(i).replace("\"", "\\\"") + ")\", a.toString());\n" +
+                 "        assertEquals(\"Tuple" + i + "(" + tupleTestParams(i).replace("\"", "\\\"") + ")\", ser.toString());\n" +
                  "    }\n" +
                  "}\n");
         fr.flush();
