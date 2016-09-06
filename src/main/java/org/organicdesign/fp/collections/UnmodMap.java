@@ -20,6 +20,8 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import org.organicdesign.fp.tuple.Tuple2;
+
 /**
  An unmodifiable map.
  This cannot extend Collection because the remove() method would then be inherited
@@ -128,11 +130,11 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
         }
 
         /**
-         Use {@link org.organicdesign.fp.collections.KeyVal#KeyVal(java.util.Map.Entry)} instead.
+         Use {@link org.organicdesign.fp.tuple.Tuple2#of(java.util.Map.Entry)} instead.
          */
         @Deprecated
         static <K,V> UnEntry<K,V> entryToUnEntry(Map.Entry<K,V> entry) {
-            return new KeyVal<>(entry);
+            return Tuple2.of(entry);
         }
 
         static <K,V>

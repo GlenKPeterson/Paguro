@@ -2,8 +2,10 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") p
 
 #News
 
-##2016-09-04 Release 2.0.2: Serializable
-Making this project properly Serializable required some breaking changes.  Please see the [Upgrade Notes in the Change Log](https://github.com/GlenKPeterson/UncleJim/blob/master/CHANGE_LOG.md#upgrade-from-1x-to-2x) for details.
+##2016-09-06 Release 2.0.3: Serializable
+**DO NOT USE Releases 2.0.0 - 2.0.2.  Breaking changes from these were reverted.**
+Thanks @sblommers for spotting the lack of serialization and writing the key unit test!
+Fixing this involved some minor breaking changes.  Please see the [Upgrade Notes in the Change Log](https://github.com/GlenKPeterson/UncleJim/blob/master/CHANGE_LOG.md#upgrade-from-1x-to-2x) for details.
 
 ###Renaming
 This project will soon be renamed to "Paguro" ("pah-GUH-row" rhymes with "furrow") which is short for the Latin "Paguroidea" - the name of the Hermit Crab superfamily in Biology.  These collections grow by adding a new shell, leaving the insides the same, much the way Hermit Crabs trade up to a new shell when they grow.  Plus, hermit crabs are cute.
@@ -45,7 +47,7 @@ Available from the [Maven Repository](http://mvnrepository.com/artifact/org.orga
         <groupId>org.organicdesign</groupId>
         <!-- NOTE: artifactId will change to "Paguro" in November 2016 -->
         <artifactId>UncleJim</artifactId>
-        <version>2.0.2</version>
+        <version>2.0.3</version>
 </dependency>
 ```
 
@@ -66,7 +68,7 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
 
         // For each address, produce a key/value pair
         // of email and person (Tuple2 implements Map.Entry)
-                                 .map(email -> kv(email, person)))
+                                 .map(email -> tup(email, person)))
 
         // toImMap() collects the results to key/value pairs and puts
         // them in an immutable map.  We already have pairs, so pass

@@ -25,7 +25,6 @@ import org.organicdesign.fp.collections.ImMap;
 import org.organicdesign.fp.collections.ImSet;
 import org.organicdesign.fp.collections.ImSortedMap;
 import org.organicdesign.fp.collections.ImSortedSet;
-import org.organicdesign.fp.collections.KeyVal;
 import org.organicdesign.fp.collections.PersistentHashMap;
 import org.organicdesign.fp.collections.PersistentHashSet;
 import org.organicdesign.fp.collections.PersistentTreeMap;
@@ -61,7 +60,7 @@ public class StaticImportsTest {
         assertEquals(PersistentHashMap.EMPTY, map(new Map.Entry[0]));
         ImMap<String,Integer> phm = PersistentHashMap.<String,Integer>empty()
                 .assoc("Hi", 43);
-        assertEquals(phm, map(kv("Hi", 43)));
+        assertEquals(phm, map(tup("Hi", 43)));
     }
 
     @SuppressWarnings({"NullArgumentToVariableArgMethod", "RedundantArrayCreation"})
@@ -76,10 +75,10 @@ public class StaticImportsTest {
 
     @Test public void testSortedMap() throws Exception {
         ImList<Map.Entry<String,Integer>> ls = PersistentVector.empty();
-        ls = ls.append(kv("Hi", 1))
-               .append(KeyVal.of("Bye", -99))
-               .append(new KeyVal<>("hi", 33))
-               .append(kv("bye", -9999));
+        ls = ls.append(tup("Hi", 1))
+               .append(Tuple2.of("Bye", -99))
+               .append(Tuple2.of("hi", 33))
+               .append(tup("bye", -9999));
         ImSortedMap<String,Integer> refMap =
                 PersistentTreeMap.ofComp(String.CASE_INSENSITIVE_ORDER, ls);
         ImSortedMap<String,Integer> testMap = sortedMap(String.CASE_INSENSITIVE_ORDER, ls);

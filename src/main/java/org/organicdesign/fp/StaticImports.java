@@ -23,7 +23,6 @@ import org.organicdesign.fp.collections.ImMap;
 import org.organicdesign.fp.collections.ImSet;
 import org.organicdesign.fp.collections.ImSortedMap;
 import org.organicdesign.fp.collections.ImSortedSet;
-import org.organicdesign.fp.collections.KeyVal;
 import org.organicdesign.fp.collections.PersistentHashMap;
 import org.organicdesign.fp.collections.PersistentHashSet;
 import org.organicdesign.fp.collections.PersistentTreeMap;
@@ -75,14 +74,16 @@ public final class StaticImports {
     private StaticImports() { throw new UnsupportedOperationException("No instantiation"); }
 
     /**
-     Returns a new KeyVal of the given items (extends Tuple2 and implements Map.Entry, UnmodMap.UnEntry, and
-     Serializable).
+     This turned out to be a bad idea due to the complexity and slowness of serializing
+     a class extended from an immutable tuple.  I made tuples serializable and was able to back out
+     other breaking changes.
      */
-    public static <K,V> KeyVal<K,V> kv(K t, V u) { return new KeyVal<>(t, u); }
+    @Deprecated
+    public static <K,V> Tuple2<K,V> kv(K t, V u) { return Tuple2.of(t, u); }
 
     /**
      Returns a new PersistentHashMap of the given keys and their paired values.  Use the
-     {@link StaticImports#kv(Object, Object)} method to define those key/value pairs briefly and
+     {@link StaticImports#tup(Object, Object)} method to define those key/value pairs briefly and
      easily.  This data definition method is one of the three methods in this project that support
      varargs.
 

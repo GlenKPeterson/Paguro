@@ -15,8 +15,14 @@ import java.util.SortedSet;
 public interface UnmodSortedIterable<T> extends UnmodIterable<T> {
     // ========================================== Static ==========================================
 
+    /**
+     Renamed to {@link #equal(Object)} to avoid confusion with instance method {@link Object#equals(Object)}
+     */
+    @Deprecated
+    static boolean equals(UnmodSortedIterable a, UnmodSortedIterable b) { return equal(a, b); }
+
     /** This is correct, but O(n).  This only works with an ordered iterable. */
-    static boolean equals(UnmodSortedIterable a, UnmodSortedIterable b) {
+    static boolean equal(UnmodSortedIterable a, UnmodSortedIterable b) {
         // Cheapest operation first...
         if (a == b) { return true; }
 
@@ -121,6 +127,7 @@ public interface UnmodSortedIterable<T> extends UnmodIterable<T> {
 //                return new KeyVal<>(iter.next());
 //            }
 //        }
+        if (sm instanceof UnmodSortedMap) { return (UnmodSortedMap<K,V>) sm; }
 
         class Implementation<K1,V1> implements UnmodSortedIterable<UnmodMap.UnEntry<K1,V1>>,
                 Serializable {

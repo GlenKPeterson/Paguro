@@ -212,7 +212,7 @@ public class PersistentTreeSet<E> implements ImSortedSet<E>, Serializable {
         SortedSet<?> that = (SortedSet) other;
 
         if (size() != that.size()) { return false; }
-        return UnmodSortedIterable.equals(this, UnmodSortedIterable.castFromSortedSet(that));
+        return UnmodSortedIterable.equal(this, UnmodSortedIterable.castFromSortedSet(that));
     }
 
     /**

@@ -136,14 +136,14 @@ public class UnmodSortedMapTest {
         Comparator<? super Map.Entry<String,Integer>> testComp0 = testEntSet.comparator();
         assert testComp0 != null;
         assertTrue("D".compareTo("d") < 0);
-        assertTrue(testComp0.compare(kv("D", 3), kv("d", -1)) < 0);
+        assertTrue(testComp0.compare(tup("D", 3), tup("d", -1)) < 0);
 
         Comparator<? super Map.Entry<String,Integer>> testComp =
                 new TestMap<>(refMap, String.CASE_INSENSITIVE_ORDER).entrySet().comparator();
 
         assertEquals(0, String.CASE_INSENSITIVE_ORDER.compare("D", "d"));
         assert testComp != null;
-        assertEquals(0, testComp.compare(kv("D", 3), kv("d", -1)));
+        assertEquals(0, testComp.compare(tup("D", 3), tup("d", -1)));
 
 //        UnmodMapTest.TestEntry<String,Integer>[] testEntries =
 //                (UnmodMapTest.TestEntry<String,Integer>[]) new UnmodMapTest.TestEntry[] {

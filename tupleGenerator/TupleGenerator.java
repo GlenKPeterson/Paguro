@@ -106,7 +106,10 @@ public class TupleGenerator {
         fr.write(copyright() +
                  "package org.organicdesign.fp.tuple;\n" +
                  "\n" +
+                 "import java.io.Serializable;\n" +
                  "import java.util.Objects;\n" +
+                 "\n" +
+                 "import static org.organicdesign.fp.FunctionUtils.stringify;\n" +
                  generatedWarning() +
                  "/**\n" +
                  " Holds " + i + " items of potentially different types.  Designed to let you easily create immutable\n" +
@@ -115,7 +118,14 @@ public class TupleGenerator {
                  " */\n" +
                  "public class Tuple" + i + "<");
         fr.write(types(i));
-        fr.write("> {\n" +
+        fr.write("> implements Serializable {\n" +
+                 "\n" +
+                 "    // For serializable.  Make sure to change whenever internal data format changes.\n" +
+                 "    // Implemented because implementing serializable only on a sub-class of an\n" +
+                 "    // immutable class requires a serialization proxy.  That's probably worse than\n" +
+                 "    // the conceptual burdeon of all tuples being Serializable." +
+                 "    private static final long serialVersionUID = 20160906065500L;\n" +
+                 "\n" +
                  "    // Fields are protected so that sub-classes can make accessor methods with meaningful names.\n");
         for (int l = 1; l <= i; l++) {
             fr.write("    protected final ");
@@ -196,14 +206,15 @@ public class TupleGenerator {
             if (isFirst) {
                 isFirst = false;
             } else {
-                if ((l % 8) == 0) {
+                if ((l % 4) == 0) {
                     fr.write(" + \",\" +\n" +
-                             "               _");
+                             "               stringify(_");
                 } else {
-                    fr.write(" + \",\" + _");
+                    fr.write(" + \",\" + stringify(_");
                 }
             }
             fr.write(String.valueOf(l));
+            fr.write(")");
         }
         fr.write(" + \")\";\n" +
                  "    }\n" +
@@ -232,9 +243,12 @@ public class TupleGenerator {
                  "\n" +
                  "    @Override\n" +
                  "    public int hashCode() {\n" +
+                 "        // First 2 fields match Tuple2 which implements java.util.Map.Entry as part of the map\n" +
+                 "        // contract and therefore must match java.util.HashMap.Node.hashCode().\n" +
                  "        int ret = 0;\n" +
-                 "        if (_1 != null) { ret = _1.hashCode(); }\n");
-        for (int l = 2; l <= i; l++) {
+                 "        if (_1 != null) { ret = _1.hashCode(); }\n" +
+                 "        if (_2 != null) { ret = ret ^ _2.hashCode(); }\n");
+        for (int l = 3; l <= i; l++) {
             fr.write("        if (_" + l + " != null) { ret = ret + _" + l + ".hashCode(); }\n");
         }
         fr.write("        return ret;\n" +
@@ -289,6 +303,20 @@ public class TupleGenerator {
         return tupleTestParamsReplace(i, j -> ( (j % 2) == 0) ? null : "null");
     }
 
+    static String commas(List<String> ss) {
+        StringBuilder sB = new StringBuilder();
+        boolean isFirst = true;
+        for (String s : ss) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                sB.append(",");
+            }
+            sB.append("String");
+        }
+        return sB.toString();
+    }
+
     static void genTupleTest(int i) throws IOException {
         FileWriter fr = new FileWriter("../src/test/java/org/organicdesign/fp/tuple/Tuple" + i +
                                        "Test.java");
@@ -298,44 +326,50 @@ public class TupleGenerator {
                  "import org.junit.Test;\n" +
                  "\n" +
                  "import static org.junit.Assert.assertEquals;\n" +
+                 "import static org.organicdesign.fp.TestUtilities.serializeDeserialize;" +
                  "import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;\n" +
                  "import static org.organicdesign.testUtils.EqualsContract.equalsSameHashCode;\n" +
                  generatedWarning() +
                  "public class Tuple" + i + "Test {\n" +
                  "    @Test public void constructionAndAccess() {\n" +
                  "        Tuple" + i + "<");
-        boolean isFirst = true;
+        List<String> strs = new ArrayList<String>(i);
         for (int j = 1; j <= i; j++) {
-            if (isFirst) {
-                isFirst = false;
-            } else {
-                fr.write(",");
-            }
-            fr.write("String");
+            strs.add("String");
         }
+        String types = commas(strs);
+        fr.write(types);
         fr.write("> a = Tuple" + i + ".of(" + tupleTestParams(i) + ");\n" +
+                 "\n");
+        fr.write("        Tuple" + i + "<");
+        fr.write(types);
+        fr.write("> ser = serializeDeserialize(a);\n" +
                  "\n");
         for (int j = 1; j <= i; j++) {
             fr.write("        assertEquals(\"" + ordinal(j) + "\", a._" + j + "());\n");
         }
+        fr.write("\n");
+        for (int j = 1; j <= i; j++) {
+            fr.write("        assertEquals(\"" + ordinal(j) + "\", ser._" + j + "());\n");
+        }
         for (int j = 1; j <= i; j++) {
             fr.write("\n" +
-                     "        equalsDistinctHashCode(a, Tuple" + i + ".of(" + tupleTestParams(i) + "),\n" +
+                     "        equalsDistinctHashCode(a, ser,\n" +
                      "                               Tuple" + i + ".of(" + tupleTestParams(i) + "),\n" +
                      "                               Tuple" + i + ".of(" + tupleTestParamsReplace(i, j, "wrong") + "));\n" +
                      "\n");
         }
         fr.write("        equalsDistinctHashCode(Tuple" + i + ".of(" + tupleTestParamsEvenNull(i) + "),\n" +
-                 "                               Tuple" + i + ".of(" + tupleTestParamsEvenNull(i) + "),\n" +
+                 "                               serializeDeserialize(Tuple" + i + ".of(" + tupleTestParamsEvenNull(i) + ")),\n" +
                  "                               Tuple" + i + ".of(" + tupleTestParamsEvenNull(i) + "),\n" +
                  "                               Tuple" + i + ".of(" + tupleTestParamsEvenNull(i-1) + ",\"wrong\"));\n" +
                  "\n" +
                  "        equalsDistinctHashCode(Tuple" + i + ".of(" + tupleTestParamsOddNull(i) + "),\n" +
-                 "                               Tuple" + i + ".of(" + tupleTestParamsOddNull(i) + "),\n" +
+                 "                               serializeDeserialize(Tuple" + i + ".of(" + tupleTestParamsOddNull(i) + ")),\n" +
                  "                               Tuple" + i + ".of(" + tupleTestParamsOddNull(i) + "),\n" +
                  "                               Tuple" + i + ".of(" + tupleTestParamsOddNull(i-1) + ",\"wrong\"));\n" +
                  "\n" +
-                 "        equalsSameHashCode(a, Tuple" + i + ".of(" + tupleTestParams(i) + "),\n" +
+                 "        equalsSameHashCode(a, ser,\n" +
                  "                           Tuple" + i + ".of(" + tupleTestParams(i) + "),\n" +
                  "                           Tuple" + i + ".of(");
         // Switch order of first 2 params for same hashcode.
@@ -346,16 +380,17 @@ public class TupleGenerator {
         fr.write("));\n" +
                  "\n" +
                  "        assertEquals(\"Tuple" + i + "(");
-        isFirst = true;
+        List<String> strs = new ArrayList<String>(i);
         for (int j = 1; j <= i; j++) {
-            if (isFirst) {
-                isFirst = false;
-            } else {
-                fr.write(",");
-            }
-            fr.write(ordinal(j));
+            strs.add("\"" + ordinal(j) + "\"");
         }
+        String ords = commas(fr, strs);
+        fr.write(ords);
         fr.write(")\", a.toString());\n" +
+
+                 "        assertEquals(\"Tuple" + i + "(");
+        fr.write(ords);
+        fr.write(")\", ser.toString());\n" +
                  "    }\n" +
                  "}\n");
         fr.flush();
@@ -363,7 +398,7 @@ public class TupleGenerator {
     }
 
     public static void main(String... args) throws IOException {
-        for (int i = 2; i <= 12; i++) {
+        for (int i = 3; i <= 12; i++) {
             genTuple(i);
             genTupleTest(i);
         }

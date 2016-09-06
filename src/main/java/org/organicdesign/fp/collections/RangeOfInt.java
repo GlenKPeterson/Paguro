@@ -13,6 +13,8 @@
 
 package org.organicdesign.fp.collections;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.List;
@@ -33,9 +35,6 @@ import java.util.NoSuchElementException;
  */
 // Note: In theory, this could implement both List<Integer> and SortedSet<Integer>
 public class RangeOfInt implements UnmodList<Integer>, Serializable {
-
-    // For serializable.  Make sure to change whenever internal data format changes.
-    private static final long serialVersionUID = 20160827174100L;
 
     // Enums are serializable and anonymous classes are not.  Therefore enums make better singletons.
     public enum Equat implements Equator<List<Integer>> {
@@ -58,8 +57,8 @@ public class RangeOfInt implements UnmodList<Integer>, Serializable {
                     return o1.equals(o2);
                 }
                 return o1.size() == o2.size() &&
-                       UnmodSortedIterable.equals(UnmodSortedIterable.castFromList(o1),
-                                                  UnmodSortedIterable.castFromList(o2));
+                       UnmodSortedIterable.equal(UnmodSortedIterable.castFromList(o1),
+                                                 UnmodSortedIterable.castFromList(o2));
             }
         }
     }
@@ -72,11 +71,6 @@ public class RangeOfInt implements UnmodList<Integer>, Serializable {
     @Deprecated
     public static final Equator<List<Integer>> LIST_EQUATOR = Equat.LIST;
 
-    private final int start;
-    private final int end;
-    private final int size;
-
-    private RangeOfInt(int s, int e) { start = s; end = e; size = (end - start); }
 
 //    public static RangeOfInt of(int s, int e) {
 //        if (e < s) {
@@ -109,6 +103,28 @@ public class RangeOfInt implements UnmodList<Integer>, Serializable {
     }
 
 //    public static RangeOfInt of(int s, int e) { return of((int) s, (int) e); }
+
+    // ==================================== Instance Variables ====================================
+
+    private final int start;
+    private final int end;
+    private transient int size;
+
+    // ======================================== Constructor ========================================
+
+    private RangeOfInt(int s, int e) { start = s; end = e; size = (end - start); }
+
+    // ======================================= Serialization =======================================
+
+    // For serializable.  Make sure to change whenever internal data format changes.
+    private static final long serialVersionUID = 20160906061300L;
+
+    private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
+        s.defaultReadObject();
+        size = end - start;
+    }
+
+    // ===================================== Instance Methods =====================================
 
 //    public int start() { return start; }
 //    public int end() { return end; }

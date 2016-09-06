@@ -38,13 +38,13 @@ import org.organicdesign.fp.collections.ImMap;
 import org.organicdesign.fp.collections.ImSet;
 import org.organicdesign.fp.collections.ImSortedMap;
 import org.organicdesign.fp.collections.ImSortedSet;
-import org.organicdesign.fp.collections.KeyVal;
 import org.organicdesign.fp.collections.UnmodCollection;
 import org.organicdesign.fp.collections.UnmodList;
 import org.organicdesign.fp.collections.UnmodMap;
 import org.organicdesign.fp.collections.UnmodSet;
 import org.organicdesign.fp.collections.UnmodSortedMap;
 import org.organicdesign.fp.collections.UnmodSortedSet;
+import org.organicdesign.fp.tuple.Tuple2;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.*;
@@ -58,7 +58,7 @@ public class FunctionUtilsTest {
     @Test public void stringifyTest() {
         assertEquals("null", stringify(null));
         assertEquals("\"Hello\"", stringify("Hello"));
-        assertEquals("kv(\"a\",3)", stringify(KeyVal.of("a", 3)));
+        assertEquals("Tuple2(\"a\",3)", stringify(Tuple2.of("a", 3)));
     }
 
     @Test (expected = UnsupportedOperationException.class)
@@ -752,9 +752,9 @@ public class FunctionUtilsTest {
         assertEquals(FunctionUtils.EMPTY_UNMOD_MAP,
                      FunctionUtils.unmodMap(Collections.emptyMap()));
 
-        ImMap<Integer,String> imMap = map(kv(1, ordinal(1)),
-                                          kv(2, ordinal(2)),
-                                          kv(3, ordinal(3)));
+        ImMap<Integer,String> imMap = map(tup(1, ordinal(1)),
+                                          tup(2, ordinal(2)),
+                                          tup(3, ordinal(3)));
 
         assertTrue(imMap == FunctionUtils.unmodMap(imMap));
 
@@ -835,9 +835,9 @@ public class FunctionUtilsTest {
         assertEquals(FunctionUtils.EMPTY_UNMOD_SORTED_MAP,
                      FunctionUtils.unmodSortedMap(Collections.emptySortedMap()));
 
-        ImSortedMap<Integer,String> imMap = sortedMap((a, b) -> a - b, vec(kv(1, ordinal(1)),
-                                                                           kv(2, ordinal(2)),
-                                                                           kv(3, ordinal(3))));
+        ImSortedMap<Integer,String> imMap = sortedMap((a, b) -> a - b, vec(tup(1, ordinal(1)),
+                                                                           tup(2, ordinal(2)),
+                                                                           tup(3, ordinal(3))));
         assertTrue(imMap == FunctionUtils.unmodSortedMap(imMap));
 
         final UnmodSortedMap<Integer,String> ts;

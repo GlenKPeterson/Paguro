@@ -11,6 +11,7 @@ import org.organicdesign.fp.collections.RangeOfInt.Equat;
 import org.organicdesign.testUtils.EqualsContract;
 
 import static org.junit.Assert.*;
+import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 
 public class RangeOfIntTest {
     @Test(expected = IllegalArgumentException.class)
@@ -340,10 +341,14 @@ public class RangeOfIntTest {
     @Test public void serializationTest() throws Exception {
         List<Integer> a = Arrays.asList(-2, -1, 0, 1, 2, 3, 4);
         List<Integer> b = RangeOfInt.of(-2, 5);
-        Equator<List<Integer>> deserEq = TestUtilities.serializeDeserialize(Equat.LIST);
+        Equator<List<Integer>> deserEq = serializeDeserialize(Equat.LIST);
         assertEquals(Equat.LIST.hash(a), deserEq.hash(a));
         assertEquals(Equat.LIST.hash(b), deserEq.hash(b));
         assertEquals(deserEq.hash(a), deserEq.hash(b));
+        assertEquals(a, b);
+        assertEquals(a.size(), b.size());
+        assertEquals(a, serializeDeserialize(b));
+        assertEquals(a.size(), serializeDeserialize(b).size());
 
         assertTrue(UnmodSortedIterable.equals(UnmodSortedIterable.castFromList(a),
                                               UnmodSortedIterable.castFromList(b)));
@@ -370,14 +375,14 @@ public class RangeOfIntTest {
         assertFalse("Not equal to different Range", deserEq.eq(RangeOfInt.of(-3, 4), b));
         assertFalse("Not equal to different Range", deserEq.eq(RangeOfInt.of(-3, 5), a));
 
-        RangeOfInt ir1 = TestUtilities.serializeDeserialize(RangeOfInt.of(0, 1));
+        RangeOfInt ir1 = serializeDeserialize(RangeOfInt.of(0, 1));
         assertEquals(ir1.contains(0), true);
         assertEquals(ir1.contains(1), false);
         assertEquals(ir1.contains(-1), false);
         assertEquals(ir1.size(), 1);
 
         List<Integer> a2 = Collections.singletonList(99);
-        List<Integer> b2 = TestUtilities.serializeDeserialize(RangeOfInt.of(99, 100));
+        List<Integer> b2 = serializeDeserialize(RangeOfInt.of(99, 100));
         assertEquals(a2.size(), b2.size());
         assertEquals(a2.get(0), b2.get(0));
     }

@@ -36,7 +36,7 @@ public class TradJavaStreamComparisonTest {
         // The Paguro way (3 lines of code):
         static final ImMap<Character,ColorVal> charToColorMapU =
                 vec(values())
-                        .toImMap(v -> kv(v.ch(), v));
+                        .toImMap(v -> tup(v.ch(), v));
 
         // Same thing in "traditional" Java (6 lines, plus closing braces):
         static final Map<Character,ColorVal> charToColorMapT;

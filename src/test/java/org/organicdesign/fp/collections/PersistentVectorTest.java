@@ -209,7 +209,7 @@ public class PersistentVectorTest {
         equalsDistinctHashCode(empty2, empty3, empty4,
                                vec((Integer) null));
 
-        System.out.println("addSeveral start");
+//        System.out.println("addSeveral start");
         final int SEVERAL = 100; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
         PersistentVector<Integer> is = PersistentVector.empty();
         for (int j = 0; j < SEVERAL; j++){

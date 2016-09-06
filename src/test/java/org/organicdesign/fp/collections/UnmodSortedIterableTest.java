@@ -12,9 +12,24 @@ import java.util.TreeSet;
 import org.junit.Test;
 import org.organicdesign.fp.TestUtilities;
 
+import static org.junit.Assert.assertTrue;
 import static org.organicdesign.fp.FunctionUtils.ordinal;
 
 public class UnmodSortedIterableTest {
+    @Test public void equalsTest() {
+        class Usi<T> implements UnmodSortedIterable<T> {
+            private final List<T> ts;
+            private Usi(List<T> l) { ts = l; }
+            /** Returns items in a guaranteed order. */
+            @Override
+            public UnmodSortedIterator<T> iterator() {
+                return new UnmodSortedIterator.Wrapper<>(ts.iterator());
+            }
+        };
+        assertTrue(UnmodSortedIterable.equal(new Usi<>(Arrays.asList("1", "2", "3")),
+                                             new Usi<>(Arrays.asList("1", "2", "3"))));
+    }
+
     @Test public void castFromSortedSetTest() {
         SortedSet<Integer> control = new TreeSet<>();
         control.addAll(Arrays.asList(9,8,7,6,5,4,3,2,1));

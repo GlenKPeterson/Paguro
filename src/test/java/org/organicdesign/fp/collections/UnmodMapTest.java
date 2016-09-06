@@ -26,9 +26,10 @@ import java.util.TreeMap;
 import org.junit.Test;
 import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.TestUtilities;
+import org.organicdesign.fp.tuple.Tuple2;
 
 import static org.junit.Assert.*;
-import static org.organicdesign.fp.StaticImports.kv;
+import static org.organicdesign.fp.StaticImports.tup;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
@@ -55,9 +56,9 @@ public class UnmodMapTest {
     }
 
     TestMap<String,Integer> unMap = new TestMap<>(Arrays.asList(
-            kv("a", 1),
-            kv("b", 2),
-            kv("c", 3)));
+            tup("a", 1),
+            tup("b", 2),
+            tup("c", 3)));
 
     @Test public void containsValue() {
         Map<String,Integer> mm = new HashMap<>();
@@ -310,7 +311,7 @@ public class UnmodMapTest {
     }
 
     static Map.Entry<String,Integer> me = new TestEntry<>("Hello", 37);
-    static UnmodMap.UnEntry<String,Integer> ue = KeyVal.of(me);
+    static UnmodMap.UnEntry<String,Integer> ue = Tuple2.of(me);
 
     @Test public void unEntryTest() {
 

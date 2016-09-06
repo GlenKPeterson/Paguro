@@ -511,7 +511,7 @@ public class PersistentVector<E> implements ImListTrans<E>, Serializable {
         if ( !(other instanceof List) ) { return false; }
         List<?> that = (List) other;
         return (this.size() == that.size()) &&
-                UnmodSortedIterable.equals(this, UnmodSortedIterable.castFromList(that));
+                UnmodSortedIterable.equal(this, UnmodSortedIterable.castFromList(that));
     }
 
     @Override public String toString() { return UnmodIterable.toString("PersistentVector", this); }

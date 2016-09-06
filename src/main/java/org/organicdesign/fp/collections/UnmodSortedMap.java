@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 
+import org.organicdesign.fp.tuple.Tuple2;
+
 /** An unmodifiable SortedMap. */
 public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>,
         UnmodSortedIterable<UnmodMap.UnEntry<K,V>> {
@@ -91,12 +93,12 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>,
 
             @Override public Entry<K,V> first() {
                 K key = parentMap.firstKey();
-                return new KeyVal<>(key, parentMap.get(key));
+                return Tuple2.of(key, parentMap.get(key));
             }
 
             @Override public Entry<K,V> last() {
                 K key = parentMap.lastKey();
-                return new KeyVal<>(key, parentMap.get(key));
+                return Tuple2.of(key, parentMap.get(key));
             }
 
             @Override public int hashCode() { return UnmodIterable.hashCode(this); }

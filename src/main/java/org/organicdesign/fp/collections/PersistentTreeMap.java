@@ -22,6 +22,7 @@ import java.util.SortedMap;
 import java.util.Stack;
 
 import org.organicdesign.fp.Option;
+import org.organicdesign.fp.tuple.Tuple2;
 
 /**
  Persistent Red Black Tree. Note that instances of this class are constant values
@@ -222,27 +223,27 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
      */
     @Override public ImSortedSet<Entry<K,V>> entrySet() {
         // This is the pretty way to do it.
-//        return this.foldLeft(PersistentTreeSet.ofComp(new KeyComparator<>(comp)),
-//                             PersistentTreeSet::put);
+        return this.foldLeft(PersistentTreeSet.ofComp(new KeyComparator<>(comp)),
+                             PersistentTreeSet::put);
 
         // This may be faster, but I haven't timed it.
 
         // Preserve comparator!
-        ImSortedSet<Entry<K,V>> ret = PersistentTreeSet.ofComp(new KeyComparator<>(comp));
-
-        // It is ABSOLUTELY CRITICAL to turn each item into a KeyVal.  What our iterator returns
-        // are actually huge chunks of the TreeMap which should not be serializable.  I don't know
-        // if we should change the iterator to wrap all these values, or if it's better to do it
-        // here.
-        for (Entry<K,V> entry : this) {
-            ret = ret.put(KeyVal.of(entry));
-        }
-        return ret;
+//        ImSortedSet<Entry<K,V>> ret = PersistentTreeSet.ofComp(new KeyComparator<>(comp));
+//
+//        // It is ABSOLUTELY CRITICAL to turn each item into a KeyVal.  What our iterator returns
+//        // are actually huge chunks of the TreeMap which should not be serializable.  I don't know
+//        // if we should change the iterator to wrap all these values, or if it's better to do it
+//        // here.
+//        for (Entry<K,V> entry : this) {
+//            ret = ret.put(Tuple2.of(entry));
+//        }
+//        return ret;
     }
 
     /** This is correct, but O(n). */
     @Override public int hashCode() {
-        return (size() == 0) ? 0 : UnmodIterable.hashCode(entrySet());
+        return (size() == 0) ? 0 : UnmodIterable.hashCode(this);
     }
 
 //    public static final Equator<SortedMap> EQUATOR = new Equator<SortedMap>() {
@@ -281,10 +282,13 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
 
         // Yay, this makes sense, and we can compare these with O(n) efficiency while still
         // maintaining compatibility with java.util.Map.
+        if (other instanceof UnmodSortedMap) {
+            return UnmodSortedIterable.equal(this, (UnmodSortedMap<?,?>) other);
+        }
         if (other instanceof SortedMap) {
-            return UnmodSortedIterable.equals(this,
-                                              UnmodSortedIterable.castFromSortedMap(
-                                                      (SortedMap<?,?>) other));
+            return UnmodSortedIterable.equal(this,
+                                             UnmodSortedIterable.castFromSortedMap(
+                                                     (SortedMap<?,?>) other));
         }
 
         // This makes no sense and takes O(n log n) or something.
@@ -293,7 +297,7 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
         // of the values.  I'm uncomfortable with this, but for now I'm aiming for
         // Compatibility with TreeMap.
         try {
-            for (Entry<K,V> e : entrySet()) {
+            for (Entry<K,V> e : this) {
                 K key = e.getKey();
                 V value = e.getValue();
                 Object thatValue = that.get(key);
@@ -360,11 +364,11 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
         return ret;
     }
 
-    String debugStr() {
-        return "PersistentTreeMap(size=" + size +
-               " comp=" + comp +
-               " tree=" + tree + ")";
-    }
+//    String debugStr() {
+//        return "PersistentTreeMap(size=" + size +
+//               " comp=" + comp +
+//               " tree=" + tree + ")";
+//    }
 
     /** Returns a string describing the first few items in this map (for debugging). */
     @Override public String toString() {
@@ -373,8 +377,7 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
         for (UnEntry<K,V> entry : this) {
             if (i > 0) { sB.append(","); }
             if (i > 4) { break; }
-            sB.append("kv(").append(entry.getKey()).append(",").append(entry.getValue())
-              .append(")");
+            sB.append(entry);
             i++;
         }
         if (i < size()) {
@@ -1319,7 +1322,7 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
             Node<K,V> t = stack.pop();
             push(asc ? t.right() : t.left());
 
-            return t;
+            return Tuple2.of(t);
         }
     }
 

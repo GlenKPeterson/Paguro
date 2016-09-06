@@ -25,7 +25,6 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 
-import org.organicdesign.fp.collections.KeyVal;
 import org.organicdesign.fp.collections.UnmodCollection;
 import org.organicdesign.fp.collections.UnmodIterable;
 import org.organicdesign.fp.collections.UnmodIterator;
@@ -36,6 +35,7 @@ import org.organicdesign.fp.collections.UnmodSet;
 import org.organicdesign.fp.collections.UnmodSortedIterator;
 import org.organicdesign.fp.collections.UnmodSortedMap;
 import org.organicdesign.fp.collections.UnmodSortedSet;
+import org.organicdesign.fp.tuple.Tuple2;
 
 /**
  A dumping ground for utility functions that aren't useful enough to belong in StaticImports.
@@ -592,7 +592,7 @@ public class FunctionUtils {
                     @Override public boolean hasNext() { return iter.hasNext(); }
 
                     @Override public UnEntry<K,V> next() {
-                        return new KeyVal<>(iter.next());
+                        return Tuple2.of(iter.next());
                     }
                 };
             }
