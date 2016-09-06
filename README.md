@@ -66,8 +66,8 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
         // For each person, find their email addresses.
         .flatMap(person -> person._3()
 
-        // For each address, produce a key/value pair
-        // of email and person (Tuple2 implements Map.Entry)
+                                 // For each address, produce a key/value pair
+                                 // of email and person (Tuple2 implements Map.Entry)
                                  .map(email -> tup(email, person)))
 
         // toImMap() collects the results to key/value pairs and puts

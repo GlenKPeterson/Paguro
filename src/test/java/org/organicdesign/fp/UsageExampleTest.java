@@ -40,23 +40,23 @@ public class UsageExampleTest {
         // Jane by her email address. The first line is a JUnit test to verify that "Jane" is the
         // name of the person we find with the subsequent code.
         assertEquals("Jane",
-                     // Define some people with lists of email addresses on the
-                     // fly.  vec() makes a List, tup() makes a Tuple
-                     // If this is confusing, read through parts 2 and 3, then
-                     // return to this one.
+                     // Define some people with lists of email addresses on the fly.
+                     // vec() makes a Vector/List, tup() makes a Tuple
                      vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
                          tup("Fred", "Tase", vec("c@d.e", "d@e.f", "e@f.g")))
 
-                             // Turn that into pairs of emails and people:
-                             // flatMap() the list of people into a list of
-                             // emails.  map() the emails to email/person pairs
-                             // while the person object is still in scope.
+                             // We want to look up people by their address.
+                             // There are multiple addresses per person.
+                             // For each person, find their email addresses.
                              .flatMap(person -> person._3()
-                                                      .map(mail -> tup(mail, person)))
 
-                             // toImMap() expects a function that maps items to
-                             // key/value pairs.  We already have pairs, so pass
-                             // it the identity function.
+                                                      // For each address, produce a key/value pair
+                                                      // of email and person (Tuple2 implements Map.Entry)
+                                                      .map(email -> tup(email, person)))
+
+                             // toImMap() collects the results to key/value pairs and puts
+                             // them in an immutable map.  We already have pairs, so pass
+                             // them through unchanged.
                              .toImMap(x -> x)
 
                              // Look up Jane by her address
