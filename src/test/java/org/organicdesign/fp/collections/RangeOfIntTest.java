@@ -172,8 +172,8 @@ public class RangeOfIntTest {
                      Equat.LIST.hash(b));
         assertEquals(a.size(), b.size());
 
-        assertTrue(UnmodSortedIterable.equals(UnmodSortedIterable.castFromList(a),
-                                              UnmodSortedIterable.castFromList(b)));
+        assertTrue(UnmodSortedIterable.equal(UnmodSortedIterable.castFromList(a),
+                                             UnmodSortedIterable.castFromList(b)));
 
         assertTrue("List and range are equal", Equat.LIST.eq(a, b));
 
@@ -350,8 +350,8 @@ public class RangeOfIntTest {
         assertEquals(a, serializeDeserialize(b));
         assertEquals(a.size(), serializeDeserialize(b).size());
 
-        assertTrue(UnmodSortedIterable.equals(UnmodSortedIterable.castFromList(a),
-                                              UnmodSortedIterable.castFromList(b)));
+        assertTrue(UnmodSortedIterable.equal(UnmodSortedIterable.castFromList(a),
+                                             UnmodSortedIterable.castFromList(b)));
 
         assertTrue("List and range are equal", deserEq.eq(a, b));
 

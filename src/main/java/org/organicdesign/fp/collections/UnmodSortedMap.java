@@ -303,7 +303,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>,
                 if ( !(o instanceof UnmodSortedCollection) ) {
                     return false;
                 }
-                return UnmodSortedIterable.equals(this, (UnmodSortedCollection) o);
+                return UnmodSortedIterable.equal(this, (UnmodSortedCollection) o);
             }
 
             @Override public String toString() {

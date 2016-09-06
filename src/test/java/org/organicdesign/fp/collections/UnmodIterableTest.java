@@ -1,14 +1,14 @@
 package org.organicdesign.fp.collections;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import org.organicdesign.fp.FunctionUtils;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.organicdesign.fp.FunctionUtils;
 
 import static org.junit.Assert.*;
 
@@ -90,14 +90,14 @@ public class UnmodIterableTest {
 
         assertEquals(0, UnmodIterable.hashCode(Arrays.asList(new String[] { null })));
 
-        assertTrue(UnmodSortedIterable.equals(a, a));
-        assertTrue(UnmodSortedIterable.equals(a, b));
-        assertTrue(UnmodSortedIterable.equals(b, a));
-        assertTrue(UnmodSortedIterable.equals(null, null));
-        assertFalse(UnmodSortedIterable.equals(a, null));
-        assertFalse(UnmodSortedIterable.equals(null, a));
-        assertFalse(UnmodSortedIterable.equals(a, c));
-        assertFalse(UnmodSortedIterable.equals(c, a));
+        assertTrue(UnmodSortedIterable.equal(a, a));
+        assertTrue(UnmodSortedIterable.equal(a, b));
+        assertTrue(UnmodSortedIterable.equal(b, a));
+        assertTrue(UnmodSortedIterable.equal(null, null));
+        assertFalse(UnmodSortedIterable.equal(a, null));
+        assertFalse(UnmodSortedIterable.equal(null, a));
+        assertFalse(UnmodSortedIterable.equal(a, c));
+        assertFalse(UnmodSortedIterable.equal(c, a));
     }
 
     @Test public void equalsHashcode() {
@@ -127,13 +127,13 @@ public class UnmodIterableTest {
         assertNotEquals(UnmodIterable.hashCode(a), UnmodIterable.hashCode(c));
         assertNotEquals(UnmodIterable.hashCode(b), UnmodIterable.hashCode(d));
 
-        assertTrue(UnmodSortedIterable.equals(a, a));
-        assertTrue(UnmodSortedIterable.equals(a, b));
-        assertTrue(UnmodSortedIterable.equals(b, a));
-        assertFalse(UnmodSortedIterable.equals(a, c));
-        assertFalse(UnmodSortedIterable.equals(c, a));
-        assertFalse(UnmodSortedIterable.equals(b, d));
-        assertFalse(UnmodSortedIterable.equals(d, b));
+        assertTrue(UnmodSortedIterable.equal(a, a));
+        assertTrue(UnmodSortedIterable.equal(a, b));
+        assertTrue(UnmodSortedIterable.equal(b, a));
+        assertFalse(UnmodSortedIterable.equal(a, c));
+        assertFalse(UnmodSortedIterable.equal(c, a));
+        assertFalse(UnmodSortedIterable.equal(b, d));
+        assertFalse(UnmodSortedIterable.equal(d, b));
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

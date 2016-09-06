@@ -16,7 +16,8 @@ public interface UnmodSortedIterable<T> extends UnmodIterable<T> {
     // ========================================== Static ==========================================
 
     /**
-     Renamed to {@link #equal(Object)} to avoid confusion with instance method {@link Object#equals(Object)}
+     Renamed to {@link UnmodSortedIterable#equal(UnmodSortedIterable, UnmodSortedIterable)} to
+     avoid confusion with instance method {@link Object#equals(Object)}
      */
     @Deprecated
     static boolean equals(UnmodSortedIterable a, UnmodSortedIterable b) { return equal(a, b); }

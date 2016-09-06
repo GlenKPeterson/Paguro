@@ -82,8 +82,8 @@ public class TransformableTest {
     @Test public void testToMutableSortedSet() throws Exception {
         SortedSet<Integer> control = new TreeSet<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9));
         Transformable<Integer> trans = Xform.of(control);
-        assertTrue(UnmodSortedIterable.equals(UnmodSortedIterable.castFromSortedSet(control),
-                                              UnmodSortedIterable.castFromSortedSet(trans.toMutableSortedSet((a, b) -> a - b))));
+        assertTrue(UnmodSortedIterable.equal(UnmodSortedIterable.castFromSortedSet(control),
+                                             UnmodSortedIterable.castFromSortedSet(trans.toMutableSortedSet((a, b) -> a - b))));
     }
 
     @Test public void testToImSet() throws Exception {
@@ -100,8 +100,8 @@ public class TransformableTest {
         control.addAll(items);
         Transformable<Integer> trans = Xform.of(items);
         assertEquals(control, trans.toImSortedSet(comp));
-        assertTrue(UnmodSortedIterable.equals(UnmodSortedIterable.castFromSortedSet(control),
-                                              trans.toImSortedSet(comp)));
+        assertTrue(UnmodSortedIterable.equal(UnmodSortedIterable.castFromSortedSet(control),
+                                             trans.toImSortedSet(comp)));
     }
 
     @Test public void testToMutableSet() throws Exception {
