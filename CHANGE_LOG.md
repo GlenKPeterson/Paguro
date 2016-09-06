@@ -1,4 +1,4 @@
-# Upgrade from 1.x to 2.x
+# Upgrade from 1.x to 2.0.3
 
 Anything that used to be implemented as an anonymous class, object, or lambda is now
 implemented as an enum or serializable sub-class.  As a result, the following constants have moved.
@@ -73,17 +73,17 @@ Issues?  Questions?  Provide feedback on the [Serialization enhancement request]
  - Removed KeyVal class and made Tuples serializable instead.  Back to using tup() instead of kv()
  - Static method UnmodSortedIterable.equals() has been deprecated (renamed to UnmodSortedIterable.equal() to avoid confusion with Object.equals()).
 
-## 2016-09-01 Release 2.0.2 DO NOT USE!
+## 2016-09-01 Release 2.0.2 USE 2.0.3 INSTEAD!
  - Gave 5 main collections custom serialized forms (after reading Josh Bloch) so that we can change
    the implementations later without breaking any clients who are using them for long-term storage.
  - Decided *NOT* to make any itera**tors** serializable.
  - Improved tests a bit, especially for serialization.
 
-## 2016-09-01 Release 2.0.1 DO NOT USE!
+## 2016-09-01 Release 2.0.1 USE 2.0.3 INSTEAD!
  - Made UnmodSortedIterable.castFrom... methods generic and serializable (and wrote tests for same).
  - Fixed some Javadoc link errors.
 
-## 2016-08-27 Release 2.0.0: Serializable DO NOT USE!
+## 2016-08-27 Release 2.0.0: USE 2.0.3 INSTEAD!
 This is a major release due to the following **breaking changes** in order to make more things serializable without creating a mess:
  - Hash codes of all tuples are now calculated by adding together the hash codes of all member items.
    They used to bitwise-or the first two items for compatibility with Map.Entry.
