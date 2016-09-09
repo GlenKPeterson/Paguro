@@ -68,15 +68,15 @@ public class PersistentHashSet<E> implements ImUnsortSetTrans<E>, Serializable {
     }
 
     @SuppressWarnings("unchecked")
-    public static <E> PersistentHashSet<E> ofMap(ImMapTrans<E,?> map) {
-        return new PersistentHashSet<>((ImMapTrans<E,E>) map);
+    public static <E> PersistentHashSet<E> ofMap(ImUnsortMap<E,?> map) {
+        return new PersistentHashSet<>((ImUnsortMap<E,E>) map);
     }
 
     // ==================================== Instance Variables ====================================
-    private final ImMapTrans<E,E> impl;
+    private final ImUnsortMap<E,E> impl;
 
     // ======================================= Constructor =======================================
-    private PersistentHashSet(ImMapTrans<E,E> i) { impl = i; }
+    private PersistentHashSet(ImUnsortMap<E,E> i) { impl = i; }
 
     // ======================================= Serialization =======================================
     // This class has a custom serialized form designed to be as small as possible.  It does not
@@ -91,10 +91,10 @@ public class PersistentHashSet<E> implements ImUnsortSetTrans<E>, Serializable {
         private static final long serialVersionUID = 20160904155600L;
 
         private final int size;
-        private transient ImMapTrans<K,K> theMap;
-        SerializationProxy(ImMapTrans<K,K> phm) {
+        private transient ImUnsortMapTrans<K,K> theMap;
+        SerializationProxy(ImUnsortMap<K,K> phm) {
             size = phm.size();
-            theMap = phm;
+            theMap = (ImUnsortMapTrans<K,K>) phm;
         }
 
         // Taken from Josh Bloch Item 75, p. 298
@@ -179,16 +179,16 @@ public class PersistentHashSet<E> implements ImUnsortSetTrans<E>, Serializable {
     }
 
     private static final class TransientHashSet<E> implements ImUnsortSetTrans<E> {
-        ImMapTrans<E,E> impl;
+        ImUnsortMapTrans<E,E> impl;
 
-        TransientHashSet(ImMapTrans<E,E> impl) { this.impl = impl; }
+        TransientHashSet(ImUnsortMapTrans<E,E> impl) { this.impl = impl; }
 
         @Override public ImUnsortSetTrans<E> asTransient() { return this; }
 
         @Override public int size() { return impl.size(); }
 
         @Override public ImUnsortSetTrans<E> put(E val) {
-            ImMapTrans<E,E> m = impl.assoc(val, val);
+            ImUnsortMapTrans<E,E> m = impl.assoc(val, val);
             if (m != impl) this.impl = m;
             return this;
         }
@@ -205,7 +205,7 @@ public class PersistentHashSet<E> implements ImUnsortSetTrans<E>, Serializable {
         }
 
         @Override public ImUnsortSetTrans<E> without(E key) {
-            ImMapTrans<E,E> m = impl.without(key);
+            ImUnsortMapTrans<E,E> m = impl.without(key);
             if (m != impl) this.impl = m;
             return this;
         }

@@ -15,20 +15,15 @@
 package org.organicdesign.fp.collections;
 
 /**
- The super-interface of PersistentHashSet (excludes TreeSet).
+ Interface for transient/mutable (hash) map builder.
  */
-public interface ImUnsortSet<E> extends ImSet<E> {
-
-    /**
-     Returns a transient (mutable builder) version of this set that is not thread safe.
-     */
-    ImUnsortSetTrans<E> asTransient();
+public interface ImUnsortMapTrans<K,V> extends ImUnsortMap<K,V> {
+    /** Returns a persistent/immutable version of this transient map. */
+    ImUnsortMap<K,V> persistent();
 
     /** {@inheritDoc} */
-    @Override
-    ImUnsortSet<E> put(E val);
+    @Override ImUnsortMapTrans<K,V> assoc(K key, V val);
 
     /** {@inheritDoc} */
-    @Override
-    ImUnsortSet<E> without(E key);
+    @Override ImUnsortMapTrans<K,V> without(K key);
 }

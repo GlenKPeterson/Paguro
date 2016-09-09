@@ -8,6 +8,7 @@
    Large maps/sets (100K elements) are 0-1% slower; within the margin of error.
  - Added ImUnsortSet and ImUnsortSetTrans interfaces to expose the TransientSet implementation.
  - Added ImListTrans interface to expose the Transient Vector implementation.
+ - Deprecated ImMapTrans - replaced it with ImUnsortMap and UmUnsortedMapTrans.
  - Radically improved test coverage of PersistentTreeMap and slightly improved PersistentHashMap
  - Added epl-v10.html referenced in Rich's comments.  Should have read the legal terms more carefully earlier.
  - Added CodeStylePaguro.xml for Idea to import.

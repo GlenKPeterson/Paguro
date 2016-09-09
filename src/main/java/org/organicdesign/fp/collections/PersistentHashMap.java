@@ -39,7 +39,7 @@ import static org.organicdesign.fp.FunctionUtils.emptyUnmodIterator;
  This file is a derivative work based on a Clojure collection licensed under the Eclipse Public
  License 1.0 Copyright Rich Hickey.  Errors are Glen Peterson's.
  */
-public class PersistentHashMap<K,V> implements ImMapTrans<K,V>, Serializable {
+public class PersistentHashMap<K,V> implements ImUnsortMapTrans<K,V>, Serializable {
 
 //    static private <K, V, R> R doKvreduce(Object[] array, Function3<R,K,V,R> f, R init) {
 //        for (int i = 0; i < array.length; i += 2) {
@@ -83,7 +83,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V>, Serializable {
                 return rootIter.next();
             }
         }
-    };
+    }
 
 //    private static final class Reduced {
 //        Object val;
@@ -201,7 +201,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V>, Serializable {
     private static class SerializationProxy<K,V> implements Serializable {
         private final Equator<K> equator;
         private final int size;
-        private transient ImMapTrans<K,V> theMap;
+        private transient ImUnsortMapTrans<K,V> theMap;
         SerializationProxy(PersistentHashMap<K,V> phm) {
             equator = phm.equator;
             size = phm.size;
@@ -381,7 +381,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V>, Serializable {
         return new PersistentHashMap<>(equator, size - 1, newroot, hasNull, nullValue);
     }
 
-    static final class TransientHashMap<K,V> implements ImMapTrans<K,V> {
+    static final class TransientHashMap<K,V> implements ImUnsortMapTrans<K,V> {
         private AtomicReference<Thread> edit;
         private final Equator<K> equator;
         private INode<K,V> root;
@@ -437,7 +437,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V>, Serializable {
             return this;
         }
 
-        @Override public ImMapTrans<K,V> asTransient() { return this; }
+        @Override public ImUnsortMapTrans<K,V> asTransient() { return this; }
 
         @Override public Option<UnEntry<K,V>> entry(K key) {
             ensureEditable();
@@ -1376,7 +1376,7 @@ public static void main(String[] args){
                 @Override public Object getValue() {
                     throw new UnsupportedOperationException("Should be Unreachable.");
                 }
-            };
+            }
         }
         @SuppressWarnings("unchecked")
         private static <K,V> UnEntry<K,V> absence() { return (UnEntry<K,V>) Absent.ENTRY; }

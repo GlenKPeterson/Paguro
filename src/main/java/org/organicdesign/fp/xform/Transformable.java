@@ -178,7 +178,8 @@ public interface Transformable<T> {
      */
     default <K,V> ImMap<K,V> toImMap(Function1<? super T,Map.Entry<K,V>> f1) {
         return foldLeft(PersistentHashMap.<K,V>empty().asTransient(),
-                        (ImMapTrans<K,V> ts, T t) -> (ImMapTrans<K,V>) ts.assoc(f1.apply(t)))
+                        (ImUnsortMapTrans<K,V> ts, T t) ->
+                                (ImUnsortMapTrans<K,V>) ts.assoc(f1.apply(t)))
                 .persistent();
     }
 
