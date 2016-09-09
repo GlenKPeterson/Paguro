@@ -24,6 +24,16 @@ public interface ImUnsortSet<E> extends ImSet<E> {
      */
     ImUnsortSetTrans<E> asTransient();
 
+    /**
+     Returns a persistent/immutable version of this (maybe transient) set.
+     Once you call persist() on it, you can't mutate the transient one anymore (or you'll get an
+     exception).  This is because they share most of the underlying implementation.
+     Theoretically, this should be on ImUnsortSetTrans, but sometimes you want to know that a set
+     is persistent, sometimes you want to know it's transient.  It's hard to pick only one, but
+     that's how inheritance works.
+     */
+    ImUnsortSet<E> persistent();
+
     /** {@inheritDoc} */
     @Override
     ImUnsortSet<E> put(E val);

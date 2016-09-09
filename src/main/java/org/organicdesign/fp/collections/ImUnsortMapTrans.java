@@ -18,9 +18,6 @@ package org.organicdesign.fp.collections;
  Interface for transient/mutable (hash) map builder.
  */
 public interface ImUnsortMapTrans<K,V> extends ImUnsortMap<K,V> {
-    /** Returns a persistent/immutable version of this transient map. */
-    ImUnsortMap<K,V> persistent();
-
     /** {@inheritDoc} */
     @Override ImUnsortMapTrans<K,V> assoc(K key, V val);
 

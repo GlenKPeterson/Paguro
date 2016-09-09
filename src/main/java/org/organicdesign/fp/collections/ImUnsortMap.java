@@ -18,6 +18,9 @@ package org.organicdesign.fp.collections;
  Interface for unsorted (today that probably means "hash") maps.
  */
 public interface ImUnsortMap<K,V> extends ImMap<K,V> {
+    /** {@inheritDoc} */
+    @Override ImUnsortMap<K,V> assoc(K key, V val);
+
     /** Returns a transient/mutable version of this (persistent/immutable) map. */
     ImUnsortMapTrans<K,V> asTransient();
 
@@ -27,8 +30,14 @@ public interface ImUnsortMap<K,V> extends ImMap<K,V> {
     /** {@inheritDoc} */
     @Override default ImSet<K> keySet() { return PersistentHashSet.ofMap(this); }
 
-    /** {@inheritDoc} */
-    @Override ImUnsortMap<K,V> assoc(K key, V val);
+    /**
+     Returns a persistent/immutable version of this (maybe) transient map.  Maybe this should be
+     on ImUnsortedMapTrans only, but that prevents reusing a variable to hold both a transient
+     and persistent map.  I really wasn't sure of the right thing to do here.  Sometimes you want
+     a guaranteed transient.  Sometimes a guaranteed persistent.  I suppose you can use the
+     specific implementation class in that case.  Inheritance forces you to pick one.
+     */
+    ImUnsortMap<K,V> persistent();
 
     /** {@inheritDoc} */
     @Override ImUnsortMap<K,V> without(K key);

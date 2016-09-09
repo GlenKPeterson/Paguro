@@ -27,7 +27,7 @@ import java.util.Set;
  This file is a derivative work based on a Clojure collection licensed under the Eclipse Public
  License 1.0 Copyright Rich Hickey
 */
-public class PersistentHashSet<E> implements ImUnsortSetTrans<E>, Serializable {
+public class PersistentHashSet<E> implements ImUnsortSet<E>, Serializable {
 
     // If you don't put this here, it inherits EMPTY from UnmodSet, which does not have .equals()
     // defined.  UnmodSet.empty won't put() either.
@@ -91,10 +91,10 @@ public class PersistentHashSet<E> implements ImUnsortSetTrans<E>, Serializable {
         private static final long serialVersionUID = 20160904155600L;
 
         private final int size;
-        private transient ImUnsortMapTrans<K,K> theMap;
+        private transient ImUnsortMap<K,K> theMap;
         SerializationProxy(ImUnsortMap<K,K> phm) {
             size = phm.size();
-            theMap = (ImUnsortMapTrans<K,K>) phm;
+            theMap = phm;
         }
 
         // Taken from Josh Bloch Item 75, p. 298

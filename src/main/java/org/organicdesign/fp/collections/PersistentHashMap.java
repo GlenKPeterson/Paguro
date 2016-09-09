@@ -39,7 +39,7 @@ import static org.organicdesign.fp.FunctionUtils.emptyUnmodIterator;
  This file is a derivative work based on a Clojure collection licensed under the Eclipse Public
  License 1.0 Copyright Rich Hickey.  Errors are Glen Peterson's.
  */
-public class PersistentHashMap<K,V> implements ImUnsortMapTrans<K,V>, Serializable {
+public class PersistentHashMap<K,V> implements ImUnsortMap<K,V>, Serializable {
 
 //    static private <K, V, R> R doKvreduce(Object[] array, Function3<R,K,V,R> f, R init) {
 //        for (int i = 0; i < array.length; i += 2) {
@@ -201,7 +201,7 @@ public class PersistentHashMap<K,V> implements ImUnsortMapTrans<K,V>, Serializab
     private static class SerializationProxy<K,V> implements Serializable {
         private final Equator<K> equator;
         private final int size;
-        private transient ImUnsortMapTrans<K,V> theMap;
+        private transient ImUnsortMap<K,V> theMap;
         SerializationProxy(PersistentHashMap<K,V> phm) {
             equator = phm.equator;
             size = phm.size;

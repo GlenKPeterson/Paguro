@@ -246,7 +246,7 @@ public class PersistentHashMapTest {
 
     @Test public void biggerHashMaps() {
         int NUM_ITEMS = 300;
-        PersistentHashMap<String,Integer> m = PersistentHashMap.empty();
+        ImUnsortMap<String,Integer> m = PersistentHashMap.empty();
 
         for (int i = 0; i < NUM_ITEMS; i++) {
             m = m.assoc(ordinal(i), i);
