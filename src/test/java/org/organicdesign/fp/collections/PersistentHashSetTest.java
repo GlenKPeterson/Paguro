@@ -17,7 +17,7 @@ import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class PersistentHashSetTest {
 
-    public static <K> void setIterTest(Set<K> c, Iterator<? extends K> test) {
+    private static <K> void setIterTest(Set<K> c, Iterator<? extends K> test) {
         Set<K> control = new HashSet<>();
         control.addAll(c);
         while (test.hasNext()) {
@@ -274,7 +274,7 @@ public class PersistentHashSetTest {
 
     @Test public void transientTest() {
         Set<Integer> control = new HashSet<>();
-        ImSetTrans<Integer> test = PersistentHashSet.<Integer>empty().asTransient();
+        ImUnsortSetTrans<Integer> test = PersistentHashSet.<Integer>empty().asTransient();
         assertEquals(control.size(), test.size());
         assertEquals(control.contains(-1), test.contains(-1));
 
@@ -292,13 +292,13 @@ public class PersistentHashSetTest {
         setIterTest(control, test.iterator());
         // Reversed test.
         setIterTest(test, control.iterator());
-        ImSet<Integer> persistent = test.persistent();
+        ImUnsortSet<Integer> persistent = test.persistent();
 
         setIterTest(control, persistent.iterator());
         setIterTest(control, serializeDeserialize(persistent).iterator());
 
         // Have to go back to transient manually.  Not ideal, but I don't want to encourage this.
-        test = ((PersistentHashSet<Integer>) persistent).asTransient();
+        test = persistent.asTransient();
 
         for (int i = 0; i < SOME; i++) {
             control.remove(i);

@@ -688,21 +688,79 @@ public class PersistentHashMapTest {
         assertEquals(a, b);
         assertEquals(b, a);
 
-        equalsDistinctHashCode(PersistentHashMap.of(vec(tup("one", 1)))
-                                                .assoc("two", 2).assoc("three", 3),
-                               PersistentHashMap.of(vec(tup("three", 3))).assoc("two", 2).assoc("one", 1),
-                               PersistentHashMap.of(vec(tup("two", 2), tup("three", 3), tup("one", 1))),
-                               PersistentHashMap.of(vec(tup("two", 2), tup("three", 3), tup("four", 4))));
+        Map<String,Integer> control = new HashMap<>();
+        control.put("one", 1);
+        control.put("two", 2);
+        control.put("three", 3);
 
-        Map<String,Integer> m = new HashMap<>();
-        m.put("one", 1);
-        m.put("two", 2);
-        m.put("three", 3);
+        ImMap<String,Integer> test = PersistentHashMap.of(vec(tup("one", 1)))
+                                                        .assoc("two", 2).assoc("three", 3);
 
-        equalsDistinctHashCode(PersistentHashMap.of(vec(tup("one", 1), tup("two", 2), tup("three", 3))),
-                               m,
-                               FunctionUtils.unmodMap(m),
-                               PersistentHashMap.of(vec(tup("two", 2), tup("three", 3), tup("four", 4))));
+        ImMap<String,Integer> ser = serializeDeserialize(test);
+
+        // Order shouldn't matter.
+        equalsDistinctHashCode(test,
+                               PersistentHashMap.of(vec(tup("three", 3))).assoc("two", 2)
+                                                .assoc("one", 1),
+                               PersistentHashMap.of(vec(tup("two", 2), tup("three", 3),
+                                                        tup("one", 1))),
+                               PersistentHashMap.of(vec(tup("two", 2), tup("three", 3),
+                                                        tup("four", 4))));
+
+        equalsDistinctHashCode(control,
+                               test,
+                               FunctionUtils.unmodMap(control),
+                               PersistentHashMap.of(vec(tup("two", 2), tup("three", 3),
+                                                        tup("four", 4))));
+
+        equalsDistinctHashCode(control,
+                               test,
+                               ser,
+                               PersistentHashMap.of(vec(tup(null, 2), tup("three", 3),
+                                                        tup("one", null))));
+
+        equalsDistinctHashCode(test.assoc(null, 5),
+                               ser.assoc(null, 5),
+                               a.assoc(null, 5),
+                               control);
+
+        equalsDistinctHashCode(test.assoc("four", null),
+                               ser.assoc("four", null),
+                               b.assoc("four", null),
+                               control);
+
+        equalsSameHashCode(test.assoc(null, null),
+                           ser.assoc(null, null),
+                           b.assoc(null, null),
+                           control);
+
+        test = test.assoc("four", null).assoc(null, 5).without("one");
+        control.put("four", null);
+        control.put(null, 5);
+        control.remove("one");
+        ser = serializeDeserialize(test);
+
+        equalsDistinctHashCode(control, test, ser, a);
+
+        test = test.without("four");
+        control.remove("four");
+        ser = serializeDeserialize(test);
+        equalsDistinctHashCode(control, test, ser, a);
+
+        test = test.without(null);
+        control.remove(null);
+        ser = serializeDeserialize(test);
+        equalsDistinctHashCode(control, test, ser, a);
+
+        test = test.assoc(null, null);
+        control.put(null, null);
+        ser = serializeDeserialize(test);
+        equalsDistinctHashCode(control, test, ser, a);
+
+        test = test.without(null);
+        control.remove(null);
+        ser = serializeDeserialize(test);
+        equalsDistinctHashCode(control, test, ser, a);
 
         equalsDistinctHashCode(PersistentHashMap.of(vec(tup("one", 1)))
                                                 .assoc("two", 2).assoc("three", 3).assoc(null, 4),

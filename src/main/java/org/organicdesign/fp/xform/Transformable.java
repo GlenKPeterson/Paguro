@@ -26,19 +26,8 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.organicdesign.fp.collections.ImList;
-import org.organicdesign.fp.collections.ImListTrans;
-import org.organicdesign.fp.collections.ImMap;
-import org.organicdesign.fp.collections.ImMapTrans;
-import org.organicdesign.fp.collections.ImSet;
-import org.organicdesign.fp.collections.ImSetTrans;
-import org.organicdesign.fp.collections.ImSortedMap;
-import org.organicdesign.fp.collections.ImSortedSet;
-import org.organicdesign.fp.collections.PersistentHashMap;
-import org.organicdesign.fp.collections.PersistentHashSet;
-import org.organicdesign.fp.collections.PersistentTreeMap;
-import org.organicdesign.fp.collections.PersistentTreeSet;
-import org.organicdesign.fp.collections.PersistentVector;
+import org.organicdesign.fp.collections.*;
+import org.organicdesign.fp.collections.ImUnsortSet;
 import org.organicdesign.fp.function.Function1;
 import org.organicdesign.fp.function.Function2;
 
@@ -202,7 +191,7 @@ public interface Transformable<T> {
      */
     default ImSet<T> toImSet() {
         return foldLeft(PersistentHashSet.<T>empty().asTransient(),
-                        ImSetTrans::put).persistent();
+                        ImUnsortSetTrans::put).persistent();
     }
 
     /**

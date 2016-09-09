@@ -22,6 +22,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.Option;
+import org.organicdesign.fp.collections.PersistentTreeMap.Box;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import static org.organicdesign.fp.FunctionUtils.emptyUnmodIterator;
@@ -55,12 +56,6 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V>, Serializable {
 //        }
 //        return init;
 //    }
-
-    // TODO: Replace with Mutable.Ref, or make methods return Tuple2.
-    private static class Box {
-        public Object val;
-        public Box(Object val) { this.val = val; }
-    }
 
     private static class Iter<K,V> implements UnmodIterator<UnEntry<K,V>> {
 //        , Serializable {
@@ -257,7 +252,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V>, Serializable {
             if (hasNull && (val == nullValue)) { return this; }
             return new PersistentHashMap<>(equator, hasNull ? size : size + 1, root, true, val);
         }
-        Box addedLeaf = new Box(null);
+        Box<Box> addedLeaf = new Box<>(null);
         INode<K,V> newroot = (root == null ? BitmapIndexedNode.empty(equator) : root);
         newroot = newroot.assoc(0, equator.hash(key), key, val, addedLeaf);
         if (newroot == root) {
@@ -393,7 +388,16 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V>, Serializable {
         private int count;
         private boolean hasNull;
         private V nullValue;
-        private final Box leafFlag = new Box(null);
+        // This is a boolean reference, with value either being null, or set to point to the
+        // box itself.  It might be clearer to replace this with an AtomicBoolean or similar.
+        // I think the reason this can be a field instead of a local variable is that the
+        // TransientHashMap is not intended to be thread safe, thus no-one will call one method
+        // while another thread calls another method.  Presumably having this here saves the cost
+        // of allocating a local variable.  Setting it to null or itself saves storing anything
+        // in memory.  Why did Rich go to all of this trouble?  Does it make a difference, or
+        // could he have just passed a local AtomicBoolean or made remove() return a pair (Boolean
+        // and INode) or even OneOf(left INode, right INode)?
+        private final Box<Box> leafFlag = new Box<>(null);
 
         TransientHashMap(PersistentHashMap<K,V> m) {
             this(m.equator(), new AtomicReference<>(Thread.currentThread()), m.root, m.size,
@@ -499,7 +503,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V>, Serializable {
     }
 
     private interface INode<K,V> {
-        INode<K,V> assoc(int shift, int hash, K key, V val, Box addedLeaf);
+        INode<K,V> assoc(int shift, int hash, K key, V val, Box<Box> addedLeaf);
 
         INode<K,V> without(int shift, int hash, K key);
 
@@ -510,10 +514,10 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V>, Serializable {
 //        Sequence<UnmodMap.UnEntry<K,V>> nodeSeq();
 
         INode<K,V> assoc(AtomicReference<Thread> edit, int shift, int hash, K key, V val,
-                         Box addedLeaf);
+                         Box<Box> addedLeaf);
 
         INode<K,V> without(AtomicReference<Thread> edit, int shift, int hash, K key,
-                           Box removedLeaf);
+                           Box<Box> removedLeaf);
 
 //        <R> R kvreduce(Function3<R,K,V,R> f, R init);
 
@@ -537,7 +541,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V>, Serializable {
             this.count = count;
         }
 
-        @Override public INode<K,V> assoc(int shift, int hash, K key, V val, Box addedLeaf) {
+        @Override public INode<K,V> assoc(int shift, int hash, K key, V val, Box<Box> addedLeaf) {
             int idx = mask(hash, shift);
             INode<K,V> node = array[idx];
             if (node == null) {
@@ -678,7 +682,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V>, Serializable {
         }
 
         @Override public INode<K,V> assoc(AtomicReference<Thread> edit, int shift, int hash,
-                                          K key, V val, Box addedLeaf) {
+                                          K key, V val, Box<Box> addedLeaf) {
             int idx = mask(hash, shift);
             INode<K,V> node = array[idx];
             if(node == null) {
@@ -696,7 +700,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V>, Serializable {
 
         @Override
         public INode<K,V> without(AtomicReference<Thread> edit, int shift, int hash, K key,
-                                  Box removedLeaf) {
+                                  Box<Box> removedLeaf) {
             int idx = mask(hash, shift);
             INode<K,V> node = array[idx];
             if (node == null) {
@@ -792,7 +796,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V>, Serializable {
             this.edit = edit;
         }
 
-        @Override public INode<K,V> assoc(int shift, int hash, K key, V val, Box addedLeaf){
+        @Override public INode<K,V> assoc(int shift, int hash, K key, V val, Box<Box> addedLeaf) {
             int bit = bitpos(hash, shift);
             int idx = index(bit);
             if((bitmap & bit) != 0) {
@@ -956,7 +960,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V>, Serializable {
         }
 
         @Override public INode<K,V> assoc(AtomicReference<Thread> edit, int shift, int hash,
-                                          K key, V val, Box addedLeaf) {
+                                          K key, V val, Box<Box> addedLeaf) {
             int bit = bitpos(hash, shift);
             int idx = index(bit);
             if((bitmap & bit) != 0) {
@@ -1022,7 +1026,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V>, Serializable {
         }
 
         @Override public INode<K,V> without(AtomicReference<Thread> edit, int shift, int hash,
-                                            K key, Box removedLeaf){
+                                            K key, Box<Box> removedLeaf){
             int bit = bitpos(hash, shift);
             if((bitmap & bit) == 0)
                 return this;
@@ -1064,7 +1068,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V>, Serializable {
             this.array = array;
         }
 
-        @Override public INode<K,V> assoc(int shift, int hash, K key, V val, Box addedLeaf){
+        @Override public INode<K,V> assoc(int shift, int hash, K key, V val, Box<Box> addedLeaf) {
             if(hash == this.hash) {
                 int idx = findIndex(key);
                 if(idx != -1) {
@@ -1130,7 +1134,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V>, Serializable {
 //            return doKvreduce(array, reducef, combinef.apply(null, null));
 //        }
 
-        public int findIndex(K key){
+        private int findIndex(K key){
             for (int i = 0; i < 2*count; i+=2) {
                 if (equator.eq(key, k(array, i))) { return i; }
             }
@@ -1171,7 +1175,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V>, Serializable {
 
 
         @Override public INode<K,V> assoc(AtomicReference<Thread> edit, int shift, int hash,
-                                          K key, V val, Box addedLeaf) {
+                                          K key, V val, Box<Box> addedLeaf) {
             if(hash == this.hash) {
                 int idx = findIndex(key);
                 if(idx != -1) {
@@ -1200,7 +1204,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V>, Serializable {
         }
 
         @Override public INode<K,V> without(AtomicReference<Thread> edit, int shift, int hash,
-                                            K key, Box removedLeaf) {
+                                            K key, Box<Box> removedLeaf) {
             int idx = findIndex(key);
             if(idx == -1)
                 return this;
@@ -1335,7 +1339,7 @@ public static void main(String[] args){
         if(key1hash == key2hash)
             return new HashCollisionNode<>(equator, null, key1hash, 2,
                                            new Object[] {key1, val1, key2, val2});
-        Box addedLeaf = new Box(null);
+        Box<Box> addedLeaf = new Box<>(null);
         AtomicReference<Thread> edit = new AtomicReference<>();
         return BitmapIndexedNode.<K,V>empty(equator)
                 .assoc(edit, shift, key1hash, key1, val1, addedLeaf)
@@ -1349,7 +1353,7 @@ public static void main(String[] args){
         if(key1hash == key2hash)
             return new HashCollisionNode<>(equator, null, key1hash, 2,
                                            new Object[] {key1, val1, key2, val2});
-        Box addedLeaf = new Box(null);
+        Box<Box> addedLeaf = new Box<>(null);
         return BitmapIndexedNode.<K,V>empty(equator)
                 .assoc(edit, shift, key1hash, key1, val1, addedLeaf)
                 .assoc(edit, shift, key2hash, key2, val2, addedLeaf);

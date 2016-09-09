@@ -1,8 +1,9 @@
-/**
- Copyright (c) Rich Hickey. All rights reserved. The use and distribution terms for this software are covered by the
- Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php) which can be found in the file epl-v10.html
- at the root of this distribution. By using this software in any fashion, you are agreeing to be bound by the terms of
- this license. You must not remove this notice, or any other, from this software.
+/*
+ Copyright (c) Rich Hickey. All rights reserved. The use and distribution terms for this software
+ are covered by the Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ which can be found in the file epl-v10.html at the root of this distribution. By using this
+ software in any fashion, you are agreeing to be bound by the terms of this license. You must not
+ remove this notice, or any other, from this software.
  */
 
 /* rich May 20, 2006 */
@@ -17,12 +18,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.SortedMap;
 import java.util.Stack;
 
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.tuple.Tuple2;
+
+import static org.organicdesign.fp.FunctionUtils.stringify;
 
 /**
  Persistent Red Black Tree. Note that instances of this class are constant values
@@ -33,20 +35,21 @@ import org.organicdesign.fp.tuple.Tuple2;
  This file is a derivative work based on a Clojure collection licensed under the Eclipse Public
  License 1.0 Copyright Rich Hickey
 
- @author Rich Hickey (Primary author)
- @author Glen Peterson (Java-centric editor)
+ @author Rich Hickey: Original author
+ @author Glen Peterson: Added generic types, static factories, custom serialization, and made Nodes
+         extend Tuple2.  All errors are Glen's.
  */
 
 public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
 
-    // Is there a better way to do this?
-    private class Box<E> implements Serializable {
-
-        // For serializable.  Make sure to change whenever internal data format changes.
-        private static final long serialVersionUID = 20160827174100L;
-
-        public E val;
-        public Box(E val) { this.val = val; }
+    /**
+     This is a throw-away class used internally by PersistentTreeMap and PersistentHashMap like
+     a mutable Option class to hold either null, or some value.  I don't want to remove this
+     without checking the effect on performance.
+     */
+    static class Box<E> {
+        E val;
+        Box(E val) { this.val = val; }
     }
 
     /**
@@ -189,7 +192,41 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
         private void writeObject(ObjectOutputStream s) throws IOException {
             s.defaultWriteObject();
 
-            // Write out all elements in the proper order
+            // Note: Serializing from the middle value could yield a more balanced tree!
+            //
+            // Before Serialization:
+            //                    11
+            //            ,------'  `----.
+            //           8                14
+            //        ,-' `-.            /  \
+            //       4       9         13    15
+            //    ,-' `-.     \       /
+            //   2       6     10   12
+            //  / \     / \
+            // 1   3   5   7
+            //
+            // If we serialize the middle value first.  The 25% and 75% second, the 12.5, 37.5...
+            // values 3rd, and the odd-numbered values last, that gives us the order:
+            // 8, 4, 12, 2, 6, 10, 14, 1, 3, 5, 7, 9, 11, 13, 15
+            //
+            // Deserializing in that order yields an ideally balanced tree without any shuffling:
+            //               8
+            //        ,-----' `-------.
+            //       4                 12
+            //    ,-' `-.          ,--'  `--.
+            //   2       6       10          14
+            //  / \     / \     /  \        /  \
+            // 1   3   5   7   9    11    13    15
+            //
+            // I just don't know how to do that without an intermediate data structure, so I'm just
+            // going in order for now.
+            //
+            // A good improvement could be made by serializing breadth-first instead of depth first
+            // to at least yield a tree no worse than the original without requiring shuffling.
+            //
+            // Either of these improvements could be made without changing the serialized form
+            // or breaking compatibility.  Just that new serialized maps would have a superior
+            // ordering.
             for (UnEntry<K,V> entry : theMap) {
                 s.writeObject(entry.getKey());
                 s.writeObject(entry.getValue());
@@ -533,7 +570,7 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
             Node<K,V> foundNode = found.val;
 
             //note only get same collection on identity of val, not equals()
-            if (foundNode.val() == val) {
+            if (foundNode.getValue() == val) {
                 return this;
             }
             return new PersistentTreeMap<>(comp, replace(tree, key, val), size);
@@ -575,7 +612,7 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
 //        return entry.getKey();
 //    }
 
-//    // I don't know what to do with this.
+//    // This lets you make a sequence of map entries from this HashMap.
 //// The other methods on Sorted seem to care only about the key, and the implementations of them
 //// here work that way.  This one, however, returns a sequence of Map.Entry<K,V> or Node<K,V>
 //// If I understood why, maybe I could do better.
@@ -672,7 +709,7 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
     @Override public Option<UnmodMap.UnEntry<K,V>> entry(K key) {
         Node<K,V> t = tree;
         while (t != null) {
-            int c = comp.compare(key, t.key);
+            int c = comp.compare(key, t.getKey());
             if (c == 0)
                 return Option.of(t);
             else if (c < 0)
@@ -701,11 +738,11 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
 
     private Node<K,V> add(Node<K,V> t, K key, V val, Box<Node<K,V>> found) {
         if (t == null) {
-            if (val == null)
-                return new Red<>(key);
-            return new RedVal<>(key, val);
+//            if (val == null)
+//                return new Red<>(key);
+            return new Red<>(key, val);
         }
-        int c = comp.compare(key, t.key);
+        int c = comp.compare(key, t.getKey());
         if (c == 0) {
             found.val = t;
             return null;
@@ -722,7 +759,7 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
     private Node<K,V> remove(Node<K,V> t, K key, Box<Node<K,V>> found) {
         if (t == null)
             return null; //not found indicator
-        int c = comp.compare(key, t.key);
+        int c = comp.compare(key, t.getKey());
         if (c == 0) {
             found.val = t;
             return append(t.left(), t.right());
@@ -732,14 +769,14 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
         if (del == null && found.val == null) //not found below
             return null;
         if (c < 0) {
-            if (t.left() instanceof Black)
-                return balanceLeftDel(t.key, t.val(), del, t.right());
+            if (t.left() instanceof PersistentTreeMap.Black)
+                return balanceLeftDel(t.getKey(), t.getValue(), del, t.right());
             else
-                return red(t.key, t.val(), del, t.right());
+                return red(t.getKey(), t.getValue(), del, t.right());
         }
-        if (t.right() instanceof Black)
-            return balanceRightDel(t.key, t.val(), t.left(), del);
-        return red(t.key, t.val(), t.left(), del);
+        if (t.right() instanceof PersistentTreeMap.Black)
+            return balanceRightDel(t.getKey(), t.getValue(), t.left(), del);
+        return red(t.getKey(), t.getValue(), t.left(), del);
 //		return t.removeLeft(del);
 //	return t.removeRight(del);
     }
@@ -753,30 +790,30 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
             return (Node<K,V>) right;
         else if (right == null)
             return (Node<K,V>) left;
-        else if (left instanceof Red) {
-            if (right instanceof Red) {
+        else if (left instanceof PersistentTreeMap.Red) {
+            if (right instanceof PersistentTreeMap.Red) {
                 Node<K,V> app = append(left.right(), right.left());
-                if (app instanceof Red)
-                    return red(app.key, app.val(),
-                               red(left.key, left.val(), left.left(), app.left()),
-                               red(right.key, right.val(), app.right(), right.right()));
+                if (app instanceof PersistentTreeMap.Red)
+                    return red(app.getKey(), app.getValue(),
+                               red(left.getKey(), left.getValue(), left.left(), app.left()),
+                               red(right.getKey(), right.getValue(), app.right(), right.right()));
                 else
-                    return red(left.key, left.val(), left.left(),
-                               red(right.key, right.val(), app, right.right()));
+                    return red(left.getKey(), left.getValue(), left.left(),
+                               red(right.getKey(), right.getValue(), app, right.right()));
             } else
-                return red(left.key, left.val(), left.left(), append(left.right(), right));
-        } else if (right instanceof Red)
-            return red(right.key, right.val(), append(left, right.left()), right.right());
+                return red(left.getKey(), left.getValue(), left.left(), append(left.right(), right));
+        } else if (right instanceof PersistentTreeMap.Red)
+            return red(right.getKey(), right.getValue(), append(left, right.left()), right.right());
         else //black/black
         {
             Node<K,V> app = append(left.right(), right.left());
-            if (app instanceof Red)
-                return red(app.key, app.val(),
-                           black(left.key, left.val(), left.left(), app.left()),
-                           black(right.key, right.val(), app.right(), right.right()));
+            if (app instanceof PersistentTreeMap.Red)
+                return red(app.getKey(), app.getValue(),
+                           black(left.getKey(), left.getValue(), left.left(), app.left()),
+                           black(right.getKey(), right.getValue(), app.right(), right.right()));
             else
-                return balanceLeftDel(left.key, left.val(), left.left(),
-                                      black(right.key, right.val(), app, right.right()));
+                return balanceLeftDel(left.getKey(), left.getValue(), left.left(),
+                                      black(right.getKey(), right.getValue(), app, right.right()));
         }
     }
 
@@ -784,14 +821,14 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
     Node<K,V> balanceLeftDel(K1 key, V1 val,
                              Node<? extends K,? extends V> del,
                              Node<? extends K,? extends V> right) {
-        if (del instanceof Red)
+        if (del instanceof PersistentTreeMap.Red)
             return red(key, val, del.blacken(), right);
-        else if (right instanceof Black)
+        else if (right instanceof PersistentTreeMap.Black)
             return rightBalance(key, val, del, right.redden());
-        else if (right instanceof Red && right.left() instanceof Black)
-            return red(right.left().key, right.left().val(),
+        else if (right instanceof PersistentTreeMap.Red && right.left() instanceof PersistentTreeMap.Black)
+            return red(right.left().getKey(), right.left().getValue(),
                        black(key, val, del, right.left().left()),
-                       rightBalance(right.key, right.val(), right.left().right(),
+                       rightBalance(right.getKey(), right.getValue(), right.left().right(),
                                     right.right().redden()));
         else
             throw new UnsupportedOperationException("Invariant violation");
@@ -801,13 +838,13 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
     Node<K,V> balanceRightDel(K1 key, V1 val,
                               Node<? extends K,? extends V> left,
                               Node<? extends K,? extends V> del) {
-        if (del instanceof Red)
+        if (del instanceof PersistentTreeMap.Red)
             return red(key, val, left, del.blacken());
-        else if (left instanceof Black)
+        else if (left instanceof PersistentTreeMap.Black)
             return leftBalance(key, val, left.redden(), del);
-        else if (left instanceof Red && left.right() instanceof Black)
-            return red(left.right().key, left.right().val(),
-                       leftBalance(left.key, left.val(), left.left().redden(), left.right().left()),
+        else if (left instanceof PersistentTreeMap.Red && left.right() instanceof PersistentTreeMap.Black)
+            return red(left.right().getKey(), left.right().getValue(),
+                       leftBalance(left.getKey(), left.getValue(), left.left().redden(), left.right().left()),
                        black(key, val, left.right().right(), del));
         else
             throw new UnsupportedOperationException("Invariant violation");
@@ -817,12 +854,12 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
     Node<K,V> leftBalance(K1 key, V1 val,
                           Node<? extends K,? extends V> ins,
                           Node<? extends K,? extends V> right) {
-        if (ins instanceof Red && ins.left() instanceof Red)
-            return red(ins.key, ins.val(), ins.left().blacken(),
+        if (ins instanceof PersistentTreeMap.Red && ins.left() instanceof PersistentTreeMap.Red)
+            return red(ins.getKey(), ins.getValue(), ins.left().blacken(),
                        black(key, val, ins.right(), right));
-        else if (ins instanceof Red && ins.right() instanceof Red)
-            return red(ins.right().key, ins.right().val(),
-                       black(ins.key, ins.val(), ins.left(), ins.right().left()),
+        else if (ins instanceof PersistentTreeMap.Red && ins.right() instanceof PersistentTreeMap.Red)
+            return red(ins.right().getKey(), ins.right().getValue(),
+                       black(ins.getKey(), ins.getValue(), ins.left(), ins.right().left()),
                        black(key, val, ins.right().right(), right));
         else
             return black(key, val, ins, right);
@@ -833,21 +870,21 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
     Node<K,V> rightBalance(K1 key, V1 val,
                            Node<? extends K,? extends V> left,
                            Node<? extends K,? extends V> ins) {
-        if (ins instanceof Red && ins.right() instanceof Red)
-            return red(ins.key, ins.val(), black(key, val, left, ins.left()),
+        if (ins instanceof PersistentTreeMap.Red && ins.right() instanceof PersistentTreeMap.Red)
+            return red(ins.getKey(), ins.getValue(), black(key, val, left, ins.left()),
                        ins.right().blacken());
-        else if (ins instanceof Red && ins.left() instanceof Red)
-            return red(ins.left().key, ins.left().val(),
+        else if (ins instanceof PersistentTreeMap.Red && ins.left() instanceof PersistentTreeMap.Red)
+            return red(ins.left().getKey(), ins.left().getValue(),
                        black(key, val, left, ins.left().left()),
-                       black(ins.key, ins.val(), ins.left().right(), ins.right()));
+                       black(ins.getKey(), ins.getValue(), ins.left().right(), ins.right()));
         else
             return black(key, val, left, ins);
     }
 
     private Node<K,V> replace(Node<K,V> t, K key, V val) {
-        int c = comp.compare(key, t.key);
-        return t.replace(t.key,
-                         c == 0 ? val : t.val(),
+        int c = comp.compare(key, t.getKey());
+        return t.replace(t.getKey(),
+                         c == 0 ? val : t.getValue(),
                          c < 0 ? replace(t.left(), key, val) : t.left(),
                          c > 0 ? replace(t.right(), key, val) : t.right());
     }
@@ -858,13 +895,13 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
                  Node<? extends K,? extends V> left,
                  Node<? extends K,? extends V> right) {
         if (left == null && right == null) {
-            if (val == null)
-                return new Red<K,V>(key);
-            return new RedVal<K,V>(key, val);
+//            if (val == null)
+//                return new Red<K,V>(key, val);
+            return new Red<K,V>(key, val);
         }
-        if (val == null)
-            return new RedBranch<K,V>((K) key, (Node<K,V>) left, (Node<K,V>) right);
-        return new RedBranchVal<K,V>((K) key, (V) val, (Node<K,V>) left, (Node<K,V>) right);
+//        if (val == null)
+//            return new RedBranch<K,V>((K) key, (Node<K,V>) left, (Node<K,V>) right);
+        return new RedBranch<K,V>((K) key, (V) val, (Node<K,V>) left, (Node<K,V>) right);
     }
 
     @SuppressWarnings({"unchecked", "RedundantCast", "Convert2Diamond"})
@@ -873,13 +910,13 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
                      Node<? extends K,? extends V> left,
                      Node<? extends K,? extends V> right) {
         if (left == null && right == null) {
-            if (val == null)
-                return new Black<>(key);
-            return new BlackVal<K,V>(key, val);
+//            if (val == null)
+//                return new Black<>(key);
+            return new Black<K,V>(key, val);
         }
-        if (val == null)
-            return new BlackBranch<K,V>((K) key, (Node<K,V>) left, (Node<K,V>) right);
-        return new BlackBranchVal<K,V>((K) key, (V) val, (Node<K,V>) left, (Node<K,V>) right);
+//        if (val == null)
+//            return new BlackBranch<K,V>((K) key, (Node<K,V>) left, (Node<K,V>) right);
+        return new BlackBranch<K,V>((K) key, (V) val, (Node<K,V>) left, (Node<K,V>) right);
     }
 
 //    public static class Reduced<A> {
@@ -887,24 +924,8 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
 //        private Reduced(A a) { val = a; }
 //    }
 
-    private static abstract class Node<K, V> implements UnEntry<K,V> {
-        //, Serializable {
-        // For serializable.  Make sure to change whenever internal data format changes.
-        // private static final long serialVersionUID = 20160827174100L;
-
-        final K key;
-
-        Node(K key) { this.key = key; }
-
-        public K key() { return key; }
-
-        public V val() { return null; }
-
-        @Override
-        public K getKey() { return key(); }
-
-        @Override
-        public V getValue() { return val(); }
+    private static abstract class Node<K, V> extends Tuple2<K,V> {
+        Node(K key, V val) { super(key, val); }
 
         Node<K,V> left() { return null; }
 
@@ -925,29 +946,17 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
         abstract Node<K,V> redden();
 
         Node<K,V> balanceLeft(Node<K,V> parent) {
-            return black(parent.key, parent.val(), this, parent.right());
+            return black(parent._1, parent._2, this, parent.right());
         }
 
         Node<K,V> balanceRight(Node<K,V> parent) {
-            return black(parent.key, parent.val(), parent.left(), this);
+            return black(parent._1, parent._2, parent.left(), this);
         }
 
         abstract Node<K,V> replace(K key, V val, Node<K,V> left, Node<K,V> right);
 
-        // Not used in this data structure, but these nodes can be returned!
-        @Override public int hashCode() { return key.hashCode(); }
-
-        // Not used in this data structure, but these nodes can be returned!
-        @Override public boolean equals(Object o) {
-            if (this == o) { return true; }
-            if ( !(o instanceof Map.Entry) ) { return false; }
-            Map.Entry that = (Map.Entry) o;
-            return Objects.equals(key, that.getKey()) &&
-                   Objects.equals(val(), that.getValue());
-        }
-
         @Override public String toString() {
-            return "Node(" + key + ")";
+            return stringify(_1) + "=" + stringify(_2);
         }
 
 //        public <R> R kvreduce(Function3<R,K,V,R> f, R init) {
@@ -968,138 +977,57 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
     } // end class Node.
 
     private static class Black<K, V> extends Node<K,V> {
-        Black(K key) { super(key); }
+        Black(K key, V val) { super(key, val); }
 
         @Override Node<K,V> addLeft(Node<K,V> ins) { return ins.balanceLeft(this); }
 
         @Override Node<K,V> addRight(Node<K,V> ins) { return ins.balanceRight(this); }
 
         @Override Node<K,V> removeLeft(Node<K,V> del) {
-            return balanceLeftDel(key, val(), del, right());
+            return balanceLeftDel(_1, _2, del, right());
         }
 
         @Override Node<K,V> removeRight(Node<K,V> del) {
-            return balanceRightDel(key, val(), left(), del);
+            return balanceRightDel(_1, _2, left(), del);
         }
 
         @Override Node<K,V> blacken() { return this; }
 
-        @Override Node<K,V> redden() { return new Red<>(key); }
+        @Override Node<K,V> redden() { return new Red<>(_1, _2); }
 
         @Override
         Node<K,V> replace(K key, V val, Node<K,V> left, Node<K,V> right) {
             return black(key, val, left, right);
         }
-
-        @Override  public String toString() {
-            return "B(" + key + ")";
-        }
-    }
-
-    private static class BlackVal<K, V> extends Black<K,V> {
-        final V val;
-
-        BlackVal(K key, V val) {
-            super(key);
-            this.val = val;
-        }
-
-        @Override public V val() { return val; }
-
-        @Override Node<K,V> redden() { return new RedVal<>(key, val); }
-
-        // Not used in this data structure, but these nodes can be returned!
-        @Override public int hashCode() {
-            // This is specified in java.util.Map as part of the map contract.
-            return  (key == null ? 0 : key.hashCode()) ^
-                    (val == null ? 0 : val.hashCode());
-        }
-
-        // Not used in this data structure, but these nodes can be returned!
-        @Override public boolean equals(Object o) {
-            if (this == o) { return true; }
-            if ( !(o instanceof Map.Entry) ) { return false; }
-            Map.Entry that = (Map.Entry) o;
-            return Objects.equals(key, that.getKey()) &&
-                   Objects.equals(val, that.getValue());
-        }
-
-        @Override  public String toString() {
-            return "BV(" + key + ":" + val + ")";
-        }
     }
 
     private static class BlackBranch<K, V> extends Black<K,V> {
-        final Node<K,V> left;
+        final transient Node<K,V> left;
+        final transient Node<K,V> right;
 
-        final Node<K,V> right;
-
-        BlackBranch(K key, Node<K,V> left, Node<K,V> right) {
-            super(key);
-            this.left = left;
-            this.right = right;
+        BlackBranch(K key, V val, Node<K,V> l, Node<K,V> r) {
+            super(key, val); left = l; right = r;
         }
 
-        @Override
-        public Node<K,V> left() { return left; }
+        @Override public Node<K,V> left() { return left; }
 
-        @Override
-        public Node<K,V> right() { return right; }
+        @Override public Node<K,V> right() { return right; }
 
-        @Override
-        Node<K,V> redden() { return new RedBranch<>(key, left, right); }
-
-        @Override  public String toString() {
-            return "BB(" + key + " left=" + left + " right=" + right + ")";
-        }
-    }
-
-    private static class BlackBranchVal<K, V> extends BlackBranch<K,V> {
-        final V val;
-
-        BlackBranchVal(K key, V val, Node<K,V> left, Node<K,V> right) {
-            super(key, left, right);
-            this.val = val;
-        }
-
-        @Override public V val() { return val; }
-
-        @Override Node<K,V> redden() { return new RedBranchVal<>(key, val, left, right); }
-
-        // Not used in this data structure, but these nodes can be returned!
-        @Override public int hashCode() {
-            // This is specified in java.util.Map as part of the map contract.
-            return  (key == null ? 0 : key.hashCode()) ^
-                    (val == null ? 0 : val.hashCode());
-        }
-
-        // Not used in this data structure, but these nodes can be returned!
-        @Override public boolean equals(Object o) {
-            if (this == o) { return true; }
-            if ( !(o instanceof Map.Entry) ) { return false; }
-            Map.Entry that = (Map.Entry) o;
-            return Objects.equals(key, that.getKey()) &&
-                   Objects.equals(val, that.getValue());
-        }
-
-        @Override  public String toString() {
-            return "BBV(" + key + ":" + val +
-                   " left=" + left + " right=" + right + ")";
-        }
+        @Override Node<K,V> redden() { return new RedBranch<>(_1, _2, left, right); }
     }
 
     private static class Red<K, V> extends Node<K,V> {
-        Red(K key) { super(key); }
+        Red(K key, V val) { super(key, val); }
 
-        @Override Node<K,V> addLeft(Node<K,V> ins) { return red(key, val(), ins, right()); }
+        @Override Node<K,V> addLeft(Node<K,V> ins) { return red(_1, _2, ins, right()); }
 
-        @Override Node<K,V> addRight(Node<K,V> ins) { return red(key, val(), left(), ins); }
+        @Override Node<K,V> addRight(Node<K,V> ins) { return red(_1, _2, left(), ins); }
 
-        @Override Node<K,V> removeLeft(Node<K,V> del) { return red(key, val(), del, right()); }
+        @Override Node<K,V> removeLeft(Node<K,V> del) { return red(_1, _2, del, right()); }
 
-        @Override Node<K,V> removeRight(Node<K,V> del) { return red(key, val(), left(), del); }
+        @Override Node<K,V> removeRight(Node<K,V> del) { return red(_1, _2, left(), del); }
 
-        @Override Node<K,V> blacken() { return new Black<>(key); }
+        @Override Node<K,V> blacken() { return new Black<>(_1, _2); }
 
         @Override
         Node<K,V> redden() { throw new UnsupportedOperationException("Invariant violation"); }
@@ -1108,52 +1036,14 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
         Node<K,V> replace(K key, V val, Node<K,V> left, Node<K,V> right) {
             return red(key, val, left, right);
         }
-
-        @Override  public String toString() {
-            return "R(" + key + ")";
-        }
-    }
-
-    private static class RedVal<K, V> extends Red<K,V> {
-        final V val;
-
-        RedVal(K key, V val) {
-            super(key);
-            this.val = val;
-        }
-
-        @Override public V val() { return val; }
-
-        @Override Node<K,V> blacken() { return new BlackVal<>(key, val); }
-
-        // Not used in this data structure, but these nodes can be returned!
-        @Override public int hashCode() {
-            // This is specified in java.util.Map as part of the map contract.
-            return  (key == null ? 0 : key.hashCode()) ^
-                    (val == null ? 0 : val.hashCode());
-        }
-
-        // Not used in this data structure, but these nodes can be returned!
-        @Override public boolean equals(Object o) {
-            if (this == o) { return true; }
-            if ( !(o instanceof Map.Entry) ) { return false; }
-            Map.Entry that = (Map.Entry) o;
-            return Objects.equals(key, that.getKey()) &&
-                   Objects.equals(val, that.getValue());
-        }
-
-        @Override  public String toString() {
-            return "RV(" + key + ":" + val + ")";
-        }
     }
 
     private static class RedBranch<K, V> extends Red<K,V> {
-        final Node<K,V> left;
+        final transient Node<K,V> left;
+        final transient Node<K,V> right;
 
-        final Node<K,V> right;
-
-        RedBranch(K key, Node<K,V> left, Node<K,V> right) {
-            super(key);
+        RedBranch(K key, V val, Node<K,V> left, Node<K,V> right) {
+            super(key, val);
             this.left = left;
             this.right = right;
         }
@@ -1163,69 +1053,31 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
         @Override public Node<K,V> right() { return right; }
 
         @Override Node<K,V> balanceLeft(Node<K,V> parent) {
-            if (left instanceof Red)
-                return red(key, val(), left.blacken(),
-                           black(parent.key, parent.val(), right, parent.right()));
-            else if (right instanceof Red)
-                return red(right.key, right.val(), black(key, val(), left, right.left()),
-                           black(parent.key, parent.val(), right.right(), parent.right()));
+            if (left instanceof PersistentTreeMap.Red)
+                return red(_1, _2, left.blacken(),
+                           black(parent.getKey(), parent.getValue(), right, parent.right()));
+            else if (right instanceof PersistentTreeMap.Red)
+                return red(right.getKey(), right.getValue(), black(_1, _2, left, right.left()),
+                           black(parent.getKey(), parent.getValue(), right.right(), parent.right()));
             else
                 return super.balanceLeft(parent);
 
         }
 
         @Override Node<K,V> balanceRight(Node<K,V> parent) {
-            if (right instanceof Red)
-                return red(key, val(),
-                           black(parent.key, parent.val(), parent.left(), left),
+            if (right instanceof PersistentTreeMap.Red)
+                return red(_1, _2,
+                           black(parent.getKey(), parent.getValue(), parent.left(), left),
                            right.blacken());
-            else if (left instanceof Red)
-                return red(left.key, left.val(),
-                           black(parent.key, parent.val(), parent.left(), left.left()),
-                           black(key, val(), left.right(), right));
+            else if (left instanceof PersistentTreeMap.Red)
+                return red(left.getKey(), left.getValue(),
+                           black(parent.getKey(), parent.getValue(), parent.left(), left.left()),
+                           black(_1, _2, left.right(), right));
             else
                 return super.balanceRight(parent);
         }
 
-        @Override Node<K,V> blacken() { return new BlackBranch<>(key, left, right); }
-
-        @Override  public String toString() {
-            return "RB(" + key + " left=" + left + " right=" + right + ")";
-        }
-    }
-
-
-    private static class RedBranchVal<K, V> extends RedBranch<K,V> {
-        final V val;
-
-        RedBranchVal(K key, V val, Node<K,V> left, Node<K,V> right) {
-            super(key, left, right);
-            this.val = val;
-        }
-
-        @Override public V val() { return val; }
-
-        @Override Node<K,V> blacken() { return new BlackBranchVal<>(key, val, left, right); }
-
-        // Not used in this data structure, but these nodes can be returned!
-        @Override public int hashCode() {
-            // This is specified in java.util.Map as part of the map contract.
-            return  (key == null ? 0 : key.hashCode()) ^
-                    (val == null ? 0 : val.hashCode());
-        }
-
-        // Not used in this data structure, but these nodes can be returned!
-        @Override public boolean equals(Object o) {
-            if (this == o) { return true; }
-            if ( !(o instanceof Map.Entry) ) { return false; }
-            Map.Entry that = (Map.Entry) o;
-            return Objects.equals(key, that.getKey()) && Objects.equals(val, that.getValue());
-        }
-
-        @Override  public String toString() {
-            return "RBV(" + key + ":" + val +
-                   " left=" + left + " right=" + right + ")";
-        }
+        @Override Node<K,V> blacken() { return new BlackBranch<>(_1, _2, left, right); }
     }
 
 

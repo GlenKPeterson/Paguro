@@ -1,17 +1,73 @@
-# Upgrade from 1.x to 2.0.3
+# Change Log
 
-Anything that used to be implemented as an anonymous class, object, or lambda is now
-implemented as an enum or serializable sub-class.  As a result, the following constants have moved.
-The easiest way to make this change is to use a static import for the new fields.  For example:
-```java
-// Obsolete:
-import static org.organicdesign.fp.function.Function1..*;
+## 2016-09-10 Release 2.0.4: Serializable (Part 4)
+ - Made PersistentTreeMap return serializable Tuple2's.  Actually these are subclasses of internal nodes that still contain
+   big chunks of the treemap, but those chunks are transient (not serializable) and private.
+   When deserialized, they become plain old Tuple2's.
+ - Speed is unchanged after this: 10-item maps/sets are 0-3% faster, but generally near the margin of error for equal speed.
+   Large maps/sets (100K elements) are 0-1% slower; within the margin of error.
+ - Added ImUnsortSet and ImUnsortSetTrans interfaces to expose the TransientSet implementation.
+ - Added ImListTrans interface to expose the Transient Vector implementation.
+ - Radically improved test coverage of PersistentTreeMap and slightly improved PersistentHashMap
+ - Added epl-v10.html referenced in Rich's comments.  Should have read the legal terms more carefully earlier.
+ - Added CodeStylePaguro.xml for Idea to import.
+ - Found some opportunities to use transient implementations more efficiently.
 
-// New:
-import static org.organicdesign.fp.function.Function1.ConstBool.*;
-```
+#### Still *NOT* Serializable
+ - FunctionUtils.unmodifiable___() methods are not serializable (yet?).
+ - Transformable is not serializable (should it be?)
 
-##### List of changes:
+Issues?  Questions?  Provide feedback on the [Serialization enhancement request](https://github.com/GlenKPeterson/UncleJim/issues/10)
+
+## 2016-09-10 Release 2.0.3: Serializable (Part 3)
+ - Reverted the most serious breaking changes from previous 2.0.x releases.
+   Going from 1.x to 2.0.3+ in the two projects I use Paguro in, no changes were necessary.
+ - Tuples all implement Serializable.
+   Serializable wants a zero-arg constructor and mutable fields on the parent class in order to deserialize the child class.
+   That's the opposite of what this project is about.
+   Better to have all tuples serializable than to make anyone write a serialization proxy on a subclass because tuples *aren't* serializable.
+   This also means that Tuple2 can still implement Map.Entry, which gets rid of the breaking changes in 2.0.0, .1, and .2.
+ - Changed serialized form of RangeOfInt to just serialize the start and end,
+   then calculate the size from that.
+ - Removed KeyVal class and made Tuples serializable instead.  Back to using tup() instead of kv()
+ - Static method UnmodSortedIterable.equals() has been deprecated (renamed to UnmodSortedIterable.equal() to avoid confusion with Object.equals()).
+
+## 2016-09-01 Release 2.0.2: USE 2.0.3+ INSTEAD!
+ - Gave 5 main collections custom serialized forms (after reading Josh Bloch) so that we can change
+   the implementations later without breaking any clients who are using them for long-term storage.
+ - Decided *NOT* to make any itera**tors** serializable.
+ - Improved tests a bit, especially for serialization.
+
+## 2016-09-01 Release 2.0.1: USE 2.0.3+ INSTEAD!
+ - Made UnmodSortedIterable.castFrom... methods generic and serializable (and wrote tests for same).
+ - Fixed some Javadoc link errors.
+
+## 2016-08-27 Release 2.0.0: USE 2.0.3+ INSTEAD - ALL SIGNIFICANT BREAKING CHANGES WERE REVERTED!
+This is a major release due to making a new serializable format.
+ - Anything that used to be implemented as an anonymous class, object, or lambda is now implemented as an enum or serializable sub-class.
+ - Hash codes of all tuples are now calculated by adding together the hash codes of all member items.
+   They used to bitwise-or the first two items for compatibility with Map.Entry.
+ - Tuple2 no longer implements Map.Entry or UnmodMap.UnEntry.  Instead, a new class KeyVal extends Tuple2, Map.Entry, UnmodMap.UnEntry, and Serializable.
+   The new KeyValuePair hashcode method is compatible with the *old* Tuple2 hashcode, but NOT with the *new* Tuple2 hashcode (or equals).
+ - Maps construction now requires KeyVals instead of Tuple2's.  StaticImports has a new helper method `kv(k,v)` for this.
+ - PersistentTreeMap now returns KeyVal's instead of UnEntry's.
+ - Removed PersistentTreeMap.EQUATOR - because I didn't see it used and it hadn't been tested.
+ - Moved ComparisonContext interface from inside the Equator interface, to it's own file: org.organicdesign.fp.ComparisonContext.
+ - Replaced Equator.ComparisonContext.DEFAULT_CONTEXT with ComparisonContext.CompCtx.DEFAULT
+ - KeyVal.toString() is now kv(k,v) like all the other Java toString methods.
+ - PersistentHashMap.ArrayNode, .BitMapIndexNode, .HashCollisionNode, and .NodeIter are now all private (were public or package).
+   There should never have been any reason to use or access these.
+
+This release also contains the following non-breaking changes:
+ - Made serializable: Persistent- HashMap, HashSet, TreeMap, TreeSet, Vector.  RangeOfInt,
+ default Equator, default Comparator, default ComparisonContext.
+ Thanks @sblommers for spotting this issue and writing the key unit test!
+ - Deprecated Equator.DEFAULT_EQUATOR use Equator.Equat.DEFAULT instead.
+ - Deprecated Equator.DEFAULT_COMPARATOR use Equator.Comp.DEFAULT instead.
+
+Note: Xform is NOT serializable.  I don't know yet whether that's good or bad.
+
+##### Moved items in 2.0:
 ```
 org.organicdesign.fp.collections.Equator:
 DEFAULT_COMPARATOR   is now   Comp.DEFAULT
@@ -37,73 +93,14 @@ is now
 org.organicdesign.fp.tuple.Tuple2.of(Map.Entry<K,V> entry)
 ```
 
-#### Additional changes
- - Tuples all implement Serializable.  I really struggled over this, but in the end decided it's better
-   to have all tuples serializable than to make anyone write a serialization proxy on a subclass because
-   tuples *aren't* serializable.  It boils down to Serializable assuming mutability and wanting a
-   zero-arg constructor and mutable fields on the parent class in order to deserialize the child class.
-   I wasn't willing to do that.
- - Removed UnmodMap.UnEntry.entryToUnEntry(Map.Entry<K,V> entry).
- - PersistentHashMap.ArrayNode, .BitMapIndexNode, .HashCollisionNode, and .NodeIter are now all private (were public or package).
-   There should never have been any reason to use or access these.
- - Added ImSetTrans&lt;E&gt; interface and exposed the Transient Set implementation.
- - Added ImListTrans&lt;E&gt; interface and exposed the Transient Vector implementation.
- - Found some opportunities to use transient implementations more efficiently.
- - Static method UnmodSortedIterable.equals() has been deprecated (renamed to UnmodSortedIterable.equal() to avoid confusion with Object.equals()).
-
-#### What's *NOT* Serializable?
+##### Not Serializable (and will probably never be)
  - The function interfaces (Function0, Function1, etc.) will *NOT* implement Serializable.
     These interfaces are general and Serializable is too much for implementers to think about (and often irrelevant).
     However, the *constants* and *singletons* in those interfaces have been changed to implement
     Serializable.
  - Iterators are *NOT* serializable.  They aren't in java.util.Collections either.
    If you need an iterator to be serializable for some reason, open an issue and we'll discuss it.
- - Transformable is not serializable.
  - Transient-HashSet, -HashMap, and -Vector are not Serializable.
- - FunctionUtils.unmodifiable___() methods are not serializable (yet?).
-
-Issues?  Questions?  Provide feedback on the [Serialization enhancement request](https://github.com/GlenKPeterson/UncleJim/issues/10)
-
-
-# Change Log
-
-## 2016-09-10 Release 2.0.3
- - Changed serialized form of RangeOfInt to just serialize the start and end,
-   then calculate the size from that.
- - Removed KeyVal class and made Tuples serializable instead.  Back to using tup() instead of kv()
- - Static method UnmodSortedIterable.equals() has been deprecated (renamed to UnmodSortedIterable.equal() to avoid confusion with Object.equals()).
-
-## 2016-09-01 Release 2.0.2 USE 2.0.3 INSTEAD!
- - Gave 5 main collections custom serialized forms (after reading Josh Bloch) so that we can change
-   the implementations later without breaking any clients who are using them for long-term storage.
- - Decided *NOT* to make any itera**tors** serializable.
- - Improved tests a bit, especially for serialization.
-
-## 2016-09-01 Release 2.0.1 USE 2.0.3 INSTEAD!
- - Made UnmodSortedIterable.castFrom... methods generic and serializable (and wrote tests for same).
- - Fixed some Javadoc link errors.
-
-## 2016-08-27 Release 2.0.0: USE 2.0.3 INSTEAD!
-This is a major release due to the following **breaking changes** in order to make more things serializable without creating a mess:
- - Hash codes of all tuples are now calculated by adding together the hash codes of all member items.
-   They used to bitwise-or the first two items for compatibility with Map.Entry.
- - Tuple2 no longer implements Map.Entry or UnmodMap.UnEntry.  Instead, a new class KeyVal extends Tuple2, Map.Entry, UnmodMap.UnEntry, and Serializable.
-   The new KeyValuePair hashcode method is compatible with the *old* Tuple2 hashcode, but NOT with the *new* Tuple2 hashcode (or equals).
- - Maps construction now requires KeyVals instead of Tuple2's.  StaticImports has a new helper method `kv(k,v)` for this.
- - PersistentTreeMap now returns KeyVal's instead of UnEntry's.
- - Removed PersistentTreeMap.EQUATOR - because I didn't see it used and it hadn't been tested.
- - Moved ComparisonContext interface from inside the Equator interface, to it's own file: org.organicdesign.fp.ComparisonContext.
- - Replaced Equator.ComparisonContext.DEFAULT_CONTEXT with ComparisonContext.CompCtx.DEFAULT
- - KeyVal.toString() is now kv(k,v) like all the other Java toString methods.
-
-This release also contains the following non-breaking changes:
- - Made serializable: Persistent- HashMap, HashSet, TreeMap, TreeSet, Vector.  RangeOfInt,
- default Equator, default Comparator, default ComparisonContext.
- Thanks @sblommers for spotting this issue and writing the key unit test!
- - Deprecated Equator.DEFAULT_EQUATOR use Equator.Equat.DEFAULT instead.
- - Deprecated Equator.DEFAULT_COMPARATOR use Equator.Comp.DEFAULT instead.
-
-Note: Xform is NOT serializable.  I don't know yet whether that's good or bad.
 
 ## 2016-03-23 Release 1.0.3
  - Fixed error message for Xform.drop() to "Can't drop less than zero items #6." Thanks @pniederw

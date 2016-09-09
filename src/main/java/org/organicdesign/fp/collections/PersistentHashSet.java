@@ -27,7 +27,7 @@ import java.util.Set;
  This file is a derivative work based on a Clojure collection licensed under the Eclipse Public
  License 1.0 Copyright Rich Hickey
 */
-public class PersistentHashSet<E> implements ImSet<E>, Serializable {
+public class PersistentHashSet<E> implements ImUnsortSetTrans<E>, Serializable {
 
     // If you don't put this here, it inherits EMPTY from UnmodSet, which does not have .equals()
     // defined.  UnmodSet.empty won't put() either.
@@ -51,7 +51,7 @@ public class PersistentHashSet<E> implements ImSet<E>, Serializable {
      */
     public static <E> PersistentHashSet<E> of(Iterable<E> elements) {
         PersistentHashSet<E> empty = empty();
-        ImSetTrans<E> ret = empty.asTransient();
+        ImUnsortSetTrans<E> ret = empty.asTransient();
         for (E e : elements) {
             ret.put(e);
         }
@@ -60,7 +60,7 @@ public class PersistentHashSet<E> implements ImSet<E>, Serializable {
 
     public static <E> PersistentHashSet<E> ofEq(Equator<E> eq, Iterable<E> init) {
         PersistentHashSet<E> empty = empty(eq);
-        ImSetTrans<E> ret = empty.asTransient();
+        ImUnsortSetTrans<E> ret = empty.asTransient();
         for (E e : init) {
             ret.put(e);
         }
@@ -135,6 +135,9 @@ public class PersistentHashSet<E> implements ImSet<E>, Serializable {
     /** Returns the Equator used by this set for equals comparisons and hashCodes */
     public Equator<E> equator() { return impl.equator(); }
 
+    /** Returns a this set. */
+    @Override public ImUnsortSet<E> persistent() { return this; }
+
     @Override public PersistentHashSet<E> without(E key) {
         if (contains(key))
             return new PersistentHashSet<>(impl.without(key));
@@ -171,18 +174,20 @@ public class PersistentHashSet<E> implements ImSet<E>, Serializable {
 
     @Override public int size() { return impl.size(); }
 
-    public ImSetTrans<E> asTransient() {
+    public ImUnsortSetTrans<E> asTransient() {
         return new TransientHashSet<>(impl.asTransient());
     }
 
-    private static final class TransientHashSet<E> implements ImSetTrans<E> {
+    private static final class TransientHashSet<E> implements ImUnsortSetTrans<E> {
         ImMapTrans<E,E> impl;
 
         TransientHashSet(ImMapTrans<E,E> impl) { this.impl = impl; }
 
+        @Override public ImUnsortSetTrans<E> asTransient() { return this; }
+
         @Override public int size() { return impl.size(); }
 
-        @Override public ImSetTrans<E> put(E val) {
+        @Override public ImUnsortSetTrans<E> put(E val) {
             ImMapTrans<E,E> m = impl.assoc(val, val);
             if (m != impl) this.impl = m;
             return this;
@@ -199,7 +204,7 @@ public class PersistentHashSet<E> implements ImSet<E>, Serializable {
             return impl.entry((E) key).isSome();
         }
 
-        @Override public ImSetTrans<E> without(E key) {
+        @Override public ImUnsortSetTrans<E> without(E key) {
             ImMapTrans<E,E> m = impl.without(key);
             if (m != impl) this.impl = m;
             return this;

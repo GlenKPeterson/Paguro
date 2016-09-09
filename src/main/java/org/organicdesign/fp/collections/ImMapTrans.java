@@ -4,6 +4,7 @@ package org.organicdesign.fp.collections;
  You could think of this as a builder for a PersistentHashMap.  It builds a little faster than the
  persistent one.  This is inherently NOT thread-safe.
  */
+// TODO: Rename to ImUnSortMap
 public interface ImMapTrans<K,V> extends ImMap<K,V> {
     ImMapTrans<K,V> asTransient();
 
