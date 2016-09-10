@@ -447,4 +447,19 @@ public class PersistentVectorTest {
         }
     }
 
+    @Test public void reverseTest() {
+        List<Integer> control = new ArrayList<>();
+        ImList<Integer> test = PersistentVector.empty();
+        for (int i = 0; i < 2000; i++) {
+            control.add(i);
+            test = test.append(i);
+        }
+        assertEquals(control.size(), test.size());
+        TestUtilities.compareIterators(control.iterator(), test.iterator());
+
+        Collections.reverse(control);
+        test = test.reverse();
+        assertEquals(control.size(), test.size());
+        TestUtilities.compareIterators(control.iterator(), test.iterator());
+    }
 }

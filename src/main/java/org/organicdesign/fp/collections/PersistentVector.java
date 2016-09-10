@@ -36,7 +36,7 @@ import org.organicdesign.fp.xform.Transformable;
  @author Rich Hickey (Primary author)
  @author Glen Peterson (Java-centric editor)
  */
-public class PersistentVector<E> implements ImListTrans<E>, Serializable {
+public class PersistentVector<E> implements ImList<E>, Serializable {
 
     // There's bit shifting going on here because it's a very fast operation.
     // Shifting right by 5 is aeons faster than dividing by 32.
@@ -96,7 +96,7 @@ public class PersistentVector<E> implements ImListTrans<E>, Serializable {
 
     /** Returns the empty ImList (there only needs to be one) */
     @SuppressWarnings("unchecked")
-    public static final <T> PersistentVector<T> empty() { return (PersistentVector<T>) EMPTY; }
+    public static <T> PersistentVector<T> empty() { return (PersistentVector<T>) EMPTY; }
 
     /**
      Public static factory method to create a vector from an Iterable.  A varargs version of this
@@ -134,7 +134,7 @@ public class PersistentVector<E> implements ImListTrans<E>, Serializable {
 
     // We could make this public someday.
     @SuppressWarnings("unchecked")
-    private static final <T> TransientVector<T> emptyTransientVector() {
+    private static <T> TransientVector<T> emptyTransientVector() {
         return (TransientVector<T>) EMPTY.asTransient();
     }
 
@@ -167,8 +167,8 @@ public class PersistentVector<E> implements ImListTrans<E>, Serializable {
         private static final long serialVersionUID = 20160904155600L;
 
         private final int size;
-        private transient ImListTrans<E> vector;
-        SerializationProxy(ImListTrans<E> v) {
+        private transient ImList<E> vector;
+        SerializationProxy(PersistentVector<E> v) {
             size = v.size();
             vector = v;
         }
@@ -209,11 +209,11 @@ public class PersistentVector<E> implements ImListTrans<E>, Serializable {
     // We could make this public some day, maybe.
     public ImListTrans<E> asTransient() { return new TransientVector<>(this); }
 
-    @Override public ImListTrans<E> persistent() { return this; }
+    @Override public ImList<E> persistent() { return this; }
 
     // Returns the high (gt 5) bits of the index of the last item.
     // I think this is the index of the start of the last array in the tree.
-    final private int tailoff() {
+    private int tailoff() {
         // ((size - 1) / 32) * 32
         // (Size - 1) is an index into an array because size starts counting from 1 and array
         //            indices start from 0.
@@ -657,7 +657,7 @@ public class PersistentVector<E> implements ImListTrans<E>, Serializable {
 
         // Returns the high (gt 5) bits of the index of the last item.
         // I think this is the index of the start of the last array in the tree.
-        final private int tailoff() {
+        private int tailoff() {
             // ((size - 1) / 32) * 32
             // (Size - 1) is an index into an array because size starts counting from 1 and array
             //            indices start from 0.

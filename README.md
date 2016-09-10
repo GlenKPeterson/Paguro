@@ -2,7 +2,7 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") p
 
 #News
 
-##2016-09-06 Release 2.0.4: Serializable (Part 4)
+##Warning
 **DO NOT USE Releases 2.0.0 - 2.0.2 because breaking changes from these releases were reverted.**
 Full notes in the [Change Log](https://github.com/GlenKPeterson/UncleJim/blob/master/CHANGE_LOG.md).
 
@@ -46,7 +46,7 @@ Available from the [Maven Repository](http://mvnrepository.com/artifact/org.orga
         <groupId>org.organicdesign</groupId>
         <!-- NOTE: artifactId will change to "Paguro" in November 2016 -->
         <artifactId>UncleJim</artifactId>
-        <version>2.0.4</version>
+        <version>2.0.5</version>
 </dependency>
 ```
 

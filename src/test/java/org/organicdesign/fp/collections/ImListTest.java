@@ -17,10 +17,7 @@ package org.organicdesign.fp.collections;
 import org.junit.Test;
 import org.organicdesign.fp.TestUtilities;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -50,7 +47,7 @@ public class ImListTest {
 //                     p.toString());
 //    }
 
-    static class TestList<T> implements ImList<T> {
+    private static class TestList<T> implements ImList<T> {
         static <T> List<T> dup(Collection<T> in) {
             List<T> out = new ArrayList<>();
             out.addAll(in);
@@ -79,6 +76,8 @@ public class ImListTest {
         @Override public int size() { return inner.size(); }
 
         @Override public T get(int index) { return inner.get(index); }
+
+        @Override public ImList<T> persistent() { return this; }
     }
 
     @Test public void get() {
@@ -105,5 +104,21 @@ public class ImListTest {
         String[] fourScore = new String[] {"Four", "score", "and", "seven", "years", "ago..."};
         TestUtilities.listIteratorTest(Arrays.asList(fourScore),
                                        new TestList<>(Arrays.asList(fourScore)));
+    }
+
+    @Test public void reverseTest() {
+        List<Integer> control = new ArrayList<>();
+        ImList<Integer> test = new TestList<>(Collections.emptyList());
+        for (int i = 0; i < 100; i++) {
+            control.add(i);
+            test = test.append(i);
+        }
+        assertEquals(control.size(), test.size());
+        TestUtilities.compareIterators(control.iterator(), test.iterator());
+
+        Collections.reverse(control);
+        test = test.reverse();
+        assertEquals(control.size(), test.size());
+        TestUtilities.compareIterators(control.iterator(), test.iterator());
     }
 }

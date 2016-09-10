@@ -13,6 +13,8 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
+import java.util.ListIterator;
+
 /**
  Holds Immutable "modification" methods that return a new ImList reflecting the modification while
  sharing as much data structure with the previous ImList as possible (for performance).
@@ -188,6 +190,9 @@ public interface ImList<E> extends UnmodList<E> {
         return notFound;
     }
 
+    /** Returns a persistent/immutable version of this transient vector/list. */
+    ImList<E> persistent();
+
     /**
      Replace the item at the given index.  Note: i.replace(i.size(), o) used to be equivalent to
      i.concat(o), but it probably won't be for the RRB tree implementation, so this will change too.
@@ -198,6 +203,15 @@ public interface ImList<E> extends UnmodList<E> {
      */
     // TODO: Don't make i.replace(i.size(), o) equivalent to i.concat(o)
     ImList<E> replace(int idx, E e);
+
+    default ImList<E> reverse() {
+        ImListTrans<E> ret = PersistentVector.<E>empty().asTransient();
+        ListIterator<E> iter = listIterator(size());
+        while (iter.hasPrevious()) {
+            ret.append(iter.previous());
+        }
+        return ret.persistent();
+    }
 
     // ====================================== STATIC METHODS ======================================
 //    static <T> ImList<T> empty() { return PersistentVector.empty(); }
