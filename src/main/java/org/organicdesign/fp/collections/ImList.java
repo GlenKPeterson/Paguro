@@ -204,6 +204,7 @@ public interface ImList<E> extends UnmodList<E> {
     // TODO: Don't make i.replace(i.size(), o) equivalent to i.concat(o)
     ImList<E> replace(int idx, E e);
 
+    /** Returns a reversed copy of this list. */
     default ImList<E> reverse() {
         ImListTrans<E> ret = PersistentVector.<E>empty().asTransient();
         ListIterator<E> iter = listIterator(size());
