@@ -1,5 +1,8 @@
 # Change Log
 
+## 2016-09-10 Release 2.0.6:
+ - Added asTransient() to ImList.
+
 ## 2016-09-10 Release 2.0.5:
  - Moved persistent() from ImListTrans to ImList and made PersistentVector implement ImList instead of ImListTrans.
    This just makes a lot more sense.  It shouldn't break any sensible client code.

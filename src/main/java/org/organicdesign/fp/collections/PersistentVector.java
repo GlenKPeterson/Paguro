@@ -207,7 +207,7 @@ public class PersistentVector<E> implements ImList<E>, Serializable {
     // not TransientVector<E> as this originally returned.
 //    @Override
     // We could make this public some day, maybe.
-    public ImListTrans<E> asTransient() { return new TransientVector<>(this); }
+    @Override public ImListTrans<E> asTransient() { return new TransientVector<>(this); }
 
     @Override public ImList<E> persistent() { return this; }
 
@@ -582,6 +582,8 @@ public class PersistentVector<E> implements ImList<E>, Serializable {
             //		root = editableRoot(root);
             //		tail = editableTail(tail);
         }
+
+        @Override public ImListTrans<F> asTransient() { return this; }
 
         @Override  public int size() {
             ensureEditable();

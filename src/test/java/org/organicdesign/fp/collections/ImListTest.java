@@ -47,7 +47,7 @@ public class ImListTest {
 //                     p.toString());
 //    }
 
-    private static class TestList<T> implements ImList<T> {
+    private static class TestList<T> implements ImListTrans<T> {
         static <T> List<T> dup(Collection<T> in) {
             List<T> out = new ArrayList<>();
             out.addAll(in);
@@ -61,13 +61,13 @@ public class ImListTest {
             inner.addAll(s);
         }
 
-        @Override public ImList<T> append(T t) {
+        @Override public ImListTrans<T> append(T t) {
             List<T> next = dup(inner);
             next.add(t);
             return new TestList<>(next);
         }
 
-        @Override public ImList<T> replace(int idx, T t) {
+        @Override public ImListTrans<T> replace(int idx, T t) {
             List<T> next = dup(inner);
             next.set(idx, t);
             return new TestList<>(next);
@@ -78,6 +78,12 @@ public class ImListTest {
         @Override public T get(int index) { return inner.get(index); }
 
         @Override public ImList<T> persistent() { return this; }
+
+        @Override public ImListTrans<T> asTransient() {
+            // Not in the spirit of what's expected, but it technically does
+            // implement Transient.
+            return this;
+        }
     }
 
     @Test public void get() {

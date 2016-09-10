@@ -127,6 +127,9 @@ public interface ImList<E> extends UnmodList<E> {
      */
     ImList<E> append(E e);
 
+    /** Returns a transient (builder) */
+    ImListTrans<E> asTransient();
+
     /**
      Adds multiple items to the end of the ImList.
 
