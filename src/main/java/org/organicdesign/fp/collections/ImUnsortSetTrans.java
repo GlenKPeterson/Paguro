@@ -20,6 +20,9 @@ package org.organicdesign.fp.collections;
  */
 public interface ImUnsortSetTrans<E> extends ImUnsortSet<E> {
 
+    /** Returns a transient/mutable version of this (persistent/immutable) set. */
+    @Override default ImUnsortSetTrans<E> asTransient() { return this; }
+
     /** {@inheritDoc} */
     @Override
     ImUnsortSetTrans<E> put(E val);

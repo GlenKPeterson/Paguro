@@ -20,7 +20,7 @@ import java.util.Objects;
 
 /**
  This approximates union of two types for Java.  It works, but it's a little experimental in the
- sense of is this the best way to do it, and how good of an idea is this in general.
+ sense of "Is this the best way to do it?" and, "How good of an idea is this in general?"
 
  Java has specifically avoided union types in favor of defining a super-type and making those other
  two types extend the new parent.  But sometimes you don't have control of the two types to make

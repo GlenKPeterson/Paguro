@@ -56,10 +56,9 @@ public class ImListTest {
 
         private final List<T> inner;
 
-        TestList(Collection<T> s) {
-            inner = new ArrayList<>();
-            inner.addAll(s);
-        }
+        TestList(Collection<T> s) { inner = dup(s); }
+
+        TestList() { inner = new ArrayList<>(); }
 
         @Override public ImListTrans<T> append(T t) {
             List<T> next = dup(inner);
@@ -80,9 +79,23 @@ public class ImListTest {
         @Override public ImList<T> persistent() { return this; }
 
         @Override public ImListTrans<T> asTransient() {
-            // Not in the spirit of what's expected, but it technically does
-            // implement Transient.
-            return this;
+            return new ImListTrans<T>() {
+                private final List<T> mutable = dup(inner);
+
+                @Override public int size() { return mutable.size(); }
+
+                @Override public T get(int i) { return mutable.get(i); }
+
+                @Override public ImListTrans<T> append(T val) { mutable.add(val); return this; }
+
+                @Override public ImList<T> persistent() {
+                    return new TestList<>(dup(mutable));
+                }
+
+                @Override public ImListTrans<T> replace(int idx, T t) {
+                    mutable.set(idx, t); return this;
+                }
+            };
         }
     }
 
@@ -101,9 +114,18 @@ public class ImListTest {
     }
 
     @Test public void concatTest() {
-        assertArrayEquals(new String[]{"a", "b", "c", "d", "e", "f"},
-                          new TestList<>(Arrays.asList("a", "b", "c"))
-                                  .concat(Arrays.asList("d", "e", "f")).toArray());
+        List<String> control = new ArrayList<>();
+        control.addAll(Arrays.asList("a", "b", "c"));
+        ImList<String> test = new TestList<>(Arrays.asList("a", "b", "c"));
+        assertEquals(control.size(), test.size());
+        assertEquals(control, test);
+        TestUtilities.listIteratorTest(control, test);
+
+        control.addAll(Arrays.asList("d", "e", "f"));
+        test = test.concat(Arrays.asList("d", "e", "f"));
+        assertEquals(control.size(), test.size());
+        assertEquals(control, test);
+        TestUtilities.listIteratorTest(control, test);
     }
 
     @Test public void iteratorTest() {

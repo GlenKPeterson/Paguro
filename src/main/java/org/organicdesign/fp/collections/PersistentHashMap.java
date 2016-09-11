@@ -437,8 +437,6 @@ public class PersistentHashMap<K,V> implements ImUnsortMap<K,V>, Serializable {
             return this;
         }
 
-        @Override public ImUnsortMapTrans<K,V> asTransient() { return this; }
-
         @Override public Option<UnEntry<K,V>> entry(K key) {
             ensureEditable();
             if (key == null) {

@@ -21,6 +21,9 @@ public interface ImUnsortMapTrans<K,V> extends ImUnsortMap<K,V> {
     /** {@inheritDoc} */
     @Override ImUnsortMapTrans<K,V> assoc(K key, V val);
 
+    /** Returns a transient/mutable version of this (persistent/immutable) map. */
+    @Override default ImUnsortMapTrans<K,V> asTransient() { return this; }
+
     /** {@inheritDoc} */
     @Override ImUnsortMapTrans<K,V> without(K key);
 }

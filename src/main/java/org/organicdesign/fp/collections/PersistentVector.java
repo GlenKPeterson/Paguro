@@ -306,16 +306,12 @@ public class PersistentVector<E> implements ImList<E>, Serializable {
     }
 
     /**
-     * Efficiently adds items to the end of this PersistentVector.
-     * @param items the values to insert
-     * @return a new PersistentVector with the additional items at the end.
+     Efficiently adds items to the end of this PersistentVector.
+     @param items the values to insert
+     @return a new PersistentVector with the additional items at the end.
      */
     @Override public PersistentVector<E> concat(Iterable<? extends E> items) {
-        ImListTrans<E> result = this.asTransient();
-        for (E e : items) {
-            result = result.append(e);
-        }
-        return (PersistentVector<E>) result.persistent();
+        return (PersistentVector<E>) ImList.super.concat(items);
     }
 
     private Node pushTail(int level, Node parent, Node tailnode) {

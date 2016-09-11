@@ -183,8 +183,6 @@ public class PersistentHashSet<E> implements ImUnsortSet<E>, Serializable {
 
         TransientHashSet(ImUnsortMapTrans<E,E> impl) { this.impl = impl; }
 
-        @Override public ImUnsortSetTrans<E> asTransient() { return this; }
-
         @Override public int size() { return impl.size(); }
 
         @Override public ImUnsortSetTrans<E> put(E val) {

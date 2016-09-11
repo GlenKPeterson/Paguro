@@ -131,18 +131,18 @@ public interface ImList<E> extends UnmodList<E> {
     ImListTrans<E> asTransient();
 
     /**
-     Adds multiple items to the end of the ImList.
+     Efficiently adds items to the end of this ImList.
 
      @param es the values to insert
      @return a new ImList with the additional items at the end.
      */
     @Override default ImList<E> concat(Iterable<? extends E> es) {
-        ImList<E> result = this;
+        ImListTrans<E> result = this.asTransient();
         for (E e : es) {
-            result = result.append(e);
+            result.append(e);
         }
-        return result;
-    };
+        return result.persistent();
+    }
 
 //    /** {@inheritDoc} */
 //    @Override ImList<E> concat(Sequence<E> other);
