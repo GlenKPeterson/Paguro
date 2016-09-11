@@ -15,7 +15,7 @@
 package org.organicdesign.fp.collections;
 
 /**
- Interface for transient/mutable (hash) map builder.
+ Interface for mutable (hash) map builder.
  */
 public interface MutableUnsortedMap<K,V> extends ImUnsortedMap<K,V> {
     /** {@inheritDoc} */

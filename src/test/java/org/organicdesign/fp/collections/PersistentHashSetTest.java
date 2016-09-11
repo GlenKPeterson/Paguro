@@ -1,9 +1,6 @@
 package org.organicdesign.fp.collections;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 import org.junit.Test;
 import org.organicdesign.fp.FunctionUtils;
@@ -304,6 +301,13 @@ public class PersistentHashSetTest {
             test.without(i);
             assertEquals(control.size(), test.size());
         }
+
+        List<Integer> others = Arrays.asList(SOME + 2, SOME + 3, SOME + 4);
+        control.addAll(others);
+        test = test.union(others);
+        assertEquals(control.size(), test.size());
+        setIterTest(control, test.iterator());
+        assertEquals(control, test);
     }
 
     enum Ctx implements ComparisonContext<Integer> {

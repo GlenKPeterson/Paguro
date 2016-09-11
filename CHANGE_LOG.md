@@ -9,6 +9,7 @@
     - ImUnsortSetTrans is now MutableUnsortedSet
     - The `persistent()` method on all of those interfaces is now `immutable()`
     - The `asTransient()` method on all of those interfaces is now `mutable()`
+ - Added union() method to ImUnsortedSet and MutableUnsortedSet and a little test for same.
 
 This is only a day after releasing these interfaces. After doing serialization, I couldn't freakin'
 write anything anymore without saying "transient (meaning mutable)" or "transient (as in not
