@@ -420,6 +420,19 @@ public class PersistentVectorTest {
         for (int i = 0; i < SEVERAL; i++) {
             assertEquals(control.get(i), test.get(i));
         }
+
+        List<Integer> additional = Arrays.asList(SEVERAL + 3, SEVERAL + 4, SEVERAL + 5);
+        control.addAll(additional);
+        test.concat(additional);
+
+        assertEquals(control.size(), test.size());
+        compareIterators(control.iterator(), test.iterator());
+        assertEquals(control, test);
+
+        assertEquals(control, test.mutable());
+        assertEquals(control.size(), test.mutable().size());
+        compareIterators(control.iterator(), test.mutable().iterator());
+
     }
 
     @Test public void testAddReplace() {

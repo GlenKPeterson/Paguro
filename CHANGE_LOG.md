@@ -1,5 +1,8 @@
 # Change Log
 
+## 2016-09-11 Release 2.0.8:
+ - Fixed illegal cast in MutableList.concat and made test for same.  Thanks to @pniederw for this!
+
 ## 2016-09-11 Release 2.0.7:
  - Massive renaming of newly exposed interfaces and methods.
     - ImUnsortMap is now ImUnsortedMap

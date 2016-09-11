@@ -14,7 +14,10 @@ public interface MutableList<E> extends ImList<E> {
 
     /** {@inheritDoc} */
     @Override default MutableList<E> concat(Iterable<? extends E> es) {
-        return (MutableList<E>) ImList.super.concat(es);
+        for (E e : es) {
+            this.append(e);
+        }
+        return this;
     }
 
     /** {@inheritDoc} */

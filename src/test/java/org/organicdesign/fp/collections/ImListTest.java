@@ -47,7 +47,7 @@ public class ImListTest {
 //                     p.toString());
 //    }
 
-    private static class TestList<T> implements MutableList<T> {
+    private static class TestList<T> implements ImList<T> {
         static <T> List<T> dup(Collection<T> in) {
             List<T> out = new ArrayList<>();
             out.addAll(in);
@@ -60,13 +60,13 @@ public class ImListTest {
 
         TestList() { inner = new ArrayList<>(); }
 
-        @Override public MutableList<T> append(T t) {
+        @Override public ImList<T> append(T t) {
             List<T> next = dup(inner);
             next.add(t);
             return new TestList<>(next);
         }
 
-        @Override public MutableList<T> replace(int idx, T t) {
+        @Override public ImList<T> replace(int idx, T t) {
             List<T> next = dup(inner);
             next.set(idx, t);
             return new TestList<>(next);
@@ -123,6 +123,7 @@ public class ImListTest {
 
         control.addAll(Arrays.asList("d", "e", "f"));
         test = test.concat(Arrays.asList("d", "e", "f"));
+
         assertEquals(control.size(), test.size());
         assertEquals(control, test);
         TestUtilities.listIteratorTest(control, test);

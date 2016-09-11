@@ -44,7 +44,7 @@ Available from the [Maven Repository](http://mvnrepository.com/artifact/org.orga
         <groupId>org.organicdesign</groupId>
         <!-- NOTE: artifactId will change to "Paguro" in November 2016 -->
         <artifactId>UncleJim</artifactId>
-        <version>2.0.7</version>
+        <version>2.0.8</version>
 </dependency>
 ```
 
