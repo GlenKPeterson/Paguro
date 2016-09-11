@@ -397,9 +397,9 @@ public class PersistentVectorTest {
                      pv);
     }
 
-    @Test public void testTransient() {
+    @Test public void testMutable() {
         List<Integer> control = new ArrayList<>();
-        ImListTrans<Integer> test = PersistentVector.<Integer>empty().asTransient();
+        MutableList<Integer> test = PersistentVector.<Integer>empty().mutable();
         final int SEVERAL = 2000; // more than 1024 so 3 levels deep.
         for (int i = 0; i < SEVERAL; i++) {
             control.add(i);

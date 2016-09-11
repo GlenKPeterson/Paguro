@@ -27,7 +27,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.organicdesign.fp.collections.*;
-import org.organicdesign.fp.collections.ImUnsortSet;
 import org.organicdesign.fp.function.Function1;
 import org.organicdesign.fp.function.Function2;
 
@@ -160,8 +159,8 @@ public interface Transformable<T> {
      Realize a thread-safe immutable list to access items quickly O(log32 n) by index.
      */
     default ImList<T> toImList() {
-        return foldLeft(PersistentVector.<T>empty().asTransient(),
-                        ImListTrans<T>::append).persistent();
+        return foldLeft(PersistentVector.<T>empty().mutable(),
+                        MutableList<T>::append).immutable();
     }
 
     /**
@@ -177,10 +176,10 @@ public interface Transformable<T> {
      @return An immutable map
      */
     default <K,V> ImMap<K,V> toImMap(Function1<? super T,Map.Entry<K,V>> f1) {
-        return foldLeft(PersistentHashMap.<K,V>empty().asTransient(),
-                        (ImUnsortMapTrans<K,V> ts, T t) ->
-                                (ImUnsortMapTrans<K,V>) ts.assoc(f1.apply(t)))
-                .persistent();
+        return foldLeft(PersistentHashMap.<K,V>empty().mutable(),
+                        (MutableUnsortedMap<K,V> ts, T t) ->
+                                (MutableUnsortedMap<K,V>) ts.assoc(f1.apply(t)))
+                .immutable();
     }
 
     /**
@@ -191,8 +190,8 @@ public interface Transformable<T> {
      @return An immutable set (with duplicates removed)
      */
     default ImSet<T> toImSet() {
-        return foldLeft(PersistentHashSet.<T>empty().asTransient(),
-                        ImUnsortSetTrans::put).persistent();
+        return foldLeft(PersistentHashSet.<T>empty().mutable(),
+                        MutableUnsortedSet::put).immutable();
     }
 
     /**

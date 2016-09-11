@@ -10,11 +10,10 @@
 
 <p>For example, in the Serialization code for PersistentVector, we use a SerializationProxy to
     handle the actual serialization and deserialization of PersistentVectors.  Our proxy has
-    a transient (in the serialization sense) ImList variable.  When serializing, it holds a
-    persistent/immutable vector.  When deserializing, it holds a TransientVector (transient as in
-    "mutable," not the Java keyword) for speed.  In the context of that code, it makes sense to
-    treat the mutable and immutable vector the same.  So the Mutable class could subclass the
-    immutable one.</p>
+    a transient (in the serialization sense) ImList variable.  When serializing, it holds an
+    immutable vector.  When deserializing, it holds a MutableVector for speed.  In the context
+    of that code, it makes sense to treat the mutable and immutable vector the same.  So the
+    Mutable class could subclass the immutable one.</p>
 
 <p>But if a method says it returns an Immutable object, we don't want to get a Mutable one by
     accident.  So that would be the opposite inheritance hierarchy.  Really, we want to move

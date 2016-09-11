@@ -127,9 +127,6 @@ public interface ImList<E> extends UnmodList<E> {
      */
     ImList<E> append(E e);
 
-    /** Returns a transient (builder) */
-    ImListTrans<E> asTransient();
-
     /**
      Efficiently adds items to the end of this ImList.
 
@@ -137,11 +134,11 @@ public interface ImList<E> extends UnmodList<E> {
      @return a new ImList with the additional items at the end.
      */
     @Override default ImList<E> concat(Iterable<? extends E> es) {
-        ImListTrans<E> result = this.asTransient();
+        MutableList<E> result = this.mutable();
         for (E e : es) {
             result.append(e);
         }
-        return result.persistent();
+        return result.immutable();
     }
 
 //    /** {@inheritDoc} */
@@ -181,6 +178,9 @@ public interface ImList<E> extends UnmodList<E> {
 //     */
 //    default E get(Number n) { return get(n.intValue()); }
 
+    /** Returns a mutable list (builder) */
+    MutableList<E> mutable();
+
     /**
      * Returns the item at this index.
      * @param i the zero-based index to get from the vector.
@@ -193,8 +193,8 @@ public interface ImList<E> extends UnmodList<E> {
         return notFound;
     }
 
-    /** Returns a persistent/immutable version of this transient vector/list. */
-    ImList<E> persistent();
+    /** Returns a immutable version of this mutable list. */
+    ImList<E> immutable();
 
     /**
      Replace the item at the given index.  Note: i.replace(i.size(), o) used to be equivalent to
@@ -209,12 +209,12 @@ public interface ImList<E> extends UnmodList<E> {
 
     /** Returns a reversed copy of this list. */
     default ImList<E> reverse() {
-        ImListTrans<E> ret = PersistentVector.<E>empty().asTransient();
+        MutableList<E> ret = PersistentVector.<E>empty().mutable();
         ListIterator<E> iter = listIterator(size());
         while (iter.hasPrevious()) {
             ret.append(iter.previous());
         }
-        return ret.persistent();
+        return ret.immutable();
     }
 
     // ====================================== STATIC METHODS ======================================

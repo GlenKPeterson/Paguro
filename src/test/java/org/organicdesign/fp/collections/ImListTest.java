@@ -47,7 +47,7 @@ public class ImListTest {
 //                     p.toString());
 //    }
 
-    private static class TestList<T> implements ImListTrans<T> {
+    private static class TestList<T> implements MutableList<T> {
         static <T> List<T> dup(Collection<T> in) {
             List<T> out = new ArrayList<>();
             out.addAll(in);
@@ -60,13 +60,13 @@ public class ImListTest {
 
         TestList() { inner = new ArrayList<>(); }
 
-        @Override public ImListTrans<T> append(T t) {
+        @Override public MutableList<T> append(T t) {
             List<T> next = dup(inner);
             next.add(t);
             return new TestList<>(next);
         }
 
-        @Override public ImListTrans<T> replace(int idx, T t) {
+        @Override public MutableList<T> replace(int idx, T t) {
             List<T> next = dup(inner);
             next.set(idx, t);
             return new TestList<>(next);
@@ -76,23 +76,23 @@ public class ImListTest {
 
         @Override public T get(int index) { return inner.get(index); }
 
-        @Override public ImList<T> persistent() { return this; }
+        @Override public ImList<T> immutable() { return this; }
 
-        @Override public ImListTrans<T> asTransient() {
-            return new ImListTrans<T>() {
+        @Override public MutableList<T> mutable() {
+            return new MutableList<T>() {
                 private final List<T> mutable = dup(inner);
 
                 @Override public int size() { return mutable.size(); }
 
                 @Override public T get(int i) { return mutable.get(i); }
 
-                @Override public ImListTrans<T> append(T val) { mutable.add(val); return this; }
+                @Override public MutableList<T> append(T val) { mutable.add(val); return this; }
 
-                @Override public ImList<T> persistent() {
+                @Override public ImList<T> immutable() {
                     return new TestList<>(dup(mutable));
                 }
 
-                @Override public ImListTrans<T> replace(int idx, T t) {
+                @Override public MutableList<T> replace(int idx, T t) {
                     mutable.set(idx, t); return this;
                 }
             };

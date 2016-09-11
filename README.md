@@ -2,9 +2,7 @@ UncleJim ("**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability") p
 
 #News
 
-##Warning
-**DO NOT USE Releases 2.0.0 - 2.0.2 because breaking changes from these releases were reverted.**
-Full notes in the [Change Log](https://github.com/GlenKPeterson/UncleJim/blob/master/CHANGE_LOG.md).
+Latest info is in the [Change Log](https://github.com/GlenKPeterson/UncleJim/blob/master/CHANGE_LOG.md).
 
 ###Renaming
 This project will soon be renamed to "Paguro" ("pah-GUH-row" rhymes with "furrow") which is short for the Latin "Paguroidea" - the name of the Hermit Crab superfamily in Biology.  These collections grow by adding a new shell, leaving the insides the same, much the way Hermit Crabs trade up to a new shell when they grow.  Plus, hermit crabs are cute.
@@ -46,7 +44,7 @@ Available from the [Maven Repository](http://mvnrepository.com/artifact/org.orga
         <groupId>org.organicdesign</groupId>
         <!-- NOTE: artifactId will change to "Paguro" in November 2016 -->
         <artifactId>UncleJim</artifactId>
-        <version>2.0.6</version>
+        <version>2.0.7</version>
 </dependency>
 ```
 

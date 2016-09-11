@@ -59,7 +59,7 @@ Rich Hickey for Clojure
 
 #To Do
  - Xform.MapDesc is not serializable.
- - Test serialization of transient versions of collections (HashSet)
+ - Test serialization of mutable versions of collections (HashSet)
  - Think about adding xform(String)
  - Change UnmodIterable.hashCode(item) to UnmodIterable.calcHashCode(item) to avoid confusion with
  the instance method of the same name (but different arity).
@@ -78,7 +78,7 @@ Rich Hickey for Clojure
  - Study monadic thinking and ensure that Or is "monad-friendly".
  Ensure you can chain together functions in a short-circuiting way, without exceptions or other side-effects.
  - Add a [Persistent RRB Tree](http://infoscience.epfl.ch/record/169879/files/RMTrees.pdf) and compare its performance to the PersistentVector.
- - Re-implement Persistent collections from Algorithms and Purely Functional Data Structures without relying on a wrapped transient collection and without locking checks, then compare efficiency.
+ - Re-implement Persistent collections from Algorithms and Purely Functional Data Structures without relying on a wrapped mutable collection and without locking checks, then compare efficiency.
  - This project needs a better name.  It's really not about Unmodifiable collections any more.  Consider just Jimm (used), Cake Pan, Baking Mold...
  Something else that conveys Immutability.  I hate that name because these collections are absolutely changeable.  They just aren't changeable in-place.
  Really, moulting (or shedding an exoskeleton) is a better analogy because these collections grow by changing a lightweight wrapper while what's inside stays basically the same.

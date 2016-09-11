@@ -1,24 +1,26 @@
 package org.organicdesign.fp.collections;
 
 /**
- Replaced with {@link ImUnsortMap} and {@link ImUnsortMapTrans}.
+ Replaced with {@link ImUnsortedMap} and {@link MutableUnsortedMap}.
  */
 @Deprecated
-public interface ImMapTrans<K,V> extends ImUnsortMapTrans<K,V> {
-    ImUnsortMapTrans<K,V> asTransient();
+public interface ImMapTrans<K,V> extends MutableUnsortedMap<K,V> {
+    MutableUnsortedMap<K,V> mutable();
 
     /** Returns the Equator used by this map for equals comparisons and hashCodes */
     Equator<K> equator();
 
-    /** Returns a persistent/immutable version of this transient map. */
-    ImUnsortMap<K,V> persistent();
+    /** Returns a immutable version of this mutable map. */
+    ImUnsortedMap<K,V> immutable();
 
     /** {@inheritDoc} */
     @Override default ImSet<K> keySet() { return PersistentHashSet.ofMap(this); }
 
     /** {@inheritDoc} */
-    @Override ImUnsortMapTrans<K,V> assoc(K key, V val);
+    @Override
+    MutableUnsortedMap<K,V> assoc(K key, V val);
 
     /** {@inheritDoc} */
-    @Override ImUnsortMapTrans<K,V> without(K key);
+    @Override
+    MutableUnsortedMap<K,V> without(K key);
 }

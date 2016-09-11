@@ -272,9 +272,9 @@ public class PersistentHashSetTest {
 //        println("accum: " + accum);
     }
 
-    @Test public void transientTest() {
+    @Test public void mutableTest() {
         Set<Integer> control = new HashSet<>();
-        ImUnsortSetTrans<Integer> test = PersistentHashSet.<Integer>empty().asTransient();
+        MutableUnsortedSet<Integer> test = PersistentHashSet.<Integer>empty().mutable();
         assertEquals(control.size(), test.size());
         assertEquals(control.contains(-1), test.contains(-1));
 
@@ -292,13 +292,12 @@ public class PersistentHashSetTest {
         setIterTest(control, test.iterator());
         // Reversed test.
         setIterTest(test, control.iterator());
-        ImUnsortSet<Integer> persistent = test.persistent();
+        ImUnsortedSet<Integer> immutable = test.immutable();
 
-        setIterTest(control, persistent.iterator());
-        setIterTest(control, serializeDeserialize(persistent).iterator());
+        setIterTest(control, immutable.iterator());
+        setIterTest(control, serializeDeserialize(immutable).iterator());
 
-        // Have to go back to transient manually.  Not ideal, but I don't want to encourage this.
-        test = persistent.asTransient();
+        test = immutable.mutable();
 
         for (int i = 0; i < SOME; i++) {
             control.remove(i);

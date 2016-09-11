@@ -39,7 +39,7 @@ http://mvnrepository.com/artifact/org.organicdesign/UncleJim
 	<groupId>org.organicdesign</groupId>
 	<!-- NOTE: artifactId will change to "Paguro" in November 2016 -->
 	<artifactId>UncleJim</artifactId>
-	<version>2.0.6</version>
+	<version>2.0.7</version>
 	<packaging>jar</packaging>
 
 	<name>Paguro (formerly known as "UncleJim" - artifact name will officially change November 2016)</name>

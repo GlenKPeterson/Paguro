@@ -15,19 +15,17 @@
 package org.organicdesign.fp.collections;
 
 /**
- Declare your set as ImUnsortSetTrans, call asTransient(), build it, then call
- mySet = mySet.persistent() without having to declare a new variable.
+ Interface for transient/mutable (hash) map builder.
  */
-public interface ImUnsortSetTrans<E> extends ImUnsortSet<E> {
+public interface MutableUnsortedMap<K,V> extends ImUnsortedMap<K,V> {
+    /** {@inheritDoc} */
+    @Override
+    MutableUnsortedMap<K,V> assoc(K key, V val);
 
-    /** Returns a transient/mutable version of this (persistent/immutable) set. */
-    @Override default ImUnsortSetTrans<E> asTransient() { return this; }
+    /** Returns a mutable version of this immutable map. */
+    @Override default MutableUnsortedMap<K,V> mutable() { return this; }
 
     /** {@inheritDoc} */
     @Override
-    ImUnsortSetTrans<E> put(E val);
-
-    /** {@inheritDoc} */
-    @Override
-    ImUnsortSetTrans<E> without(E key);
+    MutableUnsortedMap<K,V> without(K key);
 }

@@ -66,7 +66,7 @@ public class PersistentVector<E> implements ImList<E>, Serializable {
     // The bitwise | operator performs a bitwise inclusive OR operation
 
     private static class Node {
-        // Every node in a Vector (Transient or Persistent) shares a single atomic reference value.
+        // Every node in a Vector (mutable or persistent) shares a single atomic reference value.
         // I'm not sure why this is on the node instead of on the vector.  You know, if we do that,
         // we don't need this class at all and could just use arrays instead.
         transient public final AtomicReference<Thread> edit;
@@ -103,21 +103,21 @@ public class PersistentVector<E> implements ImList<E>, Serializable {
      method is: {@link org.organicdesign.fp.StaticImports#vec(Object...)}.
      */
     static public <T> PersistentVector<T> ofIter(Iterable<T> items) {
-        TransientVector<T> ret = emptyTransientVector();
+        MutableVector<T> ret = emptyMutableVector();
         for (T item : items) {
             ret.append(item);
         }
-        return ret.persistent();
+        return ret.immutable();
     }
 
 //    /** Public static factory method. */
 //    @SafeVarargs
 //    static public <T> PersistentVector<T> of(T... items) {
-//        TransientVector<T> ret = emptyTransientVector();
+//        MutableVector<T> ret = emptyMutableVector();
 //        for (T item : items) {
 //            ret = ret.append(item);
 //        }
-//        return ret.persistent();
+//        return ret.immutable();
 //    }
 
 //    @SafeVarargs
@@ -134,8 +134,8 @@ public class PersistentVector<E> implements ImList<E>, Serializable {
 
     // We could make this public someday.
     @SuppressWarnings("unchecked")
-    private static <T> TransientVector<T> emptyTransientVector() {
-        return (TransientVector<T>) EMPTY.asTransient();
+    private static <T> MutableVector<T> emptyMutableVector() {
+        return (MutableVector<T>) EMPTY.mutable();
     }
 
     // ==================================== Instance Variables ====================================
@@ -185,13 +185,13 @@ public class PersistentVector<E> implements ImList<E>, Serializable {
         @SuppressWarnings("unchecked")
         private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
             s.defaultReadObject();
-            vector = emptyTransientVector();
+            vector = emptyMutableVector();
             for (int i = 0; i < size; i++) {
                 vector.append((E) s.readObject());
             }
         }
 
-        private Object readResolve() { return vector.persistent(); }
+        private Object readResolve() { return vector.immutable(); }
     }
 
     private Object writeReplace() { return new SerializationProxy<>(this); }
@@ -204,12 +204,12 @@ public class PersistentVector<E> implements ImList<E>, Serializable {
     // ===================================== Instance Methods =====================================
 
     // IEditableCollection has this return ITransientCollection<E>,
-    // not TransientVector<E> as this originally returned.
+    // not MutableVector<E> as this originally returned.
 //    @Override
     // We could make this public some day, maybe.
-    @Override public ImListTrans<E> asTransient() { return new TransientVector<>(this); }
+    @Override public MutableList<E> mutable() { return new MutableVector<>(this); }
 
-    @Override public ImList<E> persistent() { return this; }
+    @Override public ImList<E> immutable() { return this; }
 
     // Returns the high (gt 5) bits of the index of the last item.
     // I think this is the index of the start of the last array in the tree.
@@ -546,7 +546,7 @@ public class PersistentVector<E> implements ImList<E>, Serializable {
 //    public static <A> Reduced<A> done(A a) { return new Reduced<>(a); }
 
     // Implements Counted through ITransientVector<E> -> Indexed<E> -> Counted.
-    private static final class TransientVector<F> implements ImListTrans<F> {
+    private static final class MutableVector<F> implements MutableList<F> {
         // The number of items in this Vector.
         private int size;
 
@@ -557,11 +557,11 @@ public class PersistentVector<E> implements ImList<E>, Serializable {
 
         private F[] tail;
 
-        private TransientVector(int c, int s, Node r, F[] t) {
+        private MutableVector(int c, int s, Node r, F[] t) {
             size = c; shift = s; root = r; tail = t;
         }
 
-        private TransientVector(PersistentVector<F> v) {
+        private MutableVector(PersistentVector<F> v) {
             this(v.size, v.shift, editableRoot(v.root), editableTail(v.tail));
         }
 
@@ -573,13 +573,13 @@ public class PersistentVector<E> implements ImList<E>, Serializable {
 
         private void ensureEditable() {
             if (root.edit.get() == null) {
-                throw new IllegalAccessError("Transient used after persistent! call");
+                throw new IllegalAccessError("Mutable used after immutable! call");
             }
             //		root = editableRoot(root);
             //		tail = editableTail(tail);
         }
 
-        @Override public ImListTrans<F> asTransient() { return this; }
+        @Override public MutableList<F> mutable() { return this; }
 
         @Override  public int size() {
             ensureEditable();
@@ -587,7 +587,7 @@ public class PersistentVector<E> implements ImList<E>, Serializable {
         }
 
         @SuppressWarnings("unchecked")
-        @Override  public PersistentVector<F> persistent() {
+        @Override  public PersistentVector<F> immutable() {
             ensureEditable();
             //		Thread owner = root.edit.get();
             //		if(owner != null && owner != Thread.currentThread())
@@ -601,7 +601,7 @@ public class PersistentVector<E> implements ImList<E>, Serializable {
         }
 
         @SuppressWarnings("unchecked")
-        @Override  public ImListTrans<F> append(F val) {
+        @Override  public MutableList<F> append(F val) {
             ensureEditable();
             int i = size;
             //room in tail?
@@ -700,7 +700,7 @@ public class PersistentVector<E> implements ImList<E>, Serializable {
             return node[i & LOW_BITS];
         }
 
-        @Override public ImListTrans<F> replace(int idx, F e) {
+        @Override public MutableList<F> replace(int idx, F e) {
             ensureEditable();
             F[] node = editableArrayFor(idx);
             node[idx & LOW_BITS] = e;
@@ -720,7 +720,7 @@ public class PersistentVector<E> implements ImList<E>, Serializable {
 //        /** Convenience method for using any class that implements Number as a key. */
 //        public F nth(Number key, F notFound) { return nth(key.intValue(), notFound); }
 
-//        public ImListTrans<F> insertAt(int i, F val) {
+//        public MutableList<F> insertAt(int i, F val) {
 //            ensureEditable();
 //            if (i >= 0 && i < size) {
 //                if (i >= tailoff()) {
@@ -736,12 +736,12 @@ public class PersistentVector<E> implements ImList<E>, Serializable {
 //            throw new IndexOutOfBoundsException();
 //        }
 
-//        public ImListTrans<F> assoc(int key, F val) {
+//        public MutableList<F> assoc(int key, F val) {
 //            //note - relies on ensureEditable in insertAt
 //            return insertAt(key, val);
 //        }
 //
-//        public ImListTrans<F> assoc(Number key, F val) {
+//        public MutableList<F> assoc(Number key, F val) {
 //            return insertAt(key.intValue(), val);
 //        }
 
@@ -760,7 +760,7 @@ public class PersistentVector<E> implements ImList<E>, Serializable {
 //        }
 
 //        @SuppressWarnings("unchecked")
-//        public ImListTrans<F> pop() {
+//        public MutableList<F> pop() {
 //            ensureEditable();
 //            if (size == 0)
 //                throw new IllegalStateException("Can't pop empty vector");
@@ -822,5 +822,5 @@ public class PersistentVector<E> implements ImList<E>, Serializable {
             System.arraycopy(tl, 0, ret, 0, tl.length);
             return (T[]) ret;
         }
-    } // end inner static class TransientVector
+    } // end inner static class MutableVector
 }

@@ -27,7 +27,7 @@ import java.util.Set;
  This file is a derivative work based on a Clojure collection licensed under the Eclipse Public
  License 1.0 Copyright Rich Hickey
 */
-public class PersistentHashSet<E> implements ImUnsortSet<E>, Serializable {
+public class PersistentHashSet<E> implements ImUnsortedSet<E>, Serializable {
 
     // If you don't put this here, it inherits EMPTY from UnmodSet, which does not have .equals()
     // defined.  UnmodSet.empty won't put() either.
@@ -51,32 +51,32 @@ public class PersistentHashSet<E> implements ImUnsortSet<E>, Serializable {
      */
     public static <E> PersistentHashSet<E> of(Iterable<E> elements) {
         PersistentHashSet<E> empty = empty();
-        ImUnsortSetTrans<E> ret = empty.asTransient();
+        MutableUnsortedSet<E> ret = empty.mutable();
         for (E e : elements) {
             ret.put(e);
         }
-        return (PersistentHashSet<E>) ret.persistent();
+        return (PersistentHashSet<E>) ret.immutable();
     }
 
     public static <E> PersistentHashSet<E> ofEq(Equator<E> eq, Iterable<E> init) {
         PersistentHashSet<E> empty = empty(eq);
-        ImUnsortSetTrans<E> ret = empty.asTransient();
+        MutableUnsortedSet<E> ret = empty.mutable();
         for (E e : init) {
             ret.put(e);
         }
-        return (PersistentHashSet<E>) ret.persistent();
+        return (PersistentHashSet<E>) ret.immutable();
     }
 
     @SuppressWarnings("unchecked")
-    public static <E> PersistentHashSet<E> ofMap(ImUnsortMap<E,?> map) {
-        return new PersistentHashSet<>((ImUnsortMap<E,E>) map);
+    public static <E> PersistentHashSet<E> ofMap(ImUnsortedMap<E,?> map) {
+        return new PersistentHashSet<>((ImUnsortedMap<E,E>) map);
     }
 
     // ==================================== Instance Variables ====================================
-    private final ImUnsortMap<E,E> impl;
+    private final ImUnsortedMap<E,E> impl;
 
     // ======================================= Constructor =======================================
-    private PersistentHashSet(ImUnsortMap<E,E> i) { impl = i; }
+    private PersistentHashSet(ImUnsortedMap<E,E> i) { impl = i; }
 
     // ======================================= Serialization =======================================
     // This class has a custom serialized form designed to be as small as possible.  It does not
@@ -91,8 +91,8 @@ public class PersistentHashSet<E> implements ImUnsortSet<E>, Serializable {
         private static final long serialVersionUID = 20160904155600L;
 
         private final int size;
-        private transient ImUnsortMap<K,K> theMap;
-        SerializationProxy(ImUnsortMap<K,K> phm) {
+        private transient ImUnsortedMap<K,K> theMap;
+        SerializationProxy(ImUnsortedMap<K,K> phm) {
             size = phm.size();
             theMap = phm;
         }
@@ -109,14 +109,14 @@ public class PersistentHashSet<E> implements ImUnsortSet<E>, Serializable {
         @SuppressWarnings("unchecked")
         private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
             s.defaultReadObject();
-            theMap = PersistentHashMap.<K,K>empty().asTransient();
+            theMap = PersistentHashMap.<K,K>empty().mutable();
             for (int i = 0; i < size; i++) {
                 K k = (K) s.readObject();
                 theMap = theMap.assoc(k, k);
             }
         }
 
-        private Object readResolve() { return PersistentHashSet.ofMap(theMap.persistent()); }
+        private Object readResolve() { return PersistentHashSet.ofMap(theMap.immutable()); }
     }
 
     private Object writeReplace() { return new SerializationProxy<>(impl); }
@@ -136,7 +136,7 @@ public class PersistentHashSet<E> implements ImUnsortSet<E>, Serializable {
     public Equator<E> equator() { return impl.equator(); }
 
     /** Returns a this set. */
-    @Override public ImUnsortSet<E> persistent() { return this; }
+    @Override public ImUnsortedSet<E> immutable() { return this; }
 
     @Override public PersistentHashSet<E> without(E key) {
         if (contains(key))
@@ -174,19 +174,19 @@ public class PersistentHashSet<E> implements ImUnsortSet<E>, Serializable {
 
     @Override public int size() { return impl.size(); }
 
-    public ImUnsortSetTrans<E> asTransient() {
-        return new TransientHashSet<>(impl.asTransient());
+    public MutableUnsortedSet<E> mutable() {
+        return new MutableHashSet<>(impl.mutable());
     }
 
-    private static final class TransientHashSet<E> implements ImUnsortSetTrans<E> {
-        ImUnsortMapTrans<E,E> impl;
+    private static final class MutableHashSet<E> implements MutableUnsortedSet<E> {
+        MutableUnsortedMap<E,E> impl;
 
-        TransientHashSet(ImUnsortMapTrans<E,E> impl) { this.impl = impl; }
+        MutableHashSet(MutableUnsortedMap<E,E> impl) { this.impl = impl; }
 
         @Override public int size() { return impl.size(); }
 
-        @Override public ImUnsortSetTrans<E> put(E val) {
-            ImUnsortMapTrans<E,E> m = impl.assoc(val, val);
+        @Override public MutableUnsortedSet<E> put(E val) {
+            MutableUnsortedMap<E,E> m = impl.assoc(val, val);
             if (m != impl) this.impl = m;
             return this;
         }
@@ -202,14 +202,14 @@ public class PersistentHashSet<E> implements ImUnsortSet<E>, Serializable {
             return impl.entry((E) key).isSome();
         }
 
-        @Override public ImUnsortSetTrans<E> without(E key) {
-            ImUnsortMapTrans<E,E> m = impl.without(key);
+        @Override public MutableUnsortedSet<E> without(E key) {
+            MutableUnsortedMap<E,E> m = impl.without(key);
             if (m != impl) this.impl = m;
             return this;
         }
 
-        @Override  public PersistentHashSet<E> persistent() {
-            return new PersistentHashSet<>(impl.persistent());
+        @Override  public PersistentHashSet<E> immutable() {
+            return new PersistentHashSet<>(impl.immutable());
         }
     }
 

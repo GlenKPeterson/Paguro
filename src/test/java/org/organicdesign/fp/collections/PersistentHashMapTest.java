@@ -246,7 +246,7 @@ public class PersistentHashMapTest {
 
     @Test public void biggerHashMaps() {
         int NUM_ITEMS = 300;
-        ImUnsortMap<String,Integer> m = PersistentHashMap.empty();
+        ImUnsortedMap<String,Integer> m = PersistentHashMap.empty();
 
         for (int i = 0; i < NUM_ITEMS; i++) {
             m = m.assoc(ordinal(i), i);
@@ -276,7 +276,7 @@ public class PersistentHashMapTest {
         }
         assertFalse(m.containsValue(Integer.valueOf(NUM_ITEMS)));
 
-        assertTrue(m == m.persistent());
+        assertTrue(m == m.immutable());
 
         // If you remove a key that's not there, you should get back the original map.
         assertTrue(m == m.without(ordinal(NUM_ITEMS)));
@@ -333,7 +333,7 @@ public class PersistentHashMapTest {
         assertTrue(m.containsValue(Integer.valueOf(-1)));
         assertFalse(m.containsValue(Integer.valueOf(NUM_ITEMS)));
 
-        assertTrue(m == m.persistent());
+        assertTrue(m == m.immutable());
 
         m = m.without(null);
         assertEquals(NUM_ITEMS, m.size());
@@ -352,10 +352,10 @@ public class PersistentHashMapTest {
         assertEquals(0, m.size());
     }
 
-    @Test public void transientWithNull() {
+    @Test public void mutableWithNull() {
         int NUM_ITEMS = 300;
         PersistentHashMap<String,Integer> m = PersistentHashMap.empty();
-        PersistentHashMap.TransientHashMap<String,Integer> t = m.asTransient();
+        PersistentHashMap.MutableHashMap<String,Integer> t = m.mutable();
         t = t.assoc(null, -1);
         assertEquals(1, t.size());
 
@@ -383,7 +383,7 @@ public class PersistentHashMapTest {
         assertTrue(t.containsValue(Integer.valueOf(-1)));
         assertFalse(t.containsValue(Integer.valueOf(NUM_ITEMS)));
 
-        assertTrue(t == t.asTransient());
+        assertTrue(t == t.mutable());
 
         t = t.without(null);
         assertEquals(NUM_ITEMS, t.size());
@@ -403,10 +403,10 @@ public class PersistentHashMapTest {
     }
 
     @Test (expected = IllegalAccessError.class)
-    public void transientHashEx1() {
+    public void mutableHashEx1() {
         PersistentHashMap<String,Integer> m = PersistentHashMap.empty();
-        PersistentHashMap.TransientHashMap<String,Integer> t = m.asTransient();
-        t.persistent();
+        PersistentHashMap.MutableHashMap<String,Integer> t = m.mutable();
+        t.immutable();
         t.size();
     }
 

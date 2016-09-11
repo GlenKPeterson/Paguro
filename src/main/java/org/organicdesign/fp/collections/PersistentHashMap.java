@@ -28,7 +28,7 @@ import org.organicdesign.fp.tuple.Tuple2;
 import static org.organicdesign.fp.FunctionUtils.emptyUnmodIterator;
 
 /**
- Rich Hickey's persistent rendition of Phil Bagwell's Hash Array Mapped Trie.
+ Rich Hickey's immutable rendition of Phil Bagwell's Hash Array Mapped Trie.
 
  Uses path copying for persistence,
  HashCollision leaves vs. extended hashing,
@@ -39,7 +39,7 @@ import static org.organicdesign.fp.FunctionUtils.emptyUnmodIterator;
  This file is a derivative work based on a Clojure collection licensed under the Eclipse Public
  License 1.0 Copyright Rich Hickey.  Errors are Glen Peterson's.
  */
-public class PersistentHashMap<K,V> implements ImUnsortMap<K,V>, Serializable {
+public class PersistentHashMap<K,V> implements ImUnsortedMap<K,V>, Serializable {
 
 //    static private <K, V, R> R doKvreduce(Object[] array, Function3<R,K,V,R> f, R init) {
 //        for (int i = 0; i < array.length; i += 2) {
@@ -140,13 +140,13 @@ public class PersistentHashMap<K,V> implements ImUnsortMap<K,V>, Serializable {
     public static <K,V> PersistentHashMap<K,V> ofEq(Equator<K> eq, Iterable<Map.Entry<K,V>> es) {
         if (es == null) { return empty(eq); }
         PersistentHashMap<K,V> m = empty(eq);
-        TransientHashMap<K,V> map = m.asTransient();
+        MutableHashMap<K,V> map = m.mutable();
         for (Map.Entry<K,V> entry : es) {
             if (entry != null) {
                 map.assoc(entry.getKey(), entry.getValue());
             }
         }
-        return map.persistent();
+        return map.immutable();
     }
 
     /**
@@ -164,13 +164,13 @@ public class PersistentHashMap<K,V> implements ImUnsortMap<K,V>, Serializable {
     public static <K,V> PersistentHashMap<K,V> of(Iterable<Map.Entry<K,V>> kvPairs) {
         if (kvPairs == null) { return empty(); }
         PersistentHashMap<K,V> m = empty();
-        TransientHashMap<K,V> map = m.asTransient();
+        MutableHashMap<K,V> map = m.mutable();
         for (Map.Entry<K,V> entry : kvPairs) {
             if (entry != null) {
                 map.assoc(entry.getKey(), entry.getValue());
             }
         }
-        return map.persistent();
+        return map.immutable();
     }
 
     // ==================================== Instance Variables ====================================
@@ -201,7 +201,7 @@ public class PersistentHashMap<K,V> implements ImUnsortMap<K,V>, Serializable {
     private static class SerializationProxy<K,V> implements Serializable {
         private final Equator<K> equator;
         private final int size;
-        private transient ImUnsortMap<K,V> theMap;
+        private transient ImUnsortedMap<K,V> theMap;
         SerializationProxy(PersistentHashMap<K,V> phm) {
             equator = phm.equator;
             size = phm.size;
@@ -224,13 +224,13 @@ public class PersistentHashMap<K,V> implements ImUnsortMap<K,V>, Serializable {
         @SuppressWarnings("unchecked")
         private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
             s.defaultReadObject();
-            theMap = new PersistentHashMap<K,V>(equator, 0, null, false, null).asTransient();
+            theMap = new PersistentHashMap<K,V>(equator, 0, null, false, null).mutable();
             for (int i = 0; i < size; i++) {
                 theMap.assoc((K) s.readObject(), (V) s.readObject());
             }
         }
 
-        private Object readResolve() { return theMap.persistent(); }
+        private Object readResolve() { return theMap.immutable(); }
     }
 
     private Object writeReplace() { return new SerializationProxy<>(this); }
@@ -262,8 +262,8 @@ public class PersistentHashMap<K,V> implements ImUnsortMap<K,V>, Serializable {
                                        hasNull, nullValue);
     }
 
-    @Override public TransientHashMap<K,V> asTransient() {
-        return new TransientHashMap<>(this);
+    @Override public MutableHashMap<K,V> mutable() {
+        return new MutableHashMap<>(this);
     }
 
     @Override public Option<UnmodMap.UnEntry<K,V>> entry(K key) {
@@ -317,7 +317,7 @@ public class PersistentHashMap<K,V> implements ImUnsortMap<K,V>, Serializable {
 
     @Override public int hashCode() { return UnmodIterable.hashCode(this); }
 
-    // This identical to the Transient version of this class below.
+    // This identical to the Mutable version of this class below.
     @Override public UnmodIterator<UnEntry<K,V>> iterator() {
         final UnmodIterator<UnEntry<K,V>> rootIter = (root == null) ? emptyUnmodIterator()
                                                                     : root.iterator();
@@ -325,7 +325,7 @@ public class PersistentHashMap<K,V> implements ImUnsortMap<K,V>, Serializable {
                          : rootIter;
     }
 
-    @Override public final PersistentHashMap<K,V> persistent() { return this; }
+    @Override public final PersistentHashMap<K,V> immutable() { return this; }
 
 //    public <R> R kvreduce(Function3<R,K,V,R> f, R init) {
 //        init = hasNull ? f.apply(init, null, nullValue) : init;
@@ -381,7 +381,7 @@ public class PersistentHashMap<K,V> implements ImUnsortMap<K,V>, Serializable {
         return new PersistentHashMap<>(equator, size - 1, newroot, hasNull, nullValue);
     }
 
-    static final class TransientHashMap<K,V> implements ImUnsortMapTrans<K,V> {
+    static final class MutableHashMap<K,V> implements MutableUnsortedMap<K,V> {
         private AtomicReference<Thread> edit;
         private final Equator<K> equator;
         private INode<K,V> root;
@@ -391,7 +391,7 @@ public class PersistentHashMap<K,V> implements ImUnsortMap<K,V>, Serializable {
         // This is a boolean reference, with value either being null, or set to point to the
         // box itself.  It might be clearer to replace this with an AtomicBoolean or similar.
         // I think the reason this can be a field instead of a local variable is that the
-        // TransientHashMap is not intended to be thread safe, thus no-one will call one method
+        // MutableHashMap is not intended to be thread safe, thus no-one will call one method
         // while another thread calls another method.  Presumably having this here saves the cost
         // of allocating a local variable.  Setting it to null or itself saves storing anything
         // in memory.  Why did Rich go to all of this trouble?  Does it make a difference, or
@@ -399,13 +399,13 @@ public class PersistentHashMap<K,V> implements ImUnsortMap<K,V>, Serializable {
         // and INode) or even OneOf(left INode, right INode)?
         private final Box<Box> leafFlag = new Box<>(null);
 
-        TransientHashMap(PersistentHashMap<K,V> m) {
+        MutableHashMap(PersistentHashMap<K,V> m) {
             this(m.equator(), new AtomicReference<>(Thread.currentThread()), m.root, m.size,
                  m.hasNull, m.nullValue);
         }
 
-        TransientHashMap(Equator<K> e, AtomicReference<Thread> edit, INode<K,V> root, int count,
-                         boolean hasNull, V nullValue) {
+        MutableHashMap(Equator<K> e, AtomicReference<Thread> edit, INode<K,V> root, int count,
+                       boolean hasNull, V nullValue) {
             this.equator = (e == null) ? Equator.defaultEquator() : e;
             this.edit = edit;
             this.root = root;
@@ -416,7 +416,7 @@ public class PersistentHashMap<K,V> implements ImUnsortMap<K,V>, Serializable {
 
         @Override public Equator<K> equator() { return equator; }
 
-        @Override public TransientHashMap<K,V> assoc(K key, V val) {
+        @Override public MutableHashMap<K,V> assoc(K key, V val) {
             ensureEditable();
             if (key == null) {
                 if (this.nullValue != val)
@@ -464,7 +464,7 @@ public class PersistentHashMap<K,V> implements ImUnsortMap<K,V>, Serializable {
                              : rootIter;
         }
 
-        @Override public final TransientHashMap<K,V> without(K key) {
+        @Override public final MutableHashMap<K,V> without(K key) {
             ensureEditable();
             if (key == null) {
                 if (!hasNull) return this;
@@ -483,7 +483,7 @@ public class PersistentHashMap<K,V> implements ImUnsortMap<K,V>, Serializable {
             return this;
         }
 
-        @Override public final PersistentHashMap<K,V> persistent() {
+        @Override public final PersistentHashMap<K,V> immutable() {
             ensureEditable();
             edit.set(null);
             return new PersistentHashMap<>(equator, count, root, hasNull, nullValue);
@@ -496,7 +496,7 @@ public class PersistentHashMap<K,V> implements ImUnsortMap<K,V>, Serializable {
 
         void ensureEditable() {
             if(edit.get() == null)
-                throw new IllegalAccessError("Transient used after persistent! call");
+                throw new IllegalAccessError("Mutable used after immutable! call");
         }
     }
 

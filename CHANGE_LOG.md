@@ -1,14 +1,37 @@
 # Change Log
 
-## 2016-09-10 Release 2.0.6:
+## 2016-09-11 Release 2.0.7:
+ - Massive renaming of newly exposed interfaces and methods.
+    - ImUnsortMap is now ImUnsortedMap
+    - ImUnsortSet is now ImUnsortedSet
+    - ImListTrans is now MutableList
+    - ImUnsortMapTrans is now MutableUnsortedMap
+    - ImUnsortSetTrans is now MutableUnsortedSet
+    - The `persistent()` method on all of those interfaces is now `immutable()`
+    - The `asTransient()` method on all of those interfaces is now `mutable()`
+
+This is only a day after releasing these interfaces. After doing serialization, I couldn't freakin'
+write anything anymore without saying "transient (meaning mutable)" or "transient (as in not
+serializable)".  I know Rich picked Persistent and Transient, but JPA took Persistent and
+serialization took Transient so even though I like Rich's terms, I'm changing them to save some
+small shred of my sanity.  There are only three terms: Mutable, Unmofidiable, and Immutable.
+Mutable means mutate-in-place.  Unmodifiable means you can't change it, and it probably can't
+grow without a complete deep copy.  Immutable means it never changes, yet grows efficiently
+by producing very shallow copies of most of its internals.
+
+I am leaving Rich's 5 file names as a tribute to how awesome he is and so that people talking
+about the Clojure collections won't be surprised, and to show what still carries his license
+(Eclipse 1.0).
+
+## 2016-09-10 Release 2.0.6: USE 2.0.7+ INSTEAD!
  - Added asTransient() to ImList.
 
-## 2016-09-10 Release 2.0.5:
+## 2016-09-10 Release 2.0.5: USE 2.0.7+ INSTEAD!
  - Moved persistent() from ImListTrans to ImList and made PersistentVector implement ImList instead of ImListTrans.
    This just makes a lot more sense.  It shouldn't break any sensible client code.
  - Added ImList.reverse().  @pniederw had asked for this.  Sorry for the wait.
 
-## 2016-09-10 Release 2.0.4: Serializable (Part 4)
+## 2016-09-10 Release 2.0.4: USE 2.0.7+ INSTEAD!
  - Made PersistentTreeMap return serializable Tuple2's.  Actually these are subclasses of internal nodes that still contain
    big chunks of the treemap, but those chunks are transient (not serializable) and private.
    When deserialized, they become plain old Tuple2's.
@@ -20,7 +43,7 @@
  - Radically improved test coverage of PersistentTreeMap and slightly improved PersistentHashMap
  - Added epl-v10.html referenced in Rich's comments.  Should have read the legal terms more carefully earlier.
  - Added CodeStylePaguro.xml for Idea to import.
- - Found some opportunities to use transient implementations more efficiently.
+ - Found some opportunities to use mutable implementations more efficiently.
 
 #### Still *NOT* Serializable
  - FunctionUtils.unmodifiable___() methods are not serializable (yet?).
