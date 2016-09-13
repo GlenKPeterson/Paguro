@@ -14,12 +14,19 @@
 
 package org.organicdesign.fp.collections;
 
+import java.util.Map;
+
 /**
  Interface for unsorted (today that probably means "hash") maps.
  */
 public interface ImUnsortedMap<K,V> extends ImMap<K,V> {
     /** {@inheritDoc} */
     @Override ImUnsortedMap<K,V> assoc(K key, V val);
+
+    /** {@inheritDoc} */
+    @Override default ImUnsortedMap<K,V> assoc(Map.Entry<K,V> entry) {
+        return assoc(entry.getKey(), entry.getValue());
+    }
 
     /** Returns the Equator used by this map for equals comparisons and hashCodes */
     Equator<K> equator();

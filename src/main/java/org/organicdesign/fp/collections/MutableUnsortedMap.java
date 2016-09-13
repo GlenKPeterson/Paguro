@@ -14,6 +14,8 @@
 
 package org.organicdesign.fp.collections;
 
+import java.util.Map;
+
 /**
  Interface for mutable (hash) map builder.
  */
@@ -21,6 +23,11 @@ public interface MutableUnsortedMap<K,V> extends ImUnsortedMap<K,V> {
     /** {@inheritDoc} */
     @Override
     MutableUnsortedMap<K,V> assoc(K key, V val);
+
+    /** {@inheritDoc} */
+    @Override default MutableUnsortedMap<K,V> assoc(Map.Entry<K,V> entry) {
+        return assoc(entry.getKey(), entry.getValue());
+    }
 
     /** Returns a mutable version of this immutable map. */
     @Override default MutableUnsortedMap<K,V> mutable() { return this; }

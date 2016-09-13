@@ -1,5 +1,10 @@
 # Change Log
 
+## 2016-09-13 Release 2.0.9:
+ - Fixed return type of ImUnsortedMap and MutableUnsortedMap.assoc(Map.Entry)
+ - Made ImUnsortedSet use MutableUnsortedSet's implementation of union() instead of the other way around.
+ - Added tests.
+
 ## 2016-09-11 Release 2.0.8:
  - Fixed illegal cast in MutableList.concat and made test for same.  Thanks to @pniederw for this!
 

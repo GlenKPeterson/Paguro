@@ -35,15 +35,12 @@ public interface ImUnsortedSet<E> extends ImSet<E> {
     MutableUnsortedSet<E> mutable();
 
     /** {@inheritDoc} */
-    @Override
-    ImUnsortedSet<E> put(E val);
+    @Override ImUnsortedSet<E> put(E val);
 
     /** {@inheritDoc} */
     default ImUnsortedSet<E> union(Iterable<? extends E> iter) {
         if (iter == null) { return this; }
-        MutableUnsortedSet<E> ret = this.mutable();
-        for (E e : iter) { ret.put(e); }
-        return ret.immutable();
+        return mutable().union(iter).immutable();
     }
 
     /** {@inheritDoc} */

@@ -13,6 +13,11 @@ public interface ImMap<K,V> extends UnmodMap<K,V> {
     /** Returns a new map with the given key/value added */
     ImMap<K,V> assoc(K key, V val);
 
+    /** Returns a new map with an immutable copy of the given entry added */
+    default ImMap<K,V> assoc(Map.Entry<K,V> entry) {
+        return assoc(entry.getKey(), entry.getValue());
+    }
+
     /** Returns a new map with the given key/value removed */
     ImMap<K,V> without(K key);
 
@@ -46,7 +51,4 @@ public interface ImMap<K,V> extends UnmodMap<K,V> {
 //    @Override default UnmodCollection<V> values() { return map(e -> e.getValue()).toImSet(); }
 
 //    @Override default UnmodIterator<UnEntry<K,V>> iterator() { return seq().iterator(); }
-
-    /** Returns a new map with an immutable copy of the given entry added */
-    default ImMap<K,V> assoc(Map.Entry<K,V> entry) { return assoc(entry.getKey(), entry.getValue()); }
 }
