@@ -45,7 +45,7 @@ public class TestUtilities {
 
         // This method was started by sblommers.  Thanks for your help!
         // Mistakes are Glen's.
-        // https://github.com/GlenKPeterson/UncleJim/issues/10#issuecomment-242332099
+        // https://github.com/GlenKPeterson/Paguro/issues/10#issuecomment-242332099
 
         // Write
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

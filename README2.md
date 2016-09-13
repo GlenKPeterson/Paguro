@@ -1,5 +1,5 @@
 #Notice
-Read [README.md](README.md) before this file as that is the official introduction to Paguro/UncleJim.
+Read [README.md](README.md) before this file as that is the official introduction to Paguro.
 This file contains additional information for contributors, or maybe people who are considering opening an issue.
 
 #Additional features:
@@ -55,7 +55,7 @@ Rich Hickey for Clojure
 - Maven (tested version: 3.19.0-26 64-bit Linux build)
 - Maven will download jUnit for you
 - First `mvn clean install` on: https://github.com/GlenKPeterson/TestUtils
-- Then `mvn clean test` on UncleJim
+- Then `mvn clean test` on Paguro
 
 #To Do
  - Xform.MapDesc is not serializable.
@@ -124,7 +124,7 @@ None of those are simple uses of interpose.
 
 ###Mirroring Clojure's seq (sequence abstraction)
 
-Paguro/UncleJim tried two alternatives.  One was based on the Clojure idea of a sequence: immutable, lazy, and cached.  The signature looked something like this:
+Paguro tried two alternatives.  One was based on the Clojure idea of a sequence: immutable, lazy, and cached.  The signature looked something like this:
 
 ```java
 interface Sequence1<T> {

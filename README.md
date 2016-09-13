@@ -9,7 +9,7 @@ This project used to be called UncleJim: "**Un**modifiable **Coll**ections for *
 
 #News
 
-Latest info is in the [Change Log](https://github.com/GlenKPeterson/UncleJim/blob/master/CHANGE_LOG.md).
+Latest info is in the [Change Log](https://github.com/GlenKPeterson/Paguro/blob/master/CHANGE_LOG.md).
 
 ###Renaming
 If you're working on the code of this project, you may need to run:
@@ -38,12 +38,12 @@ Package names will NOT change.
 * [Memoization](src/main/java/org/organicdesign/fp/function/Function3.java#L42) - Turns function calls into hashtable lookups to speed up slow functions over a limited range of inputs.
 * Tiny with no dependencies - The entire project fits in a 240K jar file that is compiled in the compact1 profile.
 
-UncleJim takes advantage of Java's type inferencing.  It eschews void return types, arrays, primatives, and checked exceptions in lambdas.  It can decrease the amount of code you need to write by a factor of at 2x-3x.  Using functional transfomrations instead of loops focuses you on choosing the right collections which leads to more readable code AND better Big O complexity/scalability.
+Paguro takes advantage of Java's type inferencing.  It eschews void return types, arrays, primatives, and checked exceptions in lambdas.  It can decrease the amount of code you need to write by a factor of at 2x-3x.  Using functional transfomrations instead of loops focuses you on choosing the right collections which leads to more readable code AND better Big O complexity/scalability.
 
-[![Build Status](https://travis-ci.org/GlenKPeterson/UncleJim.svg?branch=master)](https://travis-ci.org/GlenKPeterson/UncleJim)
-[![Code Coverage](http://codecov.io/github/GlenKPeterson/UncleJim/coverage.svg?branch=master)](http://codecov.io/github/GlenKPeterson/UncleJim?branch=master)
+[![Build Status](https://travis-ci.org/GlenKPeterson/Paguro.svg?branch=master)](https://travis-ci.org/GlenKPeterson/Paguro)
+[![Code Coverage](http://codecov.io/github/GlenKPeterson/Paguro/coverage.svg?branch=master)](http://codecov.io/github/GlenKPeterson/Paguro?branch=master)
 
-[![Join the chat at https://gitter.im/GlenKPeterson/UncleJim](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/GlenKPeterson/UncleJim?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://gitter.im/GlenKPeterson/Paguro](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/GlenKPeterson/Paguro?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Available from the [Maven Repository](http://mvnrepository.com/artifact/org.organicdesign/UncleJim) as:
 ```xml
@@ -90,11 +90,11 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
 
 * [Class/Interface Hierarchy](inheritanceHierarchy.pdf) (PDF)
 
-* Get started now by following the [Usage Tips](https://github.com/GlenKPeterson/UncleJim/wiki/Usage-Tips)
+* Get started now by following the [Usage Tips](https://github.com/GlenKPeterson/Paguro/wiki/Usage-Tips)
 
 * For complete API documentation, please build the javadoc: `mvn javadoc:javadoc`
 
-* [JimTrainer self-guided training](https://github.com/GlenKPeterson/JimTrainer) consists of a few short problem-sets for learning UncleJim
+* [JimTrainer self-guided training](https://github.com/GlenKPeterson/JimTrainer) consists of a few short problem-sets for learning Paguro
 
 * [Comparison with Traditional Java and Java 8 Streams](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java#L22)
 
@@ -112,37 +112,37 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
 
 ###Q: How does this compare to PCollections?
 
-[UncleJim is based on Clojure, theoretically faster and has additional features](https://github.com/GlenKPeterson/UncleJim/wiki/UncleJim-vs.-PCollections)
+[Paguro is based on Clojure, faster and has additional features](https://github.com/GlenKPeterson/Paguro/wiki/UncleJim-vs.-PCollections)
 
 ###Q: Do these Transforms create intermediate collections between each operation (like the Scala collections)?
 
-[No](https://github.com/GlenKPeterson/UncleJim/wiki/How-do-%22Xforms%22---Transformations-work%3F)
+[No](https://github.com/GlenKPeterson/Paguro/wiki/How-do-%22Xforms%22---Transformations-work%3F)
 
 ###Q: How does this compare to Streams and lambda expressions in JDK8?
 
-[Comparison](https://github.com/GlenKPeterson/UncleJim/wiki/Comparison-with-Streams-and-Lambdas-in-JDK8)
+[Comparison](https://github.com/GlenKPeterson/Paguro/wiki/Comparison-with-Streams-and-Lambdas-in-JDK8)
 
 ###Q: Why Java instead of another/better JVM language?
 
-[Why Java?](https://github.com/GlenKPeterson/UncleJim/wiki/Why-is-Paguro-written-in-Java%3F)
+[Why Java?](https://github.com/GlenKPeterson/Paguro/wiki/Why-is-UncleJim-written-in-Java%3F)
 
 #Future Development Priorities (as of 2016-08-25)
 1. Make collections implement Serializable.
 2. Implement an RRB-Tree
-3. Make a Java 7 branch (and/or Java 6) and release (Maven artifact will be called Paguro-Java7 or similar).
+3. Make a Java 7 branch (and/or Java 6) and release (Maven artifact will be called Paguro-JDK7 or similar).
 
 ### RRB-Tree
-Current development is centered around an Apache-licensed all-Java RRB-Tree.  Read the [recent status](https://github.com/GlenKPeterson/UncleJim/issues/4#issuecomment-239825939) or check out the [latest version of the code](https://github.com/GlenKPeterson/UncleJim/blob/2016-05-22_RRB-Tree/src/main/java/org/organicdesign/fp/experimental/RrbTree1.java).
+Current development is centered around an Apache-licensed all-Java RRB-Tree.  Read the [recent status](https://github.com/GlenKPeterson/Paguro/issues/4#issuecomment-239825939) or check out the [latest version of the code](https://github.com/GlenKPeterson/Paguro/blob/2016-05-22_RRB-Tree/src/main/java/org/organicdesign/fp/experimental/RrbTree1.java).
 
 As Norm Zeck pointed out by sending me [Ropes: an Alternative to Strings](http://citeseer.ist.psu.edu/viewdoc/download?doi=10.1.1.14.9450&rep=rep1&type=pdf), an RRB-Tree might make a great implementation of *both* String and StringBuilder.  We might want to add a Char8 (UTF-8 Character class pronounced "crate") and make Str8 (UTF-8 String pronounced "straight") a sub-class of RRB-Tree.  Just a thought.
 
 #Licenses
 Java&trade; is a registered trademark of the Oracle Corporation in the US and other countries.
-UncleJim is not part of Java.
-Oracle is in no way affiliated with the UncleJim project.
+Paguro is not part of Java.
+Oracle is in no way affiliated with the Paguro project.
 
-UncleJim is not part of Clojure.
-Rich Hickey and the Clojure team are in no way affiliated with the UncleJim project, though it borrows heavily from their thoughts and is partly a derivative work of their open-source code.
+Paguro is not part of Clojure.
+Rich Hickey and the Clojure team are in no way affiliated with the Paguro project, though it borrows heavily from their thoughts and is partly a derivative work of their open-source code.
 
 The Clojure collections are licensed under the Eclipse Public License.
 Versions of them have been included in this project and modified to add type safety and implement different interfaces.

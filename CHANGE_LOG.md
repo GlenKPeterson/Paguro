@@ -1,7 +1,7 @@
 # Change Log
 
 ## 2016-09-13 Release 2.0.9:
- - Fixed return type of ImUnsortedMap and MutableUnsortedMap.assoc(Map.Entry)
+ - Fixed return type of ImUnsortedMap and MutableUnsortedMap.assoc(Map.Entry).  Thanks @pniederw for reporting!
  - Made ImUnsortedSet use MutableUnsortedSet's implementation of union() instead of the other way around.
  - Added tests.
 
@@ -59,7 +59,7 @@ about the Clojure collections won't be surprised, and to show what still carries
  - FunctionUtils.unmodifiable___() methods are not serializable (yet?).
  - Transformable is not serializable (should it be?)
 
-Issues?  Questions?  Provide feedback on the [Serialization enhancement request](https://github.com/GlenKPeterson/UncleJim/issues/10)
+Issues?  Questions?  Provide feedback on the [Serialization enhancement request](https://github.com/GlenKPeterson/Paguro/issues/10)
 
 ## 2016-09-10 Release 2.0.3: Serializable (Part 3)
  - Reverted the most serious breaking changes from previous 2.0.x releases.
@@ -189,7 +189,7 @@ especially for implementing Map.keySet() and Map.entrySet().
  - Added implementations of entrySet(), keySet(), and values() in UnmodMap.  This was painful, but it makes subclassing a snap.
  The implementations rely on AbstractUnmodSet and AbstractUnmodCollection for .equals() and .hashCode() implementations (see above).
  - Regenerated tuples to bring test coverage to 100% for most of them.
- - Removed .toArray() from Transformable.  I'm not promoting array use with UncleJim, only providing it for backwards compatibility.
+ - Removed .toArray() from Transformable.  I'm not promoting array use with Paguro, only providing it for backwards compatibility.
  I could bring it back for the right reason.
  - Added tests, tests, tests.  CodeCov now reports 86%, IntelliJ 92% coverage.
 
