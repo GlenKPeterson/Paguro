@@ -13,7 +13,9 @@ Latest info is in the [Change Log](https://github.com/GlenKPeterson/UncleJim/blo
 
 ###Renaming
 If you're working on the code of this project, you may need to run:
-`git remote set-url origin https://github.com/GlenKPeterson/Paguro.git`
+```
+git remote set-url origin https://github.com/GlenKPeterson/Paguro.git
+```
 
 ####Renaming Timeline
  - 2016-08-14: This notice appeared
