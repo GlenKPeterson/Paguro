@@ -1,9 +1,9 @@
 Paguro provides type-safe versions of Clojure's immutable collections and a few other tools to make functional programming in Java a little easier.
 
-Paguro ("pah-GUH-row" rhymes with "furrow") is short for the Latin "Paguroidea" - the name of the Hermit Crab superfamily in Biology.  These collections grow by adding a new shell, leaving the insides the same, much the way Hermit Crabs trade up to a new shell when they grow.
-
 ![Hermit Crab](https://c7.staticflickr.com/8/7413/12171498934_2934c7ef28_n.jpg)
 Photo by [Rushen](https://www.flickr.com/photos/rushen/12171498934/in/photostream/)
+
+Paguro ("pah-GUH-row" rhymes with "furrow") is short for the Latin "Paguroidea" - the name of the Hermit Crab superfamily in Biology.  These collections grow by adding a new shell, leaving the insides the same, much the way Hermit Crabs trade up to a new shell when they grow.
 
 This project used to be called UncleJim: "**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability". 
 
