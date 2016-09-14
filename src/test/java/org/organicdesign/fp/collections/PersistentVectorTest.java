@@ -321,8 +321,8 @@ public class PersistentVectorTest {
 
         // Compute mean ratio.
         double sum = 0;
-        for (int i = 0; i < ratios.size(); i++) {
-            sum += ratios.get(i);
+        for (Double ratio : ratios) {
+            sum += ratio;
         }
         double meanRatio = sum / ratios.size();
         System.out.println("meanRatio: " + meanRatio);
@@ -406,6 +406,10 @@ public class PersistentVectorTest {
             test.append(i);
             assertEquals(control.size(), test.size());
         }
+
+        assertEquals(test, test.mutable());
+
+        assertTrue(test == test.mutable());
 
         for (int i = 0; i < SEVERAL; i++) {
             assertEquals(control.get(i), test.get(i));

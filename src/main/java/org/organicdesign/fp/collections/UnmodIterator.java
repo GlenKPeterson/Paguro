@@ -13,13 +13,13 @@ import java.util.Iterator;
  the ultimate client gets its own, unshared iteraTOR.  Order is not guaranteed.
  */
 public interface UnmodIterator<E> extends Iterator<E> {
-    class Implementation<E> implements UnmodIterator<E> {
+    class Wrapper<E> implements UnmodIterator<E> {
 //        , Serializable {
 //        // For serializable.  Make sure to change whenever internal data format changes.
 //        private static final long serialVersionUID = 20160903174100L;
 
         private final Iterator<E> iter;
-        Implementation(Iterator<E> i) { iter = i; }
+        Wrapper(Iterator<E> i) { iter = i; }
 
         @Override public boolean hasNext() { return iter.hasNext(); }
         @Override public E next() { return iter.next(); }

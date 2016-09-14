@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.Assert.*;
+import static org.organicdesign.fp.FunctionUtils.ordinal;
+import static org.organicdesign.fp.TestUtilities.compareIterators;
 
 /**
  Created by gpeterso on 9/13/16.
@@ -34,12 +36,21 @@ public class MutableUnsortedSetTest {
         @Override public boolean contains(Object o) { return inner.contains(o); }
 
         @Override public UnmodIterator<E> iterator() {
-            return new UnmodIterator.Implementation<>(inner.iterator());
+            return new UnmodIterator.Wrapper<>(inner.iterator());
         }
     }
 
     @Test public void testMutable() {
-        TestSet<String> s = new TestSet<>(new HashSet<>());
-        assertTrue(s == s.mutable());
+        Set<String> control = new HashSet<>();
+        TestSet<String> test = new TestSet<>(new HashSet<>());
+        for (int i = 0; i < 27; i++) {
+            String ord = ordinal(i);
+            control.add(ord);
+            test.put(ord);
+            assertEquals(control.size(), test.size());
+            assertEquals(control, test);
+        }
+        PersistentHashSetTest.setIterTest(control, test.iterator());
+        assertTrue(test == test.mutable());
     }
 }

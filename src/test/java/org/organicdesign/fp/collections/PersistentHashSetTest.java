@@ -14,7 +14,7 @@ import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class PersistentHashSetTest {
 
-    private static <K> void setIterTest(Set<K> c, Iterator<? extends K> test) {
+    static <K> void setIterTest(Set<K> c, Iterator<? extends K> test) {
         Set<K> control = new HashSet<>();
         control.addAll(c);
         while (test.hasNext()) {
