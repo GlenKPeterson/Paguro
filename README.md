@@ -10,7 +10,7 @@ This project used to be called UncleJim: "**Un**modifiable **Coll**ections for *
 
 #Renaming
 If you checked out the source code of this project when it was called UncleJim, you need to run the following (or similar) to re-associated it with the Paguro github project:
-```
+```bash
 # Display the remote repositories whose branches you track
 git remote -v
 
