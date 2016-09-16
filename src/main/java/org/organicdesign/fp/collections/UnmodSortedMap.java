@@ -101,7 +101,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>,
                 return Tuple2.of(key, parentMap.get(key));
             }
 
-            @Override public int hashCode() { return UnmodIterable.hashCode(this); }
+            @Override public int hashCode() { return UnmodIterable.hash(this); }
 
             @SuppressWarnings("unchecked")
             @Override public boolean equals(Object o) {
@@ -196,7 +196,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>,
             @Override
             public K last() { return parentMap.lastKey(); }
 
-            @Override public int hashCode() { return UnmodIterable.hashCode(this); }
+            @Override public int hashCode() { return UnmodIterable.hash(this); }
 
             @SuppressWarnings("unchecked")
             @Override public boolean equals(Object o) {
@@ -293,7 +293,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>,
             @Override public int size() { return parent.size(); }
 
             @Override public int hashCode() {
-                return UnmodIterable.hashCode(this);
+                return UnmodIterable.hash(this);
             }
 
             @Override public boolean equals(Object o) {

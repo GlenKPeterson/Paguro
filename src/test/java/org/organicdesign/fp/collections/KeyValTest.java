@@ -15,6 +15,7 @@ public class KeyValTest {
     @Rule
     public ExpectedException thrown= ExpectedException.none();
 
+    @SuppressWarnings("deprecation")
     @Test
     public void constructionAndAccess() {
         KeyVal<Integer,String> a = new KeyVal<>(7, "Hello");

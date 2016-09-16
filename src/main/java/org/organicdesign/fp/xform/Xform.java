@@ -395,7 +395,7 @@ public abstract class Xform<A> implements UnmodIterable<A> {
             return RunList.of(null, list);
         }
 
-        @Override public int hashCode() { return UnmodIterable.hashCode(this); }
+        @Override public int hashCode() { return UnmodIterable.hash(this); }
         @Override public boolean equals(Object other) {
             if (this == other) { return true; }
             if ( !(other instanceof SourceProviderIterableDesc) ) { return false; }

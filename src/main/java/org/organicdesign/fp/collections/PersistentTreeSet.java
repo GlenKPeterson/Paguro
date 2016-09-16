@@ -229,7 +229,7 @@ public class PersistentTreeSet<E> implements ImSortedSet<E>, Serializable {
     @Override public E first() { return impl.firstKey(); }
 
     /** {@inheritDoc} */
-    @Override public int hashCode() { return (size() == 0) ? 0 : UnmodIterable.hashCode(this); }
+    @Override public int hashCode() { return (size() == 0) ? 0 : UnmodIterable.hash(this); }
 
     /** {@inheritDoc} */
     @Override public Option<E> head() {

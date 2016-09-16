@@ -315,7 +315,7 @@ public class PersistentHashMap<K,V> implements ImUnsortedMap<K,V>, Serializable 
         return true;
     }
 
-    @Override public int hashCode() { return UnmodIterable.hashCode(this); }
+    @Override public int hashCode() { return UnmodIterable.hash(this); }
 
     // This identical to the Mutable version of this class below.
     @Override public UnmodIterator<UnEntry<K,V>> iterator() {

@@ -63,7 +63,7 @@ public class ImUnsortedSetTest {
                    containsAll(that);
         }
 
-        @Override public int hashCode() { return UnmodIterable.hashCode(this); }
+        @Override public int hashCode() { return UnmodIterable.hash(this); }
 
         @Override public String toString() { return inner.toString(); }
     }

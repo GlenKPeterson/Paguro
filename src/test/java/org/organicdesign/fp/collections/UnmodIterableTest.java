@@ -84,11 +84,11 @@ public class UnmodIterableTest {
             @Override public Integer next() { return intern.next(); }
         };
 
-        assertEquals(UnmodIterable.hashCode(a), UnmodIterable.hashCode(a));
-        assertEquals(UnmodIterable.hashCode(a), UnmodIterable.hashCode(b));
-        assertNotEquals(UnmodIterable.hashCode(a), UnmodIterable.hashCode(c));
+        assertEquals(UnmodIterable.hash(a), UnmodIterable.hash(a));
+        assertEquals(UnmodIterable.hash(a), UnmodIterable.hash(b));
+        assertNotEquals(UnmodIterable.hash(a), UnmodIterable.hash(c));
 
-        assertEquals(0, UnmodIterable.hashCode(Arrays.asList(new String[] { null })));
+        assertEquals(0, UnmodIterable.hash(Arrays.asList(new String[] {null })));
 
         assertTrue(UnmodSortedIterable.equal(a, a));
         assertTrue(UnmodSortedIterable.equal(a, b));
@@ -122,10 +122,10 @@ public class UnmodIterableTest {
             @Override public Integer next() { return intern.next(); }
         };
 
-        assertEquals(UnmodIterable.hashCode(a), UnmodIterable.hashCode(a));
-        assertEquals(UnmodIterable.hashCode(a), UnmodIterable.hashCode(b));
-        assertNotEquals(UnmodIterable.hashCode(a), UnmodIterable.hashCode(c));
-        assertNotEquals(UnmodIterable.hashCode(b), UnmodIterable.hashCode(d));
+        assertEquals(UnmodIterable.hash(a), UnmodIterable.hash(a));
+        assertEquals(UnmodIterable.hash(a), UnmodIterable.hash(b));
+        assertNotEquals(UnmodIterable.hash(a), UnmodIterable.hash(c));
+        assertNotEquals(UnmodIterable.hash(b), UnmodIterable.hash(d));
 
         assertTrue(UnmodSortedIterable.equal(a, a));
         assertTrue(UnmodSortedIterable.equal(a, b));
@@ -138,7 +138,7 @@ public class UnmodIterableTest {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Test (expected = IllegalArgumentException.class)
-    public void testEx01() { UnmodIterable.hashCode(null); }
+    public void testEx01() { UnmodIterable.hash(null); }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Test (expected = IllegalArgumentException.class)

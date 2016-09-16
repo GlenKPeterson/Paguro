@@ -457,6 +457,80 @@ public class PersistentHashMapTest {
         assertEquals(0, m.size());
     }
 
+    @Test public void biggerHashCollisionMutableWithNull() {
+        int NUM_ITEMS = 300;
+        Map<HashCollision,Integer> control = new HashMap<>();
+        PersistentHashMap.MutableHashMap<HashCollision,Integer> m =
+                PersistentHashMap.<HashCollision,Integer>empty().mutable();
+
+        assertEquals(control.size(), m.size());
+        assertEquals(control, m);
+
+        control.put(null, -1);
+        m.assoc(null, -1);
+        assertEquals(1, m.size());
+        assertEquals(control.size(), m.size());
+        assertEquals(control, m);
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            HashCollision hc = new HashCollision(ordinal(i));
+            control.put(hc, i);
+            m.assoc(hc, i);
+            assertEquals(i + 2, m.size());
+
+            assertEquals(control.size(), m.size());
+            assertEquals(control, m);
+        }
+        assertEquals(NUM_ITEMS + 1, m.size());
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            HashCollision hc = new HashCollision(ordinal(i));
+            assertEquals(Integer.valueOf(i), m.get(hc));
+            assertEquals(control.get(hc), m.get(hc));
+        }
+        assertEquals(Integer.valueOf(-1), m.get(null));
+        assertEquals(control.get(null), m.get(null));
+        assertNull(m.get(new HashCollision(ordinal(NUM_ITEMS))));
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            assertTrue(m.containsKey(new HashCollision(ordinal(i))));
+        }
+        assertTrue(m.containsKey(null));
+        assertFalse(m.containsKey(new HashCollision(ordinal(NUM_ITEMS))));
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            assertTrue(m.containsValue(Integer.valueOf(i)));
+        }
+        assertTrue(m.containsValue(Integer.valueOf(-1)));
+        assertFalse(m.containsValue(Integer.valueOf(NUM_ITEMS)));
+
+        m.without(null);
+        control.remove(null);
+        assertEquals(NUM_ITEMS, m.size());
+        assertNull(m.get(null));
+        assertFalse(m.containsKey(null));
+        assertFalse(m.containsValue(-1));
+
+        assertEquals(control.size(), m.size());
+        assertEquals(control, m);
+
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            HashCollision hc = new HashCollision(ordinal(i));
+
+            assertEquals(NUM_ITEMS - i, m.size());
+            control.remove(hc);
+            m.without(hc);
+            assertNull(m.get(new HashCollision(ordinal(i))));
+            assertFalse(m.containsKey(new HashCollision(ordinal(i))));
+            assertFalse(m.containsValue(Integer.valueOf(i)));
+
+            assertEquals(control.size(), m.size());
+            assertEquals(control, m);
+        }
+
+        assertEquals(0, m.size());
+    }
+
     @Test public void seq3() {
         PersistentHashMap<String,Integer> m1 = PersistentHashMap.of(vec(tup("c", 1)));
         assertEquals(Option.of(tup("c", 1)),

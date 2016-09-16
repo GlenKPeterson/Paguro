@@ -158,7 +158,7 @@ public class PersistentHashSet<E> implements ImUnsortedSet<E>, Serializable {
         return containsAll(that);
     }
 
-    @Override public int hashCode() { return UnmodIterable.hashCode(this); }
+    @Override public int hashCode() { return UnmodIterable.hash(this); }
 
     @Override public String toString() { return UnmodIterable.toString("PersistentHashSet", this); }
 

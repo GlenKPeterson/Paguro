@@ -280,7 +280,7 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
 
     /** This is correct, but O(n). */
     @Override public int hashCode() {
-        return (size() == 0) ? 0 : UnmodIterable.hashCode(this);
+        return (size() == 0) ? 0 : UnmodIterable.hash(this);
     }
 
 //    public static final Equator<SortedMap> EQUATOR = new Equator<SortedMap>() {

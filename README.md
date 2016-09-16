@@ -3,13 +3,22 @@ Paguro provides type-safe versions of Clojure's immutable collections and other 
 ![Hermit Crab](https://c7.staticflickr.com/8/7413/12171498934_2934c7ef28_n.jpg)
 Photo by [Rushen](https://www.flickr.com/photos/rushen/12171498934/in/photostream/)
 
-Paguro ("pah-GUH-row" rhymes with "furrow") is short for the Latin "Paguroidea" - the name of the Hermit Crab superfamily in Biology.  These collections grow by adding a new shell, leaving the insides the same, much the way Hermit Crabs trade up to a new shell when they grow.
+Paguro ("pah-GUH-row" rhymes with "furrow") is short for the Latin "Paguroidea" - the name of the Hermit Crab superfamily in Biology.
+These collections grow by adding a new shell, leaving the insides the same, much the way Hermit Crabs trade up to a new shell when they grow.
 
 This project used to be called UncleJim: "**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability". 
 
 #Renaming
-If you're working on the source code of this project, you may need to run:
+If you checked out the source code of this project when it was called UncleJim, you need to run the following (or similar) to re-associated it with the Paguro github project:
 ```
+# Display the remote repositories whose branches you track
+git remote -v
+
+# If it says the following, you need to run the 'remote set-url origin' command below:
+# origin	https://github.com/GlenKPeterson/UncleJim.git (fetch)
+# origin	https://github.com/GlenKPeterson/UncleJim.git (push)
+
+# Make GlenKPeterson/Paguro.git the upstream branch instead of UncleJim:
 git remote set-url origin https://github.com/GlenKPeterson/Paguro.git
 ```
 
@@ -22,7 +31,7 @@ Package names will NOT change.
 
 #Features
 
-* [Immutable collections](src/main/java/org/organicdesign/fp/collections) - type-safe generic Java versions of Clojure's immutable collections - arguably the best immutable collection implementations on the JVM.
+* [Immutable collections](src/main/java/org/organicdesign/fp/collections) - type-safe generic Java versions of Clojure's immutable collections - arguably the best immutable collections on the JVM.
 * [Functional transformations](src/main/java/org/organicdesign/fp/xform/Transformable.java#L42) are a simplified immutable alternative to Java 8 Streams, wrapping checked exceptions and avoiding primitives (you can still use Java 8 streams if you want to).
 * [Brief collection constructors](src/main/java/org/organicdesign/fp/StaticImports.java#L36) are like a tiny, type-safe data definition language:
   * `vec("one", "two", "three")` - an immutable vector/list of three strings
@@ -33,6 +42,9 @@ Package names will NOT change.
 * [Lazy initialization](src/main/java/org/organicdesign/fp/LazyRef.java#L5) - LazyRef thread-safely performs initialization and frees initialization resources on first use.  Subsequent uses get the now-constant initialized value.
 * [Memoization](src/main/java/org/organicdesign/fp/function/Function3.java#L42) - Turns function calls into hashtable lookups to speed up slow functions over a limited range of inputs.
 * Tiny with no dependencies - The entire project fits in a 240K jar file that is compiled in the compact1 profile.
+
+For complete API documentation, please build the javadoc:
+`mvn javadoc:javadoc`
 
 Paguro takes advantage of Java's type inferencing.  It eschews void return types, arrays, primatives, and checked exceptions in lambdas.  It can decrease the amount of code you need to write by a factor of at 2x-3x.  Using functional transfomrations instead of loops focuses you on choosing the right collections which leads to more readable code AND better Big O complexity/scalability.
 
@@ -47,13 +59,11 @@ Available from the [Maven Repository](http://mvnrepository.com/artifact/org.orga
         <groupId>org.organicdesign</groupId>
         <!-- NOTE: artifactId will change to "Paguro" in November 2016 -->
         <artifactId>UncleJim</artifactId>
-        <version>2.0.10</version>
+        <version>2.0.11</version>
 </dependency>
 ```
 
 #Details
-
-
 
 ```java
 // Define some people with lists of email addresses on the fly.
@@ -150,5 +160,5 @@ Unless otherwise stated, the rest of this work is licensed under the Apache 2.0 
 New contributions should be made under the Apache 2.0 license whenever practical.
 I believe it is more popular, clearer, and has been better tested in courts of law.
 
-#Contributors
-You can find outdated build requirements, API highlights, and additional information in: [README2.md](README2.md).
+#More
+Additional information is in: [README2.md](README2.md).

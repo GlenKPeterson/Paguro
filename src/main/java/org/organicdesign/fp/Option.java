@@ -16,6 +16,7 @@ package org.organicdesign.fp;
 import org.organicdesign.fp.function.Function0;
 import org.organicdesign.fp.function.Function1;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
@@ -23,13 +24,22 @@ import java.util.Objects;
  This is NOT a type-safe null.
  @param <T>
  */
-public interface Option<T> { // extends UnmodSortedIterable<T> {
+public interface Option<T> extends Serializable { // extends UnmodSortedIterable<T> {
 
     /** Return the value wrapped in this Option.  Only safe to call this on Some. */
     T get();
 
-    /** If this is Some, return the value wrapped in this Option.  Otherwise, return the given value. */
+    /**
+     If this is Some, return the value wrapped in this Option.  Otherwise, return the given value.
+     */
     T getOrElse(T t);
+
+    /**
+     If this is Some, Apply the given function, else return None.  Use this to chain options
+     together, failing fast at the first none() or continuing through as many operations that return
+     some as possible.
+     */
+    <U> Option<U> then(Function1<T,Option<U>> f);
 
     /** Is this Some? */
     boolean isSome();
@@ -37,7 +47,7 @@ public interface Option<T> { // extends UnmodSortedIterable<T> {
     /** Pass in a function to execute if its Some and another to execute if its None. */
     <U> U patMat(Function1<T,U> has, Function0<U> hasNot);
 
-    // ==================================================== Static ====================================================
+    // ========================================== Static ==========================================
     /** None is a singleton and this is its only instance. */
     Option NONE = new None();
 
@@ -63,20 +73,32 @@ public interface Option<T> { // extends UnmodSortedIterable<T> {
 
     /** Represents the absence of a value */
     final class None<T> implements Option<T> {
+        // For serializable.  Make sure to change whenever internal data format changes.
+        private static final long serialVersionUID = 20160915081300L;
+
         /** Private constructor for singleton. */
         private None() {}
 
+        /** {@inheritDoc} */
         @Override public T get() { throw new IllegalStateException("Called get on None"); }
 
+        /** {@inheritDoc} */
         @Override public T getOrElse(T t) { return t; }
 
+        /** {@inheritDoc} */
         @Override public boolean isSome() { return false; }
 //
 //        @Override public UnmodSortedIterator<T> iterator() {
 //            return UnmodSortedIterator.empty();
 //        }
 
-        @Override public <U> U patMat(Function1<T,U> has, Function0<U> hasNot) { return hasNot.get(); }
+        /** {@inheritDoc} */
+        @Override public <U> U patMat(Function1<T,U> has, Function0<U> hasNot) {
+            return hasNot.get();
+        }
+
+        /** {@inheritDoc} */
+        @Override public <U> Option<U> then(Function1<T,Option<U>> f) { return none(); }
 
         /** Valid, but deprecated because it's usually an error to call this in client code. */
         @Deprecated // Has no effect.  Darn!
@@ -84,24 +106,31 @@ public interface Option<T> { // extends UnmodSortedIterable<T> {
 
         /** Valid, but deprecated because it's usually an error to call this in client code. */
         @Deprecated // Has no effect.  Darn!
-        @Override public boolean equals(Object other) { return (this == other) || (other instanceof None); }
+        @Override public boolean equals(Object other) {
+            return (this == other) || (other instanceof None);
+        }
 
-        // Defend our singleton property in the face of deserialization.  Not sure this is necessary, but probably
-        // won't hurt.
+        /** Defend our singleton property in the face of deserialization. */
         private Object readResolve() { return NONE; }
     }
 
     /** Represents the presence of a value, even if that value is null. */
     class Some<T> implements Option<T> {
+        // For serializable.  Make sure to change whenever internal data format changes.
+        private static final long serialVersionUID = 20160915081300L;
+
         private final T item;
         private Some(T t) { item = t; }
 
         //public static Some<T> of(T t) { return new Option(t); }
 
+        /** {@inheritDoc} */
         @Override public T get() { return item; }
 
+        /** {@inheritDoc} */
         @Override public T getOrElse(T t) { return item; }
 
+        /** {@inheritDoc} */
         @Override public boolean isSome() { return true; }
 //
 //        @Override public UnmodSortedIterator<T> iterator() {
@@ -118,14 +147,19 @@ public interface Option<T> { // extends UnmodSortedIterable<T> {
 //            };
 //        }
 
+        /** {@inheritDoc} */
         @Override public <U> U patMat(Function1<T,U> has, Function0<U> hasNot) {
             return has.apply(item);
         }
 
+        /** {@inheritDoc} */
+        @Override public <U> Option<U> then(Function1<T,Option<U>> f) { return f.apply(item); }
+
         /** Valid, but deprecated because it's usually an error to call this in client code. */
         @Deprecated // Has no effect.  Darn!
         @Override public int hashCode() {
-            // We return Integer.MIN_VALUE for null to make it different from None which always returns zero.
+            // We return Integer.MIN_VALUE for null to make it different from None which always
+            // returns zero.
             return item == null ? Integer.MIN_VALUE : item.hashCode();
         }
 

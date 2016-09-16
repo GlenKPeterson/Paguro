@@ -1,5 +1,14 @@
 # Change Log
 
+## 2016-09-17 Release 2.0.11
+ - Renamed static method UnmodIterable.hashCode() to UnmodIterable.hash() to avoid confusion.
+ Deprecated old method.
+ - Made Option serializable and added tests for same.
+ - Added Option.then for chaining Some options.
+ - Deprecated and deleted most of the ill-concieved and short-lived KeyVal class.
+ - Increased PersistentHashMap test coverage by covering its internal MutableUnsortedMap better.
+ - Cleaned up some of the oldest documentation (mostly deleted duplicates).
+
 ## 2016-09-14 Release 2.0.10:
  - Renamed UnmodIterator.Implementation to UnmodIterator.Wrapper to mirror UnmodSortedIterator.Wrapper and because it's just a better name.
  - Added tests.
