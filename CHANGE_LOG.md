@@ -1,5 +1,10 @@
 # Change Log
 
+## 2016-09-17 Release 2.0.12-SNAPSHOT
+ - Added Insertion Order Map and Set.  No interfaces, not a lot of comments,
+ but 100% test coverage.  Should this be included in Paguro?
+ Should we have Paguro-core and put this in Paguro-extras?
+
 ## 2016-09-17 Release 2.0.11
  - Renamed static method UnmodIterable.hashCode() to UnmodIterable.hash() to avoid confusion.
  Deprecated old method.
