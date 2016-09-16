@@ -1,6 +1,7 @@
 # Change Log
 
 ## 2016-09-17 Release 2.0.12-SNAPSHOT
+ - ***CRITICAL:*** It looks like javac 1.8.0_31 will NOT build this code, but 1.8.0.91 will.
  - Added Insertion Order Map and Set.  No interfaces, not a lot of comments,
  but 100% test coverage.  Should this be included in Paguro?
  Should we have Paguro-core and put this in Paguro-extras?
