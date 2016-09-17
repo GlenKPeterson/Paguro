@@ -1,5 +1,12 @@
 # Change Log
 
+## 2016-09-17 Release 2.0.12
+ - Changed order of serialization for PersistentTreeMap.  Because it uses a serialization proxy, it
+ should still deserialize TreeMaps serialized before this change.  The serialization format has not
+ changed, only the order of elements is changed such that it should serialize at approximately the
+ same speed and deserialize without any internal rotations or re-balancing (therefore faster).
+ Full details in comments in org.organicdesign.fp.collections.PersistentTreeMap.SerializationProxy
+
 ## 2016-09-17 Release 2.0.11
  - Renamed static method UnmodIterable.hashCode() to UnmodIterable.hash() to avoid confusion.
  Deprecated old method.

@@ -14,10 +14,12 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Queue;
 import java.util.SortedMap;
 import java.util.Stack;
 
@@ -192,21 +194,33 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
         private void writeObject(ObjectOutputStream s) throws IOException {
             s.defaultWriteObject();
 
-            // Note: Serializing from the middle value could yield a more balanced tree!
+            // Serializing in iteration-order yields a worst-case deserialization because
+            // without re-balancing (rotating nodes) such an order yields an completely unbalanced
+            // linked list internal structure.
+            //       4
+            //      /
+            //     3
+            //    /
+            //   2
+            //  /
+            // 1
             //
-            // Before Serialization:
+            // That seems unnecessary since before Serialization we might have something like this
+            // which, while not perfect, requires no re-balancing:
+            //
             //                    11
             //            ,------'  `----.
             //           8                14
             //        ,-' `-.            /  \
             //       4       9         13    15
-            //    ,-' `-.     \       /
-            //   2       6     10   12
+            //    ,-' `-.     \       /        \
+            //   2       6     10   12          16
             //  / \     / \
             // 1   3   5   7
             //
-            // If we serialize the middle value first.  The 25% and 75% second, the 12.5, 37.5...
-            // values 3rd, and the odd-numbered values last, that gives us the order:
+            // If we serialize the middle value (n/2) first.  Then the n/4 and 3n/4,
+            // followed by n/8, 3n/8, 5n/8, 7n/8, then n/16, 3n/16, etc.  Finally, the odd-numbered
+            // values last.  That gives us the order:
             // 8, 4, 12, 2, 6, 10, 14, 1, 3, 5, 7, 9, 11, 13, 15
             //
             // Deserializing in that order yields an ideally balanced tree without any shuffling:
@@ -218,19 +232,39 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
             //  / \     / \     /  \        /  \
             // 1   3   5   7   9    11    13    15
             //
-            // I just don't know how to do that without an intermediate data structure, so I'm just
-            // going in order for now.
+            // That would be ideal, but I don't see how to do that without a significant
+            // intermediate data structure.
             //
             // A good improvement could be made by serializing breadth-first instead of depth first
             // to at least yield a tree no worse than the original without requiring shuffling.
             //
-            // Either of these improvements could be made without changing the serialized form
-            // or breaking compatibility.  Just that new serialized maps would have a superior
-            // ordering.
-            for (UnEntry<K,V> entry : theMap) {
-                s.writeObject(entry.getKey());
-                s.writeObject(entry.getValue());
+            // This improvement does not change the serialized form, or break compatibility.
+            // But it has a superior ordering for deserialization without (or with minimal)
+            // rotations.
+
+//            System.out.println("Serializing tree map...");
+            if (theMap.tree != null) {
+                Queue<Node<K,V>> queue = new ArrayDeque<>();
+                queue.add(theMap.tree);
+                while (queue.peek() != null) {
+                    Node<K,V> node = queue.remove();
+//                    System.out.println("Node: " + node);
+                    s.writeObject(node.getKey());
+                    s.writeObject(node.getValue());
+                    Node<K,V> child = node.left();
+                    if (child != null) {
+                        queue.add(child);
+                    }
+                    child = node.right();
+                    if (child != null) {
+                        queue.add(child);
+                    }
+                }
             }
+//            for (UnEntry<K,V> entry : theMap) {
+//                s.writeObject(entry.getKey());
+//                s.writeObject(entry.getValue());
+//            }
         }
 
         @SuppressWarnings("unchecked")
