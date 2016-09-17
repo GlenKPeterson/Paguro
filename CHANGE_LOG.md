@@ -1,5 +1,8 @@
 # Change Log
 
+## Release 2.1.0: RRB Tree
+
+
 ## 2016-09-17 Release 2.0.12
  - Changed order of serialization for PersistentTreeMap.  Because it uses a serialization proxy, it
  should still deserialize TreeMaps serialized before this change.  The serialization format has not

@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.junit.Test;
+import org.organicdesign.fp.TestUtilities;
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.UnmodListTest;
 import org.organicdesign.fp.tuple.Tuple2;
@@ -225,7 +226,7 @@ public class RrbTree1Test {
     }
 
     @Test public void emptyListIterator() {
-        UnmodListTest.listIteratorTest(Collections.emptyList(), RrbTree1.empty());
+        TestUtilities.listIteratorTest(Collections.emptyList(), RrbTree1.empty());
     }
 
     @Test(expected = IndexOutOfBoundsException.class)
@@ -413,7 +414,7 @@ public class RrbTree1Test {
         assertArrayEquals(test, pv2.toArray());
 
         List<Integer> tList = Arrays.asList(test);
-        UnmodListTest.listIteratorTest(tList, pv2);
+        TestUtilities.listIteratorTest(tList, pv2);
     }
 
     @Test public void equalsAndHashCode() {

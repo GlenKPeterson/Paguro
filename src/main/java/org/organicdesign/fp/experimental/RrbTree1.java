@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.organicdesign.fp.collections.ImList;
+import org.organicdesign.fp.collections.MutableList;
 import org.organicdesign.fp.collections.UnmodIterable;
 import org.organicdesign.fp.collections.UnmodSortedIterable;
 import org.organicdesign.fp.tuple.Tuple2;
@@ -309,7 +310,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
 
     private static final Leaf EMPTY_LEAF = new Leaf<>(EMPTY_ARRAY);
     @SuppressWarnings("unchecked")
-    private static final <T> Leaf<T> emptyLeaf() { return (Leaf<T>) EMPTY_LEAF; }
+    private static <T> Leaf<T> emptyLeaf() { return (Leaf<T>) EMPTY_LEAF; }
 
     private static final RrbTree1 EMPTY_RRB_TREE =
             new RrbTree1<>(emptyArray(), 0, emptyLeaf(), 0);
@@ -337,12 +338,13 @@ public class RrbTree1<E> implements ImList<E>, Indented {
 
     @Override public int size() { return size; }
 
+    @SuppressWarnings("unchecked")
     @Override public boolean equals(Object other) {
         if (this == other) { return true; }
         if ( !(other instanceof List) ) { return false; }
-        List that = (List) other;
+        List<? extends E> that = (List<? extends E>) other;
         return (this.size() == that.size()) &&
-               UnmodSortedIterable.equals(this, UnmodSortedIterable.castFromList(that));
+               UnmodSortedIterable.equal(this, UnmodSortedIterable.castFromList(that));
     }
 
     /** This implementation is correct and compatible with java.util.AbstractList, but O(n). */
@@ -404,6 +406,8 @@ public class RrbTree1<E> implements ImList<E>, Indented {
         return new RrbTree1<>(newFocus, focusStartIndex, root, size + 1);
     }
 
+    @Override public RrbTree1<E> immutable() { return this; }
+
     /**
      I would have called this insert and reversed the order or parameters.
      @param idx the insertion point
@@ -439,6 +443,11 @@ public class RrbTree1<E> implements ImList<E>, Indented {
                                            : root;
         E[] newFocus = singleElementArray(element);
         return new RrbTree1<>(newFocus, idx, newRoot, size + 1);
+    }
+
+    @Override public MutableList<E> mutable() {
+        // TODO: Implement or change interfaces.
+        throw new UnsupportedOperationException("No mutable version (yet)");
     }
 
     /**
