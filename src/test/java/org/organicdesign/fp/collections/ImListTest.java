@@ -15,11 +15,9 @@
 package org.organicdesign.fp.collections;
 
 import org.junit.Test;
+import org.organicdesign.fp.TestUtilities;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -49,7 +47,7 @@ public class ImListTest {
 //                     p.toString());
 //    }
 
-    static class TestList<T> implements ImList<T> {
+    private static class TestList<T> implements ImList<T> {
         static <T> List<T> dup(Collection<T> in) {
             List<T> out = new ArrayList<>();
             out.addAll(in);
@@ -58,10 +56,9 @@ public class ImListTest {
 
         private final List<T> inner;
 
-        TestList(Collection<T> s) {
-            inner = new ArrayList<>();
-            inner.addAll(s);
-        }
+        TestList(Collection<T> s) { inner = dup(s); }
+
+        TestList() { inner = new ArrayList<>(); }
 
         @Override public ImList<T> append(T t) {
             List<T> next = dup(inner);
@@ -78,6 +75,28 @@ public class ImListTest {
         @Override public int size() { return inner.size(); }
 
         @Override public T get(int index) { return inner.get(index); }
+
+        @Override public ImList<T> immutable() { return this; }
+
+        @Override public MutableList<T> mutable() {
+            return new MutableList<T>() {
+                private final List<T> mutable = dup(inner);
+
+                @Override public int size() { return mutable.size(); }
+
+                @Override public T get(int i) { return mutable.get(i); }
+
+                @Override public MutableList<T> append(T val) { mutable.add(val); return this; }
+
+                @Override public ImList<T> immutable() {
+                    return new TestList<>(dup(mutable));
+                }
+
+                @Override public MutableList<T> replace(int idx, T t) {
+                    mutable.set(idx, t); return this;
+                }
+            };
+        }
     }
 
     @Test public void get() {
@@ -95,14 +114,40 @@ public class ImListTest {
     }
 
     @Test public void concatTest() {
-        assertArrayEquals(new String[]{"a", "b", "c", "d", "e", "f"},
-                          new TestList<>(Arrays.asList("a", "b", "c"))
-                                  .concat(Arrays.asList("d", "e", "f")).toArray());
+        List<String> control = new ArrayList<>();
+        control.addAll(Arrays.asList("a", "b", "c"));
+        ImList<String> test = new TestList<>(Arrays.asList("a", "b", "c"));
+        assertEquals(control.size(), test.size());
+        assertEquals(control, test);
+        TestUtilities.listIteratorTest(control, test);
+
+        control.addAll(Arrays.asList("d", "e", "f"));
+        test = test.concat(Arrays.asList("d", "e", "f"));
+
+        assertEquals(control.size(), test.size());
+        assertEquals(control, test);
+        TestUtilities.listIteratorTest(control, test);
     }
 
     @Test public void iteratorTest() {
         String[] fourScore = new String[] {"Four", "score", "and", "seven", "years", "ago..."};
-        UnmodListTest.listIteratorTest(Arrays.asList(fourScore),
+        TestUtilities.listIteratorTest(Arrays.asList(fourScore),
                                        new TestList<>(Arrays.asList(fourScore)));
+    }
+
+    @Test public void reverseTest() {
+        List<Integer> control = new ArrayList<>();
+        ImList<Integer> test = new TestList<>(Collections.emptyList());
+        for (int i = 0; i < 100; i++) {
+            control.add(i);
+            test = test.append(i);
+        }
+        assertEquals(control.size(), test.size());
+        TestUtilities.compareIterators(control.iterator(), test.iterator());
+
+        Collections.reverse(control);
+        test = test.reverse();
+        assertEquals(control.size(), test.size());
+        TestUtilities.compareIterators(control.iterator(), test.iterator());
     }
 }

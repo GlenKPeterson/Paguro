@@ -1,4 +1,4 @@
-// Copyright 2015 PlanBase Inc. & Glen Peterson
+// Copyright 2016 PlanBase Inc. & Glen Peterson
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package org.organicdesign.fp.tuple;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
+import static org.organicdesign.fp.TestUtilities.serializeDeserialize;import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 import static org.organicdesign.testUtils.EqualsContract.equalsSameHashCode;
 
 // ======================================================================================
@@ -27,6 +27,8 @@ import static org.organicdesign.testUtils.EqualsContract.equalsSameHashCode;
 public class Tuple11Test {
     @Test public void constructionAndAccess() {
         Tuple11<String,String,String,String,String,String,String,String,String,String,String> a = Tuple11.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th");
+
+        Tuple11<String,String,String,String,String,String,String,String,String,String,String> ser = serializeDeserialize(a);
 
         assertEquals("1st", a._1());
         assertEquals("2nd", a._2());
@@ -40,74 +42,87 @@ public class Tuple11Test {
         assertEquals("10th", a._10());
         assertEquals("11th", a._11());
 
-        equalsDistinctHashCode(a, Tuple11.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th"),
+        assertEquals("1st", ser._1());
+        assertEquals("2nd", ser._2());
+        assertEquals("3rd", ser._3());
+        assertEquals("4th", ser._4());
+        assertEquals("5th", ser._5());
+        assertEquals("6th", ser._6());
+        assertEquals("7th", ser._7());
+        assertEquals("8th", ser._8());
+        assertEquals("9th", ser._9());
+        assertEquals("10th", ser._10());
+        assertEquals("11th", ser._11());
+
+        equalsDistinctHashCode(a, ser,
                                Tuple11.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th"),
                                Tuple11.of("wrong","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th"));
 
 
-        equalsDistinctHashCode(a, Tuple11.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th"),
+        equalsDistinctHashCode(a, ser,
                                Tuple11.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th"),
                                Tuple11.of("1st","wrong","3rd","4th","5th","6th","7th","8th","9th","10th","11th"));
 
 
-        equalsDistinctHashCode(a, Tuple11.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th"),
+        equalsDistinctHashCode(a, ser,
                                Tuple11.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th"),
                                Tuple11.of("1st","2nd","wrong","4th","5th","6th","7th","8th","9th","10th","11th"));
 
 
-        equalsDistinctHashCode(a, Tuple11.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th"),
+        equalsDistinctHashCode(a, ser,
                                Tuple11.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th"),
                                Tuple11.of("1st","2nd","3rd","wrong","5th","6th","7th","8th","9th","10th","11th"));
 
 
-        equalsDistinctHashCode(a, Tuple11.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th"),
+        equalsDistinctHashCode(a, ser,
                                Tuple11.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th"),
                                Tuple11.of("1st","2nd","3rd","4th","wrong","6th","7th","8th","9th","10th","11th"));
 
 
-        equalsDistinctHashCode(a, Tuple11.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th"),
+        equalsDistinctHashCode(a, ser,
                                Tuple11.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th"),
                                Tuple11.of("1st","2nd","3rd","4th","5th","wrong","7th","8th","9th","10th","11th"));
 
 
-        equalsDistinctHashCode(a, Tuple11.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th"),
+        equalsDistinctHashCode(a, ser,
                                Tuple11.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th"),
                                Tuple11.of("1st","2nd","3rd","4th","5th","6th","wrong","8th","9th","10th","11th"));
 
 
-        equalsDistinctHashCode(a, Tuple11.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th"),
+        equalsDistinctHashCode(a, ser,
                                Tuple11.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th"),
                                Tuple11.of("1st","2nd","3rd","4th","5th","6th","7th","wrong","9th","10th","11th"));
 
 
-        equalsDistinctHashCode(a, Tuple11.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th"),
+        equalsDistinctHashCode(a, ser,
                                Tuple11.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th"),
                                Tuple11.of("1st","2nd","3rd","4th","5th","6th","7th","8th","wrong","10th","11th"));
 
 
-        equalsDistinctHashCode(a, Tuple11.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th"),
+        equalsDistinctHashCode(a, ser,
                                Tuple11.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th"),
                                Tuple11.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","wrong","11th"));
 
 
-        equalsDistinctHashCode(a, Tuple11.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th"),
+        equalsDistinctHashCode(a, ser,
                                Tuple11.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th"),
                                Tuple11.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","wrong"));
 
         equalsDistinctHashCode(Tuple11.of("1st",null,"3rd",null,"5th",null,"7th",null,"9th",null,"11th"),
-                               Tuple11.of("1st",null,"3rd",null,"5th",null,"7th",null,"9th",null,"11th"),
+                               serializeDeserialize(Tuple11.of("1st",null,"3rd",null,"5th",null,"7th",null,"9th",null,"11th")),
                                Tuple11.of("1st",null,"3rd",null,"5th",null,"7th",null,"9th",null,"11th"),
                                Tuple11.of("1st",null,"3rd",null,"5th",null,"7th",null,"9th",null,"wrong"));
 
         equalsDistinctHashCode(Tuple11.of(null,"2nd",null,"4th",null,"6th",null,"8th",null,"10th",null),
-                               Tuple11.of(null,"2nd",null,"4th",null,"6th",null,"8th",null,"10th",null),
+                               serializeDeserialize(Tuple11.of(null,"2nd",null,"4th",null,"6th",null,"8th",null,"10th",null)),
                                Tuple11.of(null,"2nd",null,"4th",null,"6th",null,"8th",null,"10th",null),
                                Tuple11.of(null,"2nd",null,"4th",null,"6th",null,"8th",null,"10th","wrong"));
 
-        equalsSameHashCode(a, Tuple11.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th"),
+        equalsSameHashCode(a, ser,
                            Tuple11.of("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th"),
                            Tuple11.of("2nd","1st","3rd","4th","5th","6th","7th","8th","9th","10th","11th"));
 
-        assertEquals("Tuple11(1st,2nd,3rd,4th,5th,6th,7th,8th,9th,10th,11th)", a.toString());
+        assertEquals("Tuple11(\"1st\",\"2nd\",\"3rd\",\"4th\",\"5th\",\"6th\",\"7th\",\"8th\",\"9th\",\"10th\",\"11th\")", a.toString());
+        assertEquals("Tuple11(\"1st\",\"2nd\",\"3rd\",\"4th\",\"5th\",\"6th\",\"7th\",\"8th\",\"9th\",\"10th\",\"11th\")", ser.toString());
     }
 }

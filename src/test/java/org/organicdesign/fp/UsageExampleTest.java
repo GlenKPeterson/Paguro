@@ -40,24 +40,23 @@ public class UsageExampleTest {
         // Jane by her email address. The first line is a JUnit test to verify that "Jane" is the
         // name of the person we find with the subsequent code.
         assertEquals("Jane",
-                     // Define some people with lists of email addresses on the
-                     // fly.  vec() makes a List, tup() makes a Tuple
-                     // If this is confusing, read through parts 2 and 3, then
-                     // return to this one.
+                     // Define some people with lists of email addresses on the fly.
+                     // vec() makes a Vector/List, tup() makes a Tuple
                      vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
                          tup("Fred", "Tase", vec("c@d.e", "d@e.f", "e@f.g")))
 
-                             // Turn that into pairs of emails and people:
-                             // flatMap() the list of people into a list of
-                             // emails.  map() the emails to email/person pairs
-                             // while the person object is still in scope.
+                             // We want to look up people by their address.
+                             // There are multiple addresses per person.
+                             // For each person, find their email addresses.
                              .flatMap(person -> person._3()
-                                                      .map(mail -> tup(mail,
-                                                                       person)))
 
-                             // toImMap() expects a function that maps items to
-                             // key/value pairs.  We already have pairs, so pass
-                             // it the identity function.
+                                                      // For each address, produce a key/value pair
+                                                      // of email and person (Tuple2 implements Map.Entry)
+                                                      .map(email -> tup(email, person)))
+
+                             // toImMap() collects the results to key/value pairs and puts
+                             // them in an immutable map.  We already have pairs, so pass
+                             // them through unchanged.
                              .toImMap(x -> x)
 
                              // Look up Jane by her address
@@ -93,14 +92,16 @@ public class UsageExampleTest {
 
         // Everything has build-in toString() methods.  Collections show the first 3-5 elements.
         assertEquals("PersistentVector(" +
-                     "Tuple3(Jane,Smith,PersistentVector(Tuple2(HOME,a@b.c),Tuple2(WORK,b@c.d)))," +
-                     "Tuple3(Fred,Tase,PersistentVector(Tuple2(HOME,c@d.e))))",
+                     "Tuple3(\"Jane\",\"Smith\",PersistentVector(Tuple2(HOME,\"a@b.c\")," +
+                     "Tuple2(WORK,\"b@c.d\")))," +
+                     "Tuple3(\"Fred\",\"Tase\",PersistentVector(Tuple2(HOME,\"c@d.e\"))))",
                      people.toString());
 
         // Inspect Jane's record:
         Tuple3<String,String,ImList<Tuple2<EmailType,String>>> jane = people.get(0);
 
-        assertEquals("Tuple3(Jane,Smith,PersistentVector(Tuple2(HOME,a@b.c),Tuple2(WORK,b@c.d)))",
+        assertEquals("Tuple3(\"Jane\",\"Smith\",PersistentVector(Tuple2(HOME,\"a@b.c\")," +
+                     "Tuple2(WORK,\"b@c.d\")))",
                      jane.toString());
 
         // Make a map to look up people by their email address.
@@ -124,12 +125,14 @@ public class UsageExampleTest {
 
         // Look at the map we just created
         assertEquals("PersistentHashMap(" +
-                     "Tuple2(a@b.c," +
-                     "Tuple3(Jane,Smith,PersistentVector(Tuple2(HOME,a@b.c),Tuple2(WORK,b@c.d))))," +
-                     "Tuple2(b@c.d," +
-                     "Tuple3(Jane,Smith,PersistentVector(Tuple2(HOME,a@b.c),Tuple2(WORK,b@c.d))))," +
-                     "Tuple2(c@d.e," +
-                     "Tuple3(Fred,Tase,PersistentVector(Tuple2(HOME,c@d.e)))))",
+                     "Tuple2(\"a@b.c\"," +
+                     "Tuple3(\"Jane\",\"Smith\",PersistentVector(Tuple2(HOME,\"a@b.c\")," +
+                     "Tuple2(WORK,\"b@c.d\"))))," +
+                     "Tuple2(\"b@c.d\"," +
+                     "Tuple3(\"Jane\",\"Smith\",PersistentVector(Tuple2(HOME,\"a@b.c\")," +
+                     "Tuple2(WORK,\"b@c.d\"))))," +
+                     "Tuple2(\"c@d.e\"," +
+                     "Tuple3(\"Fred\",\"Tase\",PersistentVector(Tuple2(HOME,\"c@d.e\")))))",
                      peopleByEmail.toString());
 
         // Prove that we can now look up Jane by her address
@@ -180,17 +183,17 @@ public class UsageExampleTest {
         // Notice that the tuples are smart enough to take their new names, Person and Email instead
         // of Tuple3 and Tuple2.  This aids readability when debugging.
         assertEquals("PersistentVector(" +
-                     "Person(Jane,Smith," +
-                     "PersistentVector(Email(HOME,a@b.c),Email(WORK,b@c.d)))," +
-                     "Person(Fred,Tase," +
-                     "PersistentVector(Email(HOME,c@d.e),Email(WORK,d@e.f))))",
+                     "Person(\"Jane\",\"Smith\"," +
+                     "PersistentVector(Email(HOME,\"a@b.c\"),Email(WORK,\"b@c.d\")))," +
+                     "Person(\"Fred\",\"Tase\"," +
+                     "PersistentVector(Email(HOME,\"c@d.e\"),Email(WORK,\"d@e.f\"))))",
                      people.toString());
 
         // This type signature couldn't be simpler (or more descriptive):
         Person jane = people.get(0);
 
-        assertEquals("Person(Jane,Smith," +
-                     "PersistentVector(Email(HOME,a@b.c),Email(WORK,b@c.d)))",
+        assertEquals("Person(\"Jane\",\"Smith\"," +
+                     "PersistentVector(Email(HOME,\"a@b.c\"),Email(WORK,\"b@c.d\")))",
                      jane.toString());
 
         // Let's use our new, descriptive field getter methods:
@@ -208,14 +211,14 @@ public class UsageExampleTest {
                       .toImMap(Function1.identity());
 
         assertEquals("PersistentHashMap(" +
-                     "Tuple2(d@e.f," +
-                     "Person(Fred,Tase,PersistentVector(Email(HOME,c@d.e),Email(WORK,d@e.f))))," +
-                     "Tuple2(a@b.c," +
-                     "Person(Jane,Smith,PersistentVector(Email(HOME,a@b.c),Email(WORK,b@c.d))))," +
-                     "Tuple2(b@c.d," +
-                     "Person(Jane,Smith,PersistentVector(Email(HOME,a@b.c),Email(WORK,b@c.d))))," +
-                     "Tuple2(c@d.e," +
-                     "Person(Fred,Tase,PersistentVector(Email(HOME,c@d.e),Email(WORK,d@e.f)))))",
+                     "Tuple2(\"d@e.f\",Person(\"Fred\",\"Tase\",PersistentVector(Email(HOME,\"c@d.e\")," +
+                     "Email(WORK,\"d@e.f\"))))," +
+                     "Tuple2(\"a@b.c\",Person(\"Jane\",\"Smith\",PersistentVector(Email(HOME,\"a@b.c\")," +
+                     "Email(WORK,\"b@c.d\"))))," +
+                     "Tuple2(\"b@c.d\",Person(\"Jane\",\"Smith\",PersistentVector(Email(HOME,\"a@b.c\")," +
+                     "Email(WORK,\"b@c.d\"))))," +
+                     "Tuple2(\"c@d.e\",Person(\"Fred\",\"Tase\",PersistentVector(Email(HOME,\"c@d.e\")," +
+                     "Email(WORK,\"d@e.f\")))))",
                      peopleByEmail.toString());
 
         // Now look Jane up by her address.
@@ -241,7 +244,7 @@ public class UsageExampleTest {
         ImList<Integer> v = vec(4, 5);
 
         // Add more numbers at the beginning.  "precat" is short for "prepend version of
-        // concatenate" or "add-to-beginning".  UnmodIterable is the primary bridge between UncleJim
+        // concatenate" or "add-to-beginning".  UnmodIterable is the primary bridge between Paguro
         // and traditional Java.  It extends Iterable, but adds transformations and deprecates the
         // remove() method of the iterator it provides.
         UnmodIterable<Integer> u1 = v.precat(vec(1, 2, 3));

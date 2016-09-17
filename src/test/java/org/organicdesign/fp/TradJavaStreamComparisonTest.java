@@ -1,11 +1,5 @@
 package org.organicdesign.fp;
 
-import org.junit.Test;
-import org.organicdesign.fp.collections.ImList;
-import org.organicdesign.fp.collections.ImMap;
-import org.organicdesign.fp.collections.RangeOfInt;
-import org.organicdesign.fp.tuple.Tuple3;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -15,6 +9,12 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.junit.Test;
+import org.organicdesign.fp.collections.ImList;
+import org.organicdesign.fp.collections.ImMap;
+import org.organicdesign.fp.collections.RangeOfInt;
+import org.organicdesign.fp.tuple.Tuple3;
+
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.*;
 import static org.organicdesign.fp.TradJavaStreamComparisonTest.ColorVal.*;
@@ -23,7 +23,7 @@ public class TradJavaStreamComparisonTest {
 
     // Declare a simple enum with a character mapping (eg. for storing in a database or passing
     // over a network).  We'll calculate and store the reverse-mapping three different ways,
-    // Once with UncleJim (3 lines), once using "Traditional" Java (6 lines plus closing braces),
+    // Once with Paguro (3 lines), once using "Traditional" Java (6 lines plus closing braces),
     // and once using the new Java8 streams (9 lines, plus closing braces).
     public enum ColorVal {
         RED('R'),
@@ -33,7 +33,7 @@ public class TradJavaStreamComparisonTest {
         ColorVal(Character c) { ch = c; }
         public Character ch() { return ch; }
 
-        // UncleJim's way (3 lines of code):
+        // The Paguro way (3 lines of code):
         static final ImMap<Character,ColorVal> charToColorMapU =
                 vec(values())
                         .toImMap(v -> tup(v.ch(), v));
@@ -82,7 +82,7 @@ public class TradJavaStreamComparisonTest {
 
     // Prove that all three reverse-mappings cannot be changed accidentally
 
-    // Notice that UncleJim is the only one to give us a deprecation warning on this mutator
+    // Notice that Paguro is the only one to give us a deprecation warning on this mutator
     // method because it always throws an exception.  It's not deprecated in the sense that the
     // method is ever going away.  But the warning indicates the coding error of ever trying to
     // call this method.
@@ -102,7 +102,7 @@ public class TradJavaStreamComparisonTest {
     // numbers to indicate the three primary colors:
     @Test public void testExtension() {
 
-        // UncleJim has methods that return new lightweight copies of the original map,
+        // Paguro has methods that return new lightweight copies of the original map,
         // with the new value added.  This makes it a snap to extend existing immutable data
         // structures: 3 loc.
         final ImMap<Character,ColorVal> extendedMapU = charToColorMapU.assoc('1', RED)
@@ -174,7 +174,7 @@ public class TradJavaStreamComparisonTest {
         public int green() throws Exception { return _2; }
     }
 
-    // UncleJim's way: 3 loc, + 3 loc = 6 loc
+    // The Paguro way: 3 loc, + 3 loc = 6 loc
     @Test
     public void colorSquareU() {
         ImList<Color> imgData = RangeOfInt.of(0, 256)
@@ -256,7 +256,7 @@ public class TradJavaStreamComparisonTest {
 //                                                      Collectors.counting())));
 
         // But green does throw an exception.  There are various ways of handling this, but I think
-        // this is probably typical, and basically identical to what UncleJim does for you.
+        // this is probably typical, and basically identical to what Paguro does for you.
         Map<Integer,Long> greenCounts = Collections.unmodifiableMap(
                 imgData.stream()
                        .collect(Collectors.groupingBy(color -> {
@@ -272,7 +272,7 @@ public class TradJavaStreamComparisonTest {
         // distracting.  Also, why learn a whole Collectors library when you could fold into
         // a map and get exception wrapping for free?  Finally, what's returned here is just
         // another Collections.unmodifiableMap - you have to make a deep copy in order to change it.
-        // If you really want to write code this way, at least use UncleJim's
+        // If you really want to write code this way, at least use Paguro's
         // FunctionUtils.unmodMap() instead so that your IDE and compiler can warn you if you try to
         // call a deprecated method.
 

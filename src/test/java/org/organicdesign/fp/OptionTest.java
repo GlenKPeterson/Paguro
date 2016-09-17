@@ -3,6 +3,7 @@ package org.organicdesign.fp;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
+import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class OptionTest {
@@ -83,6 +84,8 @@ public class OptionTest {
 
         equalsDistinctHashCode(o1a, o1b, o1c, Option.of(0));
 
+        equalsDistinctHashCode(o1a, serializeDeserialize(o1b), o1c, Option.of(0));
+
         equalsDistinctHashCode(o1a, o1b, o1c, Option.of(2));
 
         equalsDistinctHashCode(o1a, o1b, o1c, Option.of(null));
@@ -90,6 +93,8 @@ public class OptionTest {
         equalsDistinctHashCode(o1a, o1b, o1c, Option.none());
 
         equalsDistinctHashCode(Option.of(null), Option.of(null), Option.of(null), o1a);
+        equalsDistinctHashCode(Option.of(null), serializeDeserialize(Option.of(null)),
+                               Option.of(null), o1a);
 
         Option<Integer> z = Option.of(null);
         Option<Integer> n1 = Option.none();
@@ -116,10 +121,24 @@ public class OptionTest {
         assertTrue(n1.equals(n2));
         assertTrue(n2.equals(n1));
 
-
         equalsDistinctHashCode(o1a, o1b, o1c, n1);
 
         equalsDistinctHashCode(Option.of(null), Option.of(null), Option.of(null), n2);
 
+        // None is a serializable singleton.
+        assertTrue(n1 == serializeDeserialize(n1));
+        assertEquals(n1, serializeDeserialize(n1));
+    }
+
+    @Test public void thenTest() {
+        Option<Integer> o1 = Option.of(1);
+        assertEquals(Option.none(), o1.then(i -> i > 3 ? Option.of("good")
+                                                       : Option.none()));
+        assertEquals(Option.of("good"), o1.then(i -> i < 3 ? Option.of("good")
+                                                           : Option.none()));
+
+        Option<Integer> o2 = Option.none();
+        assertEquals(Option.none(), o2.then(i -> i < 3 ? Option.of("good")
+                                                       : Option.none()));
     }
 }

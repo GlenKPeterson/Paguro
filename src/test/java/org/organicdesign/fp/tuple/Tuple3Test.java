@@ -1,4 +1,4 @@
-// Copyright 2015 PlanBase Inc. & Glen Peterson
+// Copyright 2016 PlanBase Inc. & Glen Peterson
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package org.organicdesign.fp.tuple;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
+import static org.organicdesign.fp.TestUtilities.serializeDeserialize;import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 import static org.organicdesign.testUtils.EqualsContract.equalsSameHashCode;
 
 // ======================================================================================
@@ -28,38 +28,45 @@ public class Tuple3Test {
     @Test public void constructionAndAccess() {
         Tuple3<String,String,String> a = Tuple3.of("1st","2nd","3rd");
 
+        Tuple3<String,String,String> ser = serializeDeserialize(a);
+
         assertEquals("1st", a._1());
         assertEquals("2nd", a._2());
         assertEquals("3rd", a._3());
 
-        equalsDistinctHashCode(a, Tuple3.of("1st","2nd","3rd"),
+        assertEquals("1st", ser._1());
+        assertEquals("2nd", ser._2());
+        assertEquals("3rd", ser._3());
+
+        equalsDistinctHashCode(a, ser,
                                Tuple3.of("1st","2nd","3rd"),
                                Tuple3.of("wrong","2nd","3rd"));
 
 
-        equalsDistinctHashCode(a, Tuple3.of("1st","2nd","3rd"),
+        equalsDistinctHashCode(a, ser,
                                Tuple3.of("1st","2nd","3rd"),
                                Tuple3.of("1st","wrong","3rd"));
 
 
-        equalsDistinctHashCode(a, Tuple3.of("1st","2nd","3rd"),
+        equalsDistinctHashCode(a, ser,
                                Tuple3.of("1st","2nd","3rd"),
                                Tuple3.of("1st","2nd","wrong"));
 
         equalsDistinctHashCode(Tuple3.of("1st",null,"3rd"),
-                               Tuple3.of("1st",null,"3rd"),
+                               serializeDeserialize(Tuple3.of("1st",null,"3rd")),
                                Tuple3.of("1st",null,"3rd"),
                                Tuple3.of("1st",null,"wrong"));
 
         equalsDistinctHashCode(Tuple3.of(null,"2nd",null),
-                               Tuple3.of(null,"2nd",null),
+                               serializeDeserialize(Tuple3.of(null,"2nd",null)),
                                Tuple3.of(null,"2nd",null),
                                Tuple3.of(null,"2nd","wrong"));
 
-        equalsSameHashCode(a, Tuple3.of("1st","2nd","3rd"),
+        equalsSameHashCode(a, ser,
                            Tuple3.of("1st","2nd","3rd"),
                            Tuple3.of("2nd","1st","3rd"));
 
-        assertEquals("Tuple3(1st,2nd,3rd)", a.toString());
+        assertEquals("Tuple3(\"1st\",\"2nd\",\"3rd\")", a.toString());
+        assertEquals("Tuple3(\"1st\",\"2nd\",\"3rd\")", ser.toString());
     }
 }

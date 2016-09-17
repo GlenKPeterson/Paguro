@@ -70,7 +70,10 @@ public class UnmodCollectionTest {
             "Sticks", "and", "stones", "will", "break", "my", "bones", "but", "tests",
             "will", "never", "hurt", "me." };
 
-    // Fun Fact: unColl is part of where the "Uncle" part of UncleJim names comes from.
+    // Fun Fact: This project used to be called, "UncleJim" because it just started out with
+    // UNmodifiable COLLections (UN-COLL sounds like "Uncle").  The Jim part was similarly
+    // for Java IMmutability (JIM).  But it sounded vaguely Brogrammerly, so the name was
+    // changed to Paguro.
     private static final UnmodCollection<String> unColl = new TestColl<>(sticksAndStones);
 
     @Test public void containsTest() {

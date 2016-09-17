@@ -35,7 +35,7 @@ public interface UnmodSet<E> extends UnmodCollection<E>, Set<E> {
                    containsAll(that);
         }
 
-        @Override public int hashCode() { return UnmodIterable.hashCode(this); }
+        @Override public int hashCode() { return UnmodIterable.hash(this); }
     }
 
     // ========================================= Instance =========================================

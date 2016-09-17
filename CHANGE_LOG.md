@@ -1,26 +1,193 @@
-**2016-03-23 Release 1.0.3**:
+# Change Log
+
+## 2016-09-17 Release 2.0.12
+ - Changed order of serialization for PersistentTreeMap.  Because it uses a serialization proxy, it
+ should still deserialize TreeMaps serialized before this change.  The serialization format has not
+ changed, only the order of elements is changed such that it should serialize at approximately the
+ same speed and deserialize without any internal rotations or re-balancing (therefore faster).
+ Full details in comments in org.organicdesign.fp.collections.PersistentTreeMap.SerializationProxy
+
+## 2016-09-17 Release 2.0.11
+ - Renamed static method UnmodIterable.hashCode() to UnmodIterable.hash() to avoid confusion.
+ Deprecated old method.
+ - Made Option serializable and added tests for same.
+ - Added Option.then for chaining Some options.
+ - Deprecated and deleted most of the ill-concieved and short-lived KeyVal class.
+ - Increased PersistentHashMap test coverage by covering its internal MutableUnsortedMap better.
+ - Cleaned up some of the oldest documentation (mostly deleted duplicates).
+
+## 2016-09-14 Release 2.0.10:
+ - Renamed UnmodIterator.Implementation to UnmodIterator.Wrapper to mirror UnmodSortedIterator.Wrapper and because it's just a better name.
+ - Added tests.
+
+## 2016-09-13 Release 2.0.9:
+ - Fixed return type of ImUnsortedMap and MutableUnsortedMap.assoc(Map.Entry).  Thanks @pniederw for reporting!
+ - Made ImUnsortedSet use MutableUnsortedSet's implementation of union() instead of the other way around.
+ - Added tests.
+
+## 2016-09-11 Release 2.0.8:
+ - Fixed illegal cast in MutableList.concat and made test for same.  Thanks to @pniederw for this!
+
+## 2016-09-11 Release 2.0.7:
+ - Massive renaming of newly exposed interfaces and methods.
+    - ImUnsortMap is now ImUnsortedMap
+    - ImUnsortSet is now ImUnsortedSet
+    - ImListTrans is now MutableList
+    - ImUnsortMapTrans is now MutableUnsortedMap
+    - ImUnsortSetTrans is now MutableUnsortedSet
+    - The `persistent()` method on all of those interfaces is now `immutable()`
+    - The `asTransient()` method on all of those interfaces is now `mutable()`
+ - Added union() method to ImUnsortedSet and MutableUnsortedSet and a little test for same.
+ - ImListTrans overrides concat(), refining the return type to ImListTrans.  Thanks to @pniederw for this!
+
+This is only a day after releasing these interfaces. After doing serialization, I couldn't freakin'
+write anything anymore without saying "transient (meaning mutable)" or "transient (as in not
+serializable)".  I know Rich picked Persistent and Transient, but JPA took Persistent and
+serialization took Transient so even though I like Rich's terms, I'm changing them to save some
+small shred of my sanity.  There are only three terms: Mutable, Unmofidiable, and Immutable.
+Mutable means mutate-in-place.  Unmodifiable means you can't change it, and it probably can't
+grow without a complete deep copy.  Immutable means it never changes, yet grows efficiently
+by producing very shallow copies of most of its internals.
+
+I am leaving Rich's 5 file names as a tribute to how awesome he is and so that people talking
+about the Clojure collections won't be surprised, and to show what still carries his license
+(Eclipse 1.0).
+
+## 2016-09-10 Release 2.0.6: USE 2.0.7+ INSTEAD!
+ - Added asTransient() to ImList.
+
+## 2016-09-10 Release 2.0.5: USE 2.0.7+ INSTEAD!
+ - Moved persistent() from ImListTrans to ImList and made PersistentVector implement ImList instead of ImListTrans.
+   This just makes a lot more sense.  It shouldn't break any sensible client code.
+ - Added ImList.reverse().  @pniederw had asked for this.  Sorry for the wait.
+
+## 2016-09-10 Release 2.0.4: USE 2.0.7+ INSTEAD!
+ - Made PersistentTreeMap return serializable Tuple2's.  Actually these are subclasses of internal nodes that still contain
+   big chunks of the treemap, but those chunks are transient (not serializable) and private.
+   When deserialized, they become plain old Tuple2's.
+ - Speed is unchanged after this: 10-item maps/sets are 0-3% faster, but generally near the margin of error for equal speed.
+   Large maps/sets (100K elements) are 0-1% slower; within the margin of error.
+ - Added ImUnsortSet and ImUnsortSetTrans interfaces to expose the TransientSet implementation.
+ - Added ImListTrans interface to expose the Transient Vector implementation.
+ - Deprecated ImMapTrans - replaced it with ImUnsortMap and UmUnsortedMapTrans.
+ - Radically improved test coverage of PersistentTreeMap and slightly improved PersistentHashMap
+ - Added epl-v10.html referenced in Rich's comments.  Should have read the legal terms more carefully earlier.
+ - Added CodeStylePaguro.xml for Idea to import.
+ - Found some opportunities to use mutable implementations more efficiently.
+
+#### Still *NOT* Serializable
+ - FunctionUtils.unmodifiable___() methods are not serializable (yet?).
+ - Transformable is not serializable (should it be?)
+
+Issues?  Questions?  Provide feedback on the [Serialization enhancement request](https://github.com/GlenKPeterson/Paguro/issues/10)
+
+## 2016-09-10 Release 2.0.3: Serializable (Part 3)
+ - Reverted the most serious breaking changes from previous 2.0.x releases.
+   Going from 1.x to 2.0.3+ in the two projects I use Paguro in, no changes were necessary.
+ - Tuples all implement Serializable.
+   Serializable wants a zero-arg constructor and mutable fields on the parent class in order to deserialize the child class.
+   That's the opposite of what this project is about.
+   Better to have all tuples serializable than to make anyone write a serialization proxy on a subclass because tuples *aren't* serializable.
+   This also means that Tuple2 can still implement Map.Entry, which gets rid of the breaking changes in 2.0.0, .1, and .2.
+ - Changed serialized form of RangeOfInt to just serialize the start and end,
+   then calculate the size from that.
+ - Removed KeyVal class and made Tuples serializable instead.  Back to using tup() instead of kv()
+ - Static method UnmodSortedIterable.equals() has been deprecated (renamed to UnmodSortedIterable.equal() to avoid confusion with Object.equals()).
+
+## 2016-09-01 Release 2.0.2: USE 2.0.3+ INSTEAD!
+ - Gave 5 main collections custom serialized forms (after reading Josh Bloch) so that we can change
+   the implementations later without breaking any clients who are using them for long-term storage.
+ - Decided *NOT* to make any itera**tors** serializable.
+ - Improved tests a bit, especially for serialization.
+
+## 2016-09-01 Release 2.0.1: USE 2.0.3+ INSTEAD!
+ - Made UnmodSortedIterable.castFrom... methods generic and serializable (and wrote tests for same).
+ - Fixed some Javadoc link errors.
+
+## 2016-08-27 Release 2.0.0: USE 2.0.3+ INSTEAD - ALL SIGNIFICANT BREAKING CHANGES WERE REVERTED!
+This is a major release due to making a new serializable format.
+ - Anything that used to be implemented as an anonymous class, object, or lambda is now implemented as an enum or serializable sub-class.
+ - Hash codes of all tuples are now calculated by adding together the hash codes of all member items.
+   They used to bitwise-or the first two items for compatibility with Map.Entry.
+ - Tuple2 no longer implements Map.Entry or UnmodMap.UnEntry.  Instead, a new class KeyVal extends Tuple2, Map.Entry, UnmodMap.UnEntry, and Serializable.
+   The new KeyValuePair hashcode method is compatible with the *old* Tuple2 hashcode, but NOT with the *new* Tuple2 hashcode (or equals).
+ - Maps construction now requires KeyVals instead of Tuple2's.  StaticImports has a new helper method `kv(k,v)` for this.
+ - PersistentTreeMap now returns KeyVal's instead of UnEntry's.
+ - Removed PersistentTreeMap.EQUATOR - because I didn't see it used and it hadn't been tested.
+ - Moved ComparisonContext interface from inside the Equator interface, to it's own file: org.organicdesign.fp.ComparisonContext.
+ - Replaced Equator.ComparisonContext.DEFAULT_CONTEXT with ComparisonContext.CompCtx.DEFAULT
+ - KeyVal.toString() is now kv(k,v) like all the other Java toString methods.
+ - PersistentHashMap.ArrayNode, .BitMapIndexNode, .HashCollisionNode, and .NodeIter are now all private (were public or package).
+   There should never have been any reason to use or access these.
+
+This release also contains the following non-breaking changes:
+ - Made serializable: Persistent- HashMap, HashSet, TreeMap, TreeSet, Vector.  RangeOfInt,
+ default Equator, default Comparator, default ComparisonContext.
+ Thanks @sblommers for spotting this issue and writing the key unit test!
+ - Deprecated Equator.DEFAULT_EQUATOR use Equator.Equat.DEFAULT instead.
+ - Deprecated Equator.DEFAULT_COMPARATOR use Equator.Comp.DEFAULT instead.
+
+Note: Xform is NOT serializable.  I don't know yet whether that's good or bad.
+
+##### Moved items in 2.0:
+```
+org.organicdesign.fp.collections.Equator:
+DEFAULT_COMPARATOR   is now   Comp.DEFAULT
+DEFAULT_EQUATOR      is now   Equat.DEFAULT
+ComparisonContext   moved to  org.organicdesign.fp.collections.ComparisonContext
+DEFAULT_CONTEXT      is now   org.organicdesign.fp.collections.ComparisonContext.CompCtx.DEFAULT
+
+org.organicdesign.fp.collections.RangeOfInt:
+LIST_EQUATOR  is now Equat.LIST
+
+org.organicdesign.fp.function.Function0:
+NULL   is now   Const.NULL
+New serializable sub-class for functions that always return the same value:
+Constant (Function0.Constant)
+
+org.organicdesign.fp.function.Function1
+IDENTITY  is now  Const.IDENTITY
+ACCEPT    is now  ConstBool.ACCEPT
+REJECT    is now  ConstBool.REJECT
+
+org.organicdesign.fp.collections.UnmodMap.UnEntry.entryToUnEntry(Map.Entry<K,V> entry)
+is now
+org.organicdesign.fp.tuple.Tuple2.of(Map.Entry<K,V> entry)
+```
+
+##### Not Serializable (and will probably never be)
+ - The function interfaces (Function0, Function1, etc.) will *NOT* implement Serializable.
+    These interfaces are general and Serializable is too much for implementers to think about (and often irrelevant).
+    However, the *constants* and *singletons* in those interfaces have been changed to implement
+    Serializable.
+ - Iterators are *NOT* serializable.  They aren't in java.util.Collections either.
+   If you need an iterator to be serializable for some reason, open an issue and we'll discuss it.
+ - Transient-HashSet, -HashMap, and -Vector are not Serializable.
+
+## 2016-03-23 Release 1.0.3
  - Fixed error message for Xform.drop() to "Can't drop less than zero items #6." Thanks @pniederw
  - Fixed "Wrong bounds check in UnmodList.listIterator #7." Thanks @pniederw
  - Fixed "PersistentVector can't handle reverse iteration starting from last element #8."  Thanks @pniederw
  - Fixed RangeOfInt.listIterator and UnmodList and improved tests for same issues as above.
  - Improved test coverage of PersistentVector a little bit.
 
-**2016-03-22 Release 1.0.2**:
+## 2016-03-22 Release 1.0.2
  - Improved speed of Transformable.toImList() by about 5x by using the Mutable version of the persistent vector internally.  This is thanks to a discussion with Peter Niederwieser @pniederw.  Thank you Peter!
 
-**2016-03-13 Release 1.0.1**:
+## 2016-03-13 Release 1.0.1
  - Improved some documentation of the toMap methods, used K and V for the key and value types.
  - Otherwise, this has performed well without changes for 4 months - it's stable.
  - Added test dependency on TestUtils project instead of duplicating that code here.
 
-**2015-11-22 0.12.1**:
+## 2015-11-22 Release 0.12.1
  - Renamed overloaded toString() methods on FunctionUtils to mapToString() and arrayToString().
 
-**2015-11-16 0.12.0**:
+## 2015-11-16 Release 0.12.0
  - Removed Mutable class because it wasn't thread-safe.  Use java.util.concurrent.atomic.AtomicInteger and AtomicReference instead.
  - Added a comparator parameter to Transformable.toMutableSortedMap().
 
-**2015-11-15 0.11.0**: There are many changes in this point release, but unless you are writing your own collections by subclassing the Unmod interfaces, you probably won't notice.
+## 2015-11-15 Release 0.11.0
+There are many changes in this point release, but unless you are writing your own collections by subclassing the Unmod interfaces, you probably won't notice.
 The main push at this point is near 100% test coverage before a 1.0 release.
 
  - Deprecated UnmodList.contains().  See note there.  Maybe should have deprecated UnmodCollection.contains() instead?  This still functions the way java.util.List.contains() does, it's just an error to use it.
@@ -42,11 +209,12 @@ especially for implementing Map.keySet() and Map.entrySet().
  - Added implementations of entrySet(), keySet(), and values() in UnmodMap.  This was painful, but it makes subclassing a snap.
  The implementations rely on AbstractUnmodSet and AbstractUnmodCollection for .equals() and .hashCode() implementations (see above).
  - Regenerated tuples to bring test coverage to 100% for most of them.
- - Removed .toArray() from Transformable.  I'm not promoting array use with UncleJim, only providing it for backwards compatibility.
+ - Removed .toArray() from Transformable.  I'm not promoting array use with Paguro, only providing it for backwards compatibility.
  I could bring it back for the right reason.
  - Added tests, tests, tests.  CodeCov now reports 86%, IntelliJ 92% coverage.
 
-**2015-10-28 0.10.18**: Removed default implementation of UnmodSortedSet.tailSet() because correct implementation there was not possible.
+## 2015-10-28 Release 0.10.18
+Removed default implementation of UnmodSortedSet.tailSet() because correct implementation there was not possible.
 Fixed implementation of UnmodSortedSet.headSet() to be correct.
 Removed UnmodList.insert because it was O(n).
 Replacing it with a default implementation that's O(log2 n) will take time (a rough implementation is commented out).
@@ -54,7 +222,8 @@ Fixed some return types in UnmodSortedMap to be Unmod*Sorted*Sets/Collections in
 Changed which methods have default implementations in UnmodSortedMap to make it easier to subclass.
 Improved test coverage by maybe 5%.
 
-**2015-10-28 0.10.17**: Made UnmodList implement listIterator(int i)
+## 2015-10-28 Release 0.10.17
+Made UnmodList implement listIterator(int i)
 Made Collection.containsAll() convert to a Set to bring performance from O(n^2) to O(n).
 Made UnmodSet implement containsAll() because that's the highest level where we can do it really fast.
 Made default implementation of previousIndex() in UnmodListIterator because there is probably only one useful way to implement this method.

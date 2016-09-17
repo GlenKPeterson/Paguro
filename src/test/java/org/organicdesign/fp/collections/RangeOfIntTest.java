@@ -1,15 +1,17 @@
 package org.organicdesign.fp.collections;
 
-import org.junit.Test;
-import org.organicdesign.testUtils.EqualsContract;
-
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.Test;
+import org.organicdesign.fp.TestUtilities;
+import org.organicdesign.fp.collections.RangeOfInt.Equat;
+import org.organicdesign.testUtils.EqualsContract;
+
 import static org.junit.Assert.*;
-import static org.organicdesign.fp.collections.RangeOfInt.LIST_EQUATOR;
+import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 
 public class RangeOfIntTest {
     @Test(expected = IllegalArgumentException.class)
@@ -159,41 +161,41 @@ public class RangeOfIntTest {
     }
 
     @Test public void ListIteratorTest() {
-        UnmodListTest.listIteratorTest(Arrays.asList(-2, -1, 0, 1, 2, 3, 4),
+        TestUtilities.listIteratorTest(Arrays.asList(-2, -1, 0, 1, 2, 3, 4),
                                        RangeOfInt.of(-2, 5));
     }
 
     @Test public void equatorTest() {
         List<Integer> a = Arrays.asList(-2, -1, 0, 1, 2, 3, 4);
         List<Integer> b = RangeOfInt.of(-2, 5);
-        assertEquals(LIST_EQUATOR.hash(a),
-                     LIST_EQUATOR.hash(b));
+        assertEquals(Equat.LIST.hash(a),
+                     Equat.LIST.hash(b));
         assertEquals(a.size(), b.size());
 
-        assertTrue(UnmodSortedIterable.equals(UnmodSortedIterable.castFromList(a),
-                                              UnmodSortedIterable.castFromList(b)));
+        assertTrue(UnmodSortedIterable.equal(UnmodSortedIterable.castFromList(a),
+                                             UnmodSortedIterable.castFromList(b)));
 
-        assertTrue("List and range are equal", LIST_EQUATOR.eq(a, b));
+        assertTrue("List and range are equal", Equat.LIST.eq(a, b));
 
-        assertTrue("List equal to self", LIST_EQUATOR.eq(a, a));
+        assertTrue("List equal to self", Equat.LIST.eq(a, a));
 
-        assertTrue("Range equal to self", LIST_EQUATOR.eq(b, b));
+        assertTrue("Range equal to self", Equat.LIST.eq(b, b));
 
-        assertTrue("Range equal to different Range", LIST_EQUATOR.eq(b, RangeOfInt.of(-2, 5)));
+        assertTrue("Range equal to different Range", Equat.LIST.eq(b, RangeOfInt.of(-2, 5)));
 
         // Is this a good idea?
-        assertTrue("Null equal to self", LIST_EQUATOR.eq(null, null));
+        assertTrue("Null equal to self", Equat.LIST.eq(null, null));
 
-        assertTrue("Range and range are equal", LIST_EQUATOR.eq(RangeOfInt.of(-2, 5),
+        assertTrue("Range and range are equal", Equat.LIST.eq(RangeOfInt.of(-2, 5),
                                                                            b));
 
-        assertFalse("Not equal to null", LIST_EQUATOR.eq(a, null));
-        assertFalse("Not equal to null", LIST_EQUATOR.eq(null, a));
+        assertFalse("Not equal to null", Equat.LIST.eq(a, null));
+        assertFalse("Not equal to null", Equat.LIST.eq(null, a));
 
-        assertFalse("Not equal to different Range", LIST_EQUATOR.eq(a, RangeOfInt.of(-3, 4)));
-        assertFalse("Not equal to different Range", LIST_EQUATOR.eq(b, RangeOfInt.of(-2, 4)));
-        assertFalse("Not equal to different Range", LIST_EQUATOR.eq(RangeOfInt.of(-3, 4), b));
-        assertFalse("Not equal to different Range", LIST_EQUATOR.eq(RangeOfInt.of(-3, 5), a));
+        assertFalse("Not equal to different Range", Equat.LIST.eq(a, RangeOfInt.of(-3, 4)));
+        assertFalse("Not equal to different Range", Equat.LIST.eq(b, RangeOfInt.of(-2, 4)));
+        assertFalse("Not equal to different Range", Equat.LIST.eq(RangeOfInt.of(-3, 4), b));
+        assertFalse("Not equal to different Range", Equat.LIST.eq(RangeOfInt.of(-3, 5), a));
     }
 
     @SuppressWarnings("SuspiciousMethodCalls")
@@ -239,9 +241,9 @@ public class RangeOfIntTest {
         assertEquals(sla.get(0), slb.get(0));
         assertEquals(sla.get(sla.size() - 1), slb.get(slb.size() - 1));
 
-        assertEquals(LIST_EQUATOR.hash(sla),
-                     LIST_EQUATOR.hash(slb));
-        assertTrue(LIST_EQUATOR.eq(sla, slb));
+        assertEquals(Equat.LIST.hash(sla),
+                     Equat.LIST.hash(slb));
+        assertTrue(Equat.LIST.eq(sla, slb));
 
         EqualsContract.equalsDistinctHashCode(slb,
                                               RangeOfInt.of(-1, 1).subList(0, 2),
@@ -334,5 +336,54 @@ public class RangeOfIntTest {
     public void subListEx5() {
         RangeOfInt r = RangeOfInt.of(-2, 5);
         r.subList(3,3).get(0);
+    }
+
+    @Test public void serializationTest() throws Exception {
+        List<Integer> a = Arrays.asList(-2, -1, 0, 1, 2, 3, 4);
+        List<Integer> b = RangeOfInt.of(-2, 5);
+        Equator<List<Integer>> deserEq = serializeDeserialize(Equat.LIST);
+        assertEquals(Equat.LIST.hash(a), deserEq.hash(a));
+        assertEquals(Equat.LIST.hash(b), deserEq.hash(b));
+        assertEquals(deserEq.hash(a), deserEq.hash(b));
+        assertEquals(a, b);
+        assertEquals(a.size(), b.size());
+        assertEquals(a, serializeDeserialize(b));
+        assertEquals(a.size(), serializeDeserialize(b).size());
+
+        assertTrue(UnmodSortedIterable.equal(UnmodSortedIterable.castFromList(a),
+                                             UnmodSortedIterable.castFromList(b)));
+
+        assertTrue("List and range are equal", deserEq.eq(a, b));
+
+        assertTrue("List equal to self", deserEq.eq(a, a));
+
+        assertTrue("Range equal to self", deserEq.eq(b, b));
+
+        assertTrue("Range equal to different Range", deserEq.eq(b, RangeOfInt.of(-2, 5)));
+
+        // Is this a good idea?
+        assertTrue("Null equal to self", deserEq.eq(null, null));
+
+        assertTrue("Range and range are equal", deserEq.eq(RangeOfInt.of(-2, 5),
+                                                                           b));
+
+        assertFalse("Not equal to null", deserEq.eq(a, null));
+        assertFalse("Not equal to null", deserEq.eq(null, a));
+
+        assertFalse("Not equal to different Range", deserEq.eq(a, RangeOfInt.of(-3, 4)));
+        assertFalse("Not equal to different Range", deserEq.eq(b, RangeOfInt.of(-2, 4)));
+        assertFalse("Not equal to different Range", deserEq.eq(RangeOfInt.of(-3, 4), b));
+        assertFalse("Not equal to different Range", deserEq.eq(RangeOfInt.of(-3, 5), a));
+
+        RangeOfInt ir1 = serializeDeserialize(RangeOfInt.of(0, 1));
+        assertEquals(ir1.contains(0), true);
+        assertEquals(ir1.contains(1), false);
+        assertEquals(ir1.contains(-1), false);
+        assertEquals(ir1.size(), 1);
+
+        List<Integer> a2 = Collections.singletonList(99);
+        List<Integer> b2 = serializeDeserialize(RangeOfInt.of(99, 100));
+        assertEquals(a2.size(), b2.size());
+        assertEquals(a2.get(0), b2.get(0));
     }
 }

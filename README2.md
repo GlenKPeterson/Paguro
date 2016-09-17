@@ -1,26 +1,13 @@
 #Notice
-Read [README.md](README.md) before this file as that is the official introduction to UncleJim.
+Read [README.md](README.md) before this file as that is the official introduction to Paguro.
 This file contains additional information for contributors, or maybe people who are considering opening an issue.
 
-#Additional experimental features:
+#Additional features:
+* Simplified [functional interfaces](src/main/java/org/organicdesign/fp/function) that wrap checked exceptions
 * An [Equator](src/main/java/org/organicdesign/fp/collections/Equator.java) and [ComparisonContext](src/main/java/org/organicdesign/fp/collections/Equator.java#L45) which work like `java.util.Comparator`, but for hash-based collections.
 * [Memoization](src/main/java/org/organicdesign/fp/function/Function2.java#L59) for functions
 * Unmodifiable interfaces which deprecate mutator methods and throw exceptions to retrofit legacy code and catch errors in your IDE instead of at runtime.
-These were useful before the Clojure collections and Transformable were fully integrated, but may still provide a useful extension point for integrating your own immutable collections into the traditional Java ecosystem. 
-
-#API Highlights
-
-* Type-safe versions of Clojure's [immutable collections](src/main/java/org/organicdesign/fp/collections) (classes start with the word "Persistent")
-
-* [Immutable Transformation Builder](src/main/java/org/organicdesign/fp/xform/Transformable.java)
-(implementation is in [Xform](src/main/java/org/organicdesign/fp/xform/Xform.java))
-
-* [Data Description Mini-Language](src/main/java/org/organicdesign/fp/StaticImports.java)
-
-* Simplified Java 8 [functional interfaces](src/main/java/org/organicdesign/fp/function) that wrap checked exceptions
-
-For complete API documentation, please build the javadoc:
-`mvn javadoc:javadoc`
+These were useful before the Clojure collections and Transformable were fully integrated, but may still provide a useful extension point for integrating your own immutable collections into the traditional Java ecosystem.
 
 #Thank You
 Some of the people I'm listing as contributors may not actually be aware of this project, but I found them inspiring in various ways.
@@ -29,15 +16,11 @@ The bulk of this project started as a simple question on StackExchange: [Why doe
 
 Paul Philips [Scala Collections talk](https://www.youtube.com/watch?v=uiJycy6dFSQ&t=26m19s) was a huge inspiration to me.  I watched it over and over and tried to learn from his experience as much as possible.
 
-John Tollison: For a brief review and suggestions.
-
-Nathan Williams: for many lengthy email conversations about this project, encouragement to separate state from the transformation, and occasional light code review.
-
-GreenJUG: for bearing with talks on early versions of this code two years in a row.
-
 Greenville Clojure (and Jeff Dik before that): for bearing with my newbie Clojure questions.
 
-Mike Greata: for providing encouragement, advice, and patiently listening to me drone on about this as we carpooled to user group meetings.
+John Tollison, Norm Zeck, Mike Greata, Nathan Williams, and Landon Burch: For encouragement, advice, and patiently listening to me drone on about this project ad nauseum.
+
+GreenJUG: for bearing with talks on early versions of this code two years in a row.
 
 Context-sensitive equality: prefer Equator and Comparator to <code>equals()</code>, <code>hashcode()</code> and <code>compareTo()</code> ([Daniel Spiewak, Viktor Klang, Rúnar Óli Bjarnason, Hughes Chabot](http://glenpeterson.blogspot.com/2013/09/object-equality-is-context-relative.html), java.util.TreeSet, java.util.TreeMap)
 
@@ -51,22 +34,20 @@ Rich Hickey for Clojure
 
 #Build from Source
 
-- Java 8 (tested with 64-bit Linux build 1.8.0_51).
-- Maven (tested version: 3.19.0-26 64-bit Linux build)
-- Maven will download jUnit for you
+- Java 8
+- Maven
 - First `mvn clean install` on: https://github.com/GlenKPeterson/TestUtils
-- Then `mvn clean test` on UncleJim
+- Then `mvn clean test` on Paguro
 
 #To Do
- - Change UnmodIterable.hashCode(item) to UnmodIterable.calcHashCode(item) to avoid confusion with
- the instance method of the same name (but different arity).
+ - Xform.MapDesc is not serializable.  Really none of xform is serializable.
+ - Think about adding StaticImports.xform(String)
  - Remove empty() and EMPTY from all interfaces except maybe UnmodIterator.
  These are a problem when you inherit from the interface because you have to override them or suffer.
  These objects don't implement equals() and you end up expecting in UnmodWhatever.EMPTY to .append() or otherwise behave like an ImWhatever, which it probably should never do.
  - Rename foldLeft() to just fold().  It's too confusing for people used to linked list implementations
  to think about what foldLeft() means in terms of ordering.
  - Add insert(int i, E element) to ImList, implemented by wrapping the existing list in an ImSortedMap and time it.
- - Cover a few more lines with tests in UnmodCollection and merge changes into NestingVector branch.
  - Can I make UnmodMap extend UnmodCollection instead of UnmodIterable?  Or do the contains() and contains() all methods conflict?
    Hmm... Maybe have a SizedIterable that both maps and collections can extend?  Ditto UnmodSortedMap extend UnmodSortedCollection instead of UnmodSortedIterable.
  - Have an Ordered version of Transform as well as the (default) unreliable order.  Only the ordered version can be used for implementing things like equals() and hashCode()
@@ -75,16 +56,7 @@ Rich Hickey for Clojure
  - Study monadic thinking and ensure that Or is "monad-friendly".
  Ensure you can chain together functions in a short-circuiting way, without exceptions or other side-effects.
  - Add a [Persistent RRB Tree](http://infoscience.epfl.ch/record/169879/files/RMTrees.pdf) and compare its performance to the PersistentVector.
- - Re-implement Persistent collections from Algorithms and Purely Functional Data Structures without relying on a wrapped transient collection and without locking checks, then compare efficiency.
- - This project needs a better name.  It's really not about Unmodifiable collections any more.  Consider just Jimm (used), Cake Pan, Baking Mold...
- Something else that conveys Immutability.  I hate that name because these collections are absolutely changeable.  They just aren't changeable in-place.
- Really, moulting (or shedding an exoskeleton) is a better analogy because these collections grow by changing a lightweight wrapper while what's inside stays basically the same.
- Of the various animals that moult or shed their skins or exoskeletons, most are pretty darn disgusting.
- Hermit crabs changing shells, on the other hand, is very cute.  So maybe HermitCrab would be a better name?
- Or at least a better mascot.
- Paguroidea is not taken as a name yet, and it's the name for "Hermit Crab" in all romance languages, plus Sweedish.
- Pong-pongan is a pretty-cute name too, and it's Javanese, so that's pretty appropriate.
- I think Italian is just Paguro.
+ - Re-implement Persistent collections under the Apache license.
 
 #Out of Scope
 
@@ -118,6 +90,27 @@ a, b, c, and d.
 a,b,c...
 
 None of those are simple uses of interpose.
+
+###Mirroring Clojure's seq (sequence abstraction)
+
+Paguro tried two alternatives.  One was based on the Clojure idea of a sequence: immutable, lazy, and cached.  The signature looked something like this:
+
+```java
+interface Sequence1<T> {
+    Option<T> first();
+    Sequence1<T> rest();
+}
+```
+
+Unfortunately, at 30 Million items it was at least 30x slower than using Iterators.  Another attempt was a single-shot, but still thread-safe, sequence that wraps each item in an Option.  You would check whether that Option is None to see if you've passed the last element or not.  This attempt was only about 3x slower than native iterators.
+
+```java
+interface Sequence2<T> {
+    Option<T> next();
+}
+```
+
+Ultimately, Transformable took the place of a sequence abstraction in Paguro.  It's safe, easy to use, and about 98% as fast as native Java iteration.  If you really need to pretend you have a Sequence1, Transformable has `take(1)` and `drop(1)` that you can use like `first()` and `rest()` in a pinch.  That said, everything you could do with Sequence1 you can do faster and just as clearly with Transformable.  Presumably, this is why Clojure now has Transducers.
 
 #Motivation
 

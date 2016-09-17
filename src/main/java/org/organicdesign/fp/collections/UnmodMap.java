@@ -13,13 +13,14 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
-import org.organicdesign.fp.tuple.Tuple2;
-
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+
+import org.organicdesign.fp.tuple.Tuple2;
 
 /**
  An unmodifiable map.
@@ -38,24 +39,107 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
      * @see UnmodMap#entrySet()
      */
     interface UnEntry<K,V> extends Map.Entry<K,V> {
-        /** Not allowed - this is supposed to be unmodifiable */
-        @SuppressWarnings("deprecation")
-        @Override @Deprecated default V setValue(V value) {
-            throw new UnsupportedOperationException("Modification attempted");
+        class EntryToUnEntryIter<K,V> implements UnmodIterator<UnEntry<K,V>> {
+            //, Serializable {
+            // For serializable.  Make sure to change whenever internal data format changes.
+            // private static final long serialVersionUID = 20160903082500L;
+
+            private final Iterator<Entry<K,V>> innerIter;
+            EntryToUnEntryIter(Iterator<Entry<K,V>> i) { innerIter = i; }
+
+            @Override public boolean hasNext() { return innerIter.hasNext(); }
+            @Override public UnEntry<K, V> next() {
+                class Wrapper implements UnEntry<K,V>, Serializable {
+                    // For serializable.  Make sure to change whenever internal data format changes.
+                    private static final long serialVersionUID = 20160903082500L;
+
+                    private final Entry<K,V> entry;
+                    private Wrapper(Entry<K,V> e) { entry = e; }
+                    @Override public K getKey() { return entry.getKey(); }
+                    @Override public V getValue() { return entry.getValue(); }
+                    @Override
+                    public boolean equals(Object other) {
+                        if (this == other) { return true; }
+                        if ( !(other instanceof Entry) ) { return false; }
+
+                        Entry that = (Entry) other;
+                        return Objects.equals(entry.getKey(), that.getKey()) &&
+                               Objects.equals(entry.getValue(), that.getValue());
+                    }
+
+                    @Override public int hashCode() {
+                        return entry.hashCode();
+                    }
+
+                    @Override public String toString() {
+                        return "entry(" + entry.getKey() + "," + entry.getValue() + ")";
+                    }
+                };
+
+                return new Wrapper(innerIter.next());
+            }
         }
 
+        class EntryToUnEntrySortedIter<K,V> extends EntryToUnEntryIter<K,V>
+                implements UnmodSortedIterator<UnEntry<K,V>> {
+            //, Serializable {
+            // For serializable.  Make sure to change whenever internal data format changes.
+//            private static final long serialVersionUID = 20160903082500L;
+
+            EntryToUnEntrySortedIter(Iterator<Entry<K,V>> i) { super(i); }
+        }
+
+        class UnmodKeyIter<K,V> implements UnmodIterator<K> {
+            //, Serializable {
+            // For serializable.  Make sure to change whenever internal data format changes.
+            // private static final long serialVersionUID = 20160903174100L;
+
+            private final Iterator<? extends Map.Entry<K,V>> iter;
+            UnmodKeyIter(Iterator<? extends Map.Entry<K,V>> i) { iter = i; }
+
+            @Override public boolean hasNext() { return iter.hasNext(); }
+            @Override public K next() { return iter.next().getKey(); }
+        }
+
+        class UnmodSortedKeyIter<K,V> extends UnmodKeyIter<K,V> implements UnmodSortedIterator<K> {
+            // , Serializable {
+            // For serializable.  Make sure to change whenever internal data format changes.
+//            private static final long serialVersionUID = 20160903174100L;
+
+            UnmodSortedKeyIter(Iterator<? extends Map.Entry<K,V>> i) { super(i); }
+        }
+
+        class UnmodValIter<K,V> implements UnmodIterator<V> {
+            //, Serializable {
+            // For serializable.  Make sure to change whenever internal data format changes.
+            // private static final long serialVersionUID = 20160903174100L;
+
+            private final Iterator<? extends Map.Entry<K,V>> iter;
+            UnmodValIter(Iterator<? extends Map.Entry<K,V>> i) { iter = i; }
+
+            @Override public boolean hasNext() { return iter.hasNext(); }
+            @Override public V next() { return iter.next().getValue(); }
+        }
+
+        class UnmodSortedValIter<K,V> extends UnmodValIter<K,V> implements UnmodSortedIterator<V> {
+                // , Serializable {
+            // For serializable.  Make sure to change whenever internal data format changes.
+//            private static final long serialVersionUID = 20160903174100L;
+
+            UnmodSortedValIter(Iterator<? extends Map.Entry<K,V>> i) { super(i); }
+        }
+
+        /**
+         Use {@link org.organicdesign.fp.tuple.Tuple2#of(java.util.Map.Entry)} instead.
+         */
+        @Deprecated
         static <K,V> UnEntry<K,V> entryToUnEntry(Map.Entry<K,V> entry) {
-            return Tuple2.of(entry.getKey(), entry.getValue());
+            return Tuple2.of(entry);
         }
 
         static <K,V>
         UnmodIterator<UnEntry<K,V>> entryIterToUnEntryUnIter(Iterator<Entry<K,V>> innerIter) {
-            return new UnmodIterator<UnEntry<K, V>>() {
-                @Override public boolean hasNext() { return innerIter.hasNext(); }
-                @Override public UnEntry<K, V> next() {
-                    return UnmodMap.UnEntry.entryToUnEntry(innerIter.next());
-                }
-            };
+            return new EntryToUnEntryIter<>(innerIter);
         }
 
         // This should be done with a cast, not with code.
@@ -69,35 +153,11 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
 //            };
 //        }
 //
-//        class Impl<K,V> implements UnEntry<K,V> {
-//            private final K key;
-//            private final V val;
-//            private Impl(K k, V v) { key = k; val = v; }
-//            @Override public K getKey() { return key; }
-//            @Override public V getValue() { return val; }
-//            @Override
-//            public boolean equals(Object other) {
-//                if (this == other) { return true; }
-//                if ((other == null) || !(other instanceof UnEntry)) { return false; }
-//
-//                UnEntry that = (UnEntry) other;
-//                return Objects.equals(this.key, that.getKey()) &&
-//                       Objects.equals(this.getValue(), that.getValue());
-//            }
-//
-//            @Override
-//            public int hashCode() {
-//                int ret = 0;
-//                if (key != null) { ret = key.hashCode(); }
-//                if (val != null) { return ret ^ val.hashCode(); }
-//                // If it's uninitialized, it's equal to every other uninitialized instance.
-//                return ret;
-//            }
-//
-//            @Override public String toString() {
-//                return "UnEntry(" + key + "," + val + ")";
-//            }
-//        };
+        /** Not allowed - this is supposed to be unmodifiable */
+        @SuppressWarnings("deprecation")
+        @Override @Deprecated default V setValue(V value) {
+            throw new UnsupportedOperationException("Modification attempted");
+        }
     }
 
     // ========================================= Instance =========================================
@@ -150,8 +210,14 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
      {@inheritDoc}
      */
     @Override default UnmodSet<Entry<K,V>> entrySet() {
-        final UnmodMap<K,V> parent = this;
-        return new UnmodSet.AbstractUnmodSet<Entry<K,V>>() {
+        class EntrySet extends UnmodSet.AbstractUnmodSet<Entry<K,V>>
+                implements Serializable {
+            // For serializable.  Make sure to change whenever internal data format changes.
+            private static final long serialVersionUID = 20160903104400L;
+
+            private final UnmodMap<K,V> parent;
+            private EntrySet(UnmodMap<K,V> p) { parent = p; }
+
             @SuppressWarnings("unchecked")
             @Override public boolean contains(Object o) {
                 if ( !(o instanceof Entry) ) { return false; }
@@ -170,6 +236,9 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
                 // (is an) Entry.  But Java's type system doesn't know that because (I think)
                 // it's a higher kinded type.  Thanks to type erasure, we can forget about all
                 // that and cast it to a base type then suppress the unchecked warning.
+                //
+                // Hmm... It's possible for this to return an Entry if the wrapped collection
+                // uses them...  Not sure how much that matters.
                 return (UnmodIterator) parent.iterator();
             }
 
@@ -178,7 +247,8 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
             @Override public String toString() {
                 return UnmodIterable.toString("UnmodMap.entrySet", this);
             }
-        };
+        }
+        return new EntrySet(this);
     }
 
 
@@ -220,24 +290,27 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
      {@inheritDoc}
      */
     @Override default UnmodSet<K> keySet() {
-        final UnmodMap<K,V> parent = this;
-        return new UnmodSet.AbstractUnmodSet<K>() {
+
+        class KeySet extends UnmodSet.AbstractUnmodSet<K> implements Serializable {
+            // For serializable.  Make sure to change whenever internal data format changes.
+            private static final long serialVersionUID = 20160903104400L;
+
+            private final UnmodMap<K,V> parent;
+            private KeySet(UnmodMap<K,V> p) { parent = p; }
+
             @SuppressWarnings("SuspiciousMethodCalls")
             @Override public boolean contains(Object o) { return parent.containsKey(o); }
 
             @Override public UnmodIterator<K> iterator() {
-                final UnmodIterator<UnEntry<K,V>> iter = parent.iterator();
-                return new UnmodIterator<K>() {
-                    @Override public boolean hasNext() { return iter.hasNext(); }
-                    @Override public K next() { return iter.next().getKey(); }
-                };
+                return new UnEntry.UnmodKeyIter<>(parent.iterator());
             }
             @Override public int size() { return parent.size(); }
 
             @Override public String toString() {
                 return UnmodIterable.toString("UnmodMap.keySet", this);
             }
-        };
+        }
+        return new KeySet(this);
     }
 
     /** Not allowed - this is supposed to be unmodifiable */
@@ -316,16 +389,17 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
      */
     @Deprecated
     @Override default UnmodCollection<V> values() {
-        final UnmodMap<K,V> parent = this;
-        return new UnmodCollection<V>() {
+        class Impl implements UnmodCollection<V>, Serializable {
+            // For serializable.  Make sure to change whenever internal data format changes.
+            private static final long serialVersionUID = 20160903104400L;
+
+            private final UnmodMap<K,V> parent;
+            private Impl(UnmodMap<K,V> p) { parent = p; }
+
             @SuppressWarnings("SuspiciousMethodCalls")
             @Override public boolean contains(Object o) { return parent.containsValue(o); }
             @Override public UnmodIterator<V> iterator() {
-                final UnmodIterator<UnEntry<K,V>> iter = parent.iterator();
-                return new UnmodIterator<V>() {
-                    @Override public boolean hasNext() { return iter.hasNext(); }
-                    @Override public V next() { return iter.next().getValue(); }
-                };
+                return new UnEntry.UnmodValIter<>(parent.iterator());
             }
             @Override public int size() { return parent.size(); }
 
@@ -333,5 +407,6 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
                 return UnmodIterable.toString("UnmodMap.values", this);
             }
         };
+        return new Impl(this);
     }
 }

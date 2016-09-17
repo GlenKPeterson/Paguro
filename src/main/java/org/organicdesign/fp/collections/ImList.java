@@ -13,6 +13,8 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
+import java.util.ListIterator;
+
 /**
  Holds Immutable "modification" methods that return a new ImList reflecting the modification while
  sharing as much data structure with the previous ImList as possible (for performance).
@@ -126,18 +128,18 @@ public interface ImList<E> extends UnmodList<E> {
     ImList<E> append(E e);
 
     /**
-     Adds multiple items to the end of the ImList.
+     Efficiently adds items to the end of this ImList.
 
      @param es the values to insert
      @return a new ImList with the additional items at the end.
      */
     @Override default ImList<E> concat(Iterable<? extends E> es) {
-        ImList<E> result = this;
+        MutableList<E> result = this.mutable();
         for (E e : es) {
-            result = result.append(e);
+            result.append(e);
         }
-        return result;
-    };
+        return result.immutable();
+    }
 
 //    /** {@inheritDoc} */
 //    @Override ImList<E> concat(Sequence<E> other);
@@ -176,6 +178,9 @@ public interface ImList<E> extends UnmodList<E> {
 //     */
 //    default E get(Number n) { return get(n.intValue()); }
 
+    /** Returns a mutable list (builder) */
+    MutableList<E> mutable();
+
     /**
      * Returns the item at this index.
      * @param i the zero-based index to get from the vector.
@@ -188,6 +193,9 @@ public interface ImList<E> extends UnmodList<E> {
         return notFound;
     }
 
+    /** Returns a immutable version of this mutable list. */
+    ImList<E> immutable();
+
     /**
      Replace the item at the given index.  Note: i.replace(i.size(), o) used to be equivalent to
      i.concat(o), but it probably won't be for the RRB tree implementation, so this will change too.
@@ -198,6 +206,16 @@ public interface ImList<E> extends UnmodList<E> {
      */
     // TODO: Don't make i.replace(i.size(), o) equivalent to i.concat(o)
     ImList<E> replace(int idx, E e);
+
+    /** Returns a reversed copy of this list. */
+    default ImList<E> reverse() {
+        MutableList<E> ret = PersistentVector.<E>empty().mutable();
+        ListIterator<E> iter = listIterator(size());
+        while (iter.hasPrevious()) {
+            ret.append(iter.previous());
+        }
+        return ret.immutable();
+    }
 
     // ====================================== STATIC METHODS ======================================
 //    static <T> ImList<T> empty() { return PersistentVector.empty(); }

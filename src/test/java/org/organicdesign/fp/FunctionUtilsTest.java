@@ -13,23 +13,6 @@
 
 package org.organicdesign.fp;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import org.organicdesign.fp.collections.ImList;
-import org.organicdesign.fp.collections.ImMap;
-import org.organicdesign.fp.collections.ImSet;
-import org.organicdesign.fp.collections.ImSortedMap;
-import org.organicdesign.fp.collections.ImSortedSet;
-import org.organicdesign.fp.collections.UnmodCollection;
-import org.organicdesign.fp.collections.UnmodList;
-import org.organicdesign.fp.collections.UnmodListTest;
-import org.organicdesign.fp.collections.UnmodMap;
-import org.organicdesign.fp.collections.UnmodSet;
-import org.organicdesign.fp.collections.UnmodSortedMap;
-import org.organicdesign.fp.collections.UnmodSortedSet;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayDeque;
@@ -46,6 +29,23 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.organicdesign.fp.collections.ImList;
+import org.organicdesign.fp.collections.ImMap;
+import org.organicdesign.fp.collections.ImSet;
+import org.organicdesign.fp.collections.ImSortedMap;
+import org.organicdesign.fp.collections.ImSortedSet;
+import org.organicdesign.fp.collections.UnmodCollection;
+import org.organicdesign.fp.collections.UnmodList;
+import org.organicdesign.fp.collections.UnmodMap;
+import org.organicdesign.fp.collections.UnmodSet;
+import org.organicdesign.fp.collections.UnmodSortedMap;
+import org.organicdesign.fp.collections.UnmodSortedSet;
+import org.organicdesign.fp.tuple.Tuple2;
+
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.FunctionUtils.*;
@@ -54,6 +54,12 @@ import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 @RunWith(JUnit4.class)
 public class FunctionUtilsTest {
+
+    @Test public void stringifyTest() {
+        assertEquals("null", stringify(null));
+        assertEquals("\"Hello\"", stringify("Hello"));
+        assertEquals("Tuple2(\"a\",3)", stringify(Tuple2.of("a", 3)));
+    }
 
     @Test (expected = UnsupportedOperationException.class)
     public void instantiationEx() throws Throwable {
@@ -569,7 +575,7 @@ public class FunctionUtilsTest {
         assertTrue("An unmod iterable comes through unmodified",
                    oneTwoThree == unmodIterable(oneTwoThree));
 
-        UnmodListTest.iteratorTest(Arrays.asList(1,2,3).iterator(),
+        TestUtilities.iteratorTest(Arrays.asList(1, 2, 3).iterator(),
                                    unmodIterable(Arrays.asList(1,2,3)).iterator());
     }
 
@@ -596,7 +602,7 @@ public class FunctionUtilsTest {
         assertTrue("An unmod List comes through unmodified",
                    oneTwoThree == unmodList(oneTwoThree));
 
-        UnmodListTest.listIteratorTest(Arrays.asList(1,2,3), unmodList(Arrays.asList(1,2,3)));
+        TestUtilities.listIteratorTest(Arrays.asList(1, 2, 3), unmodList(Arrays.asList(1, 2, 3)));
     }
 
     @Test public void unListTest() {
@@ -621,7 +627,7 @@ public class FunctionUtilsTest {
             assertEquals(refList.get(i), testList.get(i));
         }
 
-        UnmodListTest.iteratorTest(refList.iterator(), testList.iterator());
+        TestUtilities.iteratorTest(refList.iterator(), testList.iterator());
     }
 
     @Test (expected = IndexOutOfBoundsException.class)
@@ -776,7 +782,7 @@ public class FunctionUtilsTest {
 
         assertFalse(ts.isEmpty());
 
-        UnmodListTest.iteratorTest(ts.iterator(), sm.entrySet().iterator());
+        TestUtilities.iteratorTest(ts.iterator(), sm.entrySet().iterator());
 
         assertEquals(ts.values().hashCode(), sm.values().hashCode());
         assertTrue(ts.values().equals(sm.values()));
@@ -915,6 +921,8 @@ public class FunctionUtilsTest {
         assertFalse(ts.values().isEmpty());
 
         equalsDistinctHashCode(ts.entrySet(), m2.entrySet(), sm.entrySet(), m3.entrySet());
+        // TODO: FunctionUtils methods are not serializable!
+//        equalsDistinctHashCode(serializeDeserialize(ts.entrySet()), m2.entrySet(), sm.entrySet(), m3.entrySet());
         equalsDistinctHashCode(ts.keySet(), m2.keySet(), sm.keySet(), m3.keySet());
 
         Assert.assertEquals(m3, m3);

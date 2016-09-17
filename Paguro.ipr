@@ -25,8 +25,16 @@
         <processorPath useClasspath="true" />
         <module name="UncleJim" />
       </profile>
+      <profile default="false" name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="Paguro" />
+      </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="Paguro" target="1.8" />
       <module name="UncleJim" target="1.8" />
     </bytecodeTargetLevel>
   </component>
@@ -159,6 +167,7 @@
         <option name="METHODS_ORDER_WEIGHT" value="7" />
         <option name="STATIC_INNER_CLASSES_ORDER_WEIGHT" value="3" />
         <option name="INNER_CLASSES_ORDER_WEIGHT" value="4" />
+        <option name="RIGHT_MARGIN" value="100" />
         <option name="JD_ALIGN_PARAM_COMMENTS" value="false" />
         <option name="JD_ALIGN_EXCEPTION_COMMENTS" value="false" />
         <option name="JD_DO_NOT_WRAP_ONE_LINE_COMMENTS" value="true" />
@@ -171,7 +180,7 @@
           <option name="DO_NOT_WRAP_AFTER_SINGLE_ANNOTATION" value="true" />
         </JavaCodeStyleSettings>
         <MarkdownNavigatorCodeStyleSettings>
-          <option name="RIGHT_MARGIN" value="72" />
+          <option name="RIGHT_MARGIN" value="100" />
         </MarkdownNavigatorCodeStyleSettings>
         <XML>
           <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
@@ -206,10 +215,10 @@
   </component>
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/UncleJim.iml" filepath="$PROJECT_DIR$/UncleJim.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Paguro.iml" filepath="$PROJECT_DIR$/Paguro.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="false" assert-keyword="true" jdk-15="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="VcsDirectoryMappings">

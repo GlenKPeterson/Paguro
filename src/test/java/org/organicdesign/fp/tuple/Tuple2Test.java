@@ -1,4 +1,4 @@
-// Copyright 2015 PlanBase Inc. & Glen Peterson
+// Copyright 2016 PlanBase Inc. & Glen Peterson
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,23 +14,24 @@
 
 package org.organicdesign.fp.tuple;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.junit.Assert.*;
+import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class Tuple2Test {
     @Rule
     public ExpectedException thrown= ExpectedException.none();
 
-    @Test
     public void constructionAndAccess() {
-        Tuple2<Integer,String> a = Tuple2.of(7, "Hello");
+        Tuple2<Integer,String> a = new Tuple2<>(7, "Hello");
 
         assertEquals(new Integer(7), a._1());
         assertEquals(new Integer(7), a.getKey());
@@ -56,7 +57,7 @@ public class Tuple2Test {
         assertFalse(b.equals(a));
         assertNotEquals(a.hashCode(), b.hashCode());
 
-        Tuple2<Integer,String> c = Tuple2.of(7, null);
+        Tuple2<Integer,String> c = new Tuple2<>(7, null);
 
         assertEquals(new Integer(7), c._1());
         assertEquals(new Integer(7), c.getKey());
@@ -92,23 +93,54 @@ public class Tuple2Test {
         assertFalse(b.equals(d));
         assertFalse(c.equals(d));
         assertFalse(a.equals("Hello"));
+        //noinspection ObjectEqualsNull
         assertFalse(b.equals(null));
         assertFalse(c.equals(7));
         assertNotEquals(d.hashCode(), a.hashCode());
         assertNotEquals(d.hashCode(), b.hashCode());
         assertNotEquals(d.hashCode(), c.hashCode());
 
-        assertEquals("Tuple2(hi,3)", Tuple2.of("hi", 3).toString());
+        assertEquals("kv(\"hi\",3)", new Tuple2<>("hi", 3).toString());
 
 
         Map<Integer,String> realMap = new HashMap<>();
         realMap.put(7, "Hello");
         Map.Entry<Integer,String> realEntry = realMap.entrySet().iterator().next();
 
+        assertEquals(realEntry, a);
+        assertEquals(a, realEntry);
+
+        assertEquals(realEntry, serializeDeserialize(a));
+        assertEquals(serializeDeserialize(a), realEntry);
+
         equalsDistinctHashCode(a,
-                               Tuple2.of(7, "Hello"),
+                               Tuple2.of(realEntry),
                                realEntry,
-                               Tuple2.of(7, "hello"));
+                               new Tuple2<>(7, "hello"));
+
+        assertEquals(a, serializeDeserialize(a));
+        assertEquals(b, serializeDeserialize(b));
+        assertEquals(c, serializeDeserialize(c));
+        assertEquals(d, serializeDeserialize(d));
+        assertEquals(realEntry, serializeDeserialize(Tuple2.of(realEntry)));
+        assertEquals(serializeDeserialize(Tuple2.of(realEntry)), realEntry);
+    }
+
+    @Test public void treeMapEntryTest() {
+        TreeMap<String,Integer> control = new TreeMap<>();
+        control.put("one", 1);
+        Map.Entry<String,Integer> realEntry = control.entrySet().iterator().next();
+        Tuple2<String,Integer> test = Tuple2.of("one", 1);
+
+        assertEquals(realEntry.hashCode(), test.hashCode());
+
+        assertEquals(realEntry.hashCode(), serializeDeserialize(test).hashCode());
+
+        assertTrue(test.equals(realEntry));
+        assertTrue(realEntry.equals(test));
+
+        assertTrue(serializeDeserialize(test).equals(realEntry));
+        assertTrue(realEntry.equals(serializeDeserialize(test)));
     }
 
     @SuppressWarnings("deprecation")

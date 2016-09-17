@@ -29,76 +29,75 @@ import java.util.Comparator;
  an equator's .hashCode() or .equals() methods because those are for comparing *Equators* and are
  inherited from java.lang.Object.  I'd deprecate those methods, but you can't do that on an
  interface.
+
+ A common mistake is to implement an Equator, ComparisonContext, or Comparator as an anonymous class
+ or lambda, then be surprised when it is can't be serialized, or is deserialized as null.  These
+ one-off classes are often singletons, which are easiest to serialize as enums.  If your
+ implementation requires generic type parameters, observe how {@link #defaultEquator()} tricks
+ the type system into using generic type parameters (correctly) with an enum.
  */
 public interface Equator<T> {
 
     // ============================================= Static ========================================
 
-    Equator<Object> DEFAULT_EQUATOR = new Equator<Object>() {
-        @Override public int hash(Object o) {
-            return (o == null) ? 0 : o.hashCode();
-        }
-
-        @Override public boolean eq(Object o1, Object o2) {
-            if (o1 == null) { return (o2 == null); }
-            return o1.equals(o2);
-        }
-    };
-
-    @SuppressWarnings("unchecked")
-    static <T> Equator<T> defaultEquator() { return (Equator<T>) DEFAULT_EQUATOR; }
-
-    @SuppressWarnings("ConstantConditions")
-    Comparator<Comparable<Object>> DEFAULT_COMPARATOR =
-            (o1, o2) -> {
-                if (o1 == o2) { return 0; }
-                if (o1 == null) {
-                    return - (o2.compareTo(o1));
-                }
-                return o1.compareTo(o2);
-            };
-
-    @SuppressWarnings("unchecked")
-    static <T> Comparator<T> defaultComparator() { return (Comparator<T>) DEFAULT_COMPARATOR; }
-
-    /**
-     Implement compare() and hash() and you get a 100% compatible eq() for free.
-    */
-    interface ComparisonContext<T> extends Equator<T>, Comparator<T> {
-        /** Returns true if the first object is less than the second. */
-        default boolean lt(T o1, T o2) { return compare(o1, o2) < 0; }
-
-        /** Returns true if the first object is less than or equal to the second. */
-        default boolean lte(T o1, T o2) { return compare(o1, o2) <= 0; }
-
-        /** Returns true if the first object is greater than the second. */
-        default boolean gt(T o1, T o2) { return compare(o1, o2) > 0; }
-
-        /** Returns true if the first object is greater than or equal to the second. */
-        default boolean gte(T o1, T o2) { return compare(o1, o2) >= 0; }
-
-        @Override default boolean eq(T o1, T o2) { return compare(o1, o2) == 0; }
-
-        ComparisonContext<Comparable<Object>> DEFAULT_CONTEXT =
-                new ComparisonContext<Comparable<Object>>() {
-            @Override public int hash(Comparable<Object> o) {
+    // Enums are serializable and lambdas are not.  Therefore enums make better singletons.
+    enum Equat implements Equator<Object> {
+        DEFAULT {
+            @Override public int hash(Object o) {
                 return (o == null) ? 0 : o.hashCode();
             }
-            @SuppressWarnings("ConstantConditions")
-            @Override public int compare(Comparable<Object> o1, Comparable<Object> o2) {
+
+            @Override public boolean eq(Object o1, Object o2) {
+                if (o1 == null) { return (o2 == null); }
+                return o1.equals(o2);
+            }
+        }
+    }
+
+    /**
+     Use Equat.DEFAULT instead.
+     Being an enum, it's serializable and makes a better singleton.
+     Deprecated as of 1.1.0, 2016-08-27
+     */
+    @Deprecated
+    Equator<Object> DEFAULT_EQUATOR = Equat.DEFAULT;
+
+    @SuppressWarnings("unchecked")
+    static <T> Equator<T> defaultEquator() { return (Equator<T>) Equat.DEFAULT; }
+
+    // Enums are serializable and lambdas are not.  Therefore enums make better singletons.
+    @SuppressWarnings("ConstantConditions")
+    enum Comp implements Comparator<Comparable<Object>> {
+        DEFAULT {
+            @Override
+            public int compare(Comparable<Object> o1, Comparable<Object> o2) {
                 if (o1 == o2) { return 0; }
                 if (o1 == null) {
                     return - (o2.compareTo(o1));
                 }
                 return o1.compareTo(o2);
             }
-        };
-
-        @SuppressWarnings("unchecked")
-        static <T> ComparisonContext<T> defCompCtx() {
-            return (ComparisonContext<T>) DEFAULT_CONTEXT;
         }
     }
+
+    /**
+     Use Comp.DEFAULT instead.
+     Being an enum, it's serializable and makes a better singleton.
+     Deprecated as of 1.1.0, 2016-08-27
+     */
+    @Deprecated
+    Comparator<Comparable<Object>> DEFAULT_COMPARATOR = Comp.DEFAULT;
+
+    @SuppressWarnings("unchecked")
+    static <T> Comparator<T> defaultComparator() { return (Comparator<T>) Comp.DEFAULT; }
+
+    /**
+     Use ComparisonContext.CompCtx.DEFAULT instead.
+     Being an enum, it's serializable and makes a better singleton.
+     Deprecated as of version 1.1.0, 2016-08-27
+     */
+    @Deprecated
+    ComparisonContext<Comparable<Object>> DEFAULT_CONTEXT = ComparisonContext.CompCtx.DEFAULT;
 
     // ========================================= Instance =========================================
     /**

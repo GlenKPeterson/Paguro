@@ -58,7 +58,7 @@ import org.organicdesign.fp.xform.Xform;
  dangerous) way.</p>
 
  <p>If you're used to Clojure/JSON, you'll find that what's a map (dictionary) in those languages
- usually becomes a tuple in UncleJim. A true map data structure in a type-safe language is
+ usually becomes a tuple in Paguro. A true map data structure in a type-safe language is
  homogeneous, meaning that every member is of the same type (or a descendant of a common ancestor).
  Tuples are designed to contain unrelated data types and enforce those types.</p>
 
@@ -72,6 +72,14 @@ import org.organicdesign.fp.xform.Xform;
 public final class StaticImports {
     // Prevent instantiation
     private StaticImports() { throw new UnsupportedOperationException("No instantiation"); }
+
+    /**
+     This turned out to be a bad idea due to the complexity and slowness of serializing
+     a class extended from an immutable tuple.  I made tuples serializable and was able to back out
+     other breaking changes.
+     */
+    @Deprecated
+    public static <K,V> Tuple2<K,V> kv(K t, V u) { return Tuple2.of(t, u); }
 
     /**
      Returns a new PersistentHashMap of the given keys and their paired values.  Use the

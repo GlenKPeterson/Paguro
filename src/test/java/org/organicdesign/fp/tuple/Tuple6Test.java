@@ -1,4 +1,4 @@
-// Copyright 2015 PlanBase Inc. & Glen Peterson
+// Copyright 2016 PlanBase Inc. & Glen Peterson
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package org.organicdesign.fp.tuple;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
+import static org.organicdesign.fp.TestUtilities.serializeDeserialize;import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 import static org.organicdesign.testUtils.EqualsContract.equalsSameHashCode;
 
 // ======================================================================================
@@ -28,6 +28,8 @@ public class Tuple6Test {
     @Test public void constructionAndAccess() {
         Tuple6<String,String,String,String,String,String> a = Tuple6.of("1st","2nd","3rd","4th","5th","6th");
 
+        Tuple6<String,String,String,String,String,String> ser = serializeDeserialize(a);
+
         assertEquals("1st", a._1());
         assertEquals("2nd", a._2());
         assertEquals("3rd", a._3());
@@ -35,49 +37,57 @@ public class Tuple6Test {
         assertEquals("5th", a._5());
         assertEquals("6th", a._6());
 
-        equalsDistinctHashCode(a, Tuple6.of("1st","2nd","3rd","4th","5th","6th"),
+        assertEquals("1st", ser._1());
+        assertEquals("2nd", ser._2());
+        assertEquals("3rd", ser._3());
+        assertEquals("4th", ser._4());
+        assertEquals("5th", ser._5());
+        assertEquals("6th", ser._6());
+
+        equalsDistinctHashCode(a, ser,
                                Tuple6.of("1st","2nd","3rd","4th","5th","6th"),
                                Tuple6.of("wrong","2nd","3rd","4th","5th","6th"));
 
 
-        equalsDistinctHashCode(a, Tuple6.of("1st","2nd","3rd","4th","5th","6th"),
+        equalsDistinctHashCode(a, ser,
                                Tuple6.of("1st","2nd","3rd","4th","5th","6th"),
                                Tuple6.of("1st","wrong","3rd","4th","5th","6th"));
 
 
-        equalsDistinctHashCode(a, Tuple6.of("1st","2nd","3rd","4th","5th","6th"),
+        equalsDistinctHashCode(a, ser,
                                Tuple6.of("1st","2nd","3rd","4th","5th","6th"),
                                Tuple6.of("1st","2nd","wrong","4th","5th","6th"));
 
 
-        equalsDistinctHashCode(a, Tuple6.of("1st","2nd","3rd","4th","5th","6th"),
+        equalsDistinctHashCode(a, ser,
                                Tuple6.of("1st","2nd","3rd","4th","5th","6th"),
                                Tuple6.of("1st","2nd","3rd","wrong","5th","6th"));
 
 
-        equalsDistinctHashCode(a, Tuple6.of("1st","2nd","3rd","4th","5th","6th"),
+        equalsDistinctHashCode(a, ser,
                                Tuple6.of("1st","2nd","3rd","4th","5th","6th"),
                                Tuple6.of("1st","2nd","3rd","4th","wrong","6th"));
 
 
-        equalsDistinctHashCode(a, Tuple6.of("1st","2nd","3rd","4th","5th","6th"),
+        equalsDistinctHashCode(a, ser,
                                Tuple6.of("1st","2nd","3rd","4th","5th","6th"),
                                Tuple6.of("1st","2nd","3rd","4th","5th","wrong"));
 
         equalsDistinctHashCode(Tuple6.of("1st",null,"3rd",null,"5th",null),
-                               Tuple6.of("1st",null,"3rd",null,"5th",null),
+                               serializeDeserialize(Tuple6.of("1st",null,"3rd",null,"5th",null)),
                                Tuple6.of("1st",null,"3rd",null,"5th",null),
                                Tuple6.of("1st",null,"3rd",null,"5th","wrong"));
 
         equalsDistinctHashCode(Tuple6.of(null,"2nd",null,"4th",null,"6th"),
-                               Tuple6.of(null,"2nd",null,"4th",null,"6th"),
+                               serializeDeserialize(Tuple6.of(null,"2nd",null,"4th",null,"6th")),
                                Tuple6.of(null,"2nd",null,"4th",null,"6th"),
                                Tuple6.of(null,"2nd",null,"4th",null,"wrong"));
 
-        equalsSameHashCode(a, Tuple6.of("1st","2nd","3rd","4th","5th","6th"),
+        equalsSameHashCode(a, ser,
                            Tuple6.of("1st","2nd","3rd","4th","5th","6th"),
                            Tuple6.of("2nd","1st","3rd","4th","5th","6th"));
 
-        assertEquals("Tuple6(1st,2nd,3rd,4th,5th,6th)", a.toString());
+        assertEquals("Tuple6(\"1st\",\"2nd\",\"3rd\",\"4th\",\"5th\",\"6th\")", a.toString());
+        assertEquals("Tuple6(\"1st\",\"2nd\",\"3rd\",\"4th\",\"5th\",\"6th\")", ser.toString());
     }
 }
