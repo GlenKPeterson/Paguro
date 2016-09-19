@@ -8,6 +8,8 @@ import org.organicdesign.fp.xform.Xform;
 
 import java.util.Iterator;
 
+import static org.organicdesign.fp.FunctionUtils.stringify;
+
 /** An unmodifiable Iterable, without any guarantee about order. */
 public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
     // ========================================== Static ==========================================
@@ -119,7 +121,7 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
             Object item = iter.next();
             if (i > 0) { sB.append(","); }
             if (i > 4) { break; }
-            sB.append(item);
+            sB.append(stringify(item));
             i++;
         }
         if (iter.hasNext()) {

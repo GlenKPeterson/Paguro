@@ -14,7 +14,9 @@
 
 package org.organicdesign.fp;
 
+import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -271,7 +273,7 @@ public class FunctionUtils {
         };
     }
 
-    public static UnmodListIterator<Object> EMPTY_UNMOD_LIST_ITERATOR =
+    public static final UnmodListIterator<Object> EMPTY_UNMOD_LIST_ITERATOR =
             new UnmodListIterator<Object>() {
         @Override public boolean hasNext() { return false; }
         @Override public Object next() { throw new NoSuchElementException(); }
@@ -306,46 +308,63 @@ public class FunctionUtils {
         };
     }
 
-    /** The EMPTY list - a sentinel value for use in == comparisons. */
-    public static UnmodList<Object> EMPTY_UNMOD_LIST = new UnmodList<Object>() {
-        @Override public UnmodListIterator<Object> listIterator(int index) {
-            return emptyUnmodListIterator();
-        }
-        @Override public int size() { return 0; }
-        @Override public Object get(int index) { throw new IndexOutOfBoundsException(); }
-    };
+    private static class UnmodifiableList<T> implements UnmodList<T>, Serializable {
+        private final List<T> inner;
+        UnmodifiableList(List<T> ls) { inner = ls; }
 
-    /** Returns a type-aware version of the EMPTY list. */
+        // For serializable.  Make sure to change whenever internal data format changes.
+        private static final long serialVersionUID = 20160918033000L;
+
+        @Override public int size() { return inner.size(); }
+        @Override public T get(int index) { return inner.get(index); }
+        @Override public int hashCode() { return inner.hashCode(); }
+        @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
+        @Override public boolean equals(Object o) { return inner.equals(o); }
+        @Override public UnmodListIterator<T> listIterator(int idx) {
+            return unmodListIterator(inner.listIterator(idx));
+        }
+        @Override public UnmodListIterator<T> listIterator() {
+            return unmodListIterator(inner.listIterator());
+        }
+        @Override public UnmodSortedIterator<T> iterator() {
+            Iterator<T> iter = inner.iterator();
+            return new UnmodSortedIterator<T>() {
+                @Override public boolean hasNext() { return iter.hasNext(); }
+                @Override public T next() { return iter.next(); }
+            };
+        }
+        @Override public String toString() {
+            return UnmodIterable.toString("UnmodList", inner);
+        }
+    }
+
+    // This is a separate class 1. to defend this singleton against serialization/deserialization
+    // and I suppose 2. so that you can enforce the singleton property with the type system if you
+    // want to.
+    private static final class UnmodifiableListEmpty<T> extends UnmodifiableList<T> {
+        private static final UnmodifiableListEmpty<?> INSTANCE = new UnmodifiableListEmpty();
+        private UnmodifiableListEmpty() { super(Collections.emptyList()); }
+        // For serializable.  Make sure to change whenever internal data format changes.
+        private static final long serialVersionUID = 20160918033000L;
+        // This enforces the singleton property in the face of deserialization.
+        private Object readResolve() { return INSTANCE; }
+    }
+
+    /** Returns a type-aware version of the empty unmodifiable list. */
     @SuppressWarnings("unchecked")
-    public static <T> UnmodList<T> emptyUnmodList() { return (UnmodList<T>) EMPTY_UNMOD_LIST; }
+    public static <T> UnmodList<T> emptyUnmodList() {
+        return (UnmodList<T>) UnmodifiableListEmpty.INSTANCE;
+    }
 
     /** Returns an unmodifiable version of the given list. */
     public static <T> UnmodList<T> unmodList(List<T> inner) {
         if (inner == null) { return emptyUnmodList(); }
         if (inner instanceof UnmodList) { return (UnmodList<T>) inner; }
         if (inner.size() < 1) { return emptyUnmodList(); }
-        return new UnmodList<T>() {
-            @Override public int size() { return inner.size(); }
-            @Override public T get(int index) { return inner.get(index); }
-            @Override public int hashCode() { return inner.hashCode(); }
-            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
-            @Override public boolean equals(Object o) { return inner.equals(o); }
-            @Override public UnmodListIterator<T> listIterator(int idx) {
-                return unmodListIterator(inner.listIterator(idx));
-            }
-            @Override public UnmodListIterator<T> listIterator() {
-                return unmodListIterator(inner.listIterator());
-            }
-            @Override public UnmodSortedIterator<T> iterator() {
-                Iterator<T> iter = inner.iterator();
-                return new UnmodSortedIterator<T>() {
-                    @Override public boolean hasNext() { return iter.hasNext(); }
-                    @Override public T next() { return iter.next(); }
-                };
-            }
-        };
+        return new UnmodifiableList<>(inner);
     }
 
+    // TODO: Make this behave like UnmodList (and empty same)
     public static UnmodSet<Object> EMPTY_UNMOD_SET = new UnmodSet<Object>() {
         @Override public boolean contains(Object o) { return false; }
         @Override public int size() { return 0; }
@@ -355,6 +374,7 @@ public class FunctionUtils {
     @SuppressWarnings("unchecked")
     public static <T> UnmodSet<T> emptyUnmodSet() { return (UnmodSet<T>) EMPTY_UNMOD_SET; }
 
+    // TODO: Make this behave like UnmodList (and empty same)
     /** Returns an unmodifiable version of the given set. */
     public static <T> UnmodSet<T> unmodSet(Set<T> set) {
         if (set == null) { return emptyUnmodSet(); }
@@ -381,6 +401,7 @@ public class FunctionUtils {
         return (UnmodSortedIterator<T>) EMPTY_UNMOD_SORTED_ITERATOR;
     }
 
+    // TODO: Make this behave like UnmodList (and empty same)
     public static UnmodSet<Object> EMPTY_UNMOD_SORTED_SET = new UnmodSortedSet<Object>() {
         @Override public boolean contains(Object o) { return false; }
         @Override public int size() { return 0; }
@@ -436,6 +457,7 @@ public class FunctionUtils {
         };
     }
 
+    // TODO: Make this behave like UnmodList (and empty same)
     public static UnmodMap<Object,Object> EMPTY_UNMOD_MAP = new UnmodMap<Object,Object>() {
         @Override public UnmodSet<Entry<Object,Object>> entrySet() { return emptyUnmodSet(); }
         @Override public UnmodSet<Object> keySet() { return emptyUnmodSet(); }
@@ -453,6 +475,7 @@ public class FunctionUtils {
     @SuppressWarnings("unchecked")
     public static <T,U> UnmodMap<T,U> emptyUnmodMap() { return (UnmodMap<T,U>) EMPTY_UNMOD_MAP; }
 
+    // TODO: Make this behave like UnmodList (and empty same)
     /** Returns an unmodifiable version of the given map. */
     public static <K,V> UnmodMap<K,V> unmodMap(Map<K,V> map) {
         if (map == null) { return emptyUnmodMap(); }
@@ -483,6 +506,7 @@ public class FunctionUtils {
         };
     }
 
+    // TODO: Make this behave like UnmodList (and empty same)
     static UnmodSortedMap<Object,Object> EMPTY_UNMOD_SORTED_MAP =
             new UnmodSortedMap<Object,Object>() {
         @Override public UnmodSortedSet<Entry<Object,Object>> entrySet() {
@@ -514,6 +538,7 @@ public class FunctionUtils {
         return (UnmodSortedMap<T,U>) EMPTY_UNMOD_SORTED_MAP;
     }
 
+    // TODO: Make this behave like UnmodList (and empty same)
     /** Returns an unmodifiable version of the given sorted map. */
     public static <K,V> UnmodSortedMap<K,V> unmodSortedMap(SortedMap<K,V> map) {
         if (map == null) { return emptyUnmodSortedMap(); }
@@ -602,6 +627,7 @@ public class FunctionUtils {
         };
     }
 
+    // TODO: Make this behave like UnmodList (and empty same)
     public static UnmodCollection<Object> EMPTY_UNMOD_COLLECTION = new UnmodCollection<Object>() {
         @Override public boolean contains(Object o) { return false; }
         @Override public int size() { return 0; }

@@ -326,7 +326,7 @@ public class PersistentTreeSetTest {
     @Test public void testToString() {
         PersistentTreeSet<String> s2 = PersistentTreeSet.ofComp(STR_LEN_COMP);
 
-        assertEquals("PersistentTreeSet(b,an,the,work,hello)",
+        assertEquals("PersistentTreeSet(\"b\",\"an\",\"the\",\"work\",\"hello\")",
                      s2.put("hello").put("an").put("work").put("b").put("the").toString());
     }
 

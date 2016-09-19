@@ -50,6 +50,7 @@ import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.FunctionUtils.*;
 import static org.organicdesign.fp.StaticImports.*;
+import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 @RunWith(JUnit4.class)
@@ -324,8 +325,9 @@ public class FunctionUtilsTest {
         assertTrue("-2147483648th".equals(ordinal(-2147483648)));
     } // end testOrdinal();
 
-    public static String[] ss = {"One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven",
-            "Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen","Twenty"};
+    private static String[] ss = {"One","Two","Three","Four","Five","Six","Seven","Eight","Nine",
+                                  "Ten","Eleven", "Twelve","Thirteen","Fourteen","Fifteen",
+                                  "Sixteen","Seventeen","Eighteen","Nineteen","Twenty"};
 
     public static void mapHelper(Map<Integer,String> m, int max) {
         Assert.assertEquals("Size check", max, m.size());
@@ -594,9 +596,14 @@ public class FunctionUtilsTest {
 
     @Test public void unmodListIteratorTest() {
         UnmodList emptyUnList = FunctionUtils.unmodList(null);
-        assertTrue(EMPTY_UNMOD_LIST == emptyUnList);
-        assertTrue(EMPTY_UNMOD_LIST_ITERATOR == emptyUnList.listIterator());
-        assertTrue(EMPTY_UNMOD_LIST == FunctionUtils.unmodList(Collections.emptyList()));
+        assertTrue(FunctionUtils.emptyUnmodList() == emptyUnList);
+        // TODO: Make this pass!
+        assertTrue(FunctionUtils.emptyUnmodList() == serializeDeserialize(emptyUnList));
+        TestUtilities.listIteratorTest(Collections.emptyList(), emptyUnList);
+
+        assertTrue(FunctionUtils.emptyUnmodList() == FunctionUtils.unmodList(Collections.emptyList()));
+        assertTrue(FunctionUtils.emptyUnmodList() ==
+                   serializeDeserialize(FunctionUtils.unmodList(Collections.emptyList())));
 
         ImList<Integer> oneTwoThree = vec(1,2,3);
         assertTrue("An unmod List comes through unmodified",
@@ -615,7 +622,7 @@ public class FunctionUtilsTest {
         assertEquals(-1, emptyUnmodList().indexOf(39));
         assertEquals(-1, emptyUnmodList().lastIndexOf("hamster"));
         assertEquals(-1, emptyUnmodList().lastIndexOf(39));
-        assertTrue(EMPTY_UNMOD_LIST_ITERATOR == emptyUnmodList().listIterator(0));
+        TestUtilities.listIteratorTest(Collections.emptyList(), emptyUnmodList());
         assertEquals(0, emptyUnmodList().size());
 
         List<Integer> refList = Arrays.asList(1,2,3,4);
@@ -628,6 +635,8 @@ public class FunctionUtilsTest {
         }
 
         TestUtilities.iteratorTest(refList.iterator(), testList.iterator());
+
+        assertEquals("UnmodList(1,2,3,4)", testList.toString());
     }
 
     @Test (expected = IndexOutOfBoundsException.class)

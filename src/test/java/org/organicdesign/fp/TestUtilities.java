@@ -67,8 +67,8 @@ public class TestUtilities {
 
     /**
      Call with two Iterators to test that they are equal
-     @param a the reference iterator
-     @param b the iterator under test.
+     @param control the reference iterator
+     @param test the iterator under test.
      */
     public static <T> void compareIterators(Iterator<T> control, Iterator<? extends T> test) {
         int i = 0;
