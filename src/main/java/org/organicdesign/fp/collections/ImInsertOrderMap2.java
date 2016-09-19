@@ -20,6 +20,27 @@ public class ImInsertOrderMap2<K,V> implements ImMap<K,V>, Serializable {
     @SuppressWarnings("unchecked")
     public static <K,V> ImInsertOrderMap2<K,V> empty() { return EMPTY; }
 
+    private static final class Pair<V> implements Serializable {
+        // For serializable.  Make sure to change whenever internal data format changes.
+        private static final long serialVersionUID = 20160914085100L;
+
+        int idx;
+        V val;
+        Pair(V v, int i) { val = v; idx = i;}
+    }
+
+    private final ImMap<K,Pair<V>> inner;
+    private final int index;
+    private ImInsertOrderMap2(ImMap<K,Pair<V>> kvs, int idx) {
+        inner = kvs; index = idx;
+    }
+
+    @Override public ImInsertOrderMap2<K, V> assoc(K key, V val) {
+        int nextIdx = index + 1;
+        return new ImInsertOrderMap2<>(inner.assoc(key, new Pair<>(val, nextIdx)),
+                                       nextIdx);
+    }
+
     @Override public Option<UnEntry<K, V>> entry(K key) {
         Option<UnEntry<K,Pair<V>>> innerEntry = inner.entry(key);
         return innerEntry.then(entry -> Option.of(Tuple2.of(key, entry.getValue().val)));
@@ -31,10 +52,18 @@ public class ImInsertOrderMap2<K,V> implements ImMap<K,V>, Serializable {
                                                                 entry.getValue().val)));
     }
 
+    @Override public UnmodSortedIterator<UnEntry<K,V>> iterator() {
+        return new Iter(inner.iterator());
+    }
+
     @Override public int size() { return inner.size(); }
 
     @Override public ImInsertOrderSet2<K> keySet() {
         return ImInsertOrderSet2.ofMap(this);
+    }
+
+    @Override public ImInsertOrderMap2<K, V> without(K key) {
+        return new ImInsertOrderMap2<>(inner.without(key), index);
     }
 
     @Override public boolean equals(Object o) {
@@ -59,30 +88,6 @@ public class ImInsertOrderMap2<K,V> implements ImMap<K,V>, Serializable {
 
     }
 
-
-    private static final class Pair<V> implements Serializable {
-        int idx;
-        V val;
-        Pair(V v, int i) { val = v; idx = i;}
-        @Override public String toString() { return "(idx=" + idx + " val=" + val + ")"; }
-    }
-
-    private final ImMap<K,Pair<V>> inner;
-    private final int index;
-    private ImInsertOrderMap2(ImMap<K,Pair<V>> kvs, int idx) {
-        inner = kvs; index = idx;
-    }
-
-    @Override public ImInsertOrderMap2<K, V> assoc(K key, V val) {
-        int nextIdx = index + 1;
-        return new ImInsertOrderMap2<>(inner.assoc(key, new Pair<>(val, nextIdx)),
-                                       nextIdx);
-    }
-
-    @Override public ImInsertOrderMap2<K, V> without(K key) {
-        return new ImInsertOrderMap2<>(inner.without(key), index);
-    }
-
     private final class Iter implements UnmodSortedIterator<UnEntry<K,V>> {
         private final TreeMap<Integer,UnEntry<K,Pair<V>>> sortedItems = new TreeMap<>();
         private final UnmodIterator<UnEntry<K,Pair<V>>> inner;
@@ -95,25 +100,25 @@ public class ImInsertOrderMap2<K,V> implements ImMap<K,V>, Serializable {
 
         @Override public UnEntry<K, V> next() {
             UnEntry<K,Pair<V>> entry = sortedItems.get(idx);
-            System.out.println("entry from sortedItems:" + entry);
             if (entry == null) {
+                if (!inner.hasNext()) {
+                    idx++;
+                    return next();
+                }
                 entry = inner.next();
                 while (idx != entry.getValue().idx) {
-                    System.out.println("Add entry to sortedItems:" + entry);
                     sortedItems.put(entry.getValue().idx, entry);
+                    if (!inner.hasNext()) {
+                        idx++;
+                        return next();
+                    }
                     entry = inner.next();
                 }
             } else {
-                System.out.println("Remove entry from sortedItems:" + entry);
                 sortedItems.remove(idx);
             }
             idx++;
-            System.out.println("Return entry:" + entry);
             return Tuple2.of(entry.getKey(), entry.getValue().val);
         }
-    }
-
-    @Override public UnmodSortedIterator<UnEntry<K,V>> iterator() {
-        return new Iter(inner.iterator());
     }
 }
