@@ -23,7 +23,6 @@ import java.util.Random;
 import org.junit.Test;
 import org.organicdesign.fp.TestUtilities;
 import org.organicdesign.fp.collections.ImList;
-import org.organicdesign.fp.collections.UnmodListTest;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import static org.junit.Assert.assertArrayEquals;

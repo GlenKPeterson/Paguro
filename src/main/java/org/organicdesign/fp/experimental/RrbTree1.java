@@ -15,12 +15,15 @@ package org.organicdesign.fp.experimental;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Stack;
 
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.MutableList;
 import org.organicdesign.fp.collections.UnmodIterable;
 import org.organicdesign.fp.collections.UnmodSortedIterable;
+import org.organicdesign.fp.collections.UnmodSortedIterator;
 import org.organicdesign.fp.tuple.Tuple2;
 import org.organicdesign.fp.tuple.Tuple4;
 
@@ -336,7 +339,26 @@ public class RrbTree1<E> implements ImList<E>, Indented {
         focus = f; focusStartIndex = fi; root = r; size = s;
     }
 
-    @Override public int size() { return size; }
+    /**
+     Adds an item at the end of this structure.  This is the most efficient way to build an
+     RRB Tree as it conforms to the Clojure PersistentVector and all of its optimizations.
+     @param t the item to append
+     @return a new RRB-Tree with the item appended.
+     */
+    @Override  public RrbTree1<E> append(E t) {
+//        System.out.println("=== append(" + t + ") ===");
+        // If our focus isn't set up for appends or if it's full, insert it into the data structure
+        // where it belongs.  Then make a new focus
+        if (((focusStartIndex < root.size()) && (focus.length > 0) ) ||
+            (focus.length >= STRICT_NODE_LENGTH) ) {
+            Node<E> newRoot = root.pushFocus(focusStartIndex, focus);
+            E[] newFocus = singleElementArray(t);
+            return new RrbTree1<>(newFocus, size, newRoot, size + 1);
+        }
+
+        E[] newFocus = insertIntoArrayAt(t, focus, focus.length);
+        return new RrbTree1<>(newFocus, focusStartIndex, root, size + 1);
+    }
 
     @SuppressWarnings("unchecked")
     @Override public boolean equals(Object other) {
@@ -385,27 +407,6 @@ public class RrbTree1<E> implements ImList<E>, Indented {
         return root.get(i);
     }
 
-    /**
-     Adds an item at the end of this structure.  This is the most efficient way to build an
-     RRB Tree as it conforms to the Clojure PersistentVector and all of its optimizations.
-     @param t the item to append
-     @return a new RRB-Tree with the item appended.
-     */
-    @Override  public RrbTree1<E> append(E t) {
-//        System.out.println("=== append(" + t + ") ===");
-        // If our focus isn't set up for appends or if it's full, insert it into the data structure
-        // where it belongs.  Then make a new focus
-        if (((focusStartIndex < root.size()) && (focus.length > 0) ) ||
-            (focus.length >= STRICT_NODE_LENGTH) ) {
-            Node<E> newRoot = root.pushFocus(focusStartIndex, focus);
-            E[] newFocus = singleElementArray(t);
-            return new RrbTree1<>(newFocus, size, newRoot, size + 1);
-        }
-
-        E[] newFocus = insertIntoArrayAt(t, focus, focus.length);
-        return new RrbTree1<>(newFocus, focusStartIndex, root, size + 1);
-    }
-
     @Override public RrbTree1<E> immutable() { return this; }
 
     /**
@@ -445,6 +446,76 @@ public class RrbTree1<E> implements ImList<E>, Indented {
         return new RrbTree1<>(newFocus, idx, newRoot, size + 1);
     }
 
+    private final class IdxNode {
+        int idx = 0;
+        final Node<E> node;
+        IdxNode(Node<E> n) { node = n; }
+    }
+
+    private final class Iter implements UnmodSortedIterator<E> {
+        // We want this iterator to walk the tree.  You MUST
+        private int childIndex = 0;
+        private final Stack<IdxNode> stack = new Stack<>();
+        private Node<E> n;
+        private Iter() {
+            // TODO: Handle case where focus and/or root are null.
+            // Push the focus so we don't have to ever check the index.
+            Node<E> n = ((focus != null) && focus.length > 0) ? root.pushFocus(focusStartIndex, focus)
+                                                              : root;
+            if (n instanceof Leaf) {
+                stack.add(new IdxNode(n));
+            } else {
+                // Descent to left-most bottom node.
+                while (!(n instanceof Leaf)) {
+                    stack.add(new IdxNode(n));
+                    n = n.firstChild();
+                }
+            }
+        }
+
+        @Override public boolean hasNext() { return stack.peek() != null; }
+
+        @Override public E next() {
+            E ret = n.get(childIndex);
+            childIndex = childIndex + 1;
+
+            // Leaf node has been exhausted, find a new one.
+            if (childIndex >= n.size()) {
+                // Start the next leaf node at zero.
+                childIndex = 0;
+
+                // Get the immediate parent and increment it's child pointer.
+                IdxNode parent = stack.peek();
+                parent.idx = parent.idx + 1;
+
+                // Keep walking up the ancestors until one hasn't been exhausted (or we're done).
+                while (parent.idx >= parent.node.size()) {
+                    stack.pop();
+                    parent = stack.peek();
+                    if (parent == null) {
+                        return ret; // This is the end of the tree - all done!
+                    }
+                    parent.idx = parent.idx + 1;
+                }
+                // TODO: We want the node at the index stored with the parent in the IdxNode.
+                // Now, walk down to the first child.
+                n = parent.node;
+                while ( true ) {
+                    n = n.firstChild();
+                    if (n instanceof Leaf) {
+                        break;
+                    }
+                    stack.add(new IdxNode(n));
+                }
+            }
+            return ret;
+        }
+    }
+
+    @Override public UnmodSortedIterator<E> iterator() {
+        return new Iter();
+    }
+
     @Override public MutableList<E> mutable() {
         // TODO: Implement or change interfaces.
         throw new UnsupportedOperationException("No mutable version (yet)");
@@ -477,6 +548,8 @@ public class RrbTree1<E> implements ImList<E>, Indented {
 //        System.out.println("    this=" + this);
         return new RrbTree1<>(focus, focusStartIndex, root.replace(index, item), size);
     }
+
+    @Override public int size() { return size; }
 
     /**
      Divides this RRB-Tree such that every index less-than the given index ends up in the left-hand tree
@@ -547,12 +620,16 @@ public class RrbTree1<E> implements ImList<E>, Indented {
         // So this needs to only be implemented on Relaxed for now.
 //        Relaxed<T>[] split();
 
+        int numChildren();
+
         // Because we want to append/insert into the focus as much as possible, we will treat
         // the insert or append of a single item as a degenerate case.  Instead, the primary way
         // to add to the internal data structure will be to push the entire focus array into it
         Node<T> pushFocus(int index, T[] oldFocus);
 
         Node<T> replace(int idx, T t);
+
+        Node<T> firstChild();
     }
 
     private static class SplitNode<T> extends Tuple4<Node<T>,T[],Node<T>,T[]> implements Indented {
@@ -584,6 +661,11 @@ public class RrbTree1<E> implements ImList<E>, Indented {
         // are strict.
 //        boolean isStrict;
         Leaf(T[] ts) { items = ts; }
+
+        @Override public Node<T> firstChild() {
+            throw new UnsupportedOperationException("Don't call this on a leaf");
+        }
+
         @Override public T get(int i) { return items[i]; }
         @Override public int size() { return items.length; }
         // If we want to add one more to an existing leaf node, it must already be part of a
@@ -635,6 +717,8 @@ public class RrbTree1<E> implements ImList<E>, Indented {
 
             return new Leaf[] {new Leaf<>(split._1()), new Leaf<>(split._2())};
         }
+
+        @Override public int numChildren() { return size(); }
 
         // I think this can only be called when the root node is a leaf.
         @SuppressWarnings("unchecked")
@@ -712,6 +796,8 @@ public class RrbTree1<E> implements ImList<E>, Indented {
             shift = s; nodes = ns;
 //            System.out.println("    new Strict" + shift + arrayString(ns));
         }
+
+        @Override public Node<T> firstChild() { return nodes[0]; }
 
         /**
          Returns the high bits which we use to index into our array.  This is the simplicity (and
@@ -903,6 +989,8 @@ public class RrbTree1<E> implements ImList<E>, Indented {
 
             return new Relaxed<>(newCumSizes, nodes);
         }
+
+        @Override public int numChildren() { return nodes.length; }
 
         @SuppressWarnings("unchecked")
         @Override
@@ -1128,6 +1216,8 @@ public class RrbTree1<E> implements ImList<E>, Indented {
                 }
             }
         }
+
+        @Override public Node<T> firstChild() { return nodes[0]; }
 
         @Override public int size() {
             return cumulativeSizes[cumulativeSizes.length - 1];
@@ -1395,6 +1485,8 @@ public class RrbTree1<E> implements ImList<E>, Indented {
 
             return ret;
         }
+
+        @Override public int numChildren() { return nodes.length; }
 
         @SuppressWarnings("unchecked")
         @Override public Node<T> pushFocus(int index, T[] oldFocus) {
