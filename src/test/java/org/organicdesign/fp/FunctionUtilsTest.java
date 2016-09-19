@@ -599,7 +599,7 @@ public class FunctionUtilsTest {
         assertTrue(FunctionUtils.emptyUnmodList() == emptyUnList);
         // TODO: Make this pass!
         assertTrue(FunctionUtils.emptyUnmodList() == serializeDeserialize(emptyUnList));
-        TestUtilities.listIteratorTest(Collections.emptyList(), emptyUnList);
+        TestUtilities.listIteratorTest(Collections.emptyList(), FunctionUtils.emptyUnmodList());
 
         assertTrue(FunctionUtils.emptyUnmodList() == FunctionUtils.unmodList(Collections.emptyList()));
         assertTrue(FunctionUtils.emptyUnmodList() ==
