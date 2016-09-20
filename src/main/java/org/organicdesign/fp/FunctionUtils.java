@@ -222,55 +222,96 @@ public class FunctionUtils {
 // wrong."  Which is a little ironic because with inheritance, there are many cases in Java
 // where equality is one-sided.
 
-    public static UnmodIterator<Object> EMPTY_UNMOD_ITERATOR = new UnmodIterator<Object>() {
-        @Override public boolean hasNext() { return false; }
-        @Override public Object next() { throw new NoSuchElementException(); }
-    };
-    @SuppressWarnings("unchecked")
-    public static <T> UnmodIterator<T> emptyUnmodIterator() {
-        return (UnmodIterator<T>) EMPTY_UNMOD_ITERATOR;
+    // This seems to have to be public in order to compile without
+    // remove() in org.organicdesign.fp.collections.UnmodIterator is defined in an inaccessible class or interface
+    // As a static class in UnmodIterator, it can shadow same-named static classes in
+    // sub-interfaces, preventing use in method references (due to overloading), making overloading
+    // in subclasses onerous, and generally causing confusion.
+    public static class UnmodifiableIterator<E> implements UnmodIterator<E> {
+        // Iterators are not serializable (today) because they aren't in Java.
+        // I'm assuming Java had a good reason for that, but I really don't know.
+//        , Serializable {
+//        // For serializable.  Make sure to change whenever internal data format changes.
+//        private static final long serialVersionUID = 20160903174100L;
+
+        private final Iterator<E> iter;
+        private UnmodifiableIterator(Iterator<E> i) { iter = i; }
+
+        @Override public boolean hasNext() { return iter.hasNext(); }
+        @Override public E next() { return iter.next(); }
+
+        // Defining equals and hashcode makes no sense because can't call them without changing
+        // the iterator which both makes it useless, and changes the equals and hashcode
+        // results.
+//            @Override public int hashCode() { return iter.hashCode(); }
+//            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
+//            @Override public boolean equals(Object o) { return iter.equals(o); }
     }
 
-    static UnmodIterable<Object> EMPTY_UNMOD_ITERABLE = () -> emptyUnmodIterator();
+    // Don't put this on UnmodIterator - see reasons in UnmodifiableIterator above.
+    public static class UnmodifiableIteratorEmpty<T> extends UnmodifiableIterator<T> {
+        // Not serializable, so we don't have to defend against deserialization.
+        private static final UnmodifiableIteratorEmpty<?> INSTANCE =
+                new UnmodifiableIteratorEmpty<>(Collections.emptyIterator());
+        private UnmodifiableIteratorEmpty(Iterator<T> i) { super(i); }
+    }
+
+    /** Use {@link #emptyUnmodIterator()} instead. */
+    @Deprecated
+    public static final UnmodIterator<?> EMPTY_UNMOD_ITERATOR = UnmodifiableIteratorEmpty.INSTANCE;
 
     @SuppressWarnings("unchecked")
-    static <E> UnmodIterable<E> emptyUnmodIterable() {
-        return (UnmodIterable<E>) EMPTY_UNMOD_ITERABLE;
+    public static <T> UnmodifiableIteratorEmpty<T> emptyUnmodIterator() {
+        return (UnmodifiableIteratorEmpty<T>) UnmodifiableIteratorEmpty.INSTANCE;
+    }
+
+    private static class UnmodifiableIterable<T> implements UnmodIterable<T>, Serializable {
+        private final Iterable<T> iterable;
+        UnmodifiableIterable(Iterable<T> is) { iterable = is; }
+
+        // For serializable.  Make sure to change whenever internal data format changes.
+        private static final long serialVersionUID = 20160918033000L;
+
+        @Override public UnmodIterator<T> iterator() {
+            final Iterator<T> iter = iterable.iterator();
+            return iter.hasNext() ? new UnmodifiableIterator<>(iter)
+                                  : emptyUnmodIterator();
+        }
+    }
+
+    private static final class UnmodifiableIterableEmpty<T> extends UnmodifiableIterable<T> {
+        private static final UnmodifiableIterableEmpty<?> INSTANCE =
+                new UnmodifiableIterableEmpty<>(Collections.emptySet());
+        private UnmodifiableIterableEmpty(Iterable<T> is) { super(is); }
+        // For serializable.  Make sure to change whenever internal data format changes.
+        private static final long serialVersionUID = 20160918033000L;
+
+        // This enforces the singleton property in the face of deserialization.
+        private Object readResolve() { return INSTANCE; }
+
+        @Override public UnmodifiableIteratorEmpty<T> iterator() { return emptyUnmodIterator(); }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <E> UnmodIterable<E> emptyUnmodIterable() {
+        return (UnmodIterable<E>) UnmodifiableIterableEmpty.INSTANCE;
     }
 
     /** Returns an unmodifiable version of the given iterable. */
     public static <T> UnmodIterable<T> unmodIterable(Iterable<T> iterable) {
         if (iterable == null) { return emptyUnmodIterable(); }
         if (iterable instanceof UnmodIterable) { return (UnmodIterable<T>) iterable; }
-        return () -> new UnmodIterator<T>() {
-            private final Iterator<T> iter = iterable.iterator();
-            @Override public boolean hasNext() { return iter.hasNext(); }
-            @Override public T next() { return iter.next(); }
-            // Defining equals and hashcode makes no sense because can't call them without changing
-            // the iterator which both makes it useless, and changes the equals and hashcode
-            // results.
-//            @Override public int hashCode() { return iter.hashCode(); }
-//            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
-//            @Override public boolean equals(Object o) { return iter.equals(o); }
-        };
+        return new UnmodifiableIterable<>(iterable);
     }
 
-    /** Returns an unmodifiable version of the given iterator. */
-    // Never make this public.  We can't trust an iterator that we didn't get
-    // brand new ourselves, because iterators are inherently unsafe to share.
-    private static <T> UnmodIterator<T> unmodIterator(Iterator<T> iter) {
-        if (iter == null) { return emptyUnmodIterator(); }
+    /**
+     Returns an unmodifiable version of the given iterator.  Note that while you could pass
+     a partially used-up iterator to this method, that's probably something you want to avoid.
+     */
+    public static <T> UnmodIterator<T> unmodIterator(Iterator<T> iter) {
+        if ( (iter == null) || !iter.hasNext() ) { return emptyUnmodIterator(); }
         if (iter instanceof UnmodIterator) { return (UnmodIterator<T>) iter; }
-        return new UnmodIterator<T>() {
-            @Override public boolean hasNext() { return iter.hasNext(); }
-            @Override public T next() { return iter.next(); }
-            // Defining equals and hashcode makes no sense because can't call them without changing
-            // the iterator which both makes it useless, and changes the equals and hashcode
-            // results.
-//            @Override public int hashCode() { return iter.hashCode(); }
-//            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
-//            @Override public boolean equals(Object o) { return iter.equals(o); }
-        };
+        return new UnmodifiableIterator<>(iter);
     }
 
     public static final UnmodListIterator<Object> EMPTY_UNMOD_LIST_ITERATOR =
@@ -349,6 +390,10 @@ public class FunctionUtils {
         // This enforces the singleton property in the face of deserialization.
         private Object readResolve() { return INSTANCE; }
     }
+
+    /** Use {@link #emptyUnmodList()} instead */
+    @Deprecated
+    public static final UnmodList<?> EMPTY_UNMOD_LIST = UnmodifiableListEmpty.INSTANCE;
 
     /** Returns a type-aware version of the empty unmodifiable list. */
     @SuppressWarnings("unchecked")

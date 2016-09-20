@@ -565,6 +565,7 @@ public class FunctionUtilsTest {
 
     @Test public void emptyIteratorTest() {
         assertTrue(emptyUnmodIterable() == unmodIterable(null));
+        assertTrue(emptyUnmodIterable() == serializeDeserialize(emptyUnmodIterable()));
         assertFalse(emptyUnmodIterable().iterator().hasNext());
     }
 
@@ -654,7 +655,7 @@ public class FunctionUtilsTest {
         assertFalse(emptyUnmodSet().contains(null));
         assertEquals(0, emptyUnmodSet().size());
         assertTrue(emptyUnmodSet().isEmpty());
-        assertTrue(EMPTY_UNMOD_ITERATOR == emptyUnmodSet().iterator());
+        assertTrue(emptyUnmodIterator() == emptyUnmodSet().iterator());
     }
 
     @Test public void unSetTest() {
@@ -1041,8 +1042,7 @@ public class FunctionUtilsTest {
         assertFalse(emptyUnmodCollection().contains(null));
         assertEquals(0, emptyUnmodCollection().size());
         assertTrue(emptyUnmodCollection().isEmpty());
-        assertTrue(EMPTY_UNMOD_ITERATOR == emptyUnmodCollection().iterator());
-
+        assertTrue(emptyUnmodIterator() == emptyUnmodCollection().iterator());
     }
 
 }

@@ -1,10 +1,13 @@
 # Change Log
 
 ## 2016-09-18 Release 2.0.13
- - FunctionUtils.EMPTY_UNMOD_LIST is replaced with FunctionUtils.emptyUnmodList().
- The returned value is serializable and a still singleton.
- - FunctionUtils.unmodList(List ls) now returns a serializable subclass of UnmodList
- with a reasonable toString() implementation.
+ - FunctionUtils (The returned values are serializable and still singletons):
+    - public EMPTY_UNMOD_LIST deprecated and replaced with public emptyUnmodList()
+    - package scoped EMPTY_UNMOD_ITERABLE removed and replaced with public emptyUnmodIterable()
+    - unmodList(List ls) now returns a serializable subclass of UnmodList with a reasonable
+    toString() implementation.
+
+ - Replaced UnmodIterator.Wrapper class with FunctionUtils.unmodIterator() method.
  - PersistentTreeSet.toString() now returns string values with quotes.
 
 ## 2016-09-17 Release 2.0.12
