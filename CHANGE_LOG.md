@@ -2,10 +2,10 @@
 
 ## 2016-09-21 Release 2.0.13
  - FunctionUtils
-    - The unmodifiable collection wrappers are now serializable, but the empty collections are no longer singletons):
-    - Deprecated EMPTY_UNMOD____ and replaced with public emptyUnmod___() methods
-    - All unmod___() methods now serializable subclasss of Unmod____ interfaces with reasonable
-    toString() implementations.
+    - The unmodifiable collection wrappers are now serializable, but the empty collections are no longer singletons:
+    - Deprecated `EMPTY_UNMOD____` static fields and replaced them with `public static emptyUnmod___()` methods
+    - All `unmod___()` methods now return Serializable subclassses of `Unmod____` interfaces with reasonable
+    equals(), hashCode(), and now toString() implementations.
     - Removed arrayToString() and mapToString() - Java 8 doesn't need this for map and
     for arrays you should use Arrays.toString() instead.
     - Removed unmodIterable() and EMPTY_UNMOD_ITERABLE.  It's too vague to be useful.
