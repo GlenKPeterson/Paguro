@@ -354,8 +354,7 @@ public class PersistentHashMapTest {
 
     @Test public void mutableWithNull() {
         int NUM_ITEMS = 300;
-        PersistentHashMap<String,Integer> m = PersistentHashMap.empty();
-        PersistentHashMap.MutableHashMap<String,Integer> t = m.mutable();
+        PersistentHashMap.MutableHashMap<String,Integer> t = PersistentHashMap.emptyMutable();
         t = t.assoc(null, -1);
         assertEquals(1, t.size());
 

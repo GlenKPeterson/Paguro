@@ -23,9 +23,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.TestUtilities;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.vec;
+import static org.organicdesign.fp.TestUtilities.compareIterators;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 import static org.organicdesign.testUtils.EqualsContract.equalsSameHashCode;
@@ -129,6 +131,11 @@ public class PersistentTreeSetTest {
         PersistentTreeSet<Integer> s1 = PersistentTreeSet.of(Arrays.asList(5, 2, 4, 1, 3));
         assertEquals(5, s1.size());
         assertEquals(Integer.valueOf(1), s1.first());
+        assertTrue(s1.head().isSome());
+        assertEquals(Integer.valueOf(1), s1.head().get());
+
+        compareIterators(Arrays.asList(2,3,4,5).iterator(), s1.tailSet(2).iterator());
+
         assertEquals(Integer.valueOf(5), s1.last());
         assertArrayEquals(new Integer[]{1, 2, 3, 4, 5},
                           s1.toArray());
@@ -255,6 +262,11 @@ public class PersistentTreeSetTest {
             assertEquals(item3, item4);
         }
         assertFalse(i4.hasNext());
+
+        TestUtilities.assertEx(() -> serializeDeserialize(PersistentTreeSet
+                                                                  .ofComp((a, b) -> a - b,
+                                                                          Arrays.asList(1, 2, 3))),
+                               "PersistentTreeSet", IllegalStateException.class);
     }
 
     @Test public void equality() {

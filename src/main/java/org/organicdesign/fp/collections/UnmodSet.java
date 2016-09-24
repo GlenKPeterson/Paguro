@@ -23,10 +23,10 @@ public interface UnmodSet<E> extends UnmodCollection<E>, Set<E> {
     // ========================================== Static ==========================================
 
     /**
-     Implements equals and hashCode() methods to make defining unmod sets easier, especially for
-     implementing Map.keySet() and such.
+     Implements equals and hashCode() methods compatible with java.util.Set (which ignores order)
+     to make defining unmod sets easier, especially for implementing Map.keySet() and such.
      */
-    abstract class AbstractUnmodSet<T> implements UnmodSet<T> {
+    abstract class AbstractUnmodSet<T> extends AbstractUnmodIterable<T> implements UnmodSet<T> {
         @Override public boolean equals(Object other) {
             if (this == other) { return true; }
             if ( !(other instanceof Set) ) { return false; }
@@ -34,8 +34,6 @@ public interface UnmodSet<E> extends UnmodCollection<E>, Set<E> {
             return (size() == that.size()) &&
                    containsAll(that);
         }
-
-        @Override public int hashCode() { return UnmodIterable.hash(this); }
     }
 
     // ========================================= Instance =========================================

@@ -190,8 +190,9 @@ public interface Transformable<T> {
      @return An immutable set (with duplicates removed)
      */
     default ImSet<T> toImSet() {
-        return foldLeft(PersistentHashSet.<T>empty().mutable(),
-                        MutableUnsortedSet::put).immutable();
+        //noinspection Convert2MethodRef
+        return foldLeft(PersistentHashSet.emptyMutable(),
+                        (PersistentHashSet.MutableHashSet<T> s, T t) -> s.put(t)).immutable();
     }
 
     /**

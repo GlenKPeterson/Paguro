@@ -271,7 +271,7 @@ public class PersistentHashSetTest {
 
     @Test public void mutableTest() {
         Set<Integer> control = new HashSet<>();
-        MutableUnsortedSet<Integer> test = PersistentHashSet.<Integer>empty().mutable();
+        MutableUnsortedSet<Integer> test = PersistentHashSet.emptyMutable();
         assertEquals(control.size(), test.size());
         assertEquals(control.contains(-1), test.contains(-1));
 

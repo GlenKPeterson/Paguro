@@ -15,12 +15,12 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.collections.PersistentTreeMap.Box;
 import org.organicdesign.fp.tuple.Tuple2;
@@ -39,7 +39,8 @@ import static org.organicdesign.fp.FunctionUtils.emptyUnmodIterator;
  This file is a derivative work based on a Clojure collection licensed under the Eclipse Public
  License 1.0 Copyright Rich Hickey.  Errors are Glen Peterson's.
  */
-public class PersistentHashMap<K,V> implements ImUnsortedMap<K,V>, Serializable {
+public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
+        implements ImUnsortedMap<K,V>, Serializable {
 
 //    static private <K, V, R> R doKvreduce(Object[] array, Function3<R,K,V,R> f, R init) {
 //        for (int i = 0; i < array.length; i += 2) {
@@ -121,10 +122,21 @@ public class PersistentHashMap<K,V> implements ImUnsortedMap<K,V>, Serializable 
     @SuppressWarnings("unchecked")
     public static <K,V> PersistentHashMap<K,V> empty() { return (PersistentHashMap<K,V>) EMPTY; }
 
+    /** Works around some type inference limitations of Java 8. */
+    public static <K,V> MutableHashMap<K,V> emptyMutable() {
+        return PersistentHashMap.<K,V>empty().mutable();
+    }
+
     @SuppressWarnings("unchecked")
     public static <K,V> PersistentHashMap<K,V> empty(Equator<K> e) {
         return new PersistentHashMap<>(e, 0, null, false, null);
     }
+
+    /** Works around some type inference limitations of Java 8. */
+    public static <K,V> MutableHashMap<K,V> emptyMutable(Equator<K> e) {
+        return PersistentHashMap.<K,V>empty(e).mutable();
+    }
+
 
 //    final private static Object NOT_FOUND = new Object();
 
@@ -139,8 +151,7 @@ public class PersistentHashMap<K,V> implements ImUnsortedMap<K,V>, Serializable 
      */
     public static <K,V> PersistentHashMap<K,V> ofEq(Equator<K> eq, Iterable<Map.Entry<K,V>> es) {
         if (es == null) { return empty(eq); }
-        PersistentHashMap<K,V> m = empty(eq);
-        MutableHashMap<K,V> map = m.mutable();
+        MutableHashMap<K,V> map = emptyMutable(eq);
         for (Map.Entry<K,V> entry : es) {
             if (entry != null) {
                 map.assoc(entry.getKey(), entry.getValue());
@@ -277,46 +288,6 @@ public class PersistentHashMap<K,V> implements ImUnsortedMap<K,V>, Serializable 
         return Option.someOrNullNoneOf(entry);
     }
 
-    /**
-     This is compatible with java.util.Map but that means it wrongly allows comparisons with
-     SortedMaps, which are necessarily not commutative.  It also ignores the Equator.  As always,
-     for meaningful equals, define an equator.
-
-     @param other the other (hopefully unsorted) map to compare to.
-     @return true if these maps contain the same elements, regardless of order.
-     */
-    @Override public boolean equals(Object other) {
-        if (other == this) { return true; }
-        if ( !(other instanceof Map) ) { return false; }
-
-        Map<?,?> that = (Map<?,?>) other;
-        if (that.size() != size()) { return false; }
-
-        try {
-            for (Entry<K,V> e : this) {
-                K key = e.getKey();
-                V value = e.getValue();
-                if (value == null) {
-                    if (!(that.get(key)==null && that.containsKey(key))) {
-                        return false;
-                    }
-                } else {
-                    if (!value.equals(that.get(key))) {
-                        return false;
-                    }
-                }
-            }
-        } catch (ClassCastException unused) {
-            return false;
-        } catch (NullPointerException unused) {
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override public int hashCode() { return UnmodIterable.hash(this); }
-
     // This identical to the Mutable version of this class below.
     @Override public UnmodIterator<UnEntry<K,V>> iterator() {
         final UnmodIterator<UnEntry<K,V>> rootIter = (root == null) ? emptyUnmodIterator()
@@ -366,9 +337,6 @@ public class PersistentHashMap<K,V> implements ImUnsortedMap<K,V>, Serializable 
     /** {@inheritDoc} */
     @Override public int size() { return size; }
 
-    /** {@inheritDoc} */
-    @Override public String toString() { return UnmodIterable.toString("PersistentHashMap", this); }
-
     @SuppressWarnings("unchecked")
     @Override public PersistentHashMap<K,V> without(K key){
         if(key == null)
@@ -381,7 +349,9 @@ public class PersistentHashMap<K,V> implements ImUnsortedMap<K,V>, Serializable 
         return new PersistentHashMap<>(equator, size - 1, newroot, hasNull, nullValue);
     }
 
-    static final class MutableHashMap<K,V> implements MutableUnsortedMap<K,V> {
+    public static final class MutableHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
+            implements MutableUnsortedMap<K,V> {
+
         private AtomicReference<Thread> edit;
         private final Equator<K> equator;
         private INode<K,V> root;
@@ -399,13 +369,13 @@ public class PersistentHashMap<K,V> implements ImUnsortedMap<K,V>, Serializable 
         // and INode) or even OneOf(left INode, right INode)?
         private final Box<Box> leafFlag = new Box<>(null);
 
-        MutableHashMap(PersistentHashMap<K,V> m) {
+        private MutableHashMap(PersistentHashMap<K,V> m) {
             this(m.equator(), new AtomicReference<>(Thread.currentThread()), m.root, m.size,
                  m.hasNull, m.nullValue);
         }
 
-        MutableHashMap(Equator<K> e, AtomicReference<Thread> edit, INode<K,V> root, int count,
-                       boolean hasNull, V nullValue) {
+        private MutableHashMap(Equator<K> e, AtomicReference<Thread> edit, INode<K,V> root,
+                               int count, boolean hasNull, V nullValue) {
             this.equator = (e == null) ? Equator.defaultEquator() : e;
             this.edit = edit;
             this.root = root;
@@ -494,7 +464,7 @@ public class PersistentHashMap<K,V> implements ImUnsortedMap<K,V>, Serializable 
             return count;
         }
 
-        void ensureEditable() {
+        private void ensureEditable() {
             if(edit.get() == null)
                 throw new IllegalAccessError("Mutable used after immutable! call");
         }
@@ -780,7 +750,7 @@ public class PersistentHashMap<K,V> implements ImUnsortedMap<K,V>, Serializable 
         final AtomicReference<Thread> edit;
 
         @Override public String toString() {
-            return "BitmapIndexedNode(" + bitmap + "," + FunctionUtils.arrayToString(array) + "," +
+            return "BitmapIndexedNode(" + bitmap + "," + Arrays.toString(array) + "," +
                    edit + ")";
         }
 

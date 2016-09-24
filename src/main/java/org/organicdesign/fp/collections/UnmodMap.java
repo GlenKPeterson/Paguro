@@ -28,8 +28,47 @@ import org.organicdesign.fp.tuple.Tuple2;
  from both Collection and Map and Collection.remove() returns a boolean while Map.remove() returns
  a V (the type of the value in the key/value pair).  Maybe an UnmodSizedIterable is called for?
  */
-public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<K,V>> {
+public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<K,V>>, Sized {
     // ========================================== Static ==========================================
+
+    /**
+     Implements equals and hashCode() methods compatible with java.util.Map (which ignores order)
+     to make defining unmod Maps easier.  Inherits hashCode() and toString() from
+     AbstractUnmodIterable.
+     */
+    abstract class AbstractUnmodMap<K,V> extends AbstractUnmodIterable<UnmodMap.UnEntry<K,V>>
+            implements UnmodMap<K,V> {
+
+        @Override public boolean equals(Object other) {
+            if (this == other) { return true; }
+            if (!(other instanceof Map)) { return false; }
+
+            Map<?, ?> that = (Map<?, ?>) other;
+            if (that.size() != size()) { return false; }
+
+            try {
+                for (Entry<K, V> e : this) {
+                    K key = e.getKey();
+                    V value = e.getValue();
+                    if (value == null) {
+                        if (!(that.get(key) == null && that.containsKey(key))) {
+                            return false;
+                        }
+                    } else {
+                        if (!value.equals(that.get(key))) {
+                            return false;
+                        }
+                    }
+                }
+            } catch (ClassCastException unused) {
+                return false;
+            } catch (NullPointerException unused) {
+                return false;
+            }
+            return true;
+        }
+    }
+
     /**
      * A map entry (key-value pair).  The <tt>UnmodMap.entrySet</tt> method returns
      * a collection-view of the map, whose elements are of this class.  The
@@ -140,6 +179,12 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
         static <K,V>
         UnmodIterator<UnEntry<K,V>> entryIterToUnEntryUnIter(Iterator<Entry<K,V>> innerIter) {
             return new EntryToUnEntryIter<>(innerIter);
+        }
+
+        static <K,V>
+        UnmodSortedIterator<UnEntry<K,V>>
+        entryIterToUnEntrySortedUnIter(Iterator<Entry<K,V>> innerIter) {
+            return new EntryToUnEntrySortedIter<>(innerIter);
         }
 
         // This should be done with a cast, not with code.
@@ -290,7 +335,6 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
      {@inheritDoc}
      */
     @Override default UnmodSet<K> keySet() {
-
         class KeySet extends UnmodSet.AbstractUnmodSet<K> implements Serializable {
             // For serializable.  Make sure to change whenever internal data format changes.
             private static final long serialVersionUID = 20160903104400L;

@@ -14,6 +14,17 @@ import static org.organicdesign.fp.FunctionUtils.stringify;
 public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
     // ========================================== Static ==========================================
 
+    /**
+     Implements equals and hashCode() methods compatible with all java.util collections (this
+     algorithm is not order-dependent) and toString which takes the name of the sub-class.
+     */
+    abstract class AbstractUnmodIterable<T> implements UnmodIterable<T> {
+        @Override public int hashCode() { return UnmodIterable.hash(this); }
+        @Override public String toString() {
+            return UnmodIterable.toString(getClass().getSimpleName(), this);
+        }
+    }
+
     //    /**
 // Caution: this is a convenient optimization for immutable data structures and a nightmare
 // waiting to happen to mutable ones.  Don't go slapping this on immutable wrappers for mutable

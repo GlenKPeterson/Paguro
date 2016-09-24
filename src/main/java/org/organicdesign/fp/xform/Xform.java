@@ -476,7 +476,7 @@ public abstract class Xform<A> implements UnmodIterable<A> {
 
     @Override public UnmodIterator<A> iterator() {
         // TODO: I had a really fast array-list implementation that I could probably hack into this for performance (assuming it actually works).
-        return FunctionUtils.unmodIterable(toMutableList()).iterator();
+        return FunctionUtils.unmodIterator(toMutableList().iterator());
     }
 
     // =============================================================================================

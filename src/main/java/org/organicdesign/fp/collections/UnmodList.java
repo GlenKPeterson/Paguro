@@ -32,6 +32,34 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
     // ========================================== Static ==========================================
 
     /**
+     Implements equals and hashCode() methods compatible with java.util.Set (which ignores order)
+     to make defining unmod sets easier, especially for implementing Map.keySet() and such.
+     */
+    abstract class AbstractUnmodList<E> extends UnmodIterable.AbstractUnmodIterable<E>
+            implements UnmodList<E> {
+        @SuppressWarnings("unchecked")
+        @Override public boolean equals(Object other) {
+            if (this == other) { return true; }
+            if ( !(other instanceof List) ) { return false; }
+            List<E> that = (List<E>) other;
+            return (size() == that.size()) &&
+                   UnmodSortedIterable.equal(this, UnmodSortedIterable.castFromList(that));
+        }
+
+        /** This is correct, but O(n). This implementation is compatible with java.util.AbstractList. */
+        @Override public int hashCode() {
+            int ret = 1;
+            for (E item : this) {
+                ret *= 31;
+                if (item != null) {
+                    ret += item.hashCode();
+                }
+            }
+            return ret;
+        }
+    }
+
+    /**
      Apply the given function against all unique pairings of items in the list.  Does this belong on
      Function2 instead of List?
      */

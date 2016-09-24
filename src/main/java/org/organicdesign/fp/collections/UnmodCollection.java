@@ -33,7 +33,7 @@ import java.util.function.Predicate;
  UnmodCollection is an unmodifiable version of {@link java.util.Collection}
  which formalizes the return type of Collections.unmodifiableCollection() and Map.values().
  */
-public interface UnmodCollection<E> extends Collection<E>, UnmodIterable<E> {
+public interface UnmodCollection<E> extends Collection<E>, UnmodIterable<E>, Sized {
 
     // ========================================== Static ==========================================
 
