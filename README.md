@@ -14,7 +14,7 @@ A summary of recent updates is in the [Change Log](CHANGE_LOG.md)
 Future development priorities are further down this page.
 
 ##Renaming
-If you checked out the source code of this project when it was called UncleJim, you need to run the following (or similar) to re-associate it with the Paguro github project:
+The name of this project is being changed from UncleJim to Paguro.  If you checked out the source code of this project when it was called UncleJim, you need to run the following (or similar) to re-associate it with the Paguro github project:
 ```bash
 # Display the remote repositories whose branches you track
 git remote -v
