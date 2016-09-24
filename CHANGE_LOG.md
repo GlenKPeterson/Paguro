@@ -23,10 +23,8 @@
  - New: UnmodIterable.AbstractUnmodIterable defines hashCode() and toString() for all collections
    (except List which needs a different implementation to be compatible with java.util.List).
  - New: UnmodMap.AbstractUnmodMap defines equals() for maps.  Made PersistentHashMap and MutableHashMap extend this. 
- - New: UnmodSet.AbstractUnmodSet defines equals() for maps.  Made PersistentHashSet and MutableHashSet extend this.
+ - New: UnmodSet.AbstractUnmodSet defines equals() for sets.  Made PersistentHashSet and MutableHashSet extend this.
  - New: UnmodList.AbstractUnmodList defines equals() and hashcode() for lists.  Made PersistentVector and MutableVector extend this.
- 
- - Ensured equals, hashCode, and toString to MutableMap and MutableSet by creating .
 
 ## 2016-09-17 Release 2.0.12
  - Changed order of serialization for PersistentTreeMap.  Because it uses a serialization proxy, it
