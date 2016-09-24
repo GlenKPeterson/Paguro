@@ -8,7 +8,12 @@ These collections grow by adding a new shell, leaving the insides the same, much
 
 This project used to be called UncleJim: "**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability". 
 
-#Renaming
+# News
+A summary of recent updates is in the [Change Log](CHANGE_LOG.md)
+
+Future development priorities are further down this page.
+
+##Renaming
 If you checked out the source code of this project when it was called UncleJim, you need to run the following (or similar) to re-associate it with the Paguro github project:
 ```bash
 # Display the remote repositories whose branches you track
@@ -104,8 +109,6 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
 
 * [Comparison with Traditional Java and Java 8 Streams](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java#L22)
 
-* A summary of recent updates is in the [Change Log](CHANGE_LOG.md)
-
 #Manifesto
 
 * Immutability promotes correct code as much as type safety does.
@@ -132,12 +135,11 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
 
 [Why Java?](https://github.com/GlenKPeterson/Paguro/wiki/Why-is-UncleJim-written-in-Java%3F)
 
-#Future Development Priorities (as of 2016-09-13)
-1. Change any additional classes that need to be Serializable
-2. Implement an RRB-Tree
-3. Make a Java 7 branch (and/or Java 6) and release (Paguro-JDK7).
-4. Consider an ImmutableInsertionOrderHashMap and Set.
-5. Ensure everything is as friendly as possible to Monadic programming.
+#Future Development Priorities (as of 2016-09-24)
+1. Implement an RRB-Tree
+2. Make a Java 7 branch (and/or Java 6) and release (Paguro-JDK7).
+3. Consider an ImmutableInsertionOrderHashMap and Set.
+4. Ensure everything is as friendly as possible to Monadic programming.
 
 ### RRB-Tree
 Read the [current development status](https://github.com/GlenKPeterson/Paguro/issues/4#issuecomment-239825939) or check out the [latest version of the code](https://github.com/GlenKPeterson/Paguro/blob/2016-05-22_RRB-Tree/src/main/java/org/organicdesign/fp/experimental/RrbTree1.java).
