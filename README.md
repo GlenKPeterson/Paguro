@@ -1,15 +1,20 @@
-Paguro provides type-safe versions of Clojure's immutable collections and other tools to make functional programming in Java easier.
+Type-safe versions of Clojure's immutable collections, an immutable alternative to Java 8 Streams, and other tools to make functional programming in Java easier.
 
 ![Hermit Crab](https://c7.staticflickr.com/8/7413/12171498934_2934c7ef28_n.jpg)
 Photo by [Rushen](https://www.flickr.com/photos/rushen/12171498934/in/photostream/)
 
 Paguro ("pah-GUH-row" rhymes with "furrow") is short for the Latin "Paguroidea" - the name of the Hermit Crab superfamily in Biology.
-These collections grow by adding a new shell, leaving the insides the same, much the way Hermit Crabs trade up to a new shell when they grow.
+These collections grow by adding a new shell, leaving the insides the same, much the way [Hermit Crabs trade up to a new shell when they grow](https://www.youtube.com/watch?v=f1dnocPQXDQ).
 
 This project used to be called UncleJim: "**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability". 
 
-#Renaming
-If you checked out the source code of this project when it was called UncleJim, you need to run the following (or similar) to re-associated it with the Paguro github project:
+# News
+A summary of recent updates is in the [Change Log](CHANGE_LOG.md)
+
+Future development priorities are further down this page.
+
+##Renaming
+The name of this project is being changed from UncleJim to Paguro.  If you checked out the source code of this project when it was called UncleJim, you need to run the following (or similar) to re-associate it with the Paguro github project:
 ```bash
 # Display the remote repositories whose branches you track
 git remote -v
@@ -39,9 +44,9 @@ Package names will NOT change.
   * `tup("Alice", 11, 3.14)` - an immutable 3-field tuple or record
   * `map(tup(1, "single"), tup(2, "double"), tup(3, "triple"))` - an immutable map that uses integers to look up appropriate strings.
 * [Extensible, immutable tuples](src/main/java/org/organicdesign/fp/tuple) - use them for rapid prototyping, then later extend them to make your own lightweight, immutable Java classes with correct `equals()`, `hashCode()`, and `toString()` implementations.
-* [Lazy initialization](src/main/java/org/organicdesign/fp/LazyRef.java#L5) - LazyRef thread-safely performs initialization and frees initialization resources on first use.  Subsequent uses get the now-constant initialized value.
+* [Lazy initialization](src/main/java/org/organicdesign/fp/LazyRef.java#L5) - LazyRef thread-safely performs initialization and frees initialization resources on first use.  Subsequent uses get the now-constant initialized value.  Use this instead of static initializers to avoid initialization loops.  Cache results of expensive operations for reuse.
 * [Memoization](src/main/java/org/organicdesign/fp/function/Function3.java#L42) - Turns function calls into hashtable lookups to speed up slow functions over a limited range of inputs.
-* Tiny with no dependencies - The entire project fits in a 240K jar file that is compiled in the compact1 profile.
+* Tiny with no dependencies - The entire project fits in a 230K jar file that is compiled in the compact1 profile.
 
 For complete API documentation, please build the javadoc:
 `mvn javadoc:javadoc`
@@ -92,7 +97,7 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
         ._1();
 ```
 
-* Other [usage examples](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34) are implemented as unit tests to ensure that they remain correct and current.  Note: IntelliJ IDEA reports some non-issues in this file.
+* Other [usage examples](src/test/java/org/organicdesign/fp/UsageExampleTest.java#L34) are implemented as unit tests to ensure that they remain correct and current.
 
 * [Class/Interface Hierarchy](inheritanceHierarchy.pdf) (PDF)
 
@@ -103,8 +108,6 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
 * [JimTrainer self-guided training](https://github.com/GlenKPeterson/JimTrainer) consists of a few short problem-sets for learning Paguro
 
 * [Comparison with Traditional Java and Java 8 Streams](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java#L22)
-
-* A summary of recent updates is in the [Change Log](CHANGE_LOG.md)
 
 #Manifesto
 
@@ -132,12 +135,11 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
 
 [Why Java?](https://github.com/GlenKPeterson/Paguro/wiki/Why-is-UncleJim-written-in-Java%3F)
 
-#Future Development Priorities (as of 2016-09-13)
-1. Change any additional classes that need to be Serializable
-2. Implement an RRB-Tree
-3. Make a Java 7 branch (and/or Java 6) and release (Paguro-JDK7).
-4. Consider an ImmutableInsertionOrderHashMap and Set.
-5. Ensure everything is as friendly as possible to Monadic programming.
+#Future Development Priorities (as of 2016-09-24)
+1. Implement an RRB-Tree
+2. Make a Java 7 branch (and/or Java 6) and release (Paguro-JDK7).
+3. Consider an ImmutableInsertionOrderHashMap and Set.
+4. Ensure everything is as friendly as possible to Monadic programming.
 
 ### RRB-Tree
 Read the [current development status](https://github.com/GlenKPeterson/Paguro/issues/4#issuecomment-239825939) or check out the [latest version of the code](https://github.com/GlenKPeterson/Paguro/blob/2016-05-22_RRB-Tree/src/main/java/org/organicdesign/fp/experimental/RrbTree1.java).

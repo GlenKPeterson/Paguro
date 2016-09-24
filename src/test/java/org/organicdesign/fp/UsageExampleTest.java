@@ -78,7 +78,7 @@ public class UsageExampleTest {
     }
 
     // Define some field name constants with a standard Java Enum for subsequent examples
-    enum EmailType { HOME, WORK };
+    enum EmailType { HOME, WORK }
 
     // Part 2 of 3
     @Test public void dataDefinitionPart2() {
@@ -155,18 +155,18 @@ public class UsageExampleTest {
         Email(EmailType t, String s) { super(t, s); }
 
         // Give descriptive names to the field getters
-        public EmailType mailType() { return _1; }
-        public String address() { return _2; }
+        EmailType mailType() { return _1; }
+        String address() { return _2; }
     }
 
     // Notice in this type signature, we have replaced Tuple2<EmailType,String> with Email
-    static class Person extends Tuple3<String,String,ImList<Email>> {
+    private static class Person extends Tuple3<String,String,ImList<Email>> {
         Person(String f, String l, ImList<Email> es) { super(f, l, es); }
 
         // Give descriptive names to the field getters
-        public String first() { return _1; }
-        public String last() { return _2; }
-        public ImList<Email> emailAddrs() { return _3; }
+        String first() { return _1; }
+        String last() { return _2; }
+        ImList<Email> emailAddrs() { return _3; }
     }
 
     // Part 3 of 3 (continued)

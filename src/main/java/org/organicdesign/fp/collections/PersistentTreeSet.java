@@ -29,7 +29,8 @@ import static org.organicdesign.fp.collections.Equator.defaultComparator;
  This file is a derivative work based on a Clojure collection licensed under the Eclipse Public
  License 1.0 Copyright Rich Hickey.  Errors by Glen Peterson.
  */
-public class PersistentTreeSet<E> implements ImSortedSet<E>, Serializable {
+public class PersistentTreeSet<E> extends UnmodSortedSet.AbstractUnmodSet<E>
+        implements ImSortedSet<E>, Serializable {
 
     /**
      Be extremely careful with this because it uses the default comparator, which only works for
@@ -229,9 +230,6 @@ public class PersistentTreeSet<E> implements ImSortedSet<E>, Serializable {
     @Override public E first() { return impl.firstKey(); }
 
     /** {@inheritDoc} */
-    @Override public int hashCode() { return (size() == 0) ? 0 : UnmodIterable.hash(this); }
-
-    /** {@inheritDoc} */
     @Override public Option<E> head() {
         return size() > 0 ? Option.of(impl.firstKey()) : Option.none();
     }
@@ -266,11 +264,6 @@ public class PersistentTreeSet<E> implements ImSortedSet<E>, Serializable {
 
 //    /** {@inheritDoc} */
 //    @Override public Sequence<E> tail() { return impl.without(first()).keySet().seq(); }
-
-    /** Returns a string representation of this set. */
-    @Override public String toString() {
-        return UnmodIterable.toString("PersistentTreeSet", this);
-    }
 
 //    @Override
 //    public ISeq<E> rseq() {

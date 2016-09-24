@@ -42,7 +42,8 @@ import static org.organicdesign.fp.FunctionUtils.stringify;
          extend Tuple2.  All errors are Glen's.
  */
 
-public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
+public class PersistentTreeMap<K,V> extends UnmodSortedMap.AbstractUnmodMap<K,V>
+        implements ImSortedMap<K,V>, Serializable {
 
     /**
      This is a throw-away class used internally by PersistentTreeMap and PersistentHashMap like
@@ -312,11 +313,6 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
 //        return ret;
     }
 
-    /** This is correct, but O(n). */
-    @Override public int hashCode() {
-        return (size() == 0) ? 0 : UnmodIterable.hash(this);
-    }
-
 //    public static final Equator<SortedMap> EQUATOR = new Equator<SortedMap>() {
 //        @Override
 //        public int hash(SortedMap kvSortedMap) {
@@ -440,22 +436,6 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V>, Serializable {
 //               " comp=" + comp +
 //               " tree=" + tree + ")";
 //    }
-
-    /** Returns a string describing the first few items in this map (for debugging). */
-    @Override public String toString() {
-        StringBuilder sB = new StringBuilder("PersistentTreeMap(");
-        int i = 0;
-        for (UnEntry<K,V> entry : this) {
-            if (i > 0) { sB.append(","); }
-            if (i > 4) { break; }
-            sB.append(entry);
-            i++;
-        }
-        if (i < size()) {
-            sB.append("...");
-        }
-        return sB.append(")").toString();
-    }
 
 //    /** {@inheritDoc} */
 //    @Override public UnmodCollection<V> values() {

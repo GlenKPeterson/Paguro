@@ -14,13 +14,14 @@
 
 package org.organicdesign.fp;
 
+import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -35,14 +36,14 @@ import org.organicdesign.fp.collections.UnmodSet;
 import org.organicdesign.fp.collections.UnmodSortedIterator;
 import org.organicdesign.fp.collections.UnmodSortedMap;
 import org.organicdesign.fp.collections.UnmodSortedSet;
-import org.organicdesign.fp.tuple.Tuple2;
 
 /**
  A dumping ground for utility functions that aren't useful enough to belong in StaticImports.
 
- The unmod___() methods are an alternative to Collections.unmodifiable____() for building immutable
- collections.  These will never return null, the closest they get is to return an empty immutable
- collection (the same one is reused).  Also, the unmodifiable interfaces they return have deprecated
+ The unmod___() methods are an alternative to Collections.unmodifiable____().  They provide
+ unmodifiable wrappers to protect mutable collections for sharing.  Except for the Iterators,
+ the returned classes are Serializable.  These will never return null, the closest they get is to
+ return an empty unmodifiable collection.  The unmodifiable interfaces they return have deprecated
  the modification methods so that any attempt to use those methods causes a warning in your IDE and
  compiler.
  */
@@ -59,64 +60,63 @@ public class FunctionUtils {
         return o.toString();
     }
 
-    /** Returns a String showing the type and first few elements of a map */
-    public static <A,B> String mapToString(Map<A,B> map) {
-        if (map == null) {
-            return "null";
-        }
-        StringBuilder sB = new StringBuilder();
-
-        sB.append(map.getClass().getSimpleName());
-        sB.append("(");
-
-        int i = 0;
-        for (Map.Entry<A,B> item : map.entrySet()) {
-            if (i > 4) {
-                sB.append(",...");
-                break;
-            } else if (i > 0) {
-                sB.append(",");
-            }
-            sB.append("Entry(").append(String.valueOf(item.getKey())).append(",");
-            sB.append(String.valueOf(item.getValue())).append(")");
-            i++;
-        }
-
-        sB.append(")");
-        return sB.toString();
-    }
-
-    /** Returns a String showing the type and first few elements of an array */
-    public static String arrayToString(Object[] as) {
-        if (as == null) {
-            return "null";
-        }
-        StringBuilder sB = new StringBuilder();
-        sB.append("Array");
-
-        if ( (as.length > 0) && (as[0] != null) ) {
-            sB.append("<");
-            sB.append(as[0].getClass().getSimpleName());
-            sB.append(">");
-        }
-
-        sB.append("(");
-
-        int i = 0;
-        for (Object item : as) {
-            if (i > 4) {
-                sB.append(",...");
-                break;
-            } else if (i > 0) {
-                sB.append(",");
-            }
-            sB.append(String.valueOf(item));
-            i++;
-        }
-
-        sB.append(")");
-        return sB.toString();
-    }
+    // Not Needed in Java 8.
+//    /** Returns a String showing the type and first few elements of a map */
+//    public static <A,B> String mapToString(Map<A,B> map) {
+//        if (map == null) {
+//            return "null";
+//        }
+//        StringBuilder sB = new StringBuilder();
+//
+//        sB.append(map.getClass().getSimpleName());
+//        sB.append("(");
+//
+//        int i = 0;
+//        for (Map.Entry<A,B> item : map.entrySet()) {
+//            if (i > 4) {
+//                sB.append(",...");
+//                break;
+//            } else if (i > 0) {
+//                sB.append(",");
+//            }
+//            sB.append("Entry(").append(String.valueOf(item.getKey())).append(",");
+//            sB.append(String.valueOf(item.getValue())).append(")");
+//            i++;
+//        }
+//
+//        sB.append(")");
+//        return sB.toString();
+//    }
+//
+//    /** Returns a String showing the type and first few elements of an array */
+//    public static String arrayToString(Object[] as) {
+//        if (as == null) {
+//            return "null";
+//        }
+//        StringBuilder sB = new StringBuilder();
+//        sB.append("Array");
+//
+//        if ( (as.length > 0) && (as[0] != null) ) {
+//            sB.append("<");
+//            sB.append(as[0].getClass().getSimpleName());
+//            sB.append(">");
+//        }
+//
+//        sB.append("(");
+//
+//        int i = 0;
+//        for (Object item : as) {
+//            if (i > 4) {
+//                sB.append(",...");
+//                break;
+//            } else if (i > 0) {
+//                sB.append(",");
+//            }
+//        }
+//
+//        sB.append(")");
+//        return sB.toString();
+//    }
 
 //    public static String truncateIfNecessary(String in, int maxLen) {
 //        if ( (in == null) || (in.length() <= maxLen) ) {
@@ -220,421 +220,629 @@ public class FunctionUtils {
 // wrong."  Which is a little ironic because with inheritance, there are many cases in Java
 // where equality is one-sided.
 
-    public static UnmodIterator<Object> EMPTY_UNMOD_ITERATOR = new UnmodIterator<Object>() {
-        @Override public boolean hasNext() { return false; }
-        @Override public Object next() { throw new NoSuchElementException(); }
-    };
-    @SuppressWarnings("unchecked")
-    public static <T> UnmodIterator<T> emptyUnmodIterator() {
-        return (UnmodIterator<T>) EMPTY_UNMOD_ITERATOR;
-    }
+    // ========================================== Classes ==========================================
 
-    static UnmodIterable<Object> EMPTY_UNMOD_ITERABLE = () -> emptyUnmodIterator();
+    // The point of these classes existing at all are to wrap mutable collections for safe
+    // sharing.  Use them either to retrofit existing Java code, or to wrap mutable collections
+    // you may use for performance reasons.
+    //
+    // These are true, named classes instead of anonymous implementations so that they can properly
+    // implement Serializable.
+    //
+    // These classes seem to have to be public in order to compile without
+    // "remove() in org.organicdesign.fp.collections.UnmodIterator is defined in an inaccessible class or interface"
+    //
+    // They belong here, instead of being a static class in the Unmod___ interfacies, so that they
+    // don't overshadow same-named static classes in sub-interfaces, prevent use in method
+    // references (due to overloading), make overloading in subclasses onerous, or generally cause\
+    // confusion.
 
-    @SuppressWarnings("unchecked")
-    static <E> UnmodIterable<E> emptyUnmodIterable() {
-        return (UnmodIterable<E>) EMPTY_UNMOD_ITERABLE;
-    }
 
-    /** Returns an unmodifiable version of the given iterable. */
-    public static <T> UnmodIterable<T> unmodIterable(Iterable<T> iterable) {
-        if (iterable == null) { return emptyUnmodIterable(); }
-        if (iterable instanceof UnmodIterable) { return (UnmodIterable<T>) iterable; }
-        return () -> new UnmodIterator<T>() {
-            private final Iterator<T> iter = iterable.iterator();
-            @Override public boolean hasNext() { return iter.hasNext(); }
-            @Override public T next() { return iter.next(); }
-            // Defining equals and hashcode makes no sense because can't call them without changing
-            // the iterator which both makes it useless, and changes the equals and hashcode
-            // results.
+    /**
+     Wraps an iterator.  Not Serializable.  You probably want to use this by calling
+     {@link #unmodIterator(Iterator)}.
+     */
+    @SuppressWarnings("WeakerAccess")
+    public static class UnmodifiableIterator<E> implements UnmodIterator<E> {
+        // Iterators are not serializable (today) because they aren't in Java.
+        // I'm assuming Java had a good reason for that, but I really don't know.
+//        , Serializable {
+//        // For serializable.  Make sure to change whenever internal data format changes.
+//        private static final long serialVersionUID = 20160903174100L;
+
+        private final Iterator<E> iter;
+        private UnmodifiableIterator(Iterator<E> i) { iter = i; }
+
+        @Override public boolean hasNext() { return iter.hasNext(); }
+        @Override public E next() { return iter.next(); }
+
+        // Defining equals and hashcode makes no sense because can't call them without changing
+        // the iterator which both makes it useless, and changes the equals and hashcode
+        // results.
 //            @Override public int hashCode() { return iter.hashCode(); }
 //            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
 //            @Override public boolean equals(Object o) { return iter.equals(o); }
-        };
-    }
-
-    /** Returns an unmodifiable version of the given iterator. */
-    // Never make this public.  We can't trust an iterator that we didn't get
-    // brand new ourselves, because iterators are inherently unsafe to share.
-    private static <T> UnmodIterator<T> unmodIterator(Iterator<T> iter) {
-        if (iter == null) { return emptyUnmodIterator(); }
-        if (iter instanceof UnmodIterator) { return (UnmodIterator<T>) iter; }
-        return new UnmodIterator<T>() {
-            @Override public boolean hasNext() { return iter.hasNext(); }
-            @Override public T next() { return iter.next(); }
-            // Defining equals and hashcode makes no sense because can't call them without changing
-            // the iterator which both makes it useless, and changes the equals and hashcode
-            // results.
-//            @Override public int hashCode() { return iter.hashCode(); }
-//            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
-//            @Override public boolean equals(Object o) { return iter.equals(o); }
-        };
-    }
-
-    public static UnmodListIterator<Object> EMPTY_UNMOD_LIST_ITERATOR =
-            new UnmodListIterator<Object>() {
-        @Override public boolean hasNext() { return false; }
-        @Override public Object next() { throw new NoSuchElementException(); }
-        @Override public boolean hasPrevious() { return false; }
-        @Override public Object previous() { throw new NoSuchElementException(); }
-        @Override public int nextIndex() { return 0; }
-    };
-    @SuppressWarnings("unchecked")
-    public static <T> UnmodListIterator<T> emptyUnmodListIterator() {
-        return (UnmodListIterator<T>) EMPTY_UNMOD_LIST_ITERATOR;
     }
 
     /**
-     Returns an unmodifiable version of the given listIterator.  This is private because sharing
-     iterators is bad.
+     Wraps an ordered iterator.  Not Serializable.  You probably want to use this by calling
+     {@link #unmodSortedIterator(Iterator)}.
      */
-    private static <T> UnmodListIterator<T> unmodListIterator(ListIterator<T> iter) {
-        if (iter == null) { return emptyUnmodListIterator(); }
-        if (iter instanceof UnmodListIterator) { return (UnmodListIterator<T>) iter; }
-        return new UnmodListIterator<T>() {
-            @Override public boolean hasNext() { return iter.hasNext(); }
-            @Override public T next() { return iter.next(); }
-            @Override public boolean hasPrevious() { return iter.hasPrevious(); }
-            @Override public T previous() { return iter.previous(); }
-            @Override public int nextIndex() { return iter.nextIndex(); }
-            // Defining equals and hashcode makes no sense because can't call them without changing
-            // the iterator which both makes it useless, and changes the equals and hashcode
-            // results.
+    @SuppressWarnings("WeakerAccess")
+    public static class UnmodifiableSortedIterator<E> implements UnmodSortedIterator<E> {
+        // Iterators are not serializable (today) because they aren't in Java.
+        // I'm assuming Java had a good reason for that, but I really don't know.
+//        , Serializable {
+//        // For serializable.  Make sure to change whenever internal data format changes.
+//        private static final long serialVersionUID = 20160903174100L;
+
+        private final Iterator<E> iter;
+        private UnmodifiableSortedIterator(Iterator<E> i) { iter = i; }
+
+        @Override public boolean hasNext() { return iter.hasNext(); }
+        @Override public E next() { return iter.next(); }
+
+        // Defining equals and hashcode makes no sense because can't call them without changing
+        // the iterator which both makes it useless, and changes the equals and hashcode
+        // results.
 //            @Override public int hashCode() { return iter.hashCode(); }
 //            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
 //            @Override public boolean equals(Object o) { return iter.equals(o); }
-        };
     }
 
-    /** The EMPTY list - a sentinel value for use in == comparisons. */
-    public static UnmodList<Object> EMPTY_UNMOD_LIST = new UnmodList<Object>() {
-        @Override public UnmodListIterator<Object> listIterator(int index) {
-            return emptyUnmodListIterator();
+    // Don't put this on UnmodIterator - see reasons in UnmodifiableIterator above.
+//    public static class UnmodifiableIteratorEmpty<T> extends UnmodifiableIterator<T> {
+//        // Not serializable, so we don't have to defend against deserialization.
+//        private static final UnmodifiableIteratorEmpty<?> INSTANCE =
+//                new UnmodifiableIteratorEmpty<>(Collections.emptyIterator());
+//        private UnmodifiableIteratorEmpty(Iterator<T> i) { super(i); }
+//    }
+
+    // I don't see the need for this and I'm concerned about confusing SortedIterable with Iterable.
+//    /**
+//     Wraps an iterable.  The result will be serializable to the extent that the wrapped
+//     iterable is.  You probably want to use this by calling
+//     {@link #unmodIterable(Iterable)}.
+//     */
+//    @SuppressWarnings("WeakerAccess")
+//    public static class UnmodifiableIterable<T> implements UnmodIterable<T>, Serializable {
+//        private final Iterable<T> iterable;
+//        private UnmodifiableIterable(Iterable<T> is) { iterable = is; }
+//
+//        // For serializable.  Make sure to change whenever internal data format changes.
+//        private static final long serialVersionUID = 20160918033000L;
+//
+//        @Override public UnmodIterator<T> iterator() {
+//            return new UnmodifiableIterator<>(iterable.iterator());
+//        }
+//    }
+
+//    private static final class UnmodifiableIterableEmpty<T> extends UnmodifiableIterable<T> {
+//        private static final UnmodifiableIterableEmpty<?> INSTANCE =
+//                new UnmodifiableIterableEmpty<>(Collections.emptySet());
+//        private UnmodifiableIterableEmpty(Iterable<T> is) { super(is); }
+//        // For serializable.  Make sure to change whenever internal data format changes.
+//        private static final long serialVersionUID = 20160918033000L;
+//
+//        // This enforces the singleton property in the face of deserialization.
+//        private Object readResolve() { return INSTANCE; }
+//
+//        @Override public UnmodifiableIteratorEmpty<T> iterator() { return emptyUnmodIterator(); }
+//    }
+
+    /**
+     Wraps a list iterator.  The is NOT serializable.  You probably want to use this by calling
+     {@link #unmodListIterator(ListIterator)}.
+     */
+    @SuppressWarnings("WeakerAccess")
+    public static class UnmodifiableListIterator<T> implements UnmodListIterator<T>, Serializable {
+        private final ListIterator<T> iter;
+        private UnmodifiableListIterator(ListIterator<T> is) { iter = is; }
+
+        // For serializable.  Make sure to change whenever internal data format changes.
+        private static final long serialVersionUID = 20160918033000L;
+
+        @Override public boolean hasNext() { return iter.hasNext(); }
+        @Override public T next() { return iter.next(); }
+        @Override public boolean hasPrevious() { return iter.hasPrevious(); }
+        @Override public T previous() { return iter.previous(); }
+        @Override public int nextIndex() { return iter.nextIndex(); }
+        // Defining equals and hashcode makes no sense because can't call them without changing
+        // the iterator which both makes it useless, and changes the equals and hashcode
+        // results.
+//            @Override public int hashCode() { return iter.hashCode(); }
+//            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
+//            @Override public boolean equals(Object o) { return iter.equals(o); }
+    }
+
+    /**
+     Wraps a list.  The result will be serializable to the extent that the wrapped
+     list is.  You probably want to use this by calling
+     {@link #unmodList(List)}.
+     */
+    @SuppressWarnings("WeakerAccess")
+    public static class UnmodifiableList<T> implements UnmodList<T>, Serializable {
+        private final List<T> inner;
+        UnmodifiableList(List<T> ls) { inner = ls; }
+
+        // For serializable.  Make sure to change whenever internal data format changes.
+        private static final long serialVersionUID = 20160918033000L;
+
+        @Override public int size() { return inner.size(); }
+        @Override public T get(int index) { return inner.get(index); }
+        @Override public int hashCode() { return inner.hashCode(); }
+        @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
+        @Override public boolean equals(Object o) { return inner.equals(o); }
+        @Override public UnmodListIterator<T> listIterator(int idx) {
+            return unmodListIterator(inner.listIterator(idx));
         }
-        @Override public int size() { return 0; }
-        @Override public Object get(int index) { throw new IndexOutOfBoundsException(); }
-    };
-
-    /** Returns a type-aware version of the EMPTY list. */
-    @SuppressWarnings("unchecked")
-    public static <T> UnmodList<T> emptyUnmodList() { return (UnmodList<T>) EMPTY_UNMOD_LIST; }
-
-    /** Returns an unmodifiable version of the given list. */
-    public static <T> UnmodList<T> unmodList(List<T> inner) {
-        if (inner == null) { return emptyUnmodList(); }
-        if (inner instanceof UnmodList) { return (UnmodList<T>) inner; }
-        if (inner.size() < 1) { return emptyUnmodList(); }
-        return new UnmodList<T>() {
-            @Override public int size() { return inner.size(); }
-            @Override public T get(int index) { return inner.get(index); }
-            @Override public int hashCode() { return inner.hashCode(); }
-            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
-            @Override public boolean equals(Object o) { return inner.equals(o); }
-            @Override public UnmodListIterator<T> listIterator(int idx) {
-                return unmodListIterator(inner.listIterator(idx));
-            }
-            @Override public UnmodListIterator<T> listIterator() {
-                return unmodListIterator(inner.listIterator());
-            }
-            @Override public UnmodSortedIterator<T> iterator() {
-                Iterator<T> iter = inner.iterator();
-                return new UnmodSortedIterator<T>() {
-                    @Override public boolean hasNext() { return iter.hasNext(); }
-                    @Override public T next() { return iter.next(); }
-                };
-            }
-        };
+        @Override public UnmodListIterator<T> listIterator() {
+            return unmodListIterator(inner.listIterator());
+        }
+        @Override public UnmodSortedIterator<T> iterator() {
+            return unmodSortedIterator(inner.iterator());
+        }
+        @Override public String toString() {
+            return UnmodIterable.toString("UnmodList", inner);
+        }
     }
 
-    public static UnmodSet<Object> EMPTY_UNMOD_SET = new UnmodSet<Object>() {
-        @Override public boolean contains(Object o) { return false; }
-        @Override public int size() { return 0; }
-        @Override public boolean isEmpty() { return true; }
-        @Override public UnmodIterator<Object> iterator() { return emptyUnmodIterator(); }
-    };
-    @SuppressWarnings("unchecked")
-    public static <T> UnmodSet<T> emptyUnmodSet() { return (UnmodSet<T>) EMPTY_UNMOD_SET; }
+    /**
+     Wraps a set.  The result will be serializable to the extent that the wrapped
+     set is.  You probably want to use this by calling
+     {@link #unmodSet(Set)}.
+     */
+    @SuppressWarnings("WeakerAccess")
+    public static class UnmodifiableSet<T> implements UnmodSet<T>, Serializable {
+        private final Set<T> set;
+        private UnmodifiableSet(Set<T> s) { set = s; }
 
-    /** Returns an unmodifiable version of the given set. */
-    public static <T> UnmodSet<T> unmodSet(Set<T> set) {
-        if (set == null) { return emptyUnmodSet(); }
-        if (set instanceof UnmodSet) { return (UnmodSet<T>) set; }
-        if (set.size() < 1) { return emptyUnmodSet(); }
-        return new UnmodSet<T>() {
-            @Override public boolean contains(Object o) { return set.contains(o); }
-            @Override public int size() { return set.size(); }
-            @Override public boolean isEmpty() { return set.isEmpty(); }
-            @Override public UnmodIterator<T> iterator() { return unmodIterator(set.iterator()); }
-            @Override public int hashCode() { return set.hashCode(); }
-            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
-            @Override public boolean equals(Object o) { return set.equals(o); }
-        };
+        // For serializable.  Make sure to change whenever internal data format changes.
+        private static final long serialVersionUID = 20160918033000L;
+
+        @Override public boolean contains(Object o) { return set.contains(o); }
+        @Override public int size() { return set.size(); }
+        @Override public boolean isEmpty() { return set.isEmpty(); }
+        @Override public UnmodIterator<T> iterator() { return unmodIterator(set.iterator()); }
+        @Override public int hashCode() { return set.hashCode(); }
+        @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
+        @Override public boolean equals(Object o) { return set.equals(o); }
+        @Override public String toString() {
+            return UnmodIterable.toString("UnmodSet", set);
+        }
     }
 
-    public static UnmodSortedIterator<Object> EMPTY_UNMOD_SORTED_ITERATOR =
-            new UnmodSortedIterator<Object>() {
-        @Override public boolean hasNext() { return false; }
-        @Override public Object next() { throw new NoSuchElementException(); }
-    };
-    @SuppressWarnings("unchecked")
+    /**
+     Wraps a sorted set.  The result will be serializable to the extent that the wrapped
+     set is.  You probably want to use this by calling
+     {@link #unmodSortedSet(SortedSet)}.
+     */
+    @SuppressWarnings("WeakerAccess")
+    public static class UnmodifiableSortedSet<T> implements UnmodSortedSet<T>, Serializable {
+        private final SortedSet<T> set;
+        private UnmodifiableSortedSet(SortedSet<T> s) { set = s; }
+
+        // For serializable.  Make sure to change whenever internal data format changes.
+        private static final long serialVersionUID = 20160918033000L;
+
+        @Override public Comparator<? super T> comparator() { return set.comparator(); }
+        @Override public UnmodSortedSet<T> subSet(T fromElement, T toElement) {
+            return unmodSortedSet(set.subSet(fromElement, toElement));
+        }
+        @Override public UnmodSortedSet<T> headSet(T toElement) {
+            return unmodSortedSet(set.headSet(toElement));
+        }
+        @Override public UnmodSortedSet<T> tailSet(T fromElement) {
+            return unmodSortedSet(set.tailSet(fromElement));
+        }
+        @Override public T first() { return set.first(); }
+        @Override public T last() { return set.last(); }
+        @Override public boolean contains(Object o) { return set.contains(o); }
+        @Override public int size() { return set.size(); }
+        @Override public boolean isEmpty() { return set.isEmpty(); }
+        @Override public UnmodSortedIterator<T> iterator() {
+            return unmodSortedIterator(set.iterator());
+        }
+        @Override public int hashCode() { return set.hashCode(); }
+        @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
+        @Override public boolean equals(Object o) { return set.equals(o); }
+        @Override public String toString() {
+            return UnmodIterable.toString("UnmodSortedSet", set);
+        }
+    }
+
+    /**
+     Wraps a map.  The result will be serializable to the extent that the wrapped
+     map is.  You probably want to use this by calling
+     {@link #unmodMap(Map)}.
+     */
+    @SuppressWarnings("WeakerAccess")
+    public static class UnmodifiableMap<K,V> implements UnmodMap<K,V>, Serializable {
+        private final Map<K,V> map;
+        private UnmodifiableMap(Map<K,V> m) { map = m; }
+
+        // For serializable.  Make sure to change whenever internal data format changes.
+        private static final long serialVersionUID = 20160918033000L;
+
+        /** {@inheritDoc} */
+        @Override public UnmodIterator<UnmodMap.UnEntry<K,V>> iterator() {
+            return UnmodMap.UnEntry.entryIterToUnEntryUnIter(map.entrySet().iterator());
+        }
+
+        @Override public UnmodSet<Map.Entry<K,V>> entrySet() { return unmodSet(map.entrySet()); }
+        @Override public int size() { return map.size(); }
+        @Override public boolean isEmpty() { return map.isEmpty(); }
+        @Override public boolean containsKey(Object key) { return map.containsKey(key); }
+        @Override public boolean containsValue(Object value) {
+            return map.containsValue(value);
+        }
+        @Override public V get(Object key) { return map.get(key); }
+        @Override public UnmodSet<K> keySet() { return unmodSet(map.keySet()); }
+        @SuppressWarnings("deprecation")
+        @Deprecated
+        @Override public UnmodCollection<V> values() { return unmodCollection(map.values()); }
+        @Override public int hashCode() { return map.hashCode(); }
+        @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
+        @Override public boolean equals(Object o) { return map.equals(o); }
+        @Override public String toString() {
+            return UnmodIterable.toString("UnmodMap", map.entrySet());
+        }
+    }
+
+    /**
+     Wraps a sorted map.  The result will be serializable to the extent that the wrapped
+     sorted map is.  You probably want to use this by calling
+     {@link #unmodSortedMap(SortedMap)}.
+     */
+    @SuppressWarnings("WeakerAccess")
+    public static class UnmodifiableSortedMap<K,V> implements UnmodSortedMap<K,V>, Serializable {
+        private final SortedMap<K,V> map;
+        private UnmodifiableSortedMap(SortedMap<K,V> m) { map = m; }
+
+        // For serializable.  Make sure to change whenever internal data format changes.
+        private static final long serialVersionUID = 20160918033000L;
+
+        @Override public int size() { return map.size(); }
+        @Override public boolean isEmpty() { return map.isEmpty(); }
+        @Override public boolean containsKey(Object key) { return map.containsKey(key); }
+        @Override public boolean containsValue(Object value) {
+            return map.containsValue(value);
+        }
+        @Override public V get(Object key) { return map.get(key); }
+        @Override public Comparator<? super K> comparator() { return map.comparator(); }
+        @Override public UnmodSortedMap<K,V> subMap(K fromKey, K toKey) {
+            return unmodSortedMap(map.subMap(fromKey, toKey));
+        }
+        @Override public UnmodSortedMap<K,V> tailMap(K fromKey) {
+            return unmodSortedMap(map.tailMap(fromKey));
+        }
+        @Override public K firstKey() { return map.firstKey(); }
+        @Override public K lastKey() { return map.lastKey(); }
+        @Override public UnmodSortedIterator<UnEntry<K,V>> iterator() {
+            return UnmodMap.UnEntry.entryIterToUnEntrySortedUnIter(map.entrySet().iterator());
+        }
+        @Override public int hashCode() { return map.hashCode(); }
+        @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
+        @Override public boolean equals(Object o) { return map.equals(o); }
+
+        @Override public String toString() {
+            return UnmodIterable.toString("UnmodSortedMap", map.entrySet());
+        }
+    }
+
+    /**
+     Wraps a collection.  The result will be serializable to the extent that the wrapped
+     collection is.  You probably want to use this by calling
+     {@link #unmodCollection(Collection)} (also see caveats there).
+     */
+    @SuppressWarnings("WeakerAccess")
+    public static class UnmodifiableCollection<T> implements UnmodCollection<T>, Serializable {
+        private final Collection<T> coll;
+        private UnmodifiableCollection(Collection<T> c) { coll = c; }
+
+        // For serializable.  Make sure to change whenever internal data format changes.
+        private static final long serialVersionUID = 20160918033000L;
+
+        @Override public boolean contains(Object o) { return coll.contains(o); }
+        @Override public int size() { return coll.size(); }
+        @Override public boolean isEmpty() { return coll.isEmpty(); }
+        @Override public UnmodIterator<T> iterator() { return unmodIterator(coll.iterator()); }
+        @Override public int hashCode() { return coll.hashCode(); }
+        @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
+        @Override public boolean equals(Object o) { return coll.equals(o); }
+        @Override public String toString() {
+            return UnmodIterable.toString("UnmodCollection", coll);
+        }
+    }
+
+    // ========================================== Empties ==========================================
+
+    // I had originally provided special implementations for empty collections and iterators.
+    // I started to further enhance these with Serializable singletons with a defensive
+    // readResolve method to defend against deserializing non-singleton instances.  But that
+    // added a lot of complexity without adding a lot of real value.  It also increased the jar
+    // file size and I'm increasingly finding that the JVM optimizes best with minimal code size
+    // (and maximum reuse).  So I picked simple.  Some implementations are left commented out.
+
+    /** Returns an empty unmodifiable iterator.  The result is not serializable. */
+    public static <T> UnmodifiableIterator<T> emptyUnmodIterator() {
+        return new UnmodifiableIterator<>(Collections.emptyIterator());
+    }
+
+//    /**
+//     Returns an empty unmodifiable iterable.  The result is serializable, but deserialization will
+//     produce a new, unique object.  For this reason, you should not compare the returned iterable
+//     with the == operator.
+//     */
+//    @SuppressWarnings("WeakerAccess")
+//    public static <E> UnmodIterable<E> emptyUnmodIterable() {
+//        return new UnmodifiableIterable<>(Collections.emptySet());
+//    }
+
+    /**
+     Only use this where Sorted items are called for.  Returns an empty unmodifiable sorted
+     iterator.  The result is serializable, but deserialization will produce a new, unique object.
+     For this reason, you should not compare the returned iterator with the == operator.
+     */
     public static <T> UnmodSortedIterator<T> emptyUnmodSortedIterator() {
-        return (UnmodSortedIterator<T>) EMPTY_UNMOD_SORTED_ITERATOR;
+        return new UnmodifiableSortedIterator<>(Collections.emptyIterator());
     }
 
-    public static UnmodSet<Object> EMPTY_UNMOD_SORTED_SET = new UnmodSortedSet<Object>() {
-        @Override public boolean contains(Object o) { return false; }
-        @Override public int size() { return 0; }
-        @Override public boolean isEmpty() { return true; }
-        @Override public UnmodSortedIterator<Object> iterator() {
-            return emptyUnmodSortedIterator();
-        }
-        // Is this implementation a reason not to have an empty sorted set singleton?
-        @Override public Comparator<? super Object> comparator() { return null; }
-        @Override public UnmodSortedSet<Object> subSet(Object fromElement, Object toElement) {
-            return this;
-        }
-        @Override public UnmodSortedSet<Object> tailSet(Object fromElement) { return this; }
-        @Override public Object first() { throw new NoSuchElementException("Empty set"); }
-        @Override public Object last() { throw new NoSuchElementException("Empty set"); }
-    };
-    @SuppressWarnings("unchecked")
-    public static <T> UnmodSortedSet<T> emptyUnmodSortedSet() {
-        return (UnmodSortedSet<T>) EMPTY_UNMOD_SORTED_SET;
+    /** Returns an empty list iterator.  The result is NOT serializable. */
+    public static <T> UnmodListIterator<T> emptyUnmodListIterator() {
+        return new UnmodifiableListIterator<>(Collections.emptyListIterator());
     }
 
-    /** Returns an unmodifiable version of the given set. */
-    public static <T> UnmodSortedSet<T> unmodSortedSet(SortedSet<T> set) {
-        if (set == null) { return emptyUnmodSortedSet(); }
-        if (set instanceof UnmodSortedSet) { return (UnmodSortedSet<T>) set; }
-        if (set.size() < 1) { return emptyUnmodSortedSet(); }
-        return new UnmodSortedSet<T>() {
-            @Override public Comparator<? super T> comparator() { return set.comparator(); }
-            @Override public UnmodSortedSet<T> subSet(T fromElement, T toElement) {
-                return unmodSortedSet(set.subSet(fromElement, toElement));
-            }
-            @Override public UnmodSortedSet<T> headSet(T toElement) {
-                return unmodSortedSet(set.headSet(toElement));
-            }
-            @Override public UnmodSortedSet<T> tailSet(T fromElement) {
-                return unmodSortedSet(set.tailSet(fromElement));
-            }
-            @Override public T first() { return set.first(); }
-            @Override public T last() { return set.last(); }
-            @Override public boolean contains(Object o) { return set.contains(o); }
-            @Override public int size() { return set.size(); }
-            @Override public boolean isEmpty() { return set.isEmpty(); }
-            @Override public UnmodSortedIterator<T> iterator() {
-                return new UnmodSortedIterator<T>() {
-                    Iterator<T> iter = set.iterator();
-                    @Override public boolean hasNext() { return iter.hasNext(); }
-                    @Override public T next() { return iter.next(); }
-                };
-            }
-            @Override public int hashCode() { return set.hashCode(); }
-            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
-            @Override public boolean equals(Object o) { return set.equals(o); }
-        };
-    }
-
-    public static UnmodMap<Object,Object> EMPTY_UNMOD_MAP = new UnmodMap<Object,Object>() {
-        @Override public UnmodSet<Entry<Object,Object>> entrySet() { return emptyUnmodSet(); }
-        @Override public UnmodSet<Object> keySet() { return emptyUnmodSet(); }
-        @SuppressWarnings("deprecation")
-        @Override public UnmodCollection<Object> values() { return emptyUnmodCollection(); }
-        @Override public int size() { return 0; }
-        @Override public boolean isEmpty() { return true; }
-        @Override public UnmodIterator<UnEntry<Object,Object>> iterator() {
-            return emptyUnmodIterator();
-        }
-        @Override public boolean containsKey(Object key) { return false; }
-        @Override public boolean containsValue(Object value) { return false; }
-        @Override public Object get(Object key) { return null; }
-    };
-    @SuppressWarnings("unchecked")
-    public static <T,U> UnmodMap<T,U> emptyUnmodMap() { return (UnmodMap<T,U>) EMPTY_UNMOD_MAP; }
-
-    /** Returns an unmodifiable version of the given map. */
-    public static <K,V> UnmodMap<K,V> unmodMap(Map<K,V> map) {
-        if (map == null) { return emptyUnmodMap(); }
-        if (map instanceof UnmodMap) { return (UnmodMap<K,V>) map; }
-        if (map.size() < 1) { return emptyUnmodMap(); }
-        return new UnmodMap<K,V>() {
-            /** {@inheritDoc} */
-            @Override
-            public UnmodIterator<UnEntry<K,V>> iterator() {
-                return UnEntry.entryIterToUnEntryUnIter(map.entrySet().iterator());
-            }
-
-            @Override public UnmodSet<Entry<K,V>> entrySet() { return unmodSet(map.entrySet()); }
-            @Override public int size() { return map.size(); }
-            @Override public boolean isEmpty() { return map.isEmpty(); }
-            @Override public boolean containsKey(Object key) { return map.containsKey(key); }
-            @Override public boolean containsValue(Object value) {
-                return map.containsValue(value);
-            }
-            @Override public V get(Object key) { return map.get(key); }
-            @Override public UnmodSet<K> keySet() { return unmodSet(map.keySet()); }
-            @SuppressWarnings("deprecation")
-            @Deprecated
-            @Override public UnmodCollection<V> values() { return unmodCollection(map.values()); }
-            @Override public int hashCode() { return map.hashCode(); }
-            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
-            @Override public boolean equals(Object o) { return map.equals(o); }
-        };
-    }
-
-    static UnmodSortedMap<Object,Object> EMPTY_UNMOD_SORTED_MAP =
-            new UnmodSortedMap<Object,Object>() {
-        @Override public UnmodSortedSet<Entry<Object,Object>> entrySet() {
-            return emptyUnmodSortedSet();
-        }
-        @Override public UnmodSortedSet<Object> keySet() { return emptyUnmodSortedSet(); }
-        @Override public Comparator<? super Object> comparator() { return null; }
-        @Override public UnmodSortedMap<Object,Object> subMap(Object fromKey, Object toKey) {
-            return this;
-        }
-        @Override public UnmodSortedMap<Object,Object> tailMap(Object fromKey) { return this; }
-        @Override public Object firstKey() { throw new NoSuchElementException("empty map"); }
-        @Override public Object lastKey() { throw new NoSuchElementException("empty map"); }
-        // I don't think I should need this suppression because it's not deprecated in
-        // UnmodSortedMap.  My IDE doesn't warn me, but Java 1.8.0_60 does.
-        @SuppressWarnings("deprecation")
-        @Override public UnmodList<Object> values() { return emptyUnmodList(); }
-        @Override public int size() { return 0; }
-        @Override public boolean isEmpty() { return true; }
-        @Override public UnmodSortedIterator<UnEntry<Object,Object>> iterator() {
-            return emptyUnmodSortedIterator();
-        }
-        @Override public boolean containsKey(Object key) { return false; }
-        @Override public boolean containsValue(Object value) { return false; }
-        @Override public Object get(Object key) { return null; }
-    };
-    @SuppressWarnings("unchecked")
-    static <T,U> UnmodSortedMap<T,U> emptyUnmodSortedMap() {
-        return (UnmodSortedMap<T,U>) EMPTY_UNMOD_SORTED_MAP;
-    }
-
-    /** Returns an unmodifiable version of the given sorted map. */
-    public static <K,V> UnmodSortedMap<K,V> unmodSortedMap(SortedMap<K,V> map) {
-        if (map == null) { return emptyUnmodSortedMap(); }
-        if (map instanceof UnmodSortedMap) { return (UnmodSortedMap<K,V>) map; }
-        if (map.size() < 1) { return emptyUnmodSortedMap(); }
-        return new UnmodSortedMap<K,V>() {
-//            @Override public UnmodSortedSet<Entry<K,V>> entrySet() {
-//                return new UnmodSortedSet<Entry<K,V>>() {
-//                    Set<Entry<K,V>> entrySet = map.entrySet();
-//                    @Override public UnmodSortedIterator<Entry<K,V>> iterator() {
-//                        return new UnmodSortedIterator<Entry<K,V>>() {
-//                            Iterator<Entry<K,V>> iter = entrySet.iterator();
-//                            @Override public boolean hasNext() { return iter.hasNext(); }
-//                            @Override public Entry<K,V> next() { return iter.next(); }
-//                        };
-//                    }
-//                    @Override public UnmodSortedSet<Entry<K,V>> subSet(Entry<K,V> fromElement,
-//                                                                       Entry<K,V> toElement) {
-//                        // This is recursive.  I hope it's not an infinite loop 'cause I don't want
-//                        // to write this all out again.
-//                        return unmodSortedMap(map.subMap(fromElement.getKey(), toElement.getKey()))
-//                                .entrySet();
-//                    }
-//
-//                    @Override public UnmodSortedSet<Entry<K,V>> tailSet(Entry<K,V> fromElement) {
-//                        // This is recursive.  I hope it's not an infinite loop 'cause I don't want
-//                        // to write this all out again.
-//                        return unmodSortedMap(map.tailMap(fromElement.getKey()))
-//                                .entrySet();
-//                    }
-//
-//                    @Override public Comparator<? super Entry<K,V>> comparator() {
-//                        return (o1, o2) -> map.comparator().compare(o1.getKey(), o2.getKey());
-//                    }
-//                    @Override public Entry<K,V> first() {
-//                        K key = map.firstKey();
-//                        return Tuple2.of(key, map.get(key));
-//                    }
-//
-//                    @Override public Entry<K,V> last() {
-//                        K key = map.lastKey();
-//                        return Tuple2.of(key, map.get(key));
-//                    }
-//                    @Override public boolean contains(Object o) { return entrySet.contains(o); }
-//                    @Override public boolean isEmpty() { return entrySet.isEmpty(); }
-//                    @Override public int size() { return entrySet.size(); }
-//                    @Override public int hashCode() { return entrySet.hashCode(); }
-//                    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
-//                    @Override public boolean equals(Object o) { return entrySet.equals(o); }
-//                };
-//            }
-            @Override public int size() { return map.size(); }
-            @Override public boolean isEmpty() { return map.isEmpty(); }
-            @Override public boolean containsKey(Object key) { return map.containsKey(key); }
-            @Override public boolean containsValue(Object value) {
-                return map.containsValue(value);
-            }
-            @Override public V get(Object key) { return map.get(key); }
-//            @Override public UnmodSortedSet<K> keySet() { return unmodSet(map.keySet()); }
-            @Override public Comparator<? super K> comparator() { return map.comparator(); }
-            @Override public UnmodSortedMap<K,V> subMap(K fromKey, K toKey) {
-                return unmodSortedMap(map.subMap(fromKey, toKey));
-            }
-            @Override public UnmodSortedMap<K,V> tailMap(K fromKey) {
-                return unmodSortedMap(map.tailMap(fromKey));
-            }
-            @Override public K firstKey() { return map.firstKey(); }
-            @Override public K lastKey() { return map.lastKey(); }
-//            @Override public UnmodSortedCollection<V> values() {
-//                return unmodSortedCollection(map.values());
-//            }
-            @Override public UnmodSortedIterator<UnEntry<K,V>> iterator() {
-                return new UnmodSortedIterator<UnEntry<K,V>>() {
-                    // Could have gone with values() instead.
-                    Iterator<Entry<K,V>> iter = map.entrySet().iterator();
-                    @Override public boolean hasNext() { return iter.hasNext(); }
-
-                    @Override public UnEntry<K,V> next() {
-                        return Tuple2.of(iter.next());
-                    }
-                };
-            }
-            @Override public int hashCode() { return map.hashCode(); }
-            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
-            @Override public boolean equals(Object o) { return map.equals(o); }
-        };
-    }
-
-    public static UnmodCollection<Object> EMPTY_UNMOD_COLLECTION = new UnmodCollection<Object>() {
-        @Override public boolean contains(Object o) { return false; }
-        @Override public int size() { return 0; }
-        @Override public boolean isEmpty() { return true; }
-        @Override public UnmodIterator<Object> iterator() { return emptyUnmodIterator(); }
-    };
-
-    @SuppressWarnings("unchecked")
-    public static <T> UnmodCollection<T> emptyUnmodCollection() {
-        return (UnmodCollection<T>) EMPTY_UNMOD_COLLECTION;
-    }
-
+//    // This is a separate class 1. to defend this singleton against serialization/deserialization
+//    // and I suppose 2. so that you can enforce the singleton property with the type system if you
+//    // want to.
+//    private static final class UnmodifiableListEmpty<T> extends UnmodifiableList<T> {
+//        private static final UnmodifiableListEmpty<?> INSTANCE = new UnmodifiableListEmpty();
+//        private UnmodifiableListEmpty() { super(Collections.emptyList()); }
+//        // For serializable.  Make sure to change whenever internal data format changes.
+//        private static final long serialVersionUID = 20160918033000L;
+//        // This enforces the singleton property in the face of deserialization.
+//        private Object readResolve() { return INSTANCE; }
+//    }
 
     /**
-     Returns an unmodifiable version of the given collection.  Collections shouldn't be instantiated
-     because they are an abomination from the equals() point of view - neither List nor Set will
-     call themselves equal to a Collection.
+     Returns an empty unmodifiable list.  The result is serializable, but deserialization will
+     produce a new, unique object.  For this reason, you should not compare the returned list
+     with the == operator.
      */
-    @Deprecated
-    static <T> UnmodCollection<T> unmodCollection(Collection<T> coll) {
-        if (coll == null) { return emptyUnmodCollection(); }
-        if (coll instanceof UnmodCollection) { return (UnmodCollection<T>) coll; }
-        if (coll.size() < 1) { return emptyUnmodCollection(); }
-        return new UnmodCollection<T>() {
-            @Override public boolean contains(Object o) { return coll.contains(o); }
-            @Override public int size() { return coll.size(); }
-            @Override public boolean isEmpty() { return coll.isEmpty(); }
-            @Override public UnmodIterator<T> iterator() { return unmodIterator(coll.iterator()); }
-            @Override public int hashCode() { return coll.hashCode(); }
-            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
-            @Override public boolean equals(Object o) { return coll.equals(o); }
-        };
+    @SuppressWarnings("WeakerAccess")
+    public static <T> UnmodList<T> emptyUnmodList() {
+        return new UnmodifiableList<>(Collections.emptyList());
     }
+
+    /**
+     Returns an empty unmodifiable set.  The result is serializable, but deserialization will
+     produce a new, unique object.  For this reason, you should not compare the returned set
+     with the == operator.
+     */
+    @SuppressWarnings("WeakerAccess")
+    public static <T> UnmodSet<T> emptyUnmodSet() {
+        return new UnmodifiableSet<>(Collections.emptySet());
+    }
+
+    /**
+     Returns an empty unmodifiable sorted set.  The result is serializable, but deserialization will
+     produce a new, unique object.  For this reason, you should not compare the returned set
+     with the == operator.
+     */
+    @SuppressWarnings("WeakerAccess")
+    public static <T> UnmodSortedSet<T> emptyUnmodSortedSet() {
+        return new UnmodifiableSortedSet<>(Collections.emptySortedSet());
+    }
+
+    /**
+     Returns an empty unmodifiable map.  The result is serializable, but deserialization will
+     produce a new, unique object.  For this reason, you should not compare the returned map
+     with the == operator.
+     */
+    @SuppressWarnings("WeakerAccess")
+    public static <T,U> UnmodMap<T,U> emptyUnmodMap() {
+        return new UnmodifiableMap<>(Collections.emptyMap());
+    }
+
+    /**
+     Returns an empty unmodifiable sorted map.  This is serializable, but deserialization will
+     produce a new, unique object.  For this reason, you should not compare the returned map
+     with the == operator.
+     */
+    @SuppressWarnings("WeakerAccess")
+    public static <T,U> UnmodSortedMap<T,U> emptyUnmodSortedMap() {
+        return new UnmodifiableSortedMap<>(Collections.emptySortedMap());
+    }
+
+    /**
+     Returns an empty unmodifiable Collection.  Avoid this when possible because there is no way
+     to compare Collections for equality (they could be Lists or Sets).
+     This is serializable, but deserialization will produce a new, unique object.  For this reason,
+     you should not compare the returned collection with the == operator.
+     */
+    public static <T> UnmodCollection<T> emptyUnmodCollection() {
+        return new UnmodifiableCollection<>(Collections.emptySet());
+    }
+
+    // ====================================== Wrapper Methods ======================================
+
+//    /**
+//     Returns an unmodifiable version of the given iterable.  The result is serializable to the
+//     extent that the supplied iterable is serializable.
+//     */
+//    public static <T> UnmodIterable<T> unmodIterable(Iterable<T> iterable) {
+//        return (iterable == null)                  ? emptyUnmodIterable() :
+//               (iterable instanceof UnmodIterable) ? (UnmodIterable<T>) iterable :
+//               new UnmodifiableIterable<>(iterable);
+//    }
+
+    /**
+     Returns an unmodifiable version of the given iterator.  The result is NOT serializable.
+     You could pass a partially used-up iterator to this method, but that's probably something you
+     want to avoid.
+     */
+    public static <T> UnmodIterator<T> unmodIterator(Iterator<T> iter) {
+        return ( (iter == null) || !iter.hasNext() ) ? emptyUnmodIterator() :
+               (iter instanceof UnmodIterator)       ? (UnmodIterator<T>) iter :
+               new UnmodifiableIterator<>(iter);
+    }
+
+    /**
+     Returns an unmodifiable version of the given ordered Iterator.
+     Only use where items are ordered/sorted such as from a List or SortedSet that guarantees
+     order.  The result is NOT serializable.
+     */
+    @SuppressWarnings("WeakerAccess")
+    public static <T> UnmodSortedIterator<T> unmodSortedIterator(Iterator<T> iter) {
+        return ( (iter == null) || !iter.hasNext() ) ? emptyUnmodSortedIterator() :
+               (iter instanceof UnmodSortedIterator) ? (UnmodSortedIterator<T>) iter :
+               new UnmodifiableSortedIterator<>(iter);
+    }
+
+    /**
+     Returns an unmodifiable version of the given listIterator.  The result is NOT serializable.
+     */
+    @SuppressWarnings("WeakerAccess")
+    public static <T> UnmodListIterator<T> unmodListIterator(ListIterator<T> iter) {
+        return (iter == null)                           ? emptyUnmodListIterator() :
+               (iter instanceof UnmodListIterator)      ? (UnmodListIterator<T>) iter :
+               (!iter.hasNext() && !iter.hasPrevious()) ? emptyUnmodListIterator() :
+               new UnmodifiableListIterator<>(iter);
+    }
+
+    /**
+     Returns an unmodifiable version of the given list.  The returned list is serializable to the
+     extent that the given list is serializable.
+     */
+    public static <T> UnmodList<T> unmodList(List<T> inner) {
+        return (inner == null)              ? emptyUnmodList() :
+               (inner instanceof UnmodList) ? (UnmodList<T>) inner :
+               (inner.size() < 1)           ? emptyUnmodList() :
+               new UnmodifiableList<>(inner);
+    }
+
+    /**
+     Returns an unmodifiable version of the given set.  The result is serializable to the extent
+     that the given set is serializable.
+     */
+    public static <T> UnmodSet<T> unmodSet(Set<T> set) {
+        return (set == null)             ? emptyUnmodSet() :
+               (set instanceof UnmodSet) ? (UnmodSet<T>) set :
+               (set.size() < 1)          ? emptyUnmodSet() :
+               new UnmodifiableSet<>(set);
+    }
+
+    /**
+     Returns an unmodifiable version of the given set.  The result is serializable to the extent
+     that the given set is serializable.  A common serialization mistake is to define a comparator
+     with an anonymous class or function, or otherwise rely on a comparator which cannot be
+     serialized.  The resulting deserialized set will take the default ordering
+     (or could throw an error).  Since comparators are usually singletons, an Enum is probably the
+     best way to implement one.
+     */
+    public static <T> UnmodSortedSet<T> unmodSortedSet(SortedSet<T> set) {
+        return (set == null)                   ? emptyUnmodSortedSet() :
+               (set instanceof UnmodSortedSet) ? (UnmodSortedSet<T>) set :
+               (set.size() < 1)                ? emptyUnmodSortedSet() :
+               new UnmodifiableSortedSet<>(set);
+    }
+
+    /**
+     Returns an unmodifiable version of the given map.  The result is serializable to the
+     extent that the given map is serializable.
+     */
+    public static <K,V> UnmodMap<K,V> unmodMap(Map<K,V> map) {
+        return (map == null)             ? emptyUnmodMap() :
+               (map instanceof UnmodMap) ? (UnmodMap<K,V>) map :
+               (map.size() < 1)          ? emptyUnmodMap() :
+               new UnmodifiableMap<>(map);
+    }
+
+    /**
+     Returns an unmodifiable version of the given sorted map.  The result is serializable to the
+     extent that the given map is serializable.  A common serialization mistake is to define a
+     comparator with an anonymous class or function, or otherwise rely on a comparator which cannot
+     be serialized.  The resulting deserialized map will take the default ordering
+     (or could throw an error).  Since comparators are usually singletons, an Enum is probably the
+     best way to implement one.
+     */
+    public static <K,V> UnmodSortedMap<K,V> unmodSortedMap(SortedMap<K,V> map) {
+        return (map == null)                   ? emptyUnmodSortedMap() :
+               (map instanceof UnmodSortedMap) ? (UnmodSortedMap<K,V>) map :
+               (map.size() < 1)                ? emptyUnmodSortedMap() :
+               new UnmodifiableSortedMap<>(map);
+    }
+
+    /**
+     Returns an unmodifiable version of the given collection.  This class is too vague to be
+     compared for equality.  Both List and Set are collections, but neither consider themselves
+     equal to any Collection, and indeed their notions of equality are incompatible.
+     The returned collection is serializable to the extent that the wrapped collection is.
+     */
+    @SuppressWarnings("WeakerAccess")
+    public static <T> UnmodCollection<T> unmodCollection(Collection<T> coll) {
+        return (coll == null)                    ? emptyUnmodCollection() :
+               (coll instanceof UnmodCollection) ? (UnmodCollection<T>) coll :
+               (coll.size() < 1)                 ? emptyUnmodCollection() :
+               new UnmodifiableCollection<>(coll);
+    }
+
+    // ========================================= To Delete =========================================
+
+    /** Use {@link #emptyUnmodIterator()} instead. */
+    @SuppressWarnings({"unused", "WeakerAccess"})
+    @Deprecated
+    public static final UnmodIterator<?> EMPTY_UNMOD_ITERATOR = emptyUnmodIterator();
+
+    /** Use {@link #emptyUnmodListIterator()} instead. */
+    @SuppressWarnings({"unused", "WeakerAccess"})
+    @Deprecated
+    public static final UnmodListIterator<Object> EMPTY_UNMOD_LIST_ITERATOR =
+            emptyUnmodListIterator();
+
+//    /** Use {@link #emptyUnmodIterable()} instead. */
+//    @SuppressWarnings({"unused", "WeakerAccess"})
+//    @Deprecated
+//    // Thankfully, this was never public.
+//    static final UnmodIterable<?> EMPTY_UNMOD_ITERABLE = emptyUnmodIterable();
+
+    /** Use {@link #emptyUnmodList()} instead */
+    @SuppressWarnings({"unused", "WeakerAccess"})
+    @Deprecated
+    public static final UnmodList<?> EMPTY_UNMOD_LIST = emptyUnmodList();
+
+    /** Use {@link #emptyUnmodSet()} instead. */
+    @SuppressWarnings({"unused", "WeakerAccess"})
+    @Deprecated
+    public static final UnmodSet<Object> EMPTY_UNMOD_SET = emptyUnmodSet();
+
+    /** Use {@link #emptyUnmodSortedIterator()} instead */
+    @SuppressWarnings({"unused", "WeakerAccess"})
+    @Deprecated
+    public static final UnmodSortedIterator<Object> EMPTY_UNMOD_SORTED_ITERATOR =
+            emptyUnmodSortedIterator();
+
+    /** Use {@link #emptyUnmodSortedSet()} instead */
+    @SuppressWarnings({"unused", "WeakerAccess"})
+    @Deprecated
+    public static final UnmodSet<Object> EMPTY_UNMOD_SORTED_SET = emptyUnmodSortedSet();
+
+    /** Use {@link #emptyUnmodMap()} instead. */
+    @SuppressWarnings({"unused", "WeakerAccess"})
+    @Deprecated
+    public static final UnmodMap<Object,Object> EMPTY_UNMOD_MAP = emptyUnmodMap();
+
+    /** Use {@link #emptyUnmodSortedMap()} Instead. */
+    @SuppressWarnings({"unused", "WeakerAccess"})
+    @Deprecated
+    // Thankfully, this was never public
+    static final UnmodSortedMap<Object,Object> EMPTY_UNMOD_SORTED_MAP = emptyUnmodSortedMap();
+
+    /** Use {@link #emptyUnmodCollection()} instead */
+    @SuppressWarnings({"unused", "WeakerAccess"})
+    @Deprecated
+    public static final UnmodCollection<Object> EMPTY_UNMOD_COLLECTION = emptyUnmodCollection();
 
 //    /**
 //     Returns an int which is a unique and correct hash code for the objects passed.  This

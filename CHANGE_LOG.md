@@ -1,7 +1,30 @@
 # Change Log
 
-## Release 2.1.0: RRB Tree
-
+## 2016-09-21 Release 2.0.13
+ - FunctionUtils
+    - The unmodifiable collection wrappers are now serializable, but the empty collections are no longer singletons:
+    - Deprecated `EMPTY_UNMOD____` static fields and replaced them with `public static emptyUnmod___()` methods
+    - All `unmod___()` methods now return Serializable subclassses of `Unmod____` interfaces with reasonable
+    equals(), hashCode(), and now toString() implementations.
+    - Removed arrayToString() and mapToString() - Java 8 doesn't need this for map and
+    for arrays you should use Arrays.toString() instead.
+    - Removed unmodIterable() and EMPTY_UNMOD_ITERABLE.  It's too vague to be useful.
+    If you use unmodList() or unmodSortedSet() it safely provides an UnmodSortedIterable.
+    unmodSet() and unmodMap() provide UnmodIterables.
+ - Deprecated UnmodIterator.Wrapper class and replaced with FunctionUtils.unmodIterator() method.
+ - PersistentTreeSet.toString() now returns string values with quotes.
+ - The above changes brought the size of the jar file from under 240K to under 230K.
+ I bet removing all the deprecated stuff can get us under 220K.
+ - Made MutableVector public (but final) and added equals(), hashCode() and toString().
+ Also added PersistentVector.emptyMutable() static method because Java type inference has
+ real problems otherwise.  Added tests for same.
+ - Similarly added emptyMutable() to PersistentHashMap and PersistentHashSet.
+ - New interface: Sized, has the single method `int size()` on it.  UnmodCollection and UnmodMap now implement this.
+ - New: UnmodIterable.AbstractUnmodIterable defines hashCode() and toString() for all collections
+   (except List which needs a different implementation to be compatible with java.util.List).
+ - New: UnmodMap.AbstractUnmodMap defines equals() for maps.  Made PersistentHashMap and MutableHashMap extend this. 
+ - New: UnmodSet.AbstractUnmodSet defines equals() for maps.  Made PersistentHashSet and MutableHashSet extend this.
+ - New: UnmodList.AbstractUnmodList defines equals() and hashcode() for lists.  Made PersistentVector and MutableVector extend this.
 
 ## 2016-09-17 Release 2.0.12
  - Changed order of serialization for PersistentTreeMap.  Because it uses a serialization proxy, it

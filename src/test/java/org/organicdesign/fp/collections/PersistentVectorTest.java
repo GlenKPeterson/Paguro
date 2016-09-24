@@ -33,6 +33,7 @@ import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.vec;
 import static org.organicdesign.fp.TestUtilities.compareIterators;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
+import static org.organicdesign.fp.collections.PersistentVector.emptyMutable;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 @RunWith(JUnit4.class)
@@ -437,6 +438,21 @@ public class PersistentVectorTest {
         assertEquals(control.size(), test.mutable().size());
         compareIterators(control.iterator(), test.mutable().iterator());
 
+        assertEquals(emptyMutable(), emptyMutable());
+
+        equalsDistinctHashCode(emptyMutable(), emptyMutable(), emptyMutable(),
+                               emptyMutable().append(new Object()));
+
+        MutableList<Integer> m = emptyMutable();
+        assertEquals(Arrays.asList(3, 5, 7), m.append(3).append(5).append(7));
+        assertEquals(Arrays.asList(3, 5, 7), m.immutable());
+        assertEquals(Arrays.asList(3, 5, 7), emptyMutable().append(3).append(5).append(7));
+
+        m = PersistentVector.<Integer>empty().mutable();
+        assertEquals(Arrays.asList(3, 5, 7), m.append(3).append(5).append(7));
+        assertEquals(Arrays.asList(3, 5, 7), m.immutable());
+        assertEquals(Arrays.asList(3, 5, 7), PersistentVector.empty().mutable().append(3).append(5).append(7));
+
     }
 
     @Test public void testAddReplace() {
@@ -462,6 +478,13 @@ public class PersistentVectorTest {
         for (int i = 0; i < SEVERAL; i++) {
             assertEquals(control.get(i), test.get(i));
         }
+
+        // Replacing one beyond the index is an add (from Clojure).  Not so for java.util.List.
+        control.add(SEVERAL, 9);
+        test = test.replace(SEVERAL, 9);
+        assertEquals(control.size(), test.size());
+
+        assertEquals(test, test.immutable());
     }
 
     @Test public void reverseTest() {

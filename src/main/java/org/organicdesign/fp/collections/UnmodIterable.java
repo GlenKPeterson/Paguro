@@ -8,9 +8,22 @@ import org.organicdesign.fp.xform.Xform;
 
 import java.util.Iterator;
 
+import static org.organicdesign.fp.FunctionUtils.stringify;
+
 /** An unmodifiable Iterable, without any guarantee about order. */
 public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
     // ========================================== Static ==========================================
+
+    /**
+     Implements equals and hashCode() methods compatible with all java.util collections (this
+     algorithm is not order-dependent) and toString which takes the name of the sub-class.
+     */
+    abstract class AbstractUnmodIterable<T> implements UnmodIterable<T> {
+        @Override public int hashCode() { return UnmodIterable.hash(this); }
+        @Override public String toString() {
+            return UnmodIterable.toString(getClass().getSimpleName(), this);
+        }
+    }
 
     //    /**
 // Caution: this is a convenient optimization for immutable data structures and a nightmare
@@ -116,10 +129,10 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
         int i = 0;
         Iterator iter = iterable.iterator();
         while (iter.hasNext()) {
-            Object item = iter.next();
             if (i > 0) { sB.append(","); }
             if (i > 4) { break; }
-            sB.append(item);
+            Object item = iter.next();
+            sB.append(stringify(item));
             i++;
         }
         if (iter.hasNext()) {

@@ -36,7 +36,8 @@ import org.organicdesign.fp.xform.Transformable;
  @author Rich Hickey (Primary author)
  @author Glen Peterson (Java-centric editor)
  */
-public class PersistentVector<E> implements ImList<E>, Serializable {
+public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
+        implements ImList<E>, Serializable {
 
     // There's bit shifting going on here because it's a very fast operation.
     // Shifting right by 5 is aeons faster than dividing by 32.
@@ -99,11 +100,21 @@ public class PersistentVector<E> implements ImList<E>, Serializable {
     public static <T> PersistentVector<T> empty() { return (PersistentVector<T>) EMPTY; }
 
     /**
+     Returns a new mutable vector.  For some reason calling empty().mutable() sometimes requires
+     an explicit type parameter in Java, so this convenience method works around that.
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> MutableVector<T> emptyMutable() {
+        PersistentVector<T> e = empty();
+        return e.mutable();
+    }
+
+    /**
      Public static factory method to create a vector from an Iterable.  A varargs version of this
      method is: {@link org.organicdesign.fp.StaticImports#vec(Object...)}.
      */
     static public <T> PersistentVector<T> ofIter(Iterable<T> items) {
-        MutableVector<T> ret = emptyMutableVector();
+        MutableVector<T> ret = emptyMutable();
         for (T item : items) {
             ret.append(item);
         }
@@ -113,7 +124,7 @@ public class PersistentVector<E> implements ImList<E>, Serializable {
 //    /** Public static factory method. */
 //    @SafeVarargs
 //    static public <T> PersistentVector<T> of(T... items) {
-//        MutableVector<T> ret = emptyMutableVector();
+//        MutableVector<T> ret = emptyMutable();
 //        for (T item : items) {
 //            ret = ret.append(item);
 //        }
@@ -131,12 +142,6 @@ public class PersistentVector<E> implements ImList<E>, Serializable {
 //        }
 //        return ret;
 //    }
-
-    // We could make this public someday.
-    @SuppressWarnings("unchecked")
-    private static <T> MutableVector<T> emptyMutableVector() {
-        return (MutableVector<T>) EMPTY.mutable();
-    }
 
     // ==================================== Instance Variables ====================================
     // The number of items in this Vector.
@@ -185,7 +190,7 @@ public class PersistentVector<E> implements ImList<E>, Serializable {
         @SuppressWarnings("unchecked")
         private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
             s.defaultReadObject();
-            vector = emptyMutableVector();
+            vector = emptyMutable();
             for (int i = 0; i < size; i++) {
                 vector.append((E) s.readObject());
             }
@@ -207,7 +212,7 @@ public class PersistentVector<E> implements ImList<E>, Serializable {
     // not MutableVector<E> as this originally returned.
 //    @Override
     // We could make this public some day, maybe.
-    @Override public MutableList<E> mutable() { return new MutableVector<>(this); }
+    @Override public MutableVector<E> mutable() { return new MutableVector<>(this); }
 
     @Override public ImList<E> immutable() { return this; }
 
@@ -486,32 +491,6 @@ public class PersistentVector<E> implements ImList<E>, Serializable {
 //        }
 //    }
 
-    /** This is correct, but O(n). This implementation is compatible with java.util.AbstractList. */
-    @Override public int hashCode() {
-        int ret = 1;
-        for (E item : this) {
-            ret *= 31;
-            if (item != null) {
-                ret += item.hashCode();
-            }
-        }
-        return ret;
-    }
-
-    /**
-     This is correct, but definitely O(n), same as java.util.ArrayList.
-     This implementation is compatible with java.util.AbstractList.
-     */
-    @Override public boolean equals(Object other) {
-        if (this == other) { return true; }
-        if ( !(other instanceof List) ) { return false; }
-        List<?> that = (List) other;
-        return (this.size() == that.size()) &&
-                UnmodSortedIterable.equal(this, UnmodSortedIterable.castFromList(that));
-    }
-
-    @Override public String toString() { return UnmodIterable.toString("PersistentVector", this); }
-
     private static Node doAssoc(int level, Node node, int i, Object val) {
         Node ret = new Node(node.edit, node.array.clone());
         if (level == 0) {
@@ -546,7 +525,10 @@ public class PersistentVector<E> implements ImList<E>, Serializable {
 //    public static <A> Reduced<A> done(A a) { return new Reduced<>(a); }
 
     // Implements Counted through ITransientVector<E> -> Indexed<E> -> Counted.
-    private static final class MutableVector<F> implements MutableList<F> {
+    @SuppressWarnings("WeakerAccess")
+    public static final class MutableVector<F> extends UnmodList.AbstractUnmodList<F>
+            implements MutableList<F> {
+
         // The number of items in this Vector.
         private int size;
 

@@ -47,8 +47,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>,
 
             @SuppressWarnings("unchecked")
             @Override public boolean contains(Object o) {
-                if ( !(o instanceof Entry) ) { return false; }
-                return containsKey(((Entry<K,V>) o).getKey());
+                return (o instanceof Entry) && containsKey(((Entry<K, V>) o).getKey());
             }
 
             @SuppressWarnings("unchecked")
@@ -146,7 +145,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>,
             @Override public String toString() {
                 return UnmodIterable.toString("UnmodSortedMap.entrySet", this);
             }
-        };
+        }
         return new Implementation(this);
     }
 
@@ -300,16 +299,14 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>,
                 if (this == o) { return true; }
 
                 // This seems pretty wacky.  Not at all sure if I should be implementing this.
-                if ( !(o instanceof UnmodSortedCollection) ) {
-                    return false;
-                }
-                return UnmodSortedIterable.equal(this, (UnmodSortedCollection) o);
+                return (o instanceof UnmodSortedCollection) &&
+                       UnmodSortedIterable.equal(this, (UnmodSortedCollection) o);
             }
 
             @Override public String toString() {
                 return UnmodIterable.toString("UnmodSortedMap.values", this);
             }
-        };
+        }
         return new Impl(this);
     }
 

@@ -27,7 +27,8 @@ import java.util.Set;
  This file is a derivative work based on a Clojure collection licensed under the Eclipse Public
  License 1.0 Copyright Rich Hickey
 */
-public class PersistentHashSet<E> implements ImUnsortedSet<E>, Serializable {
+public class PersistentHashSet<E> extends UnmodSet.AbstractUnmodSet<E>
+        implements ImUnsortedSet<E>, Serializable {
 
     // If you don't put this here, it inherits EMPTY from UnmodSet, which does not have .equals()
     // defined.  UnmodSet.empty won't put() either.
@@ -37,8 +38,18 @@ public class PersistentHashSet<E> implements ImUnsortedSet<E>, Serializable {
     @SuppressWarnings("unchecked")
     public static <E> PersistentHashSet<E> empty() { return (PersistentHashSet<E>) EMPTY; }
 
+    /** Works around some type inference limitations of Java 8. */
+    public static <E> MutableHashSet<E> emptyMutable() {
+        return PersistentHashSet.<E>empty().mutable();
+    }
+
     public static <E> PersistentHashSet<E> empty(Equator<E> eq) {
         return new PersistentHashSet<>(PersistentHashMap.empty(eq));
+    }
+
+    /** Works around some type inference limitations of Java 8. */
+    public static <E> MutableHashSet<E> emptyMutable(Equator<E> eq) {
+        return empty(eq).mutable();
     }
 
     /**
@@ -59,8 +70,7 @@ public class PersistentHashSet<E> implements ImUnsortedSet<E>, Serializable {
     }
 
     public static <E> PersistentHashSet<E> ofEq(Equator<E> eq, Iterable<E> init) {
-        PersistentHashSet<E> empty = empty(eq);
-        MutableUnsortedSet<E> ret = empty.mutable();
+        MutableUnsortedSet<E> ret = emptyMutable(eq);
         for (E e : init) {
             ret.put(e);
         }
@@ -144,24 +154,6 @@ public class PersistentHashSet<E> implements ImUnsortedSet<E>, Serializable {
         return this;
     }
 
-    /**
-     This is compatible with java.util.Map but that means it wrongly allows comparisons with SortedMaps, which are
-     necessarily not commutative.
-     @param other the other (hopefully unsorted) map to compare to.
-     @return true if these maps contain the same elements, regardless of order.
-     */
-    @Override public boolean equals(Object other) {
-        if (other == this) { return true; }
-        if ( !(other instanceof Set) ) { return false; }
-        Set that = (Set) other;
-        if (that.size() != size()) { return false; }
-        return containsAll(that);
-    }
-
-    @Override public int hashCode() { return UnmodIterable.hash(this); }
-
-    @Override public String toString() { return UnmodIterable.toString("PersistentHashSet", this); }
-
     @Override public PersistentHashSet<E> put(E o) {
         if (contains(o))
             return this;
@@ -174,18 +166,20 @@ public class PersistentHashSet<E> implements ImUnsortedSet<E>, Serializable {
 
     @Override public int size() { return impl.size(); }
 
-    public MutableUnsortedSet<E> mutable() {
+    public MutableHashSet<E> mutable() {
         return new MutableHashSet<>(impl.mutable());
     }
 
-    private static final class MutableHashSet<E> implements MutableUnsortedSet<E> {
+    public static final class MutableHashSet<E> extends UnmodSet.AbstractUnmodSet<E>
+            implements MutableUnsortedSet<E> {
+
         MutableUnsortedMap<E,E> impl;
 
         MutableHashSet(MutableUnsortedMap<E,E> impl) { this.impl = impl; }
 
         @Override public int size() { return impl.size(); }
 
-        @Override public MutableUnsortedSet<E> put(E val) {
+        @Override public MutableHashSet<E> put(E val) {
             MutableUnsortedMap<E,E> m = impl.assoc(val, val);
             if (m != impl) this.impl = m;
             return this;
@@ -202,7 +196,7 @@ public class PersistentHashSet<E> implements ImUnsortedSet<E>, Serializable {
             return impl.entry((E) key).isSome();
         }
 
-        @Override public MutableUnsortedSet<E> without(E key) {
+        @Override public MutableHashSet<E> without(E key) {
             MutableUnsortedMap<E,E> m = impl.without(key);
             if (m != impl) this.impl = m;
             return this;
