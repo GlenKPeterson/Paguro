@@ -140,6 +140,7 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
 2. Make a Java 7 branch (and/or Java 6) and release (Paguro-JDK7).
 3. Consider an ImmutableInsertionOrderHashMap and Set.
 4. Ensure everything is as friendly as possible to Monadic programming.
+5. Transformable needs `first()` and `last()`, but maybe only on a SortedIterable.  Otherwise, `any(Function1<Boolean>)`
 
 ### RRB-Tree
 Read the [current development status](https://github.com/GlenKPeterson/Paguro/issues/4#issuecomment-239825939) or check out the [latest version of the code](https://github.com/GlenKPeterson/Paguro/blob/2016-05-22_RRB-Tree/src/main/java/org/organicdesign/fp/experimental/RrbTree1.java).
