@@ -384,34 +384,6 @@ pushFocus logic we already have.
     private static final RrbTree1 EMPTY_RRB_TREE =
             new RrbTree1<>(emptyArray(), 0, emptyLeaf(), 0);
 
-    /** Holds a node and the index of the child node we are currently iterating in. */
-    private static final class IdxNode<E> implements UnmodIterator<Node<E>> {
-        int idx = 0;
-        final Node<E> node;
-        IdxNode(Node<E> n) { node = n; }
-        @Override public boolean hasNext() { return idx < node.numChildren(); }
-        @Override public Node<E> next() {
-            Node<E> n = node.child(idx);
-            idx++;
-            return n;
-        }
-        @Override public String toString() { return "IdxNode(" + idx + " " + node + ")"; }
-    }
-
-    /** Holds a Leaf node and the index of the child we are currently returning. */
-    private static final class IdxLeaf<E> implements UnmodIterator<E> {
-        int idx = 0;
-        final Leaf<E> leaf;
-        IdxLeaf(Leaf<E> n) { leaf = n; }
-        @Override public boolean hasNext() { return idx < leaf.numChildren(); }
-        @Override public E next() {
-            E n = leaf.get(idx);
-            idx++;
-            return n;
-        }
-        @Override public String toString() { return "IdxLeaf(" + idx + " " + leaf + ")"; }
-    }
-
     // ================================ Node private inner classes ================================
 
     private interface Node<T> extends Indented {
@@ -1566,6 +1538,34 @@ pushFocus logic we already have.
     } // end class Relaxed
 
     // =================================== Tree-walking Iterator ==================================
+
+    /** Holds a node and the index of the child node we are currently iterating in. */
+    private static final class IdxNode<E> implements UnmodIterator<Node<E>> {
+        int idx = 0;
+        final Node<E> node;
+        IdxNode(Node<E> n) { node = n; }
+        @Override public boolean hasNext() { return idx < node.numChildren(); }
+        @Override public Node<E> next() {
+            Node<E> n = node.child(idx);
+            idx++;
+            return n;
+        }
+        @Override public String toString() { return "IdxNode(" + idx + " " + node + ")"; }
+    }
+
+    /** Holds a Leaf node and the index of the child we are currently returning. */
+    private static final class IdxLeaf<E> implements UnmodIterator<E> {
+        int idx = 0;
+        final Leaf<E> leaf;
+        IdxLeaf(Leaf<E> n) { leaf = n; }
+        @Override public boolean hasNext() { return idx < leaf.numChildren(); }
+        @Override public E next() {
+            E n = leaf.get(idx);
+            idx++;
+            return n;
+        }
+        @Override public String toString() { return "IdxLeaf(" + idx + " " + leaf + ")"; }
+    }
 
     private final class Iter implements UnmodSortedIterator<E> {
 
