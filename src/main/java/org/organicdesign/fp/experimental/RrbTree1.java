@@ -166,6 +166,53 @@ public class RrbTree1<E> implements ImList<E>, Indented {
     }
 
 // TODO: Implement join()
+/*
+I'm implementing something like the [Bagwell/Rompf RRB-Tree][1] and I'm a little unsatisfied with
+the details of the join/merge algorithm.  I wonder if there's a standard way to do this that they
+assume that I know (I don't), or if someone has come up with a better way to do this.
+
+I'm thinking the signature is something like:
+
+    public RrbTree<E> join(RrbTree<? extends E> that)
+
+My basic approach was to fit the shorter tree into the left-most or right-most leg of the taller
+tree at the correct height.  For `a.join(b)`, if `b` is taller, fit `a` into `b`'s left-most leg at
+the right height, otherwise fit `b` into `a`'s right-most leg at the right height
+
+This breaks down into 3 cases (try in order)
+
+1. The taller tree has room for all shorter.childNodes at leftmost or rightmost node n where
+`n.height = shorter.height()`.  Method: add shorter.childNodes to n.childNodes.  I'm not sure it
+buys anything over #2 from a Big O perspective, but keeping things packed tightly which makes
+subsequent operations more efficient.
+
+``` Example with radix = 3:
+         n1                      n1
+        / |\                    / |\
+      n2 n3 n4   +   s1   =   n2 n3 n4
+     ...    /       / |      ...   / |\
+          nx      s2 s3          nx s2 s3
+```
+
+2. Beginning from height `h = shorter.height() + 1`, see if there is room for one more in the
+leftmost or rightmost node n where n.height = h.  **If** so, add the (possibly modified) shorter
+tree to the left or right of n.childNodes as appropriate.  **Otherwise:** add a parent to the
+shorter tree, decrement h, and repeat.
+
+3. If there was no room, add a new top-level node t that holds both trees (if the one tree was
+shorter, it's now had enough ancestors added to make it the same height).
+
+I guess I don't see the advantage of zipping nodes together at every level the very complicated
+way it seems to do in the paper.  Even after all that work, it still has nodes of varying sizes.
+
+
+  [1]: https://infoscience.epfl.ch/record/169879/files/RMTrees.pdf
+
+
+So, for #1, if there is no room, this is effectively a split, which is pretty darn similar to the
+pushFocus logic we already have.
+*/
+
 //    private Node<E> pushFocus() {
 //        if (focus.length == 0) {
 //            return root;
@@ -324,238 +371,11 @@ public class RrbTree1<E> implements ImList<E>, Indented {
     // for <= (I think!).
     private static final int MAX_NODE_LENGTH = ( (STRICT_NODE_LENGTH+1) * 4 / 3);
 
-    // =================================== Array Helper Functions ==================================
     // We only one empty array and it makes the code simpler than pointing to null all the time.
     // Have to time the difference between using this and null.  The only difference I can imagine
     // is that this has an address in memory and null does not, so it could save a memory lookup
     // in some places.
     private static final Object[] EMPTY_ARRAY = new Object[0];
-
-    // Helper function to avoid type warnings.
-    @SuppressWarnings("unchecked")
-    private static <T> T[] emptyArray() { return (T[]) EMPTY_ARRAY; }
-
-    // Helper function to avoid type warnings.
-    @SuppressWarnings("unchecked")
-    private static <T> T[] singleElementArray(T elem) { return (T[]) new Object[] { elem }; }
-
-    @SuppressWarnings("unchecked")
-    private static <T> T[] insertIntoArrayAt(T item, T[] items, int idx, Class<T> tClass) {
-        // Make an array that's one bigger.  It's too bad that the JVM bothers to
-        // initialize this with nulls.
-
-        T[] newItems = (T[]) ( (tClass == null) ? new Object[items.length + 1]
-                                                : Array.newInstance(tClass, items.length + 1) );
-
-        // If we aren't inserting at the first item, array-copy the items before the insert
-        // point.
-        if (idx > 0) {
-            System.arraycopy(items, 0, newItems, 0, idx);
-        }
-
-        // Insert the new item.
-        newItems[idx] = item;
-
-        // If we aren't inserting at the last item, array-copy the items after the insert
-        // point.
-        if (idx < items.length) {
-            System.arraycopy(items, idx, newItems, idx + 1, items.length - idx);
-        }
-
-        return newItems;
-    }
-
-    private static <T> T[] insertIntoArrayAt(T item, T[] items, int idx) {
-        return insertIntoArrayAt(item, items, idx, null);
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T> T[] spliceIntoArrayAt(T[] insertedItems, T[] origItems, int idx,
-                                             Class<T> tClass) {
-        // Make an array that big enough.  It's too bad that the JVM bothers to
-        // initialize this with nulls.
-        T[] newItems = (T[]) Array.newInstance(tClass, insertedItems.length + origItems.length);
-
-        // If we aren't inserting at the first item, array-copy the items before the insert
-        // point.
-        if (idx > 0) {
-            //               src,  srcPos, dest,destPos,length
-            System.arraycopy(origItems, 0, newItems, 0, idx);
-        }
-
-        // Insert the new items
-        //               src,      srcPos,     dest, destPos, length
-        System.arraycopy(insertedItems, 0, newItems, idx, insertedItems.length);
-
-        // If we aren't inserting at the last item, array-copy the items after the insert
-        // point.
-        if (idx < origItems.length) {
-            System.arraycopy(origItems, idx, newItems, idx + insertedItems.length,
-                             origItems.length - idx);
-        }
-        return newItems;
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T> T[] replaceInArrayAt(T replacedItem, T[] origItems, int idx,
-                                            Class<T> tClass) {
-        // Make an array that big enough.  It's too bad that the JVM bothers to
-        // initialize this with nulls.
-        T[] newItems = (T[]) ( (tClass == null) ? new Object[origItems.length]
-                                                : Array.newInstance(tClass, origItems.length) );
-        System.arraycopy(origItems, 0, newItems, 0, origItems.length);
-        newItems[idx] = replacedItem;
-        return newItems;
-    }
-
-    private static <T> T[] replaceInArrayAt(T replacedItem, T[] origItems, int idx) {
-        return replaceInArrayAt(replacedItem, origItems, idx, null);
-    }
-
-    /**
-     Only call this if the array actually needs to be split (0 &lt; splitPoint &lt; orig.length).
-     @param orig array to split
-     @param splitIndex items less than this index go in the left, equal or greater in the right.
-     @return a 2D array of leftItems then rightItems
-     */
-    private static <T> Tuple2<T[],T[]> splitArray(T[] orig, int splitIndex) { //, Class<T> tClass) {
-        if (splitIndex < 1) {
-            throw new IllegalArgumentException("Called split when splitIndex < 1");
-        }
-        if (splitIndex > orig.length - 1) {
-            throw new IllegalArgumentException("Called split when splitIndex > orig.length - 1");
-        }
-
-        // NOTE:
-        // I sort of suspect that generic 2D array creation where the two arrays are of a different
-        // length is not possible in Java, or if it is, it's not likely to be much faster than
-        // what we have here.  I'd just copy the Arrays.copyOf code everywhere this function is used
-        // if you want more speed.
-//        int rightLength = orig.length - splitIndex;
-//        Class<T> tClass = (Class<T>) orig.getClass().getComponentType();
-//        Tuple2<T[],T[]> split = Tuple2.of((T[]) Array.newInstance(tClass, splitIndex),
-//                                          (T[]) Array.newInstance(tClass, rightLength));
-//
-        Tuple2<T[],T[]> split = Tuple2.of(Arrays.copyOf(orig, splitIndex),
-                                          Arrays.copyOfRange(orig, splitIndex, orig.length));
-
-//        // original array, offset, newArray, offset, length
-//        System.arraycopy(orig, 0, split._1(), 0, splitIndex);
-////            System.out.println("    left: " + arrayString(left));
-//
-//        System.arraycopy(orig, splitIndex, split._2(), 0, rightLength);
-////            System.out.println("    right: " + arrayString(right));
-        return split;
-    }
-
-    /**
-     Only call this if the array actually needs to be split (0 &lt; splitPoint &lt; orig.length).
-     @param orig array to split
-     @param splitIndex items less than this index go in the left, equal or greater in the right.
-     @return a 2D array of leftItems then rightItems
-     */
-    private static int[][] splitArray(int[] orig, int splitIndex) {
-        // This function started an exact duplicate of the one above, but for ints.
-        if (splitIndex < 1) {
-            throw new IllegalArgumentException("Called split when splitIndex < 1");
-        }
-        if (splitIndex > orig.length - 1) {
-            throw new IllegalArgumentException("Called split when splitIndex > orig.length - 1");
-        }
-        int rightLength = orig.length - splitIndex;
-        int[][] split = new int[][] {new int[splitIndex],
-                                     new int[rightLength]};
-        // original array, offset, newArray, offset, length
-        System.arraycopy(orig, 0, split[0], 0, splitIndex);
-//            System.out.println("    left: " + arrayString(left));
-
-        System.arraycopy(orig, splitIndex, split[1], 0, rightLength);
-//            System.out.println("    right: " + arrayString(right));
-        return split;
-    }
-
-    private static StringBuilder indentSpace(int len) {
-        StringBuilder sB = new StringBuilder();
-        while (len >= 32) {
-            sB.append("                                ");
-            len -= 32;
-        }
-        while (len >= 16) {
-            sB.append("                ");
-            len -= 16;
-        }
-        while (len >= 8) {
-            sB.append("        ");
-            len -= 8;
-        }
-        while (len >= 4) {
-            sB.append("    ");
-            len -= 4;
-        }
-        while (len >= 2) {
-            sB.append("  ");
-            len -= 2;
-        }
-        while (len >= 1) {
-            sB.append(" ");
-            len -= 1;
-        }
-        return sB;
-    }
-
-    private static <T> String arrayString(T[] items) {
-        StringBuilder sB = new StringBuilder("[");
-        boolean isFirst = true;
-        for (T item : items) {
-            if (isFirst) {
-                isFirst = false;
-            } else {
-                sB.append(" ");
-            }
-            if (item instanceof String) {
-                sB.append("\"").append(item).append("\"");
-            } else {
-                sB.append(item);
-            }
-        }
-        return sB.append("]").toString();
-    }
-
-    // TODO: We need one of these for each type of primitive for pretty-printing without commas.
-    private static String arrayString(int[] items) {
-        StringBuilder sB = new StringBuilder("[");
-        boolean isFirst = true;
-        for (int item : items) {
-            if (isFirst) {
-                isFirst = false;
-            } else {
-                sB.append(" ");
-            }
-            sB.append(item);
-        }
-        return sB.append("]").toString();
-    }
-
-    private static StringBuilder showSubNodes(StringBuilder sB, Node[] nodes, int nextIndent) {
-        boolean isFirst = true;
-        for (Node n : nodes) {
-            if (isFirst) {
-                isFirst = false;
-            } else {
-//                sB.append(" ");
-                if (nodes[0] instanceof Leaf) {
-                    sB.append(" ");
-                } else {
-                    sB.append("\n").append(indentSpace(nextIndent));
-                }
-            }
-            sB.append(n.indentedStr(nextIndent));
-        }
-        return sB;
-    }
-
-    private static void debug(String txt, Indented obj) { System.out.println(txt + obj.indentedStr(txt.length())); }
-    private static void debug(String txt) { System.out.println(txt); }
 
     private static final Leaf EMPTY_LEAF = new Leaf<>(EMPTY_ARRAY);
     @SuppressWarnings("unchecked")
@@ -579,7 +399,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
     }
 
     /** Holds a Leaf node and the index of the child we are currently returning. */
-    private final class IdxLeaf implements UnmodIterator<E> {
+    private static final class IdxLeaf<E> implements UnmodIterator<E> {
         int idx = 0;
         final Leaf<E> leaf;
         IdxLeaf(Leaf<E> n) { leaf = n; }
@@ -592,79 +412,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
         @Override public String toString() { return "IdxLeaf(" + idx + " " + leaf + ")"; }
     }
 
-    private final class Iter implements UnmodSortedIterator<E> {
-
-        @SuppressWarnings("unchecked")
-        private IdxNode[] genericArrayCreate(int depth) { return new IdxNode<?>[depth]; }
-
-        // We want this iterator to walk the node tree.
-//        private int childIndex = 0;
-        private final IdxNode[] stack;
-        private int stackMaxIdx = -1;
-
-        private void stackAdd(IdxNode i) {
-            stackMaxIdx++;
-            stack[stackMaxIdx] = i;
-        }
-
-
-//        private int leafIdx = 0;
-//        private Leaf<E> leaf;
-        private IdxLeaf idxLeaf;
-        private Iter() {
-
-            // Push the focus so we don't have to ever check the index.
-            Node<E> newRoot = ((focus != null) && focus.length > 0)
-                              ? root.pushFocus(focusStartIndex, focus)
-                              : root;
-
-            stack = genericArrayCreate(newRoot.height());
-
-//            System.out.println("newRoot:" + newRoot.indentedStr("newRoot:".length()));
-            idxLeaf = nextLeaf(newRoot);
-        }
-
-        // Descent to the leftmost unused leaf node.
-        private IdxLeaf nextLeaf(Node<E> node) {
-            // Descent to left-most bottom node.
-            while (!(node instanceof Leaf)) {
-                IdxNode<E> in = new IdxNode<>(node);
-                stackAdd(in);
-                node = in.next();
-            }
-            return new IdxLeaf((Leaf<E>) node);
-        }
-
-        private IdxLeaf ensureLeaf() {
-            // While nodes are used up, get next node from node one level up.
-            while ( (stackMaxIdx > -1) && !stack[stackMaxIdx].hasNext() ) {
-                stackMaxIdx--;
-            }
-
-            if (stackMaxIdx < 0) {
-                return null;
-            }
-            // If node one level up is used up, find a node that isn't used up and descend to its
-            // leftmost leaf.
-            return nextLeaf(stack[stackMaxIdx].next());
-        }
-
-        @Override public boolean hasNext() {
-            if (idxLeaf == null) { return false; }
-            if (idxLeaf.hasNext()) { return true; }
-            idxLeaf = ensureLeaf();
-            if (idxLeaf == null) { return false; }
-            return idxLeaf.hasNext();
-        }
-
-        @Override public E next() {
-            // If there's more in this leaf node, return it.
-            if (!idxLeaf.hasNext()) {
-                idxLeaf = ensureLeaf();
-            }
-            return idxLeaf.next();
-        }
-    }
+    // ================================ Node private inner classes ================================
 
     private interface Node<T> extends Indented {
         /** Returns the immediate child node at the given index. */
@@ -678,6 +426,9 @@ public class RrbTree1<E> implements ImList<E>, Indented {
 
         /** Returns the maximum depth below this node.  Leaf nodes are height 1. */
         int height();
+
+//        /** Try to add all sub-nodes to this one. */
+//        Node<T> join(Node<T> that);
 
         /** Number of items stored in this node */
         int size();
@@ -1394,6 +1145,12 @@ public class RrbTree1<E> implements ImList<E>, Indented {
                                                           size);
         }
 
+//        @Override Relaxed<T> join(Node<T> that) {
+//            if (that.height() > this.height()) {
+//                return nodes[nodes.length - 1].join(that);
+//            }
+//        }
+
         @SuppressWarnings("unchecked")
         Relaxed<T>[] split() {
 //            System.out.println("Relaxed.split(" + i + ")");
@@ -1520,7 +1277,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
             Node<T> subNode = nodes[subNodeIndex];
             int subNodeAdjustedIndex = subNodeAdjustedIndex(index, subNodeIndex);
 
-            // 1st choice: insert into the subNode if it has enought space enough to handle it
+            // 1st choice: insert into the subNode if it has enough space enough to handle it
             if (subNode.hasRelaxedCapacity(subNodeAdjustedIndex, oldFocus.length)) {
 //                System.out.println("  Pushing the focus down to a lower-level node with capacity.");
                 Node<T> newNode = subNode.pushFocus(subNodeAdjustedIndex, oldFocus);
@@ -1805,7 +1562,316 @@ public class RrbTree1<E> implements ImList<E>, Indented {
                 right = new Relaxed<>(rightCumSizes, rightNodes);
             }
             return right;
+        } // end fixRight()
+    } // end class Relaxed
+
+    // =================================== Tree-walking Iterator ==================================
+
+    private final class Iter implements UnmodSortedIterator<E> {
+
+        @SuppressWarnings("unchecked")
+        private IdxNode<E>[] genericArrayCreate(int depth) {
+            return (IdxNode<E>[]) new IdxNode<?>[depth];
         }
 
-    } // end class Relaxed
+        // We want this iterator to walk the node tree.
+//        private int childIndex = 0;
+        private final IdxNode<E>[] stack;
+        private int stackMaxIdx = -1;
+
+        private void stackAdd(IdxNode<E> i) {
+            stackMaxIdx++;
+            stack[stackMaxIdx] = i;
+        }
+
+
+        //        private int leafIdx = 0;
+//        private Leaf<E> leaf;
+        private IdxLeaf<E> idxLeaf;
+        private Iter() {
+
+            // Push the focus so we don't have to ever check the index.
+            Node<E> newRoot = ((focus != null) && focus.length > 0)
+                              ? root.pushFocus(focusStartIndex, focus)
+                              : root;
+
+            stack = genericArrayCreate(newRoot.height());
+
+//            System.out.println("newRoot:" + newRoot.indentedStr("newRoot:".length()));
+            idxLeaf = nextLeaf(newRoot);
+        }
+
+        // Descent to the leftmost unused leaf node.
+        private IdxLeaf<E> nextLeaf(Node<E> node) {
+            // Descent to left-most bottom node.
+            while (!(node instanceof Leaf)) {
+                IdxNode<E> in = new IdxNode<>(node);
+                stackAdd(in);
+                node = in.next();
+            }
+            return new IdxLeaf<>((Leaf<E>) node);
+        }
+
+        private IdxLeaf<E> ensureLeaf() {
+            // While nodes are used up, get next node from node one level up.
+            while ( (stackMaxIdx > -1) && !stack[stackMaxIdx].hasNext() ) {
+                stackMaxIdx--;
+            }
+
+            if (stackMaxIdx < 0) {
+                return null;
+            }
+            // If node one level up is used up, find a node that isn't used up and descend to its
+            // leftmost leaf.
+            return nextLeaf(stack[stackMaxIdx].next());
+        }
+
+        @Override public boolean hasNext() {
+            if (idxLeaf == null) { return false; }
+            if (idxLeaf.hasNext()) { return true; }
+            idxLeaf = ensureLeaf();
+            return (idxLeaf != null) && idxLeaf.hasNext();
+        }
+
+        @Override public E next() {
+            // If there's more in this leaf node, return it.
+            if (!idxLeaf.hasNext()) {
+                idxLeaf = ensureLeaf();
+            }
+            return idxLeaf.next();
+        }
+    }
+
+    // =================================== Array Helper Functions ==================================
+    // Helper function to avoid type warnings.
+    @SuppressWarnings("unchecked")
+    private static <T> T[] emptyArray() { return (T[]) EMPTY_ARRAY; }
+
+    // Helper function to avoid type warnings.
+    @SuppressWarnings("unchecked")
+    private static <T> T[] singleElementArray(T elem) { return (T[]) new Object[] { elem }; }
+
+    @SuppressWarnings("unchecked")
+    private static <T> T[] insertIntoArrayAt(T item, T[] items, int idx, Class<T> tClass) {
+        // Make an array that's one bigger.  It's too bad that the JVM bothers to
+        // initialize this with nulls.
+
+        T[] newItems = (T[]) ( (tClass == null) ? new Object[items.length + 1]
+                                                : Array.newInstance(tClass, items.length + 1) );
+
+        // If we aren't inserting at the first item, array-copy the items before the insert
+        // point.
+        if (idx > 0) {
+            System.arraycopy(items, 0, newItems, 0, idx);
+        }
+
+        // Insert the new item.
+        newItems[idx] = item;
+
+        // If we aren't inserting at the last item, array-copy the items after the insert
+        // point.
+        if (idx < items.length) {
+            System.arraycopy(items, idx, newItems, idx + 1, items.length - idx);
+        }
+
+        return newItems;
+    }
+
+    private static <T> T[] insertIntoArrayAt(T item, T[] items, int idx) {
+        return insertIntoArrayAt(item, items, idx, null);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> T[] spliceIntoArrayAt(T[] insertedItems, T[] origItems, int idx,
+                                             Class<T> tClass) {
+        // Make an array that big enough.  It's too bad that the JVM bothers to
+        // initialize this with nulls.
+        T[] newItems = (T[]) Array.newInstance(tClass, insertedItems.length + origItems.length);
+
+        // If we aren't inserting at the first item, array-copy the items before the insert
+        // point.
+        if (idx > 0) {
+            //               src,  srcPos, dest,destPos,length
+            System.arraycopy(origItems, 0, newItems, 0, idx);
+        }
+
+        // Insert the new items
+        //               src,      srcPos,     dest, destPos, length
+        System.arraycopy(insertedItems, 0, newItems, idx, insertedItems.length);
+
+        // If we aren't inserting at the last item, array-copy the items after the insert
+        // point.
+        if (idx < origItems.length) {
+            System.arraycopy(origItems, idx, newItems, idx + insertedItems.length,
+                             origItems.length - idx);
+        }
+        return newItems;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> T[] replaceInArrayAt(T replacedItem, T[] origItems, int idx,
+                                            Class<T> tClass) {
+        // Make an array that big enough.  It's too bad that the JVM bothers to
+        // initialize this with nulls.
+        T[] newItems = (T[]) ( (tClass == null) ? new Object[origItems.length]
+                                                : Array.newInstance(tClass, origItems.length) );
+        System.arraycopy(origItems, 0, newItems, 0, origItems.length);
+        newItems[idx] = replacedItem;
+        return newItems;
+    }
+
+    private static <T> T[] replaceInArrayAt(T replacedItem, T[] origItems, int idx) {
+        return replaceInArrayAt(replacedItem, origItems, idx, null);
+    }
+
+    /**
+     Only call this if the array actually needs to be split (0 &lt; splitPoint &lt; orig.length).
+     @param orig array to split
+     @param splitIndex items less than this index go in the left, equal or greater in the right.
+     @return a 2D array of leftItems then rightItems
+     */
+    private static <T> Tuple2<T[],T[]> splitArray(T[] orig, int splitIndex) { //, Class<T> tClass) {
+        if (splitIndex < 1) {
+            throw new IllegalArgumentException("Called split when splitIndex < 1");
+        }
+        if (splitIndex > orig.length - 1) {
+            throw new IllegalArgumentException("Called split when splitIndex > orig.length - 1");
+        }
+
+        // NOTE:
+        // I sort of suspect that generic 2D array creation where the two arrays are of a different
+        // length is not possible in Java, or if it is, it's not likely to be much faster than
+        // what we have here.  I'd just copy the Arrays.copyOf code everywhere this function is used
+        // if you want more speed.
+//        int rightLength = orig.length - splitIndex;
+//        Class<T> tClass = (Class<T>) orig.getClass().getComponentType();
+//        Tuple2<T[],T[]> split = Tuple2.of((T[]) Array.newInstance(tClass, splitIndex),
+//                                          (T[]) Array.newInstance(tClass, rightLength));
+//
+        // Tuple2<T[],T[]> split =
+        return Tuple2.of(Arrays.copyOf(orig, splitIndex),
+                         Arrays.copyOfRange(orig, splitIndex, orig.length));
+
+//        // original array, offset, newArray, offset, length
+//        System.arraycopy(orig, 0, split._1(), 0, splitIndex);
+////            System.out.println("    left: " + arrayString(left));
+//
+//        System.arraycopy(orig, splitIndex, split._2(), 0, rightLength);
+////            System.out.println("    right: " + arrayString(right));
+//        return split;
+    }
+
+    /**
+     Only call this if the array actually needs to be split (0 &lt; splitPoint &lt; orig.length).
+     @param orig array to split
+     @param splitIndex items less than this index go in the left, equal or greater in the right.
+     @return a 2D array of leftItems then rightItems
+     */
+    private static int[][] splitArray(int[] orig, int splitIndex) {
+        // This function started an exact duplicate of the one above, but for ints.
+        if (splitIndex < 1) {
+            throw new IllegalArgumentException("Called split when splitIndex < 1");
+        }
+        if (splitIndex > orig.length - 1) {
+            throw new IllegalArgumentException("Called split when splitIndex > orig.length - 1");
+        }
+        int rightLength = orig.length - splitIndex;
+        int[][] split = new int[][] {new int[splitIndex],
+                                     new int[rightLength]};
+        // original array, offset, newArray, offset, length
+        System.arraycopy(orig, 0, split[0], 0, splitIndex);
+//            System.out.println("    left: " + arrayString(left));
+
+        System.arraycopy(orig, splitIndex, split[1], 0, rightLength);
+//            System.out.println("    right: " + arrayString(right));
+        return split;
+    }
+
+    private static StringBuilder indentSpace(int len) {
+        StringBuilder sB = new StringBuilder();
+        while (len >= 32) {
+            sB.append("                                ");
+            len -= 32;
+        }
+        while (len >= 16) {
+            sB.append("                ");
+            len -= 16;
+        }
+        while (len >= 8) {
+            sB.append("        ");
+            len -= 8;
+        }
+        while (len >= 4) {
+            sB.append("    ");
+            len -= 4;
+        }
+        while (len >= 2) {
+            sB.append("  ");
+            len -= 2;
+        }
+        while (len >= 1) {
+            sB.append(" ");
+            len -= 1;
+        }
+        return sB;
+    }
+
+    // =============================== Debugging and pretty-printing ===============================
+
+    private static <T> String arrayString(T[] items) {
+        StringBuilder sB = new StringBuilder("[");
+        boolean isFirst = true;
+        for (T item : items) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                sB.append(" ");
+            }
+            if (item instanceof String) {
+                sB.append("\"").append(item).append("\"");
+            } else {
+                sB.append(item);
+            }
+        }
+        return sB.append("]").toString();
+    }
+
+    // TODO: We need one of these for each type of primitive for pretty-printing without commas.
+    private static String arrayString(int[] items) {
+        StringBuilder sB = new StringBuilder("[");
+        boolean isFirst = true;
+        for (int item : items) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                sB.append(" ");
+            }
+            sB.append(item);
+        }
+        return sB.append("]").toString();
+    }
+
+    private static StringBuilder showSubNodes(StringBuilder sB, Node[] nodes, int nextIndent) {
+        boolean isFirst = true;
+        for (Node n : nodes) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+//                sB.append(" ");
+                if (nodes[0] instanceof Leaf) {
+                    sB.append(" ");
+                } else {
+                    sB.append("\n").append(indentSpace(nextIndent));
+                }
+            }
+            sB.append(n.indentedStr(nextIndent));
+        }
+        return sB;
+    }
+
+    private static void debug(String txt, Indented obj) {
+        System.out.println(txt + obj.indentedStr(txt.length()));
+    }
+    private static void debug(String txt) { System.out.println(txt); }
+
 } // end class RrbTree
