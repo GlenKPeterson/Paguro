@@ -569,17 +569,12 @@ public class RrbTree1<E> implements ImList<E>, Indented {
 
     private final class Iter implements UnmodSortedIterator<E> {
 
-        // How out of balance does the tree need to get before this breaks?
-        // We should maybe ask the tree how deep it is instead of calculating a guess here.
-        private final int DEPTH =
-                ((int) Math.ceil(Math.log(Integer.MAX_VALUE) / Math.log(MIN_NODE_LENGTH))) + 1;
-
         @SuppressWarnings("unchecked")
-        private IdxNode[] genArrayCreate() { return new IdxNode<?>[DEPTH]; }
+        private IdxNode[] genericArrayCreate(int depth) { return new IdxNode<?>[depth]; }
 
         // We want this iterator to walk the node tree.
 //        private int childIndex = 0;
-        private final IdxNode[] stack = genArrayCreate();
+        private final IdxNode[] stack;
         private int stackMaxIdx = -1;
 
         private void stackAdd(IdxNode i) {
@@ -597,6 +592,8 @@ public class RrbTree1<E> implements ImList<E>, Indented {
             Node<E> newRoot = ((focus != null) && focus.length > 0)
                               ? root.pushFocus(focusStartIndex, focus)
                               : root;
+
+            stack = genericArrayCreate(newRoot.height());
 
 //            System.out.println("newRoot:" + newRoot.indentedStr("newRoot:".length()));
             idxLeaf = nextLeaf(newRoot);
@@ -645,14 +642,22 @@ public class RrbTree1<E> implements ImList<E>, Indented {
     }
 
     private interface Node<T> extends Indented {
+        /** Returns the immediate child node at the given index. */
+        Node<T> child(int childIdx);
+
         /** Return the item at the given index */
         T get(int i);
+
+        /** Returns true if this strict-Radix tree can take another 32 items. */
+        boolean hasStrictCapacity();
+
+        /** Returns the maximum depth below this node.  Leaf nodes are height 1. */
+        int height();
+
         /** Number of items stored in this node */
         int size();
 //        /** Returns true if this node's array is not full */
 //        boolean thisNodeHasCapacity();
-        /** Returns true if this strict-Radix tree can take another 32 items. */
-        boolean hasStrictCapacity();
 
         /**
          Can we put focus at the given index without reshuffling nodes?
@@ -662,13 +667,12 @@ public class RrbTree1<E> implements ImList<E>, Indented {
          */
         boolean hasRelaxedCapacity(int index, int size);
 
-        SplitNode<T> splitAt(int splitIndex);
-
         // Splitting a strict node yields an invalid Relaxed node (too short).
         // We don't yet split Leaf nodes.
         // So this needs to only be implemented on Relaxed for now.
 //        Relaxed<T>[] split();
 
+        /** Returns the number of immediate children of this node, not all descendants. */
         int numChildren();
 
         // Because we want to append/insert into the focus as much as possible, we will treat
@@ -678,8 +682,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
 
         Node<T> replace(int idx, T t);
 
-        /** Returns the immediate child node at the given index. */
-        Node<T> child(int childIdx);
+        SplitNode<T> splitAt(int splitIndex);
     }
 
     private static class SplitNode<T> extends Tuple4<Node<T>,T[],Node<T>,T[]> implements Indented {
@@ -717,6 +720,9 @@ public class RrbTree1<E> implements ImList<E>, Indented {
         }
 
         @Override public T get(int i) { return items[i]; }
+
+        @Override public int height() { return 1; }
+
         @Override public int size() { return items.length; }
         // If we want to add one more to an existing leaf node, it must already be part of a
         // relaxed tree.
@@ -848,6 +854,8 @@ public class RrbTree1<E> implements ImList<E>, Indented {
         }
 
         @Override public Node<T> child(int childIdx) { return nodes[childIdx]; }
+
+        @Override public int height() { return nodes[0].height() + 1; }
 
         /**
          Returns the high bits which we use to index into our array.  This is the simplicity (and
@@ -1268,6 +1276,8 @@ public class RrbTree1<E> implements ImList<E>, Indented {
         }
 
         @Override public Node<T> child(int childIdx) { return nodes[childIdx]; }
+
+        @Override public int height() { return nodes[0].height() + 1; }
 
         @Override public int size() {
             return cumulativeSizes[cumulativeSizes.length - 1];
