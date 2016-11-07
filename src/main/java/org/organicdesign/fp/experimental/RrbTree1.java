@@ -15,13 +15,12 @@ package org.organicdesign.fp.experimental;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Stack;
 
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.MutableList;
 import org.organicdesign.fp.collections.UnmodIterable;
+import org.organicdesign.fp.collections.UnmodIterator;
 import org.organicdesign.fp.collections.UnmodSortedIterable;
 import org.organicdesign.fp.collections.UnmodSortedIterator;
 import org.organicdesign.fp.tuple.Tuple2;
@@ -446,69 +445,108 @@ public class RrbTree1<E> implements ImList<E>, Indented {
         return new RrbTree1<>(newFocus, idx, newRoot, size + 1);
     }
 
-    private final class IdxNode {
+    /** Holds a node and the index of the child node we are currently iterating in. */
+    private static final class IdxNode<E> implements UnmodIterator<Node<E>> {
         int idx = 0;
         final Node<E> node;
         IdxNode(Node<E> n) { node = n; }
+        @Override public boolean hasNext() { return idx < node.numChildren(); }
+        @Override public Node<E> next() {
+            Node<E> n = node.child(idx);
+            idx++;
+            return n;
+        }
+        @Override public String toString() { return "IdxNode(" + idx + " " + node + ")"; }
+    }
+
+    /** Holds a Leaf node and the index of the child we are currently returning. */
+    private final class IdxLeaf implements UnmodIterator<E> {
+        int idx = 0;
+        final Leaf<E> leaf;
+        IdxLeaf(Leaf<E> n) { leaf = n; }
+        @Override public boolean hasNext() { return idx < leaf.numChildren(); }
+        @Override public E next() {
+            E n = leaf.get(idx);
+            idx++;
+            return n;
+        }
+        @Override public String toString() { return "IdxLeaf(" + idx + " " + leaf + ")"; }
     }
 
     private final class Iter implements UnmodSortedIterator<E> {
-        // We want this iterator to walk the tree.  You MUST
-        private int childIndex = 0;
-        private final Stack<IdxNode> stack = new Stack<>();
-        private Node<E> n;
-        private Iter() {
-            // TODO: Handle case where focus and/or root are null.
-            // Push the focus so we don't have to ever check the index.
-            Node<E> n = ((focus != null) && focus.length > 0) ? root.pushFocus(focusStartIndex, focus)
-                                                              : root;
-            if (n instanceof Leaf) {
-                stack.add(new IdxNode(n));
-            } else {
-                // Descent to left-most bottom node.
-                while (!(n instanceof Leaf)) {
-                    stack.add(new IdxNode(n));
-                    n = n.firstChild();
-                }
-            }
+
+        // How out of balance does the tree need to get before this breaks?
+        // We should maybe ask the tree how deep it is instead of calculating a guess here.
+        private final int DEPTH =
+                ((int) Math.ceil(Math.log(Integer.MAX_VALUE) / Math.log(MIN_NODE_LENGTH))) + 1;
+
+        @SuppressWarnings("unchecked")
+        private IdxNode[] genArrayCreate() { return new IdxNode<?>[DEPTH]; }
+
+        // We want this iterator to walk the node tree.
+//        private int childIndex = 0;
+        private final IdxNode[] stack = genArrayCreate();
+        private int stackMaxIdx = -1;
+
+        private void stackAdd(IdxNode i) {
+            stackMaxIdx++;
+            stack[stackMaxIdx] = i;
         }
 
-        @Override public boolean hasNext() { return stack.peek() != null; }
+
+//        private int leafIdx = 0;
+//        private Leaf<E> leaf;
+        private IdxLeaf idxLeaf;
+        private Iter() {
+
+            // Push the focus so we don't have to ever check the index.
+            Node<E> newRoot = ((focus != null) && focus.length > 0)
+                              ? root.pushFocus(focusStartIndex, focus)
+                              : root;
+
+//            System.out.println("newRoot:" + newRoot.indentedStr("newRoot:".length()));
+            idxLeaf = nextLeaf(newRoot);
+        }
+
+        // Descent to the leftmost unused leaf node.
+        private IdxLeaf nextLeaf(Node<E> node) {
+            // Descent to left-most bottom node.
+            while (!(node instanceof Leaf)) {
+                IdxNode<E> in = new IdxNode<>(node);
+                stackAdd(in);
+                node = in.next();
+            }
+            return new IdxLeaf((Leaf<E>) node);
+        }
+
+        private IdxLeaf ensureLeaf() {
+            // While nodes are used up, get next node from node one level up.
+            while ( (stackMaxIdx > -1) && !stack[stackMaxIdx].hasNext() ) {
+                stackMaxIdx--;
+            }
+
+            if (stackMaxIdx < 0) {
+                return null;
+            }
+            // If node one level up is used up, find a node that isn't used up and descend to its
+            // leftmost leaf.
+            return nextLeaf(stack[stackMaxIdx].next());
+        }
+
+        @Override public boolean hasNext() {
+            if (idxLeaf == null) { return false; }
+            if (idxLeaf.hasNext()) { return true; }
+            idxLeaf = ensureLeaf();
+            if (idxLeaf == null) { return false; }
+            return idxLeaf.hasNext();
+        }
 
         @Override public E next() {
-            E ret = n.get(childIndex);
-            childIndex = childIndex + 1;
-
-            // Leaf node has been exhausted, find a new one.
-            if (childIndex >= n.size()) {
-                // Start the next leaf node at zero.
-                childIndex = 0;
-
-                // Get the immediate parent and increment it's child pointer.
-                IdxNode parent = stack.peek();
-                parent.idx = parent.idx + 1;
-
-                // Keep walking up the ancestors until one hasn't been exhausted (or we're done).
-                while (parent.idx >= parent.node.size()) {
-                    stack.pop();
-                    parent = stack.peek();
-                    if (parent == null) {
-                        return ret; // This is the end of the tree - all done!
-                    }
-                    parent.idx = parent.idx + 1;
-                }
-                // TODO: We want the node at the index stored with the parent in the IdxNode.
-                // Now, walk down to the first child.
-                n = parent.node;
-                while ( true ) {
-                    n = n.firstChild();
-                    if (n instanceof Leaf) {
-                        break;
-                    }
-                    stack.add(new IdxNode(n));
-                }
+            // If there's more in this leaf node, return it.
+            if (!idxLeaf.hasNext()) {
+                idxLeaf = ensureLeaf();
             }
-            return ret;
+            return idxLeaf.next();
         }
     }
 
@@ -629,7 +667,8 @@ public class RrbTree1<E> implements ImList<E>, Indented {
 
         Node<T> replace(int idx, T t);
 
-        Node<T> firstChild();
+        /** Returns the immediate child node at the given index. */
+        Node<T> child(int childIdx);
     }
 
     private static class SplitNode<T> extends Tuple4<Node<T>,T[],Node<T>,T[]> implements Indented {
@@ -662,7 +701,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
 //        boolean isStrict;
         Leaf(T[] ts) { items = ts; }
 
-        @Override public Node<T> firstChild() {
+        @Override public Node<T> child(int childIdx) {
             throw new UnsupportedOperationException("Don't call this on a leaf");
         }
 
@@ -797,7 +836,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
 //            System.out.println("    new Strict" + shift + arrayString(ns));
         }
 
-        @Override public Node<T> firstChild() { return nodes[0]; }
+        @Override public Node<T> child(int childIdx) { return nodes[childIdx]; }
 
         /**
          Returns the high bits which we use to index into our array.  This is the simplicity (and
@@ -1217,7 +1256,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
             }
         }
 
-        @Override public Node<T> firstChild() { return nodes[0]; }
+        @Override public Node<T> child(int childIdx) { return nodes[childIdx]; }
 
         @Override public int size() {
             return cumulativeSizes[cumulativeSizes.length - 1];

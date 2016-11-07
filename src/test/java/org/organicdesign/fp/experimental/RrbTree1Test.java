@@ -17,17 +17,19 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
 import org.junit.Test;
 import org.organicdesign.fp.TestUtilities;
 import org.organicdesign.fp.collections.ImList;
+import org.organicdesign.fp.collections.UnmodIterator;
 import org.organicdesign.fp.tuple.Tuple2;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.xform;
+import static org.organicdesign.fp.TestUtilities.compareIterators;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class RrbTree1Test {
@@ -222,6 +224,81 @@ public class RrbTree1Test {
         assertEquals(Integer.valueOf(4), rrb2.get(1));
         assertEquals(Integer.valueOf(4), rrb3.get(1));
         assertEquals(Integer.valueOf(3), rrb3.get(2));
+    }
+
+    @Test public void testEmptyIterator() {
+        assertFalse(RrbTree1.empty().iterator().hasNext());
+    }
+
+    @Test public void testIterator1() {
+        UnmodIterator<Integer> it = RrbTree1.<Integer>empty().append(1).iterator();
+        assertTrue(it.hasNext());
+        assertEquals((Integer) 1, it.next());
+        assertFalse(it.hasNext());
+    }
+
+    @Test public void testIterator2() {
+        UnmodIterator<Integer> it = RrbTree1.<Integer>empty().append(1).append(2).iterator();
+        assertTrue(it.hasNext());
+        assertEquals((Integer) 1, it.next());
+        assertTrue(it.hasNext());
+        assertEquals((Integer) 2, it.next());
+        assertFalse(it.hasNext());
+    }
+
+    @Test public void testIterator3() {
+        UnmodIterator<Integer> it = RrbTree1.<Integer>empty().append(1).append(2).append(3).iterator();
+        assertTrue(it.hasNext());
+        assertEquals((Integer) 1, it.next());
+        assertTrue(it.hasNext());
+        assertEquals((Integer) 2, it.next());
+        assertTrue(it.hasNext());
+        assertEquals((Integer) 3, it.next());
+        assertFalse(it.hasNext());
+    }
+
+    @Test public void testIterator4() {
+        UnmodIterator<Integer> it = RrbTree1.<Integer>empty().append(1).append(2).append(3).append(4)
+                                                             .iterator();
+        assertTrue(it.hasNext());
+        assertEquals((Integer) 1, it.next());
+        assertTrue(it.hasNext());
+        assertEquals((Integer) 2, it.next());
+        assertTrue(it.hasNext());
+        assertEquals((Integer) 3, it.next());
+        assertTrue(it.hasNext());
+        assertEquals((Integer) 4, it.next());
+        assertFalse(it.hasNext());
+    }
+
+    @Test public void testIterator5() {
+        UnmodIterator<Integer> it = RrbTree1.<Integer>empty()
+                .append(1).append(2).append(3).append(4).append(5).iterator();
+        assertTrue(it.hasNext());
+        assertEquals((Integer) 1, it.next());
+        assertTrue(it.hasNext());
+        assertEquals((Integer) 2, it.next());
+        assertTrue(it.hasNext());
+        assertEquals((Integer) 3, it.next());
+        assertTrue(it.hasNext());
+        assertEquals((Integer) 4, it.next());
+        assertTrue(it.hasNext());
+        assertEquals((Integer) 5, it.next());
+        assertFalse(it.hasNext());
+    }
+
+    @Test public void testIterator() {
+        List<Integer> control = new ArrayList<>();
+        RrbTree1<Integer> test = RrbTree1.empty();
+
+        int SOME = 2000;
+        for (int i = 0; i < SOME; i++) {
+            control.add(i);
+            test = test.append(i);
+        }
+//        System.out.println("control:" + control);
+//        System.out.println("test:" + test.indentedStr(0));
+        compareIterators(control.iterator(), test.iterator());
     }
 
     @Test public void emptyListIterator() {
