@@ -1787,36 +1787,73 @@ pushFocus logic we already have.
         return split;
     }
 
-    private static StringBuilder indentSpace(int len) {
-        StringBuilder sB = new StringBuilder();
-        while (len >= 32) {
-            sB.append("                                ");
-            len -= 32;
-        }
-        while (len >= 16) {
-            sB.append("                ");
-            len -= 16;
-        }
-        while (len >= 8) {
-            sB.append("        ");
-            len -= 8;
-        }
-        while (len >= 4) {
-            sB.append("    ");
-            len -= 4;
-        }
-        while (len >= 2) {
-            sB.append("  ");
-            len -= 2;
-        }
-        while (len >= 1) {
-            sB.append(" ");
-            len -= 1;
-        }
-        return sB;
-    }
-
     // =============================== Debugging and pretty-printing ===============================
+
+    // Note, this is part of something completely different, but was especially useful for
+    // debugging the above.  So much so, that I want to keep it when I'm done, but it needs
+    // to move somewhere else before releasing.
+    private static final String[] SPACES = {
+            "",
+            " ",
+            "  ",
+            "   ",
+            "    ",
+            "     ",
+            "      ",
+            "       ",
+            "        ",
+            "         ",
+            "          ",
+            "           ",
+            "            ",
+            "             ",
+            "              ",
+            "               ",
+            "                ",
+            "                 ",
+            "                  ",
+            "                   ",
+            "                    ",
+            "                     ",
+            "                      ",
+            "                       ",
+            "                        ",
+            "                         ",
+            "                          ",
+            "                           ",
+            "                            ",
+            "                             ",
+            "                              ",
+            "                               ",
+            "                                ",
+            "                                 ",
+            "                                  ",
+            "                                   ",
+            "                                    ",
+            "                                     ",
+            "                                      ",
+            "                                       ",
+            "                                        ",
+            "                                         ",
+            "                                          ",
+            "                                           ",
+            "                                            ",
+            "                                             ",
+            "                                              ",
+            "                                               ",
+            "                                                "};
+
+    private static final int SPACES_LENGTH_MINUS_ONE = SPACES.length - 1;
+
+    static StringBuilder indentSpace(int len) {
+        StringBuilder sB = new StringBuilder();
+        if (len < 1) { return sB; }
+        while (len > SPACES_LENGTH_MINUS_ONE) {
+            sB.append(SPACES[SPACES_LENGTH_MINUS_ONE]);
+            len = len - SPACES_LENGTH_MINUS_ONE;
+        }
+        return sB.append(SPACES[len]);
+    }
 
     private static <T> String arrayString(T[] items) {
         StringBuilder sB = new StringBuilder("[");
@@ -1869,9 +1906,9 @@ pushFocus logic we already have.
         return sB;
     }
 
-    private static void debug(String txt, Indented obj) {
-        System.out.println(txt + obj.indentedStr(txt.length()));
-    }
-    private static void debug(String txt) { System.out.println(txt); }
+//    private static void debug(String txt, Indented obj) {
+//        System.out.println(txt + obj.indentedStr(txt.length()));
+//    }
+//    private static void debug(String txt) { System.out.println(txt); }
 
 } // end class RrbTree

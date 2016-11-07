@@ -30,6 +30,7 @@ import org.organicdesign.fp.tuple.Tuple2;
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.xform;
 import static org.organicdesign.fp.TestUtilities.compareIterators;
+import static org.organicdesign.fp.experimental.RrbTree1.indentSpace;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class RrbTree1Test {
@@ -560,5 +561,24 @@ public class RrbTree1Test {
                      rrb2.indentedStr(0));
 
         assertEquals("RrbTree(0,7,3,5,1,...)", rrb2.toString());
+    }
+
+    @Test public void testIndentSpace() {
+        assertEquals("", indentSpace(Integer.MIN_VALUE).toString());
+        assertEquals("", indentSpace(-1).toString());
+        assertEquals("", indentSpace(0).toString());
+        assertEquals(" ", indentSpace(1).toString());
+        assertEquals("  ", indentSpace(2).toString());
+        assertEquals("   ", indentSpace(3).toString());
+        assertEquals("     ", indentSpace(5).toString());
+        assertEquals("       ", indentSpace(7).toString());
+        assertEquals("           ", indentSpace(11).toString());
+        assertEquals("             ", indentSpace(13).toString());
+
+        String spaces = "";
+        for (int i = 0; i < 300; i++) {
+            assertEquals(spaces, indentSpace(i).toString());
+            spaces = spaces + " ";
+        }
     }
 }
