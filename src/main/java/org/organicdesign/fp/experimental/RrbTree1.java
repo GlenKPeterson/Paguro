@@ -165,9 +165,34 @@ public class RrbTree1<E> implements ImList<E>, Indented {
         return new Iter();
     }
 
-    public RrbTree1<E> join(RrbTree1 other) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
+// TODO: Implement join()
+//    private Node<E> pushFocus() {
+//        if (focus.length == 0) {
+//            return root;
+//        }
+//        return root.pushFocus(focusStartIndex, focus);
+//    }
+//
+//    private static <E> Node<E> eliminateUnnecessaryAncestors(Node<E> n) {
+//        while ( !(n instanceof Leaf) &&
+//                (n.numChildren() == 1) ) {
+//            n = n.child(0);
+//        }
+//        return n;
+//    }
+//
+//    public RrbTree1<E> join(RrbTree1<? extends E> that) {
+//        Node<E> leftRoot = eliminateUnnecessaryAncestors(pushFocus());
+//        Node<? extends E> rightRoot = eliminateUnnecessaryAncestors(that.pushFocus());
+//
+//        if (leftRoot.height() < rightRoot.height()) {
+//
+//        } else if ((leftRoot.numChildren() + rightRoot.numChildren()) < MAX_NODE_LENGTH ) {
+//
+//        }
+//
+//        throw new UnsupportedOperationException("Not implemented yet");
+//    }
 
     @Override public MutableList<E> mutable() {
         // TODO: Implement or change interfaces.
@@ -1171,75 +1196,10 @@ public class RrbTree1<E> implements ImList<E>, Indented {
 
     // Contains a relaxed tree of nodes that average around 32 items each.
     private static class Relaxed<T> implements Node<T> {
-        @SuppressWarnings("unchecked")
-        static <T> Relaxed<T> replaceInRelaxedAt(int[] is, Node<T>[] ns, Node<T> newNode, int subNodeIndex,
-                                                 int insertSize) {
-            Node<T>[] newNodes = replaceInArrayAt(newNode, ns, subNodeIndex, Node.class);
-            // Increment newCumSizes for the changed item and all items to the right.
-            int[] newCumSizes = new int[is.length];
-            if (subNodeIndex > 0) {
-                System.arraycopy(is, 0, newCumSizes, 0, subNodeIndex);
-            }
-            for (int i = subNodeIndex; i < is.length; i++) {
-                newCumSizes[i] = is[i] + insertSize;
-            }
-            return new Relaxed<>(newCumSizes, newNodes);
-        }
 
-        @SuppressWarnings("unchecked")
-        public static <T> Node<T> fixRight(Node<T>[] origNodes, Node<T> splitRight, int subNodeIndex) {
-            Node<T> right;
-            if (subNodeIndex == (origNodes.length - 1)) {
-//                debug("If we have a single right node, it doesn't need a parent.");
-                right = splitRight;
-            } else {
-//                debug("splitRight.size()=" + splitRight.size());
-                boolean haveRightSubNode = splitRight.size() > 0;
-//                debug("haveRightSubNode=" + haveRightSubNode);
-                // If we have a rightSubNode, it's going to need a space in our new node array.
-                int numRightNodes = (origNodes.length - subNodeIndex) - (haveRightSubNode ? 0 : 1); //(splitRight.size() > 0 ? 2 : 1); // -2 when splitRight.size() > 0
-//                debug("numRightNodes=" + numRightNodes);
-                // Here the first (leftmost) node of the right-hand side was turned into the focus
-                // and we have additional right-hand origNodes to adjust the parent for.
-                int[] rightCumSizes = new int[numRightNodes];
-                Node<T>[] rightNodes = (Node<T>[]) new Node[numRightNodes];
-
-//                    System.out.println("origNodes=" + arrayString(origNodes));
-//                    System.out.println("subNodeIndex=" + subNodeIndex);
-
-                int cumulativeSize = 0;
-                int destCopyStartIdx = 0;
-
-                if (haveRightSubNode) {
-                    //                 src,       srcPos,          dest, destPos, length
-                    System.arraycopy(origNodes, subNodeIndex + 1, rightNodes, 1, numRightNodes - 1);
-
-                    rightNodes[0] = splitRight;
-                    cumulativeSize = splitRight.size();
-                    rightCumSizes[0] = cumulativeSize;
-                    destCopyStartIdx = 1;
-                } else {
-                    //                 src,       srcPos,          dest, destPos, length
-                    System.arraycopy(origNodes, subNodeIndex + 1, rightNodes, 0, numRightNodes);
-                }
-
-//                    System.out.println("rightNodes=" + arrayString(rightNodes));
-
-                // For relaxed nodes, we could calculate from previous cumulativeSizes instead of calling .size()
-                // on each one.  For strict, we could just add a strict amount.  For now, this works.
-                for (int i = destCopyStartIdx; i < numRightNodes; i++) {
-                    cumulativeSize += rightNodes[i].size();
-                    rightCumSizes[i] = cumulativeSize;
-                }
-
-                right = new Relaxed<>(rightCumSizes, rightNodes);
-            }
-            return right;
-        }
-
-        // Holds the size of each sub-node and plus all nodes to its left.  You could think of this as maxIndex + 1.
-        // This is a separate array so it can be retrieved in a single memory fetch.  Note that this is a 1-based count,
-        // not a zero-based index.
+        // Holds the size of each sub-node and plus all nodes to its left.  You could think of this
+        // as maxIndex + 1. This is a separate array so it can be retrieved in a single memory
+        // fetch.  Note that this is a 1-based count, not a zero-based index.
         final int[] cumulativeSizes;
         // The sub nodes
         final Node<T>[] nodes;
@@ -1780,5 +1740,72 @@ public class RrbTree1<E> implements ImList<E>, Indented {
         }
 
         @Override public String toString() { return indentedStr(0); }
+
+        @SuppressWarnings("unchecked")
+        static <T> Relaxed<T> replaceInRelaxedAt(int[] is, Node<T>[] ns, Node<T> newNode, int subNodeIndex,
+                                                 int insertSize) {
+            Node<T>[] newNodes = replaceInArrayAt(newNode, ns, subNodeIndex, Node.class);
+            // Increment newCumSizes for the changed item and all items to the right.
+            int[] newCumSizes = new int[is.length];
+            if (subNodeIndex > 0) {
+                System.arraycopy(is, 0, newCumSizes, 0, subNodeIndex);
+            }
+            for (int i = subNodeIndex; i < is.length; i++) {
+                newCumSizes[i] = is[i] + insertSize;
+            }
+            return new Relaxed<>(newCumSizes, newNodes);
+        }
+
+        @SuppressWarnings("unchecked")
+        public static <T> Node<T> fixRight(Node<T>[] origNodes, Node<T> splitRight, int subNodeIndex) {
+            Node<T> right;
+            if (subNodeIndex == (origNodes.length - 1)) {
+//                debug("If we have a single right node, it doesn't need a parent.");
+                right = splitRight;
+            } else {
+//                debug("splitRight.size()=" + splitRight.size());
+                boolean haveRightSubNode = splitRight.size() > 0;
+//                debug("haveRightSubNode=" + haveRightSubNode);
+                // If we have a rightSubNode, it's going to need a space in our new node array.
+                int numRightNodes = (origNodes.length - subNodeIndex) - (haveRightSubNode ? 0 : 1); //(splitRight.size() > 0 ? 2 : 1); // -2 when splitRight.size() > 0
+//                debug("numRightNodes=" + numRightNodes);
+                // Here the first (leftmost) node of the right-hand side was turned into the focus
+                // and we have additional right-hand origNodes to adjust the parent for.
+                int[] rightCumSizes = new int[numRightNodes];
+                Node<T>[] rightNodes = (Node<T>[]) new Node[numRightNodes];
+
+//                    System.out.println("origNodes=" + arrayString(origNodes));
+//                    System.out.println("subNodeIndex=" + subNodeIndex);
+
+                int cumulativeSize = 0;
+                int destCopyStartIdx = 0;
+
+                if (haveRightSubNode) {
+                    //                 src,       srcPos,          dest, destPos, length
+                    System.arraycopy(origNodes, subNodeIndex + 1, rightNodes, 1, numRightNodes - 1);
+
+                    rightNodes[0] = splitRight;
+                    cumulativeSize = splitRight.size();
+                    rightCumSizes[0] = cumulativeSize;
+                    destCopyStartIdx = 1;
+                } else {
+                    //                 src,       srcPos,          dest, destPos, length
+                    System.arraycopy(origNodes, subNodeIndex + 1, rightNodes, 0, numRightNodes);
+                }
+
+//                    System.out.println("rightNodes=" + arrayString(rightNodes));
+
+                // For relaxed nodes, we could calculate from previous cumulativeSizes instead of calling .size()
+                // on each one.  For strict, we could just add a strict amount.  For now, this works.
+                for (int i = destCopyStartIdx; i < numRightNodes; i++) {
+                    cumulativeSize += rightNodes[i].size();
+                    rightCumSizes[i] = cumulativeSize;
+                }
+
+                right = new Relaxed<>(rightCumSizes, rightNodes);
+            }
+            return right;
+        }
+
     } // end class Relaxed
 } // end class RrbTree
