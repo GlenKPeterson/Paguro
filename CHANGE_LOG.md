@@ -1,5 +1,14 @@
 # Change Log
 
+If you're upgrading, make sure to upgrade to 2.0.13 with UncleJim before switching to Paguro.
+Please fix any Deprecation warnings at this point too because we'll be deleting some deprecated
+code soon.  The documentation next to each Deprecated annotation tells you what to use instead.
+Once we delete the deprecated methods, that documentation goes too.
+
+## 2016-11-13 Release 2.0.14
+ - Renamed Maven artifact from UncleJim to Paguro.
+ - No other changes made!
+
 ## 2016-09-21 Release 2.0.13
  - FunctionUtils
     - The unmodifiable collection wrappers are now serializable, but the empty collections are no longer singletons:

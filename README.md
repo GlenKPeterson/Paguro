@@ -13,27 +13,6 @@ A summary of recent updates is in the [Change Log](CHANGE_LOG.md)
 
 Future development priorities are further down this page.
 
-##Renaming
-The name of this project is being changed from UncleJim to Paguro.  If you checked out the source code of this project when it was called UncleJim, you need to run the following (or similar) to re-associate it with the Paguro github project:
-```bash
-# Display the remote repositories whose branches you track
-git remote -v
-
-# If it says the following, you need to run the 'remote set-url origin' command below:
-# origin	https://github.com/GlenKPeterson/UncleJim.git (fetch)
-# origin	https://github.com/GlenKPeterson/UncleJim.git (push)
-
-# Make GlenKPeterson/Paguro.git the upstream branch instead of UncleJim:
-git remote set-url origin https://github.com/GlenKPeterson/Paguro.git
-```
-
-###Renaming Timeline
- - 2016-08-14: This notice appeared
- - 2016-09-13: The project name changed on GitHub and name change notices were added to the POM
- - 2016-11: The Maven artifact name will change - this will be the only change clients need to make.
-
-Package names will NOT change.
-
 #Features
 
 * [Immutable collections](src/main/java/org/organicdesign/fp/collections) - type-safe generic Java versions of Clojure's immutable collections - arguably the best immutable collections on the JVM.
@@ -58,13 +37,13 @@ Paguro takes advantage of Java's type inferencing.  It eschews void return types
 
 [![Join the chat at https://gitter.im/GlenKPeterson/Paguro](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/GlenKPeterson/Paguro?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-Available from the [Maven Repository](http://mvnrepository.com/artifact/org.organicdesign/UncleJim) as:
+Available from the [Maven Repository](http://mvnrepository.com/artifact/org.organicdesign/Paguro) as:
 ```xml
 <dependency>
         <groupId>org.organicdesign</groupId>
-        <!-- NOTE: artifactId will change to "Paguro" in November 2016 -->
-        <artifactId>UncleJim</artifactId>
-        <version>2.0.13</version>
+        <!-- NOTE: formerly known as UncleJim -->
+        <artifactId>Paguro</artifactId>
+        <version>2.0.14</version>
 </dependency>
 ```
 
@@ -136,8 +115,7 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
 [Why Java?](https://github.com/GlenKPeterson/Paguro/wiki/Why-is-UncleJim-written-in-Java%3F)
 
 #Future Development Priorities (as of 2016-09-24)
-0. Add the following methods to StaticImports: mutableVec(items...), mutableSet(items...), mutableMap(items...), xformArray(items...).
-1. Rename artifact from UncleJim to Paguro (it's November)
+1. Add the following methods to StaticImports: mutableVec(items...), mutableSet(items...), mutableMap(items...), xformArray(items...).
 2. Implement an RRB-Tree (lacking O(log n) version of concat())
 3. Add reverseIterator() or similar to SortedUnmodIterable
 4. Transformable needs `first()` and `last()`, but maybe only on a SortedIterable.  Otherwise, `any(Function1<Boolean>)`
