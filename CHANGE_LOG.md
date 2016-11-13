@@ -1,9 +1,9 @@
 # Change Log
 
-If you're upgrading, make sure to upgrade to 2.0.13 with UncleJim before switching to Paguro.
-Please fix any Deprecation warnings at this point too because we'll be deleting some deprecated
-code soon.  The documentation next to each Deprecated annotation tells you what to use instead.
-Once we delete the deprecated methods, that documentation goes too.
+Bigger headings are better releases.  If you're upgrading, you might want to hit the biggest
+releases on the way from an old version to a new one.  Fix any deprecation warnings at each major
+release before upgrading to the next one.  The documentation next to each Deprecated annotation
+tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
 ## 2016-11-13 Release 2.0.14
  - Renamed Maven artifact from UncleJim to Paguro.
@@ -35,14 +35,14 @@ Once we delete the deprecated methods, that documentation goes too.
  - New: UnmodSet.AbstractUnmodSet defines equals() for sets.  Made PersistentHashSet and MutableHashSet extend this.
  - New: UnmodList.AbstractUnmodList defines equals() and hashcode() for lists.  Made PersistentVector and MutableVector extend this.
 
-## 2016-09-17 Release 2.0.12
+### 2016-09-17 Release 2.0.12
  - Changed order of serialization for PersistentTreeMap.  Because it uses a serialization proxy, it
  should still deserialize TreeMaps serialized before this change.  The serialization format has not
  changed, only the order of elements is changed such that it should serialize at approximately the
  same speed and deserialize without any internal rotations or re-balancing (therefore faster).
  Full details in comments in org.organicdesign.fp.collections.PersistentTreeMap.SerializationProxy
 
-## 2016-09-17 Release 2.0.11
+### 2016-09-17 Release 2.0.11
  - Renamed static method UnmodIterable.hashCode() to UnmodIterable.hash() to avoid confusion.
  Deprecated old method.
  - Made Option serializable and added tests for same.
@@ -51,19 +51,19 @@ Once we delete the deprecated methods, that documentation goes too.
  - Increased PersistentHashMap test coverage by covering its internal MutableUnsortedMap better.
  - Cleaned up some of the oldest documentation (mostly deleted duplicates).
 
-## 2016-09-14 Release 2.0.10:
+### 2016-09-14 Release 2.0.10:
  - Renamed UnmodIterator.Implementation to UnmodIterator.Wrapper to mirror UnmodSortedIterator.Wrapper and because it's just a better name.
  - Added tests.
 
-## 2016-09-13 Release 2.0.9:
+### 2016-09-13 Release 2.0.9:
  - Fixed return type of ImUnsortedMap and MutableUnsortedMap.assoc(Map.Entry).  Thanks @pniederw for reporting!
  - Made ImUnsortedSet use MutableUnsortedSet's implementation of union() instead of the other way around.
  - Added tests.
 
-## 2016-09-11 Release 2.0.8:
+### 2016-09-11 Release 2.0.8:
  - Fixed illegal cast in MutableList.concat and made test for same.  Thanks to @pniederw for this!
 
-## 2016-09-11 Release 2.0.7:
+### 2016-09-11 Release 2.0.7:
  - Massive renaming of newly exposed interfaces and methods.
     - ImUnsortMap is now ImUnsortedMap
     - ImUnsortSet is now ImUnsortedSet
@@ -88,15 +88,15 @@ I am leaving Rich's 5 file names as a tribute to how awesome he is and so that p
 about the Clojure collections won't be surprised, and to show what still carries his license
 (Eclipse 1.0).
 
-## 2016-09-10 Release 2.0.6: USE 2.0.7+ INSTEAD!
+#### 2016-09-10 Release 2.0.6: USE 2.0.7+ INSTEAD!
  - Added asTransient() to ImList.
 
-## 2016-09-10 Release 2.0.5: USE 2.0.7+ INSTEAD!
+#### 2016-09-10 Release 2.0.5: USE 2.0.7+ INSTEAD!
  - Moved persistent() from ImListTrans to ImList and made PersistentVector implement ImList instead of ImListTrans.
    This just makes a lot more sense.  It shouldn't break any sensible client code.
  - Added ImList.reverse().  @pniederw had asked for this.  Sorry for the wait.
 
-## 2016-09-10 Release 2.0.4: USE 2.0.7+ INSTEAD!
+#### 2016-09-10 Release 2.0.4: USE 2.0.7+ INSTEAD!
  - Made PersistentTreeMap return serializable Tuple2's.  Actually these are subclasses of internal nodes that still contain
    big chunks of the treemap, but those chunks are transient (not serializable) and private.
    When deserialized, they become plain old Tuple2's.
@@ -110,13 +110,13 @@ about the Clojure collections won't be surprised, and to show what still carries
  - Added CodeStylePaguro.xml for Idea to import.
  - Found some opportunities to use mutable implementations more efficiently.
 
-#### Still *NOT* Serializable
+###### Still *NOT* Serializable
  - FunctionUtils.unmodifiable___() methods are not serializable (yet?).
  - Transformable is not serializable (should it be?)
 
 Issues?  Questions?  Provide feedback on the [Serialization enhancement request](https://github.com/GlenKPeterson/Paguro/issues/10)
 
-## 2016-09-10 Release 2.0.3: Serializable (Part 3)
+### 2016-09-10 Release 2.0.3: Serializable (Part 3)
  - Reverted the most serious breaking changes from previous 2.0.x releases.
    Going from 1.x to 2.0.3+ in the two projects I use Paguro in, no changes were necessary.
  - Tuples all implement Serializable.
@@ -129,17 +129,17 @@ Issues?  Questions?  Provide feedback on the [Serialization enhancement request]
  - Removed KeyVal class and made Tuples serializable instead.  Back to using tup() instead of kv()
  - Static method UnmodSortedIterable.equals() has been deprecated (renamed to UnmodSortedIterable.equal() to avoid confusion with Object.equals()).
 
-## 2016-09-01 Release 2.0.2: USE 2.0.3+ INSTEAD!
+#### 2016-09-01 Release 2.0.2: USE 2.0.3+ INSTEAD!
  - Gave 5 main collections custom serialized forms (after reading Josh Bloch) so that we can change
    the implementations later without breaking any clients who are using them for long-term storage.
  - Decided *NOT* to make any itera**tors** serializable.
  - Improved tests a bit, especially for serialization.
 
-## 2016-09-01 Release 2.0.1: USE 2.0.3+ INSTEAD!
+#### 2016-09-01 Release 2.0.1: USE 2.0.3+ INSTEAD!
  - Made UnmodSortedIterable.castFrom... methods generic and serializable (and wrote tests for same).
  - Fixed some Javadoc link errors.
 
-## 2016-08-27 Release 2.0.0: USE 2.0.3+ INSTEAD - ALL SIGNIFICANT BREAKING CHANGES WERE REVERTED!
+#### 2016-08-27 Release 2.0.0: USE 2.0.3+ INSTEAD - ALL SIGNIFICANT BREAKING CHANGES WERE REVERTED!
 This is a major release due to making a new serializable format.
  - Anything that used to be implemented as an anonymous class, object, or lambda is now implemented as an enum or serializable sub-class.
  - Hash codes of all tuples are now calculated by adding together the hash codes of all member items.
