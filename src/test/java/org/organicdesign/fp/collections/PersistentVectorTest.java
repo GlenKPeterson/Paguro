@@ -14,6 +14,13 @@
 
 package org.organicdesign.fp.collections;
 
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.TestUtilities;
+
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,13 +28,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import org.organicdesign.fp.FunctionUtils;
-import org.organicdesign.fp.TestUtilities;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.vec;
@@ -400,7 +400,7 @@ public class PersistentVectorTest {
 
     @Test public void testMutable() {
         List<Integer> control = new ArrayList<>();
-        MutableList<Integer> test = PersistentVector.<Integer>empty().mutable();
+        MutableList<Integer> test = PersistentVector.emptyMutable();
         final int SEVERAL = 2000; // more than 1024 so 3 levels deep.
         for (int i = 0; i < SEVERAL; i++) {
             control.add(i);
@@ -451,7 +451,7 @@ public class PersistentVectorTest {
         m = PersistentVector.<Integer>empty().mutable();
         assertEquals(Arrays.asList(3, 5, 7), m.append(3).append(5).append(7));
         assertEquals(Arrays.asList(3, 5, 7), m.immutable());
-        assertEquals(Arrays.asList(3, 5, 7), PersistentVector.empty().mutable().append(3).append(5).append(7));
+        assertEquals(Arrays.asList(3, 5, 7), PersistentVector.emptyMutable().append(3).append(5).append(7));
 
     }
 

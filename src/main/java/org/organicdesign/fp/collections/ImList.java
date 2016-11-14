@@ -209,7 +209,7 @@ public interface ImList<E> extends UnmodList<E> {
 
     /** Returns a reversed copy of this list. */
     default ImList<E> reverse() {
-        MutableList<E> ret = PersistentVector.<E>empty().mutable();
+        MutableList<E> ret = PersistentVector.emptyMutable();
         ListIterator<E> iter = listIterator(size());
         while (iter.hasPrevious()) {
             ret.append(iter.previous());
