@@ -43,7 +43,7 @@ Available from the [Maven Repository](http://mvnrepository.com/artifact/org.orga
         <groupId>org.organicdesign</groupId>
         <!-- NOTE: formerly known as UncleJim -->
         <artifactId>Paguro</artifactId>
-        <version>2.0.14</version>
+        <version>2.0.15</version>
 </dependency>
 ```
 
@@ -114,15 +114,14 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
 
 [Why Java?](https://github.com/GlenKPeterson/Paguro/wiki/Why-is-UncleJim-written-in-Java%3F)
 
-#Future Development Priorities (as of 2016-09-24)
-1. Add the following methods to StaticImports: mutableVec(items...), mutableSet(items...), mutableMap(items...), xformArray(items...).
-2. Implement an RRB-Tree (lacking O(log n) version of concat())
-3. Add reverseIterator() or similar to SortedUnmodIterable
-4. Transformable needs `first()` and `last()`, but maybe only on a SortedIterable.  Otherwise, `any(Function1<Boolean>)`
-5. Ensure everything is as friendly as possible to Monadic thinking.
-6. Rename functional interfaces from Function1 to Fn1 (start by making a briefer sub-class and deprecating the long-named one).  Provide a Fn1v subclass of Fn1 (and similar for Fn0, Fn2, etc.) that returns void because sometimes you need one of those for backward compatibility and you don't want it to choke on checked exceptions.
-7. Make a Java 7 branch (and/or Java 6) and release (Paguro-JDK7).
-8. Consider adding `Class[] genericTypes` to every generic class so that generics could be known at runtime (for Cymling)
+#Future Development Priorities (as of 2016-11-13)
+1. Implement an RRB-Tree (lacking O(log n) version of concat())
+2. Add reverseIterator() or similar to SortedUnmodIterable
+3. Transformable needs `first()` and `last()`, but maybe only on a SortedIterable.  Otherwise, `any(Function1<Boolean>)`
+4. Ensure everything is as friendly as possible to Monadic thinking.
+5. Rename functional interfaces from Function1 to Fn1 (start by making a briefer sub-class and deprecating the long-named one).  Provide a Fn1v subclass of Fn1 (and similar for Fn0, Fn2, etc.) that returns void because sometimes you need one of those for backward compatibility and you don't want it to choke on checked exceptions.
+6. Make a Java 7 branch (and/or Java 6) and release (Paguro-JDK7).
+7. Consider adding `Class[] genericTypes` to every generic class so that generics could be known at runtime (for Cymling)
 
 ### RRB-Tree
 Read the [current development status](https://github.com/GlenKPeterson/Paguro/issues/4#issuecomment-239825939) or check out the [latest version of the code](https://github.com/GlenKPeterson/Paguro/blob/2016-05-22_RRB-Tree/src/main/java/org/organicdesign/fp/experimental/RrbTree1.java).

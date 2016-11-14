@@ -5,6 +5,9 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
+### 2016-11-13 Release 2.0.15
+ - Added the following convenience methods to StaticImports: mutableVec(items...), mutableSet(items...), mutableMap(items...), xformArray(items...).
+
 ## 2016-11-13 Release 2.0.14
  - Renamed Maven artifact from UncleJim to Paguro.
  - No other changes made!

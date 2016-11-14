@@ -14,11 +14,6 @@
 
 package org.organicdesign.fp;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.Map;
-
 import org.junit.Test;
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.ImMap;
@@ -34,10 +29,62 @@ import org.organicdesign.fp.tuple.Tuple2;
 import org.organicdesign.fp.tuple.Tuple3;
 import org.organicdesign.fp.xform.Xform;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import static org.junit.Assert.assertEquals;
 import static org.organicdesign.fp.StaticImports.*;
 
 public class StaticImportsTest {
+
+    @Test public void mutableMapTest() throws Exception {
+        assertEquals(Collections.emptyMap(), mutableMap());
+        assertEquals(Collections.singletonMap(35, "Thirty Five"),
+                     mutableMap(tup(35, "Thirty Five")));
+
+        Map<String,Integer> control = new HashMap<>();
+        control.put("one", 1);
+        control.put("two", 2);
+        control.put("three", 3);
+        assertEquals(control,
+                     mutableMap(tup("one", 1),
+                                tup("two", 2),
+                                tup("three", 3)));
+    }
+
+    @Test public void mutableSetTest() throws Exception {
+        assertEquals(Collections.emptySet(), mutableSet());
+        assertEquals(Collections.singleton("Thirty Five"),
+                     mutableSet("Thirty Five"));
+
+        Set<Integer> control = new HashSet<>();
+        control.add(1);
+        control.add(2);
+        control.add(3);
+        assertEquals(control,
+                     mutableSet(1, 2, 3));
+    }
+
+    @Test public void mutableVecTest() throws Exception {
+        assertEquals(Collections.emptyList(), mutableVec());
+        assertEquals(Collections.singletonList("Thirty Five"),
+                     mutableVec("Thirty Five"));
+
+        List<Integer> control = new ArrayList<>();
+        control.add(1);
+        control.add(2);
+        control.add(3);
+        assertEquals(control,
+                     mutableVec(1, 2, 3));
+    }
 
     @Test (expected = UnsupportedOperationException.class)
     public void instantiationEx() throws Throwable {
@@ -139,4 +186,18 @@ public class StaticImportsTest {
     @Test public void testXform() throws Exception {
         assertEquals(Xform.of(Arrays.asList(1,2,3)), xform(Arrays.asList(1,2,3)));
     }
+
+    @Test public void xformArrayTest() throws Exception {
+        assertEquals(Collections.emptyList(), xformArray().toImList());
+        assertEquals(Collections.singletonList("Thirty Five"),
+                     xformArray("Thirty Five").toImList());
+
+        List<Integer> control = new ArrayList<>();
+        control.add(1);
+        control.add(2);
+        control.add(3);
+        assertEquals(control,
+                     xformArray(1, 2, 3).toImList());
+    }
+
 }
