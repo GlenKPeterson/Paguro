@@ -115,6 +115,7 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
 [Why Java?](https://github.com/GlenKPeterson/Paguro/wiki/Why-is-UncleJim-written-in-Java%3F)
 
 #Future Development Priorities (as of 2016-11-13)
+0. Xform.toMutableList() returns a java.util.List, but now that there's a MutableList class, that doesn't make sense any more.
 1. Implement an RRB-Tree (lacking O(log n) version of concat())
 2. Add reverseIterator() or similar to SortedUnmodIterable
 3. Transformable needs `first()` and `last()`, but maybe only on a SortedIterable.  Otherwise, `any(Function1<Boolean>)`
