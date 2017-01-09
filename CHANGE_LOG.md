@@ -5,6 +5,10 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
+### 2017-01-08 Release 2.0.16
+ - Changed return type of StaticImports: xform() and xformArray() from Transformable to UnmodIterable.
+   Thanks to @BrenoTrancoso for finding this and suggesting the fix!
+
 ### 2016-11-13 Release 2.0.15
  - Added the following convenience methods to StaticImports: mutableVec(items...), mutableSet(items...), mutableMap(items...), xformArray(items...).
 

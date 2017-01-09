@@ -27,9 +27,9 @@ import org.organicdesign.fp.collections.PersistentHashSet;
 import org.organicdesign.fp.collections.PersistentTreeMap;
 import org.organicdesign.fp.collections.PersistentTreeSet;
 import org.organicdesign.fp.collections.PersistentVector;
+import org.organicdesign.fp.collections.UnmodIterable;
 import org.organicdesign.fp.tuple.Tuple2;
 import org.organicdesign.fp.tuple.Tuple3;
-import org.organicdesign.fp.xform.Transformable;
 import org.organicdesign.fp.xform.Xform;
 
 import java.util.Arrays;
@@ -236,13 +236,13 @@ public final class StaticImports {
      If you need to wrap a regular Java collection or other iterable outside this project to perform
      a transformation on it, this method is the most convenient, efficient way to do so.
      */
-    public static <T> Transformable<T> xform(Iterable<T> iterable) { return Xform.of(iterable); }
+    public static <T> UnmodIterable<T> xform(Iterable<T> iterable) { return Xform.of(iterable); }
 
     /**
      If you need to wrap a regular Java array outside this project to perform
      a transformation on it, this method is the most convenient, efficient way to do so.
      */
-    public static <T> Transformable<T> xformArray(T... items) {
+    public static <T> UnmodIterable<T> xformArray(T... items) {
         return Xform.of(Arrays.asList(items));
     }
 }
