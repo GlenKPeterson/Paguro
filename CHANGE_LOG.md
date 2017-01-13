@@ -5,11 +5,13 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
-### 2017-01-08 Release 2.0.17
- - Fixed ComparisonContext.eq() so that it checks for null arguments before calling compare()
-   because compare typically throws exceptions for nulls and equal knows that null always equals null
-   and never equals anything else, so it does not throw an exception.
+### 2017-01-12 Release 2.0.18
+ - Fixed ComparisonContext.eq(), lt(), lte(), gt(), gte() to check for null arguments before calling compare()
+   because compare() typically throws exceptions for nulls, null always equals null,
+   and null never equals anything else.  If a method returns true for equals or false for neq, do
+   that, otherwise throw an exception if a null argument is given.
  - Removed Deprecated items from Equator.
+ - Added test.
 
 #### 2017-01-08 Release 2.0.16
  - Changed return type of StaticImports: xform() and xformArray() from Transformable to UnmodIterable.
