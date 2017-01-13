@@ -54,14 +54,6 @@ public interface Equator<T> {
         }
     }
 
-    /**
-     Use Equat.DEFAULT instead.
-     Being an enum, it's serializable and makes a better singleton.
-     Deprecated as of 1.1.0, 2016-08-27
-     */
-    @Deprecated
-    Equator<Object> DEFAULT_EQUATOR = Equat.DEFAULT;
-
     @SuppressWarnings("unchecked")
     static <T> Equator<T> defaultEquator() { return (Equator<T>) Equat.DEFAULT; }
 
@@ -80,24 +72,8 @@ public interface Equator<T> {
         }
     }
 
-    /**
-     Use Comp.DEFAULT instead.
-     Being an enum, it's serializable and makes a better singleton.
-     Deprecated as of 1.1.0, 2016-08-27
-     */
-    @Deprecated
-    Comparator<Comparable<Object>> DEFAULT_COMPARATOR = Comp.DEFAULT;
-
     @SuppressWarnings("unchecked")
     static <T> Comparator<T> defaultComparator() { return (Comparator<T>) Comp.DEFAULT; }
-
-    /**
-     Use ComparisonContext.CompCtx.DEFAULT instead.
-     Being an enum, it's serializable and makes a better singleton.
-     Deprecated as of version 1.1.0, 2016-08-27
-     */
-    @Deprecated
-    ComparisonContext<Comparable<Object>> DEFAULT_CONTEXT = ComparisonContext.CompCtx.DEFAULT;
 
     // ========================================= Instance =========================================
     /**
@@ -114,8 +90,10 @@ public interface Equator<T> {
     /**
      Determines whether two objects are equal.  The name of this method is short so that
      auto-complete can offer it before equals().
+
+     You can do anything you want here, but consider having null == null but null != anything else.
+
      @return true if this Equator considers the two objects to be equal.
      */
     boolean eq(T o1, T o2);
-
 }

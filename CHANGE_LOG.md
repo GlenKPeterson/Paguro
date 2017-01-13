@@ -5,14 +5,20 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
-### 2017-01-08 Release 2.0.16
+### 2017-01-08 Release 2.0.17
+ - Fixed ComparisonContext.eq() so that it checks for null arguments before calling compare()
+   because compare typically throws exceptions for nulls and equal knows that null always equals null
+   and never equals anything else, so it does not throw an exception.
+ - Removed Deprecated items from Equator.
+
+#### 2017-01-08 Release 2.0.16
  - Changed return type of StaticImports: xform() and xformArray() from Transformable to UnmodIterable.
    Thanks to @BrenoTrancoso for finding this and suggesting the fix!
 
-### 2016-11-13 Release 2.0.15
+#### 2016-11-13 Release 2.0.15
  - Added the following convenience methods to StaticImports: mutableVec(items...), mutableSet(items...), mutableMap(items...), xformArray(items...).
 
-## 2016-11-13 Release 2.0.14
+# 2016-11-13 Release 2.0.14
  - Renamed Maven artifact from UncleJim to Paguro.
  - No other changes made!
 

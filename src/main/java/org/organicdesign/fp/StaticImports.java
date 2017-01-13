@@ -242,6 +242,7 @@ public final class StaticImports {
      If you need to wrap a regular Java array outside this project to perform
      a transformation on it, this method is the most convenient, efficient way to do so.
      */
+    @SafeVarargs
     public static <T> UnmodIterable<T> xformArray(T... items) {
         return Xform.of(Arrays.asList(items));
     }

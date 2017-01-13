@@ -18,7 +18,9 @@ import java.util.Comparator;
 
 /**
  Implement compare() and hash() and you get a 100% compatible eq() for free.  If you don't need
- Comparator, just use {@link Equator}.
+ Comparator, just use {@link Equator}.  Typical implementations compare() throw an
+ IllegalArgumentException if one parameter is null (if both are null, it's probably OK to return 0).
+ More at {@link #eq(Object, Object)}.
 
  A common mistake is to implement a ComparisonContext, Equator, or Comparator as an anonymous class
  or lambda, then be surprised when it is can't be serialized, or is deserialized as null.  These
@@ -39,7 +41,22 @@ public interface ComparisonContext<T> extends Equator<T>, Comparator<T> {
     /** Returns true if the first object is greater than or equal to the second. */
     default boolean gte(T o1, T o2) { return compare(o1, o2) >= 0; }
 
-    @Override default boolean eq(T o1, T o2) { return compare(o1, o2) == 0; }
+    /**
+     The default implementation of this method returns false if only one parameter is null then
+     checks if compare() returns zero.
+
+     Only null is equal to null.  If we are passed only one null value, we return false (two
+     nulls are always equal).  Many correct implementations of compare(null, nonNull) throw
+     IllegalArgumentExceptions if one argument is null because most objects cannot be meaningfully
+     be orderd with respect to null, but that's OK because we check for nulls first, then check
+     compare().
+     */
+    @Override default boolean eq(T o1, T o2) {
+        if (o1 == null) { return (o2 == null); }
+
+        // Now they are equal if compare returns zero.
+        return compare(o1, o2) == 0;
+    }
 
     // Enums are serializable and lambdas are not.  Therefore enums make better singletons.
     enum CompCtx implements ComparisonContext<Comparable<Object>> {
