@@ -16,8 +16,9 @@ package org.organicdesign.fp.collections;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import java.util.Arrays;
+
+import static org.junit.Assert.*;
 import static org.organicdesign.fp.collections.ComparisonContextTest.Ctx.CC;
 
 public class ComparisonContextTest {
@@ -93,4 +94,22 @@ public class ComparisonContextTest {
 
     @Test (expected = IllegalArgumentException.class)
     public void testEx06() { CC.lt(null, 1); }
+
+    @Test public void testMinMax() {
+        assertEquals((Integer) 2, CC.min(Arrays.asList(2, 3, 4, 5, 6, 7, 8, 9)));
+        assertEquals((Integer) 2, CC.min(Arrays.asList(3, 4, 5, 6, 7, 8, 9, 2)));
+        assertEquals((Integer) 2, CC.min(Arrays.asList(9, 8, 7, 6, 2, 5, 4, 3)));
+
+        assertEquals((Integer) 2, CC.min(Arrays.asList(2, 3, null, 5, 6, 7, 8, 9)));
+        assertEquals((Integer) 2, CC.min(Arrays.asList(null, null, null, 3, 4, 5, 6, 7, 8, 9, 2)));
+        assertEquals((Integer) 2, CC.min(Arrays.asList(9, 8, 7, 6, 2, 5, 4, 3, null)));
+
+        assertEquals((Integer) 9, CC.max(Arrays.asList(2, 3, 4, 5, 6, 7, 8, 9)));
+        assertEquals((Integer) 9, CC.max(Arrays.asList(3, 4, 5, 6, 9, 7, 8, 2)));
+        assertEquals((Integer) 9, CC.max(Arrays.asList(9, 8, 7, 6, 2, 5, 4, 3)));
+
+        assertEquals((Integer) 9, CC.max(Arrays.asList(null, null, 2, 3, 4, 5, 6, 7, 8, 9)));
+        assertEquals((Integer) 9, CC.max(Arrays.asList(3, 4, 5, 6, 9, null, 7, 8, 2)));
+        assertEquals((Integer) 9, CC.max(Arrays.asList(9, 8, 7, 6, 2, 5, 4, 3, null, null)));
+    }
 }

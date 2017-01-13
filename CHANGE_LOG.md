@@ -5,6 +5,11 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
+### 2017-01-12 Release 2.0.19
+ - Added min() and max() to ComparisonContext.  Each takes a list which could contain nulls
+   and tries its best to return a non-null result.  Should it throw an exception if the result
+   is null?  I dunno.
+
 ### 2017-01-12 Release 2.0.18
  - Fixed ComparisonContext.eq(), lt(), lte(), gt(), gte() to check for null arguments before calling compare()
    because compare() typically throws exceptions for nulls, null always equals null,

@@ -15,6 +15,7 @@
 package org.organicdesign.fp.collections;
 
 import java.util.Comparator;
+import java.util.Iterator;
 
 /**
  Implement compare() and hash() and you get a 100% compatible eq() for free.  If you don't need
@@ -61,6 +62,40 @@ public interface ComparisonContext<T> extends Equator<T>, Comparator<T> {
 
         // Now they are equal if compare returns zero.
         return compare(o1, o2) == 0;
+    }
+
+    default T min(Iterable<T> is) {
+        // Note: following code is identical to max() except for lt() vs. gt()
+        if (is == null) { throw new IllegalArgumentException("null argument"); }
+        Iterator<T> iter = is.iterator();
+        T ret = null;
+        while ( (ret == null) && iter.hasNext() ) {
+            ret = iter.next();
+        }
+        while (iter.hasNext()) {
+            T next = iter.next();
+            if ( (next != null) && lt(next, ret) ) {
+                ret = next;
+            }
+        }
+        return ret; // could be null if all items are null.
+    }
+
+    default T max(Iterable<T> is) {
+        // Note: following code is identical to min() except for lt() vs. gt()
+        if (is == null) { throw new IllegalArgumentException("null argument"); }
+        Iterator<T> iter = is.iterator();
+        T ret = null;
+        while ( (ret == null) && iter.hasNext() ) {
+            ret = iter.next();
+        }
+        while (iter.hasNext()) {
+            T next = iter.next();
+            if ( (next != null) && gt(next, ret) ) {
+                ret = next;
+            }
+        }
+        return ret; // could be null if all items are null.
     }
 
     // Enums are serializable and lambdas are not.  Therefore enums make better singletons.
