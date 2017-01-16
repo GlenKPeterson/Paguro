@@ -96,4 +96,12 @@ public interface Equator<T> {
      @return true if this Equator considers the two objects to be equal.
      */
     boolean eq(T o1, T o2);
+
+    /**
+     Returns true if two objects are NOT equal.  By default, just delegates to {@link #eq(Object, Object)} and reverses
+     the result.
+
+     @return true if this Equator considers the two objects to NOT be equal.
+     */
+    default boolean neq(T o1, T o2) { return !eq(o1, o2); }
 }

@@ -41,9 +41,8 @@ Available from the [Maven Repository](http://mvnrepository.com/artifact/org.orga
 ```xml
 <dependency>
         <groupId>org.organicdesign</groupId>
-        <!-- NOTE: formerly known as UncleJim -->
         <artifactId>Paguro</artifactId>
-        <version>2.0.19</version>
+        <version>2.0.20</version>
 </dependency>
 ```
 

@@ -40,6 +40,17 @@ public class EquatorTest {
         assertTrue(defaultEquator().eq("Hello", "Hello"));
         assertTrue(defaultEquator().eq(Integer.MIN_VALUE, Integer.MIN_VALUE));
         assertTrue(defaultEquator().eq(Integer.MIN_VALUE + 3, Integer.MIN_VALUE + 3));
+
+        // Same thing reversed for neq.
+        assertTrue(defaultEquator().neq(null, a));
+        assertTrue(defaultEquator().neq(a, null));
+        assertTrue(defaultEquator().neq(null, "Hello"));
+        assertTrue(defaultEquator().neq("Cumquat", null));
+
+        assertFalse(defaultEquator().neq(a, a));
+        assertFalse(defaultEquator().neq("Hello", "Hello"));
+        assertFalse(defaultEquator().neq(Integer.MIN_VALUE, Integer.MIN_VALUE));
+        assertFalse(defaultEquator().neq(Integer.MIN_VALUE + 3, Integer.MIN_VALUE + 3));
     }
 
     class ComparableToNull<T extends Comparable<T>> implements Comparable<T> {
