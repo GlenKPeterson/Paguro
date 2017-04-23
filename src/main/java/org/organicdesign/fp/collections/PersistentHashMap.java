@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.organicdesign.fp.Option;
+import org.organicdesign.fp.oneOf.Option;
 import org.organicdesign.fp.collections.PersistentTreeMap.Box;
 import org.organicdesign.fp.tuple.Tuple2;
 

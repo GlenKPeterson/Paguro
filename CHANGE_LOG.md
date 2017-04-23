@@ -5,6 +5,70 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
+### 2017-01-25 Release 2.1.0
+Breaking Changes:
+ - All "OneOf" classes are moved to org.organicdesign.fp.oneOf.  This includes
+     - OneOf2 org.organicdesign.fp.either
+     - Option and Or from org.organicdesign.fp
+
+   OneOf2 now implements equals(), hashCode(), toString(), and has meaningful error messages
+   which show the types of the union at runtime in `toString()` and in exception messages.
+   Option was moved because it is essentially OneOfOneOrNone.
+   Or was moved because it is an implementation of OneOf2.
+   Presumably, there will be a OneOf2OrNone, OneOf3, OneOf3OrNone, etc.
+ - `Option.patMatch()` and `OneOf2.typeMatch()` methods have been renamed simply `match()`.
+
+Non-breaking Changes:
+ - Added org.organicdesign.fp.type.RuntimeTypes.
+   This takes types used for generic parameters at compile time and makes them available at runtime.
+   Lets people develop programming languages without type erasure on the JVM and
+   it comes in very handy at various times, like for OneOf_ (Union types, Or, etc.).
+ - Paguro has gone from Functional Transforms in Java 7 to include unmodifiable (copy-on-write) collections like Guava to making Clojure collections and FP concepts convenient in pure-Java.
+   Long-term, Paguro is intended to be the Java-compatibility (and maybe Kotlin compatibility?) layer for https://github.com/GlenKPeterson/Cymling
+   The Cymling programming language basically splits the difference between Clojure (collections and xforms, assumption of immutability),
+   ML (types without objects, records/tuples instead of Clojure's maps), and Kotlin (dot syntax, function syntax, null safety),
+   Anyone who likes Paguro might want to keep an eye on Cymling development.
+
+Upgrade Instructions:
+You can use sed to fix imports for moved classes.
+```bash
+# USE CAUTION AND HAVE A BACKUP OF YOUR SOURCE CODE (E.G. VERSION CONTROL) - NO GUARANTEES
+oldString='import org.organicdesign.fp.Option'
+newString='import org.organicdesign.fp.oneOf.Option'
+sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir='.git' -rIl "$oldString" *)
+
+oldString='import org.organicdesign.fp.Or'
+newString='import org.organicdesign.fp.oneOf.Or'
+sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir='.git' -rIl "$oldString" *)
+
+oldString='import org.organicdesign.fp.either.OneOf2'
+newString='import org.organicdesign.fp.oneOf.OneOf2;\nimport org.organicdesign.fp.type.RuntimeTypes'
+sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir='.git' -rIl "$oldString" *)
+
+unset oldString
+unset newString
+```
+Then, for any place you exteded OneOf2 you'll manually need to add:
+```java
+public class Foo_Bar extends OneOf2<Foo,Bar> {
+    private static final ImList<Class> TYPES = RuntimeTypes.registerClasses(vec(Foo.class, Bar.class));
+    MyClass(Foo f, Bar b, int s) { super(TYPES, f, b, s); }
+```
+
+Manually change `.typeMatch(` and `.patMat(` to just `.match(` (or you could use sed as above)
+
+If you used the static method:
+```java
+Or.patMatch(x,
+            g -> g.apply(),
+            b -> b.apply())
+```
+You'll need to check that x cannot be null, then change it to:
+```java
+x.match(g -> g.apply(),
+        b -> b.apply())
+```
+
 ### 2017-01-16 Release 2.0.20
  - Added Equator.neq() which just returns !eq() (convenience method)
 

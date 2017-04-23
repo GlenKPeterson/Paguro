@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.organicdesign.fp.Option;
+import org.organicdesign.fp.oneOf.Option;
 import org.organicdesign.fp.collections.UnmodIterable;
 import org.organicdesign.fp.xform.Transformable;
 import org.organicdesign.fp.xform.Xform;

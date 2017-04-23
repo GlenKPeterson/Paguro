@@ -14,6 +14,7 @@
 
 package org.organicdesign.fp.collections;
 
+import java.util.Arrays;
 import java.util.Comparator;
 
 /**
@@ -42,6 +43,10 @@ public interface Equator<T> {
 
     // Enums are serializable and lambdas are not.  Therefore enums make better singletons.
     enum Equat implements Equator<Object> {
+        /**
+         Assumes the object is not an array.  Default array.equals() is == comparison which is probably not what
+         you want.
+         */
         DEFAULT {
             @Override public int hash(Object o) {
                 return (o == null) ? 0 : o.hashCode();
@@ -51,6 +56,19 @@ public interface Equator<T> {
                 if (o1 == null) { return (o2 == null); }
                 return o1.equals(o2);
             }
+//        },
+//        ARRAY {
+//            @Override public int hash(Object o) {
+//                return Arrays.hashCode( (Object[]) o);
+//            }
+//
+//            @Override public boolean eq(Object o1, Object o2) {
+//                try {
+//                    return Arrays.equals((Object[]) o1, (Object[]) o2);
+//                } catch (Exception e) {
+//                    return false;
+//                }
+//            }
         }
     }
 

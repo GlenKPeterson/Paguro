@@ -4,7 +4,7 @@ import java.util.*;
 
 import org.junit.Test;
 import org.organicdesign.fp.FunctionUtils;
-import org.organicdesign.fp.Option;
+import org.organicdesign.fp.oneOf.Option;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.vec;

@@ -23,7 +23,7 @@ import java.util.Queue;
 import java.util.SortedMap;
 import java.util.Stack;
 
-import org.organicdesign.fp.Option;
+import org.organicdesign.fp.oneOf.Option;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import static org.organicdesign.fp.FunctionUtils.stringify;

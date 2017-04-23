@@ -2,7 +2,7 @@ package org.organicdesign.fp.collections;
 
 import java.util.Map;
 
-import org.organicdesign.fp.Option;
+import org.organicdesign.fp.oneOf.Option;
 
 /** An immutable map with no guarantees about its ordering. */
 public interface ImMap<K,V> extends UnmodMap<K,V> {

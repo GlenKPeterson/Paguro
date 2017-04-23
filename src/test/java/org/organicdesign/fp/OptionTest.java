@@ -1,6 +1,7 @@
 package org.organicdesign.fp;
 
 import org.junit.Test;
+import org.organicdesign.fp.oneOf.Option;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
@@ -13,34 +14,34 @@ public class OptionTest {
         assertTrue(o1a.isSome());
         assertEquals(Integer.valueOf(1), o1a.get());
         assertEquals(Integer.valueOf(1), o1a.getOrElse(2));
-        assertEquals("One", o1a.patMat(s -> "One",
-                                       () -> "Two"));
+        assertEquals("One", o1a.match(s -> "One",
+                                      () -> "Two"));
 
         Option<Integer> z = Option.of(null);
         assertTrue(z.isSome());
         assertEquals(null, z.get());
         assertEquals(null, z.getOrElse(2));
-        assertEquals("One", z.patMat(s -> "One",
-                                     () -> "Two"));
+        assertEquals("One", z.match(s -> "One",
+                                    () -> "Two"));
 
         Option<Integer> n = Option.none();
         assertFalse(n.isSome());
         assertEquals(Integer.valueOf(2), n.getOrElse(2));
-        assertEquals("Two", n.patMat(s -> "One",
-                                     () -> "Two"));
+        assertEquals("Two", n.match(s -> "One",
+                                    () -> "Two"));
 
         Option<Integer> y = Option.someOrNullNoneOf(null);
         assertFalse(y.isSome());
         assertEquals(Integer.valueOf(2), y.getOrElse(2));
-        assertEquals("Two", y.patMat(s -> "One",
-                                     () -> "Two"));
+        assertEquals("Two", y.match(s -> "One",
+                                    () -> "Two"));
 
         Option<String> os = Option.someOrNullNoneOf("Hello");
         assertTrue(os.isSome());
         assertEquals("Hello", os.get());
         assertEquals("Hello", os.getOrElse("Goodbye"));
-        assertEquals(Integer.valueOf(1), o1a.patMat(s -> 1,
-                                                    () -> 2));
+        assertEquals(Integer.valueOf(1), o1a.match(s -> 1,
+                                                   () -> 2));
         assertEquals(Option.NONE, Option.someOrNullNoneOf(Option.NONE));
 
         assertTrue(Option.NONE.equals(Option.NONE));

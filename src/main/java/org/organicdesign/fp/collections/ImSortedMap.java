@@ -13,7 +13,7 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
-import org.organicdesign.fp.Option;
+import org.organicdesign.fp.oneOf.Option;
 
 import java.util.Map;
 
