@@ -3,17 +3,14 @@ Type-safe versions of Clojure's immutable collections, an immutable alternative 
 ![Hermit Crab](https://c7.staticflickr.com/8/7413/12171498934_2934c7ef28_n.jpg)
 Photo by [Rushen](https://www.flickr.com/photos/rushen/12171498934/in/photostream/)
 
-Paguro ("pah-GUH-row" rhymes with "furrow") is short for the Latin "Paguroidea" - the name of the Hermit Crab superfamily in Biology.
-These collections grow by adding a new shell, leaving the insides the same, much the way [Hermit Crabs trade up to a new shell when they grow](https://www.youtube.com/watch?v=f1dnocPQXDQ).
-
-This project used to be called UncleJim: "**Un**modifiable **Coll**ections for **J**ava™ **Imm**utability". 
+Paguro is short for the Latin "Paguroidea" - the name of the Hermit Crab superfamily in Biology.  These collections grow by adding a new shell, leaving the insides the same, much the way [Hermit Crabs trade up to a new shell when they grow](https://www.youtube.com/watch?v=f1dnocPQXDQ).  This project used to be called UncleJim. 
 
 # News
 A summary of recent updates is in the [Change Log](CHANGE_LOG.md)
 
 Future development priorities are further down this page.
 
-#Features
+# Features
 
 * [Immutable collections](src/main/java/org/organicdesign/fp/collections) - type-safe generic Java versions of Clojure's immutable collections - arguably the best immutable collections on the JVM.
 * [Functional transformations](src/main/java/org/organicdesign/fp/xform/Transformable.java#L42) are a simplified immutable alternative to Java 8 Streams, wrapping checked exceptions and avoiding primitives (you can still use Java 8 streams if you want to).
@@ -46,7 +43,7 @@ Available from the [Maven Repository](http://mvnrepository.com/artifact/org.orga
 </dependency>
 ```
 
-#Details
+# Details
 
 ```java
 // Define some people with lists of email addresses on the fly.
@@ -87,7 +84,7 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
 
 * [Comparison with Traditional Java and Java 8 Streams](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java#L22)
 
-#Manifesto
+# Manifesto
 
 * Immutability promotes correct code as much as type safety does.
 * Better to focus on picking the appropriate collections and transformations than on looping details.
@@ -95,40 +92,42 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
 * On-the fly data definition should be simple and easy.  Naming/formalizing those data structures should be too.
 * Minimal, easy-to-understand interface covering the most critical building blocks for higher functionality.
 
-#FAQ
+# FAQ
 
-###Q: How does this compare to PCollections?
+### Q: How does this compare to PCollections?
 
 [Paguro is based on Clojure, faster and has additional features](https://github.com/GlenKPeterson/Paguro/wiki/UncleJim-vs.-PCollections)
 
-###Q: Do these Transforms create intermediate collections between each operation (like the Scala collections)?
+### Q: Do these Transforms create intermediate collections between each operation (like the Scala collections)?
 
 [No](https://github.com/GlenKPeterson/Paguro/wiki/How-do-%22Xforms%22---Transformations-work%3F)
 
-###Q: How does this compare to Streams and lambda expressions in JDK8?
+### Q: How does this compare to Streams and lambda expressions in JDK8?
 
 [Comparison](https://github.com/GlenKPeterson/Paguro/wiki/Comparison-with-Streams-and-Lambdas-in-JDK8)
 
-###Q: Why Java instead of another/better JVM language?
+### Q: Why Java instead of another/better JVM language?
 
 [Why Java?](https://github.com/GlenKPeterson/Paguro/wiki/Why-is-UncleJim-written-in-Java%3F)
 
-#Future Development Priorities (as of 2016-11-13)
-0. Xform.toMutableList() returns a java.util.List, but now that there's a MutableList class, that doesn't make sense any more.
+# Future Development Priorities (as of 2016-11-13)
+0. `Xform.toMutableList()` returns a java.util.List, but now that there's a MutableList class, should we use that instead?  Similarly for other toMutable... methods.
 1. Implement an RRB-Tree (lacking O(log n) version of concat())
 2. Add reverseIterator() or similar to SortedUnmodIterable
 3. Transformable needs `first()` and `last()`, but maybe only on a SortedIterable.  Otherwise, `any(Function1<Boolean>)`
 4. Ensure everything is as friendly as possible to Monadic thinking.
 5. Rename functional interfaces from Function1 to Fn1 (start by making a briefer sub-class and deprecating the long-named one).  Provide a Fn1v subclass of Fn1 (and similar for Fn0, Fn2, etc.) that returns void because sometimes you need one of those for backward compatibility and you don't want it to choke on checked exceptions.
-6. Make a Java 7 branch (and/or Java 6) and release (Paguro-JDK7).
-7. Consider adding `Class[] genericTypes` to every generic class so that generics could be known at runtime (for Cymling)
+6. Consider adding interfaces to better split muable and immutable collections.  There should be a definitely unmodifiable, a definitely mutable, and an "unknown" one, but the two definitely's maybe shouldn't extend the "unknown" one.
+7. Make a Java 7 branch (and/or Java 6) and release (Paguro-JDK7).
+8. Consider adding `Class[] genericTypes` to every generic class so that generics could be known at runtime (for Cymling)
+9. Consider adding ImMap.assocIfAbsent(K key, Function1<V,V> howToUpdateValue, V newValIfAbsent).
 
 ### RRB-Tree
 Read the [current development status](https://github.com/GlenKPeterson/Paguro/issues/4#issuecomment-239825939) or check out the [latest version of the code](https://github.com/GlenKPeterson/Paguro/blob/2016-05-22_RRB-Tree/src/main/java/org/organicdesign/fp/experimental/RrbTree1.java).
 
 As Norm Zeck pointed out by sending me [Ropes: an Alternative to Strings](http://citeseer.ist.psu.edu/viewdoc/download?doi=10.1.1.14.9450&rep=rep1&type=pdf), an RRB-Tree might make a great implementation of *both* String and StringBuilder.  We might want to add a Char8 (UTF-8 Character class pronounced "crate") and make Str8 (UTF-8 String pronounced "straight") a sub-class of RRB-Tree.  Just a thought.
 
-#Licenses
+# Licenses
 Java&trade; is a registered trademark of the Oracle Corporation in the US and other countries.
 Paguro is not part of Java.
 Oracle is in no way affiliated with the Paguro project.
@@ -144,5 +143,5 @@ Unless otherwise stated, the rest of this work is licensed under the Apache 2.0 
 New contributions should be made under the Apache 2.0 license whenever practical.
 I believe it is more popular, clearer, and has been better tested in courts of law.
 
-#More
+# More
 Additional information is in: [README2.md](README2.md).

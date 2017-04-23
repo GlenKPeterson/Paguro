@@ -1,15 +1,15 @@
-#Notice
+# Notice
 Read [README.md](README.md) before this file as that is the official introduction to Paguro.
 This file contains additional information for contributors, or maybe people who are considering opening an issue.
 
-#Additional features:
+# Additional features:
 * Simplified [functional interfaces](src/main/java/org/organicdesign/fp/function) that wrap checked exceptions
 * An [Equator](src/main/java/org/organicdesign/fp/collections/Equator.java) and [ComparisonContext](src/main/java/org/organicdesign/fp/collections/Equator.java#L45) which work like `java.util.Comparator`, but for hash-based collections.
 * [Memoization](src/main/java/org/organicdesign/fp/function/Function2.java#L59) for functions
 * Unmodifiable interfaces which deprecate mutator methods and throw exceptions to retrofit legacy code and catch errors in your IDE instead of at runtime.
 These were useful before the Clojure collections and Transformable were fully integrated, but may still provide a useful extension point for integrating your own immutable collections into the traditional Java ecosystem.
 
-#Thank You
+# Thank You
 Some of the people I'm listing as contributors may not actually be aware of this project, but I found them inspiring in various ways.
 
 The bulk of this project started as a simple question on StackExchange: [Why doesn't Java 8 include immutable collections?](http://programmers.stackexchange.com/questions/221762/why-doesnt-java-8-include-immutable-collections)  People's answers were a big help in figuring out what this project should and shouldn't do.
@@ -32,21 +32,25 @@ Joshua Bloch for his book, Effective Java.
 
 Rich Hickey for Clojure
 
-#Build from Source
+# Build from Source
 
 - Java 8
 - Maven
 - First `mvn clean install` on: https://github.com/GlenKPeterson/TestUtils
 - Then `mvn clean test` on Paguro
 
-#To Do
- - Xform.MapDesc is not serializable.  Really none of xform is serializable.
- - Think about adding StaticImports.xform(String)
+# Version 3.0 breaking changes
+ - Rename all functional interfaces from `Function1` to `Fn1`.  These show up in type signatures often enough to warrant brevity.
+ - Rename `Transformable.foldLeft()` to just `Transformable.fold()`.  The left and right only make sense on linked lists (they are reversed with vectors which is confusing).  Just drop the word "left."  People who care will look it up anyway and people who don't care don't need to know.
  - Remove empty() and EMPTY from all interfaces except maybe UnmodIterator.
  These are a problem when you inherit from the interface because you have to override them or suffer.
  These objects don't implement equals() and you end up expecting in UnmodWhatever.EMPTY to .append() or otherwise behave like an ImWhatever, which it probably should never do.
  - Rename foldLeft() to just fold().  It's too confusing for people used to linked list implementations
  to think about what foldLeft() means in terms of ordering.
+
+# Think about:
+ - Xform.MapDesc is not serializable.  Really none of xform is serializable.
+ - Think about adding StaticImports.xform(String)
  - Add insert(int i, E element) to ImList, implemented by wrapping the existing list in an ImSortedMap and time it.
  - Can I make UnmodMap extend UnmodCollection instead of UnmodIterable?  Or do the contains() and contains() all methods conflict?
    Hmm... Maybe have a SizedIterable that both maps and collections can extend?  Ditto UnmodSortedMap extend UnmodSortedCollection instead of UnmodSortedIterable.
@@ -56,14 +60,16 @@ Rich Hickey for Clojure
  - Study monadic thinking and ensure that Or is "monad-friendly".
  Ensure you can chain together functions in a short-circuiting way, without exceptions or other side-effects.
  - Add a [Persistent RRB Tree](http://infoscience.epfl.ch/record/169879/files/RMTrees.pdf) and compare its performance to the PersistentVector.
+ - Replace vector with RRBTree (assuming performance is good).
  - Re-implement Persistent collections under the Apache license.
+ - Make pretty(int indent) methods on everything that returns a String of valid Cymling code to create that collection.
 
-#Out of Scope
+# Out of Scope
 
-###Option<T> firstMatching(Predicate<T> pred);
+### Option<T> firstMatching(Predicate<T> pred);
 Use with filter(...).head() instead
 
-###T reduceLeft(BiFunction<T, T, T> fun)
+### T reduceLeft(BiFunction<T, T, T> fun)
 reduceLeft() is like foldLeft without the "u" parameter.
 I implemented it, but deleted it because it seemed like a very special case of foldLeft that only operated on items of the same type as the original collection.
 I didn't think it improved readability or ease of use to have both methods.
@@ -71,7 +77,7 @@ How hard is it to pass a 0 or 1 to foldLeft?
 It's easy enough to implement if there is a compelling use case where it's significantly better than foldLeft.
 Otherwise, fewer methods means a simpler interface to learn.
 
-###Transformable<T> forEach(Function1<? super T,?> consumer)
+### Transformable<T> forEach(Function1<? super T,?> consumer)
 Java 8 has `void forEach(Consumer<? super T> action)` on both Iterable and Stream that does what
 Transformable.forEach() used to do.  The old Transformable method overloaded (but did not override)
 this method which is problematic for the reasons Josh Bloch gives in his Item 41.  Either make
@@ -79,7 +85,7 @@ use of the Java 8 `void forEach(i -> log(i))` or pass a constant function like
 `i -> { print(i); return Boolean.TRUE; }` to
 `Transformable<T> filter(Function1<? super T,Boolean> predicate)` instead. 
 
-###Transformable<T> interpose(T item)
+### Transformable<T> interpose(T item)
 I also implemented interpose(), but took it out because my only use case was to add commas to a list to display
 it in English and for that, you also need a conjunction, and often a continuation symbol:
 
@@ -91,7 +97,7 @@ a,b,c...
 
 None of those are simple uses of interpose.
 
-###Mirroring Clojure's seq (sequence abstraction)
+### Mirroring Clojure's seq (sequence abstraction)
 
 Paguro tried two alternatives.  One was based on the Clojure idea of a sequence: immutable, lazy, and cached.  The signature looked something like this:
 
@@ -112,12 +118,12 @@ interface Sequence2<T> {
 
 Ultimately, Transformable took the place of a sequence abstraction in Paguro.  It's safe, easy to use, and about 98% as fast as native Java iteration.  If you really need to pretend you have a Sequence1, Transformable has `take(1)` and `drop(1)` that you can use like `first()` and `rest()` in a pinch.  That said, everything you could do with Sequence1 you can do faster and just as clearly with Transformable.  Presumably, this is why Clojure now has Transducers.
 
-#Motivation
+# Motivation
 
-##Executive summary
+## Executive summary
 To be able to write Java at work more like the way I write Clojure without taking any significant performance penalty for doing so.  Also, to be able to use the Clojure collections in a type-safe language.  I was thinking "Java" but really Scala can take advantage of the type safety improvements as well.
 
-##Details
+## Details
 The goals of this project are to make it easy to use Java:
 
  - Immutably (Josh Bloch Item 15 and Clojure)
@@ -157,7 +163,7 @@ Within your own FP-centric world, you will use the Im interfaces and implementat
 
 In Java, variables declared outside a lambda and used within one must be effectively finial.  The Mutable.Ref class works around this limitation.
 
-#Licenses (continued)
+# Licenses (continued)
 The [EPL is not compatable with the GPL version 2 or 3](https://eclipse.org/legal/eplfaq.php#GPLCOMPATIBLE).
 You can [add an exception to the GPL to allow you to release EPL code under this modified GPL](http://www.gnu.org/licenses/gpl-faq.html#GPLIncompatibleLibs), but not the other way around.
 
@@ -166,7 +172,7 @@ Apache is not compatible with GPLv2, though you might try the GPL modification m
 
 As of 2015-03-24, the following statements made me think the Apache and EPL licenses were compatible enough for my purposes and for general enterprise adoption:
 
-###From Apache
+### From Apache
 > For the purposes of being a dependency to an Apache product, which licenses
 > are considered to be similar in terms to the Apache License 2.0?
 >
@@ -185,7 +191,7 @@ As of 2015-03-24, the following statements made me think the Apache and EPL lice
 
 Source (as of 2015-05-13): https://www.apache.org/legal/resolved#category-a
 
-###From Eclipse
+### From Eclipse
 > What licenses are acceptable for third-party code redistributed by Eclipse
 > projects?
 >
