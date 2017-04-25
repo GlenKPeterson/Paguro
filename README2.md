@@ -126,7 +126,7 @@ To be able to write Java at work more like the way I write Clojure without takin
 ## Details
 The goals of this project are to make it easy to use Java:
 
- - Immutably (Josh Bloch Item 15 and Clojure)
+ - Immutably (Josh Bloch "Effective Java" 2nd Edition Item 15 and Clojure)
  - Type safely (Josh Bloch Item 23)
  - Functionally (using first-class functions more easily: Clojure and Scala)
  - Expressiveness/Brevity (Expressions over statements: all API calls evaluate to something useful for subsequent calls: Clojure and Scala).
