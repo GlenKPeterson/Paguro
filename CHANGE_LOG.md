@@ -5,6 +5,10 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
+## 2017-05-04 Release 2.1.1
+Fixed array class cast exception bug reported by @BrenoTrancoso https://github.com/GlenKPeterson/Paguro/issues/17
+Thank you for finding and reporting this tricky issue!
+
 ### 2017-01-25 Release 2.1.0
 Breaking Changes:
  - All "OneOf" classes are moved to org.organicdesign.fp.oneOf.  This includes

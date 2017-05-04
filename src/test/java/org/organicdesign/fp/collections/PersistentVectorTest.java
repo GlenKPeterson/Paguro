@@ -44,6 +44,14 @@ public class PersistentVectorTest {
         ImList<Integer> list = vec(1, 2, 3);
         Integer[] resultArray = list.toArray(new Integer[3]);
         assertArrayEquals(threeIntArray, resultArray);
+
+        // Calling this with a too-small array used to result in a class-cast exception as [LObject was cast to
+        // [LInteger.  So calling with a smaller input array is an important test.
+        resultArray = list.toArray(new Integer[2]);
+        assertArrayEquals(threeIntArray, resultArray);
+
+        String[] resultArray2 = vec("hi", "bye", "ok").toArray(new String[3]);
+        assertArrayEquals(new String[] {"hi", "bye", "ok"}, resultArray2);
     }
 
     @Test

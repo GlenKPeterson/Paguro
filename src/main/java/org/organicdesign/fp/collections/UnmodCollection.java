@@ -13,6 +13,7 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -202,7 +203,16 @@ public interface UnmodCollection<E> extends Collection<E>, UnmodIterable<E>, Siz
     @SuppressWarnings("unchecked")
     @Override default <T> T[] toArray(T[] as) {
         if (as.length < size()) {
-            as = (T[]) new Object[size()];
+            // This produced a class cast exception when the return was put into a
+            // variable of type non-Object[] (like String[] or Integer[]).  To see the problem
+            // you must.
+            // 1. pass a smaller array so that an Object[] is created
+            // 2. Force the return type to be a String[] (or other not-exactly Object)
+            // Merely running Arrays.AsList() on it is not enough to get the exception.
+
+            // Bad: watch for this in the future!
+//            as = (T[]) new Object[size()];
+            as = (T[]) Array.newInstance(as.getClass().getComponentType(), size());
         }
         Iterator<E> iter = iterator();
         for (int i = 0; i < size(); i++) {

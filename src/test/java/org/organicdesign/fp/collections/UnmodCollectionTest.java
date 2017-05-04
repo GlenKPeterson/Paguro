@@ -155,6 +155,14 @@ public class UnmodCollectionTest {
         assertSetEqualsOnArrays(sticksAndStones, unColl.toArray(new String[3]));
         assertSetEqualsOnArrays(sticksAndStones,
                                 unColl.toArray(new String[unColl.size()]));
+
+        // In order to show the class cast exception, we need to
+        // 1. pass a smaller array so that an Object[] is created
+        // 2. Force the return type to be a String[]
+        // Merely running Arrays.AsList() on it is not enough to get the exception.
+        String[] items = unColl.toArray(new String[1]);
+        assertSetEqualsOnArrays(sticksAndStones, items);
+
         String[] result = unColl.toArray(new String[sticksAndStones.length + 3]);
         List<String> temp = new ArrayList<>(Arrays.asList(sticksAndStones));
         temp.add(null);

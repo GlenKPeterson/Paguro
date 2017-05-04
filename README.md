@@ -39,7 +39,7 @@ Available from the [Maven Repository](http://mvnrepository.com/artifact/org.orga
 <dependency>
         <groupId>org.organicdesign</groupId>
         <artifactId>Paguro</artifactId>
-        <version>2.1.0</version>
+        <version>2.1.1</version>
 </dependency>
 ```
 
