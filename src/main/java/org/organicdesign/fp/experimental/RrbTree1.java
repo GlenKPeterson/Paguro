@@ -96,6 +96,15 @@ public class RrbTree1<E> implements ImList<E>, Indented {
         return new RrbTree1<>(newFocus, focusStartIndex, root, size + 1);
     }
 
+    // TODO: This is inefficient due to no mutable version (was 5x difference for PersistentVector)
+    @Override public RrbTree1<E> concat(Iterable<? extends E> es) {
+        RrbTree1<E> ret = this;
+        for (E e : es) {
+            ret = ret.append(e);
+        }
+        return ret;
+    }
+
     @Override public E get(int i) {
 //        System.out.println("  get(" + i + ")");
         if ( (i < 0) || (i > size) ) {
@@ -165,7 +174,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
         return new Iter();
     }
 
-// TODO: Implement join()
+// TODO: Test join()
 /*
 I'm implementing something like the [Bagwell/Rompf RRB-Tree][1] and I'm a little unsatisfied with
 the details of the join/merge algorithm.  I wonder if there's a standard way to do this that they
@@ -179,67 +188,117 @@ My basic approach was to fit the shorter tree into the left-most or right-most l
 tree at the correct height.  For `a.join(b)`, if `b` is taller, fit `a` into `b`'s left-most leg at
 the right height, otherwise fit `b` into `a`'s right-most leg at the right height
 
-This breaks down into 3 cases (try in order)
+Overview:
 
-1. The taller tree has room for all shorter.childNodes at leftmost or rightmost node n where
-`n.height = shorter.height()`.  Method: add shorter.childNodes to n.childNodes.  I'm not sure it
-buys anything over #2 from a Big O perspective, but keeping things packed tightly which makes
-subsequent operations more efficient.
+1. Push the focus of both trees so we don't have to worry about it.
 
-``` Example with radix = 3:
-         n1                      n1
-        / |\                    / |\
-      n2 n3 n4   +   s1   =   n2 n3 n4
-     ...    /       / |      ...   / |\
-          nx      s2 s3          nx s2 s3
-```
+2. Find the height of each tree.
 
-2. Beginning from height `h = shorter.height() + 1`, see if there is room for one more in the
-leftmost or rightmost node n where n.height = h.  **If** so, add the (possibly modified) shorter
-tree to the left or right of n.childNodes as appropriate.  **Otherwise:** add a parent to the
-shorter tree, decrement h, and repeat.
+3. Stick the shorter tree into the proper level of the larger tree (on the left or right as
+appropriate).  If the leftmost/rightmost node at the proper level level of the larger tree is full,
+add a "skinny leg" (a new root with a single child) to the short tree and stick it on the left or
+right one level up in the large one.  If the large tree is packed, several skinny-leg insertion
+attempts may be required, or even a new root added to the large tree with 2 children: the old
+large tree and the smaller tree on the appropriate side of it.
 
-3. If there was no room, add a new top-level node t that holds both trees (if the one tree was
-shorter, it's now had enough ancestors added to make it the same height).
+Optimization: If one tree is really small, we could do an append or prepend.
 
-I guess I don't see the advantage of zipping nodes together at every level the very complicated
-way it seems to do in the paper.  Even after all that work, it still has nodes of varying sizes.
-
+I don't see the advantage of zipping nodes together at every level the very complicated
+way it seems to do in the paper.  Even after all that work, it still has nodes of varying sizes and
+involves changing more nodes than maybe necessary.
 
   [1]: https://infoscience.epfl.ch/record/169879/files/RMTrees.pdf
-
-
-So, for #1, if there is no room, this is effectively a split, which is pretty darn similar to the
-pushFocus logic we already have.
 */
 
-//    private Node<E> pushFocus() {
-//        if (focus.length == 0) {
-//            return root;
-//        }
-//        return root.pushFocus(focusStartIndex, focus);
-//    }
-//
-//    private static <E> Node<E> eliminateUnnecessaryAncestors(Node<E> n) {
-//        while ( !(n instanceof Leaf) &&
-//                (n.numChildren() == 1) ) {
-//            n = n.child(0);
-//        }
-//        return n;
-//    }
-//
-//    public RrbTree1<E> join(RrbTree1<? extends E> that) {
-//        Node<E> leftRoot = eliminateUnnecessaryAncestors(pushFocus());
-//        Node<? extends E> rightRoot = eliminateUnnecessaryAncestors(that.pushFocus());
-//
-//        if (leftRoot.height() < rightRoot.height()) {
-//
-//        } else if ((leftRoot.numChildren() + rightRoot.numChildren()) < MAX_NODE_LENGTH ) {
-//
-//        }
-//
-//        throw new UnsupportedOperationException("Not implemented yet");
-//    }
+    private Node<E> pushFocus() {
+        if (focus.length == 0) {
+            return root;
+        }
+        return root.pushFocus(focusStartIndex, focus);
+    }
+
+    private static <E> Node<E> eliminateUnnecessaryAncestors(Node<E> n) {
+        while ( !(n instanceof Leaf) &&
+                (n.numChildren() == 1) ) {
+            n = n.child(0);
+        }
+        return n;
+    }
+
+    /**
+     Joins the given tree to the right side of this tree (or this to the left side of that one) in
+     something like O(log n) time.
+     */
+    public RrbTree1<E> join(RrbTree1<E> that) {
+        if (that.size < MAX_NODE_LENGTH) {
+            return concat(that);
+        }
+        // Note that if the right-hand tree is bigger, we'll effectively add this tree to the
+        // left-hand side of that one.  It's logically the same as adding that tree to the right
+        // of this, but the mechanism by which it happens is a little different.
+        Node<E> leftRoot = eliminateUnnecessaryAncestors(pushFocus());
+        Node<E> rightRoot = eliminateUnnecessaryAncestors(that.pushFocus());
+
+        // Whether to add the right tree to the left one (true) or vice-versa (false).
+        // True also means left is taller, false: right is taller.
+        boolean leftIntoRight = leftRoot.height() < rightRoot.height();
+        Node<E> taller = leftIntoRight ? rightRoot : leftRoot;
+        Node<E> shorter = leftIntoRight ? leftRoot : rightRoot;
+
+//        taller.pushTree(shorter);
+
+        // Walk down the taller tree to the height of the shorter, remembering ancestors.
+        Node<E> n = taller;
+        Node<E>[] ancestors = genericNodeArray(taller.height() - shorter.height());
+        int i = 0;
+        for (; i < ancestors.length; i++) {
+            ancestors[i] = n;
+            n = n.endChild(leftIntoRight);
+        }
+        i--;
+        // While nodes in the taller are full, add a parent to the shorter and try the next level
+        // up.
+        while (!n.thisNodeHasRelaxedCapacity(leftRoot.numChildren()) && (i >= 0)) {
+            n = ancestors[i];
+            i--;
+            leftRoot = new Relaxed<>(new int[] { leftRoot.size() }, singleElementArray(leftRoot));
+        }
+
+        // Here we've got 2 trees of equal height so we make a new parent.
+        if (i < 0) {
+            @SuppressWarnings("unchecked")
+            Node<E>[] newRootArray = new Node[] {leftRoot, rightRoot};
+            int leftSize = leftRoot.size();
+            Node<E> newRoot =
+                    new Relaxed<>(new int[] {leftSize, leftSize + rightRoot.size()}, newRootArray);
+
+            return new RrbTree1<>(emptyArray(), 0, newRoot, newRoot.size());
+        }
+
+        // Trees are not equal height and there's room somewhere.
+        n = n.addEndChild(leftIntoRight, shorter);
+
+        while (i >= 0) {
+            Node<E> anc = ancestors[i];
+            // By definition, I think that if we need a new root node, then we aren't dealing with
+            // leaf nodes, but I could be wrong.
+            // I also think we should get rid of relaxed nodes and everything will be much easier.
+            Relaxed<E> rel = (anc instanceof Strict) ? ((Strict) anc).relax()
+                                                     : (Relaxed<E>) anc; // TODO: check for leaf!
+
+            int repIdx = leftIntoRight ? 0 : rel.numChildren() - 1;
+
+            @SuppressWarnings("unchecked")
+            Node<E>[] newNodes = replaceInArrayAt(n, rel.nodes, repIdx, Node.class);
+
+            // TODO: In relaxed nodes, we need to recalc cumulative sizes.
+            n = new Relaxed<>(replaceInIntArrayAt(n.size(), rel.cumulativeSizes, repIdx),
+                              newNodes);
+            i--;
+        }
+
+        return new RrbTree1<>(emptyArray(), 0, n, n.size());
+    }
 
     @Override public MutableList<E> mutable() {
         // TODO: Implement or change interfaces.
@@ -263,7 +322,7 @@ pushFocus logic we already have.
         if (index >= focusStartIndex) {
             int focusOffset = index - focusStartIndex;
             if (focusOffset < focus.length) {
-                return new RrbTree1<>(replaceInArrayAt(item, focus, focusOffset),
+                return new RrbTree1<>(replaceInArrayAt(item, focus, focusOffset, null),
                                       focusStartIndex, root, size);
             }
 //            System.out.println("    Subtracting focus.length");
@@ -390,6 +449,12 @@ pushFocus logic we already have.
         /** Returns the immediate child node at the given index. */
         Node<T> child(int childIdx);
 
+        /** Returns the leftMost (first) or right-most (last) child */
+        Node<T> endChild(boolean leftMost);
+
+        /** Adds a node as the first/leftmost or last/rightmost child */
+        Node<T> addEndChild(boolean leftMost, Node<T> shorter);
+
         /** Return the item at the given index */
         T get(int i);
 
@@ -406,6 +471,9 @@ pushFocus logic we already have.
         int size();
 //        /** Returns true if this node's array is not full */
 //        boolean thisNodeHasCapacity();
+
+        /** Can this node take the specified number of children? */
+        boolean thisNodeHasRelaxedCapacity(int numItems);
 
         /**
          Can we put focus at the given index without reshuffling nodes?
@@ -432,6 +500,18 @@ pushFocus logic we already have.
 
         SplitNode<T> splitAt(int splitIndex);
     }
+
+//    private interface BranchNode<T> extends Node<T> {
+//    }
+
+//    /** For calcCumulativeSizes */
+//    private static final class CumulativeSizes {
+//        int szSoFar; // Size so far (of all things to left)
+//        int srcOffset; // offset in source array
+//        int[] destArray; // the destination array
+//        int destPos; // offset in destArray to copy to
+//        int length; // number of items to copy.
+//    }
 
     private static class SplitNode<T> extends Tuple4<Node<T>,T[],Node<T>,T[]> implements Indented {
         SplitNode(Node<T> ln, T[] lf, Node<T> rn, T[] rf) { super(ln, lf, rn, rf); }
@@ -464,6 +544,16 @@ pushFocus logic we already have.
         Leaf(T[] ts) { items = ts; }
 
         @Override public Node<T> child(int childIdx) {
+            throw new UnsupportedOperationException("Don't call this on a leaf");
+        }
+
+        /** Returns the leftMost (first) or right-most (last) child */
+        @Override public Node<T> endChild(boolean leftMost) {
+            throw new UnsupportedOperationException("Don't call this on a leaf");
+        }
+
+        /** Adds a node as the first/leftmost or last/rightmost child */
+        @Override public Node<T> addEndChild(boolean leftMost, Node<T> shorter) {
             throw new UnsupportedOperationException("Don't call this on a leaf");
         }
 
@@ -574,7 +664,11 @@ pushFocus logic we already have.
             if (idx >= size()) {
                 throw new IllegalArgumentException("Invalid index " + idx + " >= " + size());
             }
-            return new Leaf<>(replaceInArrayAt(t, items, idx));
+            return new Leaf<>(replaceInArrayAt(t, items, idx, null));
+        }
+
+        @Override public boolean thisNodeHasRelaxedCapacity(int numItems) {
+            return items.length + numItems <= MAX_NODE_LENGTH;
         }
 
         @Override public String toString() {
@@ -602,6 +696,19 @@ pushFocus logic we already have.
         }
 
         @Override public Node<T> child(int childIdx) { return nodes[childIdx]; }
+
+        /** Returns the leftMost (first) or right-most (last) child */
+        @Override public Node<T> endChild(boolean leftMost) {
+            return nodes[leftMost ? 0 : nodes.length - 1];
+        }
+
+        /** Adds a node as the first/leftmost or last/rightmost child */
+        @Override public Node<T> addEndChild(boolean leftMost, Node<T> shorter) {
+            if (leftMost || !(shorter instanceof Strict)) {
+                return relax().addEndChild(leftMost, shorter);
+            }
+            return new Strict<>(shift, insertIntoArrayAt(shorter, nodes, nodes.length));
+        }
 
         @Override public int height() { return nodes[0].height() + 1; }
 
@@ -714,7 +821,6 @@ pushFocus logic we already have.
         //            return tup(this, right);
         //        }
 
-        @SuppressWarnings("unchecked")
         @Override
         public SplitNode<T> splitAt(int splitIndex) {
             int size = size();
@@ -753,7 +859,7 @@ pushFocus logic we already have.
             } else {
                 boolean haveLeft = (splitLeft.size() > 0);
                 int numLeftItems = subNodeIndex + (haveLeft ? 1 : 0);
-                Node<T>[] leftNodes = (Node<T>[]) new Node[numLeftItems];
+                Node<T>[] leftNodes = genericNodeArray(numLeftItems);
                 //                    debug("leftCumSizes=" + arrayString(leftCumSizes));
                 // Copy one less item if we are going to add the split one in a moment.
                 // I could have written:
@@ -819,8 +925,7 @@ pushFocus logic we already have.
                     if (lastNode.hasStrictCapacity()) {
 //                    System.out.println("  Pushing focus down to lower-level node with capacity.");
                         Node<T> newNode = lastNode.pushFocus(lowBits(index), oldFocus);
-                        Node<T>[] newNodes = replaceInArrayAt(newNode, nodes, nodes.length - 1,
-                                                              Node.class);
+                        Node<T>[] newNodes = replaceInArrayAt(newNode, nodes, nodes.length - 1, Node.class);
                         return new Strict<>(shift, newNodes);
                     }
                     // Regardless of what else happens, we're going to add a new node.
@@ -849,9 +954,7 @@ pushFocus logic we already have.
 
                     if ((nodes.length < STRICT_NODE_LENGTH)) {
 //                    System.out.println("  Adding a node to the existing array");
-                        Node<T>[] newNodes =
-                                (Node<T>[]) insertIntoArrayAt(newNode, nodes, subNodeIndex,
-                                                              Node.class);
+                        Node<T>[] newNodes = insertIntoArrayAt(newNode, nodes, subNodeIndex);
                         // This could allow cheap strict inserts on any leaf-node boundary...
                         return new Strict<>(shift, newNodes);
                     } else {
@@ -873,8 +976,7 @@ pushFocus logic we already have.
                     // Regardless of what else happens, we're going to add a new node.
                     Node<T> newNode = new Leaf<>(oldFocus);
 
-                    Node<T>[] newNodes = (Node<T>[]) insertIntoArrayAt(newNode, nodes, subNodeIndex,
-                                                                       Node.class);
+                    Node<T>[] newNodes = insertIntoArrayAt(newNode, nodes, subNodeIndex);
                     // This allows cheap strict inserts on any leaf-node boundary...
                     return new Strict<>(shift, newNodes);
                 }
@@ -902,6 +1004,28 @@ pushFocus logic we already have.
             Node<T> newNode = nodes[thisNodeIdx].replace(lowBits(idx), t);
             return new Strict<>(shift, replaceInArrayAt(newNode, nodes, thisNodeIdx, Node.class));
         }
+
+        @Override public boolean thisNodeHasRelaxedCapacity(int numNodes) {
+            return nodes.length + numNodes <= MAX_NODE_LENGTH;
+        }
+
+//        @Override public Node<T>[] children() { return nodes; }
+//
+//        @Override public Relaxed<T> precatChildren(BranchNode<T> n) {
+//            return relax().precatChildren(n);
+//        }
+//
+//        @Override public Relaxed<T> concatChildren(BranchNode<T> n) {
+//            return relax().concatChildren(n);
+//        }
+//
+//        @Override public void calcCumulativeSizes(CumulativeSizes cs) {
+//            int szSoFar = cs.szSoFar;
+//            for (int i = 0; i < cs.length; i++) {
+//                szSoFar += nodes[cs.srcOffset + i].size();
+//                cs.destArray[cs.destPos + i] = szSoFar;
+//            }
+//        }
 
         @Override public String toString() {
 //            return "Strict(nodes.length="+ nodes.length + ", shift=" + shift + ")";
@@ -959,6 +1083,18 @@ pushFocus logic we already have.
         }
 
         @Override public Node<T> child(int childIdx) { return nodes[childIdx]; }
+
+        /** Returns the leftMost (first) or right-most (last) child */
+        @Override public Node<T> endChild(boolean leftMost) {
+            return nodes[leftMost ? 0 : nodes.length - 1];
+        }
+
+        /** Adds a node as the first/leftmost or last/rightmost child */
+        @Override public Node<T> addEndChild(boolean leftMost, Node<T> shorter) {
+            int idx = leftMost ? 0 : nodes.length - 1;
+            return replaceInRelaxedAt(cumulativeSizes, nodes, shorter, idx,
+                                      shorter.size() - nodes[idx].size());
+        }
 
         @Override public int height() { return nodes[0].height() + 1; }
 
@@ -1091,13 +1227,90 @@ pushFocus logic we already have.
             return nodes[subNodeIndex].get(subNodeAdjustedIndex(index, subNodeIndex));
         }
 
-        private boolean thisNodeHasCapacity() {
+        @Override public boolean thisNodeHasRelaxedCapacity(int numNodes) {
 //            System.out.println("thisNodeHasCapacity(): nodes.length=" + nodes.length +
 //                               " MAX_NODE_LENGTH=" + MAX_NODE_LENGTH +
 //                               " MIN_NODE_LENGTH=" + MIN_NODE_LENGTH +
 //                               " STRICT_NODE_LENGTH=" + STRICT_NODE_LENGTH);
-            return nodes.length < MAX_NODE_LENGTH;
+            return nodes.length + numNodes <= MAX_NODE_LENGTH;
         }
+
+//        @Override public Node<T>[] children() { return nodes; }
+//
+//        /*
+//                private static final class CumulativeSizes {
+//                    int szSoFar;
+//                    int srcOffset;
+//                    int[] destArray;
+//                    int destPos;
+//                    int length;
+//                }
+//        */
+//        @Override public void calcCumulativeSizes(CumulativeSizes cs) {
+//            if ( (cs.szSoFar == 0) && (cs.srcOffset == 0) ) {
+//                //                      src, srcPos,    dest,destPos, length
+//                System.arraycopy(cumulativeSizes, cs.srcOffset, cs.destArray, cs.destPos,
+//                                 cs.length);
+//            } else {
+//                for (int i = 0; i < cs.length; i++) {
+//                    cs.destArray[cs.destPos + i] = cumulativeSizes[cs.srcOffset + i] + cs.szSoFar;
+//                }
+//            }
+//        }
+
+//        private Relaxed<T> catKids(BranchNode<T> left, BranchNode<T> right) {
+//            Node<T>[] leftKids = left.children();
+//            Node<T>[] rightKids = right.children();
+//            int numNewNodes = leftKids.length + rightKids.length;
+//            int[] sizes = new int[numNewNodes];
+//            Node<T>[] kids = arrayGenericConcat(leftKids, rightKids);
+//
+//            { // "Let" block for for variable scope.
+//                CumulativeSizes cs = new CumulativeSizes();
+////                cs.szSoFar = 0;
+////                cs.srcOffset = 0;
+//                cs.destArray = sizes;
+////                cs.destPos = 0;
+//                cs.length = leftKids.length;
+//                calcCumulativeSizes(cs);
+//            }
+//
+//            { // "Let" block for for variable scope.
+//                CumulativeSizes cs = new CumulativeSizes();
+//                cs.szSoFar = sizes[leftKids.length - 1];
+//                cs.srcOffset = leftKids.length;
+//                cs.destArray = sizes;
+//                cs.destPos = leftKids.length;
+//                cs.length = rightKids.length;
+//                calcCumulativeSizes(cs);
+//            }
+//
+//            //                      src, srcPos,    dest,destPos, length
+//            return new Relaxed<>(sizes, kids);
+//        }
+
+//        @Override public Relaxed<T> precatChildren(BranchNode<T> n) {
+//            if ( (height() - n.height()) < 1 ) {
+//                int subNodeIndex = subNodeIndex(index);
+//                Relaxed<T> alteredNode =
+//                        nodes[subNodeIndex].precatChildren(n);
+//                Node<T>[] newNodes = replaceInArrayAt(alteredNode, nodes, subNodeIndex, Node.class);
+//                return new Relaxed<>(cumulativeSizes, newNodes);
+//
+//            }
+//            if (!thisNodeHasRelaxedCapacity(n.numChildren())) {
+//                throw new IllegalArgumentException("Called precatChildren without checking thisNodeHasRelaxedCapacity");
+//            }
+//
+//            return catKids(n, this);
+//        }
+//
+//        @Override public Relaxed<T> concatChildren(BranchNode<T> n) {
+//            if (!thisNodeHasRelaxedCapacity(n.numChildren())) {
+//                throw new IllegalArgumentException("Called concatChildren without checking thisNodeHasRelaxedCapacity");
+//            }
+//            return catKids(this, n);
+//        }
 
         // I don't think this should ever be called.  Should this throw an exception instead?
         @Override public boolean hasStrictCapacity() {
@@ -1111,7 +1324,7 @@ pushFocus logic we already have.
             if ( (size < 1) || (size > MAX_NODE_LENGTH) ) {
                 throw new IllegalArgumentException("Bad size: " + size);
             }
-            if (thisNodeHasCapacity()) { return true; }
+            if (thisNodeHasRelaxedCapacity(1)) { return true; }
             int subNodeIndex = subNodeIndex(index);
             return nodes[subNodeIndex].hasRelaxedCapacity(subNodeAdjustedIndex(index, subNodeIndex),
                                                           size);
@@ -1140,7 +1353,6 @@ pushFocus logic we already have.
             return new Relaxed[] {left, right};
         }
 
-        @SuppressWarnings("unchecked")
         @Override
         public SplitNode<T> splitAt(int splitIndex) {
             int size = size();
@@ -1196,7 +1408,7 @@ pushFocus logic we already have.
                 boolean haveLeft = (splitLeft.size() > 0);
                 int numLeftItems = subNodeIndex + (haveLeft ? 1 : 0);
                 int[] leftCumSizes = new int[numLeftItems];
-                Node<T>[] leftNodes = (Node<T>[]) new Node[numLeftItems];
+                Node<T>[] leftNodes = genericNodeArray(numLeftItems);
                 //                      src, srcPos,    dest,destPos, length
                 System.arraycopy(cumulativeSizes, 0, leftCumSizes, 0, numLeftItems);
                 if (haveLeft) {
@@ -1259,7 +1471,7 @@ pushFocus logic we already have.
             }
 
             // I think this is a root node thing.
-            if (!thisNodeHasCapacity()) {
+            if (!thisNodeHasRelaxedCapacity(1)) {
                 // For now, split at half of size.
                 Relaxed<T>[] split = split();
 
@@ -1306,7 +1518,7 @@ pushFocus logic we already have.
                         subNodeIndex++;
                     }
 
-                    newNodes = insertIntoArrayAt(newNode, nodes, subNodeIndex, Node.class);
+                    newNodes = insertIntoArrayAt(newNode, nodes, subNodeIndex);
                     // Increment newCumSizes for the changed item and all items to the right.
                     newCumSizes = new int[cumulativeSizes.length + 1];
                     int cumulativeSize = 0;
@@ -1408,7 +1620,7 @@ pushFocus logic we already have.
 //            System.out.println("Split node1: " + node1);
 //            System.out.println("Split node2: " + node2);
 
-            Node<T>[] newNodes = (Node<T>[]) new Node[nodes.length + 1];
+            Node<T>[] newNodes = genericNodeArray(nodes.length + 1);
 
             // If we aren't inserting at the first item, array-copy the nodes before the insert
             // point.
@@ -1470,9 +1682,20 @@ pushFocus logic we already have.
 
         @Override public String toString() { return indentedStr(0); }
 
-        @SuppressWarnings("unchecked")
-        static <T> Relaxed<T> replaceInRelaxedAt(int[] is, Node<T>[] ns, Node<T> newNode, int subNodeIndex,
-                                                 int insertSize) {
+        // TODO: Search for more opportunities to use this
+        /**
+         Replace a node in a relaxed node by recalculating the cumulative sizes and copying
+         all sub nodes.
+         @param is original cumulative sizes
+         @param ns original nodes
+         @param newNode replacement node
+         @param subNodeIndex index to replace in this node's immediate children
+         @param insertSize the difference in size between the original node and the new node.
+         @return a new immutable Relaxed node with the immediate child node replaced.
+         */
+        static <T> Relaxed<T> replaceInRelaxedAt(int[] is, Node<T>[] ns, Node<T> newNode,
+                                                 int subNodeIndex, int insertSize) {
+            @SuppressWarnings("unchecked")
             Node<T>[] newNodes = replaceInArrayAt(newNode, ns, subNodeIndex, Node.class);
             // Increment newCumSizes for the changed item and all items to the right.
             int[] newCumSizes = new int[is.length];
@@ -1485,7 +1708,6 @@ pushFocus logic we already have.
             return new Relaxed<>(newCumSizes, newNodes);
         }
 
-        @SuppressWarnings("unchecked")
         public static <T> Node<T> fixRight(Node<T>[] origNodes, Node<T> splitRight, int subNodeIndex) {
             Node<T> right;
             if (subNodeIndex == (origNodes.length - 1)) {
@@ -1501,7 +1723,7 @@ pushFocus logic we already have.
                 // Here the first (leftmost) node of the right-hand side was turned into the focus
                 // and we have additional right-hand origNodes to adjust the parent for.
                 int[] rightCumSizes = new int[numRightNodes];
-                Node<T>[] rightNodes = (Node<T>[]) new Node[numRightNodes];
+                Node<T>[] rightNodes = genericNodeArray(numRightNodes);
 
 //                    System.out.println("origNodes=" + arrayString(origNodes));
 //                    System.out.println("subNodeIndex=" + subNodeIndex);
@@ -1647,17 +1869,36 @@ pushFocus logic we already have.
     @SuppressWarnings("unchecked")
     private static <T> T[] emptyArray() { return (T[]) EMPTY_ARRAY; }
 
+    @SuppressWarnings("unchecked")
+    private static <T> Node<T>[] genericNodeArray(int size) {
+        return (Node<T>[]) new Node<?>[size];
+    }
+
+//    // Thank you jeannicolas
+//    // http://stackoverflow.com/questions/80476/how-can-i-concatenate-two-arrays-in-java
+//    private static <T> T[] arrayGenericConcat(T[] a, T[] b) {
+//        int aLen = a.length;
+//        int bLen = b.length;
+//
+//        @SuppressWarnings("unchecked")
+//        T[] c = (T[]) Array.newInstance(a.getClass().getComponentType(), aLen + bLen);
+//        System.arraycopy(a, 0, c, 0, aLen);
+//        System.arraycopy(b, 0, c, aLen, bLen);
+//
+//        return c;
+//    }
+
     // Helper function to avoid type warnings.
     @SuppressWarnings("unchecked")
     private static <T> T[] singleElementArray(T elem) { return (T[]) new Object[] { elem }; }
 
-    @SuppressWarnings("unchecked")
-    private static <T> T[] insertIntoArrayAt(T item, T[] items, int idx, Class<T> tClass) {
+    private static <T> T[] insertIntoArrayAt(T item, T[] items, int idx) {
         // Make an array that's one bigger.  It's too bad that the JVM bothers to
         // initialize this with nulls.
 
-        T[] newItems = (T[]) ( (tClass == null) ? new Object[items.length + 1]
-                                                : Array.newInstance(tClass, items.length + 1) );
+        @SuppressWarnings("unchecked")
+        T[] newItems = (T[]) Array.newInstance(items.getClass().getComponentType(),
+                                               items.length + 1);
 
         // If we aren't inserting at the first item, array-copy the items before the insert
         // point.
@@ -1677,9 +1918,9 @@ pushFocus logic we already have.
         return newItems;
     }
 
-    private static <T> T[] insertIntoArrayAt(T item, T[] items, int idx) {
-        return insertIntoArrayAt(item, items, idx, null);
-    }
+//    private static <T> T[] insertIntoArrayAt(T item, T[] items, int idx) {
+//        return insertIntoArrayAt(item, items, idx, null);
+//    }
 
     @SuppressWarnings("unchecked")
     private static <T> T[] spliceIntoArrayAt(T[] insertedItems, T[] origItems, int idx,
@@ -1708,6 +1949,15 @@ pushFocus logic we already have.
         return newItems;
     }
 
+    private static int[] replaceInIntArrayAt(int replacedItem, int[] origItems, int idx) {
+        // Make an array that big enough.  It's too bad that the JVM bothers to
+        // initialize this with nulls.
+        int[] newItems = new int[origItems.length];
+        System.arraycopy(origItems, 0, newItems, 0, origItems.length);
+        newItems[idx] = replacedItem;
+        return newItems;
+    }
+
     @SuppressWarnings("unchecked")
     private static <T> T[] replaceInArrayAt(T replacedItem, T[] origItems, int idx,
                                             Class<T> tClass) {
@@ -1718,10 +1968,6 @@ pushFocus logic we already have.
         System.arraycopy(origItems, 0, newItems, 0, origItems.length);
         newItems[idx] = replacedItem;
         return newItems;
-    }
-
-    private static <T> T[] replaceInArrayAt(T replacedItem, T[] origItems, int idx) {
-        return replaceInArrayAt(replacedItem, origItems, idx, null);
     }
 
     /**
