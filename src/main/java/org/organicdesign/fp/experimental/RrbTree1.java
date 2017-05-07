@@ -97,6 +97,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
     }
 
     // TODO: This is inefficient due to no mutable version (was 5x difference for PersistentVector)
+    // TODO: Allow this to use default impl in ImList once we have a mutable version.
     @Override public RrbTree1<E> concat(Iterable<? extends E> es) {
         RrbTree1<E> ret = this;
         for (E e : es) {
@@ -233,6 +234,12 @@ involves changing more nodes than maybe necessary.
         if (that.size < MAX_NODE_LENGTH) {
             return concat(that);
         }
+        if (this.size < MAX_NODE_LENGTH) {
+            for (int i = 0; i < size; i++) {
+                that = that.insert(i, this.get(i));
+            }
+            return that;
+        }
         // Note that if the right-hand tree is bigger, we'll effectively add this tree to the
         // left-hand side of that one.  It's logically the same as adding that tree to the right
         // of this, but the mechanism by which it happens is a little different.
@@ -287,13 +294,8 @@ involves changing more nodes than maybe necessary.
                                                      : (Relaxed<E>) anc; // TODO: check for leaf!
 
             int repIdx = leftIntoRight ? 0 : rel.numChildren() - 1;
-
-            @SuppressWarnings("unchecked")
-            Node<E>[] newNodes = replaceInArrayAt(n, rel.nodes, repIdx, Node.class);
-
-            // TODO: In relaxed nodes, we need to recalc cumulative sizes.
-            n = new Relaxed<>(replaceInIntArrayAt(n.size(), rel.cumulativeSizes, repIdx),
-                              newNodes);
+            n = Relaxed.replaceInRelaxedAt(rel.cumulativeSizes, rel.nodes, n, repIdx,
+                                           n.size() - rel.nodes[repIdx].size());
             i--;
         }
 
