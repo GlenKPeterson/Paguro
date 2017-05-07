@@ -92,7 +92,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
             return new RrbTree1<>(newFocus, size, newRoot, size + 1);
         }
 
-        E[] newFocus = insertIntoArrayAt(t, focus, focus.length);
+        E[] newFocus = insertIntoArrayAt(t, focus, focus.length, null);
         return new RrbTree1<>(newFocus, focusStartIndex, root, size + 1);
     }
 
@@ -157,7 +157,7 @@ public class RrbTree1<E> implements ImList<E>, Indented {
 
         if ( (diff >= 0) && (diff <= focus.length) ) {
 //            System.out.println("new focus...");
-            E[] newFocus = insertIntoArrayAt(element, focus, diff);
+            E[] newFocus = insertIntoArrayAt(element, focus, diff, null);
             return new RrbTree1<>(newFocus, focusStartIndex, root, size + 1);
         }
 
@@ -175,7 +175,6 @@ public class RrbTree1<E> implements ImList<E>, Indented {
         return new Iter();
     }
 
-// TODO: Test join()
 /*
 I'm implementing something like the [Bagwell/Rompf RRB-Tree][1] and I'm a little unsatisfied with
 the details of the join/merge algorithm.  I wonder if there's a standard way to do this that they
@@ -231,6 +230,11 @@ involves changing more nodes than maybe necessary.
      something like O(log n) time.
      */
     public RrbTree1<E> join(RrbTree1<E> that) {
+
+        // We don't want to wonder below if we're inserting leaves or branch-nodes.
+        // Also, it leaves the tree cleaner to just smash leaves onto the bigger tree.
+        // Ultimately, we might want to see if we can grab the tail and stick it where it belongs
+        // but for now, this should be alright.
         if (that.size < MAX_NODE_LENGTH) {
             return concat(that);
         }
@@ -240,6 +244,10 @@ involves changing more nodes than maybe necessary.
             }
             return that;
         }
+
+        // OK, here we've eliminated the case of merging a leaf into a tree.  We only have to
+        // deal with tree-into-tree merges below.
+        //
         // Note that if the right-hand tree is bigger, we'll effectively add this tree to the
         // left-hand side of that one.  It's logically the same as adding that tree to the right
         // of this, but the mechanism by which it happens is a little different.
@@ -262,13 +270,26 @@ involves changing more nodes than maybe necessary.
             ancestors[i] = n;
             n = n.endChild(leftIntoRight);
         }
+//        System.out.println("ancestors.length: " + ancestors.length + " i: " + i);
         i--;
         // While nodes in the taller are full, add a parent to the shorter and try the next level
         // up.
-        while (!n.thisNodeHasRelaxedCapacity(leftRoot.numChildren()) && (i >= 0)) {
+        while (!n.thisNodeHasRelaxedCapacity(shorter.numChildren()) && (i >= 0)) {
             n = ancestors[i];
             i--;
-            leftRoot = new Relaxed<>(new int[] { leftRoot.size() }, singleElementArray(leftRoot));
+
+            //noinspection unchecked
+            shorter = new Relaxed<>(new int[] { shorter.size() },
+                                    (Node<E>[]) new Node[] { shorter });
+
+            // Weird, I know, but sometimes we care about which is shorter and sometimes about
+            // left and right.  So now we fixed the shorter tree, we have to update the left/right
+            // pointer that was pointing to it.
+            if (leftIntoRight) {
+                leftRoot = shorter;
+            } else {
+                rightRoot = shorter;
+            }
         }
 
         // Here we've got 2 trees of equal height so we make a new parent.
@@ -291,7 +312,7 @@ involves changing more nodes than maybe necessary.
             // leaf nodes, but I could be wrong.
             // I also think we should get rid of relaxed nodes and everything will be much easier.
             Relaxed<E> rel = (anc instanceof Strict) ? ((Strict) anc).relax()
-                                                     : (Relaxed<E>) anc; // TODO: check for leaf!
+                                                     : (Relaxed<E>) anc;
 
             int repIdx = leftIntoRight ? 0 : rel.numChildren() - 1;
             n = Relaxed.replaceInRelaxedAt(rel.cumulativeSizes, rel.nodes, n, repIdx,
@@ -709,7 +730,8 @@ involves changing more nodes than maybe necessary.
             if (leftMost || !(shorter instanceof Strict)) {
                 return relax().addEndChild(leftMost, shorter);
             }
-            return new Strict<>(shift, insertIntoArrayAt(shorter, nodes, nodes.length));
+            //noinspection unchecked
+            return new Strict<>(shift, insertIntoArrayAt(shorter, nodes, nodes.length, Node.class));
         }
 
         @Override public int height() { return nodes[0].height() + 1; }
@@ -956,7 +978,8 @@ involves changing more nodes than maybe necessary.
 
                     if ((nodes.length < STRICT_NODE_LENGTH)) {
 //                    System.out.println("  Adding a node to the existing array");
-                        Node<T>[] newNodes = insertIntoArrayAt(newNode, nodes, subNodeIndex);
+                        Node<T>[] newNodes =
+                                insertIntoArrayAt(newNode, nodes, subNodeIndex, Node.class);
                         // This could allow cheap strict inserts on any leaf-node boundary...
                         return new Strict<>(shift, newNodes);
                     } else {
@@ -978,7 +1001,8 @@ involves changing more nodes than maybe necessary.
                     // Regardless of what else happens, we're going to add a new node.
                     Node<T> newNode = new Leaf<>(oldFocus);
 
-                    Node<T>[] newNodes = insertIntoArrayAt(newNode, nodes, subNodeIndex);
+                    Node<T>[] newNodes =
+                            insertIntoArrayAt(newNode, nodes, subNodeIndex, Node.class);
                     // This allows cheap strict inserts on any leaf-node boundary...
                     return new Strict<>(shift, newNodes);
                 }
@@ -1093,9 +1117,8 @@ involves changing more nodes than maybe necessary.
 
         /** Adds a node as the first/leftmost or last/rightmost child */
         @Override public Node<T> addEndChild(boolean leftMost, Node<T> shorter) {
-            int idx = leftMost ? 0 : nodes.length - 1;
-            return replaceInRelaxedAt(cumulativeSizes, nodes, shorter, idx,
-                                      shorter.size() - nodes[idx].size());
+            return insertInRelaxedAt(cumulativeSizes, nodes, shorter,
+                                     leftMost ? 0 : nodes.length);
         }
 
         @Override public int height() { return nodes[0].height() + 1; }
@@ -1520,7 +1543,7 @@ involves changing more nodes than maybe necessary.
                         subNodeIndex++;
                     }
 
-                    newNodes = insertIntoArrayAt(newNode, nodes, subNodeIndex);
+                    newNodes = insertIntoArrayAt(newNode, nodes, subNodeIndex, Node.class);
                     // Increment newCumSizes for the changed item and all items to the right.
                     newCumSizes = new int[cumulativeSizes.length + 1];
                     int cumulativeSize = 0;
@@ -1710,6 +1733,45 @@ involves changing more nodes than maybe necessary.
             return new Relaxed<>(newCumSizes, newNodes);
         }
 
+        /**
+         Insert a node in a relaxed node by recalculating the cumulative sizes and copying
+         all sub nodes.
+         @param oldCumSizes original cumulative sizes
+         @param ns original nodes
+         @param newNode replacement node
+         @param subNodeIndex index to insert in this node's immediate children
+         @return a new immutable Relaxed node with the immediate child node inserted.
+         */
+        static <T> Relaxed<T> insertInRelaxedAt(int[] oldCumSizes, Node<T>[] ns, Node<T> newNode,
+                                                int subNodeIndex) {
+            @SuppressWarnings("unchecked")
+            Node<T>[] newNodes = insertIntoArrayAt(newNode, ns, subNodeIndex, Node.class);
+
+            int oldLen = oldCumSizes.length;
+//            if (subNodeIndex > oldLen) {
+//                throw new IllegalStateException("subNodeIndex > oldCumSizes.length");
+//            }
+
+            int[] newCumSizes = new int[oldLen + 1];
+            // Copy unchanged cumulative sizes
+            if (subNodeIndex > 0) {
+                System.arraycopy(oldCumSizes, 0, newCumSizes, 0, subNodeIndex);
+            }
+            // insert the cumulative size of the new node
+            int newNodeSize = newNode.size();
+            // Find cumulative size of previous node
+            int prevNodeTotal =
+                    (subNodeIndex == 0) ? 0
+                                        : oldCumSizes[subNodeIndex - 1];
+
+            newCumSizes[subNodeIndex] = newNodeSize + prevNodeTotal;
+
+            for (int i = subNodeIndex; i < oldCumSizes.length; i++) {
+                newCumSizes[i + 1] = oldCumSizes[i] + newNodeSize;
+            }
+            return new Relaxed<>(newCumSizes, newNodes);
+        }
+
         public static <T> Node<T> fixRight(Node<T>[] origNodes, Node<T> splitRight, int subNodeIndex) {
             Node<T> right;
             if (subNodeIndex == (origNodes.length - 1)) {
@@ -1892,15 +1954,23 @@ involves changing more nodes than maybe necessary.
 
     // Helper function to avoid type warnings.
     @SuppressWarnings("unchecked")
-    private static <T> T[] singleElementArray(T elem) { return (T[]) new Object[] { elem }; }
+    private static <T> T[] singleElementArray(T elem) {
+        return (T[]) new Object[] { elem };
+    }
 
-    private static <T> T[] insertIntoArrayAt(T item, T[] items, int idx) {
+    private static <T> T[] insertIntoArrayAt(T item, T[] items, int idx, Class<T> tClass) {
         // Make an array that's one bigger.  It's too bad that the JVM bothers to
         // initialize this with nulls.
 
+//        System.out.println("items.getClass(): " + items.getClass());
+//        System.out.println("items.getClass().getComponentType(): " + items.getClass().getComponentType());
+//        System.out.println("item.getClass(): " + item.getClass());
+
         @SuppressWarnings("unchecked")
-        T[] newItems = (T[]) Array.newInstance(items.getClass().getComponentType(),
-                                               items.length + 1);
+        // Make an array that big enough.  It's too bad that the JVM bothers to
+        // initialize this with nulls.
+        T[] newItems = (T[]) ( (tClass == null) ? new Object[items.length + 1]
+                                                : Array.newInstance(tClass, items.length + 1) );
 
         // If we aren't inserting at the first item, array-copy the items before the insert
         // point.
@@ -1951,14 +2021,14 @@ involves changing more nodes than maybe necessary.
         return newItems;
     }
 
-    private static int[] replaceInIntArrayAt(int replacedItem, int[] origItems, int idx) {
-        // Make an array that big enough.  It's too bad that the JVM bothers to
-        // initialize this with nulls.
-        int[] newItems = new int[origItems.length];
-        System.arraycopy(origItems, 0, newItems, 0, origItems.length);
-        newItems[idx] = replacedItem;
-        return newItems;
-    }
+//    private static int[] replaceInIntArrayAt(int replacedItem, int[] origItems, int idx) {
+//        // Make an array that big enough.  It's too bad that the JVM bothers to
+//        // initialize this with nulls.
+//        int[] newItems = new int[origItems.length];
+//        System.arraycopy(origItems, 0, newItems, 0, origItems.length);
+//        newItems[idx] = replacedItem;
+//        return newItems;
+//    }
 
     @SuppressWarnings("unchecked")
     private static <T> T[] replaceInArrayAt(T replacedItem, T[] origItems, int idx,

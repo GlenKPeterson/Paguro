@@ -617,17 +617,7 @@ public class RrbTree1Test {
 
         assertEquals(r3, r1.join(r2));
 
-        r1 = rrb(1, 2, 3, 4, 5, 6);
-        r2 = rrb(7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26);
-
-        System.out.println("r1: " + r1.indentedStr(4));
-        System.out.println("r2: " + r2.indentedStr(4));
-        System.out.println("r1.join(r2): " + r1.join(r2).indentedStr(13));
-
-        assertEquals(rrb(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26),
-                     r1.join(r2));
-
-        int MAX_ITEMS = 27; // 100;
+        int MAX_ITEMS = 100;
         List<Integer> control = new ArrayList<>();
         for (int j = 1; j < MAX_ITEMS; j++) {
             control.add(j);
@@ -642,11 +632,22 @@ public class RrbTree1Test {
                 r2 = r2.append(j);
             }
 
-            System.out.println("r1: " + r1.indentedStr(4));
-            System.out.println("r2: " + r2.indentedStr(4));
-            System.out.println("r1.join(r2): " + r1.join(r2).indentedStr(13));
+//            System.out.println("r1: " + r1.indentedStr(4));
+//            System.out.println("r2: " + r2.indentedStr(4));
+//            System.out.println("r1.join(r2): " + r1.join(r2).indentedStr(13));
 
             assertEquals(control, r1.join(r2));
         }
+
+//        r1 = rrb(1, 2, 3, 4, 5, 6);
+//        r2 = rrb(7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26);
+//
+//        System.out.println("r1: " + r1.indentedStr(4));
+//        System.out.println("r2: " + r2.indentedStr(4));
+//        System.out.println("r1.join(r2): " + r1.join(r2).indentedStr(13));
+//
+//        assertEquals(rrb(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26),
+//                     r1.join(r2));
+
     }
 }
