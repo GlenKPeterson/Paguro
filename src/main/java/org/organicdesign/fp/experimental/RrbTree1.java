@@ -268,6 +268,11 @@ involves changing more nodes than maybe necessary.
         int i = 0;
         for (; i < ancestors.length; i++) {
             ancestors[i] = n;
+            if (n instanceof Leaf) {
+//                System.out.println("this: " + this.indentedStr(6));
+                System.out.println("leaf: " + n.indentedStr(6));
+                throw new IllegalStateException("Somehow found a leaf node");
+            }
             n = n.endChild(leftIntoRight);
         }
 //        System.out.println("ancestors.length: " + ancestors.length + " i: " + i);
@@ -354,6 +359,26 @@ involves changing more nodes than maybe necessary.
 //        System.out.println("    About to do replace with maybe-adjusted index=" + index);
 //        System.out.println("    this=" + this);
         return new RrbTree1<>(focus, focusStartIndex, root.replace(index, item), size);
+    }
+
+    public RrbTree1<E> without(int index) {
+        if ( (index > 0) && (index < size - 1) ) {
+            Tuple2<RrbTree1<E>,RrbTree1<E>> s1 = split(index);
+            Tuple2<RrbTree1<E>,RrbTree1<E>> s2 = s1._2().split(1);
+            System.out.println("this: " + this.indentedStr(6));
+            System.out.println("s1-L: " + s1._1().indentedStr(6));
+            System.out.println("s1-R: " + s1._2().indentedStr(6));
+            System.out.println("s2-L: " + s2._1().indentedStr(6));
+            System.out.println("s2-R: " + s2._2().indentedStr(6));
+
+            return s1._1().join(s2._2());
+        } else if (index == 0) {
+            return split(1)._2();
+        } else if (index == size - 1) {
+            return split(size - 1)._1();
+        } else {
+            throw new IllegalArgumentException("out of bounds");
+        }
     }
 
     @Override public int size() { return size; }
