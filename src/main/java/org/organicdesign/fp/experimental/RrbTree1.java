@@ -13,10 +13,6 @@
 // limitations under the License.
 package org.organicdesign.fp.experimental;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.List;
-
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.MutableList;
 import org.organicdesign.fp.collections.UnmodIterable;
@@ -26,19 +22,28 @@ import org.organicdesign.fp.collections.UnmodSortedIterator;
 import org.organicdesign.fp.tuple.Tuple2;
 import org.organicdesign.fp.tuple.Tuple4;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.List;
+
 interface Indented { String indentedStr(int indent); }
 
 /**
  This is based on the paper, "RRB-Trees: Efficient Immutable Vectors" by Phil Bagwell and
- Tiark Rompf.  With some background from the Cormen, Leiserson, Rivest & Stein Algorithms book entry
+ Tiark Rompf, with the following differences:
+
+ - The Relaxed nodes can be sized between n/3 and 2n/3 (Bagwell/Rompf specify n and n-1)
+ - The Join operation sticks the shorter tree unaltered into the larger tree (except for very
+   small trees which just get concatenated).
+
+ Details were filled in from the Cormen, Leiserson, Rivest & Stein Algorithms book entry
  on B-Trees.  Also with an awareness of the Clojure PersistentVector by Rich Hickey.  All errors
  are by Glen Peterson.
 
  Still TO-DO:
   - More Testing
-  - join(RrbTree1 other)
-  - remove(int index)
   - Change radix from 4 to 32.
+  - Consider mutable vector
   - Speed testing and optimization.
 
  History (what little I know):
@@ -365,11 +370,11 @@ involves changing more nodes than maybe necessary.
         if ( (index > 0) && (index < size - 1) ) {
             Tuple2<RrbTree1<E>,RrbTree1<E>> s1 = split(index);
             Tuple2<RrbTree1<E>,RrbTree1<E>> s2 = s1._2().split(1);
-            System.out.println("this: " + this.indentedStr(6));
-            System.out.println("s1-L: " + s1._1().indentedStr(6));
-            System.out.println("s1-R: " + s1._2().indentedStr(6));
-            System.out.println("s2-L: " + s2._1().indentedStr(6));
-            System.out.println("s2-R: " + s2._2().indentedStr(6));
+//            System.out.println("this: " + this.indentedStr(6));
+//            System.out.println("s1-L: " + s1._1().indentedStr(6));
+//            System.out.println("s1-R: " + s1._2().indentedStr(6));
+//            System.out.println("s2-L: " + s2._1().indentedStr(6));
+//            System.out.println("s2-R: " + s2._2().indentedStr(6));
 
             return s1._1().join(s2._2());
         } else if (index == 0) {

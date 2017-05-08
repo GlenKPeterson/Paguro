@@ -13,19 +13,18 @@
 // limitations under the License.
 package org.organicdesign.fp.experimental;
 
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-
 import org.junit.Test;
 import org.organicdesign.fp.TestUtilities;
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.UnmodIterator;
 import org.organicdesign.fp.tuple.Tuple2;
+
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.xform;
@@ -665,7 +664,7 @@ public class RrbTree1Test {
                 control.add(j);
             }
 
-            System.out.println("i: " + i);
+//            System.out.println("i: " + i);
             control.remove(i);
             assertEquals(control, r1.without(i));
         }
