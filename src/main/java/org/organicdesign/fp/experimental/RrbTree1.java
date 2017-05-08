@@ -412,10 +412,10 @@ involves changing more nodes than maybe necessary.
         SplitNode<E> split = newRoot.splitAt(splitIndex);
 
         E[] leftFocus = split.leftFocus();
-        Node<E> left = split.left();
+        Node<E> left = eliminateUnnecessaryAncestors(split.left());
 
         E[] rightFocus = split.rightFocus();
-        Node<E> right = split.right();
+        Node<E> right = eliminateUnnecessaryAncestors(split.right());
 
         return Tuple2.of(new RrbTree1<>(leftFocus, left.size(), left, left.size() + leftFocus.length),
                          new RrbTree1<>(rightFocus, 0, right, right.size() + rightFocus.length));
@@ -566,7 +566,15 @@ involves changing more nodes than maybe necessary.
 //        int length; // number of items to copy.
 //    }
 
+    /** This class is the return type when splitting a node. */
     private static class SplitNode<T> extends Tuple4<Node<T>,T[],Node<T>,T[]> implements Indented {
+        /**
+         Constructor.
+         @param ln Left-hand whole-node
+         @param lf Left-focus (leftover items from left node)
+         @param rn Right-hand whole-node
+         @param rf Right-focus (leftover items from right node)
+         */
         SplitNode(Node<T> ln, T[] lf, Node<T> rn, T[] rf) { super(ln, lf, rn, rf); }
         public Node<T> left() { return _1; }
         public T[] leftFocus() { return _2; }
@@ -891,6 +899,8 @@ involves changing more nodes than maybe necessary.
             //            System.out.println("==========================");
             //            System.out.println("before=" + this.indentedStr(7));
 
+            // Not split on a child boundary, so find which child to split and pass it the
+            // appropriate index.
             int subNodeIndex = highBits(splitIndex);
             Node<T> subNode = nodes[subNodeIndex];
             int subNodeAdjustedIndex = lowBits(splitIndex);
