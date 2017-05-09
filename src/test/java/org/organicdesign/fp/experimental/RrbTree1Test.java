@@ -51,6 +51,7 @@ public class RrbTree1Test {
             for (int k = 0; k <= j; k++) {
                 assertEquals("Checking index: " + k + " for size=" + control.size(), control.get(k), is.get(k));
             }
+            is.debugValidate();
 //            System.out.println(is);
         }
         assertEquals(SEVERAL, is.size());
@@ -121,6 +122,7 @@ public class RrbTree1Test {
 //            System.out.println("About to insert at=" + idx + " elem=" + j + " into=" + is.indentedStr());
             is = is.insert(idx, j);
             control.add(idx, j);
+            is.debugValidate();
 //            System.out.println("control:" + control);
 //            System.out.println("===test:" + is.indentedStr());
             assertEquals("size", control.size(), is.size());
@@ -189,6 +191,7 @@ public class RrbTree1Test {
             for (int j = 0; j < is.size(); j++) {
                 assertEquals(control.get(j), is.get(j));
             }
+            is.debugValidate();
         } catch (Exception e) {
             System.out.println("rands:" + rands); // print before blowing up...
             // OK, now we can continue throwing exception.
@@ -225,6 +228,10 @@ public class RrbTree1Test {
         assertEquals(Integer.valueOf(4), rrb2.get(1));
         assertEquals(Integer.valueOf(4), rrb3.get(1));
         assertEquals(Integer.valueOf(3), rrb3.get(2));
+        rrb.debugValidate();
+        rrb1.debugValidate();
+        rrb2.debugValidate();
+        rrb3.debugValidate();
     }
 
     @Test public void testEmptyIterator() {
@@ -300,6 +307,7 @@ public class RrbTree1Test {
 //        System.out.println("control:" + control);
 //        System.out.println("test:" + test.indentedStr(0));
         compareIterators(control.iterator(), test.iterator());
+        test.debugValidate();
     }
 
     @Test public void emptyListIterator() {
@@ -328,6 +336,7 @@ public class RrbTree1Test {
             for (int k = 0; k <= j; k++) {
                 assertEquals(Integer.valueOf(k), is.get(k));
             }
+            is.debugValidate();
         }
         assertEquals(SEVERAL, is.size());
         for (int j = 0; j < SEVERAL; j++){
@@ -371,6 +380,9 @@ public class RrbTree1Test {
                      leftControl, leftSplit);
         assertEquals("rightControl:" + rightControl + "\n doesn't equal rightSplit:" + rightSplit,
                      rightControl, rightSplit);
+        leftSplit.debugValidate();
+        rightSplit.debugValidate();
+        System.out.println("==================================");
     }
 
     @Test public void splitTestPrevFail() {
@@ -398,7 +410,8 @@ public class RrbTree1Test {
             try {
                 testSplit(control, is, splitIndex);
             } catch (Exception e) {
-                System.out.println("Bad splitIndex:" + splitIndex); // print before blowing up...
+                System.out.println("Bad splitIndex: " + splitIndex); // print before blowing up...
+                System.out.println("before split: " + is.indentedStr(13)); // print before blowing up...
                 // OK, now we can continue throwing exception.
                 throw e;
             }
@@ -438,14 +451,16 @@ public class RrbTree1Test {
 
         assertArrayEquals(new String[]{"Goodbye", "World"},
                           pv.replace(0, "Goodbye").toArray());
+        pv.debugValidate();
 
-        ImList<Integer> pv2 = RrbTree1.empty();
+        RrbTree1<Integer> pv2 = RrbTree1.empty();
         int len = 999;
         Integer[] control = new Integer[len];
         // Build test vector
         for (int i = 0; i < len; i++) {
             pv2 = pv2.append(i);
             control[i] = i;
+            pv2.debugValidate();
         }
         assertArrayEquals(control, pv2.toArray());
 
@@ -460,6 +475,7 @@ public class RrbTree1Test {
             int replacement = len - i;
             pv2 = pv2.replace(i, replacement);
             rrb3 = rrb3.replace(i, replacement);
+            rrb3.debugValidate();
             control[i] = replacement;
         }
         assertArrayEquals(control, pv2.toArray());
@@ -471,6 +487,7 @@ public class RrbTree1Test {
             int replacement = len - idx;
             pv2 = pv2.replace(idx, replacement);
             rrb3 = rrb3.replace(idx, replacement);
+            rrb3.debugValidate();
             control[idx] = replacement;
         }
         assertArrayEquals(control, pv2.toArray());
@@ -632,11 +649,15 @@ public class RrbTree1Test {
                 r2 = r2.append(j);
             }
 
+
+            System.out.println("\n==============================================");
+            System.out.println("join index: " + i);
 //            System.out.println("r1: " + r1.indentedStr(4));
 //            System.out.println("r2: " + r2.indentedStr(4));
-//            System.out.println("r1.join(r2): " + r1.join(r2).indentedStr(13));
-
-            assertEquals(control, r1.join(r2));
+            r3 = r1.join(r2);
+//            System.out.println("r3: " + r3.indentedStr(13));
+            assertEquals(control, r3);
+            r3.debugValidate();
         }
 
 //        r1 = rrb(1, 2, 3, 4, 5, 6);
@@ -671,7 +692,9 @@ public class RrbTree1Test {
 
             System.out.println("i: " + i);
                 control.remove(i);
-                assertEquals(control, r1.without(i));
+                RrbTree1 r2 = r1.without(i);
+                assertEquals(control, r2);
+                r2.debugValidate();
             }
 //        }
     }

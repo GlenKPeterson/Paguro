@@ -13,6 +13,10 @@
 // limitations under the License.
 package org.organicdesign.fp.experimental;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.List;
+
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.MutableList;
 import org.organicdesign.fp.collections.UnmodIterable;
@@ -21,10 +25,6 @@ import org.organicdesign.fp.collections.UnmodSortedIterable;
 import org.organicdesign.fp.collections.UnmodSortedIterator;
 import org.organicdesign.fp.tuple.Tuple2;
 import org.organicdesign.fp.tuple.Tuple4;
-
-import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.List;
 
 interface Indented { String indentedStr(int indent); }
 
@@ -109,6 +109,26 @@ public class RrbTree1<E> implements ImList<E>, Indented {
             ret = ret.append(e);
         }
         return ret;
+    }
+
+    void debugValidate() {
+        if (focus.length > STRICT_NODE_LENGTH) {
+            throw new IllegalStateException("focus too long!\n" +
+                                            this.indentedStr(0));
+        }
+        int sz = root.debugValidate();
+        if (sz != size - focus.length) {
+            throw new IllegalStateException("Size incorrect\n" +
+                                            this.indentedStr(0));
+        }
+        if ( (focusStartIndex < 0) || (focusStartIndex > size) ) {
+            throw new IllegalStateException("focusStartIndex out of bounds!\n" +
+                                            this.indentedStr(0));
+        }
+        if (!root.equals(eliminateUnnecessaryAncestors(root))) {
+            throw new IllegalStateException("Unnecessary ancestors!\n" +
+                                            this.indentedStr(0));
+        }
     }
 
     @Override public E get(int i) {
@@ -250,14 +270,24 @@ involves changing more nodes than maybe necessary.
             return that;
         }
 
+        System.out.println("REAL JOIN");
+
         // OK, here we've eliminated the case of merging a leaf into a tree.  We only have to
         // deal with tree-into-tree merges below.
         //
         // Note that if the right-hand tree is bigger, we'll effectively add this tree to the
         // left-hand side of that one.  It's logically the same as adding that tree to the right
         // of this, but the mechanism by which it happens is a little different.
-        Node<E> leftRoot = eliminateUnnecessaryAncestors(pushFocus());
-        Node<E> rightRoot = eliminateUnnecessaryAncestors(that.pushFocus());
+        Node<E> leftRoot = pushFocus();
+        Node<E> rightRoot = that.pushFocus();
+
+        if (leftRoot != eliminateUnnecessaryAncestors(leftRoot)) {
+            throw new IllegalStateException("Left had unnecessary ancestors!");
+        }
+
+        if (rightRoot != eliminateUnnecessaryAncestors(rightRoot)) {
+            throw new IllegalStateException("Right had unnecessary ancestors!");
+        }
 
         // Whether to add the right tree to the left one (true) or vice-versa (false).
         // True also means left is taller, false: right is taller.
@@ -265,13 +295,20 @@ involves changing more nodes than maybe necessary.
         Node<E> taller = leftIntoRight ? rightRoot : leftRoot;
         Node<E> shorter = leftIntoRight ? leftRoot : rightRoot;
 
+        System.out.println("taller.height(): " + taller.height());
+        System.out.println("taller: " + taller.indentedStr(8));
+        System.out.println("shorter.height(): " + shorter.height());
+        System.out.println("shorter:" + shorter.indentedStr(8));
+
 //        taller.pushTree(shorter);
 
         // Walk down the taller tree to the height of the shorter, remembering ancestors.
         Node<E> n = taller;
-        Node<E>[] ancestors = genericNodeArray(taller.height() - shorter.height());
-        int i = 0;
-        for (; i < ancestors.length; i++) {
+        int i = -1;
+        Node<E>[] ancestors = null;
+        ancestors = genericNodeArray(taller.height() - shorter.height());
+        for (i = 0; i < ancestors.length; i++) {
+            System.out.println("Adding an ancestor to array...");
             ancestors[i] = n;
             if (n instanceof Leaf) {
 //                System.out.println("this: " + this.indentedStr(6));
@@ -279,21 +316,25 @@ involves changing more nodes than maybe necessary.
                 throw new IllegalStateException("Somehow found a leaf node");
             }
             n = n.endChild(leftIntoRight);
+            System.out.println("New n:" + n.indentedStr(6));
         }
 //        System.out.println("ancestors.length: " + ancestors.length + " i: " + i);
         i--;
         // While nodes in the taller are full, add a parent to the shorter and try the next level
+
         // up.
         while (!n.thisNodeHasRelaxedCapacity(shorter.numChildren()) && (i >= 0)) {
             n = ancestors[i];
             i--;
 
+            // TODO: if shorter is a Strict or a leaf where size = STRICT_NODE_SIZE use a strict parent.
             //noinspection unchecked
-            shorter = new Relaxed<>(new int[] { shorter.size() },
-                                    (Node<E>[]) new Node[] { shorter });
+            shorter = new Relaxed<>(new int[]{shorter.size()},
+                                    (Node<E>[]) new Node[]{shorter});
 
             // Weird, I know, but sometimes we care about which is shorter and sometimes about
-            // left and right.  So now we fixed the shorter tree, we have to update the left/right
+            // left and right.  So now we fixed the shorter tree, we have to update the
+            // left/right
             // pointer that was pointing to it.
             if (leftIntoRight) {
                 leftRoot = shorter;
@@ -301,26 +342,31 @@ involves changing more nodes than maybe necessary.
                 rightRoot = shorter;
             }
         }
-
-        // Here we've got 2 trees of equal height so we make a new parent.
+//         Here we've got 2 trees of equal height so we make a new parent.
         if (i < 0) {
+            System.out.println("2 trees of equal height so we make a new parent");
             @SuppressWarnings("unchecked")
             Node<E>[] newRootArray = new Node[] {leftRoot, rightRoot};
             int leftSize = leftRoot.size();
             Node<E> newRoot =
                     new Relaxed<>(new int[] {leftSize, leftSize + rightRoot.size()}, newRootArray);
-
+            newRoot.debugValidate();
             return new RrbTree1<>(emptyArray(), 0, newRoot, newRoot.size());
         }
 
         // Trees are not equal height and there's room somewhere.
         n = n.addEndChild(leftIntoRight, shorter);
+        n.debugValidate();
 
+        // We've merged the nodes.  Now see if we need to create new parents
+        // to hold the changed sub-nodes...
         while (i >= 0) {
             Node<E> anc = ancestors[i];
             // By definition, I think that if we need a new root node, then we aren't dealing with
+
             // leaf nodes, but I could be wrong.
-            // I also think we should get rid of relaxed nodes and everything will be much easier.
+            // I also think we should get rid of relaxed nodes and everything will be much
+            // easier.
             Relaxed<E> rel = (anc instanceof Strict) ? ((Strict) anc).relax()
                                                      : (Relaxed<E>) anc;
 
@@ -330,6 +376,7 @@ involves changing more nodes than maybe necessary.
             i--;
         }
 
+        n.debugValidate();
         return new RrbTree1<>(emptyArray(), 0, n, n.size());
     }
 
@@ -502,6 +549,8 @@ involves changing more nodes than maybe necessary.
         /** Returns the immediate child node at the given index. */
         Node<T> child(int childIdx);
 
+        int debugValidate();
+
         /** Returns the leftMost (first) or right-most (last) child */
         Node<T> endChild(boolean leftMost);
 
@@ -575,7 +624,9 @@ involves changing more nodes than maybe necessary.
          @param rn Right-hand whole-node
          @param rf Right-focus (leftover items from right node)
          */
-        SplitNode(Node<T> ln, T[] lf, Node<T> rn, T[] rf) { super(ln, lf, rn, rf); }
+        SplitNode(Node<T> ln, T[] lf, Node<T> rn, T[] rf) {
+            super(ln, lf, rn, rf);
+        }
         public Node<T> left() { return _1; }
         public T[] leftFocus() { return _2; }
         public Node<T> right() { return _3; }
@@ -606,6 +657,20 @@ involves changing more nodes than maybe necessary.
 
         @Override public Node<T> child(int childIdx) {
             throw new UnsupportedOperationException("Don't call this on a leaf");
+        }
+
+        @Override public int debugValidate() {
+            if (items.length == 0) {
+                return 0;
+            }
+            if (items.length < MIN_NODE_LENGTH) {
+                throw new IllegalStateException("Leaf too short!\n" +
+                                                this.indentedStr(0));
+            } else if (items.length > MAX_NODE_LENGTH) {
+                throw new IllegalStateException("Leaf too long!\n" +
+                                                this.indentedStr(0));
+            }
+            return items.length;
         }
 
         /** Returns the leftMost (first) or right-most (last) child */
@@ -757,6 +822,36 @@ involves changing more nodes than maybe necessary.
         }
 
         @Override public Node<T> child(int childIdx) { return nodes[childIdx]; }
+
+        @Override public int debugValidate() {
+            int sz = 0;
+            int height = height() - 1;
+            int sh = shift - NODE_LENGTH_POW_2;
+            for (int i = 0; i < nodes.length; i++) {
+                Node<T> n = nodes[i];
+                if ( !(n instanceof Strict) &&
+                     !(n instanceof Leaf) ) {
+                    throw new IllegalStateException("Strict nodes can only have strict or leaf children!\n" +
+                                                    this.indentedStr(0));
+                }
+                if (n.height() != height) {
+                    throw new IllegalStateException("Unequal height!\n" +
+                                                    this.indentedStr(0));
+                }
+                if ( (n instanceof Strict) &&
+                     ((Strict) n).shift != sh ) {
+                    throw new IllegalStateException("Unexpected shift difference between levels!\n" +
+                                                    this.indentedStr(0));
+                }
+                if ( (i < nodes.length - 1) &&
+                     ((n.size() % STRICT_NODE_LENGTH) != 0) ) {
+                    throw new IllegalStateException("Non-last strict node is not full!\n" +
+                                                    this.indentedStr(0));
+                }
+                sz += n.size();
+            }
+            return sz;
+        }
 
         /** Returns the leftMost (first) or right-most (last) child */
         @Override public Node<T> endChild(boolean leftMost) {
@@ -919,7 +1014,10 @@ involves changing more nodes than maybe necessary.
             final Node<T> splitLeft = split.left();
             if (subNodeIndex == 0) {
                 //                debug("If we have a single left node, it doesn't need a parent.");
-                left = splitLeft;
+                System.out.println("NOPARENT");
+
+                //noinspection unchecked
+                left = new Strict<>(shift, new Node[] {splitLeft});
             } else {
                 boolean haveLeft = (splitLeft.size() > 0);
                 int numLeftItems = subNodeIndex + (haveLeft ? 1 : 0);
@@ -937,7 +1035,26 @@ involves changing more nodes than maybe necessary.
                 left = new Strict<>(shift, leftNodes);
             }
 
+            left.debugValidate();
+            split.right().debugValidate();
+
+            if ( (split.right().size() > 0) &&
+                 (nodes[0].height() != split.right().height()) ) {
+                throw new IllegalStateException("Have a right node of a different height!" +
+                                                "nodes:" + showSubNodes(new StringBuilder(), nodes, 6) +
+                                                "\nright:" + split.right().indentedStr(6));
+            }
             final Node<T> right = Relaxed.fixRight(nodes, split.right(), subNodeIndex);
+
+            right.debugValidate();
+
+            if ( (left.size() > 0) &&
+                 (right.size() > 0) &&
+                 (left.height() != right.height()) ) {
+                throw new IllegalStateException("Unequal heights of split!\n" +
+                "left: " + left.indentedStr(6) +
+                "\nright:" + right.indentedStr(6));
+            }
 
             SplitNode<T> ret = new SplitNode<>(left, split.leftFocus(),
                                                right, split.rightFocus());
@@ -1149,6 +1266,28 @@ involves changing more nodes than maybe necessary.
         }
 
         @Override public Node<T> child(int childIdx) { return nodes[childIdx]; }
+
+        @Override public int debugValidate() {
+            int sz = 0;
+            int height = height() - 1;
+            if (nodes.length != cumulativeSizes.length) {
+                throw new IllegalStateException("Unequal size of nodes and sizes!\n" +
+                                                this.indentedStr(0));
+            }
+            for (int i = 0; i < nodes.length; i++) {
+                Node<T> n = nodes[i];
+                if (n.height() != height) {
+                    throw new IllegalStateException("Unequal height!\n" +
+                                                    this.indentedStr(0));
+                }
+                sz += n.size();
+                if (sz != cumulativeSizes[i]) {
+                    throw new IllegalStateException("Cumulative Sizes are wrong!\n" +
+                                                    this.indentedStr(0));
+                }
+            }
+            return sz;
+        }
 
         /** Returns the leftMost (first) or right-most (last) child */
         @Override public Node<T> endChild(boolean leftMost) {
@@ -1812,25 +1951,42 @@ involves changing more nodes than maybe necessary.
             return new Relaxed<>(newCumSizes, newNodes);
         }
 
+        /**
+
+         @param origNodes the immediate children of the node we're splitting
+         @param splitRight the pre-split right node
+         @param subNodeIndex
+         @param <T>
+         @return
+         */
         public static <T> Node<T> fixRight(Node<T>[] origNodes, Node<T> splitRight, int subNodeIndex) {
+            System.out.println("origNodes=" + showSubNodes(new StringBuilder(), origNodes, 10));
+            System.out.println("splitRight=" + splitRight.indentedStr(11));
+            System.out.println("subNodeIndex=" + subNodeIndex);
+            if (splitRight.size() == 0) {
+                System.out.println("called with splitRight.size() = 0!");
+            } else if (origNodes[0].height() != splitRight.height()) {
+                throw new IllegalStateException("Passed a splitRight node of a different height than the origNodes!");
+            }
             Node<T> right;
             if (subNodeIndex == (origNodes.length - 1)) {
-//                debug("If we have a single right node, it doesn't need a parent.");
-                right = splitRight;
+                System.out.println("If we have a single right node, it doesn't need a parent.");
+//                right = splitRight;
+                //noinspection unchecked
+                right = new Relaxed<>(new int[] { splitRight.size() }, new Node[]{ splitRight });
             } else {
-//                debug("splitRight.size()=" + splitRight.size());
+                System.out.println("splitRight.size()=" + splitRight.size());
                 boolean haveRightSubNode = splitRight.size() > 0;
-//                debug("haveRightSubNode=" + haveRightSubNode);
+                System.out.println("haveRightSubNode=" + haveRightSubNode);
                 // If we have a rightSubNode, it's going to need a space in our new node array.
                 int numRightNodes = (origNodes.length - subNodeIndex) - (haveRightSubNode ? 0 : 1); //(splitRight.size() > 0 ? 2 : 1); // -2 when splitRight.size() > 0
-//                debug("numRightNodes=" + numRightNodes);
+                System.out.println("numRightNodes=" + numRightNodes);
                 // Here the first (leftmost) node of the right-hand side was turned into the focus
                 // and we have additional right-hand origNodes to adjust the parent for.
                 int[] rightCumSizes = new int[numRightNodes];
                 Node<T>[] rightNodes = genericNodeArray(numRightNodes);
 
-//                    System.out.println("origNodes=" + arrayString(origNodes));
-//                    System.out.println("subNodeIndex=" + subNodeIndex);
+                // TODO: origNodes is correct!
 
                 int cumulativeSize = 0;
                 int destCopyStartIdx = 0;
@@ -1848,7 +2004,8 @@ involves changing more nodes than maybe necessary.
                     System.arraycopy(origNodes, subNodeIndex + 1, rightNodes, 0, numRightNodes);
                 }
 
-//                    System.out.println("rightNodes=" + arrayString(rightNodes));
+                // TODO: rightNodes is unbalanced!
+                    System.out.println("rightNodes=" + arrayString(rightNodes));
 
                 // For relaxed nodes, we could calculate from previous cumulativeSizes instead of calling .size()
                 // on each one.  For strict, we could just add a strict amount.  For now, this works.
@@ -1858,6 +2015,7 @@ involves changing more nodes than maybe necessary.
                 }
 
                 right = new Relaxed<>(rightCumSizes, rightNodes);
+                right.debugValidate();
             }
             return right;
         } // end fixRight()
