@@ -281,7 +281,7 @@ involves changing more nodes than maybe necessary.
             return that;
         }
 
-        System.out.println("REAL JOIN");
+//        System.out.println("REAL JOIN");
 
         // OK, here we've eliminated the case of merging a leaf into a tree.  We only have to
         // deal with tree-into-tree merges below.
@@ -306,10 +306,10 @@ involves changing more nodes than maybe necessary.
         Node<E> taller = leftIntoRight ? rightRoot : leftRoot;
         Node<E> shorter = leftIntoRight ? leftRoot : rightRoot;
 
-        System.out.println("taller.height(): " + taller.height());
-        System.out.println("taller: " + taller.indentedStr(8));
-        System.out.println("shorter.height(): " + shorter.height());
-        System.out.println("shorter:" + shorter.indentedStr(8));
+//        System.out.println("taller.height(): " + taller.height());
+//        System.out.println("taller: " + taller.indentedStr(8));
+//        System.out.println("shorter.height(): " + shorter.height());
+//        System.out.println("shorter:" + shorter.indentedStr(8));
 
         // Most compact: Descend the taller tree to shorter.height and find room for all
         //     shorter children as children of that node.
@@ -337,15 +337,14 @@ involves changing more nodes than maybe necessary.
         Node<E>[] ancestors =  genericNodeArray(descentDepth);
         int i = 0;
         for (; i < ancestors.length; i++) {
-            System.out.println("Adding an ancestor to array...");
+//            System.out.println("Adding an ancestor to array...");
             ancestors[i] = n;
             if (n instanceof Leaf) {
-//                System.out.println("this: " + this.indentedStr(6));
-                System.out.println("leaf: " + n.indentedStr(6));
+//                System.out.println("leaf: " + n.indentedStr(6));
                 throw new IllegalStateException("Somehow found a leaf node");
             }
             n = n.endChild(leftIntoRight);
-            System.out.println("New n:" + n.indentedStr(6));
+//            System.out.println("New n:" + n.indentedStr(6));
         }
         // i is incremented before leaving the loop, so decrement it here to make it point
         // to ancestors.length - 1;
@@ -358,7 +357,7 @@ involves changing more nodes than maybe necessary.
         // Most compact: Descend the taller tree to shorter.height and find room for all
         //     shorter children as children of that node.
         if (n.thisNodeHasRelaxedCapacity(shorter.numChildren())) {
-            System.out.println("Adding kids of shorter to proper level of taller...");
+//            System.out.println("Adding kids of shorter to proper level of taller...");
             Node<E>[] kids;
             if (shorter instanceof Strict) {
                 kids = ((Strict) shorter).nodes;
@@ -369,17 +368,17 @@ involves changing more nodes than maybe necessary.
                                                 shorter.getClass());
             }
             n = n.addEndChildren(leftIntoRight, kids);
-            System.out.println("Merged:" + n.indentedStr(7));
+//            System.out.println("Merged:" + n.indentedStr(7));
         }
 
         if (i >= 0) {
-            System.out.println("Going back up one after lowest check.");
+//            System.out.println("Going back up one after lowest check.");
             n = ancestors[i];
             i--;
             if (n.height() != shorter.height() + 1) {
                 throw new IllegalStateException("Didn't go back up enough");
             }
-            System.out.println("n:" + n.indentedStr(2));
+//            System.out.println("n:" + n.indentedStr(2));
         }
 
 //        System.out.println("ancestors.length: " + ancestors.length + " i: " + i);
@@ -389,7 +388,7 @@ involves changing more nodes than maybe necessary.
         while (!n.thisNodeHasRelaxedCapacity(1) &&
                 (i >= 0) ) {
 
-            System.out.println("no room for short at this level (n has too many kids)");
+//            System.out.println("no room for short at this level (n has too many kids)");
 
             n = ancestors[i];
             i--;
@@ -406,7 +405,7 @@ involves changing more nodes than maybe necessary.
             } else {
                 rightRoot = shorter;
             }
-            System.out.println("n:" + n.indentedStr(2));
+//            System.out.println("n:" + n.indentedStr(2));
         }
 
         // Here we either have 2 trees of equal height, or
@@ -416,12 +415,12 @@ involves changing more nodes than maybe necessary.
             if (!n.thisNodeHasRelaxedCapacity(1)) {
                 throw new IllegalStateException("somehow got here without relaxed capacity...");
             }
-            System.out.println("Shorter one level below n and there's room");
+//            System.out.println("Shorter one level below n and there's room");
             // Trees are not equal height and there's room somewhere.
             n = n.addEndChild(leftIntoRight, shorter);
             n.debugValidate();
         } else if (i < 0) {
-            System.out.println("2 trees of equal height so we make a new parent");
+//            System.out.println("2 trees of equal height so we make a new parent");
             if (shorter.height() != n.height()) {
                 throw new IllegalStateException("Expected trees of equal height");
             }
@@ -536,6 +535,9 @@ involves changing more nodes than maybe necessary.
         // TODO: Do not abbreviate the returned tree at a lower level, or we can get left with a short-leg
         // TODO: Instead, remove single parent nodes until we are left with a leaf, or a node with multiple children.
         SplitNode<E> split = newRoot.splitAt(splitIndex);
+
+        split.left().debugValidate();
+        split.right().debugValidate();
 
         E[] leftFocus = split.leftFocus();
         Node<E> left = eliminateUnnecessaryAncestors(split.left());
@@ -1704,8 +1706,13 @@ involves changing more nodes than maybe necessary.
                 for (int i = 0; i < rightCumSizes.length; i++) {
                     rightCumSizes[i] = rightCumSizes[i] - bias;
                 }
-                return new SplitNode<>(new Relaxed<>(leftCumSizes, splitNodes._1()), emptyArray(),
-                                       new Relaxed<>(rightCumSizes, splitNodes._2()), emptyArray());
+                Node<T> left = new Relaxed<>(leftCumSizes, splitNodes._1());
+                left.debugValidate();
+                Node<T> right = new Relaxed<>(rightCumSizes, splitNodes._2());
+                right.debugValidate();
+
+                return new SplitNode<>(left, emptyArray(),
+                                       right, emptyArray());
             }
 
             int subNodeAdjustedIndex = subNodeAdjustedIndex(splitIndex, subNodeIndex);
@@ -1746,9 +1753,11 @@ involves changing more nodes than maybe necessary.
                     leftNodes[numLeftItems - 1] = splitLeft;
                 }
                 left = new Relaxed<>(leftCumSizes, leftNodes);
+                left.debugValidate();
             }
 
             final Node<T> right = fixRight(nodes, split.right(), subNodeIndex);
+            right.debugValidate();
 
             SplitNode<T> ret = new SplitNode<>(left, split.leftFocus(),
                                                right, split.rightFocus());

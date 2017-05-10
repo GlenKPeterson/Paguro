@@ -649,12 +649,12 @@ public class RrbTree1Test {
             }
 
 
-            System.out.println("\n==============================================");
-            System.out.println("join index: " + i);
+//            System.out.println("\n==============================================");
+//            System.out.println("join index: " + i);
 //            System.out.println("r1: " + r1.indentedStr(4));
 //            System.out.println("r2: " + r2.indentedStr(4));
             r3 = r1.join(r2);
-            System.out.println("r3: " + r3.indentedStr(13));
+//            System.out.println("r3: " + r3.indentedStr(13));
             assertEquals(control, r3);
             r3.debugValidate();
         }
