@@ -250,6 +250,17 @@ involves changing more nodes than maybe necessary.
         return n;
     }
 
+    @SuppressWarnings("unchecked")
+    private static <E> Node<E> addAncestor(Node<E> n) {
+        return ( (n instanceof Leaf) &&
+                 (n.size() == STRICT_NODE_LENGTH) ) ? new Strict<>(NODE_LENGTH_POW_2,
+                                                                   (Node<E>[]) new Node[]{n}) :
+               (n instanceof Strict) ? new Strict<>(((Strict) n).shift + NODE_LENGTH_POW_2,
+                                                    (Node<E>[]) new Node[]{n}) :
+               new Relaxed<>(new int[] { n.size() },
+                             (Node<E>[]) new Node[]{n});
+    }
+
     /**
      Joins the given tree to the right side of this tree (or this to the left side of that one) in
      something like O(log n) time.
@@ -300,14 +311,32 @@ involves changing more nodes than maybe necessary.
         System.out.println("shorter.height(): " + shorter.height());
         System.out.println("shorter:" + shorter.indentedStr(8));
 
-//        taller.pushTree(shorter);
+        // Most compact: Descend the taller tree to shorter.height and find room for all
+        //     shorter children as children of that node.
+        //
+        // Next: add the shorter node, unchanged, as a child to the taller tree at
+        //       shorter.height + 1
+        //
+        // If that level of the taller tree is full, add an ancestor to the shorter node and try to
+        // fit at the next level up in the taller tree.
+        //
+        // If this brings us to the top of the taller tree (both trees are the same height), add a
+        // new parent node with leftRoot and rightRoot as children
 
-        // Walk down the taller tree to the height of the shorter, remembering ancestors.
+        // Walk down the taller tree to one below the shorter, remembering ancestors.
         Node<E> n = taller;
-        int i = -1;
-        Node<E>[] ancestors = null;
-        ancestors = genericNodeArray(taller.height() - shorter.height());
-        for (i = 0; i < ancestors.length; i++) {
+
+        // This is the maximum we can descend into the taller tree (before running out of tree)
+//        int maxDescent = taller.height() - 1;
+
+        // Actual amount we're going to descend.
+        int descentDepth = taller.height() - shorter.height();
+        if ( (descentDepth < 0) || (descentDepth >= taller.height()) ) {
+            throw new IllegalStateException("Illegal descent depth: " + descentDepth);
+        }
+        Node<E>[] ancestors =  genericNodeArray(descentDepth);
+        int i = 0;
+        for (; i < ancestors.length; i++) {
             System.out.println("Adding an ancestor to array...");
             ancestors[i] = n;
             if (n instanceof Leaf) {
@@ -318,33 +347,85 @@ involves changing more nodes than maybe necessary.
             n = n.endChild(leftIntoRight);
             System.out.println("New n:" + n.indentedStr(6));
         }
-//        System.out.println("ancestors.length: " + ancestors.length + " i: " + i);
+        // i is incremented before leaving the loop, so decrement it here to make it point
+        // to ancestors.length - 1;
         i--;
-        // While nodes in the taller are full, add a parent to the shorter and try the next level
 
+        if (n.height() != shorter.height()) {
+            throw new IllegalStateException("Didn't get to proper height");
+        }
+
+        // Most compact: Descend the taller tree to shorter.height and find room for all
+        //     shorter children as children of that node.
+        if (n.thisNodeHasRelaxedCapacity(shorter.numChildren())) {
+            System.out.println("Adding kids of shorter to proper level of taller...");
+            Node<E>[] kids;
+            if (shorter instanceof Strict) {
+                kids = ((Strict) shorter).nodes;
+            } else if (shorter instanceof Relaxed) {
+                kids = ((Relaxed) shorter).nodes;
+            } else {
+                throw new IllegalStateException("Expected a strict or relaxed, but found " +
+                                                shorter.getClass());
+            }
+            n = n.addEndChildren(leftIntoRight, kids);
+            System.out.println("Merged:" + n.indentedStr(7));
+        }
+
+        if (i >= 0) {
+            System.out.println("Going back up one after lowest check.");
+            n = ancestors[i];
+            i--;
+            if (n.height() != shorter.height() + 1) {
+                throw new IllegalStateException("Didn't go back up enough");
+            }
+            System.out.println("n:" + n.indentedStr(2));
+        }
+
+//        System.out.println("ancestors.length: " + ancestors.length + " i: " + i);
+
+        // While nodes in the taller are full, add a parent to the shorter and try the next level
         // up.
-        while (!n.thisNodeHasRelaxedCapacity(shorter.numChildren()) && (i >= 0)) {
+        while (!n.thisNodeHasRelaxedCapacity(1) &&
+                (i >= 0) ) {
+
+            System.out.println("no room for short at this level (n has too many kids)");
+
             n = ancestors[i];
             i--;
 
-            // TODO: if shorter is a Strict or a leaf where size = STRICT_NODE_SIZE use a strict parent.
             //noinspection unchecked
-            shorter = new Relaxed<>(new int[]{shorter.size()},
-                                    (Node<E>[]) new Node[]{shorter});
+            shorter = addAncestor(shorter);
+            shorter.debugValidate();
 
-            // Weird, I know, but sometimes we care about which is shorter and sometimes about
-            // left and right.  So now we fixed the shorter tree, we have to update the
-            // left/right
-            // pointer that was pointing to it.
+            // Sometimes we care about which is shorter and sometimes about left and right.
+            // Since we fixed the shorter tree, we have to update the left/right
+            // pointer to point to the new shorter.
             if (leftIntoRight) {
                 leftRoot = shorter;
             } else {
                 rightRoot = shorter;
             }
+            System.out.println("n:" + n.indentedStr(2));
         }
-//         Here we've got 2 trees of equal height so we make a new parent.
-        if (i < 0) {
+
+        // Here we either have 2 trees of equal height, or
+        // we have room in n for the shorter as a child.
+
+        if (shorter.height() == (n.height() - 1)) {
+            if (!n.thisNodeHasRelaxedCapacity(1)) {
+                throw new IllegalStateException("somehow got here without relaxed capacity...");
+            }
+            System.out.println("Shorter one level below n and there's room");
+            // Trees are not equal height and there's room somewhere.
+            n = n.addEndChild(leftIntoRight, shorter);
+            n.debugValidate();
+        } else if (i < 0) {
             System.out.println("2 trees of equal height so we make a new parent");
+            if (shorter.height() != n.height()) {
+                throw new IllegalStateException("Expected trees of equal height");
+            }
+
             @SuppressWarnings("unchecked")
             Node<E>[] newRootArray = new Node[] {leftRoot, rightRoot};
             int leftSize = leftRoot.size();
@@ -352,11 +433,9 @@ involves changing more nodes than maybe necessary.
                     new Relaxed<>(new int[] {leftSize, leftSize + rightRoot.size()}, newRootArray);
             newRoot.debugValidate();
             return new RrbTree1<>(emptyArray(), 0, newRoot, newRoot.size());
+        } else {
+            throw new IllegalStateException("How did we get here?");
         }
-
-        // Trees are not equal height and there's room somewhere.
-        n = n.addEndChild(leftIntoRight, shorter);
-        n.debugValidate();
 
         // We've merged the nodes.  Now see if we need to create new parents
         // to hold the changed sub-nodes...
@@ -557,6 +636,9 @@ involves changing more nodes than maybe necessary.
         /** Adds a node as the first/leftmost or last/rightmost child */
         Node<T> addEndChild(boolean leftMost, Node<T> shorter);
 
+        /** Adds kids as leftmost or rightmost of current children */
+        Node<T> addEndChildren(boolean leftMost, Node<T>[] newKids);
+
         /** Return the item at the given index */
         T get(int i);
 
@@ -666,7 +748,7 @@ involves changing more nodes than maybe necessary.
             if (items.length < MIN_NODE_LENGTH) {
                 throw new IllegalStateException("Leaf too short!\n" +
                                                 this.indentedStr(0));
-            } else if (items.length > MAX_NODE_LENGTH) {
+            } else if (items.length >= MAX_NODE_LENGTH) {
                 throw new IllegalStateException("Leaf too long!\n" +
                                                 this.indentedStr(0));
             }
@@ -680,6 +762,11 @@ involves changing more nodes than maybe necessary.
 
         /** Adds a node as the first/leftmost or last/rightmost child */
         @Override public Node<T> addEndChild(boolean leftMost, Node<T> shorter) {
+            throw new UnsupportedOperationException("Don't call this on a leaf");
+        }
+
+        /** Adds kids as leftmost or rightmost of current children */
+        @Override public Node<T> addEndChildren(boolean leftMost, Node<T>[] newKids) {
             throw new UnsupportedOperationException("Don't call this on a leaf");
         }
 
@@ -794,7 +881,10 @@ involves changing more nodes than maybe necessary.
         }
 
         @Override public boolean thisNodeHasRelaxedCapacity(int numItems) {
-            return items.length + numItems <= MAX_NODE_LENGTH;
+            if ( (numItems < 1) || (numItems >= MAX_NODE_LENGTH) ) {
+                throw new IllegalArgumentException("Bad size: " + numItems);
+            }
+            return items.length + numItems < MAX_NODE_LENGTH;
         }
 
         @Override public String toString() {
@@ -865,6 +955,14 @@ involves changing more nodes than maybe necessary.
             }
             //noinspection unchecked
             return new Strict<>(shift, insertIntoArrayAt(shorter, nodes, nodes.length, Node.class));
+        }
+
+        /** Adds kids as leftmost or rightmost of current children */
+        @Override public Node<T> addEndChildren(boolean leftMost, Node<T>[] newKids) {
+            if (!thisNodeHasRelaxedCapacity(newKids.length)) {
+                throw new IllegalStateException("Can't add enough kids");
+            }
+            return relax().addEndChildren(leftMost, newKids);
         }
 
         @Override public int height() { return nodes[0].height() + 1; }
@@ -1189,7 +1287,7 @@ involves changing more nodes than maybe necessary.
         }
 
         @Override public boolean thisNodeHasRelaxedCapacity(int numNodes) {
-            return nodes.length + numNodes <= MAX_NODE_LENGTH;
+            return nodes.length + numNodes < MAX_NODE_LENGTH;
         }
 
 //        @Override public Node<T>[] children() { return nodes; }
@@ -1298,6 +1396,24 @@ involves changing more nodes than maybe necessary.
         @Override public Node<T> addEndChild(boolean leftMost, Node<T> shorter) {
             return insertInRelaxedAt(cumulativeSizes, nodes, shorter,
                                      leftMost ? 0 : nodes.length);
+        }
+
+        /** Adds kids as leftmost or rightmost of current children */
+        @Override public Node<T> addEndChildren(boolean leftMost, Node<T>[] newKids) {
+            if (!thisNodeHasRelaxedCapacity(newKids.length)) {
+                throw new IllegalStateException("Can't add enough kids");
+            }
+            if (nodes[0].height() != newKids[0].height()) {
+                throw new IllegalStateException("Kids not same height");
+            }
+            @SuppressWarnings("unchecked")
+            Node<T>[] res = spliceIntoArrayAt(newKids, nodes,
+                                              leftMost ? 0
+                                                       : nodes.length, Node.class);
+            // TODO: Figure out which side we inserted on and do the math to adjust counts instead
+            // of looking them up.
+            int[] sizes = makeSizeArray(res);
+            return new Relaxed<>(sizes, res);
         }
 
         @Override public int height() { return nodes[0].height() + 1; }
@@ -1436,7 +1552,7 @@ involves changing more nodes than maybe necessary.
 //                               " MAX_NODE_LENGTH=" + MAX_NODE_LENGTH +
 //                               " MIN_NODE_LENGTH=" + MIN_NODE_LENGTH +
 //                               " STRICT_NODE_LENGTH=" + STRICT_NODE_LENGTH);
-            return nodes.length + numNodes <= MAX_NODE_LENGTH;
+            return nodes.length + numNodes < MAX_NODE_LENGTH;
         }
 
 //        @Override public Node<T>[] children() { return nodes; }
@@ -1886,6 +2002,25 @@ involves changing more nodes than maybe necessary.
 
         @Override public String toString() { return indentedStr(0); }
 
+        /**
+         This asks each node what size it is, then puts the cumulative sizes into a new array.
+         In theory, it might be faster to figure out what side we added/removed nodes and do
+         some addition/subtraction (in the amount of the added/removed nodes).  But I want to
+         optimize other things first and be sure everything is correct before experimenting with
+         that.  After all, it might not even be faster!
+         @param newNodes
+         @return
+         */
+        private static int[] makeSizeArray(Node[] newNodes) {
+            int[] newCumSizes = new int[newNodes.length];
+            int cumulativeSize = 0;
+            for (int i = 0; i < newCumSizes.length; i++) {
+                cumulativeSize += newNodes[i].size();
+                newCumSizes[i] = cumulativeSize;
+            }
+            return newCumSizes;
+        }
+
         // TODO: Search for more opportunities to use this
         /**
          Replace a node in a relaxed node by recalculating the cumulative sizes and copying
@@ -2192,12 +2327,21 @@ involves changing more nodes than maybe necessary.
 //        return insertIntoArrayAt(item, items, idx, null);
 //    }
 
-    @SuppressWarnings("unchecked")
-    private static <T> T[] spliceIntoArrayAt(T[] insertedItems, T[] origItems, int idx,
-                                             Class<T> tClass) {
+    /**
+     Called splice, but handles precat (idx = 0) and concat (idx = origItems.length).
+     @param insertedItems the items to insert
+     @param origItems the original items.
+     @param idx the index to insert new items at
+     @param tClass the class of the resulting new array
+     @return a new array with the new items inserted at the proper position of the old array.
+     */
+    private static <A> A[] spliceIntoArrayAt(A[] insertedItems, A[] origItems, int idx,
+                                             Class<A> tClass) {
         // Make an array that big enough.  It's too bad that the JVM bothers to
         // initialize this with nulls.
-        T[] newItems = (T[]) Array.newInstance(tClass, insertedItems.length + origItems.length);
+        @SuppressWarnings("unchecked")
+        A[] newItems = tClass == null ? (A[]) new Object[insertedItems.length + origItems.length] :
+                       (A[]) Array.newInstance(tClass, insertedItems.length + origItems.length);
 
         // If we aren't inserting at the first item, array-copy the items before the insert
         // point.
