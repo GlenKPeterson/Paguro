@@ -15,11 +15,11 @@
 package org.organicdesign.fp.xform;
 
 import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.function.Fn1;
+import org.organicdesign.fp.function.Fn2;
 import org.organicdesign.fp.oneOf.Or;
 import org.organicdesign.fp.collections.UnmodIterable;
 import org.organicdesign.fp.collections.UnmodIterator;
-import org.organicdesign.fp.function.Function1;
-import org.organicdesign.fp.function.Function2;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -62,9 +62,9 @@ public abstract class Xform<A> implements UnmodIterable<A> {
     static abstract class Operation {
         // Time using a linked list of ops instead of array, so that we can easily remove ops from
         // the list when they are used up.
-        Function1<Object,Boolean> filter = null;
-        Function1 map = null;
-        Function1<Object,Iterable> flatMap = null;
+        Fn1<Object,Boolean> filter = null;
+        Fn1 map = null;
+        Fn1<Object,Iterable> flatMap = null;
 
         /**
          Drops as many items as the source can handle.
@@ -110,11 +110,11 @@ public abstract class Xform<A> implements UnmodIterable<A> {
         }
 
         private static class FilterOp extends Operation {
-            FilterOp(Function1<Object,Boolean> func) { filter = func; }
+            FilterOp(Fn1<Object,Boolean> func) { filter = func; }
         }
 
         private static class MapOp extends Operation {
-            MapOp(Function1 func) { map = func; }
+            MapOp(Fn1 func) { map = func; }
             @Override public Or<Long,OpStrategy> drop(long num) {
                 return Or.bad(OpStrategy.ASK_SUPPLIER);
             }
@@ -127,7 +127,7 @@ public abstract class Xform<A> implements UnmodIterable<A> {
 //            ListSourceDesc<U> cache = null;
 //            int numToDrop = 0;
 
-            FlatMapOp(Function1<Object,Iterable> func) { flatMap = func; }
+            FlatMapOp(Fn1<Object,Iterable> func) { flatMap = func; }
         }
 
         /**
@@ -206,7 +206,7 @@ public abstract class Xform<A> implements UnmodIterable<A> {
         @Override public Iterator iterator() {
             @SuppressWarnings("Convert2Lambda")
             ArrayList prevSrc = _fold(prev, prev.opArray(), 0, new ArrayList(),
-                                      new Function2<ArrayList,Object,ArrayList>() {
+                                      new Fn2<ArrayList,Object,ArrayList>() {
                                           @SuppressWarnings("unchecked")
                                           @Override
                                           public ArrayList applyEx(ArrayList res, Object item) throws Exception {
@@ -303,23 +303,23 @@ public abstract class Xform<A> implements UnmodIterable<A> {
 
     /** Describes a filter() operation, but does not perform it. */
     private static class FilterDesc<T> extends Xform<T> {
-        final Function1<? super T,Boolean> f;
+        final Fn1<? super T,Boolean> f;
 
-        FilterDesc(Xform<T> prev, Function1<? super T,Boolean> func) { super(prev); f = func; }
+        FilterDesc(Xform<T> prev, Fn1<? super T,Boolean> func) { super(prev);f = func; }
 
         @SuppressWarnings("unchecked")
         @Override protected RunList toRunList() {
             RunList ret = prevOp.toRunList();
-            ret.list.add(new Operation.FilterOp((Function1<Object,Boolean>) f));
+            ret.list.add(new Operation.FilterOp((Fn1<Object,Boolean>) f));
             return ret;
         }
     }
 
     /** Describes a map() operation, but does not perform it. */
     private static class MapDesc<T,U> extends Xform<U> {
-        final Function1<? super T,? extends U> f;
+        final Fn1<? super T,? extends U> f;
 
-        MapDesc(Xform<T> prev, Function1<? super T,? extends U> func) { super(prev); f = func; }
+        MapDesc(Xform<T> prev, Fn1<? super T,? extends U> func) { super(prev);f = func; }
 
         @SuppressWarnings("unchecked")
         @Override protected RunList toRunList() {
@@ -331,15 +331,15 @@ public abstract class Xform<A> implements UnmodIterable<A> {
 
     /** Describes a flatMap() operation, but does not perform it. */
     private static class FlatMapDesc<T,U> extends Xform<U> {
-        final Function1<? super T,Iterable<U>> f;
-        FlatMapDesc(Xform<T> prev, Function1<? super T,Iterable<U>> func) {
+        final Fn1<? super T,Iterable<U>> f;
+        FlatMapDesc(Xform<T> prev, Fn1<? super T,Iterable<U>> func) {
             super(prev); f = func;
         }
 
         @SuppressWarnings("unchecked")
         @Override protected RunList toRunList() {
             RunList ret = prevOp.toRunList();
-            ret.list.add(new Operation.FlatMapOp((Function1) f));
+            ret.list.add(new Operation.FlatMapOp((Fn1) f));
             return ret;
         }
     }
@@ -437,7 +437,7 @@ public abstract class Xform<A> implements UnmodIterable<A> {
     // is 2.6 times faster than wrapping items type-safely in Options and 10 to 100 times faster
     // than lazily evaluated and cached linked-list, Sequence model.
     @SuppressWarnings("unchecked")
-    private static <H> H _fold(Iterable source, Operation[] ops, int opIdx, H ident, Function2 reducer) {
+    private static <H> H _fold(Iterable source, Operation[] ops, int opIdx, H ident, Fn2 reducer) {
         Object ret = ident;
 
         // This is a label - the first one I have used in Java in years, or maybe ever.
@@ -522,7 +522,7 @@ public abstract class Xform<A> implements UnmodIterable<A> {
     // Do we need a dropWhile???
 
     /** Provides a way to collect the results of the transformation. */
-    @Override public <B> B fold(B ident, Function2<B,? super A,B> reducer) {
+    @Override public <B> B fold(B ident, Fn2<B,? super A,B> reducer) {
         if (reducer == null) {
             throw new IllegalArgumentException("Can't fold with a null reduction function.");
         }
@@ -545,13 +545,13 @@ public abstract class Xform<A> implements UnmodIterable<A> {
 
      {@inheritDoc}
      */
-    @Override public <B> B fold(B ident, Function2<B,? super A,B> reducer,
-                                Function1<? super B,Boolean> terminateWhen) {
+    @Override public <B> B fold(B ident, Fn2<B,? super A,B> reducer,
+                                Fn1<? super B,Boolean> terminateWhen) {
         if (reducer == null) {
             throw new IllegalArgumentException("Can't fold with a null reduction function.");
         }
 
-        if ( (terminateWhen == null) || (Function1.reject() == terminateWhen) ) {
+        if ( (terminateWhen == null) || (Fn1.reject() == terminateWhen) ) {
             return fold(ident, reducer);
         }
 
@@ -573,17 +573,17 @@ public abstract class Xform<A> implements UnmodIterable<A> {
         return ident;
     }
 
-    @Override public Xform<A> filter(Function1<? super A,Boolean> f) {
+    @Override public Xform<A> filter(Fn1<? super A,Boolean> f) {
         if (f == null) { throw new IllegalArgumentException("Can't filter with a null function."); }
         return new FilterDesc<>(this, f);
     }
 
-    @Override public <B> Xform<B> flatMap(Function1<? super A,Iterable<B>> f) {
+    @Override public <B> Xform<B> flatMap(Fn1<? super A,Iterable<B>> f) {
         if (f == null) { throw new IllegalArgumentException("Can't flatmap with a null function."); }
         return new FlatMapDesc<>(this, f);
     }
 
-    @Override public <B> Xform<B> map(Function1<? super A, ? extends B> f) {
+    @Override public <B> Xform<B> map(Fn1<? super A, ? extends B> f) {
         if (f == null) { throw new IllegalArgumentException("Can't map with a null function."); }
         return new MapDesc<>(this, f);
     }
@@ -595,7 +595,7 @@ public abstract class Xform<A> implements UnmodIterable<A> {
         return new TakeDesc<>(this, numItems);
     }
 
-    @Override public Xform<A> takeWhile(Function1<? super A,Boolean> f) {
+    @Override public Xform<A> takeWhile(Fn1<? super A,Boolean> f) {
         if (f == null) {
             throw new IllegalArgumentException("Can't takeWhile with a null function.");
         }

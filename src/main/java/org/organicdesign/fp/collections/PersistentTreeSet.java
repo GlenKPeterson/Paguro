@@ -171,7 +171,7 @@ public class PersistentTreeSet<E> extends UnmodSortedSet.AbstractUnmodSet<E>
     // ===================================== Instance Methods =====================================
     /**
      Returns the comparator used to order the items in this set, or null if it uses
-     Function2.DEFAULT_COMPARATOR (for compatibility with java.util.SortedSet).
+     Fn2.DEFAULT_COMPARATOR (for compatibility with java.util.SortedSet).
      */
     @Override public Comparator<? super E> comparator() { return impl.comparator(); }
 

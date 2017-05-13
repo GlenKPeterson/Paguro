@@ -1,6 +1,6 @@
 package org.organicdesign.fp;
 
-import org.organicdesign.fp.function.Function0;
+import org.organicdesign.fp.function.Fn0;
 
 /**
  Lazily initialize a value (and free the initialization resources) on the first call to get().
@@ -8,10 +8,10 @@ import org.organicdesign.fp.function.Function0;
  function and the value it produces are free from side effects.
  */
 public class LazyRef<T> {
-    private Function0<T> producer;
+    private Fn0<T> producer;
     private T value;
 
-    private LazyRef(Function0<T> p) { producer = p; }
+    private LazyRef(Fn0<T> p) { producer = p; }
 
     /**
      Construct a LazyRef from the given initialization function.
@@ -20,7 +20,7 @@ public class LazyRef<T> {
 
      @return a LazyRef with the given producer.
      */
-    public static <T> LazyRef<T> of(Function0<T> producer) {
+    public static <T> LazyRef<T> of(Fn0<T> producer) {
         if (producer == null) {
             throw new IllegalArgumentException("The producer function cannot be null (the value it returns can)");
         }

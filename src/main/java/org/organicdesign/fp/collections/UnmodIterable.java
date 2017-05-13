@@ -1,8 +1,8 @@
 package org.organicdesign.fp.collections;
 
+import org.organicdesign.fp.function.Fn1;
+import org.organicdesign.fp.function.Fn2;
 import org.organicdesign.fp.oneOf.Option;
-import org.organicdesign.fp.function.Function1;
-import org.organicdesign.fp.function.Function2;
 import org.organicdesign.fp.xform.Transformable;
 import org.organicdesign.fp.xform.Xform;
 
@@ -168,28 +168,28 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
     }
 
     /** {@inheritDoc} */
-    @Override default <B> B fold(B ident, Function2<B,? super T,B> reducer) {
+    @Override default <B> B fold(B ident, Fn2<B,? super T,B> reducer) {
         return Xform.of(this).fold(ident, reducer);
     }
 
     /** {@inheritDoc} */
-    @Override default <B> B fold(B ident, Function2<B,? super T,B> reducer,
-                                 Function1<? super B,Boolean> terminateWhen) {
+    @Override default <B> B fold(B ident, Fn2<B,? super T,B> reducer,
+                                 Fn1<? super B,Boolean> terminateWhen) {
         return Xform.of(this).fold(ident, reducer, terminateWhen);
     }
 
     /** {@inheritDoc} */
-    @Override default UnmodIterable<T> filter(Function1<? super T,Boolean> f) {
+    @Override default UnmodIterable<T> filter(Fn1<? super T,Boolean> f) {
         return Xform.of(this).filter(f);
     }
 
     /** {@inheritDoc} */
-    @Override default <B> UnmodIterable<B> flatMap(Function1<? super T,Iterable<B>> f) {
+    @Override default <B> UnmodIterable<B> flatMap(Fn1<? super T,Iterable<B>> f) {
         return Xform.of(this).flatMap(f);
     }
 
     /** {@inheritDoc} */
-    @Override default <B> UnmodIterable<B> map(Function1<? super T, ? extends B> f) {
+    @Override default <B> UnmodIterable<B> map(Fn1<? super T, ? extends B> f) {
         return Xform.of(this).map(f);
     }
 
@@ -199,7 +199,7 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
     }
 
     /** {@inheritDoc} */
-    @Override default UnmodIterable<T> takeWhile(Function1<? super T,Boolean> f) {
+    @Override default UnmodIterable<T> takeWhile(Fn1<? super T,Boolean> f) {
         return Xform.of(this).takeWhile(f);
     }
 

@@ -18,7 +18,7 @@ import org.junit.Test;
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.ImMap;
 import org.organicdesign.fp.collections.UnmodIterable;
-import org.organicdesign.fp.function.Function1;
+import org.organicdesign.fp.function.Fn1;
 import org.organicdesign.fp.tuple.Tuple2;
 import org.organicdesign.fp.tuple.Tuple3;
 
@@ -208,7 +208,7 @@ public class UsageExampleTest {
         ImMap<String,Person> peopleByEmail =
                 people.flatMap(person -> person.emailAddrs()
                                                .map(mail -> tup(mail.address(), person)))
-                      .toImMap(Function1.identity());
+                      .toImMap(Fn1.identity());
 
         assertEquals("PersistentHashMap(" +
                      "Tuple2(\"d@e.f\",Person(\"Fred\",\"Tase\",PersistentVector(Email(HOME,\"c@d.e\")," +

@@ -26,8 +26,8 @@ import org.organicdesign.fp.collections.PersistentHashSet;
 import org.organicdesign.fp.collections.PersistentTreeMap;
 import org.organicdesign.fp.collections.PersistentTreeSet;
 import org.organicdesign.fp.collections.PersistentVector;
-import org.organicdesign.fp.function.Function1;
-import org.organicdesign.fp.function.Function2;
+import org.organicdesign.fp.function.Fn1;
+import org.organicdesign.fp.function.Fn2;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -72,7 +72,7 @@ public interface Transformable<T> {
      @return a Transformable of only the filtered items.
      @param predicate a function that returns true for items to keep, false for items to drop
      */
-    Transformable<T> filter(Function1<? super T,Boolean> predicate);
+    Transformable<T> filter(Fn1<? super T,Boolean> predicate);
 
     /**
      Transform each item into zero or more new items using the given function.
@@ -83,7 +83,7 @@ public interface Transformable<T> {
      return is smaller, use filter followed by map if possible, or vice versa if not.
      @param f yields a Transformable of 0 or more results for each input item.
      */
-    <U> Transformable<U> flatMap(Function1<? super T,Iterable<U>> f);
+    <U> Transformable<U> flatMap(Fn1<? super T,Iterable<U>> f);
 
     /**
      Apply the function to each item, accumulating the result in u.  Other transformations can be
@@ -104,7 +104,7 @@ public interface Transformable<T> {
      @param fun combines each value in the list with the result so far.  The initial result is u.
      @return an eagerly evaluated result which could be a single value like a sum, or a collection.
      */
-    <U> U fold(U u, Function2<U,? super T,U> fun);
+    <U> U fold(U u, Fn2<U,? super T,U> fun);
 
     /**
      Normally you want to terminate by doing a take(), drop(), or takeWhile() before you get to the
@@ -123,7 +123,7 @@ public interface Transformable<T> {
      processing the input at that time, returning the latest u.
      @return an eagerly evaluated result which could be a single value like a sum, or a collection.
      */
-    <U> U fold(U u, Function2<U,? super T,U> fun, Function1<? super U,Boolean> terminateWhen);
+    <U> U fold(U u, Fn2<U,? super T,U> fun, Fn1<? super U,Boolean> terminateWhen);
 
     /**
      Transform each item into exactly one new item using the given function.
@@ -131,7 +131,7 @@ public interface Transformable<T> {
      @return a Transformable of the same size as the input (may contain duplicates) containing the
      return values of the given function in the same order as the input values.
      */
-    <U> Transformable<U> map(Function1<? super T,? extends U> func);
+    <U> Transformable<U> map(Fn1<? super T,? extends U> func);
 
     /**
      Add items to the beginning of this Transformable ("precat" is a PREpending version of conCAT).
@@ -154,7 +154,7 @@ public interface Transformable<T> {
      beginning of the transformable, that satisfy the given predicate.  This could be 0 items to
      the entire transformable.
      */
-    Transformable<T> takeWhile(Function1<? super T,Boolean> predicate);
+    Transformable<T> takeWhile(Fn1<? super T,Boolean> predicate);
 
 //    /**
 //     Returns an Object[] for backward compatibility
@@ -180,12 +180,12 @@ public interface Transformable<T> {
      of null values.
 
      @param f1 Maps each item in this collection to a key/value pair.  If the collection is composed
-     of Map.Entries (or Tuple2's), you can pass Function1.identity() here.  This function must never
+     of Map.Entries (or Tuple2's), you can pass Fn1.identity() here.  This function must never
      return null (filter out nulls in an earlier step of the transform if necessary).
 
      @return An immutable map
      */
-    default <K,V> ImMap<K,V> toImMap(Function1<? super T,Map.Entry<K,V>> f1) {
+    default <K,V> ImMap<K,V> toImMap(Fn1<? super T,Map.Entry<K,V>> f1) {
         return fold(PersistentHashMap.<K,V>empty().mutable(),
                     (MutableUnsortedMap<K,V> ts, T t) ->
                                 (MutableUnsortedMap<K,V>) ts.assoc(f1.apply(t)))
@@ -214,7 +214,7 @@ public interface Transformable<T> {
      want to use a null key, make sure the comparator treats nulls correctly in all circumstances!
 
      @param f1 Maps each item in this collection to a key/value pair.  If the collection is composed
-     of Map.Entries, you can pass Function1.identity() here.  In the case of a duplicate key, later
+     of Map.Entries, you can pass Fn1.identity() here.  In the case of a duplicate key, later
      values in transform overwrite the earlier ones.  The resulting map can contain zero or one
      null key (if your comparator knows how to sort nulls) and any number of null values.  This
      function must never return null (filter out nulls in an earlier step of the transform if
@@ -223,7 +223,7 @@ public interface Transformable<T> {
      @return a new PersistentTreeMap of the specified comparator and the given key/value pairs
      */
     default <K,V> ImSortedMap<K,V> toImSortedMap(Comparator<? super K> comp,
-                                                 Function1<? super T,Map.Entry<K,V>> f1) {
+                                                 Fn1<? super T,Map.Entry<K,V>> f1) {
         return fold((ImSortedMap<K, V>) PersistentTreeMap.<K, V>empty(comp),
                     (ts, t) -> ts.assoc(f1.apply(t)));
     }
@@ -233,7 +233,7 @@ public interface Transformable<T> {
      retrieve entries in order.
 
      @param comparator Determines the ordering.  If T implements Comparable, you can pass
-                       Function2.defaultComparator() here.
+                       Fn2.defaultComparator() here.
      @return An immutable set (with duplicates removed).  Null elements are not allowed.
      */
     default ImSortedSet<T> toImSortedSet(Comparator<? super T> comparator) {
@@ -256,7 +256,7 @@ public interface Transformable<T> {
 
      @return A map with the keys from the given set, mapped to values using the given function.
      */
-    default <K,V> Map<K,V> toMutableMap(final Function1<? super T,Map.Entry<K,V>> f1) {
+    default <K,V> Map<K,V> toMutableMap(final Fn1<? super T,Map.Entry<K,V>> f1) {
         return fold(new HashMap<>(), (ts, t) -> {
             Map.Entry<K,V> entry = f1.apply(t);
             ts.put(entry.getKey(), entry.getValue());
@@ -276,7 +276,7 @@ public interface Transformable<T> {
      */
     default <K,V> SortedMap<K,V>
     toMutableSortedMap(Comparator<? super K> comp,
-                       final Function1<? super T,Map.Entry<K,V>> f1) {
+                       final Fn1<? super T,Map.Entry<K,V>> f1) {
         return fold(new TreeMap<>(), (ts, t) -> {
             Map.Entry<K,V> entry = f1.apply(t);
             ts.put(entry.getKey(), entry.getValue());
@@ -300,7 +300,7 @@ public interface Transformable<T> {
      Returns a mutable tree set. Use toImSortedSet unless you need to modify the set in-place.
 
      @param comparator Determines the ordering.  If T implements Comparable, you can pass
-                       Function2.defaultComparator() here.
+                       Fn2.defaultComparator() here.
      @return A mutable sorted set
      */
     default SortedSet<T> toMutableSortedSet(Comparator<? super T> comparator) {

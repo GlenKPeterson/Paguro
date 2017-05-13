@@ -18,7 +18,7 @@ import junit.framework.TestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.organicdesign.fp.function.Function1;
+import org.organicdesign.fp.function.Fn1;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,8 +32,8 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.organicdesign.fp.FunctionUtils.emptyUnmodIterator;
 import static org.organicdesign.fp.StaticImports.vec;
 import static org.organicdesign.fp.StaticImports.xform;
-import static org.organicdesign.fp.function.Function1.accept;
-import static org.organicdesign.fp.function.Function1.reject;
+import static org.organicdesign.fp.function.Fn1.accept;
+import static org.organicdesign.fp.function.Fn1.reject;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 @RunWith(JUnit4.class)
@@ -710,7 +710,7 @@ public class XformTest extends TestCase {
     public void foldLeftEx2() {
         assertEquals(Integer.valueOf(45),
                      Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                          .fold(0, null, Function1.reject()));
+                          .fold(0, null, Fn1.reject()));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -724,7 +724,7 @@ public class XformTest extends TestCase {
 
         assertEquals(Integer.valueOf(45),
                      Xform.of(Arrays.asList(ints))
-                          .fold(0, (accum, i) -> accum + i, Function1.reject()));
+                          .fold(0, (accum, i) -> accum + i, Fn1.reject()));
 
         assertEquals(Integer.valueOf(45),
                      Xform.of(Arrays.asList(ints))

@@ -266,12 +266,12 @@ DEFAULT_CONTEXT      is now   org.organicdesign.fp.collections.ComparisonContext
 org.organicdesign.fp.collections.RangeOfInt:
 LIST_EQUATOR  is now Equat.LIST
 
-org.organicdesign.fp.function.Function0:
+org.organicdesign.fp.function.Fn0:
 NULL   is now   Const.NULL
 New serializable sub-class for functions that always return the same value:
 Constant (Function0.Constant)
 
-org.organicdesign.fp.function.Function1
+org.organicdesign.fp.function.Fn1
 IDENTITY  is now  Const.IDENTITY
 ACCEPT    is now  ConstBool.ACCEPT
 REJECT    is now  ConstBool.REJECT

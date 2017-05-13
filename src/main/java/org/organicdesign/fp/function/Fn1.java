@@ -31,9 +31,9 @@ import org.organicdesign.fp.xform.Xform;
  into unchecked ones.
  */
 @FunctionalInterface
-public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
+public interface Fn1<T,U> extends Function<T,U>, Consumer<T> {
     // ========================================== Static ==========================================
-    enum Const implements Function1<Object,Object> {
+    enum Const implements Fn1<Object,Object> {
         IDENTITY {
             @Override
             public Object applyEx(Object t) throws Exception {
@@ -42,14 +42,14 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
 
             @SuppressWarnings({"unchecked", "TypeParameterExplicitlyExtendsObject"})
             @Override
-            public <S> Function1<S,Object> compose(Function1<? super S,? extends Object> f) {
+            public <S> Fn1<S,Object> compose(Fn1<? super S,? extends Object> f) {
                 // Composing any function with the identity function has no effect on the original
                 // function (by definition of identity) - just return it.
-                return (Function1<S,Object>) f;
+                return (Fn1<S,Object>) f;
             }
         }
     }
-    enum ConstBool implements Function1<Object,Boolean> {
+    enum ConstBool implements Fn1<Object,Boolean> {
         /**
          A predicate that always returns true.  Use accept() for a type-safe version of this predicate.
          */
@@ -71,12 +71,12 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
 
     /** Use {@link Const#IDENTITY} instead. */
     @Deprecated
-    Function1<Object,Object> IDENTITY = Const.IDENTITY;
+    Fn1<Object,Object> IDENTITY = Const.IDENTITY;
 
     @SuppressWarnings("unchecked")
-    static <V> Function1<V,V> identity() { return (Function1<V,V>) Const.IDENTITY; }
+    static <V> Fn1<V,V> identity() { return (Fn1<V,V>) Const.IDENTITY; }
 
-    static <S> Function1<S,Boolean> or(Function1<S,Boolean> a, Function1<S,Boolean> b) {
+    static <S> Fn1<S,Boolean> or(Fn1<S,Boolean> a, Fn1<S,Boolean> b) {
         // Composition is not necessary in every case:
         return a == ConstBool.ACCEPT ? a : // If any are true, all are true.
                a == ConstBool.REJECT ? b : // return whatever b is.
@@ -85,7 +85,7 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
                (S s) -> (a.apply(s) == Boolean.TRUE) || (b.apply(s) == Boolean.TRUE); // compose
     }
 
-    static <S> Function1<S,Boolean> and(Function1<S,Boolean> a, Function1<S,Boolean> b) {
+    static <S> Fn1<S,Boolean> and(Fn1<S,Boolean> a, Fn1<S,Boolean> b) {
         // Composition is not necessary in every case:
         return a == ConstBool.ACCEPT ? b : // return whatever b is.
                a == ConstBool.REJECT ? a : // if any are false, all are false.
@@ -94,7 +94,7 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
                (S s) -> (a.apply(s) == Boolean.TRUE) && (b.apply(s) == Boolean.TRUE); // compose
     }
 
-    static <S> Function1<S,Boolean> negate(Function1<? super S,Boolean> a) {
+    static <S> Fn1<S,Boolean> negate(Fn1<? super S,Boolean> a) {
         return a == ConstBool.ACCEPT ? reject() :
                a == ConstBool.REJECT ? accept() :
                (S s) -> (a.apply(s) == Boolean.TRUE) ? Boolean.FALSE : Boolean.TRUE;
@@ -102,19 +102,19 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
 
     /** Use {@link ConstBool#ACCEPT} instead */
     @Deprecated
-    Function1<Object,Boolean> ACCEPT = ConstBool.ACCEPT;
+    Fn1<Object,Boolean> ACCEPT = ConstBool.ACCEPT;
 
     /** Use {@link ConstBool#REJECT} instead */
     @Deprecated
-    Function1<Object,Boolean> REJECT = ConstBool.REJECT;
+    Fn1<Object,Boolean> REJECT = ConstBool.REJECT;
 
     /** Returns a type-safe version of the ConstBool.ACCEPT predicate. */
     @SuppressWarnings("unchecked")
-    static <T> Function1<T,Boolean> accept() { return (Function1<T,Boolean>) ConstBool.ACCEPT; }
+    static <T> Fn1<T,Boolean> accept() { return (Fn1<T,Boolean>) ConstBool.ACCEPT; }
 
     /** Returns a type-safe version of the ConstBool.REJECT predicate. */
     @SuppressWarnings("unchecked")
-    static <T> Function1<T,Boolean> reject() { return (Function1<T,Boolean>) ConstBool.REJECT; }
+    static <T> Fn1<T,Boolean> reject() { return (Fn1<T,Boolean>) ConstBool.REJECT; }
 
     /**
      Composes multiple functions into a single function to potentially minimize trips through
@@ -133,9 +133,9 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
      is to chain two functions with an intermediate type into a single composite function:
 
      <pre><code>
-     public static &lt;A,B,C&gt; Function1&lt;A,C&gt; chain2(final Function1&lt;A,B&gt; f1,
-                                                             final Function1&lt;B,C&gt; f2) {
-         return new Function1&lt;A,C&gt;() {
+     public static &lt;A,B,C&gt; Fn1&lt;A,C&gt; chain2(final Fn1&lt;A,B&gt; f1,
+                                                             final Fn1&lt;B,C&gt; f2) {
+         return new Fn1&lt;A,C&gt;() {
              &#64;Override
              public C applyEx(A a) throws Exception {
                  return f2.applyEx(f1.applyEx(a));
@@ -156,12 +156,12 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
 
      @return a function which applies all the given functions in order.
      */
-    static <V> Function1<V,V> compose(Iterable<Function1<V,V>> in) {
+    static <V> Fn1<V,V> compose(Iterable<Fn1<V,V>> in) {
         if (in == null) {
             return identity();
         }
-        final List<Function1<V,V>> out = new ArrayList<>();
-        for (Function1<V,V> f : in) {
+        final List<Fn1<V,V>> out = new ArrayList<>();
+        for (Fn1<V,V> f : in) {
             if ((f == null) || (f == Const.IDENTITY)) {
                 continue;
             }
@@ -174,7 +174,7 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
         } else {
             return v -> {
                 V ret = v;
-                for (Function1<V,V> f : out) {
+                for (Fn1<V,V> f : out) {
                     ret = f.applyEx(ret);
                 }
                 return ret;
@@ -197,11 +197,11 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
 
      @return a predicate which returns true if all input predicates return true, false otherwise.
      */
-    static <T> Function1<T,Boolean> and(Iterable<Function1<T,Boolean>> in) {
+    static <T> Fn1<T,Boolean> and(Iterable<Fn1<T,Boolean>> in) {
         if (in == null) { return accept(); }
 
-        Transformable<Function1<T,Boolean>> v =
-                (in instanceof UnmodIterable) ? (UnmodIterable<Function1<T,Boolean>>) in
+        Transformable<Fn1<T,Boolean>> v =
+                (in instanceof UnmodIterable) ? (UnmodIterable<Fn1<T,Boolean>>) in
                                      : Xform.of(in);
 
         return v.filter(p -> (p != null) && (p != ConstBool.ACCEPT))
@@ -226,11 +226,11 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
      @return a predicate which returns true if any of the input predicates return true,
      false otherwise.
      */
-    static <T> Function1<T,Boolean> or(Iterable<Function1<T,Boolean>> in) {
+    static <T> Fn1<T,Boolean> or(Iterable<Fn1<T,Boolean>> in) {
         if (in == null) { return reject(); }
 
-        Transformable<Function1<T,Boolean>> v =
-                (in instanceof UnmodIterable) ? (UnmodIterable<Function1<T,Boolean>>) in
+        Transformable<Fn1<T,Boolean>> v =
+                (in instanceof UnmodIterable) ? (UnmodIterable<Fn1<T,Boolean>>) in
                                      : Xform.of(in);
 
         return v.filter(p -> (p != null) && (p != ConstBool.REJECT))
@@ -242,17 +242,17 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
     enum BooleanCombiner {
         AND {
             @Override
-            public <T> Function1<T,Boolean> combine(Iterable<Function1<T,Boolean>> in) {
+            public <T> Fn1<T,Boolean> combine(Iterable<Fn1<T,Boolean>> in) {
                 return and(in);
             }
         },
         OR {
             @Override
-            public <T> Function1<T,Boolean> combine(Iterable<Function1<T,Boolean>> in) {
+            public <T> Fn1<T,Boolean> combine(Iterable<Fn1<T,Boolean>> in) {
                 return or(in);
             }
         };
-        public abstract <T> Function1<T,Boolean> combine(Iterable<Function1<T,Boolean>> in);
+        public abstract <T> Fn1<T,Boolean> combine(Iterable<Fn1<T,Boolean>> in);
     }
 
     /**
@@ -261,8 +261,8 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
      will return identical output very quickly.  Please note that the return values from f need to
      implement equals() and hashCode() correctly for this to work correctly and quickly.
      */
-    static <A,B> Function1<A,B> memoize(Function1<A,B> f) {
-        return new Function1<A,B>() {
+    static <A,B> Fn1<A,B> memoize(Fn1<A,B> f) {
+        return new Fn1<A,B>() {
             private final Map<A,Option<B>> memo = new HashMap<>();
             @Override
             public synchronized B applyEx(A a) throws Exception {
@@ -295,15 +295,15 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
     @Override default void accept(T t) { apply(t); }
 
     @SuppressWarnings("unchecked")
-    default <S> Function1<S,U> compose(final Function1<? super S, ? extends T> f) {
+    default <S> Fn1<S,U> compose(final Fn1<? super S, ? extends T> f) {
         if (f == Const.IDENTITY) {
             // This violates type safety, but makes sense - composing any function with the
             // identity function should return the original function unchanged.  If you mess up the
             // types, then that's your problem.  With generics and type erasure this may be the
             // best you can do.
-            return (Function1<S,U>) this;
+            return (Fn1<S,U>) this;
         }
-        final Function1<T,U> parent = this;
+        final Fn1<T,U> parent = this;
         return s -> parent.applyEx(f.applyEx(s));
     }
 }

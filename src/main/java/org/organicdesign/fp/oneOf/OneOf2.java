@@ -15,7 +15,7 @@
 package org.organicdesign.fp.oneOf;
 
 import org.organicdesign.fp.collections.ImList;
-import org.organicdesign.fp.function.Function1;
+import org.organicdesign.fp.function.Fn1;
 import org.organicdesign.fp.type.RuntimeTypes;
 
 import java.util.Objects;
@@ -125,8 +125,8 @@ public class OneOf2<A,B> {
     // We only store one item and it's type is erased, so we have to cast it at runtime.
     // If sel is managed correctly, it ensures that the cast is accurate.
     @SuppressWarnings("unchecked")
-    public <R> R match(Function1<A, R> fa,
-                       Function1<B, R> fb) {
+    public <R> R match(Fn1<A, R> fa,
+                       Fn1<B, R> fb) {
         if (sel == 1) {
             return fa.apply((A) item);
         }

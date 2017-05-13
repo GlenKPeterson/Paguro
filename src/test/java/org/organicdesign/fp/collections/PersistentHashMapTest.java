@@ -32,8 +32,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.FunctionUtilsTest;
+import org.organicdesign.fp.function.Fn1;
 import org.organicdesign.fp.oneOf.Option;
-import org.organicdesign.fp.function.Function1;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import static org.junit.Assert.*;
@@ -1043,7 +1043,7 @@ public class PersistentHashMapTest {
         UnmodIterable<String> seq = m.map(e -> e.getValue());
         PersistentHashSet<String> u = PersistentHashSet.empty();
         // System.out.println("Initial u: " + u);
-//        Function2<PersistentHashSet<String>,? super String,PersistentHashSet<String>> fun = (accum, t) -> accum.put(t);
+//        Fn2<PersistentHashSet<String>,? super String,PersistentHashSet<String>> fun = (accum, t) -> accum.put(t);
         // System.out.println("seq: " + seq);
         // System.out.println("===>item: " + item);
         Option<String> item = seq.head();
@@ -1263,13 +1263,13 @@ public class PersistentHashMapTest {
                                            null, tup(5, "Five"), null,
                                            tup(7, "Seven"), null, tup(9, "Nine"), null)
                                                .filter(t -> t != null)
-                                               .toImMap(Function1.identity()),
+                                               .toImMap(Fn1.identity()),
                                        max);
         FunctionUtilsTest.mapHelperEven(
                 vec(null, tup(2, "Two"), null, tup(4, "Four"), null,
                     tup(6, "Six"), null, tup(8, "Eight"), null, tup(10, "Ten"))
                         .filter(t -> t != null)
-                        .toImMap(Function1.identity()), max);
+                        .toImMap(Fn1.identity()), max);
     }
 
     @Test public void testImMap3() {
@@ -1295,11 +1295,11 @@ public class PersistentHashMapTest {
         assertEquals(a.hashCode(), c.hashCode());
         FunctionUtilsTest.mapHelperOdd(vec(tup(1, "One"), null, tup(3, "Three"))
                                                .filter(t -> t != null)
-                                               .toImMap(Function1.identity()),
+                                               .toImMap(Fn1.identity()),
                                        max);
         FunctionUtilsTest.mapHelperEven(vec(null, tup(2, "Two"), null)
                                                 .filter(t -> t != null)
-                                                .toImMap(Function1.identity()),
+                                                .toImMap(Fn1.identity()),
                                         max);
     }
 
@@ -1322,7 +1322,7 @@ public class PersistentHashMapTest {
         FunctionUtilsTest.mapHelperOdd(map(tup(1, "One")), max);
         FunctionUtilsTest.mapHelperEven(vec((Map.Entry<Integer,String>) null)
                                                 .filter(t -> t != null)
-                                                .toImMap(Function1.identity()),
+                                                .toImMap(Fn1.identity()),
                                         max);
     }
 
@@ -1390,12 +1390,12 @@ public class PersistentHashMapTest {
         verify(result, vec(tup(1, "one"), null, tup(2, "two"), null,
                            tup(3, "three"), null, tup(4, "four"))
                 .filter(t -> t != null)
-                .toImMap(Function1.identity()));
+                .toImMap(Fn1.identity()));
 
         verify(result, vec(null, tup(1, "one"), null, tup(2, "two"),
                            null, tup(3, "three"), null, tup(4, "four"), null)
                 .filter(t -> t != null)
-                .toImMap(Function1.identity()));
+                .toImMap(Fn1.identity()));
 
         verify(result, PersistentHashMap.ofEq(
                 Equator.defaultEquator(),

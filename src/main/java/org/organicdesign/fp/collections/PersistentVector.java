@@ -424,7 +424,7 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
 //    }
 
 //    @SuppressWarnings("unchecked")
-//    public <U> U reduce(Function2<U, E, U> f, U init) {
+//    public <U> U reduce(Fn2<U, E, U> f, U init) {
 //        int step = 0;
 //        for (int i = 0; i < size; i += step) {
 //            E[] array = leafNodeArrayFor(i);

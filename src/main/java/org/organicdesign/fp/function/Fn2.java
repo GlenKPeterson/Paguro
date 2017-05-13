@@ -25,7 +25,7 @@ import org.organicdesign.fp.tuple.Tuple2;
  into unchecked ones.
  */
 @FunctionalInterface
-public interface Function2<A,B,R> extends BiFunction<A,B,R> {
+public interface Fn2<A,B,R> extends BiFunction<A,B,R> {
     /** Implement this one method and you don't have to worry about checked exceptions. */
     R applyEx(A a, B b) throws Exception;
 
@@ -55,8 +55,8 @@ public interface Function2<A,B,R> extends BiFunction<A,B,R> {
      very quickly.  Please note that the parameters to f need to implement equals() and hashCode() correctly
      for this to work correctly and quickly.
      */
-    static <A,B,Z> Function2<A,B,Z> memoize(Function2<A,B,Z> f) {
-        return new Function2<A,B,Z>() {
+    static <A,B,Z> Fn2<A,B,Z> memoize(Fn2<A,B,Z> f) {
+        return new Fn2<A,B,Z>() {
             private final Map<Tuple2<A,B>,Option<Z>> map = new HashMap<>();
             @Override
             public synchronized Z applyEx(A a, B b) throws Exception {

@@ -440,8 +440,8 @@ public class PersistentTreeMap<K,V> extends UnmodSortedMap.AbstractUnmodMap<K,V>
 //    /** {@inheritDoc} */
 //    @Override public UnmodCollection<V> values() {
 //        class ValueColl<B,Z> implements UnmodCollection<B>, UnmodSortedIterable<B> {
-//            private final Function0<UnmodSortedIterator<UnEntry<Z,B>>> iterFactory;
-//            private ValueColl(Function0<UnmodSortedIterator<UnEntry<Z, B>>> f) { iterFactory = f; }
+//            private final Fn0<UnmodSortedIterator<UnEntry<Z,B>>> iterFactory;
+//            private ValueColl(Fn0<UnmodSortedIterator<UnEntry<Z, B>>> f) { iterFactory = f; }
 //
 //            @Override public int size() { return size; }
 //
@@ -550,7 +550,7 @@ public class PersistentTreeMap<K,V> extends UnmodSortedMap.AbstractUnmodMap<K,V>
 
     /**
      Returns the comparator used to order the keys in this map, or null if it uses
-     Function2.DEFAULT_COMPARATOR (for compatibility with java.util.SortedMap).
+     Fn2.DEFAULT_COMPARATOR (for compatibility with java.util.SortedMap).
      */
     @Override public Comparator<? super K> comparator() {
         return (comp == Equator.Comp.DEFAULT) ? null : comp;
@@ -973,7 +973,7 @@ public class PersistentTreeMap<K,V> extends UnmodSortedMap.AbstractUnmodMap<K,V>
             return stringify(_1) + "=" + stringify(_2);
         }
 
-//        public <R> R kvreduce(Function3<R,K,V,R> f, R init) {
+//        public <R> R kvreduce(Fn3<R,K,V,R> f, R init) {
 //            if (left() != null) {
 //                init = left().kvreduce(f, init);
 //                if (init instanceof Reduced)

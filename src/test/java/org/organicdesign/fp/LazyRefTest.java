@@ -15,7 +15,7 @@ package org.organicdesign.fp;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.organicdesign.fp.function.Function0;
+import org.organicdesign.fp.function.Fn0;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -27,7 +27,7 @@ public class LazyRefTest {
     @Test
     public void testLazyRef() {
         AtomicInteger intRef = new AtomicInteger(3);
-        Function0<Integer> f = () -> intRef.incrementAndGet();
+        Fn0<Integer> f = () -> intRef.incrementAndGet();
         assertEquals(new Integer(4), f.apply());
         assertEquals(new Integer(5), f.apply());
         assertEquals(new Integer(6), f.apply());
@@ -56,7 +56,7 @@ public class LazyRefTest {
 //    @Test
 //    public void testLazyInt() {
 //        Mutable.IntRef intRef = Mutable.IntRef.of(3);
-//        Function0<Integer> f = () -> intRef.increment().value();
+//        Fn0<Integer> f = () -> intRef.increment().value();
 //        assertEquals(f.apply(), new Integer(4));
 //        assertEquals(f.apply(), new Integer(5));
 //        assertEquals(f.apply(), new Integer(6));

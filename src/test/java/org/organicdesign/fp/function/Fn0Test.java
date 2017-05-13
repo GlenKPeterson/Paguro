@@ -11,10 +11,10 @@ import static org.junit.Assert.*;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 @RunWith(JUnit4.class)
-public class Function0Test {
+public class Fn0Test {
     @Test(expected = RuntimeException.class)
     public void applyIOException() {
-        new Function0<Integer>() {
+        new Fn0<Integer>() {
             @Override public Integer applyEx() throws Exception {
                 throw new IOException("test exception");
             }
@@ -23,7 +23,7 @@ public class Function0Test {
 
     @Test(expected = IllegalStateException.class)
     public void applyIllegalStateException() {
-        new Function0<Integer>() {
+        new Fn0<Integer>() {
             @Override public Integer applyEx() throws Exception {
                 throw new IllegalStateException("test exception");
             }
@@ -31,31 +31,31 @@ public class Function0Test {
     }
 
     @Test public void constantFunction() throws Exception {
-        Function0<Integer> f = Function0.constantFunction(7);
+        Fn0<Integer> f = Fn0.constantFunction(7);
         assertEquals(Integer.valueOf(7), f.apply());
         assertEquals(Integer.valueOf(7), f.applyEx());
         assertEquals(Integer.valueOf(7), f.get());
         assertEquals(Integer.valueOf(7), f.call());
-        assertEquals(f.hashCode(), Function0.constantFunction(Integer.valueOf(7)).hashCode());
-        assertTrue(f.equals(Function0.constantFunction(Integer.valueOf(7))));
+        assertEquals(f.hashCode(), Fn0.constantFunction(Integer.valueOf(7)).hashCode());
+        assertTrue(f.equals(Fn0.constantFunction(Integer.valueOf(7))));
 
         assertEquals("() -> 7", f.toString());
 
-        equalsDistinctHashCode(Function0.constantFunction(7),
-                               Function0.constantFunction(7),
-                               Function0.constantFunction(7),
-                               Function0.constantFunction(8));
+        equalsDistinctHashCode(Fn0.constantFunction(7),
+                               Fn0.constantFunction(7),
+                               Fn0.constantFunction(7),
+                               Fn0.constantFunction(8));
 
-        assertEquals(0, Function0.constantFunction(null).hashCode());
+        assertEquals(0, Fn0.constantFunction(null).hashCode());
 
-        assertNotEquals(Function0.constantFunction(null), null);
+        assertNotEquals(Fn0.constantFunction(null), null);
 
-        assertFalse(Function0.constantFunction(35).equals((Callable<Integer>) () -> 35));
+        assertFalse(Fn0.constantFunction(35).equals((Callable<Integer>) () -> 35));
     }
 
     @Test(expected = IllegalStateException.class)
     public void testCall() throws Exception {
-        new Function0<Integer>() {
+        new Fn0<Integer>() {
             @Override public Integer applyEx() throws Exception {
                 throw new IllegalStateException("test exception");
             }
@@ -64,6 +64,6 @@ public class Function0Test {
     }
 
     @Test public void testNull() {
-        assertNull(Function0.Const.NULL.apply());
+        assertNull(Fn0.Const.NULL.apply());
     }
 }

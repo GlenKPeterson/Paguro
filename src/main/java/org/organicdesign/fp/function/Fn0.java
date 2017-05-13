@@ -23,7 +23,7 @@ import java.util.function.Supplier;
  into unchecked ones.  It's also called a thunk when used to delay evaluation.
  */
 @FunctionalInterface
-public interface Function0<U> extends Supplier<U>, Callable<U> {
+public interface Fn0<U> extends Supplier<U>, Callable<U> {
     /** Implement this one method and you don't have to worry about checked exceptions. */
     U applyEx() throws Exception;
 
@@ -49,7 +49,7 @@ public interface Function0<U> extends Supplier<U>, Callable<U> {
 
     // ========================================== Static ==========================================
     // Enums are serializable.  Anonymous classes and lambdas are not.
-    enum Const implements Function0<Object> {
+    enum Const implements Fn0<Object> {
         NULL {
             @Override public Object applyEx() throws Exception { return null; }
         }
@@ -57,13 +57,13 @@ public interface Function0<U> extends Supplier<U>, Callable<U> {
 
     /** Use {@link Const#NULL} instead because it's serializable. */
     @Deprecated
-    Function0<Object> NULL = Const.NULL;
+    Fn0<Object> NULL = Const.NULL;
 
     /**
      Wraps a value in a constant function.  If you need to "memoize" some really expensive
      operation, use it to wrap a LazyRef.
      */
-    class Constant<K> implements Function0<K>, Serializable {
+    class Constant<K> implements Fn0<K>, Serializable {
         private static final long serialVersionUID = 201608281356L;
         private final K k;
         Constant(K theK) { k = theK; }
@@ -77,13 +77,13 @@ public interface Function0<U> extends Supplier<U>, Callable<U> {
         @Override public String toString() { return "() -> " + k; };
     }
 
-    static <K> Function0<K> constantFunction(final K k) { return new Constant<>(k); }
+    static <K> Fn0<K> constantFunction(final K k) { return new Constant<>(k); }
 //    /**
 //     Use only on pure functions with no side effects.
 //     In this case, that means a constant function (always returns the same value).
 //     */
-//    static <T> Function0<T> memoize(Function0<T> f) {
-//        return new Function0<T>() {
+//    static <T> Fn0<T> memoize(Fn0<T> f) {
+//        return new Fn0<T>() {
 //            LazyRef<T> ref = LazyRef.of(() -> f.apply());
 //            @Override public T applyEx() throws Exception {
 //                return ref.get();

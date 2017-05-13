@@ -13,8 +13,8 @@
 
 package org.organicdesign.fp.oneOf;
 
-import org.organicdesign.fp.function.Function0;
-import org.organicdesign.fp.function.Function1;
+import org.organicdesign.fp.function.Fn0;
+import org.organicdesign.fp.function.Fn1;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -39,13 +39,13 @@ public interface Option<T> extends Serializable { // extends UnmodSortedIterable
      together, failing fast at the first none() or continuing through as many operations that return
      some as possible.
      */
-    <U> Option<U> then(Function1<T,Option<U>> f);
+    <U> Option<U> then(Fn1<T,Option<U>> f);
 
     /** Is this Some? */
     boolean isSome();
 
     /** Pass in a function to execute if its Some and another to execute if its None. */
-    <U> U match(Function1<T,U> has, Function0<U> hasNot);
+    <U> U match(Fn1<T,U> has, Fn0<U> hasNot);
 
     // ========================================== Static ==========================================
     /** None is a singleton and this is its only instance. */
@@ -93,12 +93,12 @@ public interface Option<T> extends Serializable { // extends UnmodSortedIterable
 //        }
 
         /** {@inheritDoc} */
-        @Override public <U> U match(Function1<T,U> has, Function0<U> hasNot) {
+        @Override public <U> U match(Fn1<T,U> has, Fn0<U> hasNot) {
             return hasNot.get();
         }
 
         /** {@inheritDoc} */
-        @Override public <U> Option<U> then(Function1<T,Option<U>> f) { return none(); }
+        @Override public <U> Option<U> then(Fn1<T,Option<U>> f) { return none(); }
 
         /** Valid, but deprecated because it's usually an error to call this in client code. */
         @Deprecated // Has no effect.  Darn!
@@ -148,12 +148,12 @@ public interface Option<T> extends Serializable { // extends UnmodSortedIterable
 //        }
 
         /** {@inheritDoc} */
-        @Override public <U> U match(Function1<T,U> has, Function0<U> hasNot) {
+        @Override public <U> U match(Fn1<T,U> has, Fn0<U> hasNot) {
             return has.apply(item);
         }
 
         /** {@inheritDoc} */
-        @Override public <U> Option<U> then(Function1<T,Option<U>> f) { return f.apply(item); }
+        @Override public <U> Option<U> then(Fn1<T,Option<U>> f) { return f.apply(item); }
 
         /** Valid, but deprecated because it's usually an error to call this in client code. */
         @Deprecated // Has no effect.  Darn!

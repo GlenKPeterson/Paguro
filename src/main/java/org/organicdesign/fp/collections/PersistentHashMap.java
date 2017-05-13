@@ -42,7 +42,7 @@ import static org.organicdesign.fp.FunctionUtils.emptyUnmodIterator;
 public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
         implements ImUnsortedMap<K,V>, Serializable {
 
-//    static private <K, V, R> R doKvreduce(Object[] array, Function3<R,K,V,R> f, R init) {
+//    static private <K, V, R> R doKvreduce(Object[] array, Fn3<R,K,V,R> f, R init) {
 //        for (int i = 0; i < array.length; i += 2) {
 //            if (array[i] != null) {
 //                init = f.apply(init, k(array, i), v(array, i + 1));
@@ -298,7 +298,7 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
 
     @Override public final PersistentHashMap<K,V> immutable() { return this; }
 
-//    public <R> R kvreduce(Function3<R,K,V,R> f, R init) {
+//    public <R> R kvreduce(Fn3<R,K,V,R> f, R init) {
 //        init = hasNull ? f.apply(init, null, nullValue) : init;
 //        if(RT.isReduced(init))
 //            return ((IDeref)init).deref();
@@ -312,11 +312,11 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
 //        return init;
 //    }
 
-//    public <R> R fold(long n, final Function2<R,R,R> combinef, final Function3<R,K,V,R> reducef,
-//                      Function1<Function0<R>,R> fjinvoke, final Function1<Function0,R> fjtask,
-//                      final Function1<R,Object> fjfork, final Function1<Object,R> fjjoin){
+//    public <R> R fold(long n, final Fn2<R,R,R> combinef, final Fn3<R,K,V,R> reducef,
+//                      Fn1<Fn0<R>,R> fjinvoke, final Fn1<Fn0,R> fjtask,
+//                      final Fn1<R,Object> fjfork, final Fn1<Object,R> fjjoin){
 //        //we are ignoring n for now
-//        Function0<R> top = () -> {
+//        Fn0<R> top = () -> {
 //            R ret = combinef.apply(null,null);
 //            if(root != null)
 //                ret = combinef.apply(ret, root.fold(combinef, reducef, fjtask, fjfork, fjjoin));
@@ -487,11 +487,11 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
         INode<K,V> without(AtomicReference<Thread> edit, int shift, int hash, K key,
                            Box<Box> removedLeaf);
 
-//        <R> R kvreduce(Function3<R,K,V,R> f, R init);
+//        <R> R kvreduce(Fn3<R,K,V,R> f, R init);
 
-//        <R> R fold(Function2<R,R,R> combinef, Function3<R,K,V,R> reducef,
-//                   final Function1<Function0,R> fjtask,
-//                   final Function1<R,Object> fjfork, final Function1<Object,R> fjjoin);
+//        <R> R fold(Fn2<R,R,R> combinef, Fn3<R,K,V,R> reducef,
+//                   final Fn1<Fn0,R> fjtask,
+//                   final Fn1<R,Object> fjfork, final Fn1<Object,R> fjjoin);
 
         UnmodIterator<UnEntry<K,V>> iterator();
     }
@@ -564,7 +564,7 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
             return new Iter<>(array);
         }
 
-//        @Override public <R> R kvreduce(Function3<R,K,V,R> f, R init){
+//        @Override public <R> R kvreduce(Fn3<R,K,V,R> f, R init){
 //            for(INode<K,V> node : array){
 //                if(node != null){
 //                    init = node.kvreduce(f,init);
@@ -574,10 +574,10 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
 //            }
 //            return init;
 //        }
-//        @Override public <R> R fold(Function2<R,R,R> combinef, Function3<R,K,V,R> reducef,
-//                                    final Function1<Function0,R> fjtask,
-//                                    final Function1<R,Object> fjfork,
-//                                    final Function1<Object,R> fjjoin){
+//        @Override public <R> R fold(Fn2<R,R,R> combinef, Fn3<R,K,V,R> reducef,
+//                                    final Fn1<Fn0,R> fjtask,
+//                                    final Fn1<R,Object> fjfork,
+//                                    final Fn1<Object,R> fjjoin){
 //            List<Callable<R>> tasks = new ArrayList<>();
 //            for(final INode<K,V> node : array){
 //                if(node != null){
@@ -588,10 +588,10 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
 //            return foldTasks(tasks,combinef,fjtask,fjfork,fjjoin);
 //        }
 
-//        static private <R> R foldTasks(List<Callable<R>> tasks, final Function2<R,R,R> combinef,
-//                                       final Function1<Function0,R> fjtask,
-//                                       final Function1<R,Object> fjfork,
-//                                       final Function1<Object,R> fjjoin) {
+//        static private <R> R foldTasks(List<Callable<R>> tasks, final Fn2<R,R,R> combinef,
+//                                       final Fn1<Fn0,R> fjtask,
+//                                       final Fn1<R,Object> fjfork,
+//                                       final Fn1<Object,R> fjjoin) {
 //
 //            if(tasks.isEmpty())
 //                return combinef.apply(null,null);
@@ -880,14 +880,14 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
             return new NodeIter<>(array);
         }
 
-//        @Override public <R> R kvreduce(Function3<R,K,V,R> f, R init){
+//        @Override public <R> R kvreduce(Fn3<R,K,V,R> f, R init){
 //            return doKvreduce(array, f, init);
 //        }
 
-//        @Override public <R> R fold(Function2<R,R,R> combinef, Function3<R,K,V,R> reducef,
-//                                    final Function1<Function0,R> fjtask,
-//                                    final Function1<R,Object> fjfork,
-//                                    final Function1<Object,R> fjjoin){
+//        @Override public <R> R fold(Fn2<R,R,R> combinef, Fn3<R,K,V,R> reducef,
+//                                    final Fn1<Fn0,R> fjtask,
+//                                    final Fn1<R,Object> fjfork,
+//                                    final Fn1<Object,R> fjjoin){
 //            return doKvreduce(array, reducef, combinef.apply(null, null));
 //        }
 
@@ -1091,14 +1091,14 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
 
         @Override public UnmodIterator<UnEntry<K,V>> iterator() { return new NodeIter<>(array); }
 
-//        @Override public <R> R kvreduce(Function3<R,K,V,R> f, R init){
+//        @Override public <R> R kvreduce(Fn3<R,K,V,R> f, R init){
 //            return doKvreduce(array, f, init);
 //        }
 
-//        @Override public <R> R fold(Function2<R,R,R> combinef, Function3<R,K,V,R> reducef,
-//                                    final Function1<Function0,R> fjtask,
-//                                    final Function1<R,Object> fjfork,
-//                                    final Function1<Object,R> fjjoin){
+//        @Override public <R> R fold(Fn2<R,R,R> combinef, Fn3<R,K,V,R> reducef,
+//                                    final Fn1<Fn0,R> fjtask,
+//                                    final Fn1<R,Object> fjfork,
+//                                    final Fn1<Object,R> fjjoin){
 //            return doKvreduce(array, reducef, combinef.apply(null, null));
 //        }
 

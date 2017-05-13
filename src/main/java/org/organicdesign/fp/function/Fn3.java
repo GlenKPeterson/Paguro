@@ -21,7 +21,7 @@ import org.organicdesign.fp.tuple.Tuple3;
 
 /** A three-argument, exception-safe functional interface. */
 @FunctionalInterface
-public interface Function3<A,B,C,R> {
+public interface Fn3<A,B,C,R> {
     /** Implement this one method and you don't have to worry about checked exceptions. */
     R applyEx(A a, B b, C c) throws Exception;
 
@@ -46,8 +46,8 @@ public interface Function3<A,B,C,R> {
      for this to work correctly and quickly.  Also, make sure your domain is very small!  This function uses O(n^3)
      memory.
      */
-    static <A,B,C,Z> Function3<A,B,C,Z> memoize(Function3<A,B,C,Z> f) {
-        return new Function3<A,B,C,Z>() {
+    static <A,B,C,Z> Fn3<A,B,C,Z> memoize(Fn3<A,B,C,Z> f) {
+        return new Fn3<A,B,C,Z>() {
             private final Map<Tuple3<A,B,C>,Option<Z>> map = new HashMap<>();
             @Override
             public synchronized Z applyEx(A a, B b, C c) throws Exception {

@@ -21,7 +21,7 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
-import org.organicdesign.fp.function.Function2;
+import org.organicdesign.fp.function.Fn2;
 
 /**
  An unmodifiable version of {@link java.util.List} which formalizes the return type of
@@ -61,9 +61,9 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
 
     /**
      Apply the given function against all unique pairings of items in the list.  Does this belong on
-     Function2 instead of List?
+     Fn2 instead of List?
      */
-    static <T> void permutations(List<T> items, Function2<? super T,? super T,?> f) {
+    static <T> void permutations(List<T> items, Fn2<? super T,? super T,?> f) {
         for (int i = 0; i < items.size(); i++) {
             for (int j = i + 1; j < items.size(); j++) {
                 f.apply(items.get(i), items.get(j));
