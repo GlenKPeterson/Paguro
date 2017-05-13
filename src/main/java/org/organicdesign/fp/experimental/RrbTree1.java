@@ -1114,7 +1114,7 @@ involves changing more nodes than maybe necessary.
             final Node<T> splitLeft = split.left();
             if (subNodeIndex == 0) {
                 //                debug("If we have a single left node, it doesn't need a parent.");
-                System.out.println("NOPARENT");
+//                System.out.println("NOPARENT");
 
                 //noinspection unchecked
                 left = new Strict<>(shift, new Node[] {splitLeft});
@@ -1727,12 +1727,15 @@ involves changing more nodes than maybe necessary.
 //            debug("split=", split);
 
             final Node<T> left;
-            final Node<T> splitLeft = split.left();
+            Node<T> splitLeft = split.left();
+            splitLeft.debugValidate();
+
             if (subNodeIndex == 0) {
 //                debug("If we have a single left node, it doesn't need a parent.");
                 left = splitLeft;
             } else {
                 boolean haveLeft = (splitLeft.size() > 0);
+//                System.out.println("haveLeft:" + haveLeft);
                 int numLeftItems = subNodeIndex + (haveLeft ? 1 : 0);
                 int[] leftCumSizes = new int[numLeftItems];
                 Node<T>[] leftNodes = genericNodeArray(numLeftItems);
@@ -1750,6 +1753,15 @@ involves changing more nodes than maybe necessary.
                 // but that's always equal to subNodeIndex.
                 System.arraycopy(nodes, 0, leftNodes, 0, subNodeIndex);
                 if (haveLeft) {
+                    // I don't know why I have to fix this here.
+                    while (splitLeft.height() < this.height() - 1) {
+                        splitLeft = addAncestor(splitLeft);
+                    }
+                    if ( (leftNodes.length > 0) &&
+                         (leftNodes[0].height() != splitLeft.height()) ) {
+                        throw new IllegalStateException("nodesHeight: " + leftNodes[0].height() +
+                                                        " splitLeftHeight: " + splitLeft.height());
+                    }
                     leftNodes[numLeftItems - 1] = splitLeft;
                 }
                 left = new Relaxed<>(leftCumSizes, leftNodes);
@@ -2104,33 +2116,31 @@ involves changing more nodes than maybe necessary.
          @return
          */
         public static <T> Node<T> fixRight(Node<T>[] origNodes, Node<T> splitRight, int subNodeIndex) {
-            System.out.println("origNodes=" + showSubNodes(new StringBuilder(), origNodes, 10));
-            System.out.println("splitRight=" + splitRight.indentedStr(11));
-            System.out.println("subNodeIndex=" + subNodeIndex);
+//            System.out.println("origNodes=" + showSubNodes(new StringBuilder(), origNodes, 10));
+//            System.out.println("splitRight=" + splitRight.indentedStr(11));
+//            System.out.println("subNodeIndex=" + subNodeIndex);
             if (splitRight.size() == 0) {
-                System.out.println("called with splitRight.size() = 0!");
+//                System.out.println("called with splitRight.size() = 0!");
             } else if (origNodes[0].height() != splitRight.height()) {
                 throw new IllegalStateException("Passed a splitRight node of a different height than the origNodes!");
             }
             Node<T> right;
             if (subNodeIndex == (origNodes.length - 1)) {
-                System.out.println("If we have a single right node, it doesn't need a parent.");
+//                System.out.println("If we have a single right node, it doesn't need a parent.");
 //                right = splitRight;
                 //noinspection unchecked
                 right = new Relaxed<>(new int[] { splitRight.size() }, new Node[]{ splitRight });
             } else {
-                System.out.println("splitRight.size()=" + splitRight.size());
+//                System.out.println("splitRight.size()=" + splitRight.size());
                 boolean haveRightSubNode = splitRight.size() > 0;
-                System.out.println("haveRightSubNode=" + haveRightSubNode);
+//                System.out.println("haveRightSubNode=" + haveRightSubNode);
                 // If we have a rightSubNode, it's going to need a space in our new node array.
                 int numRightNodes = (origNodes.length - subNodeIndex) - (haveRightSubNode ? 0 : 1); //(splitRight.size() > 0 ? 2 : 1); // -2 when splitRight.size() > 0
-                System.out.println("numRightNodes=" + numRightNodes);
+//                System.out.println("numRightNodes=" + numRightNodes);
                 // Here the first (leftmost) node of the right-hand side was turned into the focus
                 // and we have additional right-hand origNodes to adjust the parent for.
                 int[] rightCumSizes = new int[numRightNodes];
                 Node<T>[] rightNodes = genericNodeArray(numRightNodes);
-
-                // TODO: origNodes is correct!
 
                 int cumulativeSize = 0;
                 int destCopyStartIdx = 0;
@@ -2148,8 +2158,7 @@ involves changing more nodes than maybe necessary.
                     System.arraycopy(origNodes, subNodeIndex + 1, rightNodes, 0, numRightNodes);
                 }
 
-                // TODO: rightNodes is unbalanced!
-                    System.out.println("rightNodes=" + arrayString(rightNodes));
+//                    System.out.println("rightNodes=" + arrayString(rightNodes));
 
                 // For relaxed nodes, we could calculate from previous cumulativeSizes instead of calling .size()
                 // on each one.  For strict, we could just add a strict amount.  For now, this works.

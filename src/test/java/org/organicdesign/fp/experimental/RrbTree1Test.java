@@ -381,7 +381,7 @@ public class RrbTree1Test {
                      rightControl, rightSplit);
         leftSplit.debugValidate();
         rightSplit.debugValidate();
-        System.out.println("==================================");
+//        System.out.println("==================================");
     }
 
     @Test public void splitTestPrevFail() {
@@ -671,7 +671,6 @@ public class RrbTree1Test {
 
     }
 
-    @Ignore
     @Test public void testWithout() {
         assertEquals(rrb(1,2,3,5,6), rrb(1,2,3,4,5,6).without(3));
 
@@ -689,7 +688,7 @@ public class RrbTree1Test {
                     control.add(j);
                 }
 
-            System.out.println("i: " + i);
+//            System.out.println("i: " + i);
                 control.remove(i);
                 RrbTree1 r2 = r1.without(i);
                 assertEquals(control, r2);
