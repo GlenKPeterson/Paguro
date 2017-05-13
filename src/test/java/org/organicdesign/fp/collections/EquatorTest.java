@@ -40,7 +40,41 @@ public class EquatorTest {
         assertTrue(defaultEquator().eq("Hello", "Hello"));
         assertTrue(defaultEquator().eq(Integer.MIN_VALUE, Integer.MIN_VALUE));
         assertTrue(defaultEquator().eq(Integer.MIN_VALUE + 3, Integer.MIN_VALUE + 3));
+
+        // Same thing reversed for neq.
+        assertTrue(defaultEquator().neq(null, a));
+        assertTrue(defaultEquator().neq(a, null));
+        assertTrue(defaultEquator().neq(null, "Hello"));
+        assertTrue(defaultEquator().neq("Cumquat", null));
+
+        assertFalse(defaultEquator().neq(a, a));
+        assertFalse(defaultEquator().neq("Hello", "Hello"));
+        assertFalse(defaultEquator().neq(Integer.MIN_VALUE, Integer.MIN_VALUE));
+        assertFalse(defaultEquator().neq(Integer.MIN_VALUE + 3, Integer.MIN_VALUE + 3));
     }
+
+//    @Test public void arrayEquatorTest() {
+//        assertEquals(Equat.ARRAY.hash(new Integer[] { 1, 2, 3 }),
+//                     Equat.ARRAY.hash(new Integer[] { 1, 2, 3 }));
+//
+//        assertEquals(Equat.ARRAY.hash(new Integer[] { null, 2, 3 }),
+//                     Equat.ARRAY.hash(new Integer[] { null, 2, 3 }));
+//
+//        assertNotEquals(Equat.ARRAY.hash(new Integer[] {1, 2, 3 }),
+//                        Equat.ARRAY.hash(new Integer[] { 1, 2, 4 }));
+//
+//        assertTrue(Equat.ARRAY.eq(new Integer[] {1, 2, 3 }, new Integer[] {1, 2, 3 }));
+//        assertFalse(Equat.ARRAY.eq(new Integer[] {1, 2, 3 }, new Integer[] {1, 2, 4 }));
+//
+//        assertTrue(Equat.ARRAY.eq(new Integer[] {1, null, 3 }, new Integer[] {1, null, 3 }));
+//        assertFalse(Equat.ARRAY.eq(new Integer[] {1, null, 3 }, new Integer[] {1, null, 4 }));
+//
+//        assertTrue(Equat.ARRAY.eq(null, null));
+//        assertFalse(Equat.ARRAY.eq(null, new Integer[] {1, null, 4 }));
+//        assertFalse(Equat.ARRAY.eq(new Integer[] {1, null, 3 }, null));
+//
+//        assertFalse(Equat.ARRAY.eq("hi", new Integer[] {1, null, 4 }));
+//    }
 
     class ComparableToNull<T extends Comparable<T>> implements Comparable<T> {
         private final T item;

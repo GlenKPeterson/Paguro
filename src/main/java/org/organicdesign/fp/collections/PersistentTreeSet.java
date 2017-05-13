@@ -19,7 +19,7 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.SortedSet;
 
-import org.organicdesign.fp.Option;
+import org.organicdesign.fp.oneOf.Option;
 
 import static org.organicdesign.fp.collections.Equator.defaultComparator;
 

@@ -14,6 +14,13 @@
 
 package org.organicdesign.fp.collections;
 
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.TestUtilities;
+
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,13 +28,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import org.organicdesign.fp.FunctionUtils;
-import org.organicdesign.fp.TestUtilities;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.vec;
@@ -44,6 +44,14 @@ public class PersistentVectorTest {
         ImList<Integer> list = vec(1, 2, 3);
         Integer[] resultArray = list.toArray(new Integer[3]);
         assertArrayEquals(threeIntArray, resultArray);
+
+        // Calling this with a too-small array used to result in a class-cast exception as [LObject was cast to
+        // [LInteger.  So calling with a smaller input array is an important test.
+        resultArray = list.toArray(new Integer[2]);
+        assertArrayEquals(threeIntArray, resultArray);
+
+        String[] resultArray2 = vec("hi", "bye", "ok").toArray(new String[3]);
+        assertArrayEquals(new String[] {"hi", "bye", "ok"}, resultArray2);
     }
 
     @Test
@@ -400,7 +408,7 @@ public class PersistentVectorTest {
 
     @Test public void testMutable() {
         List<Integer> control = new ArrayList<>();
-        MutableList<Integer> test = PersistentVector.<Integer>empty().mutable();
+        MutableList<Integer> test = PersistentVector.emptyMutable();
         final int SEVERAL = 2000; // more than 1024 so 3 levels deep.
         for (int i = 0; i < SEVERAL; i++) {
             control.add(i);
@@ -451,7 +459,7 @@ public class PersistentVectorTest {
         m = PersistentVector.<Integer>empty().mutable();
         assertEquals(Arrays.asList(3, 5, 7), m.append(3).append(5).append(7));
         assertEquals(Arrays.asList(3, 5, 7), m.immutable());
-        assertEquals(Arrays.asList(3, 5, 7), PersistentVector.empty().mutable().append(3).append(5).append(7));
+        assertEquals(Arrays.asList(3, 5, 7), PersistentVector.emptyMutable().append(3).append(5).append(7));
 
     }
 

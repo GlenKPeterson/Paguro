@@ -1,12 +1,13 @@
 <html>
 <body>
-<p>This approximates union of two types for Java - for when something (e.g. a return type) can be
-    exactly one of a number of things.</p>
+<p>This approximates union types for Java - for when something (e.g. a return type) can be
+    exactly one of some number of things.  This is NOT variance or inheritance (Cars and Trucks are Vehicles),
+this is one un-related thing or another (a set of things that are either Trucks OR Happiness).</p>
 
 <p>Java has specifically avoided union types in favor of defining a super-type and making those
     other two types extend the new parent.  But sometimes you don't have control of the two types to
-    make them inherit from a common ancestor.  Sometimes, one hierarchy makes sense in one context
-    and another hierarchy makes sense in another.</p>
+    make them inherit from a common ancestor (like Trucks and Happiness).  Sometimes, one hierarchy
+    makes sense in one context and another hierarchy makes sense in another.</p>
 
 <p>For example, in the Serialization code for PersistentVector, we use a SerializationProxy to
     handle the actual serialization and deserialization of PersistentVectors.  Our proxy has
@@ -19,8 +20,8 @@
     accident.  So that would be the opposite inheritance hierarchy.  Really, we want to move
     to a type system where types are sets so that you can have an ImmutableOrMutable type and
     a OnlyImmutable type and have PersistentVector be one in one circumstance and the other in
-    the other circumstance.  ML had this in 1990.  Haskell took it from there.  Then Object Oriented
-    programming took the world by storm and no-one had any interest in types without Objects.
+    the other circumstance.  ML had this in 1990.  Haskelltook it from there.  Then Object Oriented
+    programming took the world by storm and in types without Objects waned.
     In retrospect, we may have missed something.</p>
 
 <p>If you like Paguro and are interested in a new JVM and maybe compile-to-JavaScript language
@@ -28,7 +29,5 @@
     evolving spec for the
     <a href="https://github.com/GlenKPeterson/Cymling" target="_blank">Cymling</a> programming
     language.  It may need some help to become reality.</p>
-
-</p>
 </body>
 </html>

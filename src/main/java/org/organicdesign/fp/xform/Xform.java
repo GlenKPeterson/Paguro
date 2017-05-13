@@ -15,7 +15,7 @@
 package org.organicdesign.fp.xform;
 
 import org.organicdesign.fp.FunctionUtils;
-import org.organicdesign.fp.Or;
+import org.organicdesign.fp.oneOf.Or;
 import org.organicdesign.fp.collections.UnmodIterable;
 import org.organicdesign.fp.collections.UnmodIterator;
 import org.organicdesign.fp.function.Function1;

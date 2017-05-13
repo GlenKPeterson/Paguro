@@ -1,5 +1,105 @@
 # Change Log
 
+Bigger headings are better releases.  If you're upgrading, you might want to hit the biggest
+releases on the way from an old version to a new one.  Fix any deprecation warnings at each major
+release before upgrading to the next one.  The documentation next to each Deprecated annotation
+tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
+
+## 2017-05-04 Release 2.1.1
+Fixed array class cast exception bug reported by @BrenoTrancoso https://github.com/GlenKPeterson/Paguro/issues/17
+Thank you for finding and reporting this tricky issue!
+
+### 2017-01-25 Release 2.1.0
+Breaking Changes:
+ - All "OneOf" classes are moved to org.organicdesign.fp.oneOf.  This includes
+     - OneOf2 org.organicdesign.fp.either
+     - Option and Or from org.organicdesign.fp
+
+   OneOf2 now implements equals(), hashCode(), toString(), and has meaningful error messages
+   which show the types of the union at runtime in `toString()` and in exception messages.
+   Option was moved because it is essentially OneOfOneOrNone.
+   Or was moved because it is an implementation of OneOf2.
+   Presumably, there will be a OneOf2OrNone, OneOf3, OneOf3OrNone, etc.
+ - `Option.patMatch()` and `OneOf2.typeMatch()` methods have been renamed simply `match()`.
+
+Non-breaking Changes:
+ - Added org.organicdesign.fp.type.RuntimeTypes.
+   This takes types used for generic parameters at compile time and makes them available at runtime.
+   Lets people develop programming languages without type erasure on the JVM and
+   it comes in very handy at various times, like for OneOf_ (Union types, Or, etc.).
+ - Paguro has gone from Functional Transforms in Java 7 to include unmodifiable (copy-on-write) collections like Guava to making Clojure collections and FP concepts convenient in pure-Java.
+   Long-term, Paguro is intended to be the Java-compatibility (and maybe Kotlin compatibility?) layer for https://github.com/GlenKPeterson/Cymling
+   The Cymling programming language basically splits the difference between Clojure (collections and xforms, assumption of immutability),
+   ML (types without objects, records/tuples instead of Clojure's maps), and Kotlin (dot syntax, function syntax, null safety),
+   Anyone who likes Paguro might want to keep an eye on Cymling development.
+
+Upgrade Instructions:
+You can use sed to fix imports for moved classes.
+```bash
+# USE CAUTION AND HAVE A BACKUP OF YOUR SOURCE CODE (E.G. VERSION CONTROL) - NO GUARANTEES
+oldString='import org.organicdesign.fp.Option'
+newString='import org.organicdesign.fp.oneOf.Option'
+sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir='.git' -rIl "$oldString" *)
+
+oldString='import org.organicdesign.fp.Or'
+newString='import org.organicdesign.fp.oneOf.Or'
+sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir='.git' -rIl "$oldString" *)
+
+oldString='import org.organicdesign.fp.either.OneOf2'
+newString='import org.organicdesign.fp.oneOf.OneOf2;\nimport org.organicdesign.fp.type.RuntimeTypes'
+sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir='.git' -rIl "$oldString" *)
+
+unset oldString
+unset newString
+```
+Then, for any place you exteded OneOf2 you'll manually need to add:
+```java
+public class Foo_Bar extends OneOf2<Foo,Bar> {
+    private static final ImList<Class> TYPES = RuntimeTypes.registerClasses(vec(Foo.class, Bar.class));
+    MyClass(Foo f, Bar b, int s) { super(TYPES, f, b, s); }
+```
+
+Manually change `.typeMatch(` and `.patMat(` to just `.match(` (or you could use sed as above)
+
+If you used the static method:
+```java
+Or.patMatch(x,
+            g -> g.apply(),
+            b -> b.apply())
+```
+You'll need to check that x cannot be null, then change it to:
+```java
+x.match(g -> g.apply(),
+        b -> b.apply())
+```
+
+### 2017-01-16 Release 2.0.20
+ - Added Equator.neq() which just returns !eq() (convenience method)
+
+### 2017-01-12 Release 2.0.19
+ - Added min() and max() to ComparisonContext.  Each takes a list which could contain nulls
+   and tries its best to return a non-null result.  Should it throw an exception if the result
+   is null?  I dunno.
+
+### 2017-01-12 Release 2.0.18
+ - Fixed ComparisonContext.eq(), lt(), lte(), gt(), gte() to check for null arguments before calling compare()
+   because compare() typically throws exceptions for nulls, null always equals null,
+   and null never equals anything else.  If a method returns true for equals or false for neq, do
+   that, otherwise throw an exception if a null argument is given.
+ - Removed Deprecated items from Equator.
+ - Added test.
+
+#### 2017-01-08 Release 2.0.16
+ - Changed return type of StaticImports: xform() and xformArray() from Transformable to UnmodIterable.
+   Thanks to @BrenoTrancoso for finding this and suggesting the fix!
+
+#### 2016-11-13 Release 2.0.15
+ - Added the following convenience methods to StaticImports: mutableVec(items...), mutableSet(items...), mutableMap(items...), xformArray(items...).
+
+# 2016-11-13 Release 2.0.14
+ - Renamed Maven artifact from UncleJim to Paguro.
+ - No other changes made!
+
 ## 2016-09-21 Release 2.0.13
  - FunctionUtils
     - The unmodifiable collection wrappers are now serializable, but the empty collections are no longer singletons:
@@ -23,17 +123,17 @@
  - New: UnmodIterable.AbstractUnmodIterable defines hashCode() and toString() for all collections
    (except List which needs a different implementation to be compatible with java.util.List).
  - New: UnmodMap.AbstractUnmodMap defines equals() for maps.  Made PersistentHashMap and MutableHashMap extend this. 
- - New: UnmodSet.AbstractUnmodSet defines equals() for maps.  Made PersistentHashSet and MutableHashSet extend this.
+ - New: UnmodSet.AbstractUnmodSet defines equals() for sets.  Made PersistentHashSet and MutableHashSet extend this.
  - New: UnmodList.AbstractUnmodList defines equals() and hashcode() for lists.  Made PersistentVector and MutableVector extend this.
 
-## 2016-09-17 Release 2.0.12
+### 2016-09-17 Release 2.0.12
  - Changed order of serialization for PersistentTreeMap.  Because it uses a serialization proxy, it
  should still deserialize TreeMaps serialized before this change.  The serialization format has not
  changed, only the order of elements is changed such that it should serialize at approximately the
  same speed and deserialize without any internal rotations or re-balancing (therefore faster).
  Full details in comments in org.organicdesign.fp.collections.PersistentTreeMap.SerializationProxy
 
-## 2016-09-17 Release 2.0.11
+### 2016-09-17 Release 2.0.11
  - Renamed static method UnmodIterable.hashCode() to UnmodIterable.hash() to avoid confusion.
  Deprecated old method.
  - Made Option serializable and added tests for same.
@@ -42,19 +142,19 @@
  - Increased PersistentHashMap test coverage by covering its internal MutableUnsortedMap better.
  - Cleaned up some of the oldest documentation (mostly deleted duplicates).
 
-## 2016-09-14 Release 2.0.10:
+### 2016-09-14 Release 2.0.10:
  - Renamed UnmodIterator.Implementation to UnmodIterator.Wrapper to mirror UnmodSortedIterator.Wrapper and because it's just a better name.
  - Added tests.
 
-## 2016-09-13 Release 2.0.9:
+### 2016-09-13 Release 2.0.9:
  - Fixed return type of ImUnsortedMap and MutableUnsortedMap.assoc(Map.Entry).  Thanks @pniederw for reporting!
  - Made ImUnsortedSet use MutableUnsortedSet's implementation of union() instead of the other way around.
  - Added tests.
 
-## 2016-09-11 Release 2.0.8:
+### 2016-09-11 Release 2.0.8:
  - Fixed illegal cast in MutableList.concat and made test for same.  Thanks to @pniederw for this!
 
-## 2016-09-11 Release 2.0.7:
+### 2016-09-11 Release 2.0.7:
  - Massive renaming of newly exposed interfaces and methods.
     - ImUnsortMap is now ImUnsortedMap
     - ImUnsortSet is now ImUnsortedSet
@@ -79,15 +179,15 @@ I am leaving Rich's 5 file names as a tribute to how awesome he is and so that p
 about the Clojure collections won't be surprised, and to show what still carries his license
 (Eclipse 1.0).
 
-## 2016-09-10 Release 2.0.6: USE 2.0.7+ INSTEAD!
+#### 2016-09-10 Release 2.0.6: USE 2.0.7+ INSTEAD!
  - Added asTransient() to ImList.
 
-## 2016-09-10 Release 2.0.5: USE 2.0.7+ INSTEAD!
+#### 2016-09-10 Release 2.0.5: USE 2.0.7+ INSTEAD!
  - Moved persistent() from ImListTrans to ImList and made PersistentVector implement ImList instead of ImListTrans.
    This just makes a lot more sense.  It shouldn't break any sensible client code.
  - Added ImList.reverse().  @pniederw had asked for this.  Sorry for the wait.
 
-## 2016-09-10 Release 2.0.4: USE 2.0.7+ INSTEAD!
+#### 2016-09-10 Release 2.0.4: USE 2.0.7+ INSTEAD!
  - Made PersistentTreeMap return serializable Tuple2's.  Actually these are subclasses of internal nodes that still contain
    big chunks of the treemap, but those chunks are transient (not serializable) and private.
    When deserialized, they become plain old Tuple2's.
@@ -101,13 +201,13 @@ about the Clojure collections won't be surprised, and to show what still carries
  - Added CodeStylePaguro.xml for Idea to import.
  - Found some opportunities to use mutable implementations more efficiently.
 
-#### Still *NOT* Serializable
+###### Still *NOT* Serializable
  - FunctionUtils.unmodifiable___() methods are not serializable (yet?).
  - Transformable is not serializable (should it be?)
 
 Issues?  Questions?  Provide feedback on the [Serialization enhancement request](https://github.com/GlenKPeterson/Paguro/issues/10)
 
-## 2016-09-10 Release 2.0.3: Serializable (Part 3)
+### 2016-09-10 Release 2.0.3: Serializable (Part 3)
  - Reverted the most serious breaking changes from previous 2.0.x releases.
    Going from 1.x to 2.0.3+ in the two projects I use Paguro in, no changes were necessary.
  - Tuples all implement Serializable.
@@ -120,17 +220,17 @@ Issues?  Questions?  Provide feedback on the [Serialization enhancement request]
  - Removed KeyVal class and made Tuples serializable instead.  Back to using tup() instead of kv()
  - Static method UnmodSortedIterable.equals() has been deprecated (renamed to UnmodSortedIterable.equal() to avoid confusion with Object.equals()).
 
-## 2016-09-01 Release 2.0.2: USE 2.0.3+ INSTEAD!
+#### 2016-09-01 Release 2.0.2: USE 2.0.3+ INSTEAD!
  - Gave 5 main collections custom serialized forms (after reading Josh Bloch) so that we can change
    the implementations later without breaking any clients who are using them for long-term storage.
  - Decided *NOT* to make any itera**tors** serializable.
  - Improved tests a bit, especially for serialization.
 
-## 2016-09-01 Release 2.0.1: USE 2.0.3+ INSTEAD!
+#### 2016-09-01 Release 2.0.1: USE 2.0.3+ INSTEAD!
  - Made UnmodSortedIterable.castFrom... methods generic and serializable (and wrote tests for same).
  - Fixed some Javadoc link errors.
 
-## 2016-08-27 Release 2.0.0: USE 2.0.3+ INSTEAD - ALL SIGNIFICANT BREAKING CHANGES WERE REVERTED!
+#### 2016-08-27 Release 2.0.0: USE 2.0.3+ INSTEAD - ALL SIGNIFICANT BREAKING CHANGES WERE REVERTED!
 This is a major release due to making a new serializable format.
  - Anything that used to be implemented as an anonymous class, object, or lambda is now implemented as an enum or serializable sub-class.
  - Hash codes of all tuples are now calculated by adding together the hash codes of all member items.

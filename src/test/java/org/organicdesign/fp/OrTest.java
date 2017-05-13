@@ -14,6 +14,7 @@
 package org.organicdesign.fp;
 
 import org.junit.Test;
+import org.organicdesign.fp.oneOf.Or;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
@@ -25,9 +26,8 @@ public class OrTest {
         assertFalse(or.isGood());
         assertEquals("Hello", or.bad());
 
-        assertTrue(Or.patMatch(or,
-                               (g) -> Boolean.FALSE,
-                               (b) -> "Hello".equals(b)));
+        assertTrue(or.match((g) -> Boolean.FALSE,
+                            (b) -> "Hello".equals(b)));
     }
 
     @Test public void good() {
@@ -36,28 +36,20 @@ public class OrTest {
         assertTrue(or.isGood());
         assertEquals("Hello", or.good());
 
-        assertTrue(Or.patMatch(or,
-                               (g) -> "Hello".equals(g),
-                               (b) -> Boolean.FALSE));
+        assertTrue(or.match((g) -> "Hello".equals(g),
+                            (b) -> Boolean.FALSE));
     }
 
     @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
+    @Test (expected = IllegalStateException.class)
     public void badEx() {
         Or.bad("Hello").good();
     }
 
     @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
+    @Test (expected = IllegalStateException.class)
     public void goodEx() {
         Or.good("Hello").bad();
-    }
-
-    @Test (expected = IllegalArgumentException.class)
-    public void patMatchNullEx() {
-        Or.patMatch(null,
-                    (b) -> Boolean.FALSE,
-                    (g) -> "Hello".equals(g));
     }
 
     @Test public void equalsHashCodeToStr() {
@@ -72,17 +64,19 @@ public class OrTest {
                                Or.bad("Hello"));
 
         Or<Integer,String> b = Or.bad("Hello");
+//        System.out.println("b:" + b.toString());
         assertEquals(b.hashCode(), Or.bad("Hello").hashCode());
         assertTrue(b.equals(Or.bad("Hello")));
 
         Or<String,Integer> g = Or.good("Hello");
+//        System.out.println("g:" + g);
         assertEquals(g.hashCode(), Or.good("Hello").hashCode());
         assertTrue(g.equals(Or.good("Hello")));
 
         assertNotEquals(b.hashCode(), g.hashCode());
         assertNotEquals(b, g);
 
-        assertEquals("Bad(Hello)", b.toString());
-        assertEquals("Good(Hello)", g.toString());
+        assertEquals("Bad(\"Hello\")", b.toString());
+        assertEquals("Good(\"Hello\")", g.toString());
     }
 }

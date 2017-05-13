@@ -16,7 +16,7 @@ package org.organicdesign.fp.function;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.organicdesign.fp.Option;
+import org.organicdesign.fp.oneOf.Option;
 import org.organicdesign.fp.tuple.Tuple3;
 
 /** A three-argument, exception-safe functional interface. */

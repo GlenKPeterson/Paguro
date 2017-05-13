@@ -13,14 +13,14 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
+import org.organicdesign.fp.tuple.Tuple2;
+
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-
-import org.organicdesign.fp.tuple.Tuple2;
 
 /**
  An unmodifiable map.
@@ -198,7 +198,11 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
 //            };
 //        }
 //
-        /** Not allowed - this is supposed to be unmodifiable */
+        /**
+         Not compatible with immutability - use
+         {@link ImMap#assoc(Object, Object)}
+         instead because it returns a new map.
+         */
         @SuppressWarnings("deprecation")
         @Override @Deprecated default V setValue(V value) {
             throw new UnsupportedOperationException("Modification attempted");
@@ -363,7 +367,11 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
                     BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
         throw new UnsupportedOperationException("Modification attempted");
     }
-    /** Not allowed - this is supposed to be unmodifiable */
+    /**
+     Not compatible with immutability - use
+     {@link ImMap#assoc(Object, Object)}
+     instead because it returns a new map.
+     */
     @Override @Deprecated default V put(K key, V value) {
         throw new UnsupportedOperationException("Modification attempted");
     }

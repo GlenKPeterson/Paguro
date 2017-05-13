@@ -1,7 +1,7 @@
 package org.organicdesign.fp.collections;
 
 import org.junit.Test;
-import org.organicdesign.fp.Option;
+import org.organicdesign.fp.oneOf.Option;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import java.util.HashMap;

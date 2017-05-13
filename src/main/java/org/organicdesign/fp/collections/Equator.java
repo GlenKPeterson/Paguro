@@ -14,6 +14,7 @@
 
 package org.organicdesign.fp.collections;
 
+import java.util.Arrays;
 import java.util.Comparator;
 
 /**
@@ -42,6 +43,10 @@ public interface Equator<T> {
 
     // Enums are serializable and lambdas are not.  Therefore enums make better singletons.
     enum Equat implements Equator<Object> {
+        /**
+         Assumes the object is not an array.  Default array.equals() is == comparison which is probably not what
+         you want.
+         */
         DEFAULT {
             @Override public int hash(Object o) {
                 return (o == null) ? 0 : o.hashCode();
@@ -51,16 +56,21 @@ public interface Equator<T> {
                 if (o1 == null) { return (o2 == null); }
                 return o1.equals(o2);
             }
+//        },
+//        ARRAY {
+//            @Override public int hash(Object o) {
+//                return Arrays.hashCode( (Object[]) o);
+//            }
+//
+//            @Override public boolean eq(Object o1, Object o2) {
+//                try {
+//                    return Arrays.equals((Object[]) o1, (Object[]) o2);
+//                } catch (Exception e) {
+//                    return false;
+//                }
+//            }
         }
     }
-
-    /**
-     Use Equat.DEFAULT instead.
-     Being an enum, it's serializable and makes a better singleton.
-     Deprecated as of 1.1.0, 2016-08-27
-     */
-    @Deprecated
-    Equator<Object> DEFAULT_EQUATOR = Equat.DEFAULT;
 
     @SuppressWarnings("unchecked")
     static <T> Equator<T> defaultEquator() { return (Equator<T>) Equat.DEFAULT; }
@@ -80,24 +90,8 @@ public interface Equator<T> {
         }
     }
 
-    /**
-     Use Comp.DEFAULT instead.
-     Being an enum, it's serializable and makes a better singleton.
-     Deprecated as of 1.1.0, 2016-08-27
-     */
-    @Deprecated
-    Comparator<Comparable<Object>> DEFAULT_COMPARATOR = Comp.DEFAULT;
-
     @SuppressWarnings("unchecked")
     static <T> Comparator<T> defaultComparator() { return (Comparator<T>) Comp.DEFAULT; }
-
-    /**
-     Use ComparisonContext.CompCtx.DEFAULT instead.
-     Being an enum, it's serializable and makes a better singleton.
-     Deprecated as of version 1.1.0, 2016-08-27
-     */
-    @Deprecated
-    ComparisonContext<Comparable<Object>> DEFAULT_CONTEXT = ComparisonContext.CompCtx.DEFAULT;
 
     // ========================================= Instance =========================================
     /**
@@ -114,8 +108,18 @@ public interface Equator<T> {
     /**
      Determines whether two objects are equal.  The name of this method is short so that
      auto-complete can offer it before equals().
+
+     You can do anything you want here, but consider having null == null but null != anything else.
+
      @return true if this Equator considers the two objects to be equal.
      */
     boolean eq(T o1, T o2);
 
+    /**
+     Returns true if two objects are NOT equal.  By default, just delegates to {@link #eq(Object, Object)} and reverses
+     the result.
+
+     @return true if this Equator considers the two objects to NOT be equal.
+     */
+    default boolean neq(T o1, T o2) { return !eq(o1, o2); }
 }

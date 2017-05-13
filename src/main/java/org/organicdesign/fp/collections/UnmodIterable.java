@@ -1,6 +1,6 @@
 package org.organicdesign.fp.collections;
 
-import org.organicdesign.fp.Option;
+import org.organicdesign.fp.oneOf.Option;
 import org.organicdesign.fp.function.Function1;
 import org.organicdesign.fp.function.Function2;
 import org.organicdesign.fp.xform.Transformable;

@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.organicdesign.fp;
+package org.organicdesign.fp.oneOf;
 
 import org.organicdesign.fp.function.Function0;
 import org.organicdesign.fp.function.Function1;
@@ -20,9 +20,9 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- Indicates presence or absence of a value (null is a valid, present value) or end-of-stream.
- This is NOT a type-safe null.
- @param <T>
+ Indicates presence or absence of a value (null is a valid, present value).  None often means "end of stream" or
+ "none found". This is NOT a type-safe null (unless you want that, in which case use the
+ {@link #someOrNullNoneOf(Object)} static factory method).  You can think of this class as OneOf1OrNone.
  */
 public interface Option<T> extends Serializable { // extends UnmodSortedIterable<T> {
 
@@ -45,7 +45,7 @@ public interface Option<T> extends Serializable { // extends UnmodSortedIterable
     boolean isSome();
 
     /** Pass in a function to execute if its Some and another to execute if its None. */
-    <U> U patMat(Function1<T,U> has, Function0<U> hasNot);
+    <U> U match(Function1<T,U> has, Function0<U> hasNot);
 
     // ========================================== Static ==========================================
     /** None is a singleton and this is its only instance. */
@@ -93,7 +93,7 @@ public interface Option<T> extends Serializable { // extends UnmodSortedIterable
 //        }
 
         /** {@inheritDoc} */
-        @Override public <U> U patMat(Function1<T,U> has, Function0<U> hasNot) {
+        @Override public <U> U match(Function1<T,U> has, Function0<U> hasNot) {
             return hasNot.get();
         }
 
@@ -148,7 +148,7 @@ public interface Option<T> extends Serializable { // extends UnmodSortedIterable
 //        }
 
         /** {@inheritDoc} */
-        @Override public <U> U patMat(Function1<T,U> has, Function0<U> hasNot) {
+        @Override public <U> U match(Function1<T,U> has, Function0<U> hasNot) {
             return has.apply(item);
         }
 

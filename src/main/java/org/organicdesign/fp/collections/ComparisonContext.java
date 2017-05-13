@@ -15,10 +15,18 @@
 package org.organicdesign.fp.collections;
 
 import java.util.Comparator;
+import java.util.Iterator;
 
 /**
  Implement compare() and hash() and you get a 100% compatible eq() for free.  If you don't need
- Comparator, just use {@link Equator}.
+ Comparator, just use {@link Equator}.  Typical implementations compare() throw an
+ IllegalArgumentException if one parameter is null (if both are null, it's probably OK to return 0).
+
+ Only null is equal to null.  If we are passed only one null value, it can't equal the other (two
+ nulls are always equal).  Many correct implementations of compare(null, nonNull) throw
+ IllegalArgumentExceptions if one argument is null because most objects cannot be meaningfully
+ be orderd with respect to null, but that's OK because for default implementations of eq(), gte(),
+ and lte() check for nulls first, then check the output of compare().
 
  A common mistake is to implement a ComparisonContext, Equator, or Comparator as an anonymous class
  or lambda, then be surprised when it is can't be serialized, or is deserialized as null.  These
@@ -31,15 +39,64 @@ public interface ComparisonContext<T> extends Equator<T>, Comparator<T> {
     default boolean lt(T o1, T o2) { return compare(o1, o2) < 0; }
 
     /** Returns true if the first object is less than or equal to the second. */
-    default boolean lte(T o1, T o2) { return compare(o1, o2) <= 0; }
+    default boolean lte(T o1, T o2) {
+        if ( (o1 == null) || (o2 == null) ) { return (o1 == o2); }
+        return compare(o1, o2) <= 0;
+    }
 
     /** Returns true if the first object is greater than the second. */
     default boolean gt(T o1, T o2) { return compare(o1, o2) > 0; }
 
     /** Returns true if the first object is greater than or equal to the second. */
-    default boolean gte(T o1, T o2) { return compare(o1, o2) >= 0; }
+    default boolean gte(T o1, T o2) {
+        if ( (o1 == null) || (o2 == null) ) { return (o1 == o2); }
+        return compare(o1, o2) >= 0;
+    }
 
-    @Override default boolean eq(T o1, T o2) { return compare(o1, o2) == 0; }
+    /**
+     The default implementation of this method returns false if only one parameter is null then
+     checks if compare() returns zero.
+     */
+    @Override default boolean eq(T o1, T o2) {
+        if ( (o1 == null) || (o2 == null) ) { return (o1 == o2); }
+
+        // Now they are equal if compare returns zero.
+        return compare(o1, o2) == 0;
+    }
+
+    default T min(Iterable<T> is) {
+        // Note: following code is identical to max() except for lt() vs. gt()
+        if (is == null) { throw new IllegalArgumentException("null argument"); }
+        Iterator<T> iter = is.iterator();
+        T ret = null;
+        while ( (ret == null) && iter.hasNext() ) {
+            ret = iter.next();
+        }
+        while (iter.hasNext()) {
+            T next = iter.next();
+            if ( (next != null) && lt(next, ret) ) {
+                ret = next;
+            }
+        }
+        return ret; // could be null if all items are null.
+    }
+
+    default T max(Iterable<T> is) {
+        // Note: following code is identical to min() except for lt() vs. gt()
+        if (is == null) { throw new IllegalArgumentException("null argument"); }
+        Iterator<T> iter = is.iterator();
+        T ret = null;
+        while ( (ret == null) && iter.hasNext() ) {
+            ret = iter.next();
+        }
+        while (iter.hasNext()) {
+            T next = iter.next();
+            if ( (next != null) && gt(next, ret) ) {
+                ret = next;
+            }
+        }
+        return ret; // could be null if all items are null.
+    }
 
     // Enums are serializable and lambdas are not.  Therefore enums make better singletons.
     enum CompCtx implements ComparisonContext<Comparable<Object>> {

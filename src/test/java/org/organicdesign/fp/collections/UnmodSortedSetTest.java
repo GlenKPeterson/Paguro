@@ -82,7 +82,7 @@ public class UnmodSortedSetTest {
         assertEquals(1, unSortSet.tailSet("goat").size());
         assertTrue(unSortSet.tailSet("goat").contains("goat"));
 
-//        ImSortedSet<String> unionized = unSortSet.union(Arrays.asList("horse", "iguana"));
+//        ImSortedSet<String> unionized = unSortSet.oneOf(Arrays.asList("horse", "iguana"));
 //        assertEquals(unSortSet.size() + 2, unionized.size());
 //        assertTrue(unionized.containsAll(unSortSet));
 //        assertFalse(unSortSet.containsAll(unionized));

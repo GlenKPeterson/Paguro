@@ -37,13 +37,12 @@ They say that the Maven search site can take up to 2 hours to update:
 http://mvnrepository.com/artifact/org.organicdesign/Paguro
 	-->
 	<groupId>org.organicdesign</groupId>
-	<!-- NOTE: artifactId will change to "Paguro" in November 2016 -->
-	<artifactId>UncleJim</artifactId>
+	<artifactId>Paguro</artifactId>
 	<version>3.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>Paguro (formerly known as "UncleJim" - artifact name will officially change November 2016)</name>
-	<description>Immutable Clojure collections and a Transformation abstraction for Java 8+, immutably, type-safely, and with good performance.  Name will change to "Paguro" in November 2016.</description>
+	<name>Paguro</name>
+	<description>Immutable Clojure collections and a Transformation abstraction for Java 8+, immutably, type-safely, and with good performance.</description>
 	<url>https://github.com/GlenKPeterson/Paguro</url>
 
 	<licenses>

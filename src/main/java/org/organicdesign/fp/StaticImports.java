@@ -14,24 +14,27 @@
 
 package org.organicdesign.fp;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Map;
-
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.ImMap;
 import org.organicdesign.fp.collections.ImSet;
 import org.organicdesign.fp.collections.ImSortedMap;
 import org.organicdesign.fp.collections.ImSortedSet;
+import org.organicdesign.fp.collections.MutableList;
+import org.organicdesign.fp.collections.MutableUnsortedMap;
+import org.organicdesign.fp.collections.MutableUnsortedSet;
 import org.organicdesign.fp.collections.PersistentHashMap;
 import org.organicdesign.fp.collections.PersistentHashSet;
 import org.organicdesign.fp.collections.PersistentTreeMap;
 import org.organicdesign.fp.collections.PersistentTreeSet;
 import org.organicdesign.fp.collections.PersistentVector;
+import org.organicdesign.fp.collections.UnmodIterable;
 import org.organicdesign.fp.tuple.Tuple2;
 import org.organicdesign.fp.tuple.Tuple3;
-import org.organicdesign.fp.xform.Transformable;
 import org.organicdesign.fp.xform.Xform;
+
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Map;
 
 /**
  <p>A mini data definition language composed of vec(), tup(), map(), set(), plus xform() which makes
@@ -51,9 +54,9 @@ import org.organicdesign.fp.xform.Xform;
  // Create a map with a few key value pairs
  map(tup("a", 1), tup("b", 2), tup("c", 3);</code></pre>
 
- <p>vec(), map(), and set() are the only three methods in this project to take varargs.  I tried
- writing out versions that took multiple type-safe arguments, but IntelliJ presented you with a
- menu of all of them for auto-completion which was overwhelming, so I reverted to varargs.  Also,
+ <p>There are only a few methods in this project to take varargs and they are all in this file.
+ Writing out versions that took multiple type-safe arguments caused IntelliJ to present all of them
+ for auto-completion which was overwhelming, so I reverted to varargs.  Also,
  varargs relax some type safety rules (variance) for data definition in a generally helpful (rarely
  dangerous) way.</p>
 
@@ -73,18 +76,18 @@ public final class StaticImports {
     // Prevent instantiation
     private StaticImports() { throw new UnsupportedOperationException("No instantiation"); }
 
-    /**
-     This turned out to be a bad idea due to the complexity and slowness of serializing
-     a class extended from an immutable tuple.  I made tuples serializable and was able to back out
-     other breaking changes.
-     */
-    @Deprecated
-    public static <K,V> Tuple2<K,V> kv(K t, V u) { return Tuple2.of(t, u); }
+//    /**
+//     This turned out to be a bad idea due to the complexity and slowness of serializing
+//     a class extended from an immutable tuple.  I made tuples serializable and was able to back out
+//     other breaking changes.
+//     */
+//    @Deprecated
+//    public static <K,V> Tuple2<K,V> kv(K t, V u) { return Tuple2.of(t, u); }
 
     /**
      Returns a new PersistentHashMap of the given keys and their paired values.  Use the
      {@link StaticImports#tup(Object, Object)} method to define those key/value pairs briefly and
-     easily.  This data definition method is one of the three methods in this project that support
+     easily.  This data definition method is one of the few methods in this project that support
      varargs.
 
      @param kvPairs Key/value pairs (to go into the map).  In the case of a duplicate key, later
@@ -100,7 +103,58 @@ public final class StaticImports {
     }
 
     /**
-     Returns a new PersistentHashSet of the values.  This data definition method is one of the three
+     Returns a new MutableUnsortedMap of the given keys and their paired values.  Use the
+     {@link StaticImports#tup(Object, Object)} method to define those key/value pairs briefly and
+     easily.  This data definition method is one of the few methods in this project that support
+     varargs.
+
+     @param kvPairs Key/value pairs (to go into the map).  In the case of a duplicate key, later
+     values in the input list overwrite the earlier ones.  The resulting map can contain zero or one
+     null key and any number of null values.  Null k/v pairs will be silently ignored.
+
+     @return a new MutableUnsortedMap of the given key/value pairs
+     */
+    @SafeVarargs
+    public static <K,V> MutableUnsortedMap<K,V> mutableMap(Map.Entry<K,V>... kvPairs) {
+        MutableUnsortedMap<K,V> ret = PersistentHashMap.emptyMutable();
+        if (kvPairs == null) { return ret; }
+        for (Map.Entry<K,V> me : kvPairs) {
+            ret.assoc(me);
+        }
+        return ret;
+    }
+
+    /**
+     Returns a new MutableUnsortedSet of the values.  This data definition method is one of the few
+     methods in this project that support varargs.  If the input contains duplicate elements, later
+     values overwrite earlier ones.
+     */
+    @SafeVarargs
+    public static <T> MutableUnsortedSet<T> mutableSet(T... items) {
+        MutableUnsortedSet<T> ret = PersistentHashSet.emptyMutable();
+        if (items == null) { return ret; }
+        for (T t : items) {
+            ret.put(t);
+        }
+        return ret;
+    }
+
+    /**
+     Returns a MutableVector of the given items.  This data definition method is one of the
+     few methods in this project that support varargs.
+     */
+    @SafeVarargs
+    public static <T> MutableList<T> mutableVec(T... items) {
+        MutableList<T> ret = PersistentVector.emptyMutable();
+        if (items == null) { return ret; }
+        for (T t : items) {
+            ret.append(t);
+        }
+        return ret;
+    }
+
+    /**
+     Returns a new PersistentHashSet of the values.  This data definition method is one of the few
      methods in this project that support varargs.  If the input contains duplicate elements, later
      values overwrite earlier ones.
      */
@@ -170,7 +224,7 @@ public final class StaticImports {
 
     /**
      Returns a new PersistentVector of the given items.  This data definition method is one of the
-     three methods in this project that support varargs.
+     few methods in this project that support varargs.
      */
     @SafeVarargs
     static public <T> ImList<T> vec(T... items) {
@@ -178,12 +232,26 @@ public final class StaticImports {
         return PersistentVector.ofIter(Arrays.asList(items));
     }
 
-    /** Wrap a regular Java collection or other iterable outside this project to perform a transformation on it. */
-    public static <T> Transformable<T> xform(Iterable<T> iterable) { return Xform.of(iterable); }
+    /**
+     If you need to wrap a regular Java collection or other iterable outside this project to perform
+     a transformation on it, this method is the most convenient, efficient way to do so.
+     */
+    public static <T> UnmodIterable<T> xform(Iterable<T> iterable) { return Xform.of(iterable); }
+
+    /**
+     If you need to wrap a regular Java array outside this project to perform
+     a transformation on it, this method is the most convenient, efficient way to do so.
+     */
+    @SafeVarargs
+    public static <T> UnmodIterable<T> xformArray(T... items) {
+        return Xform.of(Arrays.asList(items));
+    }
 
     // TODO: Enable this to make Maps, Strings, and StringBuilders work like other collections.
 //    /** Wrap a Java.util.Map to perform a transformation on it. */
-//    public static <K,V> Transformable<Map.Entry<K,V>> xform(Map<K,V> map) { return Xform.of(map.entrySet()); }
+//    public static <K,V> UnmodIterable<Map.Entry<K,V>> xform(Map<K,V> map) {
+//        return Xform.of(map.entrySet());
+//    }
 //
 //    /** Wrap a String to perform a transformation on it. */
 //    public static Transformable<Character> xform(CharSequence seq) {
