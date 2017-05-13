@@ -692,7 +692,7 @@ public class XformTest extends TestCase {
 //        assertTrue(Xform.EMPTY.drop(1).equals(Xform.EMPTY));
 //    }
 
-    @Test public void foldLeft() {
+    @Test public void fold() {
         Integer[] ints = new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9};
 
         assertEquals(Integer.valueOf(45),
@@ -700,14 +700,14 @@ public class XformTest extends TestCase {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void foldLeftEx() {
+    public void foldEx() {
         assertEquals(Integer.valueOf(45),
                      Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
                           .fold(0, null));
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void foldLeftEx2() {
+    public void foldEx2() {
         assertEquals(Integer.valueOf(45),
                      Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
                           .fold(0, null, Fn1.reject()));
@@ -719,7 +719,7 @@ public class XformTest extends TestCase {
     @Test(expected = IllegalArgumentException.class)
     public void mapEx() { Xform.of(Arrays.asList(1, 2, 3)).map(null); }
 
-    @Test public void foldLeftTerm() {
+    @Test public void foldTerm() {
         Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
         assertEquals(Integer.valueOf(45),

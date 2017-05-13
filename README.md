@@ -21,7 +21,7 @@ Future development priorities are further down this page.
   * `map(tup(1, "single"), tup(2, "double"), tup(3, "triple"))` - an immutable map that uses integers to look up appropriate strings.
 * [Extensible, immutable tuples](src/main/java/org/organicdesign/fp/tuple) - use them for rapid prototyping, then later extend them to make your own lightweight, immutable Java classes with correct `equals()`, `hashCode()`, and `toString()` implementations.
 * [Lazy initialization](src/main/java/org/organicdesign/fp/LazyRef.java#L5) - LazyRef thread-safely performs initialization and frees initialization resources on first use.  Subsequent uses get the now-constant initialized value.  Use this instead of static initializers to avoid initialization loops.  Cache results of expensive operations for reuse.
-* [Memoization](src/main/java/org/organicdesign/fp/function/Function3.java#L42) - Turns function calls into hashtable lookups to speed up slow functions over a limited range of inputs.
+* [Memoization](src/main/java/org/organicdesign/fp/function/Fn3.java#L42) - Turns function calls into hashtable lookups to speed up slow functions over a limited range of inputs.
 * Tiny with no dependencies - The entire project fits in a 230K jar file that is compiled in the compact1 profile.
 
 For complete API documentation, please build the javadoc:
@@ -113,9 +113,9 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
 # Future Development Priorities (as of 2016-11-13)
 0. `Xform.toMutableList()` returns a java.util.List, but now that there's a MutableList class, should we use that instead?  Similarly for other toMutable... methods.
 2. Add reverseIterator() or similar to SortedUnmodIterable
-3. Transformable needs `first()` and `last()`, but maybe only on a SortedIterable.  Otherwise, `any(Function1<Boolean>)`
+3. Transformable needs `first()` and `last()`, but maybe only on a SortedIterable.  Otherwise, `any(Fn1<Boolean>)`
 4. Ensure everything is as friendly as possible to Monadic thinking.
-5. Rename functional interfaces from Function1 to Fn1 (start by making a briefer sub-class and deprecating the long-named one).  Provide a Fn1v subclass of Fn1 (and similar for Fn0, Fn2, etc.) that returns void because sometimes you need one of those for backward compatibility and you don't want it to choke on checked exceptions.
+5. Provide a Fn1v subclass of Fn1 (and similar for Fn0, Fn2, etc.) that returns void because sometimes you need one of those for backward compatibility and you don't want it to choke on checked exceptions.
 6. Consider adding interfaces to better split muable and immutable collections.  There should be a definitely unmodifiable, a definitely mutable, and an "unknown" one, but the two definitely's maybe shouldn't extend the "unknown" one.
 7. Make a Java 7 branch (and/or Java 6) and release (Paguro-JDK7).
 8. Consider adding `Class[] genericTypes` to every generic class so that generics could be known at runtime (for Cymling)
