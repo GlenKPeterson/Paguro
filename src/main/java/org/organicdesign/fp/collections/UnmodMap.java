@@ -418,7 +418,7 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
 
      If you want to keep a count of duplicates, try something like this, but it has a different
      signature:
-     <pre><code>ImMap&lt;V,Integer&gt; valueCounts = myMap.foldLeft(PersistentHashMap.empty(),
+     <pre><code>ImMap&lt;V,Integer&gt; valueCounts = myMap.fold(PersistentHashMap.empty(),
                      (ImMap&lt;V,Integer&gt; accum, UnEntry&lt;K,V&gt; origEntry) -&gt; {
                              V inVal = origEntry.getValue();
                              return accum.assoc(inVal,

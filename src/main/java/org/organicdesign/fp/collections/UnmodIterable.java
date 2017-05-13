@@ -168,14 +168,14 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
     }
 
     /** {@inheritDoc} */
-    @Override default <B> B foldLeft(B ident, Function2<B,? super T,B> reducer) {
-        return Xform.of(this).foldLeft(ident, reducer);
+    @Override default <B> B fold(B ident, Function2<B,? super T,B> reducer) {
+        return Xform.of(this).fold(ident, reducer);
     }
 
     /** {@inheritDoc} */
-    @Override default <B> B foldLeft(B ident, Function2<B,? super T,B> reducer,
-                                    Function1<? super B,Boolean> terminateWhen) {
-        return Xform.of(this).foldLeft(ident, reducer, terminateWhen);
+    @Override default <B> B fold(B ident, Function2<B,? super T,B> reducer,
+                                 Function1<? super B,Boolean> terminateWhen) {
+        return Xform.of(this).fold(ident, reducer, terminateWhen);
     }
 
     /** {@inheritDoc} */

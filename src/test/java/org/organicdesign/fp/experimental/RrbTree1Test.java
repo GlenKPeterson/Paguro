@@ -512,11 +512,11 @@ public class RrbTree1Test {
     @Test public void equalsAndHashCode() {
         List<Integer> control = Arrays.asList(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
         RrbTree1<Integer> rrb1 =
-                xform(control).foldLeft(RrbTree1.<Integer>empty(),
-                                        (accum, item) -> accum.append(item));
+                xform(control).fold(RrbTree1.<Integer>empty(),
+                                    (accum, item) -> accum.append(item));
         RrbTree1<Integer> rrb2 =
-                xform(control).foldLeft(RrbTree1.<Integer>empty(),
-                                        (accum, item) -> accum.append(item));
+                xform(control).fold(RrbTree1.<Integer>empty(),
+                                    (accum, item) -> accum.append(item));
 
         List<Integer> other = Arrays.asList(1,3,2,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
 
@@ -528,11 +528,11 @@ public class RrbTree1Test {
         List<Integer> hasNull = Arrays.asList(1,2,3,4,5,6,null,8,9,10,11,12,13,14,15,16,17,18,19,20);
 
         RrbTree1<Integer> rrb3 =
-                xform(hasNull).foldLeft(RrbTree1.<Integer>empty(),
-                                        (accum, item) -> accum.append(item));
+                xform(hasNull).fold(RrbTree1.<Integer>empty(),
+                                    (accum, item) -> accum.append(item));
         RrbTree1<Integer> rrb4 =
-                xform(hasNull).foldLeft(RrbTree1.<Integer>empty(),
-                                        (accum, item) -> accum.append(item));
+                xform(hasNull).fold(RrbTree1.<Integer>empty(),
+                                    (accum, item) -> accum.append(item));
 
         equalsDistinctHashCode(rrb3, rrb4, hasNull, other);
     }

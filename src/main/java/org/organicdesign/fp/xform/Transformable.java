@@ -77,7 +77,7 @@ public interface Transformable<T> {
     /**
      Transform each item into zero or more new items using the given function.
      One of the two higher-order functions that can produce more output items than input items.
-     foldLeft is the other, but flatMap is lazy while foldLeft is eager.
+     fold is the other, but flatMap is lazy while fold is eager.
      @return a lazily evaluated collection which is expected to be larger than the input
      collection.  For a collection that's the same size, map() is more efficient.  If the expected
      return is smaller, use filter followed by map if possible, or vice versa if not.
@@ -89,13 +89,12 @@ public interface Transformable<T> {
      Apply the function to each item, accumulating the result in u.  Other transformations can be
      implemented with just this one function, but it is clearer (and allows lazy evaluation) to use
      the most specific transformations that meet your needs.  Still, sometimes you need the
-     flexibility foldLeft provides.  This implementation follows the convention that foldLeft
-     processes items *in order* unless those items are a linked list, and in this case, they are
-     not.
+     flexibility fold provides.  This is techincally a fold-left because it processes items
+     *in order* unless those items are a linked list.
 
-     FoldLeft is one of the two higher-order functions that can produce more output items than input
-     items (when u is a collection). FlatMap is the other, but foldLeft is eager while flatMap is
-     lazy. FoldLeft can also produce a single (scalar) value.  In that form, it is often called
+     Fold is one of the two higher-order functions that can produce more output items than input
+     items (when u is a collection). FlatMap is the other, but fold is eager while flatMap is
+     lazy. Fold can also produce a single (scalar) value.  In that form, it is often called
      reduce().
 
      @param u the accumulator and starting value.  This will be passed to the function on the
@@ -105,14 +104,14 @@ public interface Transformable<T> {
      @param fun combines each value in the list with the result so far.  The initial result is u.
      @return an eagerly evaluated result which could be a single value like a sum, or a collection.
      */
-    <U> U foldLeft(U u, Function2<U,? super T,U> fun);
+    <U> U fold(U u, Function2<U,? super T,U> fun);
 
     /**
      Normally you want to terminate by doing a take(), drop(), or takeWhile() before you get to the
      fold, but if you need to terminate based on the complete result so far, you can  provide your
-     own termination condition to this version of foldLeft().
+     own termination condition to this version of fold().
 
-     If foldLeft replaces a loop, and return is a more general form of break, then this function can
+     If fold replaces a loop, and return is a more general form of break, then this function can
      do anything a loop can do.
 
      @param u the accumulator and starting value.  This will be passed to the function on the
@@ -124,7 +123,7 @@ public interface Transformable<T> {
      processing the input at that time, returning the latest u.
      @return an eagerly evaluated result which could be a single value like a sum, or a collection.
      */
-    <U> U foldLeft(U u, Function2<U,? super T,U> fun, Function1<? super U,Boolean> terminateWhen);
+    <U> U fold(U u, Function2<U,? super T,U> fun, Function1<? super U,Boolean> terminateWhen);
 
     /**
      Transform each item into exactly one new item using the given function.
@@ -170,8 +169,8 @@ public interface Transformable<T> {
      Realize a thread-safe immutable list to access items quickly O(log32 n) by index.
      */
     default ImList<T> toImList() {
-        return foldLeft(PersistentVector.emptyMutable(),
-                        MutableList<T>::append).immutable();
+        return fold(PersistentVector.emptyMutable(),
+                    MutableList<T>::append).immutable();
     }
 
     /**
@@ -187,8 +186,8 @@ public interface Transformable<T> {
      @return An immutable map
      */
     default <K,V> ImMap<K,V> toImMap(Function1<? super T,Map.Entry<K,V>> f1) {
-        return foldLeft(PersistentHashMap.<K,V>empty().mutable(),
-                        (MutableUnsortedMap<K,V> ts, T t) ->
+        return fold(PersistentHashMap.<K,V>empty().mutable(),
+                    (MutableUnsortedMap<K,V> ts, T t) ->
                                 (MutableUnsortedMap<K,V>) ts.assoc(f1.apply(t)))
                 .immutable();
     }
@@ -202,8 +201,8 @@ public interface Transformable<T> {
      */
     default ImSet<T> toImSet() {
         //noinspection Convert2MethodRef
-        return foldLeft(PersistentHashSet.emptyMutable(),
-                        (PersistentHashSet.MutableHashSet<T> s, T t) -> s.put(t)).immutable();
+        return fold(PersistentHashSet.emptyMutable(),
+                    (PersistentHashSet.MutableHashSet<T> s, T t) -> s.put(t)).immutable();
     }
 
     /**
@@ -225,8 +224,8 @@ public interface Transformable<T> {
      */
     default <K,V> ImSortedMap<K,V> toImSortedMap(Comparator<? super K> comp,
                                                  Function1<? super T,Map.Entry<K,V>> f1) {
-        return foldLeft((ImSortedMap<K, V>) PersistentTreeMap.<K, V>empty(comp),
-                        (ts, t) -> ts.assoc(f1.apply(t)));
+        return fold((ImSortedMap<K, V>) PersistentTreeMap.<K, V>empty(comp),
+                    (ts, t) -> ts.assoc(f1.apply(t)));
     }
 
     /**
@@ -238,12 +237,12 @@ public interface Transformable<T> {
      @return An immutable set (with duplicates removed).  Null elements are not allowed.
      */
     default ImSortedSet<T> toImSortedSet(Comparator<? super T> comparator) {
-        return foldLeft(PersistentTreeSet.ofComp(comparator), PersistentTreeSet::put);
+        return fold(PersistentTreeSet.ofComp(comparator), PersistentTreeSet::put);
     }
 
     /** Realize a mutable list.  Use toImList unless you need to modify the list in-place. */
     default List<T> toMutableList() {
-        return foldLeft(new ArrayList<>(), (ts, t) -> {
+        return fold(new ArrayList<>(), (ts, t) -> {
             ts.add(t);
             return ts;
         });
@@ -258,7 +257,7 @@ public interface Transformable<T> {
      @return A map with the keys from the given set, mapped to values using the given function.
      */
     default <K,V> Map<K,V> toMutableMap(final Function1<? super T,Map.Entry<K,V>> f1) {
-        return foldLeft(new HashMap<>(), (ts, t) -> {
+        return fold(new HashMap<>(), (ts, t) -> {
             Map.Entry<K,V> entry = f1.apply(t);
             ts.put(entry.getKey(), entry.getValue());
             return ts;
@@ -278,7 +277,7 @@ public interface Transformable<T> {
     default <K,V> SortedMap<K,V>
     toMutableSortedMap(Comparator<? super K> comp,
                        final Function1<? super T,Map.Entry<K,V>> f1) {
-        return foldLeft(new TreeMap<>(), (ts, t) -> {
+        return fold(new TreeMap<>(), (ts, t) -> {
             Map.Entry<K,V> entry = f1.apply(t);
             ts.put(entry.getKey(), entry.getValue());
             return ts;
@@ -291,7 +290,7 @@ public interface Transformable<T> {
      @return A mutable set (with duplicates removed)
      */
     default Set<T> toMutableSet() {
-        return foldLeft(new HashSet<>(), (ts, t) -> {
+        return fold(new HashSet<>(), (ts, t) -> {
             ts.add(t);
             return ts;
         });
@@ -305,7 +304,7 @@ public interface Transformable<T> {
      @return A mutable sorted set
      */
     default SortedSet<T> toMutableSortedSet(Comparator<? super T> comparator) {
-        return foldLeft(new TreeSet<>(comparator), (ts, t) -> {
+        return fold(new TreeSet<>(comparator), (ts, t) -> {
             ts.add(t);
             return ts;
         });

@@ -190,8 +190,8 @@ public class TradJavaStreamComparisonTest {
                                       "Color(0,2,255),"));
 
         ImMap<Integer,Integer> greenCounts = imgData
-                .foldLeft(map(),
-                          (accum, color) -> accum.assoc(color.green(),
+                .fold(map(),
+                      (accum, color) -> accum.assoc(color.green(),
                                                         accum.getOrElse(color.green(), 0) + 1));
 
         assertEquals(256, greenCounts.size());

@@ -44,18 +44,18 @@ public class UnmodIterableTest {
                      testIterable.drop(1).toMutableList());
 
         assertEquals(Arrays.asList("Howz", "nowz", "brownz", "cowz"),
-                     testIterable.foldLeft(new ArrayList<>(),
-                                           (List<String> accum, String str) -> {
+                     testIterable.fold(new ArrayList<>(),
+                                       (List<String> accum, String str) -> {
                                                accum.add(str + "z");
                                                return accum;
                                            }));
         assertEquals(Arrays.asList("Howz", "nowz"),
-                     testIterable.foldLeft(new ArrayList<>(),
-                                           (List<String> accum, String str) -> {
+                     testIterable.fold(new ArrayList<>(),
+                                       (List<String> accum, String str) -> {
                                                accum.add(str + "z");
                                                return accum;
                                            },
-                                           (List<String> list) -> list.size() > 1));
+                                       (List<String> list) -> list.size() > 1));
 
         assertEquals(Arrays.asList("How", "now", "cow"),
                      testIterable.filter((String s) -> s.endsWith("w")).toMutableList());

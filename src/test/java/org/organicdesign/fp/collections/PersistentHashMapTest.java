@@ -1057,7 +1057,7 @@ public class PersistentHashMapTest {
             item = seq.head();
         }
         // System.out.println("Final u: " + u);
-        // System.out.println("m.seq().map(e -> e.getValue()).foldLeft(): " + m.seq().map(e -> e.getValue()).foldLeft(PersistentHashSet.empty(), (accum, t) -> accum.put(t)));
+        // System.out.println("m.seq().map(e -> e.getValue()).fold(): " + m.seq().map(e -> e.getValue()).fold(PersistentHashSet.empty(), (accum, t) -> accum.put(t)));
         // System.out.println("m.seq().map(e -> e.getValue()).toImSet(): " + m.seq().map(e -> e.getValue()).toImSet());
         // System.out.println("m.values(): " + m.values());
 

@@ -29,13 +29,13 @@ import java.util.Objects;
 
 /**
  An immutable description of operations to be performed (a transformation, transform, or x-form).
- When foldLeft() is called, the Xform definition is "compiled" into a mutable transformation which
+ When fold() is called, the Xform definition is "compiled" into a mutable transformation which
  is then carried out.  This allows certain performance shortcuts (such as doing a drop with index
  addition instead of iteration) and also hides the mutability otherwise inherent in a
  transformation.
 
  Xform is an abstract class.  Most of the methods on Xform produce immutable descriptions of actions
- to take at a later time.  These are represented by ___Desc classes.  When foldLeft() is called
+ to take at a later time.  These are represented by ___Desc classes.  When fold() is called
  (or any of the helper methods that wrap it), that produces a result by first stringing together
  a bunch of Operations (____Op classes) and then "running" them.  This is analogous to compiling
  a program and running it.  The ____Desc classes are like the immutable source, the ____Op classes
@@ -48,7 +48,7 @@ import java.util.Objects;
  */
 public abstract class Xform<A> implements UnmodIterable<A> {
 
-    enum OpStrategy { HANDLE_INTERNALLY, ASK_SUPPLIER, CANNOT_HANDLE; }
+    enum OpStrategy { HANDLE_INTERNALLY, ASK_SUPPLIER, CANNOT_HANDLE }
 
     private static final Object TERMINATE = new Object();
     @SuppressWarnings("unchecked")
@@ -204,17 +204,16 @@ public abstract class Xform<A> implements UnmodIterable<A> {
         private AppendOp(RunList prv, Iterable src) { super(prv, src); }
 
         @Override public Iterator iterator() {
-            ArrayList prevSrc = _foldLeft(prev, prev.opArray(), 0, new ArrayList(),
-                                          new Function2<ArrayList,Object,ArrayList>() {
-                                              @SuppressWarnings("unchecked")
-                                              @Override
-                                              public ArrayList applyEx(ArrayList res, Object item) throws Exception {
-                                                  res.add(item);
-                                                  return res;
-                                              }
+            @SuppressWarnings("Convert2Lambda")
+            ArrayList prevSrc = _fold(prev, prev.opArray(), 0, new ArrayList(),
+                                      new Function2<ArrayList,Object,ArrayList>() {
+                                          @SuppressWarnings("unchecked")
+                                          @Override
+                                          public ArrayList applyEx(ArrayList res, Object item) throws Exception {
+                                              res.add(item);
+                                              return res;
                                           }
-
-            );
+                                      });
             //noinspection unchecked
             return new Iterator() {
                 Iterator innerIter = prevSrc.iterator();
@@ -438,7 +437,7 @@ public abstract class Xform<A> implements UnmodIterable<A> {
     // is 2.6 times faster than wrapping items type-safely in Options and 10 to 100 times faster
     // than lazily evaluated and cached linked-list, Sequence model.
     @SuppressWarnings("unchecked")
-    private static <H> H _foldLeft(Iterable source, Operation[] ops, int opIdx, H ident, Function2 reducer) {
+    private static <H> H _fold(Iterable source, Operation[] ops, int opIdx, H ident, Function2 reducer) {
         Object ret = ident;
 
         // This is a label - the first one I have used in Java in years, or maybe ever.
@@ -460,7 +459,7 @@ public abstract class Xform<A> implements UnmodIterable<A> {
                         return (H) ret;
                     }
                 } else if (op.flatMap != null) {
-                    ret = _foldLeft(op.flatMap.apply(o), ops, j + 1, (H) ret, reducer);
+                    ret = _fold(op.flatMap.apply(o), ops, j + 1, (H) ret, reducer);
                     // stop processing this source item and go to the next one.
                     continue sourceLoop;
                 }
@@ -472,7 +471,7 @@ public abstract class Xform<A> implements UnmodIterable<A> {
             ret = reducer.apply(ret, o);
         }
         return (H) ret;
-    } // end _foldLeft();
+    } // end _fold();
 
     @Override public UnmodIterator<A> iterator() {
         // TODO: I had a really fast array-list implementation that I could probably hack into this for performance (assuming it actually works).
@@ -523,17 +522,17 @@ public abstract class Xform<A> implements UnmodIterable<A> {
     // Do we need a dropWhile???
 
     /** Provides a way to collect the results of the transformation. */
-    @Override public <B> B foldLeft(B ident, Function2<B,? super A,B> reducer) {
+    @Override public <B> B fold(B ident, Function2<B,? super A,B> reducer) {
         if (reducer == null) {
-            throw new IllegalArgumentException("Can't foldLeft with a null reduction function.");
+            throw new IllegalArgumentException("Can't fold with a null reduction function.");
         }
 
         // Construct an optimized array of OpRuns (mutable operations for this run)
         RunList runList = toRunList();
-        return _foldLeft(runList, runList.opArray(), 0, ident, reducer);
+        return _fold(runList, runList.opArray(), 0, ident, reducer);
     }
 
-    // TODO: Is this worth keeping over takeWhile(f).foldLeft(...)?
+    // TODO: Is this worth keeping over takeWhile(f).fold(...)?
     /**
      Thit implementation should be correct, but could be slow in the case where previous operations
      are slow and the terminateWhen operation is fast and terminates early.  It actually renders
@@ -546,18 +545,18 @@ public abstract class Xform<A> implements UnmodIterable<A> {
 
      {@inheritDoc}
      */
-    @Override public <B> B foldLeft(B ident, Function2<B,? super A,B> reducer,
-                                    Function1<? super B,Boolean> terminateWhen) {
+    @Override public <B> B fold(B ident, Function2<B,? super A,B> reducer,
+                                Function1<? super B,Boolean> terminateWhen) {
         if (reducer == null) {
-            throw new IllegalArgumentException("Can't foldLeft with a null reduction function.");
+            throw new IllegalArgumentException("Can't fold with a null reduction function.");
         }
 
         if ( (terminateWhen == null) || (Function1.reject() == terminateWhen) ) {
-            return foldLeft(ident, reducer);
+            return fold(ident, reducer);
         }
 
         // Yes, this is a cheap plastic imitation of what you'd hope for if you really need this
-        // method.  The trouble is that when I implemented it correctly in _foldLeft, I found
+        // method.  The trouble is that when I implemented it correctly in _fold, I found
         // it was going to be incredibly difficult, or more likely impossible to implement
         // when the previous operation was flatMap, since you don't have the right result type to
         // check against when you recurse in to the flat mapping function, and if you check the

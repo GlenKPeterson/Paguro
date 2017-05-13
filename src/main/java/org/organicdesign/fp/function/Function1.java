@@ -205,8 +205,8 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
                                      : Xform.of(in);
 
         return v.filter(p -> (p != null) && (p != ConstBool.ACCEPT))
-                .foldLeft(accept(),
-                          (accum, p) -> (p == reject()) ? p : and(accum, p),
+                .fold(accept(),
+                      (accum, p) -> (p == reject()) ? p : and(accum, p),
                           accum -> accum == reject());
     }
 
@@ -234,8 +234,8 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
                                      : Xform.of(in);
 
         return v.filter(p -> (p != null) && (p != ConstBool.REJECT))
-                .foldLeft(reject(),
-                          (accum, p) -> (p == ConstBool.ACCEPT) ? p : or(accum, p),
+                .fold(reject(),
+                      (accum, p) -> (p == ConstBool.ACCEPT) ? p : or(accum, p),
                           accum -> accum == ConstBool.ACCEPT);
     }
 

@@ -41,104 +41,104 @@ public class XformTest extends TestCase {
 
     public static void basics(Xform<Integer> td) {
         assertEquals(Arrays.asList(1, 2, 3),
-                     td.foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
+                     td.fold(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                          accum.add(i);
                          return accum;
                      }));
         assertEquals(Arrays.asList(2, 3, 4),
                      td.map(i -> i + 1)
-                       .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
+                       .fold(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                            accum.add(i);
                            return accum;
                        }));
         assertEquals(Arrays.asList(1, 3),
                      td.filter(i -> i != 2)
-                       .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
+                       .fold(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                            accum.add(i);
                            return accum;
                        }));
         assertEquals(Arrays.asList(1, 10, 100, 2, 20, 200, 3, 30, 300),
                      td.flatMap(i -> vec(i, i * 10, i * 100))
-                       .foldLeft(new ArrayList<>(), (accum, i) -> {
+                       .fold(new ArrayList<>(), (accum, i) -> {
                            accum.add(i);
                            return accum;
                        }));
         assertEquals(Arrays.asList(2, 3),
                      td.drop(1)
-                       .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
+                       .fold(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                            accum.add(i);
                            return accum;
                        }));
         assertEquals(Arrays.asList(1, 2, 3),
                      td.drop(0)
-                       .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
+                       .fold(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                            accum.add(i);
                            return accum;
                        }));
         assertEquals(Collections.emptyList(),
                      td.drop(99)
-                       .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
+                       .fold(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                            accum.add(i);
                            return accum;
                        }));
         assertEquals(Collections.emptyList(),
                      td.drop(Integer.MAX_VALUE)
-                       .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
+                       .fold(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                            accum.add(i);
                            return accum;
                        }));
         assertEquals(Arrays.asList(1, 2),
                      td.take(2)
-                       .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
+                       .fold(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                            accum.add(i);
                            return accum;
                        }));
         assertEquals(Collections.emptyList(),
                      td.take(0)
-                       .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
+                       .fold(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                            accum.add(i);
                            return accum;
                        }));
         assertEquals(Arrays.asList(1, 2, 3),
                      td.take(3)
-                       .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
+                       .fold(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                            accum.add(i);
                            return accum;
                        }));
         assertEquals(Arrays.asList(1, 2, 3),
                      td.take(99)
-                       .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
+                       .fold(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                            accum.add(i);
                            return accum;
                        }));
         assertEquals(Arrays.asList(1, 2, 3),
                      td.take(Integer.MAX_VALUE)
-                       .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
+                       .fold(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                            accum.add(i);
                            return accum;
                        }));
         assertEquals(Arrays.asList(1, 2, 3, 4, 5, 6),
                      td.concat(Arrays.asList(4, 5, 6))
-                       .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
+                       .fold(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                            accum.add(i);
                            return accum;
                        }));
         assertEquals(Arrays.asList(1, 2, 3, 4, 5, 6),
                      td.concat(Xform.of(Arrays.asList(4, 5, 6)).toImSortedSet((a, b) -> a - b))
-                       .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
+                       .fold(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                            accum.add(i);
             return accum;
         }));
 //        assertEquals(Arrays.asList(1, 2, 3, 4, 5, 6),
 //                     td.concatArray(new Integer[]{4, 5, 6})
-//                       .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
+//                       .fold(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
 //                           accum.add(i);
 //                           return accum;
 //                       }));
         assertEquals(Arrays.asList(2, 3, 4, 5, 6, 7),
                      td.concat(Arrays.asList(4, 5, 6))
                        .map(i -> i + 1)
-                       .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
+                       .fold(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                            accum.add(i);
                            return accum;
                        }));
@@ -160,26 +160,26 @@ public class XformTest extends TestCase {
 
     public static void longerCombinations(Xform<Integer> td) {
         assertEquals(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9),
-                     td.foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
+                     td.fold(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                          accum.add(i);
                          return accum;
                      }));
         assertEquals(Arrays.asList(2, 4, 6, 8),
                      td.filter(i -> i % 2 == 0)
-                       .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
+                       .fold(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                            accum.add(i);
                            return accum;
                        }));
         assertEquals(Arrays.asList(1, 2, 3, 4, 5),
                      td.take(5)
-                       .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
+                       .fold(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                          accum.add(i);
                          return accum;
                      }));
         assertEquals(Arrays.asList(3, 5, 7, 9),
                      td.filter(i -> i % 2 == 0)
                        .map(i -> i + 1)
-                       .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
+                       .fold(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                            accum.add(i);
                            return accum;
                        }));
@@ -187,7 +187,7 @@ public class XformTest extends TestCase {
                      td.filter(i -> i % 2 == 0)
                        .map(i -> i + 1)
                        .take(3)
-                       .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
+                       .fold(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                            accum.add(i);
                            return accum;
                        }));
@@ -195,7 +195,7 @@ public class XformTest extends TestCase {
                      td.filter(i -> i % 2 == 0)
                        .map(i -> i + 1)
                        .flatMap(i -> vec(i, i * 10, i * 100))
-                       .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
+                       .fold(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                            accum.add(i);
                            return accum;
                        }));
@@ -204,7 +204,7 @@ public class XformTest extends TestCase {
                        .filter(i -> i % 2 == 0)
                        .map(i -> i + 1)
                        .flatMap(i -> vec(i, i * 10, i * 100))
-                       .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
+                       .fold(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                            accum.add(i);
                            return accum;
                        }));
@@ -213,7 +213,7 @@ public class XformTest extends TestCase {
                      td.filter(i -> i % 2 == 0)
                        .map(i -> i + 1)
                        .drop(2)
-                       .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
+                       .fold(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                            accum.add(i);
                            return accum;
                        }));
@@ -223,7 +223,7 @@ public class XformTest extends TestCase {
                        .map(i -> i + 1)
                        .drop(2)
                        .flatMap(i -> vec(i, i * 10, i * 100))
-                       .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
+                       .fold(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                            accum.add(i);
                            return accum;
                        }));
@@ -232,7 +232,7 @@ public class XformTest extends TestCase {
                        .map(i -> i + 1)
                        .flatMap(i -> vec(i, i * 10, i * 100))
                        .drop(5)
-                       .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
+                       .fold(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                            accum.add(i);
                            return accum;
                        }));
@@ -242,7 +242,7 @@ public class XformTest extends TestCase {
                        .flatMap(i -> vec(i, i * 10, i * 100))
                        .drop(5)
                        .take(6)
-                       .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
+                       .fold(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                            accum.add(i);
                            return accum;
                        }));
@@ -253,7 +253,7 @@ public class XformTest extends TestCase {
                        .drop(5)
                        .take(6)
                        .concat(Arrays.asList(91, 92, 93))
-                       .foldLeft(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
+                       .fold(new ArrayList<>(), (List<Integer> accum, Integer i) -> {
                            accum.add(i);
                            return accum;
                        }));
@@ -696,21 +696,21 @@ public class XformTest extends TestCase {
         Integer[] ints = new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9};
 
         assertEquals(Integer.valueOf(45),
-                     Xform.of(Arrays.asList(ints)).foldLeft(0, (accum, i) -> accum + i));
+                     Xform.of(Arrays.asList(ints)).fold(0, (accum, i) -> accum + i));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void foldLeftEx() {
         assertEquals(Integer.valueOf(45),
                      Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                          .foldLeft(0, null));
+                          .fold(0, null));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void foldLeftEx2() {
         assertEquals(Integer.valueOf(45),
                      Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                          .foldLeft(0, null, Function1.reject()));
+                          .fold(0, null, Function1.reject()));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -724,28 +724,28 @@ public class XformTest extends TestCase {
 
         assertEquals(Integer.valueOf(45),
                      Xform.of(Arrays.asList(ints))
-                          .foldLeft(0, (accum, i) -> accum + i, Function1.reject()));
+                          .fold(0, (accum, i) -> accum + i, Function1.reject()));
 
         assertEquals(Integer.valueOf(45),
                      Xform.of(Arrays.asList(ints))
-                          .foldLeft(0, (accum, i) -> accum + i, null));
+                          .fold(0, (accum, i) -> accum + i, null));
 
         assertArrayEquals(new Integer[]{2, 3, 4},
                           Xform.of(Arrays.asList(ints))
-                               .foldLeft(new ArrayList<>(),
-                                         (accum, i) -> {
+                               .fold(new ArrayList<>(),
+                                     (accum, i) -> {
                                              accum.add(i + 1);
                                              return accum;
                                          },
-                                         (accum) -> accum.size() == 3).toArray());
+                                     (accum) -> accum.size() == 3).toArray());
         assertArrayEquals(new Integer[]{2, 3, 4, 5, 6, 7, 8, 9, 10},
                           Xform.of(Arrays.asList(ints))
-                                  .foldLeft(new ArrayList<>(),
-                                            (accum, i) -> {
+                                  .fold(new ArrayList<>(),
+                                        (accum, i) -> {
                                                 accum.add(i + 1);
                                                 return accum;
                                             },
-                                            (accum) -> accum.size() == 20).toArray());
+                                        (accum) -> accum.size() == 20).toArray());
 
         // This is fun and it should work.  But it really sets up for the early-termination test
         // next.
@@ -753,8 +753,8 @@ public class XformTest extends TestCase {
                                    7, 14, 21, 8, 16, 24, 9, 18, 27),
                      Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
                           .flatMap(i -> Xform.of(Arrays.asList(i, i * 2, i * 3)))
-                          .foldLeft(new ArrayList<>(),
-                                    (alist, item) -> {
+                          .fold(new ArrayList<>(),
+                                (alist, item) -> {
                                         alist.add(item);
                                         return alist;
                                     }));
@@ -764,9 +764,9 @@ public class XformTest extends TestCase {
                                    7,14,21, 8,16),
                      Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
                           .flatMap(i -> Xform.of(Arrays.asList(i, i * 2, i * 3)))
-                          .foldLeft(new ArrayList<>(),
-                                    (alist, item) -> { alist.add(item); return alist; },
-                                    (items) -> items.contains(16)));
+                          .fold(new ArrayList<>(),
+                                (alist, item) -> { alist.add(item); return alist; },
+                                (items) -> items.contains(16)));
     }
 
     @Test public void toIterator() {

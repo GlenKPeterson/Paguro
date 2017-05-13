@@ -295,8 +295,8 @@ public class PersistentTreeMap<K,V> extends UnmodSortedMap.AbstractUnmodMap<K,V>
      */
     @Override public ImSortedSet<Entry<K,V>> entrySet() {
         // This is the pretty way to do it.
-        return this.foldLeft(PersistentTreeSet.ofComp(new KeyComparator<>(comp)),
-                             PersistentTreeSet::put);
+        return this.fold(PersistentTreeSet.ofComp(new KeyComparator<>(comp)),
+                         PersistentTreeSet::put);
 
         // This may be faster, but I haven't timed it.
 
