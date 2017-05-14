@@ -65,19 +65,19 @@ public class MyBenchmark {
         public ImList<Integer> vec = buildList(PersistentVector.empty(), 1000000);
     }
 
-    @Benchmark public void BuildRrb10() { buildList(RrbTree1.empty(), 10); }
-    @Benchmark public void BuildRrb100() { buildList(RrbTree1.empty(), 100); }
-    @Benchmark public void BuildRrb1000() { buildList(RrbTree1.empty(), 1000); }
-    @Benchmark public void BuildRrb10000() { buildList(RrbTree1.empty(), 10000); }
-    @Benchmark public void BuildRrb100000() { buildList(RrbTree1.empty(), 100000); }
-    @Benchmark public void BuildRrb1000000() { buildList(RrbTree1.empty(), 1000000); }
-
-    @Benchmark public void BuildVec10() { buildList(PersistentVector.empty(), 10); }
-    @Benchmark public void BuildVec100() { buildList(PersistentVector.empty(), 100); }
-    @Benchmark public void BuildVec1000() { buildList(PersistentVector.empty(), 1000); }
-    @Benchmark public void BuildVec10000() { buildList(PersistentVector.empty(), 10000); }
-    @Benchmark public void BuildVec100000() { buildList(PersistentVector.empty(), 100000); }
-    @Benchmark public void BuildVec1000000() { buildList(PersistentVector.empty(), 1000000); }
+//    @Benchmark public void BuildRrb10() { buildList(RrbTree1.empty(), 10); }
+//    @Benchmark public void BuildRrb100() { buildList(RrbTree1.empty(), 100); }
+//    @Benchmark public void BuildRrb1000() { buildList(RrbTree1.empty(), 1000); }
+//    @Benchmark public void BuildRrb10000() { buildList(RrbTree1.empty(), 10000); }
+//    @Benchmark public void BuildRrb100000() { buildList(RrbTree1.empty(), 100000); }
+//    @Benchmark public void BuildRrb1000000() { buildList(RrbTree1.empty(), 1000000); }
+//
+//    @Benchmark public void BuildVec10() { buildList(PersistentVector.empty(), 10); }
+//    @Benchmark public void BuildVec100() { buildList(PersistentVector.empty(), 100); }
+//    @Benchmark public void BuildVec1000() { buildList(PersistentVector.empty(), 1000); }
+//    @Benchmark public void BuildVec10000() { buildList(PersistentVector.empty(), 10000); }
+//    @Benchmark public void BuildVec100000() { buildList(PersistentVector.empty(), 100000); }
+//    @Benchmark public void BuildVec1000000() { buildList(PersistentVector.empty(), 1000000); }
 
     @Benchmark public void IterateRrb10(Rrb10 rrb) { iterateList(rrb.rrb); }
     @Benchmark public void IterateRrb100(Rrb100 rrb) { iterateList(rrb.rrb); }

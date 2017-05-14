@@ -2064,20 +2064,6 @@ involves changing more nodes than maybe necessary.
         @Override public String toString() { return "IdxNode(" + idx + " " + node + ")"; }
     }
 
-    /** Holds a Leaf node and the index of the child we are currently returning. */
-    private static final class IdxLeaf<E> implements UnmodIterator<E> {
-        int idx = 0;
-        final Leaf<E> leaf;
-        IdxLeaf(Leaf<E> n) { leaf = n; }
-        @Override public boolean hasNext() { return idx < leaf.numChildren(); }
-        @Override public E next() {
-            E n = leaf.get(idx);
-            idx++;
-            return n;
-        }
-        @Override public String toString() { return "IdxLeaf(" + idx + " " + leaf + ")"; }
-    }
-
     private final class Iter implements UnmodSortedIterator<E> {
 
         @SuppressWarnings("unchecked")
@@ -2098,7 +2084,8 @@ involves changing more nodes than maybe necessary.
 
         //        private int leafIdx = 0;
 //        private Leaf<E> leaf;
-        private IdxLeaf<E> idxLeaf;
+        private E[] leafArray = emptyArray();
+        private int leafArrayIdx;
         private Iter() {
 
             // Push the focus so we don't have to ever check the index.
@@ -2109,47 +2096,50 @@ involves changing more nodes than maybe necessary.
             stack = genericArrayCreate(newRoot.height());
 
 //            System.out.println("newRoot:" + newRoot.indentedStr("newRoot:".length()));
-            idxLeaf = nextLeaf(newRoot);
+            leafArray = nextLeafArray(newRoot);
         }
 
         // Descent to the leftmost unused leaf node.
-        private IdxLeaf<E> nextLeaf(Node<E> node) {
+        private E[] nextLeafArray(Node<E> node) {
             // Descent to left-most bottom node.
             while (!(node instanceof Leaf)) {
                 IdxNode<E> in = new IdxNode<>(node);
                 stackAdd(in);
                 node = in.next();
             }
-            return new IdxLeaf<>((Leaf<E>) node);
+            return ((Leaf<E>) node).items;
         }
 
-        private IdxLeaf<E> ensureLeaf() {
+        private E[] ensureLeaf() {
             // While nodes are used up, get next node from node one level up.
             while ( (stackMaxIdx > -1) && !stack[stackMaxIdx].hasNext() ) {
                 stackMaxIdx--;
             }
 
             if (stackMaxIdx < 0) {
-                return null;
+                return emptyArray();
             }
             // If node one level up is used up, find a node that isn't used up and descend to its
             // leftmost leaf.
-            return nextLeaf(stack[stackMaxIdx].next());
+            return nextLeafArray(stack[stackMaxIdx].next());
         }
 
         @Override public boolean hasNext() {
-            if (idxLeaf == null) { return false; }
-            if (idxLeaf.hasNext()) { return true; }
-            idxLeaf = ensureLeaf();
-            return (idxLeaf != null) && idxLeaf.hasNext();
+            if (leafArrayIdx < leafArray.length) { return true; }
+//            if (leafArray.length == 0) { return false; }
+            leafArray = ensureLeaf();
+            leafArrayIdx = 0;
+            return leafArray.length > 0;
         }
 
         @Override public E next() {
-            // If there's more in this leaf node, return it.
-            if (!idxLeaf.hasNext()) {
-                idxLeaf = ensureLeaf();
+            // If there's no more in this leaf array, get the next one
+            if (leafArrayIdx >= leafArray.length) {
+                leafArray = ensureLeaf();
+                leafArrayIdx = 0;
             }
-            return idxLeaf.next();
+            // Return the next item in the leaf array and increment index
+            return leafArray[leafArrayIdx++];
         }
     }
 
