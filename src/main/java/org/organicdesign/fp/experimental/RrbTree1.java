@@ -20,7 +20,6 @@ import java.util.List;
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.MutableList;
 import org.organicdesign.fp.collections.UnmodIterable;
-import org.organicdesign.fp.collections.UnmodIterator;
 import org.organicdesign.fp.collections.UnmodSortedIterable;
 import org.organicdesign.fp.collections.UnmodSortedIterator;
 import org.organicdesign.fp.tuple.Tuple2;
@@ -87,7 +86,6 @@ public class RrbTree1<E> implements ImList<E>, Indented {
      @return a new RRB-Tree with the item appended.
      */
     @Override public RrbTree1<E> append(E t) {
-//        System.out.println("=== append(" + t + ") ===");
         // If our focus isn't set up for appends or if it's full, insert it into the data structure
         // where it belongs.  Then make a new focus
         if (((focusStartIndex < root.size()) && (focus.length > 0) ) ||
@@ -133,7 +131,6 @@ public class RrbTree1<E> implements ImList<E>, Indented {
     }
 
     @Override public E get(int i) {
-//        System.out.println("  get(" + i + ")");
         if ( (i < 0) || (i > size) ) {
             throw new IndexOutOfBoundsException("Index: " + i + " size: " + size);
         }
@@ -145,16 +142,12 @@ public class RrbTree1<E> implements ImList<E>, Indented {
 //        }
 
         if (i >= focusStartIndex) {
-//            System.out.println("    i>=focusStartIndex: " + focusStartIndex);
             int focusOffset = i - focusStartIndex;
             if (focusOffset < focus.length) {
                 return focus[focusOffset];
             }
             i -= focus.length;
         }
-//        System.out.println("    focusStartIndex: " + focusStartIndex);
-//        System.out.println("    focus.length: " + focus.length);
-//        System.out.println("    adjusted index: " + i);
         return root.get(i);
     }
 
@@ -168,8 +161,6 @@ public class RrbTree1<E> implements ImList<E>, Indented {
      */
     @SuppressWarnings("WeakerAccess")
     public RrbTree1<E> insert(int idx, E element) {
-//        System.out.println("insert(int " + idx + ", E " + element + ")");
-
         // If the focus is full, push it into the tree and make a new one with the new element.
         if (focus.length >= STRICT_NODE_LENGTH) {
             Node<E> newRoot = root.pushFocus(focusStartIndex, focus);
@@ -179,17 +170,13 @@ public class RrbTree1<E> implements ImList<E>, Indented {
 
         // If the index is within the focus, add the item there.
         int diff = idx - focusStartIndex;
-//        System.out.println("diff: " + diff);
 
         if ( (diff >= 0) && (diff <= focus.length) ) {
-//            System.out.println("new focus...");
+            // new focus
             E[] newFocus = insertIntoArrayAt(element, focus, diff, null);
             return new RrbTree1<>(newFocus, focusStartIndex, root, size + 1);
         }
 
-//        System.out.println("insert somewhere other than the current focus.");
-//        System.out.println("focusStartIndex: " + focusStartIndex);
-//        System.out.println("focus: " + arrayString(focus));
         // Here we are left with an insert somewhere else than the current focus.
         Node<E> newRoot = focus.length > 0 ? root.pushFocus(focusStartIndex, focus)
                                            : root;
@@ -266,6 +253,7 @@ involves changing more nodes than maybe necessary.
      Joins the given tree to the right side of this tree (or this to the left side of that one) in
      something like O(log n) time.
      */
+    @SuppressWarnings("unchecked")
     public RrbTree1<E> join(RrbTree1<E> that) {
 
         // We don't want to wonder below if we're inserting leaves or branch-nodes.
@@ -281,8 +269,6 @@ involves changing more nodes than maybe necessary.
             }
             return that;
         }
-
-//        System.out.println("REAL JOIN");
 
         // OK, here we've eliminated the case of merging a leaf into a tree.  We only have to
         // deal with tree-into-tree merges below.
@@ -306,11 +292,6 @@ involves changing more nodes than maybe necessary.
         boolean leftIntoRight = leftRoot.height() < rightRoot.height();
         Node<E> taller = leftIntoRight ? rightRoot : leftRoot;
         Node<E> shorter = leftIntoRight ? leftRoot : rightRoot;
-
-//        System.out.println("taller.height(): " + taller.height());
-//        System.out.println("taller: " + taller.indentedStr(8));
-//        System.out.println("shorter.height(): " + shorter.height());
-//        System.out.println("shorter:" + shorter.indentedStr(8));
 
         // Most compact: Descend the taller tree to shorter.height and find room for all
         //     shorter children as children of that node.
@@ -338,14 +319,12 @@ involves changing more nodes than maybe necessary.
         Node<E>[] ancestors =  genericNodeArray(descentDepth);
         int i = 0;
         for (; i < ancestors.length; i++) {
-//            System.out.println("Adding an ancestor to array...");
+            // Add an ancestor to array
             ancestors[i] = n;
 //            if (n instanceof Leaf) {
-////                System.out.println("leaf: " + n.indentedStr(6));
 //                throw new IllegalStateException("Somehow found a leaf node");
 //            }
             n = n.endChild(leftIntoRight);
-//            System.out.println("New n:" + n.indentedStr(6));
         }
         // i is incremented before leaving the loop, so decrement it here to make it point
         // to ancestors.length - 1;
@@ -358,33 +337,27 @@ involves changing more nodes than maybe necessary.
         // Most compact: Descend the taller tree to shorter.height and find room for all
         //     shorter children as children of that node.
         if (n.thisNodeHasRelaxedCapacity(shorter.numChildren())) {
-//            System.out.println("Adding kids of shorter to proper level of taller...");
+            // Adding kids of shorter to proper level of taller...
             Node<E>[] kids;
             if (shorter instanceof Strict) {
-                //noinspection unchecked
                 kids = ((Strict) shorter).nodes;
             } else if (shorter instanceof Relaxed) {
-                //noinspection unchecked
                 kids = ((Relaxed) shorter).nodes;
             } else {
                 throw new IllegalStateException("Expected a strict or relaxed, but found " +
                                                 shorter.getClass());
             }
             n = n.addEndChildren(leftIntoRight, kids);
-//            System.out.println("Merged:" + n.indentedStr(7));
         }
 
         if (i >= 0) {
-//            System.out.println("Going back up one after lowest check.");
+            // Go back up one after lowest check.
             n = ancestors[i];
             i--;
 //            if (n.height() != shorter.height() + 1) {
 //                throw new IllegalStateException("Didn't go back up enough");
 //            }
-//            System.out.println("n:" + n.indentedStr(2));
         }
-
-//        System.out.println("ancestors.length: " + ancestors.length + " i: " + i);
 
         // TODO: Is this used?
         // While nodes in the taller are full, add a parent to the shorter and try the next level
@@ -392,12 +365,10 @@ involves changing more nodes than maybe necessary.
         while (!n.thisNodeHasRelaxedCapacity(1) &&
                 (i >= 0) ) {
 
-//            System.out.println("no room for short at this level (n has too many kids)");
-
+            // no room for short at this level (n has too many kids)
             n = ancestors[i];
             i--;
 
-            //noinspection unchecked
             shorter = addAncestor(shorter);
 //            shorter.debugValidate();
 
@@ -409,7 +380,6 @@ involves changing more nodes than maybe necessary.
             } else {
                 rightRoot = shorter;
             }
-//            System.out.println("n:" + n.indentedStr(2));
         }
 
         // Here we either have 2 trees of equal height, or
@@ -419,12 +389,12 @@ involves changing more nodes than maybe necessary.
 //            if (!n.thisNodeHasRelaxedCapacity(1)) {
 //                throw new IllegalStateException("somehow got here without relaxed capacity...");
 //            }
-//            System.out.println("Shorter one level below n and there's room");
+            // Shorter one level below n and there's room
             // Trees are not equal height and there's room somewhere.
             n = n.addEndChild(leftIntoRight, shorter);
 //            n.debugValidate();
         } else if (i < 0) {
-//            System.out.println("2 trees of equal height so we make a new parent");
+            // 2 trees of equal height so we make a new parent
 //            if (shorter.height() != n.height()) {
 //                throw new IllegalStateException("Expected trees of equal height");
 //            }
@@ -477,7 +447,6 @@ involves changing more nodes than maybe necessary.
      */
     @Override
     public RrbTree1<E> replace(int index, E item) {
-//        System.out.println("replace(index=" + index + ", item=" + item + ")");
         if ( (index < 0) || (index > size) ) {
             throw new IndexOutOfBoundsException("Index: " + index + " size: " + size);
         }
@@ -487,11 +456,9 @@ involves changing more nodes than maybe necessary.
                 return new RrbTree1<>(replaceInArrayAt(item, focus, focusOffset, null),
                                       focusStartIndex, root, size);
             }
-//            System.out.println("    Subtracting focus.length");
             index -= focus.length;
         }
-//        System.out.println("    About to do replace with maybe-adjusted index=" + index);
-//        System.out.println("    this=" + this);
+        // About to do replace with maybe-adjusted index
         return new RrbTree1<>(focus, focusStartIndex, root.replace(index, item), size);
     }
 
@@ -499,12 +466,6 @@ involves changing more nodes than maybe necessary.
         if ( (index > 0) && (index < size - 1) ) {
             Tuple2<RrbTree1<E>,RrbTree1<E>> s1 = split(index);
             Tuple2<RrbTree1<E>,RrbTree1<E>> s2 = s1._2().split(1);
-//            System.out.println("this: " + this.indentedStr(6));
-//            System.out.println("s1-L: " + s1._1().indentedStr(6));
-//            System.out.println("s1-R: " + s1._2().indentedStr(6));
-//            System.out.println("s2-L: " + s2._1().indentedStr(6));
-//            System.out.println("s2-R: " + s2._2().indentedStr(6));
-
             return s1._1().join(s2._2());
         } else if (index == 0) {
             return split(1)._2();
@@ -843,7 +804,6 @@ involves changing more nodes than maybe necessary.
             T[] newItems = spliceIntoArrayAt(oldFocus, items, splitIndex,
                                              (Class<T>) items[0].getClass());
 
-//            System.out.println("    newItems: " + arrayString(newItems));
             // Shift right one is divide-by 2.
             Tuple2<T[],T[]> split = splitArray(newItems, newItems.length >> 1);
 
@@ -933,7 +893,6 @@ involves changing more nodes than maybe necessary.
         // Constructor
         Strict(int s, Node<T>[] ns) {
             shift = s; nodes = ns;
-//            System.out.println("    new Strict" + shift + arrayString(ns));
         }
 
         @Override public Node<T> child(int childIdx) { return nodes[childIdx]; }
@@ -974,11 +933,11 @@ involves changing more nodes than maybe necessary.
         }
 
         /** Adds a node as the first/leftmost or last/rightmost child */
+        @SuppressWarnings("unchecked")
         @Override public Node<T> addEndChild(boolean leftMost, Node<T> shorter) {
             if (leftMost || !(shorter instanceof Strict)) {
                 return relax().addEndChild(leftMost, shorter);
             }
-            //noinspection unchecked
             return new Strict<>(shift, insertIntoArrayAt(shorter, nodes, nodes.length, Node.class));
         }
 
@@ -1031,23 +990,15 @@ involves changing more nodes than maybe necessary.
         }
 
         @Override public T get(int i) {
-//            System.out.println("  Strict.get(" + i + ")");
             // Find the node indexed by the high bits (for this height).
             // Send the low bits on to our sub-nodes.
             return nodes[highBits(i)].get(lowBits(i));
         }
         @Override public int size() {
             int lastNodeIdx = nodes.length - 1;
-//            System.out.println("    Strict.size()");
-//            System.out.println("      nodes.length:" + nodes.length);
-//            System.out.println("      shift:" + shift);
-//            System.out.println("      STRICT_NODE_LENGTH:" + STRICT_NODE_LENGTH);
-
             // Add up all the full nodes (only the last can be partial)
             int shiftedLength = lastNodeIdx << shift;
-//            System.out.println("      shifed length:" + shiftedLength);
             int partialNodeSize = nodes[lastNodeIdx].size();
-//            System.out.println("      Remainder:" + partialNodeSize);
             return shiftedLength + partialNodeSize;
         }
         private boolean thisNodeHasCapacity() { return nodes.length < STRICT_NODE_LENGTH; }
@@ -1065,6 +1016,7 @@ involves changing more nodes than maybe necessary.
             return size < MAX_NODE_LENGTH - STRICT_NODE_LENGTH;
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public SplitNode<T> splitAt(int splitIndex) {
             int size = size();
@@ -1089,7 +1041,6 @@ involves changing more nodes than maybe necessary.
             final Node<T> left;
             final Node<T> splitLeft = split.left();
             if (subNodeIndex == 0) {
-                //noinspection unchecked
                 left = new Strict<>(shift, new Node[] {splitLeft});
             } else {
                 boolean haveLeft = (splitLeft.size() > 0);
@@ -1161,13 +1112,8 @@ involves changing more nodes than maybe necessary.
         @SuppressWarnings("unchecked")
         @Override
         public Node<T> pushFocus(int index, T[] oldFocus) {
-//            System.out.println("Strict pushFocus(" + arrayString(oldFocus) +
-//                               ", " + index + ")");
-//            System.out.println("  this: " + this);
-
             // If the proper sub-node can take the additional array, let it!
             int subNodeIndex = highBits(index);
-//                System.out.println("  subNodeIndex: " + subNodeIndex);
 
             // It's a strict-compatible addition if the focus being pushed is of
             // STRICT_NODE_LENGTH and the index it's pushed to falls on the final leaf-node boundary
@@ -1177,7 +1123,7 @@ involves changing more nodes than maybe necessary.
                 if (index == size()) {
                     Node<T> lastNode = nodes[nodes.length - 1];
                     if (lastNode.hasStrictCapacity()) {
-//                    System.out.println("  Pushing focus down to lower-level node with capacity.");
+                        // Pushing focus down to lower-level node with capacity.
                         Node<T> newNode = lastNode.pushFocus(lowBits(index), oldFocus);
                         Node<T>[] newNodes = replaceInArrayAt(newNode, nodes, nodes.length - 1,
                                                               Node.class);
@@ -1407,17 +1353,12 @@ involves changing more nodes than maybe necessary.
             //
             // Now guess the sub-node index (quickly).
 
-
-//            System.out.println("treeIndex=" + treeIndex);
-//            System.out.println(" cumulativeSizes=" + arrayString(cumulativeSizes));
             int guess = (cumulativeSizes.length * treeIndex) / size();
-//            System.out.println(" guess=" + guess);
             if (guess >= cumulativeSizes.length) {
-//                System.out.println("Guessed beyond end length - returning last item.");
+                // Guessed beyond end length - returning last item.
                 return cumulativeSizes.length - 1;
             }
             int guessedCumSize = cumulativeSizes[guess];
-//            System.out.println(" guessedCumSize=" + guessedCumSize);
 
             // Now we must check the guess.  The cumulativeSizes we store are slightly misnamed because
             // the max valid treeIndex for a node is its size - 1.  If our guessedCumSize is
@@ -1495,20 +1436,11 @@ involves changing more nodes than maybe necessary.
         }
 
         @Override public T get(int index) {
-//            System.out.println("        Relaxed.get(" + index + ")");
             int subNodeIndex = subNodeIndex(index);
-//            System.out.println("        subNodeIndex: " + subNodeIndex);
-//            System.out.println("        subNodeAdjustedIndex(index, subNodeIndex): " +
-//                               subNodeAdjustedIndex(index, subNodeIndex));
-
             return nodes[subNodeIndex].get(subNodeAdjustedIndex(index, subNodeIndex));
         }
 
         @Override public boolean thisNodeHasRelaxedCapacity(int numNodes) {
-//            System.out.println("thisNodeHasCapacity(): nodes.length=" + nodes.length +
-//                               " MAX_NODE_LENGTH=" + MAX_NODE_LENGTH +
-//                               " MIN_NODE_LENGTH=" + MIN_NODE_LENGTH +
-//                               " STRICT_NODE_LENGTH=" + STRICT_NODE_LENGTH);
             return nodes.length + numNodes < MAX_NODE_LENGTH;
         }
 
@@ -1530,15 +1462,8 @@ involves changing more nodes than maybe necessary.
                                                           size);
         }
 
-//        @Override Relaxed<T> join(Node<T> that) {
-//            if (that.height() > this.height()) {
-//                return nodes[nodes.length - 1].join(that);
-//            }
-//        }
-
         @SuppressWarnings("unchecked")
         Relaxed<T>[] split() {
-//            System.out.println("Relaxed.split(" + i + ")");
             int midpoint = nodes.length >> 1; // Shift-right one is the same as dividing by 2.
             Relaxed<T> left = new Relaxed<>(Arrays.copyOf(cumulativeSizes, midpoint),
                                                     Arrays.copyOf(nodes, midpoint));
@@ -1566,15 +1491,11 @@ involves changing more nodes than maybe necessary.
                 return new SplitNode<>(this, emptyArray(), emptyLeaf(), emptyArray());
             }
 
-//            System.out.println("==========================");
-//            System.out.println("before=" + this.indentedStr(7));
-
             int subNodeIndex = subNodeIndex(splitIndex);
             Node<T> subNode = nodes[subNodeIndex];
 
-//            System.out.println("subNodeIndex=" + subNodeIndex);
             if ( (subNodeIndex > 0) && (splitIndex == cumulativeSizes[subNodeIndex - 1]) ) {
-//                System.out.println("FALLS ON AN EXISTING NODE BOUNDARY");
+                // Falls on an existing node boundary
                 Tuple2<Node<T>[],Node<T>[]> splitNodes = splitArray(nodes, subNodeIndex);
 
                 int[][] splitCumSizes = splitArray(cumulativeSizes, subNodeIndex);
@@ -1605,7 +1526,6 @@ involves changing more nodes than maybe necessary.
                 left = splitLeft;
             } else {
                 boolean haveLeft = (splitLeft.size() > 0);
-//                System.out.println("haveLeft:" + haveLeft);
                 int numLeftItems = subNodeIndex + (haveLeft ? 1 : 0);
                 int[] leftCumSizes = new int[numLeftItems];
                 Node<T>[] leftNodes = genericNodeArray(numLeftItems);
@@ -1663,18 +1583,13 @@ involves changing more nodes than maybe necessary.
         @SuppressWarnings("unchecked")
         @Override public Node<T> pushFocus(int index, T[] oldFocus) {
             // TODO: Review this entire method.
-//            System.out.println("===========\n" +
-//                               "Relaxed pushFocus(index=" + index + ", oldFocus=" +
-//                               arrayString(oldFocus) + ")");
-//            System.out.println("  this: " + this);
-
             int subNodeIndex = subNodeIndex(index);
             Node<T> subNode = nodes[subNodeIndex];
             int subNodeAdjustedIndex = subNodeAdjustedIndex(index, subNodeIndex);
 
             // 1st choice: insert into the subNode if it has enough space enough to handle it
             if (subNode.hasRelaxedCapacity(subNodeAdjustedIndex, oldFocus.length)) {
-//                System.out.println("  Pushing the focus down to a lower-level node w. capacity.");
+                // Push the focus down to a lower-level node w. capacity.
                 Node<T> newNode = subNode.pushFocus(subNodeAdjustedIndex, oldFocus);
                 // Make a copy of our nodesArray, replacing the old node at subNodeIndex with the
                 // new node
@@ -1686,18 +1601,11 @@ involves changing more nodes than maybe necessary.
             if (!thisNodeHasRelaxedCapacity(1)) {
                 // For now, split at half of size.
                 Relaxed<T>[] split = split();
-
-//                Relaxed<T> node1 = split[0];
-//                Relaxed<T> node2 = split[1];
-
-//                System.out.println("Split node1: " + node1);
-//                System.out.println("Split node2: " + node2);
                 int max1 = split[0].size();
                 Relaxed<T> newRelaxed =
                         new Relaxed<>(new int[] {max1,
                                                  max1 + split[1].size()},
                                       split);
-//                System.out.println("newRelaxed3: " + newRelaxed);
                 return newRelaxed.pushFocus(index, oldFocus);
             }
 
@@ -1710,8 +1618,6 @@ involves changing more nodes than maybe necessary.
                 //    boundary and , make it one.
                 //  - Else, insert into the array and replace one leaf with two.
 
-//                System.out.println("Leaf!");
-
                 final Node<T>[] newNodes;
                 final int[] newCumSizes;
                 final int numToSkip;
@@ -1721,7 +1627,7 @@ involves changing more nodes than maybe necessary.
                 if ( (oldFocus.length >= MIN_NODE_LENGTH) &&
                      (subNodeAdjustedIndex == 0 || subNodeAdjustedIndex == subNode.size()) ) {
 
-//                    System.out.println("Insert-between");
+                    // Insert-between
                     // Just add a new leaf
                     Leaf<T> newNode = new Leaf<>(oldFocus);
 
@@ -1746,7 +1652,7 @@ involves changing more nodes than maybe necessary.
                 } else {
                     // Grab the array from the existing leaf node, make the insert, and yield two
                     // new leaf nodes.
-//                    System.out.println("Split-to-insert");
+                    // Split-to-insert
                     Leaf<T>[] res =
                             ((Leaf<T>) subNode).spliceAndSplit(oldFocus, subNodeAdjustedIndex);
                     Leaf<T> leftLeaf = res[0];
@@ -1754,12 +1660,9 @@ involves changing more nodes than maybe necessary.
 
                     newNodes = new Node[nodes.length + 1];
 
-//                    System.out.println("old cumulativeSizes=" + arrayString(cumulativeSizes));
-
                     // Increment newCumSizes for the changed item and all items to the right.
                     newCumSizes = new int[cumulativeSizes.length + 1];
                     int leftSize = 0;
-//                    System.out.println("subNodeIndex=" + subNodeIndex);
 
                     // Copy nodes and cumulativeSizes before split
                     if (subNodeIndex > 0) {
@@ -1767,10 +1670,8 @@ involves changing more nodes than maybe necessary.
                         System.arraycopy(nodes, 0, newNodes, 0, subNodeIndex);
                         //               src,   srcPos, dest,    destPos, length
                         System.arraycopy(cumulativeSizes, 0, newCumSizes, 0, subNodeIndex);
-//                        System.out.println("start of newCumSizes=" + arrayString(newCumSizes));
 
                         leftSize = cumulativeSizes[subNodeIndex - 1];
-//                        System.out.println("cumulativeSize=" + cumulativeSize);
                     }
 
                     // Copy split nodes and cumulativeSizes
@@ -1780,37 +1681,22 @@ involves changing more nodes than maybe necessary.
                     newCumSizes[subNodeIndex] = leftSize;
                     newCumSizes[subNodeIndex + 1] = leftSize + rightLeaf.size();
 
-//                    System.out.println("continued newNodes=" + arrayString(newNodes));
-//                    System.out.println("continued cumulativeSizes=" + arrayString(newCumSizes));
-
-
                     if (subNodeIndex < (nodes.length - 1)) {
                         //               src,srcPos,dest,destPos,length
                         System.arraycopy(nodes, subNodeIndex + 1, newNodes, subNodeIndex + 2,
                                          nodes.length - subNodeIndex - 1);
-//                        System.out.println("completed newNodes=" + arrayString(newNodes));
                     }
                     numToSkip = 2;
                 }
                 for (int i = subNodeIndex + numToSkip; i < newCumSizes.length; i++) {
-//                    System.out.println("i=" + i);
-//                    System.out.println("numToSkip=" + numToSkip);
-//                    System.out.println("oldFocus.length=" + oldFocus.length);
-//                    System.out.println("cumulativeSizes[i - 1]=" + cumulativeSizes[i - 1]);
                     newCumSizes[i] = cumulativeSizes[i - 1] + oldFocus.length;
-//                    System.out.println("newCumSizes so far=" + arrayString(newCumSizes));
                 }
 
-//                System.out.println("newNodes=" + arrayString(newNodes));
-//                System.out.println("newCumSizes=" + arrayString(newCumSizes));
                 return new Relaxed<>(newCumSizes, newNodes);
                 // end if subNode instanceof Leaf
             } else if (subNode instanceof Strict) {
-//                System.out.println("Converting Strict to Relaxed...");
-//                System.out.println("Before: " + subNode.indentedStr(8));
+                // Convert Strict to Relaxed
                 Relaxed<T> relaxed = ((Strict) subNode).relax();
-//                System.out.println("After: " + relaxed.indentedStr(7));
-//                System.out.println();
                 Node<T> newNode = relaxed.pushFocus(subNodeAdjustedIndex, oldFocus);
                 return replaceInRelaxedAt(cumulativeSizes, nodes, newNode, subNodeIndex,
                                           oldFocus.length);
@@ -1820,19 +1706,10 @@ involves changing more nodes than maybe necessary.
             // split the appropriate sub-node.
 
             // For now, split at half of size.
-//            System.out.println("Splitting from:\n" + this.indentedStr(0));
-//            System.out.println("About to split:\n" + subNode.indentedStr(0));
-//            System.out.println("Split at: " + (subNode.size() >> 1));
-//            System.out.println("To insert: " + arrayString(oldFocus));
-
             Relaxed<T>[] newSubNode = ((Relaxed<T>) subNode).split();
 
             Relaxed<T> node1 = newSubNode[0];
             Relaxed<T> node2 = newSubNode[1];
-
-//            System.out.println("Split node1: " + node1);
-//            System.out.println("Split node2: " + node2);
-
             Node<T>[] newNodes = genericNodeArray(nodes.length + 1);
 
             // If we aren't inserting at the first item, array-copy the nodes before the insert
@@ -1987,11 +1864,9 @@ involves changing more nodes than maybe necessary.
          @param subNodeIndex the index to split children at?
          @return a copy of this node with only the right-hand side of the split.
          */
+        @SuppressWarnings("unchecked")
         public static <T> Node<T> fixRight(Node<T>[] origNodes, Node<T> splitRight,
                                            int subNodeIndex) {
-//            System.out.println("origNodes=" + showSubNodes(new StringBuilder(), origNodes, 10));
-//            System.out.println("splitRight=" + splitRight.indentedStr(11));
-//            System.out.println("subNodeIndex=" + subNodeIndex);
 //            if ( (splitRight.size() > 0) &&
 //                 (origNodes[0].height() != splitRight.height()) ) {
 //                throw new IllegalStateException("Passed a splitRight node of a different height" +
@@ -1999,17 +1874,12 @@ involves changing more nodes than maybe necessary.
 //            }
             Node<T> right;
             if (subNodeIndex == (origNodes.length - 1)) {
-//                System.out.println("If we have a single right node, it doesn't need a parent.");
 //                right = splitRight;
-                //noinspection unchecked
                 right = new Relaxed<>(new int[] { splitRight.size() }, new Node[]{ splitRight });
             } else {
-//                System.out.println("splitRight.size()=" + splitRight.size());
                 boolean haveRightSubNode = splitRight.size() > 0;
-//                System.out.println("haveRightSubNode=" + haveRightSubNode);
                 // If we have a rightSubNode, it's going to need a space in our new node array.
                 int numRightNodes = (origNodes.length - subNodeIndex) - (haveRightSubNode ? 0 : 1);
-//                System.out.println("numRightNodes=" + numRightNodes);
                 // Here the first (leftmost) node of the right-hand side was turned into the focus
                 // and we have additional right-hand origNodes to adjust the parent for.
                 int[] rightCumSizes = new int[numRightNodes];
@@ -2031,8 +1901,6 @@ involves changing more nodes than maybe necessary.
                     System.arraycopy(origNodes, subNodeIndex + 1, rightNodes, 0, numRightNodes);
                 }
 
-//                    System.out.println("rightNodes=" + arrayString(rightNodes));
-
                 // For relaxed nodes, we could calculate from previous cumulativeSizes instead of
                 // calling .size() on each one.  For strict, we could just add a strict amount.
                 // For now, this works.
@@ -2051,66 +1919,48 @@ involves changing more nodes than maybe necessary.
     // =================================== Tree-walking Iterator ==================================
 
     /** Holds a node and the index of the child node we are currently iterating in. */
-    private static final class IdxNode<E> implements UnmodIterator<Node<E>> {
+    private static final class IdxNode<E> {
         int idx = 0;
         final Node<E> node;
         IdxNode(Node<E> n) { node = n; }
-        @Override public boolean hasNext() { return idx < node.numChildren(); }
-        @Override public Node<E> next() {
-            Node<E> n = node.child(idx);
-            idx++;
-            return n;
-        }
-        @Override public String toString() { return "IdxNode(" + idx + " " + node + ")"; }
+        public boolean hasNext() { return idx < node.numChildren(); }
+        public Node<E> next() { return node.child(idx++); }
+//        public String toString() { return "IdxNode(" + idx + " " + node + ")"; }
     }
 
     private final class Iter implements UnmodSortedIterator<E> {
 
-        @SuppressWarnings("unchecked")
-        private IdxNode<E>[] genericArrayCreate(int depth) {
-            return (IdxNode<E>[]) new IdxNode<?>[depth];
-        }
-
         // We want this iterator to walk the node tree.
-//        private int childIndex = 0;
         private final IdxNode<E>[] stack;
         private int stackMaxIdx = -1;
 
-        private void stackAdd(IdxNode<E> i) {
-            stackMaxIdx++;
-            stack[stackMaxIdx] = i;
-        }
-
-
-        //        private int leafIdx = 0;
-//        private Leaf<E> leaf;
         private E[] leafArray = emptyArray();
         private int leafArrayIdx;
-        private Iter() {
 
+        @SuppressWarnings("unchecked")
+        private Iter() {
             // Push the focus so we don't have to ever check the index.
             Node<E> newRoot = ((focus != null) && focus.length > 0)
                               ? root.pushFocus(focusStartIndex, focus)
                               : root;
 
-            stack = genericArrayCreate(newRoot.height());
-
-//            System.out.println("newRoot:" + newRoot.indentedStr("newRoot:".length()));
-            leafArray = nextLeafArray(newRoot);
+            stack = (IdxNode<E>[]) new IdxNode<?>[newRoot.height()];
+            leafArray = findLeaf(newRoot);
         }
 
         // Descent to the leftmost unused leaf node.
-        private E[] nextLeafArray(Node<E> node) {
+        private E[] findLeaf(Node<E> node) {
             // Descent to left-most bottom node.
             while (!(node instanceof Leaf)) {
                 IdxNode<E> in = new IdxNode<>(node);
-                stackAdd(in);
+                // Add indexNode to ancestor stack
+                stack[++stackMaxIdx] = in;
                 node = in.next();
             }
             return ((Leaf<E>) node).items;
         }
 
-        private E[] ensureLeaf() {
+        private E[] nextLeafArray() {
             // While nodes are used up, get next node from node one level up.
             while ( (stackMaxIdx > -1) && !stack[stackMaxIdx].hasNext() ) {
                 stackMaxIdx--;
@@ -2121,13 +1971,13 @@ involves changing more nodes than maybe necessary.
             }
             // If node one level up is used up, find a node that isn't used up and descend to its
             // leftmost leaf.
-            return nextLeafArray(stack[stackMaxIdx].next());
+            return findLeaf(stack[stackMaxIdx].next());
         }
 
         @Override public boolean hasNext() {
             if (leafArrayIdx < leafArray.length) { return true; }
 //            if (leafArray.length == 0) { return false; }
-            leafArray = ensureLeaf();
+            leafArray = nextLeafArray();
             leafArrayIdx = 0;
             return leafArray.length > 0;
         }
@@ -2135,7 +1985,7 @@ involves changing more nodes than maybe necessary.
         @Override public E next() {
             // If there's no more in this leaf array, get the next one
             if (leafArrayIdx >= leafArray.length) {
-                leafArray = ensureLeaf();
+                leafArray = nextLeafArray();
                 leafArrayIdx = 0;
             }
             // Return the next item in the leaf array and increment index
@@ -2176,11 +2026,6 @@ involves changing more nodes than maybe necessary.
     private static <T> T[] insertIntoArrayAt(T item, T[] items, int idx, Class<T> tClass) {
         // Make an array that's one bigger.  It's too bad that the JVM bothers to
         // initialize this with nulls.
-
-//        System.out.println("items.getClass(): " + items.getClass());
-//        System.out.println("items.getClass().getComponentType(): " +
-//                            items.getClass().getComponentType());
-//        System.out.println("item.getClass(): " + item.getClass());
 
         @SuppressWarnings("unchecked")
         // Make an array that big enough.  It's too bad that the JVM bothers to
@@ -2297,10 +2142,8 @@ involves changing more nodes than maybe necessary.
 
 //        // original array, offset, newArray, offset, length
 //        System.arraycopy(orig, 0, split._1(), 0, splitIndex);
-////            System.out.println("    left: " + arrayString(left));
 //
 //        System.arraycopy(orig, splitIndex, split._2(), 0, rightLength);
-////            System.out.println("    right: " + arrayString(right));
 //        return split;
     }
 
@@ -2323,10 +2166,7 @@ involves changing more nodes than maybe necessary.
                                      new int[rightLength]};
         // original array, offset, newArray, offset, length
         System.arraycopy(orig, 0, split[0], 0, splitIndex);
-//            System.out.println("    left: " + arrayString(left));
-
         System.arraycopy(orig, splitIndex, split[1], 0, rightLength);
-//            System.out.println("    right: " + arrayString(right));
         return split;
     }
 
@@ -2448,10 +2288,4 @@ involves changing more nodes than maybe necessary.
         }
         return sB;
     }
-
-//    private static void debug(String txt, Indented obj) {
-//        System.out.println(txt + obj.indentedStr(txt.length()));
-//    }
-//    private static void debug(String txt) { System.out.println(txt); }
-
 } // end class RrbTree
