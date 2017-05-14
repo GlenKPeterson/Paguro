@@ -29,6 +29,21 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 THE POSSIBILITY OF SUCH DAMAGE.
 -->
 
+<!--
+Build first:
+mvn clean install
+
+Check that nothing blows up:
+java -jar target/benchmarks.jar -f 1 -i 1 -wi 0
+
+// A reasonably fast test
+java -jar target/benchmarks.jar -f 2 -i 5 -wi 3
+
+// Takes 3-10 warmup iterations to settle in, so this is safer:
+java -jar target/benchmarks.jar -f 2 -i 5 -wi 8
+
+-->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>

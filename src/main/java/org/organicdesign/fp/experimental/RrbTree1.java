@@ -139,10 +139,10 @@ public class RrbTree1<E> implements ImList<E>, Indented {
         }
 
         // This is a debugging assertion - can't be covered by a test.
-        if ( (focusStartIndex < 0) || (focusStartIndex > size) ) {
-            throw new IllegalStateException("focusStartIndex: " + focusStartIndex +
-                                            " size: " + size);
-        }
+//        if ( (focusStartIndex < 0) || (focusStartIndex > size) ) {
+//            throw new IllegalStateException("focusStartIndex: " + focusStartIndex +
+//                                            " size: " + size);
+//        }
 
         if (i >= focusStartIndex) {
 //            System.out.println("    i>=focusStartIndex: " + focusStartIndex);
@@ -293,13 +293,13 @@ involves changing more nodes than maybe necessary.
         Node<E> leftRoot = pushFocus();
         Node<E> rightRoot = that.pushFocus();
 
-        if (leftRoot != eliminateUnnecessaryAncestors(leftRoot)) {
-            throw new IllegalStateException("Left had unnecessary ancestors!");
-        }
+//        if (leftRoot != eliminateUnnecessaryAncestors(leftRoot)) {
+//            throw new IllegalStateException("Left had unnecessary ancestors!");
+//        }
 
-        if (rightRoot != eliminateUnnecessaryAncestors(rightRoot)) {
-            throw new IllegalStateException("Right had unnecessary ancestors!");
-        }
+//        if (rightRoot != eliminateUnnecessaryAncestors(rightRoot)) {
+//            throw new IllegalStateException("Right had unnecessary ancestors!");
+//        }
 
         // Whether to add the right tree to the left one (true) or vice-versa (false).
         // True also means left is taller, false: right is taller.
@@ -332,18 +332,18 @@ involves changing more nodes than maybe necessary.
 
         // Actual amount we're going to descend.
         int descentDepth = taller.height() - shorter.height();
-        if ( (descentDepth < 0) || (descentDepth >= taller.height()) ) {
-            throw new IllegalStateException("Illegal descent depth: " + descentDepth);
-        }
+//        if ( (descentDepth < 0) || (descentDepth >= taller.height()) ) {
+//            throw new IllegalStateException("Illegal descent depth: " + descentDepth);
+//        }
         Node<E>[] ancestors =  genericNodeArray(descentDepth);
         int i = 0;
         for (; i < ancestors.length; i++) {
 //            System.out.println("Adding an ancestor to array...");
             ancestors[i] = n;
-            if (n instanceof Leaf) {
-//                System.out.println("leaf: " + n.indentedStr(6));
-                throw new IllegalStateException("Somehow found a leaf node");
-            }
+//            if (n instanceof Leaf) {
+////                System.out.println("leaf: " + n.indentedStr(6));
+//                throw new IllegalStateException("Somehow found a leaf node");
+//            }
             n = n.endChild(leftIntoRight);
 //            System.out.println("New n:" + n.indentedStr(6));
         }
@@ -351,9 +351,9 @@ involves changing more nodes than maybe necessary.
         // to ancestors.length - 1;
         i--;
 
-        if (n.height() != shorter.height()) {
-            throw new IllegalStateException("Didn't get to proper height");
-        }
+//        if (n.height() != shorter.height()) {
+//            throw new IllegalStateException("Didn't get to proper height");
+//        }
 
         // Most compact: Descend the taller tree to shorter.height and find room for all
         //     shorter children as children of that node.
@@ -378,9 +378,9 @@ involves changing more nodes than maybe necessary.
 //            System.out.println("Going back up one after lowest check.");
             n = ancestors[i];
             i--;
-            if (n.height() != shorter.height() + 1) {
-                throw new IllegalStateException("Didn't go back up enough");
-            }
+//            if (n.height() != shorter.height() + 1) {
+//                throw new IllegalStateException("Didn't go back up enough");
+//            }
 //            System.out.println("n:" + n.indentedStr(2));
         }
 
@@ -399,7 +399,7 @@ involves changing more nodes than maybe necessary.
 
             //noinspection unchecked
             shorter = addAncestor(shorter);
-            shorter.debugValidate();
+//            shorter.debugValidate();
 
             // Sometimes we care about which is shorter and sometimes about left and right.
             // Since we fixed the shorter tree, we have to update the left/right
@@ -416,25 +416,25 @@ involves changing more nodes than maybe necessary.
         // we have room in n for the shorter as a child.
 
         if (shorter.height() == (n.height() - 1)) {
-            if (!n.thisNodeHasRelaxedCapacity(1)) {
-                throw new IllegalStateException("somehow got here without relaxed capacity...");
-            }
+//            if (!n.thisNodeHasRelaxedCapacity(1)) {
+//                throw new IllegalStateException("somehow got here without relaxed capacity...");
+//            }
 //            System.out.println("Shorter one level below n and there's room");
             // Trees are not equal height and there's room somewhere.
             n = n.addEndChild(leftIntoRight, shorter);
-            n.debugValidate();
+//            n.debugValidate();
         } else if (i < 0) {
 //            System.out.println("2 trees of equal height so we make a new parent");
-            if (shorter.height() != n.height()) {
-                throw new IllegalStateException("Expected trees of equal height");
-            }
+//            if (shorter.height() != n.height()) {
+//                throw new IllegalStateException("Expected trees of equal height");
+//            }
 
             @SuppressWarnings("unchecked")
             Node<E>[] newRootArray = new Node[] {leftRoot, rightRoot};
             int leftSize = leftRoot.size();
             Node<E> newRoot =
                     new Relaxed<>(new int[] {leftSize, leftSize + rightRoot.size()}, newRootArray);
-            newRoot.debugValidate();
+//            newRoot.debugValidate();
             return new RrbTree1<>(emptyArray(), 0, newRoot, newRoot.size());
         } else {
             throw new IllegalStateException("How did we get here?");
@@ -458,7 +458,7 @@ involves changing more nodes than maybe necessary.
             i--;
         }
 
-        n.debugValidate();
+//        n.debugValidate();
         return new RrbTree1<>(emptyArray(), 0, n, n.size());
     }
 
@@ -539,8 +539,8 @@ involves changing more nodes than maybe necessary.
 
         SplitNode<E> split = newRoot.splitAt(splitIndex);
 
-        split.left().debugValidate();
-        split.right().debugValidate();
+//        split.left().debugValidate();
+//        split.right().debugValidate();
 
         E[] lFocus = split.leftFocus();
         Node<E> left = eliminateUnnecessaryAncestors(split.left());
@@ -603,8 +603,7 @@ involves changing more nodes than maybe necessary.
 
     // There's bit shifting going on here because it's a very fast operation.
     // Shifting right by 5 is eons faster than dividing by 32.
-    // TODO: Change to 5.
-    private static final int NODE_LENGTH_POW_2 = 2; // 2 for testing now, 5 for real later.
+    private static final int NODE_LENGTH_POW_2 = 5; // 2 for testing, 5 for real
 
     // 0b00000000000000000000000000100000 = 0x20 = 32
     private static final int STRICT_NODE_LENGTH = 1 << NODE_LENGTH_POW_2;
@@ -715,12 +714,12 @@ involves changing more nodes than maybe necessary.
          */
         SplitNode(Node<T> ln, T[] lf, Node<T> rn, T[] rf) {
             super(ln, lf, rn, rf);
-            if (lf.length > STRICT_NODE_LENGTH) {
-                throw new IllegalStateException("Left focus too long: " + arrayString(lf));
-            }
-            if (rf.length > STRICT_NODE_LENGTH) {
-                throw new IllegalStateException("Right focus too long: " + arrayString(rf));
-            }
+//            if (lf.length > STRICT_NODE_LENGTH) {
+//                throw new IllegalStateException("Left focus too long: " + arrayString(lf));
+//            }
+//            if (rf.length > STRICT_NODE_LENGTH) {
+//                throw new IllegalStateException("Right focus too long: " + arrayString(rf));
+//            }
         }
         public Node<T> left() { return _1; }
         public T[] leftFocus() { return _2; }
@@ -799,24 +798,21 @@ involves changing more nodes than maybe necessary.
 
         @Override public boolean hasRelaxedCapacity(int index, int size) {
             // Appends and prepends need to be a good size, but random inserts do not.
-            if ( (size < 1) || (size >= MAX_NODE_LENGTH) ) {
-                throw new IllegalArgumentException("Bad size: " + size);
-              // + " MIN_NODE_LENGTH=" + MIN_NODE_LENGTH + " MAX_NODE_LENGTH=" + MAX_NODE_LENGTH);
-            }
-//            System.out.println("Leaf.hasRelaxedCapacity(index=" + index + ", size=" + size + ")");
-//            System.out.println("   Leaf.items=" + arrayString(items));
-//            System.out.println("   MAX_NODE_LENGTH=" + MAX_NODE_LENGTH);
+//            if ( (size < 1) || (size >= MAX_NODE_LENGTH) ) {
+//                throw new IllegalArgumentException("Bad size: " + size);
+//              // + " MIN_NODE_LENGTH=" + MIN_NODE_LENGTH + " MAX_NODE_LENGTH=" + MAX_NODE_LENGTH);
+//            }
             return (items.length + size) < MAX_NODE_LENGTH;
         }
 
         @Override
         public SplitNode<T> splitAt(int splitIndex) {
-            if (splitIndex < 0) {
-                throw new IllegalArgumentException("Called splitAt when splitIndex < 0");
-            }
-            if (splitIndex > items.length - 1) {
-                throw new IllegalArgumentException("Called splitAt when splitIndex > orig.length - 1");
-            }
+//            if (splitIndex < 0) {
+//                throw new IllegalArgumentException("Called splitAt when splitIndex < 0");
+//            }
+//            if (splitIndex > items.length - 1) {
+//                throw new IllegalArgumentException("Called splitAt when splitIndex > orig.length - 1");
+//            }
 
             // Should we just ensure that the split is between 1 and items.length (exclusive)?
             if (splitIndex == 0) {
@@ -859,9 +855,9 @@ involves changing more nodes than maybe necessary.
         // I think this can only be called when the root node is a leaf.
         @SuppressWarnings("unchecked")
         @Override public Node<T> pushFocus(int index, T[] oldFocus) {
-            if (oldFocus.length == 0) {
-                throw new IllegalStateException("Never call this with an empty focus!");
-            }
+//            if (oldFocus.length == 0) {
+//                throw new IllegalStateException("Never call this with an empty focus!");
+//            }
             // We put the empty Leaf as the root of the empty vector and it stays there
             // until the first call to this method, at which point, the oldFocus becomes the
             // new root.
@@ -903,16 +899,16 @@ involves changing more nodes than maybe necessary.
 
         @Override
         public Node<T> replace(int idx, T t) {
-            if (idx >= size()) {
-                throw new IllegalArgumentException("Invalid index " + idx + " >= " + size());
-            }
+//            if (idx >= size()) {
+//                throw new IllegalArgumentException("Invalid index " + idx + " >= " + size());
+//            }
             return new Leaf<>(replaceInArrayAt(t, items, idx, null));
         }
 
         @Override public boolean thisNodeHasRelaxedCapacity(int numItems) {
-            if ( (numItems < 1) || (numItems >= MAX_NODE_LENGTH) ) {
-                throw new IllegalArgumentException("Bad size: " + numItems);
-            }
+//            if ( (numItems < 1) || (numItems >= MAX_NODE_LENGTH) ) {
+//                throw new IllegalArgumentException("Bad size: " + numItems);
+//            }
             return items.length + numItems < MAX_NODE_LENGTH;
         }
 
@@ -988,9 +984,9 @@ involves changing more nodes than maybe necessary.
 
         /** Adds kids as leftmost or rightmost of current children */
         @Override public Node<T> addEndChildren(boolean leftMost, Node<T>[] newKids) {
-            if (!thisNodeHasRelaxedCapacity(newKids.length)) {
-                throw new IllegalStateException("Can't add enough kids");
-            }
+//            if (!thisNodeHasRelaxedCapacity(newKids.length)) {
+//                throw new IllegalStateException("Can't add enough kids");
+//            }
             return relax().addEndChildren(leftMost, newKids);
         }
 
@@ -1061,9 +1057,9 @@ involves changing more nodes than maybe necessary.
         }
 
         @Override public boolean hasRelaxedCapacity(int index, int size) {
-            if ( (size < 1) || (size >= MAX_NODE_LENGTH) ) {
-                throw new IllegalArgumentException("Bad size: " + size);
-            }
+//            if ( (size < 1) || (size >= MAX_NODE_LENGTH) ) {
+//                throw new IllegalArgumentException("Bad size: " + size);
+//            }
             // It has relaxed capacity because a Relaxed node could have up to MAX_NODE_LENGTH nodes
             // and by definition this Strict node has exactly STRICT_NODE_LENGTH items.
             return size < MAX_NODE_LENGTH - STRICT_NODE_LENGTH;
@@ -1072,18 +1068,15 @@ involves changing more nodes than maybe necessary.
         @Override
         public SplitNode<T> splitAt(int splitIndex) {
             int size = size();
-            if ( (splitIndex < 0) || (splitIndex > size) ) {
-                throw new IllegalArgumentException("Bad splitIndex: " + splitIndex);
-            }
+//            if ( (splitIndex < 0) || (splitIndex > size) ) {
+//                throw new IllegalArgumentException("Bad splitIndex: " + splitIndex);
+//            }
             if (splitIndex == 0) {
                 return new SplitNode<>(emptyLeaf(), emptyArray(), this, emptyArray());
             }
             if (splitIndex == size) {
                 return new SplitNode<>(this, emptyArray(), emptyLeaf(), emptyArray());
             }
-
-            //            System.out.println("==========================");
-            //            System.out.println("before=" + this.indentedStr(7));
 
             // Not split on a child boundary, so find which child to split and pass it the
             // appropriate index.
@@ -1093,27 +1086,15 @@ involves changing more nodes than maybe necessary.
 
             SplitNode<T> split = subNode.splitAt(subNodeAdjustedIndex);
 
-            //            debug("--------------------------");
-            //            debug("before=", this);
-            //            debug("splitIndex=" + splitIndex);
-            //            debug("nodes.length=" + nodes.length);
-            //            debug("subNodeIndex=" + subNodeIndex);
-            ////            debug("subNode=", subNode);
-            //            debug("split=", split);
-
             final Node<T> left;
             final Node<T> splitLeft = split.left();
             if (subNodeIndex == 0) {
-                //                debug("If we have a single left node, it doesn't need a parent.");
-//                System.out.println("NOPARENT");
-
                 //noinspection unchecked
                 left = new Strict<>(shift, new Node[] {splitLeft});
             } else {
                 boolean haveLeft = (splitLeft.size() > 0);
                 int numLeftItems = subNodeIndex + (haveLeft ? 1 : 0);
                 Node<T>[] leftNodes = genericNodeArray(numLeftItems);
-                //                    debug("leftCumSizes=" + arrayString(leftCumSizes));
                 // Copy one less item if we are going to add the split one in a moment.
                 // I could have written:
                 //     haveLeft ? numLeftItems - 1
@@ -1126,37 +1107,35 @@ involves changing more nodes than maybe necessary.
                 left = new Strict<>(shift, leftNodes);
             }
 
-            left.debugValidate();
-            split.right().debugValidate();
+//            left.debugValidate();
+//            split.right().debugValidate();
 
-            if ( (split.right().size() > 0) &&
-                 (nodes[0].height() != split.right().height()) ) {
-                throw new IllegalStateException(
-                        "Have a right node of a different height!" +
-                        "nodes:" + showSubNodes(new StringBuilder(), nodes, 6) +
-                        "\nright:" + split.right().indentedStr(6));
-            }
+//            if ( (split.right().size() > 0) &&
+//                 (nodes[0].height() != split.right().height()) ) {
+//                throw new IllegalStateException(
+//                        "Have a right node of a different height!" +
+//                        "nodes:" + showSubNodes(new StringBuilder(), nodes, 6) +
+//                        "\nright:" + split.right().indentedStr(6));
+//            }
             final Node<T> right = Relaxed.fixRight(nodes, split.right(), subNodeIndex);
 
-            right.debugValidate();
+//            right.debugValidate();
 
-            if ( (left.size() > 0) &&
-                 (right.size() > 0) &&
-                 (left.height() != right.height()) ) {
-                throw new IllegalStateException("Unequal heights of split!\n" +
-                "left: " + left.indentedStr(6) +
-                "\nright:" + right.indentedStr(6));
-            }
+//            if ( (left.size() > 0) &&
+//                 (right.size() > 0) &&
+//                 (left.height() != right.height()) ) {
+//                throw new IllegalStateException("Unequal heights of split!\n" +
+//                "left: " + left.indentedStr(6) +
+//                "\nright:" + right.indentedStr(6));
+//            }
 
-            SplitNode<T> ret = new SplitNode<>(left, split.leftFocus(),
-                                               right, split.rightFocus());
-            //            debug("RETURNING=", ret);
-            if (this.size() != ret.size()) {
-                throw new IllegalStateException(
-                        "Split on " + this.size() + " items returned " + ret.size() + " items");
-            }
+//            if (this.size() != ret.size()) {
+//                throw new IllegalStateException(
+//                        "Split on " + this.size() + " items returned " + ret.size() + " items");
+//            }
 
-            return ret;
+            return new SplitNode<>(left, split.leftFocus(),
+                                   right, split.rightFocus());
         }
 
         Relaxed<T> relax() {
@@ -1221,7 +1200,7 @@ involves changing more nodes than maybe necessary.
 
                     // Make the skinny-branch of single-element strict nodes:
                     while (newShift < maxShift) {
-//                    System.out.println("  Adding a skinny branch node...");
+                        // Add a skinny branch node
                         Node<T>[] newNodes = (Node<T>[]) Array.newInstance(newNode.getClass(), 1);
                         newNodes[0] = newNode;
                         newNode = new Strict<>(newShift, newNodes);
@@ -1229,13 +1208,13 @@ involves changing more nodes than maybe necessary.
                     }
 
                     if ((nodes.length < STRICT_NODE_LENGTH)) {
-//                    System.out.println("  Adding a node to the existing array");
+                        // Add a node to the existing array
                         Node<T>[] newNodes =
                                 insertIntoArrayAt(newNode, nodes, subNodeIndex, Node.class);
                         // This could allow cheap strict inserts on any leaf-node boundary...
                         return new Strict<>(shift, newNodes);
                     } else {
-//                    System.out.println("  Adding a level to the Strict tree");
+                        // Add a level to the Strict tree
                         return new Strict(shift + NODE_LENGTH_POW_2,
                                              new Node[]{this, newNode});
                     }
@@ -1261,21 +1240,18 @@ involves changing more nodes than maybe necessary.
             } // end if oldFocus.length == STRICT_NODE_LENGTH
 
             // Here we're going to yield a Relaxed Radix node, so punt to that (slower) logic.
-//            System.out.println("Yield a Relaxed node.");
             int[] cumulativeSizes = new int[nodes.length];
             int cumulativeSize = 0;
             for (int i = 0; i < cumulativeSizes.length; i++) {
                 cumulativeSize = cumulativeSize + nodes[i].size();
                 cumulativeSizes[i] = cumulativeSize;
             }
-//            System.out.println("End indices: " + arrayString(cumulativeSizes));
             return new Relaxed<>(cumulativeSizes, nodes).pushFocus(index, oldFocus);
         }
 
         @SuppressWarnings("unchecked")
         @Override
         public Node<T> replace(int idx, T t) {
-//            System.out.println("  Strict.get(" + i + ")");
             // Find the node indexed by the high bits (for this height).
             // Send the low bits on to our sub-nodes.
             int thisNodeIdx = highBits(idx);
@@ -1286,24 +1262,6 @@ involves changing more nodes than maybe necessary.
         @Override public boolean thisNodeHasRelaxedCapacity(int numNodes) {
             return nodes.length + numNodes < MAX_NODE_LENGTH;
         }
-
-//        @Override public Node<T>[] children() { return nodes; }
-//
-//        @Override public Relaxed<T> precatChildren(BranchNode<T> n) {
-//            return relax().precatChildren(n);
-//        }
-//
-//        @Override public Relaxed<T> concatChildren(BranchNode<T> n) {
-//            return relax().concatChildren(n);
-//        }
-//
-//        @Override public void calcCumulativeSizes(CumulativeSizes cs) {
-//            int szSoFar = cs.szSoFar;
-//            for (int i = 0; i < cs.length; i++) {
-//                szSoFar += nodes[cs.srcOffset + i].size();
-//                cs.destArray[cs.destPos + i] = szSoFar;
-//            }
-//        }
 
         @Override public String toString() {
 //            return "Strict(nodes.length="+ nodes.length + ", shift=" + shift + ")";
@@ -1335,31 +1293,31 @@ involves changing more nodes than maybe necessary.
             nodes = ns;
 
             // Consider removing constraint validations before shipping for performance
-            if (cumulativeSizes.length < 1) {
-                throw new IllegalArgumentException("cumulativeSizes.length < 1");
-            }
-            if (nodes.length < 1) {
-                throw new IllegalArgumentException("nodes.length < 1");
-            }
-            if (cumulativeSizes.length != nodes.length) {
-                throw new IllegalArgumentException(
-                        "cumulativeSizes.length:" + cumulativeSizes.length +
-                        " != nodes.length:" + nodes.length);
-            }
+//            if (cumulativeSizes.length < 1) {
+//                throw new IllegalArgumentException("cumulativeSizes.length < 1");
+//            }
+//            if (nodes.length < 1) {
+//                throw new IllegalArgumentException("nodes.length < 1");
+//            }
+//            if (cumulativeSizes.length != nodes.length) {
+//                throw new IllegalArgumentException(
+//                        "cumulativeSizes.length:" + cumulativeSizes.length +
+//                        " != nodes.length:" + nodes.length);
+//            }
 
-            int cumulativeSize = 0;
-            for (int i = 0; i < nodes.length; i++) {
-                cumulativeSize += nodes[i].size();
-                if (cumulativeSize != cumulativeSizes[i]) {
-                    throw new IllegalArgumentException(
-                            "nodes[" + i + "].size() was " +
-                            nodes[i].size() +
-                            " which is not compatable with cumulativeSizes[" +
-                            i + "] which was " + cumulativeSizes[i] +
-                            "\n\tcumulativeSizes=" + arrayString(cumulativeSizes) +
-                            "\n\tnodes=" + arrayString(nodes));
-                }
-            }
+//            int cumulativeSize = 0;
+//            for (int i = 0; i < nodes.length; i++) {
+//                cumulativeSize += nodes[i].size();
+//                if (cumulativeSize != cumulativeSizes[i]) {
+//                    throw new IllegalArgumentException(
+//                            "nodes[" + i + "].size() was " +
+//                            nodes[i].size() +
+//                            " which is not compatable with cumulativeSizes[" +
+//                            i + "] which was " + cumulativeSizes[i] +
+//                            "\n\tcumulativeSizes=" + arrayString(cumulativeSizes) +
+//                            "\n\tnodes=" + arrayString(nodes));
+//                }
+//            }
         }
 
         @Override public Node<T> child(int childIdx) { return nodes[childIdx]; }
@@ -1399,12 +1357,12 @@ involves changing more nodes than maybe necessary.
 
         /** Adds kids as leftmost or rightmost of current children */
         @Override public Node<T> addEndChildren(boolean leftMost, Node<T>[] newKids) {
-            if (!thisNodeHasRelaxedCapacity(newKids.length)) {
-                throw new IllegalStateException("Can't add enough kids");
-            }
-            if (nodes[0].height() != newKids[0].height()) {
-                throw new IllegalStateException("Kids not same height");
-            }
+//            if (!thisNodeHasRelaxedCapacity(newKids.length)) {
+//                throw new IllegalStateException("Can't add enough kids");
+//            }
+//            if (nodes[0].height() != newKids[0].height()) {
+//                throw new IllegalStateException("Kids not same height");
+//            }
             @SuppressWarnings("unchecked")
             Node<T>[] res = spliceIntoArrayAt(newKids, nodes,
                                               leftMost ? 0
@@ -1563,9 +1521,9 @@ involves changing more nodes than maybe necessary.
         @Override public boolean hasRelaxedCapacity(int index, int size) {
 // I think we can add any number of items (less than MAX_NODE_LENGTH)
 //            if ( (size < MIN_NODE_LENGTH) || (size > MAX_NODE_LENGTH) ) {
-            if ( (size < 1) || (size > MAX_NODE_LENGTH) ) {
-                throw new IllegalArgumentException("Bad size: " + size);
-            }
+//            if ( (size < 1) || (size > MAX_NODE_LENGTH) ) {
+//                throw new IllegalArgumentException("Bad size: " + size);
+//            }
             if (thisNodeHasRelaxedCapacity(1)) { return true; }
             int subNodeIndex = subNodeIndex(index);
             return nodes[subNodeIndex].hasRelaxedCapacity(subNodeAdjustedIndex(index, subNodeIndex),
@@ -1598,9 +1556,9 @@ involves changing more nodes than maybe necessary.
         @Override
         public SplitNode<T> splitAt(int splitIndex) {
             int size = size();
-            if ( (splitIndex < 0) || (splitIndex > size) ) {
-                throw new IllegalArgumentException("Bad splitIndex: " + splitIndex);
-            }
+//            if ( (splitIndex < 0) || (splitIndex > size) ) {
+//                throw new IllegalArgumentException("Bad splitIndex: " + splitIndex);
+//            }
             if (splitIndex == 0) {
                 return new SplitNode<>(emptyLeaf(), emptyArray(), emptyLeaf(), emptyArray());
             }
@@ -1627,9 +1585,9 @@ involves changing more nodes than maybe necessary.
                     rightCumSizes[i] = rightCumSizes[i] - bias;
                 }
                 Node<T> left = new Relaxed<>(leftCumSizes, splitNodes._1());
-                left.debugValidate();
+//                left.debugValidate();
                 Node<T> right = new Relaxed<>(rightCumSizes, splitNodes._2());
-                right.debugValidate();
+//                right.debugValidate();
 
                 return new SplitNode<>(left, emptyArray(),
                                        right, emptyArray());
@@ -1638,17 +1596,9 @@ involves changing more nodes than maybe necessary.
             int subNodeAdjustedIndex = subNodeAdjustedIndex(splitIndex, subNodeIndex);
             SplitNode<T> split = subNode.splitAt(subNodeAdjustedIndex);
 
-//            debug("--------------------------");
-//            debug("before=", this);
-//            debug("splitIndex=" + splitIndex);
-//            debug("nodes.length=" + nodes.length);
-//            debug("subNodeIndex=" + subNodeIndex);
-////            debug("subNode=", subNode);
-//            debug("split=", split);
-
             final Node<T> left;
             Node<T> splitLeft = split.left();
-            splitLeft.debugValidate();
+//            splitLeft.debugValidate();
 
             if (subNodeIndex == 0) {
 //                debug("If we have a single left node, it doesn't need a parent.");
@@ -1677,36 +1627,35 @@ involves changing more nodes than maybe necessary.
                     while (splitLeft.height() < this.height() - 1) {
                         splitLeft = addAncestor(splitLeft);
                     }
-                    if ( (leftNodes.length > 0) &&
-                         (leftNodes[0].height() != splitLeft.height()) ) {
-                        throw new IllegalStateException("nodesHeight: " + leftNodes[0].height() +
-                                                        " splitLeftHeight: " + splitLeft.height());
-                    }
+//                    if ( (leftNodes.length > 0) &&
+//                         (leftNodes[0].height() != splitLeft.height()) ) {
+//                        throw new IllegalStateException("nodesHeight: " + leftNodes[0].height() +
+//                                                        " splitLeftHeight: " + splitLeft.height());
+//                    }
                     leftNodes[numLeftItems - 1] = splitLeft;
                 }
                 left = new Relaxed<>(leftCumSizes, leftNodes);
-                left.debugValidate();
+//                left.debugValidate();
             }
 
             final Node<T> right = fixRight(nodes, split.right(), subNodeIndex);
-            right.debugValidate();
+//            right.debugValidate();
 
-            SplitNode<T> ret = new SplitNode<>(left, split.leftFocus(),
-                                               right, split.rightFocus());
-//            debug("RETURNING=", ret);
-            if (this.size() != ret.size()) {
-                throw new IllegalStateException(
-                        "Split on " + this.size() + " items returned " +
-                        ret.size() + " items\n" +
-                        "original=" + this.indentedStr(9) + "\n" +
-                        "splitIndex=" + splitIndex + "\n" +
-                        "leftFocus=" + arrayString(split.leftFocus()) + "\n" +
-                        "left=" + left.indentedStr(5) + "\n" +
-                        "rightFocus=" + arrayString(split.rightFocus()) + "\n" +
-                        "right=" + right.indentedStr(6));
-            }
+            //            debug("RETURNING=", ret);
+//            if (this.size() != ret.size()) {
+//                throw new IllegalStateException(
+//                        "Split on " + this.size() + " items returned " +
+//                        ret.size() + " items\n" +
+//                        "original=" + this.indentedStr(9) + "\n" +
+//                        "splitIndex=" + splitIndex + "\n" +
+//                        "leftFocus=" + arrayString(split.leftFocus()) + "\n" +
+//                        "left=" + left.indentedStr(5) + "\n" +
+//                        "rightFocus=" + arrayString(split.rightFocus()) + "\n" +
+//                        "right=" + right.indentedStr(6));
+//            }
 
-            return ret;
+            return new SplitNode<>(left, split.leftFocus(),
+                                   right, split.rightFocus());
         }
 
         @Override public int numChildren() { return nodes.length; }
@@ -2043,11 +1992,11 @@ involves changing more nodes than maybe necessary.
 //            System.out.println("origNodes=" + showSubNodes(new StringBuilder(), origNodes, 10));
 //            System.out.println("splitRight=" + splitRight.indentedStr(11));
 //            System.out.println("subNodeIndex=" + subNodeIndex);
-            if ( (splitRight.size() > 0) &&
-                 (origNodes[0].height() != splitRight.height()) ) {
-                throw new IllegalStateException("Passed a splitRight node of a different height" +
-                                                " than the origNodes!");
-            }
+//            if ( (splitRight.size() > 0) &&
+//                 (origNodes[0].height() != splitRight.height()) ) {
+//                throw new IllegalStateException("Passed a splitRight node of a different height" +
+//                                                " than the origNodes!");
+//            }
             Node<T> right;
             if (subNodeIndex == (origNodes.length - 1)) {
 //                System.out.println("If we have a single right node, it doesn't need a parent.");
@@ -2093,7 +2042,7 @@ involves changing more nodes than maybe necessary.
                 }
 
                 right = new Relaxed<>(rightCumSizes, rightNodes);
-                right.debugValidate();
+//                right.debugValidate();
             }
             return right;
         } // end fixRight()
@@ -2335,12 +2284,12 @@ involves changing more nodes than maybe necessary.
      @return a 2D array of leftItems then rightItems
      */
     private static <T> Tuple2<T[],T[]> splitArray(T[] orig, int splitIndex) { //, Class<T> tClass) {
-        if (splitIndex < 1) {
-            throw new IllegalArgumentException("Called split when splitIndex < 1");
-        }
-        if (splitIndex > orig.length - 1) {
-            throw new IllegalArgumentException("Called split when splitIndex > orig.length - 1");
-        }
+//        if (splitIndex < 1) {
+//            throw new IllegalArgumentException("Called split when splitIndex < 1");
+//        }
+//        if (splitIndex > orig.length - 1) {
+//            throw new IllegalArgumentException("Called split when splitIndex > orig.length - 1");
+//        }
 
         // NOTE:
         // I sort of suspect that generic 2D array creation where the two arrays are of a different
@@ -2373,12 +2322,12 @@ involves changing more nodes than maybe necessary.
      */
     private static int[][] splitArray(int[] orig, int splitIndex) {
         // This function started an exact duplicate of the one above, but for ints.
-        if (splitIndex < 1) {
-            throw new IllegalArgumentException("Called split when splitIndex < 1");
-        }
-        if (splitIndex > orig.length - 1) {
-            throw new IllegalArgumentException("Called split when splitIndex > orig.length - 1");
-        }
+//        if (splitIndex < 1) {
+//            throw new IllegalArgumentException("Called split when splitIndex < 1");
+//        }
+//        if (splitIndex > orig.length - 1) {
+//            throw new IllegalArgumentException("Called split when splitIndex > orig.length - 1");
+//        }
         int rightLength = orig.length - splitIndex;
         int[][] split = new int[][] {new int[splitIndex],
                                      new int[rightLength]};
