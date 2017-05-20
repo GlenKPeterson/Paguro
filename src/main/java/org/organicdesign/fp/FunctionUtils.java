@@ -21,7 +21,6 @@ import java.util.ListIterator;
 
 import org.organicdesign.fp.collections.UnmodIterator;
 import org.organicdesign.fp.collections.UnmodListIterator;
-import org.organicdesign.fp.collections.UnmodSortedIterator;
 
 /**
  A dumping ground for utility functions that aren't useful enough to belong in StaticImports.
@@ -250,39 +249,6 @@ public class FunctionUtils {
 //            @Override public boolean equals(Object o) { return iter.equals(o); }
     }
 
-    /**
-     Wraps an ordered iterator.  Not Serializable.
-     */
-    @SuppressWarnings("WeakerAccess")
-    public static class UnmodifiableSortedIterator<E> implements UnmodSortedIterator<E> {
-        // Iterators are not serializable (today) because they aren't in Java.
-        // I'm assuming Java had a good reason for that, but I really don't know.
-//        , Serializable {
-//        // For serializable.  Make sure to change whenever internal data format changes.
-//        private static final long serialVersionUID = 20160903174100L;
-
-        private final Iterator<E> iter;
-        private UnmodifiableSortedIterator(Iterator<E> i) { iter = i; }
-
-        @Override public boolean hasNext() { return iter.hasNext(); }
-        @Override public E next() { return iter.next(); }
-
-        // Defining equals and hashcode makes no sense because can't call them without changing
-        // the iterator which both makes it useless, and changes the equals and hashcode
-        // results.
-//            @Override public int hashCode() { return iter.hashCode(); }
-//            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
-//            @Override public boolean equals(Object o) { return iter.equals(o); }
-    }
-
-    // Don't put this on UnmodIterator - see reasons in UnmodifiableIterator above.
-//    public static class UnmodifiableIteratorEmpty<T> extends UnmodifiableIterator<T> {
-//        // Not serializable, so we don't have to defend against deserialization.
-//        private static final UnmodifiableIteratorEmpty<?> INSTANCE =
-//                new UnmodifiableIteratorEmpty<>(Collections.emptyIterator());
-//        private UnmodifiableIteratorEmpty(Iterator<T> i) { super(i); }
-//    }
-
     /** Wraps a list iterator.  The is NOT serializable. */
     @SuppressWarnings("WeakerAccess")
     public static class UnmodifiableListIterator<T> implements UnmodListIterator<T>, Serializable {
@@ -317,15 +283,6 @@ public class FunctionUtils {
     /** Returns an empty unmodifiable iterator.  The result is not serializable. */
     public static <T> UnmodifiableIterator<T> emptyUnmodIterator() {
         return new UnmodifiableIterator<>(Collections.emptyIterator());
-    }
-
-    /**
-     Only use this where Sorted items are called for.  Returns an empty unmodifiable sorted
-     iterator.  The result is serializable, but deserialization will produce a new, unique object.
-     For this reason, you should not compare the returned iterator with the == operator.
-     */
-    public static <T> UnmodSortedIterator<T> emptyUnmodSortedIterator() {
-        return new UnmodifiableSortedIterator<>(Collections.emptyIterator());
     }
 
     /** Returns an empty list iterator.  The result is NOT serializable. */
