@@ -1,14 +1,13 @@
 package org.organicdesign.fp.collections;
 
 import org.junit.Test;
-import org.organicdesign.fp.FunctionUtils;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.FunctionUtils.ordinal;
-import static org.organicdesign.fp.TestUtilities.compareIterators;
 
 /**
  Created by gpeterso on 9/13/16.
@@ -37,7 +36,11 @@ public class MutableUnsortedSetTest {
         @Override public boolean contains(Object o) { return inner.contains(o); }
 
         @Override public UnmodIterator<E> iterator() {
-            return FunctionUtils.unmodIterator(inner.iterator());
+            return new UnmodIterator<E>() {
+                private final Iterator<E> iter = inner.iterator();
+                @Override public boolean hasNext() { return iter.hasNext(); }
+                @Override public E next() { return iter.next(); }
+            };
         }
     }
 

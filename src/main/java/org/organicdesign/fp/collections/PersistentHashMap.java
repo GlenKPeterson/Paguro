@@ -25,7 +25,7 @@ import org.organicdesign.fp.oneOf.Option;
 import org.organicdesign.fp.collections.PersistentTreeMap.Box;
 import org.organicdesign.fp.tuple.Tuple2;
 
-import static org.organicdesign.fp.FunctionUtils.emptyUnmodIterator;
+import static org.organicdesign.fp.collections.UnmodIterator.emptyUnmodIterator;
 
 /**
  Rich Hickey's immutable rendition of Phil Bagwell's Hash Array Mapped Trie.

@@ -14,11 +14,6 @@
 
 package org.organicdesign.fp;
 
-import java.util.Collections;
-import java.util.Iterator;
-
-import org.organicdesign.fp.collections.UnmodIterator;
-
 /**
  A dumping ground for utility functions that aren't useful enough to belong in StaticImports.
 
@@ -194,80 +189,5 @@ public class FunctionUtils {
             }
         }
         return Integer.toString(origI) + "th";
-    }
-
-// EqualsWhichDoesntCheckParameterClass Note:
-// http://codereview.stackexchange.com/questions/88333/is-one-sided-equality-more-helpful-or-more-confusing-than-quick-failure
-// "There is no one-sided equality. If it is one-sided, that is it's asymmetric, then it's just
-// wrong."  Which is a little ironic because with inheritance, there are many cases in Java
-// where equality is one-sided.
-
-    // ========================================== Classes ==========================================
-
-    // The point of these classes existing at all are to wrap mutable collections for safe
-    // sharing.  Use them either to retrofit existing Java code, or to wrap mutable collections
-    // you may use for performance reasons.
-    //
-    // These are true, named classes instead of anonymous implementations so that they can properly
-    // implement Serializable.
-    //
-    // These classes seem to have to be public in order to compile without
-    // "remove() in org.organicdesign.fp.collections.UnmodIterator is defined in an inaccessible class or interface"
-    //
-    // They belong here, instead of being a static class in the Unmod___ interfacies, so that they
-    // don't overshadow same-named static classes in sub-interfaces, prevent use in method
-    // references (due to overloading), make overloading in subclasses onerous, or generally cause\
-    // confusion.
-
-
-    /**
-     Wraps an iterator.  Not Serializable.  You probably want to use this by calling
-     {@link #unmodIterator(Iterator)}.
-     */
-    @SuppressWarnings("WeakerAccess")
-    public static class UnmodifiableIterator<E> implements UnmodIterator<E> {
-        // Iterators are not serializable (today) because they aren't in Java.
-        // I'm assuming Java had a good reason for that, but I really don't know.
-//        , Serializable {
-//        // For serializable.  Make sure to change whenever internal data format changes.
-//        private static final long serialVersionUID = 20160903174100L;
-
-        private final Iterator<E> iter;
-        private UnmodifiableIterator(Iterator<E> i) { iter = i; }
-
-        @Override public boolean hasNext() { return iter.hasNext(); }
-        @Override public E next() { return iter.next(); }
-
-        // Defining equals and hashcode makes no sense because can't call them without changing
-        // the iterator which both makes it useless, and changes the equals and hashcode
-        // results.
-//            @Override public int hashCode() { return iter.hashCode(); }
-//            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
-//            @Override public boolean equals(Object o) { return iter.equals(o); }
-    }
-
-    // ========================================== Empties ==========================================
-
-    // I had originally provided special implementations for empty collections and iterators.
-    // I started to further enhance these with Serializable singletons with a defensive
-    // readResolve method to defend against deserializing non-singleton instances.  But that
-    // added a lot of complexity without adding a lot of real value.  It also increased the jar
-    // file size and I'm increasingly finding that the JVM optimizes best with minimal code size
-    // (and maximum reuse).  So I picked simple.  Some implementations are left commented out.
-
-    /** Returns an empty unmodifiable iterator.  The result is not serializable. */
-    public static <T> UnmodifiableIterator<T> emptyUnmodIterator() {
-        return new UnmodifiableIterator<>(Collections.emptyIterator());
-    }
-
-    /**
-     Returns an unmodifiable version of the given iterator.  The result is NOT serializable.
-     You could pass a partially used-up iterator to this method, but that's probably something you
-     want to avoid.
-     */
-    public static <T> UnmodIterator<T> unmodIterator(Iterator<T> iter) {
-        return ( (iter == null) || !iter.hasNext() ) ? emptyUnmodIterator() :
-               (iter instanceof UnmodIterator)       ? (UnmodIterator<T>) iter :
-               new UnmodifiableIterator<>(iter);
     }
 }

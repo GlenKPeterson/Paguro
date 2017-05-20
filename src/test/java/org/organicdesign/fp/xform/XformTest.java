@@ -18,7 +18,6 @@ import junit.framework.TestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.organicdesign.fp.function.Fn1;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,7 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.assertArrayEquals;
-import static org.organicdesign.fp.FunctionUtils.emptyUnmodIterator;
+import static org.organicdesign.fp.collections.UnmodIterator.emptyUnmodIterator;
 import static org.organicdesign.fp.StaticImports.vec;
 import static org.organicdesign.fp.StaticImports.xform;
 import static org.organicdesign.fp.function.Fn1.accept;

@@ -16,7 +16,6 @@ package org.organicdesign.fp;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,8 +23,10 @@ import org.junit.runners.JUnit4;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.*;
-import static org.organicdesign.fp.FunctionUtils.*;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.organicdesign.fp.FunctionUtils.ordinal;
+import static org.organicdesign.fp.FunctionUtils.stringify;
 
 @RunWith(JUnit4.class)
 public class FunctionUtilsTest {
@@ -555,12 +556,4 @@ public class FunctionUtilsTest {
 //        TestUtilities.iteratorTest(Arrays.asList(1, 2, 3).iterator(),
 //                                   unmodIterable(Arrays.asList(1,2,3)).iterator());
 //    }
-
-    @Test public void testEmptyUnmodIterator() {
-        assertFalse(emptyUnmodIterator().hasNext());
-    }
-
-    @Test(expected = NoSuchElementException.class)
-    public void testEmptyNext() { emptyUnmodIterator().next(); }
-
 }
