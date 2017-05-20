@@ -14,13 +14,10 @@
 
 package org.organicdesign.fp;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.ListIterator;
 
 import org.organicdesign.fp.collections.UnmodIterator;
-import org.organicdesign.fp.collections.UnmodListIterator;
 
 /**
  A dumping ground for utility functions that aren't useful enough to belong in StaticImports.
@@ -249,28 +246,6 @@ public class FunctionUtils {
 //            @Override public boolean equals(Object o) { return iter.equals(o); }
     }
 
-    /** Wraps a list iterator.  The is NOT serializable. */
-    @SuppressWarnings("WeakerAccess")
-    public static class UnmodifiableListIterator<T> implements UnmodListIterator<T>, Serializable {
-        private final ListIterator<T> iter;
-        private UnmodifiableListIterator(ListIterator<T> is) { iter = is; }
-
-        // For serializable.  Make sure to change whenever internal data format changes.
-        private static final long serialVersionUID = 20160918033000L;
-
-        @Override public boolean hasNext() { return iter.hasNext(); }
-        @Override public T next() { return iter.next(); }
-        @Override public boolean hasPrevious() { return iter.hasPrevious(); }
-        @Override public T previous() { return iter.previous(); }
-        @Override public int nextIndex() { return iter.nextIndex(); }
-        // Defining equals and hashcode makes no sense because can't call them without changing
-        // the iterator which both makes it useless, and changes the equals and hashcode
-        // results.
-//            @Override public int hashCode() { return iter.hashCode(); }
-//            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
-//            @Override public boolean equals(Object o) { return iter.equals(o); }
-    }
-
     // ========================================== Empties ==========================================
 
     // I had originally provided special implementations for empty collections and iterators.
@@ -283,11 +258,6 @@ public class FunctionUtils {
     /** Returns an empty unmodifiable iterator.  The result is not serializable. */
     public static <T> UnmodifiableIterator<T> emptyUnmodIterator() {
         return new UnmodifiableIterator<>(Collections.emptyIterator());
-    }
-
-    /** Returns an empty list iterator.  The result is NOT serializable. */
-    public static <T> UnmodListIterator<T> emptyUnmodListIterator() {
-        return new UnmodifiableListIterator<>(Collections.emptyListIterator());
     }
 
     /**
