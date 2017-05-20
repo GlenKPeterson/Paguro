@@ -32,8 +32,8 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
     // ========================================== Static ==========================================
 
     /**
-     Implements equals and hashCode() methods compatible with java.util.Set (which ignores order)
-     to make defining unmod sets easier, especially for implementing Map.keySet() and such.
+     Implements equals and hashCode() methods compatible with java.util.List (which ignores order)
+     to make defining unmod lists easier.
      */
     abstract class AbstractUnmodList<E> extends UnmodIterable.AbstractUnmodIterable<E>
             implements UnmodList<E> {
@@ -46,7 +46,7 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
                    UnmodSortedIterable.equal(this, UnmodSortedIterable.castFromList(that));
         }
 
-        /** This is correct, but O(n). This implementation is compatible with java.util.AbstractList. */
+        /** This implementation is compatible with java.util.AbstractList but O(n). */
         @Override public int hashCode() {
             int ret = 1;
             for (E item : this) {
