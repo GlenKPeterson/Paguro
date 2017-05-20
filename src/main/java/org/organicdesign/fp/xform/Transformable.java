@@ -14,6 +14,18 @@
 
 package org.organicdesign.fp.xform;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.ImMap;
 import org.organicdesign.fp.collections.ImSet;
@@ -28,18 +40,7 @@ import org.organicdesign.fp.collections.PersistentTreeSet;
 import org.organicdesign.fp.collections.PersistentVector;
 import org.organicdesign.fp.function.Fn1;
 import org.organicdesign.fp.function.Fn2;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import org.organicdesign.fp.oneOf.Or;
 
 /**
  Represents transformations to be carried out on a collection.  The to___() methods were formerly
@@ -97,33 +98,39 @@ public interface Transformable<T> {
      lazy. Fold can also produce a single (scalar) value.  In that form, it is often called
      reduce().
 
-     @param u the accumulator and starting value.  This will be passed to the function on the
+     @param accum the accumulator and starting value.  This will be passed to the function on the
      first iteration to be combined with the first member of the underlying data source.  For some
      operations you'll need to pass an identity, e.g. for a sum, pass 0, for a product, pass 1 as
      this parameter.
-     @param fun combines each value in the list with the result so far.  The initial result is u.
+     @param reducer combines each value in the list with the result so far.  The initial result is u.
      @return an eagerly evaluated result which could be a single value like a sum, or a collection.
      */
-    <U> U fold(U u, Fn2<U,? super T,U> fun);
+    <U> U fold(U accum, Fn2<? super U,? super T,U> reducer);
 
     /**
      Normally you want to terminate by doing a take(), drop(), or takeWhile() before you get to the
      fold, but if you need to terminate based on the complete result so far, you can  provide your
      own termination condition to this version of fold().
 
-     If fold replaces a loop, and return is a more general form of break, then this function can
-     do anything a loop can do.
+     This function can do anything a loop can do.  One use case is to accumulate a map and
+     stop if it finds a duplicate key, before overwriting that element in the map.  It could then
+     return the map so far, an error, or whatever you like.
 
-     @param u the accumulator and starting value.  This will be passed to the function on the
+     @param accum the accumulator and starting value.  This will be passed to the function on the
      first iteration to be combined with the first member of the underlying data source.  For some
      operations you'll need to pass an identity, e.g. for a sum, pass 0, for a product, pass 1 as
      this parameter.
-     @param fun combines each value in the list with the result so far.  The initial result is u.
-     @param terminateWhen returns true when the termination condition is reached and will stop
-     processing the input at that time, returning the latest u.
-     @return an eagerly evaluated result which could be a single value like a sum, or a collection.
+     @param terminator return null to continue processing.  Return non-null to terminate
+     the foldUntil and return Or.bad of this value.  This function is called at the beginning
+     of each "loop", thus it's first called with the original value of accum and the first item
+     to process.  Returning non-null immediately will prevent the reducer from ever being called.
+     @param reducer combines each value in the list with the result so far.  The initial result is u.
+     @return an {@link Or} where the {@link Or#good()} is an eagerly evaluated result and
+     {@link Or#bad()} is whatever terminateWhen returned.
      */
-    <U> U fold(U u, Fn2<U,? super T,U> fun, Fn1<? super U,Boolean> terminateWhen);
+    <G,B> Or<G,B> foldUntil(G accum,
+                            Fn2<? super G,? super T,B> terminator,
+                            Fn2<? super G,? super T,G> reducer);
 
     /**
      Transform each item into exactly one new item using the given function.
@@ -187,8 +194,7 @@ public interface Transformable<T> {
      */
     default <K,V> ImMap<K,V> toImMap(Fn1<? super T,Map.Entry<K,V>> f1) {
         return fold(PersistentHashMap.<K,V>empty().mutable(),
-                    (MutableUnsortedMap<K,V> ts, T t) ->
-                                (MutableUnsortedMap<K,V>) ts.assoc(f1.apply(t)))
+                    (MutableUnsortedMap<K,V> ts, T t) -> ts.assoc(f1.apply(t)))
                 .immutable();
     }
 

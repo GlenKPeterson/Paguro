@@ -88,8 +88,8 @@ public class RrbTree1<E> implements ImList<E>, Indented {
     @Override public RrbTree1<E> append(E t) {
         // If our focus isn't set up for appends or if it's full, insert it into the data structure
         // where it belongs.  Then make a new focus
-        if (((focusStartIndex < root.size()) && (focus.length > 0) ) ||
-            (focus.length >= STRICT_NODE_LENGTH) ) {
+        if ( (focus.length >= STRICT_NODE_LENGTH) ||
+             ((focus.length > 0) && (focusStartIndex < root.size())) ) {
             Node<E> newRoot = root.pushFocus(focusStartIndex, focus);
             E[] newFocus = singleElementArray(t);
             return new RrbTree1<>(newFocus, size, newRoot, size + 1);

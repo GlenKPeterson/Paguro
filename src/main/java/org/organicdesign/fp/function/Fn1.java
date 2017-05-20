@@ -23,6 +23,7 @@ import java.util.function.Function;
 
 import org.organicdesign.fp.oneOf.Option;
 import org.organicdesign.fp.collections.UnmodIterable;
+import org.organicdesign.fp.oneOf.Or;
 import org.organicdesign.fp.xform.Transformable;
 import org.organicdesign.fp.xform.Xform;
 
@@ -204,10 +205,14 @@ public interface Fn1<T,U> extends Function<T,U>, Consumer<T> {
                 (in instanceof UnmodIterable) ? (UnmodIterable<Fn1<T,Boolean>>) in
                                      : Xform.of(in);
 
-        return v.filter(p -> (p != null) && (p != ConstBool.ACCEPT))
-                .fold(accept(),
-                      (accum, p) -> (p == reject()) ? p : and(accum, p),
-                          accum -> accum == reject());
+        Or<Fn1<T,Boolean>,Fn1<T,Boolean>> ret =
+                v.filter(p -> (p != null) && (p != ConstBool.ACCEPT))
+                 .foldUntil(accept(),
+                            (accum, p) -> (p == reject()) ? p : null,
+                            Fn1::and); // (accum, p) -> and(accum, p)
+        // We don't care whether it returns early or not.  Just return whatever is in the or.
+        return ret.match(g -> g,
+                         b -> b);
     }
 
     /**
@@ -233,10 +238,14 @@ public interface Fn1<T,U> extends Function<T,U>, Consumer<T> {
                 (in instanceof UnmodIterable) ? (UnmodIterable<Fn1<T,Boolean>>) in
                                      : Xform.of(in);
 
-        return v.filter(p -> (p != null) && (p != ConstBool.REJECT))
-                .fold(reject(),
-                      (accum, p) -> (p == ConstBool.ACCEPT) ? p : or(accum, p),
-                          accum -> accum == ConstBool.ACCEPT);
+        Or<Fn1<T,Boolean>,Fn1<T,Boolean>> ret =
+                v.filter(p -> (p != null) && (p != ConstBool.REJECT))
+                .foldUntil(reject(),
+                           (accum, p) -> (p == ConstBool.ACCEPT) ? p : null,
+                           Fn1::or); // (accum, p) -> or(accum, p)
+        // We don't care whether it returns early or not.  Just return whatever is in the or.
+        return ret.match(g -> g,
+                         b -> b);
     }
 
     enum BooleanCombiner {

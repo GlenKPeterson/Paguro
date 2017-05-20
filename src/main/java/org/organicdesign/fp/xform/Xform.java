@@ -522,7 +522,7 @@ public abstract class Xform<A> implements UnmodIterable<A> {
     // Do we need a dropWhile???
 
     /** Provides a way to collect the results of the transformation. */
-    @Override public <B> B fold(B ident, Fn2<B,? super A,B> reducer) {
+    @Override public <B> B fold(B ident, Fn2<? super B,? super A,B> reducer) {
         if (reducer == null) {
             throw new IllegalArgumentException("Can't fold with a null reduction function.");
         }
@@ -532,7 +532,6 @@ public abstract class Xform<A> implements UnmodIterable<A> {
         return _fold(runList, runList.opArray(), 0, ident, reducer);
     }
 
-    // TODO: Is this worth keeping over takeWhile(f).fold(...)?
     /**
      Thit implementation should be correct, but could be slow in the case where previous operations
      are slow and the terminateWhen operation is fast and terminates early.  It actually renders
@@ -545,14 +544,14 @@ public abstract class Xform<A> implements UnmodIterable<A> {
 
      {@inheritDoc}
      */
-    @Override public <B> B fold(B ident, Fn2<B,? super A,B> reducer,
-                                Fn1<? super B,Boolean> terminateWhen) {
+    @Override public <G,B> Or<G,B> foldUntil(G accum,
+                                             Fn2<? super G,? super A,B> terminator,
+                                             Fn2<? super G,? super A,G> reducer) {
+        if (terminator == null) {
+            return Or.good(fold(accum, reducer));
+        }
         if (reducer == null) {
             throw new IllegalArgumentException("Can't fold with a null reduction function.");
-        }
-
-        if ( (terminateWhen == null) || (Fn1.reject() == terminateWhen) ) {
-            return fold(ident, reducer);
         }
 
         // Yes, this is a cheap plastic imitation of what you'd hope for if you really need this
@@ -565,12 +564,13 @@ public abstract class Xform<A> implements UnmodIterable<A> {
         // this exact problem.
         List<A> as = this.toMutableList();
         for (A a : as) {
-            ident = reducer.apply(ident, a);
-            if (terminateWhen.apply(ident)) {
-                return ident;
+            B term = terminator.apply(accum, a);
+            if (term != null) {
+                return Or.bad(term);
             }
+            accum = reducer.apply(accum, a);
         }
-        return ident;
+        return Or.good(accum);
     }
 
     @Override public Xform<A> filter(Fn1<? super A,Boolean> f) {

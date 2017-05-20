@@ -35,6 +35,28 @@ public class RrbTree1Test {
 
     private Random rand = new java.security.SecureRandom();
 
+    @Test public void buildStrict() {
+        final int SEVERAL = 2000; //0; //0; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
+        RrbTree1<Integer> is = RrbTree1.empty();
+        ArrayList<Integer> control = new ArrayList<>();
+        for (int j = 0; j < SEVERAL; j++){
+            is = is.append(j);
+            control.add(j);
+            assertEquals(j + 1, is.size());
+            assertEquals(Integer.valueOf(j), is.get(j));
+//            System.out.println(" ==" + is);
+//            for (int k = 0; k <= j; k++) {
+//                assertEquals("Checking index: " + k + " for size=" + control.size(), control.get(k), is.get(k));
+//            }
+            is.debugValidate();
+//            System.out.println(is);
+        }
+        assertEquals(SEVERAL, is.size());
+        for (int j = 0; j < SEVERAL; j++){
+            assertEquals(Integer.valueOf(j), is.get(j));
+        }
+    }
+
     @Test
     public void insertAtZero() {
         final int SEVERAL = 100; //0; //0; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;

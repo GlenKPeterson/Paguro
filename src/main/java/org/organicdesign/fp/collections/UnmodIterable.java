@@ -3,6 +3,7 @@ package org.organicdesign.fp.collections;
 import org.organicdesign.fp.function.Fn1;
 import org.organicdesign.fp.function.Fn2;
 import org.organicdesign.fp.oneOf.Option;
+import org.organicdesign.fp.oneOf.Or;
 import org.organicdesign.fp.xform.Transformable;
 import org.organicdesign.fp.xform.Xform;
 
@@ -168,14 +169,16 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
     }
 
     /** {@inheritDoc} */
-    @Override default <B> B fold(B ident, Fn2<B,? super T,B> reducer) {
+    @Override default <B> B fold(B ident, Fn2<? super B,? super T,B> reducer) {
         return Xform.of(this).fold(ident, reducer);
     }
 
     /** {@inheritDoc} */
-    @Override default <B> B fold(B ident, Fn2<B,? super T,B> reducer,
-                                 Fn1<? super B,Boolean> terminateWhen) {
-        return Xform.of(this).fold(ident, reducer, terminateWhen);
+    @Override default <G,B> Or<G,B> foldUntil(G accum,
+                                              Fn2<? super G,? super T,B> terminator,
+                                              Fn2<? super G,? super T,G> reducer) {
+
+        return Xform.of(this).foldUntil(accum, terminator, reducer);
     }
 
     /** {@inheritDoc} */

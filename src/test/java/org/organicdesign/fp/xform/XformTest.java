@@ -708,9 +708,9 @@ public class XformTest extends TestCase {
 
     @Test(expected = IllegalArgumentException.class)
     public void foldEx2() {
-        assertEquals(Integer.valueOf(45),
+        assertEquals(45,
                      Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                          .fold(0, null, Fn1.reject()));
+                          .foldUntil(null, (a, b) -> a, null).good());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -724,28 +724,29 @@ public class XformTest extends TestCase {
 
         assertEquals(Integer.valueOf(45),
                      Xform.of(Arrays.asList(ints))
-                          .fold(0, (accum, i) -> accum + i, Fn1.reject()));
+                          .foldUntil(0, null, (accum, i) -> accum + i).good());
 
         assertEquals(Integer.valueOf(45),
                      Xform.of(Arrays.asList(ints))
-                          .fold(0, (accum, i) -> accum + i, null));
+                          .foldUntil(0, null, (accum, i) -> accum + i).good());
 
         assertArrayEquals(new Integer[]{2, 3, 4},
                           Xform.of(Arrays.asList(ints))
-                               .fold(new ArrayList<>(),
-                                     (accum, i) -> {
-                                             accum.add(i + 1);
-                                             return accum;
-                                         },
-                                     (accum) -> accum.size() == 3).toArray());
+                               .foldUntil(new ArrayList<>(),
+                                          (accum, i) -> accum.size() == 3 ? accum : null,
+                                          (accum, i) -> {
+                                              accum.add(i + 1);
+                                              return accum;
+                                          }).match(g -> g,
+                                                   b -> b).toArray());
         assertArrayEquals(new Integer[]{2, 3, 4, 5, 6, 7, 8, 9, 10},
                           Xform.of(Arrays.asList(ints))
-                                  .fold(new ArrayList<>(),
-                                        (accum, i) -> {
-                                                accum.add(i + 1);
-                                                return accum;
-                                            },
-                                        (accum) -> accum.size() == 20).toArray());
+                                  .foldUntil(new ArrayList<>(),
+                                             (accum, i) -> accum.size() == 20 ? accum : null,
+                                             (accum, i) -> {
+                                                 accum.add(i + 1);
+                                                 return accum;
+                                             }).match(g->g,b->b).toArray());
 
         // This is fun and it should work.  But it really sets up for the early-termination test
         // next.
@@ -764,9 +765,10 @@ public class XformTest extends TestCase {
                                    7,14,21, 8,16),
                      Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
                           .flatMap(i -> Xform.of(Arrays.asList(i, i * 2, i * 3)))
-                          .fold(new ArrayList<>(),
-                                (alist, item) -> { alist.add(item); return alist; },
-                                (items) -> items.contains(16)));
+                          .foldUntil(new ArrayList<>(),
+                                     (items, item) -> items.contains(16) ? items : null,
+                                     (alist, item) -> { alist.add(item); return alist; })
+                          .match(g->g,b->b));
     }
 
     @Test public void toIterator() {
