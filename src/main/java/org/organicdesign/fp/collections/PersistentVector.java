@@ -48,10 +48,6 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
     // 0b00000000000000000000000000011111 = 0x1f
     private static final int LOW_BITS = MAX_NODE_LENGTH - 1;
 
-    /** Use {@link org.organicdesign.fp.xform.Transformable#toImList()} instead. */
-    @Deprecated
-    public static <T> ImList<T> fromXform(Transformable<T> trans) { return trans.toImList(); }
-
     // Java shift operator review:
     // The signed left shift operator "<<" shifts a bit pattern to the left, and
     // the signed right shift operator ">>" shifts a bit pattern to the right.

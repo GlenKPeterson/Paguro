@@ -55,10 +55,6 @@ public interface Fn0<U> extends Supplier<U>, Callable<U> {
         }
     }
 
-    /** Use {@link Const#NULL} instead because it's serializable. */
-    @Deprecated
-    Fn0<Object> NULL = Const.NULL;
-
     /**
      Wraps a value in a constant function.  If you need to "memoize" some really expensive
      operation, use it to wrap a LazyRef.

@@ -168,14 +168,6 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
             UnmodSortedValIter(Iterator<? extends Map.Entry<K,V>> i) { super(i); }
         }
 
-        /**
-         Use {@link org.organicdesign.fp.tuple.Tuple2#of(java.util.Map.Entry)} instead.
-         */
-        @Deprecated
-        static <K,V> UnEntry<K,V> entryToUnEntry(Map.Entry<K,V> entry) {
-            return Tuple2.of(entry);
-        }
-
         static <K,V>
         UnmodIterator<UnEntry<K,V>> entryIterToUnEntryUnIter(Iterator<Entry<K,V>> innerIter) {
             return new EntryToUnEntryIter<>(innerIter);
@@ -439,8 +431,7 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
 
      {@inheritDoc}
      */
-    @Deprecated
-    @Override default UnmodCollection<V> values() {
+    @Override @Deprecated default UnmodCollection<V> values() {
         class Impl implements UnmodCollection<V>, Serializable {
             // For serializable.  Make sure to change whenever internal data format changes.
             private static final long serialVersionUID = 20160903104400L;

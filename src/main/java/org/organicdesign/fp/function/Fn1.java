@@ -70,10 +70,6 @@ public interface Fn1<T,U> extends Function<T,U>, Consumer<T> {
         }
     }
 
-    /** Use {@link Const#IDENTITY} instead. */
-    @Deprecated
-    Fn1<Object,Object> IDENTITY = Const.IDENTITY;
-
     @SuppressWarnings("unchecked")
     static <V> Fn1<V,V> identity() { return (Fn1<V,V>) Const.IDENTITY; }
 
@@ -100,14 +96,6 @@ public interface Fn1<T,U> extends Function<T,U>, Consumer<T> {
                a == ConstBool.REJECT ? accept() :
                (S s) -> (a.apply(s) == Boolean.TRUE) ? Boolean.FALSE : Boolean.TRUE;
     }
-
-    /** Use {@link ConstBool#ACCEPT} instead */
-    @Deprecated
-    Fn1<Object,Boolean> ACCEPT = ConstBool.ACCEPT;
-
-    /** Use {@link ConstBool#REJECT} instead */
-    @Deprecated
-    Fn1<Object,Boolean> REJECT = ConstBool.REJECT;
 
     /** Returns a type-safe version of the ConstBool.ACCEPT predicate. */
     @SuppressWarnings("unchecked")

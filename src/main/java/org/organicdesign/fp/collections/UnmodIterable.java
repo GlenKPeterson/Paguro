@@ -96,13 +96,6 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
 //    }
 
     /**
-     Renamed to {@link UnmodIterable#hash(Iterable)} to avoid confusion with instance method
-     {@link Object#hashCode()} 2016-09-17
-     */
-    @Deprecated
-    static int hashCode(Iterable is) { return hash(is); }
-
-    /**
      This is correct, but O(n).  It also works regardless of the order of the items because
      a + b = b + a, even when an overflow occurs.
      */

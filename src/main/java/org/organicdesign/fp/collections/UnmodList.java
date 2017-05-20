@@ -112,8 +112,7 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
      deprecation warning, but include a description of why you need to use a List instead of some
      kind of Set or Map!
      */
-    @Deprecated
-    @Override default boolean contains(Object o) {
+    @Override @Deprecated default boolean contains(Object o) {
         for (Object item : this) {
             if (Objects.equals(item, o)) { return true; }
         }

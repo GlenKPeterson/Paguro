@@ -76,14 +76,6 @@ public final class StaticImports {
     // Prevent instantiation
     private StaticImports() { throw new UnsupportedOperationException("No instantiation"); }
 
-//    /**
-//     This turned out to be a bad idea due to the complexity and slowness of serializing
-//     a class extended from an immutable tuple.  I made tuples serializable and was able to back out
-//     other breaking changes.
-//     */
-//    @Deprecated
-//    public static <K,V> Tuple2<K,V> kv(K t, V u) { return Tuple2.of(t, u); }
-
     /**
      Returns a new PersistentHashMap of the given keys and their paired values.  Use the
      {@link StaticImports#tup(Object, Object)} method to define those key/value pairs briefly and

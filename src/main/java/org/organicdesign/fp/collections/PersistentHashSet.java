@@ -184,9 +184,6 @@ public class PersistentHashSet<E> extends UnmodSet.AbstractUnmodSet<E>
             return this;
         }
 
-//        @Deprecated
-//        @Override public Sequence<E> seq() { return impl.keySet().seq(); }
-
         @Override
         public UnmodIterator<E> iterator() { return impl.map(e -> e.getKey()).iterator(); }
 

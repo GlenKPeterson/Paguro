@@ -15,13 +15,6 @@ import java.util.SortedSet;
 public interface UnmodSortedIterable<T> extends UnmodIterable<T> {
     // ========================================== Static ==========================================
 
-    /**
-     Renamed to {@link UnmodSortedIterable#equal(UnmodSortedIterable, UnmodSortedIterable)} to
-     avoid confusion with instance method {@link Object#equals(Object)}
-     */
-    @Deprecated
-    static boolean equals(UnmodSortedIterable a, UnmodSortedIterable b) { return equal(a, b); }
-
     /** This is correct, but O(n).  This only works with an ordered iterable. */
     static boolean equal(UnmodSortedIterable a, UnmodSortedIterable b) {
         // Cheapest operation first...
