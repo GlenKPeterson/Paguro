@@ -14,18 +14,18 @@
 
 package org.organicdesign.fp.xform;
 
-import org.organicdesign.fp.FunctionUtils;
-import org.organicdesign.fp.function.Fn1;
-import org.organicdesign.fp.function.Fn2;
-import org.organicdesign.fp.oneOf.Or;
-import org.organicdesign.fp.collections.UnmodIterable;
-import org.organicdesign.fp.collections.UnmodIterator;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+
+import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.collections.UnmodIterable;
+import org.organicdesign.fp.collections.UnmodIterator;
+import org.organicdesign.fp.function.Fn1;
+import org.organicdesign.fp.function.Fn2;
+import org.organicdesign.fp.oneOf.Or;
 
 /**
  An immutable description of operations to be performed (a transformation, transform, or x-form).

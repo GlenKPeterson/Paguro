@@ -14,13 +14,8 @@
 
 package org.organicdesign.fp.xform;
 
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -33,6 +28,7 @@ import org.organicdesign.fp.collections.ImSortedMap;
 import org.organicdesign.fp.collections.ImSortedSet;
 import org.organicdesign.fp.collections.MutableList;
 import org.organicdesign.fp.collections.MutableUnsortedMap;
+import org.organicdesign.fp.collections.MutableUnsortedSet;
 import org.organicdesign.fp.collections.PersistentHashMap;
 import org.organicdesign.fp.collections.PersistentHashSet;
 import org.organicdesign.fp.collections.PersistentTreeMap;
@@ -175,10 +171,7 @@ public interface Transformable<T> {
     /**
      Realize a thread-safe immutable list to access items quickly O(log32 n) by index.
      */
-    default ImList<T> toImList() {
-        return fold(PersistentVector.emptyMutable(),
-                    MutableList<T>::append).immutable();
-    }
+    default ImList<T> toImList() { return toMutableList().immutable(); }
 
     /**
      Realize an unordered immutable hash map to very quickly O(1) look up values by key, but don't
@@ -192,10 +185,8 @@ public interface Transformable<T> {
 
      @return An immutable map
      */
-    default <K,V> ImMap<K,V> toImMap(Fn1<? super T,Map.Entry<K,V>> f1) {
-        return fold(PersistentHashMap.<K,V>empty().mutable(),
-                    (MutableUnsortedMap<K,V> ts, T t) -> ts.assoc(f1.apply(t)))
-                .immutable();
+    default <K,V> ImMap<K,V> toImMap(Fn1<? super T,Entry<K,V>> f1) {
+        return toMutableMap(f1).immutable();
     }
 
     /**
@@ -205,11 +196,7 @@ public interface Transformable<T> {
 
      @return An immutable set (with duplicates removed)
      */
-    default ImSet<T> toImSet() {
-        //noinspection Convert2MethodRef
-        return fold(PersistentHashSet.emptyMutable(),
-                    (PersistentHashSet.MutableHashSet<T> s, T t) -> s.put(t)).immutable();
-    }
+    default ImSet<T> toImSet() { return toMutableSet().immutable(); }
 
     /**
      Realize an immutable, ordered (tree) map to quickly O(log2 n) look up values by key, but still
@@ -229,7 +216,7 @@ public interface Transformable<T> {
      @return a new PersistentTreeMap of the specified comparator and the given key/value pairs
      */
     default <K,V> ImSortedMap<K,V> toImSortedMap(Comparator<? super K> comp,
-                                                 Fn1<? super T,Map.Entry<K,V>> f1) {
+                                                 Fn1<? super T,Entry<K,V>> f1) {
         return fold((ImSortedMap<K, V>) PersistentTreeMap.<K, V>empty(comp),
                     (ts, t) -> ts.assoc(f1.apply(t)));
     }
@@ -247,11 +234,9 @@ public interface Transformable<T> {
     }
 
     /** Realize a mutable list.  Use toImList unless you need to modify the list in-place. */
-    default List<T> toMutableList() {
-        return fold(new ArrayList<>(), (ts, t) -> {
-            ts.add(t);
-            return ts;
-        });
+    default MutableList<T> toMutableList() {
+        return fold(PersistentVector.emptyMutable(),
+                    MutableList<T>::append);
     }
 
     /**
@@ -262,12 +247,9 @@ public interface Transformable<T> {
 
      @return A map with the keys from the given set, mapped to values using the given function.
      */
-    default <K,V> Map<K,V> toMutableMap(final Fn1<? super T,Map.Entry<K,V>> f1) {
-        return fold(new HashMap<>(), (ts, t) -> {
-            Map.Entry<K,V> entry = f1.apply(t);
-            ts.put(entry.getKey(), entry.getValue());
-            return ts;
-        });
+    default <K,V> MutableUnsortedMap<K,V> toMutableMap(final Fn1<? super T,Entry<K,V>> f1) {
+        return fold(PersistentHashMap.emptyMutable(),
+                    (MutableUnsortedMap<K,V> ts, T t) -> ts.assoc(f1.apply(t)));
     }
 
     /**
@@ -281,10 +263,9 @@ public interface Transformable<T> {
      @return A map with the keys from the given set, mapped to values using the given function.
      */
     default <K,V> SortedMap<K,V>
-    toMutableSortedMap(Comparator<? super K> comp,
-                       final Fn1<? super T,Map.Entry<K,V>> f1) {
-        return fold(new TreeMap<>(), (ts, t) -> {
-            Map.Entry<K,V> entry = f1.apply(t);
+    toMutableSortedMap(Comparator<? super K> comp, final Fn1<? super T,Entry<K,V>> f1) {
+        return fold(new TreeMap<>(comp), (ts, t) -> {
+            Entry<K,V> entry = f1.apply(t);
             ts.put(entry.getKey(), entry.getValue());
             return ts;
         });
@@ -295,11 +276,9 @@ public interface Transformable<T> {
 
      @return A mutable set (with duplicates removed)
      */
-    default Set<T> toMutableSet() {
-        return fold(new HashSet<>(), (ts, t) -> {
-            ts.add(t);
-            return ts;
-        });
+    default MutableUnsortedSet<T> toMutableSet() {
+        return fold(PersistentHashSet.emptyMutable(),
+                    PersistentHashSet.MutableHashSet::put);
     }
 
     /**

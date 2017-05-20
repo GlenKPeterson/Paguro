@@ -297,20 +297,6 @@ public class PersistentTreeMap<K,V> extends UnmodSortedMap.AbstractUnmodMap<K,V>
         // This is the pretty way to do it.
         return this.fold(PersistentTreeSet.ofComp(new KeyComparator<>(comp)),
                          PersistentTreeSet::put);
-
-        // This may be faster, but I haven't timed it.
-
-        // Preserve comparator!
-//        ImSortedSet<Entry<K,V>> ret = PersistentTreeSet.ofComp(new KeyComparator<>(comp));
-//
-//        // It is ABSOLUTELY CRITICAL to turn each item into a KeyVal.  What our iterator returns
-//        // are actually huge chunks of the TreeMap which should not be serializable.  I don't know
-//        // if we should change the iterator to wrap all these values, or if it's better to do it
-//        // here.
-//        for (Entry<K,V> entry : this) {
-//            ret = ret.put(Tuple2.of(entry));
-//        }
-//        return ret;
     }
 
 //    public static final Equator<SortedMap> EQUATOR = new Equator<SortedMap>() {
@@ -1157,7 +1143,7 @@ public class PersistentTreeMap<K,V> extends UnmodSortedMap.AbstractUnmodMap<K,V>
     /**
      This currently returns chunks of the inner tree structure that implement Map.Entry.
      They are not serializable and should not be made so.  I can alter this to return nice,
-     neat, KeyVal objects which are serializable, but we've made it this far without so...
+     neat, Tuple2 objects which are serializable, but we've made it this far without so...
      */
     private static class NodeIterator<K, V> implements UnmodSortedIterator<UnEntry<K,V>> {
         //, Serializable {
