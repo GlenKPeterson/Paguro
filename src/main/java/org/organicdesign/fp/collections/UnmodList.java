@@ -211,7 +211,7 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
             }
 
             @Override public int nextIndex() { return idx; }
-        };
+        }
         return new Impl(index);
     }
 
