@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package org.organicdesign.fp.experimental;
+package org.organicdesign.fp.collections;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -22,22 +22,23 @@ import java.util.Random;
 
 import org.junit.Test;
 import org.organicdesign.fp.TestUtilities;
+import org.organicdesign.fp.collections.RrbTree;
 import org.organicdesign.fp.collections.UnmodIterator;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.xform;
 import static org.organicdesign.fp.TestUtilities.compareIterators;
-import static org.organicdesign.fp.experimental.RrbTree1.indentSpace;
+import static org.organicdesign.fp.collections.RrbTree.indentSpace;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
-public class RrbTree1Test {
+public class RrbTreeTest {
 
     private Random rand = new java.security.SecureRandom();
 
     @Test public void buildStrict() {
         final int SEVERAL = 2000; //0; //0; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
-        RrbTree1<Integer> is = RrbTree1.empty();
+        RrbTree<Integer> is = RrbTree.empty();
         ArrayList<Integer> control = new ArrayList<>();
         for (int j = 0; j < SEVERAL; j++){
             is = is.append(j);
@@ -60,7 +61,7 @@ public class RrbTree1Test {
     @Test
     public void insertAtZero() {
         final int SEVERAL = 100; //0; //0; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
-        RrbTree1<Integer> is = RrbTree1.empty();
+        RrbTree<Integer> is = RrbTree.empty();
         ArrayList<Integer> control = new ArrayList<>();
         for (int j = 0; j < SEVERAL; j++){
             is = is.insert(0, j);
@@ -80,8 +81,8 @@ public class RrbTree1Test {
         }
     }
 
-    private RrbTree1<Integer> randomInsertTest(int[] indices) {
-        RrbTree1<Integer> is = RrbTree1.empty();
+    private RrbTree<Integer> randomInsertTest(int[] indices) {
+        RrbTree<Integer> is = RrbTree.empty();
         ArrayList<Integer> control = new ArrayList<>();
         return randomInsertTest2(is, control, indices);
     }
@@ -104,7 +105,7 @@ public class RrbTree1Test {
     @Test
     public void insertRandom() {
         final int SEVERAL = 1000; //0; //0; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
-        RrbTree1<Integer> is = RrbTree1.empty();
+        RrbTree<Integer> is = RrbTree.empty();
         ArrayList<Integer> control = new ArrayList<>();
         ArrayList<Integer> rands = new ArrayList<>();
         try {
@@ -134,7 +135,7 @@ public class RrbTree1Test {
         }
     }
 
-    private RrbTree1<Integer> randomInsertTest2(RrbTree1<Integer> is, List<Integer> control, int[] indices) {
+    private RrbTree<Integer> randomInsertTest2(RrbTree<Integer> is, List<Integer> control, int[] indices) {
         assertEquals("inputSize (if this blows up, this test is being used incorrectly)", control.size(), is.size());
 //        System.out.println("Before:" + is.indentedStr());
         for (int j = 0; j < indices.length; j++){
@@ -177,7 +178,7 @@ public class RrbTree1Test {
      Sequences of random inserts which previously failed.  So far, these are
      */
     @Test public void randIntoStrictPrevFail() {
-        RrbTree1<Integer> is = RrbTree1.empty();
+        RrbTree<Integer> is = RrbTree.empty();
         ArrayList<Integer> control = new ArrayList<>();
         for (int i = 0; i < SEVERAL; i++) {
             is = is.append(i);
@@ -191,7 +192,7 @@ public class RrbTree1Test {
 
     @Test
     public void insertRandomIntoStrict() {
-        RrbTree1<Integer> is = RrbTree1.empty();
+        RrbTree<Integer> is = RrbTree.empty();
         ArrayList<Integer> control = new ArrayList<>();
         ArrayList<Integer> rands = new ArrayList<>();
         for (int i = 0; i < SEVERAL; i++) {
@@ -221,15 +222,15 @@ public class RrbTree1Test {
 
     @Test
     public void basics() {
-        RrbTree1<Integer> rrb = RrbTree1.empty();
+        RrbTree<Integer> rrb = RrbTree.empty();
         assertEquals(0, rrb.size());
 
-        RrbTree1<Integer> rrb1 = rrb.append(5);
+        RrbTree<Integer> rrb1 = rrb.append(5);
         assertEquals(0, rrb.size());
         assertEquals(1, rrb1.size());
         assertEquals(Integer.valueOf(5), rrb1.get(0));
 
-        RrbTree1<Integer> rrb2 = rrb1.append(4);
+        RrbTree<Integer> rrb2 = rrb1.append(4);
         assertEquals(0, rrb.size());
         assertEquals(1, rrb1.size());
         assertEquals(2, rrb2.size());
@@ -237,7 +238,7 @@ public class RrbTree1Test {
         assertEquals(Integer.valueOf(5), rrb2.get(0));
         assertEquals(Integer.valueOf(4), rrb2.get(1));
 
-        RrbTree1<Integer> rrb3 = rrb2.append(3);
+        RrbTree<Integer> rrb3 = rrb2.append(3);
         assertEquals(0, rrb.size());
         assertEquals(1, rrb1.size());
         assertEquals(2, rrb2.size());
@@ -255,18 +256,18 @@ public class RrbTree1Test {
     }
 
     @Test public void testEmptyIterator() {
-        assertFalse(RrbTree1.empty().iterator().hasNext());
+        assertFalse(RrbTree.empty().iterator().hasNext());
     }
 
     @Test public void testIterator1() {
-        UnmodIterator<Integer> it = RrbTree1.<Integer>empty().append(1).iterator();
+        UnmodIterator<Integer> it = RrbTree.<Integer>empty().append(1).iterator();
         assertTrue(it.hasNext());
         assertEquals((Integer) 1, it.next());
         assertFalse(it.hasNext());
     }
 
     @Test public void testIterator2() {
-        UnmodIterator<Integer> it = RrbTree1.<Integer>empty().append(1).append(2).iterator();
+        UnmodIterator<Integer> it = RrbTree.<Integer>empty().append(1).append(2).iterator();
         assertTrue(it.hasNext());
         assertEquals((Integer) 1, it.next());
         assertTrue(it.hasNext());
@@ -275,7 +276,7 @@ public class RrbTree1Test {
     }
 
     @Test public void testIterator3() {
-        UnmodIterator<Integer> it = RrbTree1.<Integer>empty().append(1).append(2).append(3).iterator();
+        UnmodIterator<Integer> it = RrbTree.<Integer>empty().append(1).append(2).append(3).iterator();
         assertTrue(it.hasNext());
         assertEquals((Integer) 1, it.next());
         assertTrue(it.hasNext());
@@ -286,8 +287,8 @@ public class RrbTree1Test {
     }
 
     @Test public void testIterator4() {
-        UnmodIterator<Integer> it = RrbTree1.<Integer>empty().append(1).append(2).append(3).append(4)
-                                                             .iterator();
+        UnmodIterator<Integer> it = RrbTree.<Integer>empty().append(1).append(2).append(3).append(4)
+                                                            .iterator();
         assertTrue(it.hasNext());
         assertEquals((Integer) 1, it.next());
         assertTrue(it.hasNext());
@@ -300,7 +301,7 @@ public class RrbTree1Test {
     }
 
     @Test public void testIterator5() {
-        UnmodIterator<Integer> it = RrbTree1.<Integer>empty()
+        UnmodIterator<Integer> it = RrbTree.<Integer>empty()
                 .append(1).append(2).append(3).append(4).append(5).iterator();
         assertTrue(it.hasNext());
         assertEquals((Integer) 1, it.next());
@@ -317,7 +318,7 @@ public class RrbTree1Test {
 
     @Test public void testIterator() {
         List<Integer> control = new ArrayList<>();
-        RrbTree1<Integer> test = RrbTree1.empty();
+        RrbTree<Integer> test = RrbTree.empty();
 
         int SOME = 2000;
         for (int i = 0; i < SOME; i++) {
@@ -331,24 +332,24 @@ public class RrbTree1Test {
     }
 
     @Test public void emptyListIterator() {
-        TestUtilities.listIteratorTest(Collections.emptyList(), RrbTree1.empty());
+        TestUtilities.listIteratorTest(Collections.emptyList(), RrbTree.empty());
     }
 
     @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx00() { RrbTree1.empty().get(Integer.MIN_VALUE); }
+    public void emptyEx00() { RrbTree.empty().get(Integer.MIN_VALUE); }
     @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx01() { RrbTree1.empty().get(-1); }
+    public void emptyEx01() { RrbTree.empty().get(-1); }
     @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx02() { RrbTree1.empty().get(0); }
+    public void emptyEx02() { RrbTree.empty().get(0); }
     @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx03() { RrbTree1.empty().get(1); }
+    public void emptyEx03() { RrbTree.empty().get(1); }
     @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx04() { RrbTree1.empty().get(Integer.MAX_VALUE); }
+    public void emptyEx04() { RrbTree.empty().get(Integer.MAX_VALUE); }
 
     @Test public void addSeveralItems() throws NoSuchAlgorithmException {
 //        System.out.println("addSeveral start");
         final int SEVERAL = 100; //0; //0; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
-        RrbTree1<Integer> is = RrbTree1.empty();
+        RrbTree<Integer> is = RrbTree.empty();
         for (int j = 0; j < SEVERAL; j++){
             is = is.append(j);
             assertEquals(j + 1, is.size());
@@ -366,7 +367,7 @@ public class RrbTree1Test {
 
     // TODO: Think about what exception to expect.
     @Test(expected = Exception.class)
-    public void putEx() { RrbTree1.empty().replace(1, "Hello"); }
+    public void putEx() { RrbTree.empty().replace(1, "Hello"); }
 
     private static boolean isPrime(int num) {
         return false;
@@ -378,18 +379,18 @@ public class RrbTree1Test {
 //        return true;
     }
 
-    private static <T> void testSplit(ArrayList<T> control, RrbTree1<T> test, int splitIndex) {
+    private static <T> void testSplit(ArrayList<T> control, RrbTree<T> test, int splitIndex) {
         if ( (splitIndex < 1) && (splitIndex > control.size()) ) {
             throw new IllegalArgumentException("Constraint violation failed: 1 <= splitIndex <= size");
         }
 //        System.out.println("test=" + test.indentedStr(5));
-        Tuple2<RrbTree1<T>,RrbTree1<T>> split = test.split(splitIndex);
+        Tuple2<RrbTree<T>,RrbTree<T>> split = test.split(splitIndex);
 //        System.out.println("leftSplit=" + split._1().indentedStr(10));
 //        System.out.println("rightSplit=" + split._2().indentedStr(11));
         List<T> leftControl = control.subList(0, splitIndex);
         List<T> rightControl = control.subList(splitIndex, control.size());
-        RrbTree1<T> leftSplit = split._1();
-        RrbTree1<T> rightSplit = split._2();
+        RrbTree<T> leftSplit = split._1();
+        RrbTree<T> rightSplit = split._2();
         if (isPrime(splitIndex)) {
             System.out.println("original=\n" + test.indentedStr(0));
             System.out.println("splitIndex=" + splitIndex);
@@ -406,7 +407,7 @@ public class RrbTree1Test {
     }
 
     @Test public void splitTestPrevFail() {
-        RrbTree1<Integer> is = RrbTree1.empty();
+        RrbTree<Integer> is = RrbTree.empty();
         ArrayList<Integer> control = new ArrayList<>();
         for (int i = 0; i < SEVERAL; i++) {
             is = is.append(i);
@@ -416,7 +417,7 @@ public class RrbTree1Test {
     }
 
     @Test public void strictSplitTest() {
-        RrbTree1<Integer> is = RrbTree1.empty();
+        RrbTree<Integer> is = RrbTree.empty();
         ArrayList<Integer> control = new ArrayList<>();
 //        int splitIndex = rand.nextInt(is.size() + 1);
         for (int i = 0; i < SEVERAL; i++) {
@@ -426,7 +427,7 @@ public class RrbTree1Test {
         for (int splitIndex = 1; splitIndex <= SEVERAL; splitIndex++) {
 //            int splitIndex = i; //rand.nextInt(is.size() + 1);
 //            System.out.println("splitIndex=" + splitIndex);
-//        System.out.println("empty=" + RrbTree1.empty().indentedStr(6));
+//        System.out.println("empty=" + RrbTree.empty().indentedStr(6));
             try {
                 testSplit(control, is, splitIndex);
             } catch (Exception e) {
@@ -439,7 +440,7 @@ public class RrbTree1Test {
     }
 
     @Test public void relaxedSplitTest() {
-        RrbTree1<Integer> is = RrbTree1.empty();
+        RrbTree<Integer> is = RrbTree.empty();
         ArrayList<Integer> control = new ArrayList<>();
         ArrayList<Integer> rands = new ArrayList<>();
         int splitIndex = 0;
@@ -464,7 +465,7 @@ public class RrbTree1Test {
     }
 
     @Test public void replace() {
-        RrbTree1<String> pv = RrbTree1.empty();
+        RrbTree<String> pv = RrbTree.empty();
         pv = pv.append("Hello").append("World");
         assertArrayEquals(new String[] { "Hello", "World" },
                           pv.toArray());
@@ -473,7 +474,7 @@ public class RrbTree1Test {
                           pv.replace(0, "Goodbye").toArray());
         pv.debugValidate();
 
-        RrbTree1<Integer> pv2 = RrbTree1.empty();
+        RrbTree<Integer> pv2 = RrbTree.empty();
         int len = 999;
         Integer[] control = new Integer[len];
         // Build test vector
@@ -484,7 +485,7 @@ public class RrbTree1Test {
         }
         assertArrayEquals(control, pv2.toArray());
 
-        RrbTree1<Integer> rrb3 = RrbTree1.empty();
+        RrbTree<Integer> rrb3 = RrbTree.empty();
         for (int i = 0; i < len; i++) {
             rrb3 = rrb3.insert(0, len - 1 - i);
         }
@@ -515,7 +516,7 @@ public class RrbTree1Test {
     }
 
     @Test public void listIterator() {
-        RrbTree1<Integer> pv2 = RrbTree1.empty();
+        RrbTree<Integer> pv2 = RrbTree.empty();
         int len = 99;
         Integer[] test = new Integer[len];
 
@@ -533,11 +534,11 @@ public class RrbTree1Test {
 
     @Test public void equalsAndHashCode() {
         List<Integer> control = Arrays.asList(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
-        RrbTree1<Integer> rrb1 =
-                xform(control).fold(RrbTree1.<Integer>empty(),
+        RrbTree<Integer> rrb1 =
+                xform(control).fold(RrbTree.<Integer>empty(),
                                     (accum, item) -> accum.append(item));
-        RrbTree1<Integer> rrb2 =
-                xform(control).fold(RrbTree1.<Integer>empty(),
+        RrbTree<Integer> rrb2 =
+                xform(control).fold(RrbTree.<Integer>empty(),
                                     (accum, item) -> accum.append(item));
 
         List<Integer> other = Arrays.asList(1,3,2,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
@@ -549,11 +550,11 @@ public class RrbTree1Test {
 
         List<Integer> hasNull = Arrays.asList(1,2,3,4,5,6,null,8,9,10,11,12,13,14,15,16,17,18,19,20);
 
-        RrbTree1<Integer> rrb3 =
-                xform(hasNull).fold(RrbTree1.<Integer>empty(),
+        RrbTree<Integer> rrb3 =
+                xform(hasNull).fold(RrbTree.<Integer>empty(),
                                     (accum, item) -> accum.append(item));
-        RrbTree1<Integer> rrb4 =
-                xform(hasNull).fold(RrbTree1.<Integer>empty(),
+        RrbTree<Integer> rrb4 =
+                xform(hasNull).fold(RrbTree.<Integer>empty(),
                                     (accum, item) -> accum.append(item));
 
         equalsDistinctHashCode(rrb3, rrb4, hasNull, other);
@@ -585,14 +586,14 @@ public class RrbTree1Test {
 //                  322, 229, 350, 105, 101, 119, 342, 134, 218, 55, 258, 205, 327, 298, 309, 27,
 //                  345, 41, 268, 33, 305, 270, 327, 191, 69, 289, 45, 284, 240, 317, 123, 171};
 
-        RrbTree1<Integer> rrb1 = randomInsertTest(new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 });
+        RrbTree<Integer> rrb1 = randomInsertTest(new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8 });
         String s1 = rrb1.indentedStr(0);
         assertTrue(s1.contains("RrbTree(size=9 "));
         assertTrue(s1.contains("        root="));
 
         assertEquals("RrbTree(0,1,2,3,4,...)", rrb1.toString());
 
-        RrbTree1<Integer> rrb2 = randomInsertTest(new int[] { 0, 1, 2, 1, 3, 2, 6, 1, 7});
+        RrbTree<Integer> rrb2 = randomInsertTest(new int[] {0, 1, 2, 1, 3, 2, 6, 1, 7});
         s1 = rrb2.indentedStr(0);
         assertTrue(s1.contains("RrbTree(size=9 "));
         assertTrue(s1.contains("        root="));
@@ -620,8 +621,8 @@ public class RrbTree1Test {
     }
 
     @SafeVarargs
-    private static <T> RrbTree1<T> rrb(T... ts) {
-        RrbTree1<T> ret = RrbTree1.empty();
+    private static <T> RrbTree<T> rrb(T... ts) {
+        RrbTree<T> ret = RrbTree.empty();
         for (T t : ts) {
             ret = ret.append(t);
         }
@@ -630,27 +631,27 @@ public class RrbTree1Test {
 
     @Test public void joinTest() {
         assertEquals(rrb(1,2,3,4,5,6), rrb(1,2,3).join(rrb(4,5,6)));
-        RrbTree1<Integer> r1 = rrb(1,2,3,4,5,6,7,8,9,
-                                   10,11,12,13,14,15,16,17,18,19,
-                                   20,21,22,23,24,25,26,27,28,29,
-                                   30,31,32,33,34,35,36,37,38,39,
-                                   40,41,42,43,44,45,46,47,48,49);
-        RrbTree1<Integer> r2 = rrb(50,51,52,53,54,55,56,57,58,59,
-                                   60,61,62,63,64,65,66,67,68,69,
-                                   70,71,72,73,74,75,76,77,78,79,
-                                   80,81,82,83,84,85,86,87,88,89,
-                                   90,91,92,93,94,95,96,97,98,99);
+        RrbTree<Integer> r1 = rrb(1, 2, 3, 4, 5, 6, 7, 8, 9,
+                                  10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+                                  20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+                                  30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
+                                  40, 41, 42, 43, 44, 45, 46, 47, 48, 49);
+        RrbTree<Integer> r2 = rrb(50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
+                                  60, 61, 62, 63, 64, 65, 66, 67, 68, 69,
+                                  70, 71, 72, 73, 74, 75, 76, 77, 78, 79,
+                                  80, 81, 82, 83, 84, 85, 86, 87, 88, 89,
+                                  90, 91, 92, 93, 94, 95, 96, 97, 98, 99);
 
-        RrbTree1<Integer> r3 = rrb(1,2,3,4,5,6,7,8,9,
-                                   10,11,12,13,14,15,16,17,18,19,
-                                   20,21,22,23,24,25,26,27,28,29,
-                                   30,31,32,33,34,35,36,37,38,39,
-                                   40,41,42,43,44,45,46,47,48,49,
-                                   50,51,52,53,54,55,56,57,58,59,
-                                   60,61,62,63,64,65,66,67,68,69,
-                                   70,71,72,73,74,75,76,77,78,79,
-                                   80,81,82,83,84,85,86,87,88,89,
-                                   90,91,92,93,94,95,96,97,98,99);
+        RrbTree<Integer> r3 = rrb(1, 2, 3, 4, 5, 6, 7, 8, 9,
+                                  10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+                                  20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+                                  30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
+                                  40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
+                                  50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
+                                  60, 61, 62, 63, 64, 65, 66, 67, 68, 69,
+                                  70, 71, 72, 73, 74, 75, 76, 77, 78, 79,
+                                  80, 81, 82, 83, 84, 85, 86, 87, 88, 89,
+                                  90, 91, 92, 93, 94, 95, 96, 97, 98, 99);
 
         assertEquals(r3, r1.join(r2));
 
@@ -660,8 +661,8 @@ public class RrbTree1Test {
             control.add(j);
         }
         for (int i = 1; i < MAX_ITEMS; i++) {
-            r1 = RrbTree1.empty();
-            r2 = RrbTree1.empty();
+            r1 = RrbTree.empty();
+            r2 = RrbTree.empty();
             for (int j = 1; j < i; j++) {
                 r1 = r1.append(j);
             }
@@ -699,7 +700,7 @@ public class RrbTree1Test {
 //            System.out.println("m: " + m);
 
             int MAX_ITEMS = 76; //m; //100; // TODO: Make this 76 to see issue
-            RrbTree1<Integer> r1 = RrbTree1.empty();
+            RrbTree<Integer> r1 = RrbTree.empty();
             for (int j = 1; j < MAX_ITEMS; j++) {
                 r1 = r1.append(j);
             }
@@ -711,7 +712,7 @@ public class RrbTree1Test {
 
 //            System.out.println("i: " + i);
                 control.remove(i);
-                RrbTree1 r2 = r1.without(i);
+                RrbTree r2 = r1.without(i);
                 assertEquals(control, r2);
                 r2.debugValidate();
             }

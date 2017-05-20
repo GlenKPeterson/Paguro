@@ -5,7 +5,7 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.PersistentVector;
-import org.organicdesign.fp.experimental.RrbTree1;
+import org.organicdesign.fp.collections.RrbTree;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +30,7 @@ public class MyBenchmark {
     }
 
     public static ImList<Integer> insertAtZeroRrb(int maxIdx) {
-        RrbTree1<Integer> empty = RrbTree1.empty();
+        RrbTree<Integer> empty = RrbTree.empty();
         for (int i = maxIdx; i >= 0; i--) {
             empty = empty.insert(0, i);
         }
@@ -54,28 +54,28 @@ public class MyBenchmark {
     }
 
     @State(Scope.Thread) public static class Rrb1 {
-        public ImList<Integer> rrb = buildList(RrbTree1.empty(), 1);
+        public ImList<Integer> rrb = buildList(RrbTree.empty(), 1);
     }
     @State(Scope.Thread) public static class Rrb10 {
-        public ImList<Integer> rrb = buildList(RrbTree1.empty(), 10);
+        public ImList<Integer> rrb = buildList(RrbTree.empty(), 10);
     }
     @State(Scope.Thread) public static class Rrb100 {
-        public ImList<Integer> rrb = buildList(RrbTree1.empty(), 100);
+        public ImList<Integer> rrb = buildList(RrbTree.empty(), 100);
     }
     @State(Scope.Thread) public static class Rrb1000 {
-        public ImList<Integer> rrb = buildList(RrbTree1.empty(), 1000);
+        public ImList<Integer> rrb = buildList(RrbTree.empty(), 1000);
     }
     @State(Scope.Thread) public static class Rrb10000 {
-        public ImList<Integer> rrb = buildList(RrbTree1.empty(), 10000);
+        public ImList<Integer> rrb = buildList(RrbTree.empty(), 10000);
     }
     @State(Scope.Thread) public static class Rrb100000 {
-        public ImList<Integer> rrb = buildList(RrbTree1.empty(), 100000);
+        public ImList<Integer> rrb = buildList(RrbTree.empty(), 100000);
     }
     @State(Scope.Thread) public static class Rrb1000000 {
-        public ImList<Integer> rrb = buildList(RrbTree1.empty(), 1000000);
+        public ImList<Integer> rrb = buildList(RrbTree.empty(), 1000000);
     }
     @State(Scope.Thread) public static class Rrb10000000 {
-        public ImList<Integer> rrb = buildList(RrbTree1.empty(), 10000000);
+        public ImList<Integer> rrb = buildList(RrbTree.empty(), 10000000);
     }
 
     @State(Scope.Thread) public static class Vec1 {
@@ -113,14 +113,14 @@ public class MyBenchmark {
     @State(Scope.Thread) public static class List10000000 { public List<Integer> list = buildList2(10000000); }
 
 
-    @Benchmark public void BuildRrb1() { buildList(RrbTree1.empty(), 1); }
-    @Benchmark public void BuildRrb10() { buildList(RrbTree1.empty(), 10); }
-    @Benchmark public void BuildRrb100() { buildList(RrbTree1.empty(), 100); }
-    @Benchmark public void BuildRrb1000() { buildList(RrbTree1.empty(), 1000); }
-    @Benchmark public void BuildRrb10000() { buildList(RrbTree1.empty(), 10000); }
-    @Benchmark public void BuildRrb100000() { buildList(RrbTree1.empty(), 100000); }
-    @Benchmark public void BuildRrb1000000() { buildList(RrbTree1.empty(), 1000000); }
-    @Benchmark public void BuildRrb10000000() { buildList(RrbTree1.empty(), 10000000); }
+    @Benchmark public void BuildRrb1() { buildList(RrbTree.empty(), 1); }
+    @Benchmark public void BuildRrb10() { buildList(RrbTree.empty(), 10); }
+    @Benchmark public void BuildRrb100() { buildList(RrbTree.empty(), 100); }
+    @Benchmark public void BuildRrb1000() { buildList(RrbTree.empty(), 1000); }
+    @Benchmark public void BuildRrb10000() { buildList(RrbTree.empty(), 10000); }
+    @Benchmark public void BuildRrb100000() { buildList(RrbTree.empty(), 100000); }
+    @Benchmark public void BuildRrb1000000() { buildList(RrbTree.empty(), 1000000); }
+    @Benchmark public void BuildRrb10000000() { buildList(RrbTree.empty(), 10000000); }
 
     @Benchmark public void BuildVec1() { buildList(PersistentVector.empty(), 1); }
     @Benchmark public void BuildVec10() { buildList(PersistentVector.empty(), 10); }
