@@ -14,13 +14,6 @@
 
 package org.organicdesign.fp.collections;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import org.organicdesign.fp.FunctionUtils;
-import org.organicdesign.fp.TestUtilities;
-
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,6 +21,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.organicdesign.fp.TestUtilities;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.vec;
@@ -241,7 +240,7 @@ public class PersistentVectorTest {
         List<Integer> different = Arrays.asList(1,2,3,4,5,6,7,8,9,0,11,12,13,14,15,16,17,18,19,20,
                                                  21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,41);
 
-        equalsDistinctHashCode(list, l2, FunctionUtils.unmodList(l2), different);
+        equalsDistinctHashCode(list, l2, Collections.unmodifiableList(l2), different);
     }
 
     // Time ImVectorImplementation vs. java.util.ArrayList to prove that performance does not degrade
@@ -255,7 +254,7 @@ public class PersistentVectorTest {
                                    "Better that, than set the limit too high and miss a performance drop.");
 
         // These are worst-case timings, indexed by number of items inserted in the test.
-        final UnmodMap<Integer,Double> benchmarkRatios;
+        final Map<Integer,Double> benchmarkRatios;
         {
             Map<Integer,Double> mm = new HashMap<>();
             mm.put(1, 1.4);
@@ -265,7 +264,7 @@ public class PersistentVectorTest {
             mm.put(10000, 18.0);
             mm.put(100000, 13.9);
             mm.put(1000000, 7.8);
-            benchmarkRatios = FunctionUtils.unmodMap(mm);
+            benchmarkRatios = Collections.unmodifiableMap(mm);
         }
 
         // Remember the results of each insertion test to average them later.

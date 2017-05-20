@@ -15,6 +15,7 @@
 package org.organicdesign.fp.collections;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -22,7 +23,6 @@ import java.util.TreeSet;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.TestUtilities;
 
 import static org.junit.Assert.*;
@@ -35,7 +35,8 @@ import static org.organicdesign.testUtils.EqualsContract.equalsSameHashCode;
 @RunWith(JUnit4.class)
 public class PersistentTreeSetTest {
 
-    public static final Comparator<String> STR_LEN_COMP = (a, b) -> a.length() - b.length();
+    public static final Comparator<String> STR_LEN_COMP =
+            (a, b) -> Integer.compare(a.length(), b.length());
 
     @Test public void javaBug() {
         // This illustrates the bug in java
@@ -264,7 +265,7 @@ public class PersistentTreeSetTest {
         assertFalse(i4.hasNext());
 
         TestUtilities.assertEx(() -> serializeDeserialize(PersistentTreeSet
-                                                                  .ofComp((a, b) -> a - b,
+                                                                  .ofComp(Integer::compare,
                                                                           Arrays.asList(1, 2, 3))),
                                "PersistentTreeSet", IllegalStateException.class);
     }
@@ -278,12 +279,12 @@ public class PersistentTreeSetTest {
         ss1.add("work");
         ss1.add("an");
         ss1.add("hello");
-        equalsDistinctHashCode(s1, ss1, FunctionUtils.unmodSortedSet(ss1),
+        equalsDistinctHashCode(s1, ss1, Collections.unmodifiableSortedSet(ss1),
                                PersistentTreeSet.of(Arrays.asList("hello", "an", "work", "the")));
 
         // Really, you need to read the JavaDoc for PersistentTreeSet.equals() to understand the bizarre notion of
         // equality being checked here.
-        equalsDistinctHashCode(s1, ss1, FunctionUtils.unmodSortedSet(ss1),
+        equalsDistinctHashCode(s1, ss1, Collections.unmodifiableSortedSet(ss1),
                                PersistentTreeSet.ofComp(STR_LEN_COMP,
                                                         Arrays.asList("helloz", "an", "work", "b", "the")));
 
@@ -310,7 +311,7 @@ public class PersistentTreeSetTest {
 //        assertEquals(ss2, ss);
 //
 //
-        equalsDistinctHashCode(s2, ss, FunctionUtils.unmodSortedSet(ss),
+        equalsDistinctHashCode(s2, ss, Collections.unmodifiableSortedSet(ss),
                                PersistentTreeSet.ofComp(STR_LEN_COMP,
                                                         Arrays.asList("helloz", "an", "work", "the")));
 
@@ -322,7 +323,7 @@ public class PersistentTreeSetTest {
 //        assertNotEquals(yadda, ss);
 //        assertNotEquals(yadda, unmodSortedSet(ss));
 
-        equalsDistinctHashCode(s2, ss, FunctionUtils.unmodSortedSet(ss),
+        equalsDistinctHashCode(s2, ss, Collections.unmodifiableSortedSet(ss),
                                PersistentTreeSet.of(Arrays.asList("an", "helloz", "work", "b", "the")));
 
         equalsSameHashCode(s2,

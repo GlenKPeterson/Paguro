@@ -1,9 +1,13 @@
 package org.organicdesign.fp.collections;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import org.junit.Test;
-import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.oneOf.Option;
 
 import static org.junit.Assert.*;
@@ -366,7 +370,7 @@ public class PersistentHashSetTest {
         ss1.add("work");
         ss1.add("an");
         ss1.add("hello");
-        equalsDistinctHashCode(s1, ss1, FunctionUtils.unmodSet(ss1),
+        equalsDistinctHashCode(s1, ss1, Collections.unmodifiableSet(ss1),
                                PersistentHashSet.of(vec("hello", "an", "work", "the")));
     }
 

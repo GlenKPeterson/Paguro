@@ -14,6 +14,7 @@
 
 package org.organicdesign.fp.collections;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -220,7 +221,7 @@ public class PersistentTreeMapTest {
 
         equalsDistinctHashCode(test,
                                control,
-                               FunctionUtils.unmodSortedMap(control),
+                               Collections.unmodifiableSortedMap(control),
                                PersistentTreeMap.of(vec(tup("two", 2),
                                                         tup("three", 3),
                                                         tup("four", 4))));

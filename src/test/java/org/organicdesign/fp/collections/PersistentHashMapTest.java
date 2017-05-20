@@ -782,7 +782,7 @@ public class PersistentHashMapTest {
 
         equalsDistinctHashCode(control,
                                test,
-                               FunctionUtils.unmodMap(control),
+                               Collections.unmodifiableMap(control),
                                PersistentHashMap.of(vec(tup("two", 2), tup("three", 3),
                                                         tup("four", 4))));
 
