@@ -14,9 +14,9 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.organicdesign.fp.FunctionUtils.ordinal;
 import static org.organicdesign.fp.StaticImports.vec;
-import static org.organicdesign.fp.function.Fn1.Const.IDENTITY;
-import static org.organicdesign.fp.function.Fn1.ConstBool.ACCEPT;
-import static org.organicdesign.fp.function.Fn1.ConstBool.REJECT;
+import static org.organicdesign.fp.function.Fn1.ConstObjObj.IDENTITY;
+import static org.organicdesign.fp.function.Fn1.ConstObjBool.ACCEPT;
+import static org.organicdesign.fp.function.Fn1.ConstObjBool.REJECT;
 
 @RunWith(JUnit4.class)
 public class Fn1Test {

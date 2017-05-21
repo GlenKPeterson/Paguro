@@ -14,12 +14,15 @@
 
 package org.organicdesign.fp.collections;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.Test;
 import org.organicdesign.fp.TestUtilities;
 
-import java.util.*;
-
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 public class ImListTest {
@@ -58,7 +61,7 @@ public class ImListTest {
 
         TestList(Collection<T> s) { inner = dup(s); }
 
-        TestList() { inner = new ArrayList<>(); }
+//        TestList() { inner = new ArrayList<>(); }
 
         @Override public ImList<T> append(T t) {
             List<T> next = dup(inner);
@@ -75,8 +78,6 @@ public class ImListTest {
         @Override public int size() { return inner.size(); }
 
         @Override public T get(int index) { return inner.get(index); }
-
-        @Override public ImList<T> immutable() { return this; }
 
         @Override public MutableList<T> mutable() {
             return new MutableList<T>() {

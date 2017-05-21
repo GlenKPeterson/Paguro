@@ -148,8 +148,6 @@ public class RrbTree<E> implements ImList<E>, Indented {
         return root.get(i);
     }
 
-    @Override public RrbTree<E> immutable() { return this; }
-
     /**
      I would have called this insert and reversed the order or parameters.
      @param idx the insertion point

@@ -34,7 +34,10 @@ import org.organicdesign.fp.xform.Xform;
 @FunctionalInterface
 public interface Fn1<T,U> extends Function<T,U>, Consumer<T> {
     // ========================================== Static ==========================================
-    enum Const implements Fn1<Object,Object> {
+
+    /** Constant functions that take an Object and return an Object */
+    enum ConstObjObj implements Fn1<Object,Object> {
+        /** The Identity function */
         IDENTITY {
             @Override
             public Object applyEx(Object t) throws Exception {
@@ -50,9 +53,12 @@ public interface Fn1<T,U> extends Function<T,U>, Consumer<T> {
             }
         }
     }
-    enum ConstBool implements Fn1<Object,Boolean> {
+
+    /** Constant functions that take an Object and return a Boolean */
+    enum ConstObjBool implements Fn1<Object,Boolean> {
         /**
-         A predicate that always returns true.  Use accept() for a type-safe version of this predicate.
+         A predicate that always returns true.  Use {@link #accept()} for a type-safe version of
+         this predicate.
          */
         ACCEPT {
             @Override public Boolean applyEx (Object ignored) throws Exception {
@@ -61,7 +67,8 @@ public interface Fn1<T,U> extends Function<T,U>, Consumer<T> {
         },
 
         /**
-         A predicate that always returns false. Use ConstBool.REJECT for a type-safe version of this predicate.
+         A predicate that always returns false. Use {@link #reject()} for a type-safe version of
+         this predicate.
          */
         REJECT {
             @Override public Boolean applyEx (Object ignored) throws Exception {
@@ -71,39 +78,39 @@ public interface Fn1<T,U> extends Function<T,U>, Consumer<T> {
     }
 
     @SuppressWarnings("unchecked")
-    static <V> Fn1<V,V> identity() { return (Fn1<V,V>) Const.IDENTITY; }
+    static <V> Fn1<V,V> identity() { return (Fn1<V,V>) ConstObjObj.IDENTITY; }
 
     static <S> Fn1<S,Boolean> or(Fn1<S,Boolean> a, Fn1<S,Boolean> b) {
         // Composition is not necessary in every case:
-        return a == ConstBool.ACCEPT ? a : // If any are true, all are true.
-               a == ConstBool.REJECT ? b : // return whatever b is.
-               b == ConstBool.ACCEPT ? b : // If any are true, all are true.
-               b == ConstBool.REJECT ? a : // Just amounts to if a else false.
+        return a == ConstObjBool.ACCEPT ? a : // If any are true, all are true.
+               a == ConstObjBool.REJECT ? b : // return whatever b is.
+               b == ConstObjBool.ACCEPT ? b : // If any are true, all are true.
+               b == ConstObjBool.REJECT ? a : // Just amounts to if a else false.
                (S s) -> (a.apply(s) == Boolean.TRUE) || (b.apply(s) == Boolean.TRUE); // compose
     }
 
     static <S> Fn1<S,Boolean> and(Fn1<S,Boolean> a, Fn1<S,Boolean> b) {
         // Composition is not necessary in every case:
-        return a == ConstBool.ACCEPT ? b : // return whatever b is.
-               a == ConstBool.REJECT ? a : // if any are false, all are false.
-               b == ConstBool.ACCEPT ? a : // Just amounts to if a else false.
-               b == ConstBool.REJECT ? b : // If any are false, all are false.
+        return a == ConstObjBool.ACCEPT ? b : // return whatever b is.
+               a == ConstObjBool.REJECT ? a : // if any are false, all are false.
+               b == ConstObjBool.ACCEPT ? a : // Just amounts to if a else false.
+               b == ConstObjBool.REJECT ? b : // If any are false, all are false.
                (S s) -> (a.apply(s) == Boolean.TRUE) && (b.apply(s) == Boolean.TRUE); // compose
     }
 
     static <S> Fn1<S,Boolean> negate(Fn1<? super S,Boolean> a) {
-        return a == ConstBool.ACCEPT ? reject() :
-               a == ConstBool.REJECT ? accept() :
+        return a == ConstObjBool.ACCEPT ? reject() :
+               a == ConstObjBool.REJECT ? accept() :
                (S s) -> (a.apply(s) == Boolean.TRUE) ? Boolean.FALSE : Boolean.TRUE;
     }
 
-    /** Returns a type-safe version of the ConstBool.ACCEPT predicate. */
+    /** Returns a type-safe version of the ConstObjBool.ACCEPT predicate. */
     @SuppressWarnings("unchecked")
-    static <T> Fn1<T,Boolean> accept() { return (Fn1<T,Boolean>) ConstBool.ACCEPT; }
+    static <T> Fn1<T,Boolean> accept() { return (Fn1<T,Boolean>) ConstObjBool.ACCEPT; }
 
-    /** Returns a type-safe version of the ConstBool.REJECT predicate. */
+    /** Returns a type-safe version of the ConstObjBool.REJECT predicate. */
     @SuppressWarnings("unchecked")
-    static <T> Fn1<T,Boolean> reject() { return (Fn1<T,Boolean>) ConstBool.REJECT; }
+    static <T> Fn1<T,Boolean> reject() { return (Fn1<T,Boolean>) ConstObjBool.REJECT; }
 
     /**
      Composes multiple functions into a single function to potentially minimize trips through
@@ -151,7 +158,7 @@ public interface Fn1<T,U> extends Function<T,U>, Consumer<T> {
         }
         final List<Fn1<V,V>> out = new ArrayList<>();
         for (Fn1<V,V> f : in) {
-            if ((f == null) || (f == Const.IDENTITY)) {
+            if ((f == null) || (f == ConstObjObj.IDENTITY)) {
                 continue;
             }
             out.add(f);
@@ -194,7 +201,7 @@ public interface Fn1<T,U> extends Function<T,U>, Consumer<T> {
                                      : Xform.of(in);
 
         Or<Fn1<T,Boolean>,Fn1<T,Boolean>> ret =
-                v.filter(p -> (p != null) && (p != ConstBool.ACCEPT))
+                v.filter(p -> (p != null) && (p != ConstObjBool.ACCEPT))
                  .foldUntil(accept(),
                             (accum, p) -> (p == reject()) ? p : null,
                             Fn1::and); // (accum, p) -> and(accum, p)
@@ -207,12 +214,12 @@ public interface Fn1<T,U> extends Function<T,U>, Consumer<T> {
      Composes multiple predicates into a single predicate to potentially minimize trips through
      the source data.  The resultant predicate will loop through the predicates for each item in
      the source, but for few predicates and many source items, that takes less memory.  Considers
-     no predicate to mean "reject all."  Use only accept()/ConstBool.ACCEPT and ConstBool.REJECT since
+     no predicate to mean "reject all."  Use only accept()/ConstObjBool.ACCEPT and ConstObjBool.REJECT since
      function comparison is done by reference.
 
-     @param in the predicates to test in order.  Nulls and ConstBool.REJECT predicates are ignored.  Any
+     @param in the predicates to test in order.  Nulls and ConstObjBool.REJECT predicates are ignored.  Any
      ACCEPT predicate will cause this entire method to return the ACCEPT predicate.
-     No predicates means ConstBool.REJECT.
+     No predicates means ConstObjBool.REJECT.
 
      @param <T> the type of object to predicate on.
 
@@ -227,9 +234,9 @@ public interface Fn1<T,U> extends Function<T,U>, Consumer<T> {
                                      : Xform.of(in);
 
         Or<Fn1<T,Boolean>,Fn1<T,Boolean>> ret =
-                v.filter(p -> (p != null) && (p != ConstBool.REJECT))
+                v.filter(p -> (p != null) && (p != ConstObjBool.REJECT))
                 .foldUntil(reject(),
-                           (accum, p) -> (p == ConstBool.ACCEPT) ? p : null,
+                           (accum, p) -> (p == ConstObjBool.ACCEPT) ? p : null,
                            Fn1::or); // (accum, p) -> or(accum, p)
         // We don't care whether it returns early or not.  Just return whatever is in the or.
         return ret.match(g -> g,
@@ -293,7 +300,7 @@ public interface Fn1<T,U> extends Function<T,U>, Consumer<T> {
 
     @SuppressWarnings("unchecked")
     default <S> Fn1<S,U> compose(final Fn1<? super S, ? extends T> f) {
-        if (f == Const.IDENTITY) {
+        if (f == ConstObjObj.IDENTITY) {
             // This violates type safety, but makes sense - composing any function with the
             // identity function should return the original function unchanged.  If you mess up the
             // types, then that's your problem.  With generics and type erasure this may be the

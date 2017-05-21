@@ -20,7 +20,7 @@ import org.organicdesign.fp.function.Fn1;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.organicdesign.fp.StaticImports.vec;
-import static org.organicdesign.fp.function.Fn1.ConstBool.*;
+import static org.organicdesign.fp.function.Fn1.ConstObjBool.*;
 
 @RunWith(JUnit4.class)
 public class BooleanCombinerTest {

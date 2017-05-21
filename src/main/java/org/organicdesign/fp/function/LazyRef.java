@@ -1,13 +1,12 @@
-package org.organicdesign.fp;
+package org.organicdesign.fp.function;
 
-import org.organicdesign.fp.function.Fn0;
-
+// Should this bee an inner class of Fn0?
 /**
  Lazily initialize a value (and free the initialization resources) on the first call to get().
  Subsequent calls to get() cheaply return the previously initialized value.  This class is thread-safe if the producer
  function and the value it produces are free from side effects.
  */
-public class LazyRef<T> {
+public class LazyRef<T> implements Fn0<T> {
     private Fn0<T> producer;
     private T value;
 
@@ -35,7 +34,7 @@ public class LazyRef<T> {
      @return the same value every time it is called.
      */
     // This whole method is synchronized on the advice of Goetz2006 p. 347
-    public synchronized T get() {
+    public synchronized T applyEx() {
         // Have we produced our value yet?
         if (producer != null) {
             // produce our value.

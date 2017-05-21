@@ -16,11 +16,8 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
-
-import org.organicdesign.fp.xform.Transformable;
 
 // Consider replacing with RRB-Tree
 // https://github.com/clojure/core.rrb-vector/blob/master/src/main/clojure/clojure/core/rrb_vector.clj
@@ -186,13 +183,14 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
         @SuppressWarnings("unchecked")
         private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
             s.defaultReadObject();
-            vector = emptyMutable();
+            MutableList<E> temp = emptyMutable();
             for (int i = 0; i < size; i++) {
-                vector.append((E) s.readObject());
+                temp.append((E) s.readObject());
             }
+            vector = temp.immutable();
         }
 
-        private Object readResolve() { return vector.immutable(); }
+        private Object readResolve() { return vector; }
     }
 
     private Object writeReplace() { return new SerializationProxy<>(this); }
@@ -209,8 +207,6 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
 //    @Override
     // We could make this public some day, maybe.
     @Override public MutableVector<E> mutable() { return new MutableVector<>(this); }
-
-    @Override public ImList<E> immutable() { return this; }
 
     // Returns the high (gt 5) bits of the index of the last item.
     // I think this is the index of the start of the last array in the tree.
@@ -556,8 +552,6 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
             //		root = editableRoot(root);
             //		tail = editableTail(tail);
         }
-
-        @Override public MutableList<F> mutable() { return this; }
 
         @Override  public int size() {
             ensureEditable();

@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.organicdesign.fp.function.Fn0;
+import org.organicdesign.fp.function.LazyRef;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

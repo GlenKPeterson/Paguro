@@ -415,10 +415,6 @@ public class PersistentVectorTest {
             assertEquals(control.size(), test.size());
         }
 
-        assertEquals(test, test.mutable());
-
-        assertTrue(test == test.mutable());
-
         for (int i = 0; i < SEVERAL; i++) {
             assertEquals(control.get(i), test.get(i));
         }
@@ -441,9 +437,10 @@ public class PersistentVectorTest {
         compareIterators(control.iterator(), test.iterator());
         assertEquals(control, test);
 
-        assertEquals(control, test.mutable());
-        assertEquals(control.size(), test.mutable().size());
-        compareIterators(control.iterator(), test.mutable().iterator());
+        ImList<Integer> imTest = test.immutable();
+        assertEquals(control, imTest);
+        assertEquals(control.size(), imTest.size());
+        compareIterators(control.iterator(), imTest.iterator());
 
         assertEquals(emptyMutable(), emptyMutable());
 
@@ -491,7 +488,7 @@ public class PersistentVectorTest {
         test = test.replace(SEVERAL, 9);
         assertEquals(control.size(), test.size());
 
-        assertEquals(test, test.immutable());
+        assertEquals(test, test.mutable());
     }
 
     @Test public void reverseTest() {
