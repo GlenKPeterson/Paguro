@@ -53,6 +53,15 @@ public class MyBenchmark {
         return last;
     }
 
+    public static Integer getEach(List<Integer> is) {
+        Integer last = null;
+        int size = is.size();
+        for (int i = size - 1; i >= 0; i--) {
+            last = is.get(i);
+        }
+        return last;
+    }
+
     @State(Scope.Thread) public static class Rrb1 {
         public ImList<Integer> rrb = buildList(RrbTree.empty(), 1);
     }
@@ -186,5 +195,32 @@ public class MyBenchmark {
     @Benchmark public void IterateList100000(List100000 list) { iterateList(list.list); }
     @Benchmark public void IterateList1000000(List1000000 list) { iterateList(list.list); }
     @Benchmark public void IterateList10000000(List10000000 list) { iterateList(list.list); }
+
+    @Benchmark public void GetEachRrb1(Rrb1 rrb) { getEach(rrb.rrb); }
+    @Benchmark public void GetEachRrb10(Rrb10 rrb) { getEach(rrb.rrb); }
+    @Benchmark public void GetEachRrb100(Rrb100 rrb) { getEach(rrb.rrb); }
+    @Benchmark public void GetEachRrb1000(Rrb1000 rrb) { getEach(rrb.rrb); }
+    @Benchmark public void GetEachRrb10000(Rrb10000 rrb) { getEach(rrb.rrb); }
+    @Benchmark public void GetEachRrb100000(Rrb100000 rrb) { getEach(rrb.rrb); }
+    @Benchmark public void GetEachRrb1000000(Rrb1000000 rrb) { getEach(rrb.rrb); }
+    @Benchmark public void GetEachRrb10000000(Rrb10000000 rrb) { getEach(rrb.rrb); }
+
+    @Benchmark public void GetEachVec1(Vec1 vec) { getEach(vec.vec); }
+    @Benchmark public void GetEachVec10(Vec10 vec) { getEach(vec.vec); }
+    @Benchmark public void GetEachVec100(Vec100 vec) { getEach(vec.vec); }
+    @Benchmark public void GetEachVec1000(Vec1000 vec) { getEach(vec.vec); }
+    @Benchmark public void GetEachVec10000(Vec10000 vec) { getEach(vec.vec); }
+    @Benchmark public void GetEachVec100000(Vec100000 vec) { getEach(vec.vec); }
+    @Benchmark public void GetEachVec1000000(Vec1000000 vec) { getEach(vec.vec); }
+    @Benchmark public void GetEachVec10000000(Vec10000000 vec) { getEach(vec.vec); }
+
+    @Benchmark public void GetEachList1(List1 list) { getEach(list.list); }
+    @Benchmark public void GetEachList10(List10 list) { getEach(list.list); }
+    @Benchmark public void GetEachList100(List100 list) { getEach(list.list); }
+    @Benchmark public void GetEachList1000(List1000 list) { getEach(list.list); }
+    @Benchmark public void GetEachList10000(List10000 list) { getEach(list.list); }
+    @Benchmark public void GetEachList100000(List100000 list) { getEach(list.list); }
+    @Benchmark public void GetEachList1000000(List1000000 list) { getEach(list.list); }
+    @Benchmark public void GetEachList10000000(List10000000 list) { getEach(list.list); }
 
 }
