@@ -20,7 +20,9 @@ import java.util.List;
 import org.organicdesign.fp.tuple.Tuple2;
 import org.organicdesign.fp.tuple.Tuple4;
 
-interface Indented { String indentedStr(int indent); }
+import static org.organicdesign.fp.collections.Cowry.*;
+import static org.organicdesign.fp.collections.Indented.arrayString;
+import static org.organicdesign.fp.collections.Indented.indentSpace;
 
 /**
  This is based on the paper, "RRB-Trees: Efficient Immutable Vectors" by Phil Bagwell and
@@ -570,12 +572,6 @@ involves changing more nodes than maybe necessary.
     // Always check if less-than this.  Never less-than-or-equal.  Cormen adds a -1 here and tests
     // for <= (I think!).
     private static final int MAX_NODE_LENGTH = ( (STRICT_NODE_LENGTH+1) * 4 / 3);
-
-    // We only one empty array and it makes the code simpler than pointing to null all the time.
-    // Have to time the difference between using this and null.  The only difference I can imagine
-    // is that this has an address in memory and null does not, so it could save a memory lookup
-    // in some places.
-    private static final Object[] EMPTY_ARRAY = new Object[0];
 
     private static final Leaf EMPTY_LEAF = new Leaf<>(EMPTY_ARRAY);
     @SuppressWarnings("unchecked")
@@ -1988,298 +1984,337 @@ involves changing more nodes than maybe necessary.
         }
     }
 
+//    @SuppressWarnings("WeakerAccess")
+//    public static final class MutableRrb<F> extends UnmodList.AbstractUnmodList<F>
+//            implements MutableList<F>, Indented {
+//
+//        // Focus is like the tail in Rich Hickey's Persistent Vector, but named after the structure
+//        // in Scala's implementation.  Tail and focus are both designed to allow repeated appends or
+//        // inserts to the same area of a vector to be done in constant time.  Tail only handles appends
+//        // but this can handle repeated inserts to any area of a vector.
+//        private final F[] focus;
+//        private final int focusStartIndex;
+//        private final int focusLength;
+//        private final Node<F> root;
+//        private final int size;
+//
+//        // Constructor
+//        private MutableRrb(RrbTree<F> imm) {
+//            focus = editableTail(imm.focus);
+//            focusStartIndex = imm.focusStartIndex;
+//            focusLength = imm.focus.length;
+//            root = editableRoot(imm.root);
+//            size = imm.size;
+////        debugValidate();
+//        }
+//
+//        private MutableRrb(F[] f, int fi, int fl, Node<F> r, int s) {
+//            focus = editableTail(f); focusStartIndex = fi; focusLength = fl; root = editableRoot(r); size = s;
+////        debugValidate();
+//        }
+//
+//        private Node ensureEditable(Node node) {
+//            if (node.edit == root.edit)
+//                return node;
+//            if (node instanceof Strict) {
+//                return new Strict(((Strict) node).shift, root.edit, node.items.clone());
+//            } else if (root instanceof Relaxed) {
+//                return new Relaxed(root.edit, node.items.clone());
+//            } else {
+//                throw new IllegalStateException("Expected a Strict or Relaxed but found neither.");
+//            }
+//        }
+//
+//        private void ensureEditable() {
+//            if (root.edit.get() == null) {
+//                throw new IllegalAccessError("Mutable used after immutable! call");
+//            }
+//            //		root = editableRoot(root);
+//            //		tail = editableTail(tail);
+//        }
+//
+//        private static Node editableRoot(Node node) {
+//            if (node instanceof Strict) {
+//                return new Strict(new AtomicReference<>(Thread.currentThread()), node.items.clone());
+//            } else if (node instanceof Relaxed) {
+//                return new Relaxed(new AtomicReference<>(Thread.currentThread()), node.items.clone());
+//            } else {
+//                throw new IllegalStateException("Expected a Strict or Relaxed but found neither.");
+//            }
+//        }
+//
+//        @SuppressWarnings("unchecked")
+//        private static <T> T[] editableTail(T[] tl) {
+//            Object[] ret = new Object[MAX_NODE_LENGTH];
+//            System.arraycopy(tl, 0, ret, 0, tl.length);
+//            return (T[]) ret;
+//        }
+//
+// TODO: focusLength gives a 3x performance boost 10-1K items, tapering to 50% boost at 10M items.
+//        /**
+//         Adds an item at the end of this structure.  This is the most efficient way to build an
+//         RRB Tree as it conforms to the Clojure PersistentVector and all of its optimizations.
+//         @param t the item to append
+//         @return a new RRB-Tree with the item appended.
+//         */
+//        @SuppressWarnings("unchecked")
+//        @Override public MutableRrb<F> append(F t) {
+//            ensureEditable();
+//            // If our focus isn't set up for appends or if it's full, insert it into the data structure
+//            // where it belongs.  Then make a new focus
+//            if ( (focusLength >= STRICT_NODE_LENGTH) ||
+//                 ((focusLength > 0) && (focusStartIndex < root.size())) ) {
+//
+//                Node<F> newRoot = root.pushFocus(focusStartIndex, truncateArray(focus, focusLength, null));
+//
+//                // Make a full-size array.
+//                @SuppressWarnings("unchecked")
+//                F[] newItems = (F[]) new Object[STRICT_NODE_LENGTH];
+//                // Insert the new item.
+//                newItems[0] = t;
+//                return new MutableRrb<>(newItems, size, 1, newRoot, size + 1);
+//            }
+////        System.out.println("focus:" + focus);
+//
+//            F[] newItems = focus;
+//            if (focus.length <= focusLength) {
+////            System.out.println("==== NEW FOCUS ====");
+//                // Make an array that big enough.  It's too bad that the JVM bothers to
+//                // initialize this with nulls.
+//                newItems = (F[]) new Object[STRICT_NODE_LENGTH];
+//
+//                // If we aren't inserting at the first item, array-copy the items before the insert
+//                // point.
+//                System.arraycopy(focus, 0, newItems, 0, focusLength);
+//            }
+//
+//            // Insert the new item.
+//            newItems[focusLength] = t;
+//            return new MutableRrb<>(newItems, focusStartIndex, focusLength + 1, root, size + 1);
+//        }
+//
+//        @Override public MutableRrb<F> concat(Iterable<? extends F> es) {
+//            ensureEditable();
+//            for (F e : es) {
+//                append(e);
+//            }
+//            return this;
+//        }
+//
+//        void debugValidate() {
+//            // TODO: Fix for focusLength optomization
+//            if (focusLength > STRICT_NODE_LENGTH) {
+//                throw new IllegalStateException("focus len:" + focusLength +
+//                                                " gt STRICT_NODE_LENGTH:" + STRICT_NODE_LENGTH +
+//                                                "\n" + this.indentedStr(0));
+//            }
+//            int sz = root.debugValidate();
+//            if (sz != size - focusLength) {
+//                throw new IllegalStateException("Size incorrect\n" +
+//                                                this.indentedStr(0));
+//            }
+//            if ( (focusStartIndex < 0) || (focusStartIndex > size) ) {
+//                throw new IllegalStateException("focusStartIndex out of bounds!\n" +
+//                                                this.indentedStr(0));
+//            }
+//            if (!root.equals(eliminateUnnecessaryAncestors(root))) {
+//                throw new IllegalStateException("Unnecessary ancestors!\n" +
+//                                                this.indentedStr(0));
+//            }
+//        }
+//
+//        @Override public F get(int i) {
+//            ensureEditable();
+//            if ( (i < 0) || (i > size) ) {
+//                throw new IndexOutOfBoundsException("Index: " + i + " size: " + size);
+//            }
+//
+//            // This is a debugging assertion - can't be covered by a test.
+////        if ( (focusStartIndex < 0) || (focusStartIndex > size) ) {
+////            throw new IllegalStateException("focusStartIndex: " + focusStartIndex +
+////                                            " size: " + size);
+////        }
+//
+//            if (i >= focusStartIndex) {
+//                int focusOffset = i - focusStartIndex;
+//                if (focusOffset < focusLength) {
+//                    return focus[focusOffset];
+//                }
+//                i -= focusLength;
+//            }
+//            return root.get(i);
+//        }
+//
+//        @SuppressWarnings("unchecked")
+//        @Override  public RrbTree<F> immutable() {
+//            ensureEditable();
+//            root.edit.set(null);
+//            F[] trimmedFocus = (F[]) new Object[focusLength];
+//            System.arraycopy(focus, 0, trimmedFocus, 0, focusLength);
+//            return new RrbTree<>(trimmedFocus, focusStartIndex, root, size);
+//        }
+//
+//        /**
+//         I would have called this insert and reversed the order or parameters.
+//         @param idx the insertion point
+//         @param element the item to insert
+//         @return a new RRB-Tree with the item inserted.
+//         */
+//        @SuppressWarnings("WeakerAccess")
+//        public MutableRrb<F> insert(int idx, F element) {
+//            ensureEditable();
+//            // If the focus is full, push it into the tree and make a new one with the new element.
+//            if (focusLength >= STRICT_NODE_LENGTH) {
+//                Node<F> newRoot = root.pushFocus(focusStartIndex, truncateArray(focus, focusLength, null));
+//                return new MutableRrb<>(singleElementArray(element), idx, 1, newRoot, size + 1);
+//            }
+//
+//            // If the index is within the focus, add the item there.
+//            int diff = idx - focusStartIndex;
+//
+//            if ( (diff >= 0) && (diff <= focusLength) ) {
+//                // new focus
+//                F[] newFocus = insertIntoArrayAt(element, focus, diff, null);
+//                return new MutableRrb<>(newFocus, focusStartIndex, focusLength + 1, root, size + 1);
+//            }
+//
+//            // Here we are left with an insert somewhere else than the current focus.
+//            Node<F> newRoot = focusLength > 0 ? root.pushFocus(focusStartIndex, truncateArray(focus, focusLength, null))
+//                                              : root;
+//            F[] newFocus = singleElementArray(element);
+//            return new MutableRrb<>(newFocus, idx, 1, newRoot, size + 1);
+//        }
+//
+//        @Override public UnmodSortedIterator<F> iterator() {
+//            return new Iter(focusLength);
+//        }
+//
+//        private Node<F> pushFocus() {
+//            ensureEditable();
+//            if (focusLength == 0) {
+//                return root;
+//            }
+//            return root.pushFocus(focusStartIndex, truncateArray(focus, focusLength, null));
+//        }
+//
+//        @Override public MutableList<F> mutable() { return this; }
+//
+//        /**
+//         Replace the item at the given index.  Note: i.replace(i.size(), o) used to be equivalent to
+//         i.concat(o), but it probably won't be for the RRB tree implementation, so this will change too.
+//
+//         @param index the index where the value should be stored.
+//         @param item   the value to store
+//         @return a new MutableRrb with the replaced item
+//         */
+//        @Override
+//        public MutableRrb<F> replace(int index, F item) {
+//            ensureEditable();
+//            if ( (index < 0) || (index > size) ) {
+//                throw new IndexOutOfBoundsException("Index: " + index + " size: " + size);
+//            }
+//            if (index >= focusStartIndex) {
+//                int focusOffset = index - focusStartIndex;
+//                if (focusOffset < focusLength) {
+//                    return new MutableRrb<>(replaceInArrayAt(item, focus, focusOffset, null),
+//                                         focusStartIndex, focusLength, root, size);
+//                }
+//                index -= focusLength;
+//            }
+//            // About to do replace with maybe-adjusted index
+//            return new MutableRrb<>(focus, focusStartIndex, focusLength, root.replace(index, item), size);
+//        }
+//
+//        public MutableRrb<F> without(int index) {
+//            ensureEditable();
+//            if ( (index > 0) && (index < size - 1) ) {
+//                Tuple2<MutableRrb<F>,MutableRrb<F>> s1 = split(index);
+//                Tuple2<MutableRrb<F>,MutableRrb<F>> s2 = s1._2().split(1);
+//                return s1._1().join(s2._2());
+//            } else if (index == 0) {
+//                return split(1)._2();
+//            } else if (index == size - 1) {
+//                return split(size - 1)._1();
+//            } else {
+//                throw new IllegalArgumentException("out of bounds");
+//            }
+//        }
+//
+//        @Override public int size() { return size; }
+//
+//        /**
+//         Divides this RRB-Tree such that every index less-than the given index ends up in the left-hand
+//         tree and the indexed item and all subsequent ones end up in the right-hand tree.
+//
+//         @param splitIndex the split point (excluded from the left-tree, included in the right one)
+//         @return two new sub-trees as determined by the split point.  If the point is 0 or this.size()
+//         one tree will be empty (but never null).
+//         */
+//        public Tuple2<MutableRrb<F>,MutableRrb<F>> split(int splitIndex) {
+//            if ( (splitIndex < 1) && (splitIndex > size) ) {
+//                throw new IllegalArgumentException("Constraint violation failed: 1 <= splitIndex <= size");
+//            }
+//            // Push the focus before splitting.
+//            Node<F> newRoot = (focusLength > 0) ? root.pushFocus(focusStartIndex, truncateArray(focus, focusLength, null))
+//                                                : root;
+//
+//            // If a leaf-node is split, the fragments become the new focus for each side of the split.
+//            // Otherwise, the focus can be left empty, or the last node of each side can be made into
+//            // the focus.
+//
+//            SplitNode<F> split = newRoot.splitAt(splitIndex);
+//
+////        split.left().debugValidate();
+////        split.right().debugValidate();
+//
+//            F[] lFocus = split.leftFocus();
+//            Node<F> left = eliminateUnnecessaryAncestors(split.left());
+//
+//            F[] rFocus = split.rightFocus();
+//            Node<F> right = eliminateUnnecessaryAncestors(split.right());
+//
+//            return Tuple2.of(new MutableRrb<>(lFocus, left.size(), lFocus.length, left, left.size() + lFocus.length),
+//                             new MutableRrb<>(rFocus, 0, rFocus.length, right, right.size() + rFocus.length));
+//        }
+//
+//        @Override public String toString() {
+//            return UnmodIterable.toString("MutableRrb", this);
+//        }
+//
+//        @Override public String indentedStr(int indent) {
+//            return "MutableRrb(size=" + size +
+//                   " fsi=" + focusStartIndex +
+//                   " focus=" + arrayString(focus) + "\n" +
+//                   indentSpace(indent + 8) + "root=" +
+//                   (root == null ? "null" : root.indentedStr(indent + 13)) +
+//                   ")";
+//        }
+//    } // End inner class MutableRrb
+
     // =================================== Array Helper Functions ==================================
     // Helper function to avoid type warnings.
-    @SuppressWarnings("unchecked")
-    private static <T> T[] emptyArray() { return (T[]) EMPTY_ARRAY; }
 
     @SuppressWarnings("unchecked")
     private static <T> Node<T>[] genericNodeArray(int size) {
         return (Node<T>[]) new Node<?>[size];
     }
 
-//    // Thank you jeannicolas
-//    // http://stackoverflow.com/questions/80476/how-can-i-concatenate-two-arrays-in-java
-//    private static <T> T[] arrayGenericConcat(T[] a, T[] b) {
-//        int aLen = a.length;
-//        int bLen = b.length;
-//
-//        @SuppressWarnings("unchecked")
-//        T[] c = (T[]) Array.newInstance(a.getClass().getComponentType(), aLen + bLen);
-//        System.arraycopy(a, 0, c, 0, aLen);
-//        System.arraycopy(b, 0, c, aLen, bLen);
-//
-//        return c;
-//    }
-
-    // Helper function to avoid type warnings.
-    @SuppressWarnings("unchecked")
-    private static <T> T[] singleElementArray(T elem) {
-        return (T[]) new Object[] { elem };
-    }
-
-    private static <T> T[] insertIntoArrayAt(T item, T[] items, int idx, Class<T> tClass) {
-        // Make an array that's one bigger.  It's too bad that the JVM bothers to
-        // initialize this with nulls.
-
-        @SuppressWarnings("unchecked")
-        // Make an array that big enough.  It's too bad that the JVM bothers to
-        // initialize this with nulls.
-        T[] newItems = (T[]) ( (tClass == null) ? new Object[items.length + 1]
-                                                : Array.newInstance(tClass, items.length + 1) );
-
-        // If we aren't inserting at the first item, array-copy the items before the insert
-        // point.
-        if (idx > 0) {
-            System.arraycopy(items, 0, newItems, 0, idx);
-        }
-
-        // Insert the new item.
-        newItems[idx] = item;
-
-        // If we aren't inserting at the last item, array-copy the items after the insert
-        // point.
-        if (idx < items.length) {
-            System.arraycopy(items, idx, newItems, idx + 1, items.length - idx);
-        }
-
-        return newItems;
-    }
-
-//    private static <T> T[] insertIntoArrayAt(T item, T[] items, int idx) {
-//        return insertIntoArrayAt(item, items, idx, null);
-//    }
-
-    /**
-     Called splice, but handles precat (idx = 0) and concat (idx = origItems.length).
-     @param insertedItems the items to insert
-     @param origItems the original items.
-     @param idx the index to insert new items at
-     @param tClass the class of the resulting new array
-     @return a new array with the new items inserted at the proper position of the old array.
-     */
-    private static <A> A[] spliceIntoArrayAt(A[] insertedItems, A[] origItems, int idx,
-                                             Class<A> tClass) {
-        // Make an array that big enough.  It's too bad that the JVM bothers to
-        // initialize this with nulls.
-        @SuppressWarnings("unchecked")
-        A[] newItems = tClass == null ? (A[]) new Object[insertedItems.length + origItems.length] :
-                       (A[]) Array.newInstance(tClass, insertedItems.length + origItems.length);
-
-        // If we aren't inserting at the first item, array-copy the items before the insert
-        // point.
-        if (idx > 0) {
-            //               src,  srcPos, dest,destPos,length
-            System.arraycopy(origItems, 0, newItems, 0, idx);
-        }
-
-        // Insert the new items
-        //               src,      srcPos,     dest, destPos, length
-        System.arraycopy(insertedItems, 0, newItems, idx, insertedItems.length);
-
-        // If we aren't inserting at the last item, array-copy the items after the insert
-        // point.
-        if (idx < origItems.length) {
-            System.arraycopy(origItems, idx, newItems, idx + insertedItems.length,
-                             origItems.length - idx);
-        }
-        return newItems;
-    }
-
-//    private static int[] replaceInIntArrayAt(int replacedItem, int[] origItems, int idx) {
-//        // Make an array that big enough.  It's too bad that the JVM bothers to
-//        // initialize this with nulls.
-//        int[] newItems = new int[origItems.length];
-//        System.arraycopy(origItems, 0, newItems, 0, origItems.length);
-//        newItems[idx] = replacedItem;
-//        return newItems;
-//    }
-
-    @SuppressWarnings("unchecked")
-    private static <T> T[] replaceInArrayAt(T replacedItem, T[] origItems, int idx,
-                                            Class<T> tClass) {
-        // Make an array that big enough.  It's too bad that the JVM bothers to
-        // initialize this with nulls.
-        T[] newItems = (T[]) ( (tClass == null) ? new Object[origItems.length]
-                                                : Array.newInstance(tClass, origItems.length) );
-        System.arraycopy(origItems, 0, newItems, 0, origItems.length);
-        newItems[idx] = replacedItem;
-        return newItems;
-    }
-
-    /**
-     Only call this if the array actually needs to be split (0 &lt; splitPoint &lt; orig.length).
-     @param orig array to split
-     @param splitIndex items less than this index go in the left, equal or greater in the right.
-     @return a 2D array of leftItems then rightItems
-     */
-    private static <T> Tuple2<T[],T[]> splitArray(T[] orig, int splitIndex) { //, Class<T> tClass) {
-//        if (splitIndex < 1) {
-//            throw new IllegalArgumentException("Called split when splitIndex < 1");
-//        }
-//        if (splitIndex > orig.length - 1) {
-//            throw new IllegalArgumentException("Called split when splitIndex > orig.length - 1");
-//        }
-
-        // NOTE:
-        // I sort of suspect that generic 2D array creation where the two arrays are of a different
-        // length is not possible in Java, or if it is, it's not likely to be much faster than
-        // what we have here.  I'd just copy the Arrays.copyOf code everywhere this function is used
-        // if you want more speed.
-//        int rightLength = orig.length - splitIndex;
-//        Class<T> tClass = (Class<T>) orig.getClass().getComponentType();
-//        Tuple2<T[],T[]> split = Tuple2.of((T[]) Array.newInstance(tClass, splitIndex),
-//                                          (T[]) Array.newInstance(tClass, rightLength));
-//
-        // Tuple2<T[],T[]> split =
-        return Tuple2.of(Arrays.copyOf(orig, splitIndex),
-                         Arrays.copyOfRange(orig, splitIndex, orig.length));
-
-//        // original array, offset, newArray, offset, length
-//        System.arraycopy(orig, 0, split._1(), 0, splitIndex);
-//
-//        System.arraycopy(orig, splitIndex, split._2(), 0, rightLength);
-//        return split;
-    }
-
-    /**
-     Only call this if the array actually needs to be split (0 &lt; splitPoint &lt; orig.length).
-     @param orig array to split
-     @param splitIndex items less than this index go in the left, equal or greater in the right.
-     @return a 2D array of leftItems then rightItems
-     */
-    private static int[][] splitArray(int[] orig, int splitIndex) {
-        // This function started an exact duplicate of the one above, but for ints.
-//        if (splitIndex < 1) {
-//            throw new IllegalArgumentException("Called split when splitIndex < 1");
-//        }
-//        if (splitIndex > orig.length - 1) {
-//            throw new IllegalArgumentException("Called split when splitIndex > orig.length - 1");
-//        }
-        int rightLength = orig.length - splitIndex;
-        int[][] split = new int[][] {new int[splitIndex],
-                                     new int[rightLength]};
-        // original array, offset, newArray, offset, length
-        System.arraycopy(orig, 0, split[0], 0, splitIndex);
-        System.arraycopy(orig, splitIndex, split[1], 0, rightLength);
-        return split;
-    }
-
     // =============================== Debugging and pretty-printing ===============================
 
-    // Note, this is part of something completely different, but was especially useful for
-    // debugging the above.  So much so, that I want to keep it when I'm done, but it needs
-    // to move somewhere else before releasing.
-    private static final String[] SPACES = {
-            "",
-            " ",
-            "  ",
-            "   ",
-            "    ",
-            "     ",
-            "      ",
-            "       ",
-            "        ",
-            "         ",
-            "          ",
-            "           ",
-            "            ",
-            "             ",
-            "              ",
-            "               ",
-            "                ",
-            "                 ",
-            "                  ",
-            "                   ",
-            "                    ",
-            "                     ",
-            "                      ",
-            "                       ",
-            "                        ",
-            "                         ",
-            "                          ",
-            "                           ",
-            "                            ",
-            "                             ",
-            "                              ",
-            "                               ",
-            "                                ",
-            "                                 ",
-            "                                  ",
-            "                                   ",
-            "                                    ",
-            "                                     ",
-            "                                      ",
-            "                                       ",
-            "                                        ",
-            "                                         ",
-            "                                          ",
-            "                                           ",
-            "                                            ",
-            "                                             ",
-            "                                              ",
-            "                                               ",
-            "                                                "};
-
-    private static final int SPACES_LENGTH_MINUS_ONE = SPACES.length - 1;
-
-    static StringBuilder indentSpace(int len) {
-        StringBuilder sB = new StringBuilder();
-        if (len < 1) { return sB; }
-        while (len > SPACES_LENGTH_MINUS_ONE) {
-            sB.append(SPACES[SPACES_LENGTH_MINUS_ONE]);
-            len = len - SPACES_LENGTH_MINUS_ONE;
-        }
-        return sB.append(SPACES[len]);
-    }
-
-    private static <T> String arrayString(T[] items) {
-        StringBuilder sB = new StringBuilder("[");
+    private static StringBuilder showSubNodes(StringBuilder sB, Object[] items, int nextIndent) {
         boolean isFirst = true;
-        for (T item : items) {
-            if (isFirst) {
-                isFirst = false;
-            } else {
-                sB.append(" ");
-            }
-            if (item instanceof String) {
-                sB.append("\"").append(item).append("\"");
-            } else {
-                sB.append(item);
-            }
-        }
-        return sB.append("]").toString();
-    }
-
-    // TODO: We need one of these for each type of primitive for pretty-printing without commas.
-    private static String arrayString(int[] items) {
-        StringBuilder sB = new StringBuilder("[");
-        boolean isFirst = true;
-        for (int item : items) {
-            if (isFirst) {
-                isFirst = false;
-            } else {
-                sB.append(" ");
-            }
-            sB.append(item);
-        }
-        return sB.append("]").toString();
-    }
-
-    private static StringBuilder showSubNodes(StringBuilder sB, Node[] nodes, int nextIndent) {
-        boolean isFirst = true;
-        for (Node n : nodes) {
+        for (Object n : items) {
             if (isFirst) {
                 isFirst = false;
             } else {
 //                sB.append(" ");
-                if (nodes[0] instanceof Leaf) {
+                if (items[0] instanceof Leaf) {
                     sB.append(" ");
                 } else {
                     sB.append("\n").append(indentSpace(nextIndent));
                 }
             }
-            sB.append(n.indentedStr(nextIndent));
+            sB.append(((Node) n).indentedStr(nextIndent));
         }
         return sB;
     }

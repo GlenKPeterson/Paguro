@@ -22,14 +22,11 @@ import java.util.Random;
 
 import org.junit.Test;
 import org.organicdesign.fp.TestUtilities;
-import org.organicdesign.fp.collections.RrbTree;
-import org.organicdesign.fp.collections.UnmodIterator;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.xform;
 import static org.organicdesign.fp.TestUtilities.compareIterators;
-import static org.organicdesign.fp.collections.RrbTree.indentSpace;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class RrbTreeTest {
@@ -39,13 +36,13 @@ public class RrbTreeTest {
     @Test public void buildStrict() {
         final int SEVERAL = 2000; //0; //0; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
         RrbTree<Integer> is = RrbTree.empty();
-        ArrayList<Integer> control = new ArrayList<>();
+//        ArrayList<Integer> control = new ArrayList<>();
         for (int j = 0; j < SEVERAL; j++){
             is = is.append(j);
-            control.add(j);
+//            control.add(j);
             assertEquals(j + 1, is.size());
             assertEquals(Integer.valueOf(j), is.get(j));
-//            System.out.println(" ==" + is);
+//            System.out.println(is.indentedStr(0));
 //            for (int k = 0; k <= j; k++) {
 //                assertEquals("Checking index: " + k + " for size=" + control.size(), control.get(k), is.get(k));
 //            }
@@ -599,25 +596,6 @@ public class RrbTreeTest {
         assertTrue(s1.contains("        root="));
 
         assertEquals("RrbTree(0,7,3,5,1,...)", rrb2.toString());
-    }
-
-    @Test public void testIndentSpace() {
-        assertEquals("", indentSpace(Integer.MIN_VALUE).toString());
-        assertEquals("", indentSpace(-1).toString());
-        assertEquals("", indentSpace(0).toString());
-        assertEquals(" ", indentSpace(1).toString());
-        assertEquals("  ", indentSpace(2).toString());
-        assertEquals("   ", indentSpace(3).toString());
-        assertEquals("     ", indentSpace(5).toString());
-        assertEquals("       ", indentSpace(7).toString());
-        assertEquals("           ", indentSpace(11).toString());
-        assertEquals("             ", indentSpace(13).toString());
-
-        String spaces = "";
-        for (int i = 0; i < 300; i++) {
-            assertEquals(spaces, indentSpace(i).toString());
-            spaces = spaces + " ";
-        }
     }
 
     @SafeVarargs

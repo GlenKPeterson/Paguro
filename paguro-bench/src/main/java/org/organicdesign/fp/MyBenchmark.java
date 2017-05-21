@@ -140,6 +140,15 @@ public class MyBenchmark {
     @Benchmark public void BuildVec1000000() { buildList(PersistentVector.empty(), 1000000); }
     @Benchmark public void BuildVec10000000() { buildList(PersistentVector.empty(), 10000000); }
 
+    @Benchmark public void BuildVecMut1() { buildList(PersistentVector.emptyMutable(), 1); }
+    @Benchmark public void BuildVecMut10() { buildList(PersistentVector.emptyMutable(), 10); }
+    @Benchmark public void BuildVecMut100() { buildList(PersistentVector.emptyMutable(), 100); }
+    @Benchmark public void BuildVecMut1000() { buildList(PersistentVector.emptyMutable(), 1000); }
+    @Benchmark public void BuildVecMut10000() { buildList(PersistentVector.emptyMutable(), 10000); }
+    @Benchmark public void BuildVecMut100000() { buildList(PersistentVector.emptyMutable(), 100000); }
+    @Benchmark public void BuildVecMut1000000() { buildList(PersistentVector.emptyMutable(), 1000000); }
+    @Benchmark public void BuildVecMut10000000() { buildList(PersistentVector.emptyMutable(), 10000000); }
+
     @Benchmark public void BuildList1() { buildList2(1); }
     @Benchmark public void BuildList10() { buildList2(10); }
     @Benchmark public void BuildList100() { buildList2(100); }
