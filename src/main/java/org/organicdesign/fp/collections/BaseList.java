@@ -14,8 +14,8 @@
 package org.organicdesign.fp.collections;
 
 /**
- Adds copy-on-write methods to UnmodList.  Lowest common ancestor of {@link MutableList} and
- {@link ImList}.
+ Adds copy-on-write, "fluent interface" methods to {@link UnmodList}.
+ Lowest common ancestor of {@link MutableList} and {@link ImList}.
  */
 public interface BaseList<E> extends UnmodList<E> {
     /**

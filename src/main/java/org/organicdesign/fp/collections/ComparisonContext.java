@@ -18,21 +18,23 @@ import java.util.Comparator;
 import java.util.Iterator;
 
 /**
- Implement compare() and hash() and you get a 100% compatible eq() for free.  If you don't need
- Comparator, just use {@link Equator}.  Typical implementations compare() throw an
- IllegalArgumentException if one parameter is null (if both are null, it's probably OK to return 0).
+ <p>A Comparison Context represents both ordering and equality, since the two often need to be
+ defined compatibly.  Implement compare() and hash() and you get a 100% compatible eq() for free.
+ If you don't want ordering, use {@link Equator} instead.  Typical implementations of
+ {@link #compare(Object, Object)} throw an IllegalArgumentException if one parameter is null
+ (if both are null, it's probably OK to return 0).</p>
 
- Only null is equal to null.  If we are passed only one null value, it can't equal the other (two
- nulls are always equal).  Many correct implementations of compare(null, nonNull) throw
+ <p>Only null is equal to null.  If we are passed only one null value, it can't equal the other
+ (two nulls are always equal).  Many correct implementations of compare(null, nonNull) throw
  IllegalArgumentExceptions if one argument is null because most objects cannot be meaningfully
  be orderd with respect to null, but that's OK because for default implementations of eq(), gte(),
- and lte() check for nulls first, then check the output of compare().
+ and lte() check for nulls first, then check the output of compare().</p>
 
- A common mistake is to implement a ComparisonContext, Equator, or Comparator as an anonymous class
- or lambda, then be surprised when it is can't be serialized, or is deserialized as null.  These
- one-off classes are often singletons, which are easiest to serialize as enums.  If your
+ <p>A common mistake is to implement a ComparisonContext, Equator, or Comparator as an anonymous
+ class or lambda, then be surprised when it is can't be serialized, or is deserialized as null.
+ These one-off classes are often singletons, which are easiest to serialize as enums.  If your
  implementation requires generic type parameters, look at how {@link #defCompCtx()} tricks the type
- system into using generic type parameters (correctly) with an enum.
+ system into using generic type parameters (correctly) with an enum.</p>
 */
 public interface ComparisonContext<T> extends Equator<T>, Comparator<T> {
     /** Returns true if the first object is less than the second. */

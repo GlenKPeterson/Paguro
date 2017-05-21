@@ -24,8 +24,9 @@ import java.util.function.UnaryOperator;
 import org.organicdesign.fp.function.Fn2;
 
 /**
- An unmodifiable version of {@link java.util.List} which formalizes the return type of
- Collections.unmodifiableList()
+ Formalizes the return type of {@link java.util.Collections#unmodifiableList(List)}, deprecating
+ mutator methods and implementing them to throw exceptions.  You could think of this as
+ "clearing the slate" to a point where immutable, functional, fluent interfaces can be built again.
  */
 public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
 
