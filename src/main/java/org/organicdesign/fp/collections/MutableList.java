@@ -14,8 +14,11 @@
 package org.organicdesign.fp.collections;
 
 /**
- A mutate-in-place interface using copy-on-write methods so that you can treat mutable and
- immutable lists the same.  Being mutable, this is inherently NOT thread-safe.
+ A mutate-in-place interface using the same copy-on-write methods as {@link BaseList} and
+ {@link ImList} so that you can treat mutable and immutable lists the same.
+ You could think of this as a builder for an ImList, or just a stand-alone MutableList
+ that behaves similarly (extends {@link org.organicdesign.fp.xform.Transformable}).
+ Being mutable, this is inherently NOT thread-safe.
  */
 public interface MutableList<E> extends BaseList<E> {
     /** {@inheritDoc} */
