@@ -20,15 +20,14 @@ import java.util.Iterator;
 /**
  <p>A Comparison Context represents both ordering and equality, since the two often need to be
  defined compatibly.  Implement compare() and hash() and you get a 100% compatible eq() for free.
- If you don't want ordering, use {@link Equator} instead.  Typical implementations of
- {@link #compare(Object, Object)} throw an IllegalArgumentException if one parameter is null
- (if both are null, it's probably OK to return 0).</p>
+ If you don't want ordering, use {@link Equator} instead.</p>
 
- <p>Only null is equal to null.  If we are passed only one null value, it can't equal the other
- (two nulls are always equal).  Many correct implementations of compare(null, nonNull) throw
+ <p>Typical implementations of {@link #compare(Object, Object)} throw an
  IllegalArgumentExceptions if one argument is null because most objects cannot be meaningfully
- be orderd with respect to null, but that's OK because for default implementations of eq(), gte(),
- and lte() check for nulls first, then check the output of compare().</p>
+ be orderd with respect to null.  It's also OK if you want to return 0 when both arguments are null
+ because null is equal to null  Default implementations of eq(), gte(), and lte() check for nulls
+ first, before calling compare() so they will work either way you choose to implement
+ compare().</p>
 
  <p>A common mistake is to implement a ComparisonContext, Equator, or Comparator as an anonymous
  class or lambda, then be surprised when it is can't be serialized, or is deserialized as null.
