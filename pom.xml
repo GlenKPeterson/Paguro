@@ -129,6 +129,9 @@ http://mvnrepository.com/artifact/org.organicdesign/Paguro
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<!-- JavaDoc wasn't providing the right links to the Java APIs with the default version of the plugin on my machine. -->
 				<version>2.10.2</version>
+				<configuration>
+					<additionalparam>-Xdoclint:none</additionalparam>
+				</configuration>
 				<executions>
 					<execution>
 						<id>attach-javadocs</id>

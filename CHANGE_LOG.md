@@ -5,6 +5,42 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
+# Release 3.0: RRB Tree
+Major changes:
+ - Added Base___ for Im___ and Mutable___ interfaces to extend.  Mutable___ no longer extends Im___.
+ - Renamed interfaces Function# to Fn#
+ - Added an RRB Tree (still improving performance, but for insert at 0 in large lists it kills ArrayList)
+ - Added foldUntil() to Transformable to replace the earlier version of foldLeft with a repeatUntil function parameter.
+   Thanks to cal101 for inspiring this!
+ - Removed a bunch of deprecated and unused items
+ - Added JavaDoc to Git site
+
+Here is a script to ease your upgrade from 2.1.1 to 3.0:
+```bash
+# USE CAUTION AND HAVE A BACKUP OF YOUR SOURCE CODE (VERSION CONTROL) - NO GUARANTEES
+oldString='import org.organicdesign.fp.LazyRef'
+newString='import org.organicdesign.fp.function.LazyRef'
+sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir='.git' -rIl "$oldString" *)
+
+oldString='.foldLeft('
+newString='.fold('
+sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir='.git' -rIl "$oldString" *)
+
+sed -i -e 's/\<Function\([0-3]\)\>/Fn\1/g' $(egrep --exclude-dir='.svn' --exclude-dir='.git' -wrIl 'Function[0-3]' *)
+```
+Manual upgrade tasks:
+ - Do a clean build of your project
+   - IntelliJ users right-click on the /src/java/ folder in your project and choose `Rebuild '<default>'`
+   - Maven users: `mvn clean package`
+ - There will be type errors where you pass a Mutable___ as an Im___.
+   If the variable is myVar, simply change it to myVar.immutable() wherever errors show up.
+     Unless you really wanted a Mutable___ in which case, you need to change the type signature.
+
+##### Oops!
+I'm sorry I ever made Mutable___ extend Im___.  It's an embarrassing rookie mistake.
+I wasn't sure exposing mutable collections was worthwhile, I was "just trying them out" and suddenly found myself using them everywhere.
+Well, they're fixed now.  ["Go forth and spread beauty and light!"](https://www.youtube.com/watch?v=9oRctV5Fygc&t=12m28s)
+
 ## 2017-05-04 Release 2.1.1
 Fixed array class cast exception bug reported by @BrenoTrancoso https://github.com/GlenKPeterson/Paguro/issues/17
 Thank you for finding and reporting this tricky issue!
