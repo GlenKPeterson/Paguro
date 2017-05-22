@@ -25,28 +25,30 @@ import static org.organicdesign.fp.collections.Indented.arrayString;
 import static org.organicdesign.fp.collections.Indented.indentSpace;
 
 /**
- This is based on the paper, "RRB-Trees: Efficient Immutable Vectors" by Phil Bagwell and
- Tiark Rompf, with the following differences:
+ <p>This is based on the paper, "RRB-Trees: Efficient Immutable Vectors" by Phil Bagwell and
+ Tiark Rompf, with the following differences:</p>
 
- - The Relaxed nodes can be sized between n/3 and 2n/3 (Bagwell/Rompf specify n and n-1)
- - The Join operation sticks the shorter tree unaltered into the larger tree (except for very
-   small trees which just get concatenated).
+ <ul>
+ <li>The Relaxed nodes can be sized between n/3 and 2n/3 (Bagwell/Rompf specify n and n-1)</li>
+ <li>The Join operation sticks the shorter tree unaltered into the larger tree (except for very
+ small trees which just get concatenated).</li>
+ </ul>
 
- Details were filled in from the Cormen, Leiserson, Rivest & Stein Algorithms book entry
+ <p>Details were filled in from the Cormen, Leiserson, Rivest & Stein Algorithms book entry
  on B-Trees.  Also with an awareness of the Clojure PersistentVector by Rich Hickey.  All errors
- are by Glen Peterson.
+ are by Glen Peterson.</p>
 
- Still TO-DO:
-  - More Testing
-  - Change radix from 4 to 32.
-  - Consider mutable vector
-  - Speed testing and optimization.
+ <h4>Still TO-DO:</h4>
+   <ul>
+    <li>Consider mutable vector</li>
+    <li>Speed testing and optimization.</li>
+ </ul>
 
- History (what little I know):
- 1972: B-Tree: Rudolf Bayer and Ed McCreight
- 1998: Purely Functional Data Structures: Chris Okasaki
- 2007: Clojure's Persistent Vector (and HashMap) implementations: Rich Hickey
- 2012: RRB-Tree: Phil Bagwell and Tiark Rompf
+ <h4>History (what little I know):</h4>
+ 1972: B-Tree: Rudolf Bayer and Ed McCreight<br>
+ 1998: Purely Functional Data Structures: Chris Okasaki<br>
+ 2007: Clojure's Persistent Vector (and HashMap) implementations: Rich Hickey<br>
+ 2012: RRB-Tree: Phil Bagwell and Tiark Rompf<br>
 
  */
 @SuppressWarnings("WeakerAccess")
@@ -98,6 +100,7 @@ public class RrbTree<E> implements ImList<E>, Indented {
 
     // TODO: This is inefficient due to no mutable version (was 5x difference for PersistentVector)
     // TODO: Allow this to use default impl in ImList once we have a mutable version.
+    /** {@inheritDoc} */
     @Override public RrbTree<E> concat(Iterable<? extends E> es) {
         RrbTree<E> ret = this;
         for (E e : es) {
@@ -127,6 +130,7 @@ public class RrbTree<E> implements ImList<E>, Indented {
         }
     }
 
+    /** {@inheritDoc} */
     @Override public E get(int i) {
         if ( (i < 0) || (i > size) ) {
             throw new IndexOutOfBoundsException("Index: " + i + " size: " + size);
@@ -149,7 +153,8 @@ public class RrbTree<E> implements ImList<E>, Indented {
     }
 
     /**
-     I would have called this insert and reversed the order or parameters.
+     Inserts an item in the RRB tree pushing the current element at that index and all subsequent
+     elements to the right.
      @param idx the insertion point
      @param element the item to insert
      @return a new RRB-Tree with the item inserted.
@@ -179,6 +184,7 @@ public class RrbTree<E> implements ImList<E>, Indented {
         return new RrbTree<>(newFocus, idx, newRoot, size + 1);
     }
 
+    /** {@inheritDoc} */
     @Override public UnmodSortedIterator<E> iterator() {
         return new Iter();
     }
@@ -427,21 +433,14 @@ involves changing more nodes than maybe necessary.
         return new RrbTree<>(emptyArray(), 0, n, n.size());
     }
 
+    /** {@inheritDoc} */
     @Override public MutableList<E> mutable() {
         // TODO: Implement or change interfaces.
         throw new UnsupportedOperationException("No mutable version (yet)");
     }
 
-    /**
-     Replace the item at the given index.  Note: i.replace(i.size(), o) used to be equivalent to
-     i.concat(o), but it probably won't be for the RRB tree implementation, so this will change too.
-
-     @param index the index where the value should be stored.
-     @param item   the value to store
-     @return a new RrbTree with the replaced item
-     */
-    @Override
-    public RrbTree<E> replace(int index, E item) {
+    /** {@inheritDoc} */
+    @Override public RrbTree<E> replace(int index, E item) {
         if ( (index < 0) || (index > size) ) {
             throw new IndexOutOfBoundsException("Index: " + index + " size: " + size);
         }
@@ -457,6 +456,10 @@ involves changing more nodes than maybe necessary.
         return new RrbTree<>(focus, focusStartIndex, root.replace(index, item), size);
     }
 
+    /**
+     Returns a new RrbTree minus the given item (all items to the right are shifted left one)
+     This is O(log n).
+     */
     public RrbTree<E> without(int index) {
         if ( (index > 0) && (index < size - 1) ) {
             Tuple2<RrbTree<E>,RrbTree<E>> s1 = split(index);
@@ -510,6 +513,7 @@ involves changing more nodes than maybe necessary.
 
     // ================================== Standard Object Methods ==================================
 
+    /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     @Override public boolean equals(Object other) {
         if (this == other) { return true; }
@@ -531,10 +535,12 @@ involves changing more nodes than maybe necessary.
         return ret;
     }
 
+    /** {@inheritDoc} */
     @Override public String toString() {
         return UnmodIterable.toString("RrbTree", this);
     }
 
+    /** {@inheritDoc} */
     @Override public String indentedStr(int indent) {
         return "RrbTree(size=" + size +
                " fsi=" + focusStartIndex +
