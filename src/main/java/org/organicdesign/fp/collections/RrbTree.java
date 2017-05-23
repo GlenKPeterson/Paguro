@@ -243,8 +243,10 @@ involves changing more nodes than maybe necessary.
     private static <E> Node<E> addAncestor(Node<E> n) {
         return ( (n instanceof Leaf) &&
                  (n.size() == STRICT_NODE_LENGTH) ) ? new Strict<>(NODE_LENGTH_POW_2,
+                                                                   n.size(),
                                                                    (Node<E>[]) new Node[]{n}) :
                (n instanceof Strict) ? new Strict<>(((Strict) n).shift + NODE_LENGTH_POW_2,
+                                                    n.size(),
                                                     (Node<E>[]) new Node[]{n}) :
                new Relaxed<>(new int[] { n.size() },
                              (Node<E>[]) new Node[]{n});
@@ -832,7 +834,8 @@ involves changing more nodes than maybe necessary.
                                                     new Leaf<>(oldFocus)}
                                      : new Leaf[] { new Leaf<>(oldFocus),
                                                     this };
-                return new Strict<>(NODE_LENGTH_POW_2, newNodes);
+                // Size is twice STRICT_NODE_LENGTH, so shift left 1 to double.
+                return new Strict<>(NODE_LENGTH_POW_2, STRICT_NODE_LENGTH << 1, newNodes);
             }
 
             if ((items.length + oldFocus.length) < MAX_NODE_LENGTH) {
@@ -883,11 +886,12 @@ involves changing more nodes than maybe necessary.
         // For speed, we calculate it as height << NODE_LENGTH_POW_2
         // TODO: Can we store shift at the top-level Strict only?
         final int shift;
+        final int size;
         // These are the child nodes
         final Node<T>[] nodes;
         // Constructor
-        Strict(int s, Node<T>[] ns) {
-            shift = s; nodes = ns;
+        Strict(int sh, int sz, Node<T>[] ns) {
+            shift = sh; size = sz; nodes = ns;
         }
 
         @Override public Node<T> child(int childIdx) { return nodes[childIdx]; }
@@ -905,7 +909,7 @@ involves changing more nodes than maybe necessary.
                             this.indentedStr(0));
                 }
                 if (n.height() != height) {
-                    throw new IllegalStateException("Unequal height!\n" + this.indentedStr(0));
+                    throw new IllegalStateException("Unequal height!  My height = " + height() + "\n" + this.indentedStr(0));
                 }
                 if ( (n instanceof Strict) &&
                      ((Strict) n).shift != sh ) {
@@ -933,7 +937,8 @@ involves changing more nodes than maybe necessary.
             if (leftMost || !(shorter instanceof Strict)) {
                 return relax().addEndChild(leftMost, shorter);
             }
-            return new Strict<>(shift, insertIntoArrayAt(shorter, nodes, nodes.length, Node.class));
+            return new Strict<>(shift, size + shorter.size(),
+                                insertIntoArrayAt(shorter, nodes, nodes.length, Node.class));
         }
 
         /** Adds kids as leftmost or rightmost of current children */
@@ -944,7 +949,9 @@ involves changing more nodes than maybe necessary.
             return relax().addEndChildren(leftMost, newKids);
         }
 
-        @Override public int height() { return nodes[0].height() + 1; }
+        @Override public int height() {
+            return (shift / NODE_LENGTH_POW_2) + 1;
+        }
 
         /**
          Returns the high bits which we use to index into our array.  This is the simplicity (and
@@ -989,13 +996,7 @@ involves changing more nodes than maybe necessary.
             // Send the low bits on to our sub-nodes.
             return nodes[highBits(i)].get(lowBits(i));
         }
-        @Override public int size() {
-            int lastNodeIdx = nodes.length - 1;
-            // Add up all the full nodes (only the last can be partial)
-            int shiftedLength = lastNodeIdx << shift;
-            int partialNodeSize = nodes[lastNodeIdx].size();
-            return shiftedLength + partialNodeSize;
-        }
+        @Override public int size() { return size; }
         private boolean thisNodeHasCapacity() { return nodes.length < STRICT_NODE_LENGTH; }
 
         @Override public boolean hasStrictCapacity() {
@@ -1014,7 +1015,7 @@ involves changing more nodes than maybe necessary.
         @SuppressWarnings("unchecked")
         @Override
         public SplitNode<T> splitAt(int splitIndex) {
-            int size = size();
+//            int size = size();
 //            if ( (splitIndex < 0) || (splitIndex > size) ) {
 //                throw new IllegalArgumentException("Bad splitIndex: " + splitIndex);
 //            }
@@ -1036,7 +1037,7 @@ involves changing more nodes than maybe necessary.
             final Node<T> left;
             final Node<T> splitLeft = split.left();
             if (subNodeIndex == 0) {
-                left = new Strict<>(shift, new Node[] {splitLeft});
+                left = new Strict<>(shift, splitLeft.size(), new Node[] {splitLeft});
             } else {
                 boolean haveLeft = (splitLeft.size() > 0);
                 int numLeftItems = subNodeIndex + (haveLeft ? 1 : 0);
@@ -1050,7 +1051,11 @@ involves changing more nodes than maybe necessary.
                 if (haveLeft) {
                     leftNodes[numLeftItems - 1] = splitLeft;
                 }
-                left = new Strict<>(shift, leftNodes);
+                int newSize = 0;
+                for (Node n : leftNodes) {
+                    newSize += n.size();
+                }
+                left = new Strict<>(shift, newSize, leftNodes);
             }
 
 //            left.debugValidate();
@@ -1122,7 +1127,7 @@ involves changing more nodes than maybe necessary.
                         Node<T> newNode = lastNode.pushFocus(lowBits(index), oldFocus);
                         Node<T>[] newNodes = replaceInArrayAt(newNode, nodes, nodes.length - 1,
                                                               Node.class);
-                        return new Strict<>(shift, newNodes);
+                        return new Strict<>(shift, size + oldFocus.length, newNodes);
                     }
                     // Regardless of what else happens, we're going to add a new node.
                     Node<T> newNode = new Leaf<>(oldFocus);
@@ -1144,7 +1149,7 @@ involves changing more nodes than maybe necessary.
                         // Add a skinny branch node
                         Node<T>[] newNodes = (Node<T>[]) Array.newInstance(newNode.getClass(), 1);
                         newNodes[0] = newNode;
-                        newNode = new Strict<>(newShift, newNodes);
+                        newNode = new Strict<>(newShift, oldFocus.length, newNodes);
                         newShift += NODE_LENGTH_POW_2;
                     }
 
@@ -1153,11 +1158,12 @@ involves changing more nodes than maybe necessary.
                         Node<T>[] newNodes =
                                 insertIntoArrayAt(newNode, nodes, subNodeIndex, Node.class);
                         // This could allow cheap strict inserts on any leaf-node boundary...
-                        return new Strict<>(shift, newNodes);
+                        return new Strict<>(shift, size + oldFocus.length, newNodes);
                     } else {
                         // Add a level to the Strict tree
                         return new Strict(shift + NODE_LENGTH_POW_2,
-                                             new Node[]{this, newNode});
+                                          size + oldFocus.length,
+                                          new Node[]{this, newNode});
                     }
                 } else if ( (shift == NODE_LENGTH_POW_2) &&
                             (lowBits(index) == 0) &&
@@ -1176,7 +1182,7 @@ involves changing more nodes than maybe necessary.
                     Node<T>[] newNodes =
                             insertIntoArrayAt(newNode, nodes, subNodeIndex, Node.class);
                     // This allows cheap strict inserts on any leaf-node boundary...
-                    return new Strict<>(shift, newNodes);
+                    return new Strict<>(shift, size + oldFocus.length, newNodes);
                 }
             } // end if oldFocus.length == STRICT_NODE_LENGTH
 
@@ -1197,7 +1203,8 @@ involves changing more nodes than maybe necessary.
             // Send the low bits on to our sub-nodes.
             int thisNodeIdx = highBits(idx);
             Node<T> newNode = nodes[thisNodeIdx].replace(lowBits(idx), t);
-            return new Strict<>(shift, replaceInArrayAt(newNode, nodes, thisNodeIdx, Node.class));
+            return new Strict<>(shift, size,
+                                replaceInArrayAt(newNode, nodes, thisNodeIdx, Node.class));
         }
 
         @Override public boolean thisNodeHasRelaxedCapacity(int numNodes) {
