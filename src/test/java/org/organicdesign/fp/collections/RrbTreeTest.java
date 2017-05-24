@@ -33,19 +33,23 @@ public class RrbTreeTest {
 
     private Random rand = new java.security.SecureRandom();
 
-    @Test public void buildStrict() {
-        final int SEVERAL = 10000; //0; //0; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
-        RrbTree<Integer> is = RrbTree.empty();
-        for (int j = 0; j < SEVERAL; j++){
+    private static RrbTree<Integer> buildInOrderTest(RrbTree<Integer> is, int iterations) {
+        for (int j = 0; j < iterations; j++){
             is = is.append(j);
             assertEquals(j + 1, is.size());
             assertEquals(Integer.valueOf(j), is.get(j));
             is.debugValidate();
         }
-        assertEquals(SEVERAL, is.size());
-        for (int j = 0; j < SEVERAL; j++){
+        assertEquals(iterations, is.size());
+        for (int j = 0; j < iterations; j++){
             assertEquals(Integer.valueOf(j), is.get(j));
         }
+        return is;
+    }
+
+    @Test public void buildStrict() {
+        buildInOrderTest(RrbTree.empty(), 10000);
+        buildInOrderTest(RrbTree.emptyMutable(), 100000);
     }
 
     @Test

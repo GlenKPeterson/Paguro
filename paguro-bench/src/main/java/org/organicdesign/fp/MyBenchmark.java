@@ -3,9 +3,12 @@ package org.organicdesign.fp;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
+import org.organicdesign.fp.collections.BaseList;
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.PersistentVector;
 import org.organicdesign.fp.collections.RrbTree;
+import org.organicdesign.fp.collections.RrbTree.ImRrbt;
+import org.organicdesign.fp.collections.RrbTree.MutableRrbt;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,15 +25,24 @@ public class MyBenchmark {
         return empty;
     }
 
-    public static ImList<Integer> buildList(ImList<Integer> empty, int maxIdx) {
+    @SuppressWarnings("unchecked")
+    public static <T extends BaseList<Integer>> T buildList(T empty, int maxIdx) {
         for (int i = 0; i < maxIdx; i++) {
-            empty = empty.append(i);
+            empty = (T) empty.append(i);
         }
         return empty;
     }
 
-    public static ImList<Integer> insertAtZeroRrb(int maxIdx) {
-        RrbTree<Integer> empty = RrbTree.empty();
+    public static ImRrbt<Integer> insertAtZeroRrb(int maxIdx) {
+        ImRrbt<Integer> empty = RrbTree.empty();
+        for (int i = maxIdx; i >= 0; i--) {
+            empty = empty.insert(0, i);
+        }
+        return empty;
+    }
+
+    public static MutableRrbt<Integer> insertAtZeroRrbMut(int maxIdx) {
+        MutableRrbt<Integer> empty = RrbTree.emptyMutable();
         for (int i = maxIdx; i >= 0; i--) {
             empty = empty.insert(0, i);
         }
@@ -131,6 +143,15 @@ public class MyBenchmark {
     @Benchmark public void BuildRrb1000000() { buildList(RrbTree.empty(), 1000000); }
     @Benchmark public void BuildRrb10000000() { buildList(RrbTree.empty(), 10000000); }
 
+    @Benchmark public void BuildRrbMut1() { buildList(RrbTree.emptyMutable(), 1); }
+    @Benchmark public void BuildRrbMut10() { buildList(RrbTree.emptyMutable(), 10); }
+    @Benchmark public void BuildRrbMut100() { buildList(RrbTree.emptyMutable(), 100); }
+    @Benchmark public void BuildRrbMut1000() { buildList(RrbTree.emptyMutable(), 1000); }
+    @Benchmark public void BuildRrbMut10000() { buildList(RrbTree.emptyMutable(), 10000); }
+    @Benchmark public void BuildRrbMut100000() { buildList(RrbTree.emptyMutable(), 100000); }
+    @Benchmark public void BuildRrbMut1000000() { buildList(RrbTree.emptyMutable(), 1000000); }
+    @Benchmark public void BuildRrbMut10000000() { buildList(RrbTree.emptyMutable(), 10000000); }
+
     @Benchmark public void BuildVec1() { buildList(PersistentVector.empty(), 1); }
     @Benchmark public void BuildVec10() { buildList(PersistentVector.empty(), 10); }
     @Benchmark public void BuildVec100() { buildList(PersistentVector.empty(), 100); }
@@ -177,6 +198,15 @@ public class MyBenchmark {
     @Benchmark public void InsertZeroRrb1000000() { insertAtZeroRrb(1000000); }
     // Takes more than a second.
 //    @Benchmark public void InsertZeroRrb10000000() { insertAtZeroRrb(10000000); }
+
+    @Benchmark public void InsertZeroRrbMut1() { insertAtZeroRrbMut(1); }
+    @Benchmark public void InsertZeroRrbMut10() { insertAtZeroRrbMut(10); }
+    @Benchmark public void InsertZeroRrbMut100() { insertAtZeroRrbMut(100); }
+    @Benchmark public void InsertZeroRrbMut1000() { insertAtZeroRrbMut(1000); }
+    @Benchmark public void InsertZeroRrbMut10000() { insertAtZeroRrbMut(10000); }
+    @Benchmark public void InsertZeroRrbMut100000() { insertAtZeroRrbMut(100000); }
+    @Benchmark public void InsertZeroRrbMut1000000() { insertAtZeroRrbMut(1000000); }
+    @Benchmark public void InsertZeroRrbMut10000000() { insertAtZeroRrbMut(10000000); }
 
     @Benchmark public void IterateRrb1(Rrb1 rrb) { iterateList(rrb.rrb); }
     @Benchmark public void IterateRrb10(Rrb10 rrb) { iterateList(rrb.rrb); }
