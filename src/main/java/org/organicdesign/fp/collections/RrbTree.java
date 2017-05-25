@@ -58,11 +58,11 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
     // in Scala's implementation.  Tail and focus are both designed to allow repeated appends or
     // inserts to the same area of a vector to be done in constant time.  Tail only handles appends
     // but this can handle repeated inserts to any area of a vector.
-    private final E[] focus;
-    private final int focusStartIndex;
-    private final int focusLength;
-    private final Node<E> root;
-    private final int size;
+    private E[] focus;
+    private int focusStartIndex;
+    private int focusLength;
+    private Node<E> root;
+    private int size;
 
     // Constructor
     RrbTree(E[] f, int fi, int fl, Node<E> r, int s) {
@@ -80,24 +80,27 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
             // where it belongs.  Then make a new focus
             if ( (super.focusLength >= STRICT_NODE_LENGTH) ||
                  ((super.focusLength > 0) && (super.focusStartIndex < super.root.size())) ) {
-                Node<E> newRoot = super.root.pushFocus(super.focusStartIndex, super.focus);
-                E[] newFocus = (E[]) new Object[STRICT_NODE_LENGTH];
-                newFocus[0] = val;
-                return new MutableRrbt<>(newFocus, super.size, 1, newRoot, super.size + 1);
+                super.root = super.root.pushFocus(super.focusStartIndex,
+                                                  arrayCopy(super.focus, super.focusLength, null));
+                super.focus = (E[]) new Object[STRICT_NODE_LENGTH];
+                super.focus[0] = val;
+                super.focusStartIndex = super.size;
+                super.focusLength = 1;
+                super.size++;
+                return this;
             }
 
-            E[] newFocus = super.focus;
+            // TODO: 1. Make sure to defensively copy mutable arrays before pushFocus
+            // TODO: 2. Get rid of "new MutableRrbt" because we should just mutate the old one.
+            // TODO: 3. Make the root the first argument to RrbTree, MutableRrbt and ImRrbt.
+
             if (super.focus.length <= super.focusLength) {
-//            System.out.println("==== NEW FOCUS ====");
-                // Make an array that big enough.
-                newFocus = (E[]) new Object[STRICT_NODE_LENGTH];
-
-                // If we aren't inserting at the first item, array-copy the items before the insert
-                // point.
-                System.arraycopy(super.focus, 0, newFocus, 0, super.focusLength);
+                super.focus = arrayCopy(super.focus, STRICT_NODE_LENGTH, null);
             }
-            newFocus[super.focusLength] = val;
-            return new MutableRrbt<>(newFocus, super.focusStartIndex, super.focusLength + 1, super.root, super.size + 1);
+            super.focus[super.focusLength] = val;
+            super.focusLength++;
+            super.size++;
+            return this;
         }
 
         /** {@inheritDoc} */
@@ -111,25 +114,86 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
 
         /** {@inheritDoc} */
         @Override public ImRrbt<E> immutable() {
-            // Defensively copy the focus
-            @SuppressWarnings("unchecked")
-            E[] newFocus = (E[]) new Object[super.focusLength];
-            //                      src, srcPos,    dest,destPos, length
-            System.arraycopy(super.focus, 0, newFocus, 0, super.focusLength);
-            // TODO: Should we defensively copy the root as well?
-            return new ImRrbt<>(newFocus, super.focusStartIndex, super.focusLength,
+            return new ImRrbt<>(arrayCopy(super.focus, super.focusLength, null),
+                                super.focusStartIndex, super.focusLength,
                                 super.root, super.size);
         }
 
         /** {@inheritDoc} */
-        @Override public MutableRrbt<E> insert(int idx, E element) {
-            return (MutableRrbt<E>) super.insert(idx, element);
+        @Override public MutableRrbt<E> insert(int idx, E element)  {
+            // If the focus is full, push it into the tree and make a new one with the new element.
+            if (super.focusLength >= STRICT_NODE_LENGTH) {
+                super.root = super.root.pushFocus(super.focusStartIndex,
+                                                  arrayCopy(super.focus, super.focusLength, null));
+                super.focus = singleElementArray(element);
+                super.focusStartIndex = idx;
+                super.focusLength = 1;
+                super.size++;
+                return this;
+            }
+
+            // If we have no focus, add a new one at the ideal spot.
+            // TODO: Make sure Immutable does this too.
+            if (super.focusLength == 0) {
+                super.focus = singleElementArray(element);
+                super.focusStartIndex = idx;
+                super.focusLength = 1;
+                super.size++;
+                return this;
+            }
+
+             // If the index is within the focus, add the item there.
+            int diff = idx - super.focusStartIndex;
+
+            if ( (diff >= 0) && (diff <= super.focusLength) ) {
+                // Here focus length cannot be zero!
+                // We want to double the length each time up to STRICT_NODE_LENGTH
+                // because there is no guarantee that the next insert will be in the same
+                // place, so this hedges our bets.
+                if (super.focus.length <= super.focusLength) {
+                    int newLen = (super.focusLength >= HALF_STRICT_NODE_LENGTH)
+                                 ? STRICT_NODE_LENGTH
+                                 : super.focusLength << 1; // double size.
+                    super.focus = arrayCopy(super.focus, newLen, null);
+                }
+                // Shift existing items past insertion index to the right
+                for (int i = super.focusLength; (i >= diff) && (i > 0); i--) {
+                    super.focus[i] = super.focus[i - 1];
+                }
+                // Put new item into the focus.
+                super.focus[diff] = element;
+                super.focusLength++;
+                super.size++;
+                return this;
+            }
+
+            // Here we are left with an insert somewhere else than the current focus.
+            // Here the mutable version has a focus that's longer than the number of items used,
+            // So we need to shorten it before pushing it into the tree.
+            if (super.focusLength > 0) {
+                super.root = super.root.pushFocus(super.focusStartIndex,
+                                                  arrayCopy(super.focus, super.focusLength, null));
+            }
+            super.focus = singleElementArray(element);
+            super.focusStartIndex = idx;
+            super.focusLength = 1;
+            super.size++;
+            return this;
         }
 
         /** {@inheritDoc} */
         @Override public MutableRrbt<E> replace(int index, E item) {
             return (MutableRrbt<E>) super.replace(index, item);
         }
+
+        /** {@inheritDoc} */
+        @Override Node<E> pushFocus() {
+            return (super.focusLength == 0)
+                   ? super.root
+                   : super.root.pushFocus(super.focusStartIndex,
+                                          arrayCopy(super.focus, super.focusLength, null));
+        }
+
     }
 
     /** Immutable version of an RRB Tree */
@@ -158,18 +222,35 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
 
         /** {@inheritDoc} */
         @Override public ImRrbt<E> insert(int idx, E element) {
-            return (ImRrbt<E>) super.insert(idx, element);
+            // If the focus is full, push it into the tree and make a new one with the new element.
+            if (super.focusLength >= STRICT_NODE_LENGTH) {
+                Node<E> newRoot = super.root.pushFocus(super.focusStartIndex, super.focus);
+                E[] newFocus = singleElementArray(element);
+                return new ImRrbt<>(newFocus, idx, 1, newRoot, super.size + 1);
+            }
+
+            // If the index is within the focus, add the item there.
+            int diff = idx - super.focusStartIndex;
+
+            if ( (diff >= 0) && (diff <= super.focusLength) ) {
+                // new focus
+                E[] newFocus = insertIntoArrayAt(element, super.focus, diff, null);
+                return new ImRrbt<>(newFocus, super.focusStartIndex, super.focusLength + 1, super.root, super.size + 1) ;
+            }
+
+            // Here we are left with an insert somewhere else than the current focus.
+            Node<E> newRoot = super.focusLength > 0 ? super.root.pushFocus(super.focusStartIndex,
+                                                                           super.focus)
+                                                    : super.root;
+            E[] newFocus = singleElementArray(element);
+            return new ImRrbt<>(newFocus, idx, 1, newRoot, super.size + 1);
         }
 
         /** {@inheritDoc} */
         @Override public MutableRrbt<E> mutable() {
-            // Defensively copy the focus
-            @SuppressWarnings("unchecked")
-            E[] newFocus = (E[]) new Object[super.focusLength];
-            //                      src, srcPos,    dest,destPos, length
-            System.arraycopy(super.focus, 0, newFocus, 0, super.focusLength);
             // TODO: Should we defensively copy the root as well?
-            return new MutableRrbt<>(newFocus, super.focusStartIndex, super.focusLength,
+            return new MutableRrbt<>(arrayCopy(super.focus, super.focusLength, null),
+                                     super.focusStartIndex, super.focusLength,
                                      super.root, super.size);
         }
 
@@ -182,6 +263,12 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         private static final ImRrbt EMPTY_IM_RRBT =
                 new ImRrbt<>(emptyArray(), 0, 0, emptyLeaf(), 0);
 
+        /** {@inheritDoc} */
+        @Override Node<E> pushFocus() {
+            return (super.focusLength == 0)
+                   ? super.root
+                   : super.root.pushFocus(super.focusStartIndex, super.focus);
+        }
     }
 
     /** Returns the empty, immutable RRB-Tree (there is only one) */
@@ -251,36 +338,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
      @return a new RRB-Tree with the item inserted.
      */
     @SuppressWarnings("WeakerAccess")
-    public RrbTree<E> insert(int idx, E element) {
-        // If the focus is full, push it into the tree and make a new one with the new element.
-        if (focusLength >= STRICT_NODE_LENGTH) {
-            Node<E> newRoot = root.pushFocus(focusStartIndex, focus);
-            E[] newFocus = singleElementArray(element);
-            return (this instanceof MutableRrbt)
-                   ? new MutableRrbt<>(newFocus, idx, 1, newRoot, size + 1)
-                   : new ImRrbt<>(newFocus, idx, 1, newRoot, size + 1);
-        }
-
-        // If the index is within the focus, add the item there.
-        int diff = idx - focusStartIndex;
-
-        if ( (diff >= 0) && (diff <= focusLength) ) {
-            // TODO: Maybe shift existing array for mutable.
-            // new focus
-            E[] newFocus = insertIntoArrayAt(element, focus, diff, null);
-            return (this instanceof MutableRrbt)
-                   ? new MutableRrbt<>(newFocus, focusStartIndex, focusLength + 1, root, size + 1)
-                   : new ImRrbt<>(newFocus, focusStartIndex, focusLength + 1, root, size + 1) ;
-        }
-
-        // Here we are left with an insert somewhere else than the current focus.
-        Node<E> newRoot = focusLength > 0 ? root.pushFocus(focusStartIndex, focus)
-                                          : root;
-        E[] newFocus = singleElementArray(element);
-        return (this instanceof MutableRrbt)
-               ? new MutableRrbt<>(newFocus, idx, 1, newRoot, size + 1)
-               : new ImRrbt<>(newFocus, idx, 1, newRoot, size + 1);
-    }
+    public abstract RrbTree<E> insert(int idx, E element);
 
     /** {@inheritDoc} */
     @Override public UnmodSortedIterator<E> iterator() {
@@ -322,12 +380,8 @@ involves changing more nodes than maybe necessary.
   [1]: https://infoscience.epfl.ch/record/169879/files/RMTrees.pdf
 */
 
-    private Node<E> pushFocus() {
-        if (focusLength == 0) {
-            return root;
-        }
-        return root.pushFocus(focusStartIndex, focus);
-    }
+    /** Internal method - do not use. */
+    abstract Node<E> pushFocus();
 
     private static <E> Node<E> eliminateUnnecessaryAncestors(Node<E> n) {
         while ( !(n instanceof Leaf) &&
@@ -596,8 +650,7 @@ involves changing more nodes than maybe necessary.
             throw new IllegalArgumentException("Constraint violation failed: 1 <= splitIndex <= size");
         }
         // Push the focus before splitting.
-        Node<E> newRoot = (focusLength > 0) ? root.pushFocus(focusStartIndex, focus)
-                                             : root;
+        Node<E> newRoot = pushFocus();
 
         // If a leaf-node is split, the fragments become the new focus for each side of the split.
         // Otherwise, the focus can be left empty, or the last node of each side can be made into
@@ -684,6 +737,8 @@ involves changing more nodes than maybe necessary.
 
     // 0b00000000000000000000000000100000 = 0x20 = 32
     private static final int STRICT_NODE_LENGTH = 1 << NODE_LENGTH_POW_2;
+
+    private static final int HALF_STRICT_NODE_LENGTH = STRICT_NODE_LENGTH >> 1;
 
     // (MIN_NODE_LENGTH + MAX_NODE_LENGTH) / 2 should equal STRICT_NODE_LENGTH so that they have the
     // same average node size to make the index interpolation easier.

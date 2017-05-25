@@ -60,9 +60,16 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
     // The bitwise | operator performs a bitwise inclusive OR operation
 
     private static class Node {
-        // Every node in a Vector (mutable or persistent) shares a single atomic reference value.
-        // I'm not sure why this is on the node instead of on the vector.  You know, if we do that,
-        // we don't need this class at all and could just use arrays instead.
+        // The same data structure backs both the mutable and immutable vector.  The immutable
+        // one uses copy-on-write for all operations.  The mutable one still uses copy-on-write
+        // for the tree, but not for the tail.  Instead of creating a new tail one bigger after
+        // each append, it creates a STRICT_NODE_SIZE tail and inserts items into it in place.
+        //
+        // The reason we need this AtomicReference is that some mutable vector could still have
+        // a pointer to the Tail array that's in the tree.  When first mutating, the current thread
+        // is placed in here.  After the mutable structure is made immutable, a null is placed in
+        // here.  Subsequent attempts to mutate anything check and if they find the null, they
+        // throw an exception.
         transient public final AtomicReference<Thread> edit;
 
         // This is either the data in the node (for a leaf node), or it's pointers to sub-nodes (for

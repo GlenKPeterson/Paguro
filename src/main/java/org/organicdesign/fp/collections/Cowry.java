@@ -74,6 +74,16 @@ final class Cowry {
         return newItems;
     }
 
+    static <T> T[] arrayCopy(T[] items, int length, Class<T> tClass) {
+        @SuppressWarnings("unchecked")
+        T[] newItems = (T[]) ((tClass == null) ? new Object[length]
+                                               : Array.newInstance(tClass, length) );
+        System.arraycopy(items, 0, newItems, 0,
+                         items.length < length ? items.length
+                                               : length);
+        return newItems;
+    }
+
 //    private static <T> T[] insertIntoArrayAt(T item, T[] items, int idx) {
 //        return insertIntoArrayAt(item, items, idx, null);
 //    }

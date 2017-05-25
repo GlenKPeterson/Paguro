@@ -52,12 +52,9 @@ public class RrbTreeTest {
         buildInOrderTest(RrbTree.emptyMutable(), 100000);
     }
 
-    @Test
-    public void insertAtZero() {
-        final int SEVERAL = 100; //0; //0; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
-        RrbTree<Integer> is = RrbTree.empty();
+    private static RrbTree<Integer> buildReverseOrderTest(RrbTree<Integer> is, int iterations) {
         ArrayList<Integer> control = new ArrayList<>();
-        for (int j = 0; j < SEVERAL; j++){
+        for (int j = 0; j < iterations; j++){
             is = is.insert(0, j);
             control.add(0, j);
             assertEquals(j + 1, is.size());
@@ -69,16 +66,22 @@ public class RrbTreeTest {
             is.debugValidate();
 //            System.out.println(is);
         }
-        assertEquals(SEVERAL, is.size());
-        for (int j = 0; j < SEVERAL; j++){
-            assertEquals(Integer.valueOf(SEVERAL - j - 1), is.get(j));
+        assertEquals(iterations, is.size());
+        for (int j = 0; j < iterations; j++){
+            assertEquals(Integer.valueOf(iterations - j - 1), is.get(j));
         }
+//        System.out.println(is.indentedStr(0));
+        return is;
+    }
+
+    @Test public void insertAtZero() {
+        buildReverseOrderTest(RrbTree.empty(),        1000);
+        buildReverseOrderTest(RrbTree.emptyMutable(), 1000);
     }
 
     private RrbTree<Integer> randomInsertTest(int[] indices) {
-        RrbTree<Integer> is = RrbTree.empty();
-        ArrayList<Integer> control = new ArrayList<>();
-        return randomInsertTest2(is, control, indices);
+        randomInsertTest2(RrbTree.empty(), new ArrayList<>(), indices);
+        return randomInsertTest2(RrbTree.emptyMutable(), new ArrayList<>(), indices);
     }
 
     /**
