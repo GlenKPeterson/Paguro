@@ -34,12 +34,16 @@ public class RrbTreeTest {
     private Random rand = new java.security.SecureRandom();
 
     private static RrbTree<Integer> buildInOrderTest(RrbTree<Integer> is, int iterations) {
-        for (int j = 0; j < iterations; j++){
+        ArrayList<Integer> control = new ArrayList<>();
+        for (int j = 0; j < iterations; j++) {
             is = is.append(j);
+            control.add(j);
             assertEquals(j + 1, is.size());
             assertEquals(Integer.valueOf(j), is.get(j));
-            is.debugValidate();
         }
+        //noinspection AssertEqualsBetweenInconvertibleTypes
+        assertEquals(control, is);
+        is.debugValidate();
         assertEquals(iterations, is.size());
         for (int j = 0; j < iterations; j++){
             assertEquals(Integer.valueOf(j), is.get(j));

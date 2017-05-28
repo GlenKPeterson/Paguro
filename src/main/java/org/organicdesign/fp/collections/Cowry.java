@@ -42,8 +42,18 @@ final class Cowry {
 
     // Helper function to avoid type warnings.
     @SuppressWarnings("unchecked")
-    static <T> T[] singleElementArray(T elem) {
-        return (T[]) new Object[] { elem };
+    static <T> T[] singleElementArray(T elem) { return (T[]) new Object[] { elem }; }
+
+    // Helper function to avoid type warnings.
+    @SuppressWarnings("unchecked")
+    static <T> T[] singleElementArray(T elem, Class<T> tClass) {
+        if (tClass == null) {
+            return (T[]) new Object[] { elem };
+        }
+
+        T[] newItems = (T[]) Array.newInstance(tClass, 1);
+        newItems[0] = elem;
+        return newItems;
     }
 
     static <T> T[] insertIntoArrayAt(T item, T[] items, int idx, Class<T> tClass) {

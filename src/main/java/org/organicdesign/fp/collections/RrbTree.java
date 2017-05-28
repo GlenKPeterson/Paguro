@@ -13,7 +13,6 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
 
@@ -295,7 +294,9 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         }
         int sz = root.debugValidate();
         if (sz != size - focusLength) {
-            throw new IllegalStateException("Size incorrect\n" +
+            throw new IllegalStateException("Size incorrect.  Root size: " + root.size() +
+                                            " RrbSize: " + size +
+                                            " focusLen: " + focusLength + "\n" +
                                             this.indentedStr(0));
         }
         if ( (focusStartIndex < 0) || (focusStartIndex > size) ) {
@@ -1062,6 +1063,10 @@ involves changing more nodes than maybe necessary.
         @Override public Node<T> child(int childIdx) { return nodes[childIdx]; }
 
         @Override public int debugValidate() {
+            if (nodes.length > STRICT_NODE_LENGTH) {
+                throw new IllegalStateException("Too many child nodes!\n" +
+                                                this.indentedStr(0));
+            }
             int sz = 0;
             int height = height() - 1;
             int sh = shift - NODE_LENGTH_POW_2;
@@ -1081,10 +1086,18 @@ involves changing more nodes than maybe necessary.
                     throw new IllegalStateException(
                             "Unexpected shift difference between levels!\n" + this.indentedStr(0));
                 }
-                if ( (i < nodes.length - 1) &&
-                     ((n.size() % STRICT_NODE_LENGTH) != 0) ) {
-                    throw new IllegalStateException("Non-last strict node is not full!\n" +
-                                                    this.indentedStr(0));
+                if (i < nodes.length - 1) {
+                    if (n.hasStrictCapacity())  {
+                        throw new IllegalStateException("Non-last strict node is not full!\n" +
+                                                        this.indentedStr(0));
+                    }
+                    if ((n.size() % STRICT_NODE_LENGTH) != 0){
+                        throw new IllegalStateException("Non-last strict node has a weird size!\n" +
+                                                        this.indentedStr(0));
+                    }
+                }
+                if (n instanceof Strict) {
+                    n.debugValidate();
                 }
                 sz += n.size();
             }
@@ -1119,7 +1132,8 @@ involves changing more nodes than maybe necessary.
         }
 
         /**
-         Returns the high bits which we use to index into our array.  This is the simplicity (and
+         Returns the highest bits which we use to index into our array - the index of the immediate
+         child of this node.  This is the simplicity (and
          speed) of Strict indexing.  When everything works, this can be inlined for performance.
          This could maybe yield a good guess for Relaxed nodes?
 
@@ -1161,7 +1175,9 @@ involves changing more nodes than maybe necessary.
             // Send the low bits on to our sub-nodes.
             return nodes[highBits(i)].get(lowBits(i));
         }
+
         @Override public int size() { return size; }
+
         private boolean thisNodeHasCapacity() { return nodes.length < STRICT_NODE_LENGTH; }
 
         @Override public boolean hasStrictCapacity() {
@@ -1312,9 +1328,7 @@ involves changing more nodes than maybe necessary.
                     // Make the skinny-branch of single-element strict nodes:
                     while (newShift < maxShift) {
                         // Add a skinny branch node
-                        Node<T>[] newNodes = (Node<T>[]) Array.newInstance(newNode.getClass(), 1);
-                        newNodes[0] = newNode;
-                        newNode = new Strict<>(newShift, oldFocus.length, newNodes);
+                        newNode = new Strict<>(newShift, oldFocus.length, singleElementArray(newNode, Node.class));
                         newShift += NODE_LENGTH_POW_2;
                     }
 
@@ -1352,13 +1366,7 @@ involves changing more nodes than maybe necessary.
             } // end if oldFocus.length == STRICT_NODE_LENGTH
 
             // Here we're going to yield a Relaxed Radix node, so punt to that (slower) logic.
-            int[] cumulativeSizes = new int[nodes.length];
-            int cumulativeSize = 0;
-            for (int i = 0; i < cumulativeSizes.length; i++) {
-                cumulativeSize = cumulativeSize + nodes[i].size();
-                cumulativeSizes[i] = cumulativeSize;
-            }
-            return new Relaxed<>(cumulativeSizes, nodes).pushFocus(index, oldFocus);
+            return relax().pushFocus(index, oldFocus);
         }
 
         @SuppressWarnings("unchecked")
@@ -1384,7 +1392,10 @@ involves changing more nodes than maybe necessary.
         @Override public String indentedStr(int indent) {
             StringBuilder sB = new StringBuilder() // indentSpace(indent)
                     .append("Strict").append(shift).append("(");
-            return showSubNodes(sB, nodes, indent + sB.length())
+            int len = sB.length();
+            sB.append("size=").append(size).append("\n");
+            sB.append(indentSpace(len + indent));
+            return showSubNodes(sB, nodes, indent + len)
                     .append(")")
                     .toString();
         }
@@ -1482,8 +1493,7 @@ involves changing more nodes than maybe necessary.
                                                        : nodes.length, Node.class);
             // TODO: Figure out which side we inserted on and do the math to adjust counts instead
             // of looking them up.
-            int[] sizes = makeSizeArray(res);
-            return new Relaxed<>(sizes, res);
+            return new Relaxed<>(makeSizeArray(res), res);
         }
 
         @Override public int height() { return nodes[0].height() + 1; }
