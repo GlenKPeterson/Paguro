@@ -1293,80 +1293,276 @@ involves changing more nodes than maybe necessary.
         @SuppressWarnings("unchecked")
         @Override
         public Node<T> pushFocus(int index, T[] oldFocus) {
-            // If the proper sub-node can take the additional array, let it!
-            int subNodeIndex = highBits(index);
+//            System.out.println("\n\nCalled pushFocus(index=" + index +
+//                               ", oldFocus=" + Arrays.toString(oldFocus));
+//            System.out.println("thisNode:\n" + indentedStr(0));
 
             // It's a strict-compatible addition if the focus being pushed is of
             // STRICT_NODE_LENGTH and the index it's pushed to falls on the final leaf-node boundary
             // and the children of this node are leaves and this node is not full.
-            if (oldFocus.length == STRICT_NODE_LENGTH) {
+            if (oldFocus.length != STRICT_NODE_LENGTH) {
+//                System.out.println("Relaxing1!");
+                // Here we're going to yield a Relaxed Radix node, so punt to that (slower) logic.
+                return relax().pushFocus(index, oldFocus);
+            }
 
-                if (index == size()) {
-                    Node<T> lastNode = nodes[nodes.length - 1];
-                    if (lastNode.hasStrictCapacity()) {
-                        // Pushing focus down to lower-level node with capacity.
-                        Node<T> newNode = lastNode.pushFocus(lowBits(index), oldFocus);
-                        Node<T>[] newNodes = replaceInArrayAt(newNode, nodes, nodes.length - 1,
-                                                              Node.class);
-                        return new Strict<>(shift, size + oldFocus.length, newNodes);
-                    }
-                    // Regardless of what else happens, we're going to add a new node.
-                    Node<T> newNode = new Leaf<>(oldFocus);
+            // This was simpler using recursion, but hopefully significantly faster without.
 
-                    // Make a skinny branch of a tree by walking up from the leaf node until our
-                    // new branch is at the same level as the old one.  We have to build evenly
-                    // (like hotels in Monopoly) in order to keep the tree balanced.  Even height,
-                    // but left-packed (the lower indices must all be filled before adding new
-                    // nodes to the right).
-                    int newShift = NODE_LENGTH_POW_2;
+            IdxNode<T>[] stack = (IdxNode<T>[]) new IdxNode<?>[height() - 1];
+            int stackMaxIdx = -1; // -1 means there's no stack.
+            Strict<T> node = this;
+            int i = index; // This is the index for whatever level we descend to.
+            boolean skinnyBranch = false;
 
-                    // If we've got space in our array, we just have to add skinny-branch nodes up
-                    // to the level below ours.  But if we don't have space, we have to add a
-                    // single-element strict node at the same level as ours here too.
-                    int maxShift = (nodes.length < STRICT_NODE_LENGTH) ? shift : shift + 1;
+            // Descend to lowest-level strict node, or at least until we determine that a
+            // skinny branch is needed.
+            while (node.shift > NODE_LENGTH_POW_2) {
+//                System.out.println("Add indexNode to ancestor stack...");
+                // Add indexNode to ancestor stack
+                int childIndex = node.highBits(i);
 
-                    // Make the skinny-branch of single-element strict nodes:
-                    while (newShift < maxShift) {
-                        // Add a skinny branch node
-                        newNode = new Strict<>(newShift, oldFocus.length, singleElementArray(newNode, Node.class));
-                        newShift += NODE_LENGTH_POW_2;
-                    }
+                // We've "used up" the high bits of this index by selecting the correct child of
+                // the current node.  We only need to consider the low bits going forward.
+                // Important to chop off the high bits now, before going down to the next level.
+//                System.out.println("Previous (low bit) index: " + i);
+                i = node.lowBits(i);
+//                System.out.println("New adjusted (low bit) index: " + i);
 
-                    if ((nodes.length < STRICT_NODE_LENGTH)) {
-                        // Add a node to the existing array
-                        Node<T>[] newNodes =
-                                insertIntoArrayAt(newNode, nodes, subNodeIndex, Node.class);
-                        // This could allow cheap strict inserts on any leaf-node boundary...
-                        return new Strict<>(shift, size + oldFocus.length, newNodes);
-                    } else {
-                        // Add a level to the Strict tree
-                        return new Strict(shift + NODE_LENGTH_POW_2,
-                                          size + oldFocus.length,
-                                          new Node[]{this, newNode});
-                    }
-                } else if ( (shift == NODE_LENGTH_POW_2) &&
-                            (lowBits(index) == 0) &&
-                            (nodes.length < STRICT_NODE_LENGTH) ) {
-                    // Here we are:
-                    //    Pushing a STRICT_NODE_LENGTH focus
-                    //    At the level above the leaf nodes
-                    //    Inserting *between* existing leaf nodes (or before or after)
-                    //    Have room for at least one more leaf child
-                    // That makes it free and legal to insert a new STRICT_NODE_LENGTH leaf node and
-                    // still yield a Strict (as opposed to Relaxed).
 
-                    // Regardless of what else happens, we're going to add a new node.
-                    Node<T> newNode = new Leaf<>(oldFocus);
+                // diff == 0 is an append (existing node should be full - starts skinnyBranch!)
+                // diff == 1 means replace in last node
+                // diff > 1 means replace in some other node (requires a relaxed node).
+                int diff = node.nodes.length - childIndex;
 
-                    Node<T>[] newNodes =
-                            insertIntoArrayAt(newNode, nodes, subNodeIndex, Node.class);
-                    // This allows cheap strict inserts on any leaf-node boundary...
-                    return new Strict<>(shift, size + oldFocus.length, newNodes);
+                // To satisfy the packed-left requirement for strict trees, only the rightmost
+                // strict node can be non-full.  The converse ensures that if we're in a
+                // non-full strict node, it is the rightmost node (could be the only strict
+                // node in the tree).  However, we are in a loop that's walking down a strict
+                // node tree and guaranteed not at the bottom yet.  So either we are inserting
+                // into the last of the last of the last Strict nodes, or we're trying to
+                // perform an illegal operation on a strict tree.  In which case, we have to
+                // yield a relaxed node instead of a strict one.
+
+//                System.out.println("node.nodes.length=" + node.nodes.length +
+//                                   " childIndex=" + childIndex +
+//                                   " diff=" + diff);
+                if (diff > 1) {
+//                    System.out.println("Relaxing2! node.nodes.length=" + node.nodes.length +
+//                                       " childIndex=" + childIndex);
+                    // No way this could be a strict pushFocus.  Do a relaxed one instead.
+                    return relax().pushFocus(index, oldFocus);
+                } else if (diff == 0) {
+                    skinnyBranch = true;
+                    break;
                 }
-            } // end if oldFocus.length == STRICT_NODE_LENGTH
 
-            // Here we're going to yield a Relaxed Radix node, so punt to that (slower) logic.
-            return relax().pushFocus(index, oldFocus);
+                stack[++stackMaxIdx] = new IdxNode<>(node, childIndex);
+
+                // We can insert off the end of the array (append).
+                // In that case, it doesn't matter the exact node we get, just save a node
+                // Maybe we shouldn't save a node here at all?
+                node = (Strict) node.nodes[childIndex];
+            }
+
+            if (skinnyBranch) {
+                // We guaranteed above that we can have a strict push-focus, so we must be in
+                // the rightmost (and lowest-level) node of the Strict tree and it's full.
+                // Create a new skinny branch and find the lowest non-full ancestor level to
+                // attach it to.
+                // Here's our new lowest-level node.
+                Strict<T> skinny = new Strict<>(NODE_LENGTH_POW_2, oldFocus.length,
+                                                singleElementArray(new Leaf<>(oldFocus),
+                                                                   Node.class));
+
+//                System.out.println("\nstackMaxIdx: " + stackMaxIdx);
+//                System.out.println("Lowest skinny branch:\n" + node.indentedStr(0));
+//                if (stackMaxIdx > -1) {
+//                    System.out.println("non-full parent: " + stack[stackMaxIdx].node.indentedStr(17));
+//                }
+
+                int skinnyEndShift = node.thisNodeHasCapacity() ? node.shift - NODE_LENGTH_POW_2
+                                                                : node.shift;
+
+                // If we're here, the node is full, so skinny sits at least that high.
+                while (skinny.shift < skinnyEndShift) {
+                    skinny = new Strict<>(skinny.shift + NODE_LENGTH_POW_2, oldFocus.length,
+                                          singleElementArray(skinny, Node.class));
+                }
+
+//                System.out.println("I think this is the proper skinny:\n" + skinny.indentedStr(0));
+
+
+//                while ( (stackMaxIdx >= 0)  && !node.thisNodeHasCapacity() ) {
+//                    skinny = new Strict<>(skinny.shift + NODE_LENGTH_POW_2, oldFocus.length,
+//                                          singleElementArray(skinny, Node.class));
+//
+//                    // This is the parent node and the index of the child we are modifying
+//                    IdxNode<T> in = stack[stackMaxIdx--];
+//                    node = (Strict) in.node;
+//                }
+                if (node.thisNodeHasCapacity()) {
+                    node = new Strict<>(node.shift, node.size + oldFocus.length,
+                                        insertIntoArrayAt(skinny, node.nodes,
+                                                          node.nodes.length, Node.class));
+//                    System.out.println("Skinny integrated with tree:\n" + node.indentedStr(0));
+                    skinny = null;
+                }
+
+                // Set skinny into old tree.
+                // Recreate ancestors
+                while (stackMaxIdx >= 0) {
+                    // This is the parent node and the index of the child we are modifying
+                    IdxNode<T> in = stack[stackMaxIdx];
+                    // The parent node.
+                    Strict<T> parNode = (Strict<T>) in.node;
+
+                    // Here our pointer node pops up one level in the tree
+                    node = new Strict<>(parNode.shift, parNode.size + oldFocus.length,
+                                        replaceInArrayAt(node, parNode.nodes,
+                                                         in.idx, Node.class));
+//                    System.out.println("node:\n" + node.indentedStr(0));
+                    --stackMaxIdx;
+                }
+
+                if (skinny == null) {
+//                    // TODO: Remove...
+//                    s.debugValidate();
+//                    System.out.println("Returning9: " + node.indentedStr(12));
+                    return node;
+                } else {
+                    return new Strict(shift + NODE_LENGTH_POW_2,
+                                             size + oldFocus.length,
+                                             new Node[]{this, skinny});
+
+//                    // TODO: Remove...
+//                    s.debugValidate();
+//                    System.out.println("Returning7: " + s.indentedStr(12));
+
+//                    return s;
+                }
+            }
+
+            // Here node is the lowest-level strict node.
+//            System.out.println("Node: " + node.indentedStr(7));
+//            System.out.println("idx: " + i);
+//            System.out.println("high bits: " + node.highBits(i));
+
+            // This allows cheap strict inserts on any leaf-node boundary.
+            // Now make the new node and walk back up the tree replacing (or creating) all
+            // ancestors.
+            if (node.thisNodeHasCapacity()) {
+
+//                System.out.println("Node with capacity: " + node.indentedStr(20));
+//                System.out.println("i:" + i + " node.highBits(i):" + node.highBits(i));
+
+                if (node.highBits(i) > node.nodes.length + 1) {
+                    throw new IllegalArgumentException("Oops! node.nodes.length=" +
+                                                       node.nodes.length);
+                }
+
+                // Replace lowest-level node
+                node = new Strict<>(node.shift, node.size + oldFocus.length,
+                                    insertIntoArrayAt(new Leaf<>(oldFocus), node.nodes,
+                                                      node.highBits(i), Node.class));
+
+//                System.out.println("stackMaxIdx: " + stackMaxIdx);
+//                System.out.println("Lowest:\n" + node.indentedStr(0));
+
+                // Recreate ancestors
+                while (stackMaxIdx >= 0) {
+                    // This is the parent node and the index of the child we are modifying
+                    IdxNode<T> in = stack[stackMaxIdx];
+                    // The parent node.
+                    Strict<T> parNode = (Strict<T>) in.node;
+                    // Here our pointer node pops up one level in the tree
+                    node = new Strict<>(parNode.shift, parNode.size + oldFocus.length,
+                                        replaceInArrayAt(node, parNode.nodes,
+                                                         in.idx, Node.class));
+//                    System.out.println("node:\n" + node.indentedStr(0));
+                    --stackMaxIdx;
+                }
+
+//                // TODO: Remove...
+//                node.debugValidate();
+//                System.out.println("Returning1:\n" + node.indentedStr(0));
+
+                return node;
+            } else {
+                // TODO: I think we guaranteed above that skinny branch is taken care of, no?
+
+
+                // We guaranteed above that we can have a strict push-focus, so we must be in
+                // the rightmost (and lowest-level) node of the Strict tree and it's full.
+                // Create a new skinny branch and find the lowest non-full ancestor level to
+                // attach it to.
+                // Here's our new lowest-level node.
+                node = new Strict<>(node.shift, oldFocus.length,
+                                    singleElementArray(new Leaf<>(oldFocus), Node.class));
+
+//                System.out.println("\nstackMaxIdx: " + stackMaxIdx);
+//                System.out.println("Lowest skinny branch:\n" + node.indentedStr(0));
+
+//                boolean requireNonFull = true;
+
+//                // Recreate ancestors
+//                while (stackMaxIdx >= 0) {
+//                    // This is the parent node and the index of the child we are modifying
+//                    IdxNode<T> in = stack[stackMaxIdx];
+//                    // The parent node.
+//                    Strict<T> parNode = (Strict<T>) in.node;
+//
+//                    if (requireNonFull) {
+//                        // Here we are in a skinny leg.
+//                        if (parNode.thisNodeHasCapacity()) {
+//                            requireNonFull = false;
+//                            // Here our pointer node gets inserted into the existing tree
+//                            node = new Strict<>(parNode.shift, parNode.size + oldFocus.length,
+//                                                insertIntoArrayAt(node, parNode.nodes,
+//                                                                  in.idx, Node.class));
+//                            System.out.println("new home skinny branch node:\n" + node.indentedStr(0));
+//                        } else {
+//                            // Here our pointer node pops up one level in the skinny branch
+//                            node = new Strict<>(parNode.shift, oldFocus.length,
+//                                                singleElementArray(node, Node.class));
+//                            System.out.println("skinny branch ancestor:\n" + node.indentedStr(0));
+//                        }
+//                    } else {
+//                        // Here our pointer node pops up one level in the tree
+//                        node = new Strict<>(parNode.shift, parNode.size + oldFocus.length,
+//                                            replaceInArrayAt(node, parNode.nodes,
+//                                                              in.idx, Node.class));
+//                        System.out.println("node:\n" + node.indentedStr(0));
+//                    }
+//                    --stackMaxIdx;
+//                }
+
+                // The entire tree was packed.  Have to add a level above and return that.
+                // I wonder if this could be a bug for a strict tree inside a Relaxed one?
+                // I guess it's up to the Relaxed node to check for this case before trying
+                // to pushFocus().
+//                if (requireNonFull) {
+//                    System.out.println("requireNonFull thisHeight: " + this.height() + " nodeHeight: " + node.height());
+
+                    return new Strict(shift + NODE_LENGTH_POW_2,
+                                             size + oldFocus.length,
+                                             new Node[]{this, node});
+
+//                    System.out.println("New Strict Tree:\n" + s.indentedStr(0));
+//
+//                    // TODO: Remove...
+//                    s.debugValidate();
+//                    System.out.println("Returning2: " + indentedStr(12));
+
+//                    return s;
+//                }
+
+//
+////                // TODO: Remove...
+////                node.debugValidate();
+////                System.out.println("Returning3: " + indentedStr(12));
+//
+//                return node;
+            }
         }
 
         @SuppressWarnings("unchecked")
@@ -1413,8 +1609,9 @@ involves changing more nodes than maybe necessary.
 
         // Constructor
         Relaxed(int[] szs, Node<T>[] ns) {
-            cumulativeSizes = szs;
-            nodes = ns;
+            throw new IllegalStateException("Not Allowed!");
+//            cumulativeSizes = szs;
+//            nodes = ns;
 
             // Consider removing constraint validations before shipping for performance
 //            if (cumulativeSizes.length < 1) {
@@ -2100,6 +2297,7 @@ involves changing more nodes than maybe necessary.
         int idx = 0;
         final Node<E> node;
         IdxNode(Node<E> n) { node = n; }
+        IdxNode(Node<E> n, int i) { node = n; idx = i; }
         public boolean hasNext() { return idx < node.numChildren(); }
         public Node<E> next() { return node.child(idx++); }
 //        public String toString() { return "IdxNode(" + idx + " " + node + ")"; }
