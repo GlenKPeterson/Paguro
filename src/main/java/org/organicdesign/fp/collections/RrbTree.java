@@ -57,35 +57,34 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
     // in Scala's implementation.  Tail and focus are both designed to allow repeated appends or
     // inserts to the same area of a vector to be done in constant time.  Tail only handles appends
     // but this can handle repeated inserts to any area of a vector.
-    private E[] focus;
-    private int focusStartIndex;
-    private int focusLength;
-    private Node<E> root;
-    private int size;
-
-    // Constructor
-    RrbTree(E[] f, int fi, int fl, Node<E> r, int s) {
-        focus = f; focusStartIndex = fi; focusLength = fl; root = r; size = s;
-    }
 
     /** Mutable version of an RRB Tree */
     public static class MutableRrbt<E> extends RrbTree<E> implements MutableList<E> {
-        MutableRrbt(E[] f, int fi, int fl, Node<E> r, int s) { super (f, fi, fl, r, s); }
+        private E[] focus;
+        private int focusStartIndex;
+        private int focusLength;
+        private Node<E> root;
+        private int size;
+
+        MutableRrbt(E[] f, int fi, int fl, Node<E> r, int s) {
+            focus = f; focusStartIndex = fi; focusLength = fl; root = r; size = s;
+        }
 
         /** {@inheritDoc} */
         @SuppressWarnings("unchecked")
         @Override public MutableRrbt<E> append(E val) {
             // If our focus isn't set up for appends or if it's full, insert it into the data structure
             // where it belongs.  Then make a new focus
-            if ( (super.focusLength >= STRICT_NODE_LENGTH) ||
-                 ((super.focusLength > 0) && (super.focusStartIndex < super.root.size())) ) {
-                super.root = super.root.pushFocus(super.focusStartIndex,
-                                                  arrayCopy(super.focus, super.focusLength, null));
-                super.focus = (E[]) new Object[STRICT_NODE_LENGTH];
-                super.focus[0] = val;
-                super.focusStartIndex = super.size;
-                super.focusLength = 1;
-                super.size++;
+            if ( (focusLength >= STRICT_NODE_LENGTH) ||
+                 ((focusLength > 0) &&
+                  (focusStartIndex < (size - focusLength))) ) {
+                root = root.pushFocus(focusStartIndex,
+                                                  arrayCopy(focus, focusLength, null));
+                focus = (E[]) new Object[STRICT_NODE_LENGTH];
+                focus[0] = val;
+                focusStartIndex = size;
+                focusLength = 1;
+                size++;
                 return this;
             }
 
@@ -93,12 +92,12 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
             // TODO: 2. Get rid of "new MutableRrbt" because we should just mutate the old one.
             // TODO: 3. Make the root the first argument to RrbTree, MutableRrbt and ImRrbt.
 
-            if (super.focus.length <= super.focusLength) {
-                super.focus = arrayCopy(super.focus, STRICT_NODE_LENGTH, null);
+            if (focus.length <= focusLength) {
+                focus = arrayCopy(focus, STRICT_NODE_LENGTH, null);
             }
-            super.focus[super.focusLength] = val;
-            super.focusLength++;
-            super.size++;
+            focus[focusLength] = val;
+            focusLength++;
+            size++;
             return this;
         }
 
@@ -111,107 +110,428 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
             return ret;
         }
 
+        void debugValidate() {
+            if (focusLength > STRICT_NODE_LENGTH) {
+                throw new IllegalStateException("focus len:" + focusLength +
+                                                " gt STRICT_NODE_LENGTH:" + STRICT_NODE_LENGTH +
+                                                "\n" + this.indentedStr(0));
+            }
+            int sz = root.debugValidate();
+            if (sz != size - focusLength) {
+                throw new IllegalStateException("Size incorrect.  Root size: " + root.size() +
+                                                " RrbSize: " + size +
+                                                " focusLen: " + focusLength + "\n" +
+                                                this.indentedStr(0));
+            }
+            if ( (focusStartIndex < 0) || (focusStartIndex > size) ) {
+                throw new IllegalStateException("focusStartIndex out of bounds!\n" +
+                                                this.indentedStr(0));
+            }
+            if (!root.equals(eliminateUnnecessaryAncestors(root))) {
+                throw new IllegalStateException("Unnecessary ancestors!\n" +
+                                                this.indentedStr(0));
+            }
+        }
+
+        /** {@inheritDoc} */
+        @Override public E get(int i) {
+            if ( (i < 0) || (i > size) ) {
+                throw new IndexOutOfBoundsException("Index: " + i + " size: " + size);
+            }
+
+            // This is a debugging assertion - can't be covered by a test.
+//        if ( (focusStartIndex < 0) || (focusStartIndex > size) ) {
+//            throw new IllegalStateException("focusStartIndex: " + focusStartIndex +
+//                                            " size: " + size);
+//        }
+
+            if (i >= focusStartIndex) {
+                int focusOffset = i - focusStartIndex;
+                if (focusOffset < focusLength) {
+                    return focus[focusOffset];
+                }
+                i -= focusLength;
+            }
+            return root.get(i);
+        }
+
         /** {@inheritDoc} */
         @Override public ImRrbt<E> immutable() {
-            return new ImRrbt<>(arrayCopy(super.focus, super.focusLength, null),
-                                super.focusStartIndex, super.focusLength,
-                                super.root, super.size);
+            return new ImRrbt<>(arrayCopy(focus, focusLength, null),
+                                focusStartIndex, focusLength,
+                                root, size);
+        }
+
+        /** {@inheritDoc} */
+        @Override public String indentedStr(int indent) {
+            return "RrbTree(size=" + size +
+                   " fsi=" + focusStartIndex +
+                   " focus=" + arrayString(focus) + "\n" +
+                   indentSpace(indent + 8) + "root=" +
+                   (root == null ? "null" : root.indentedStr(indent + 13)) +
+                   ")";
         }
 
         /** {@inheritDoc} */
         @Override public MutableRrbt<E> insert(int idx, E element)  {
             // If the focus is full, push it into the tree and make a new one with the new element.
-            if (super.focusLength >= STRICT_NODE_LENGTH) {
-                super.root = super.root.pushFocus(super.focusStartIndex,
-                                                  arrayCopy(super.focus, super.focusLength, null));
-                super.focus = singleElementArray(element);
-                super.focusStartIndex = idx;
-                super.focusLength = 1;
-                super.size++;
+            if (focusLength >= STRICT_NODE_LENGTH) {
+                root = root.pushFocus(focusStartIndex,
+                                                  arrayCopy(focus, focusLength, null));
+                focus = singleElementArray(element);
+                focusStartIndex = idx;
+                focusLength = 1;
+                size++;
                 return this;
             }
 
             // If we have no focus, add a new one at the ideal spot.
             // TODO: Make sure Immutable does this too.
-            if (super.focusLength == 0) {
-                super.focus = singleElementArray(element);
-                super.focusStartIndex = idx;
-                super.focusLength = 1;
-                super.size++;
+            if (focusLength == 0) {
+                focus = singleElementArray(element);
+                focusStartIndex = idx;
+                focusLength = 1;
+                size++;
                 return this;
             }
 
              // If the index is within the focus, add the item there.
-            int diff = idx - super.focusStartIndex;
+            int diff = idx - focusStartIndex;
 
-            if ( (diff >= 0) && (diff <= super.focusLength) ) {
+            if ( (diff >= 0) && (diff <= focusLength) ) {
                 // Here focus length cannot be zero!
                 // We want to double the length each time up to STRICT_NODE_LENGTH
                 // because there is no guarantee that the next insert will be in the same
                 // place, so this hedges our bets.
-                if (super.focus.length <= super.focusLength) {
-                    int newLen = (super.focusLength >= HALF_STRICT_NODE_LENGTH)
+                if (focus.length <= focusLength) {
+                    int newLen = (focusLength >= HALF_STRICT_NODE_LENGTH)
                                  ? STRICT_NODE_LENGTH
-                                 : super.focusLength << 1; // double size.
-                    super.focus = arrayCopy(super.focus, newLen, null);
+                                 : focusLength << 1; // double size.
+                    focus = arrayCopy(focus, newLen, null);
                 }
                 // Shift existing items past insertion index to the right
-                for (int i = super.focusLength; (i >= diff) && (i > 0); i--) {
-                    super.focus[i] = super.focus[i - 1];
+                for (int i = focusLength; (i >= diff) && (i > 0); i--) {
+                    focus[i] = focus[i - 1];
                 }
                 // Put new item into the focus.
-                super.focus[diff] = element;
-                super.focusLength++;
-                super.size++;
+                focus[diff] = element;
+                focusLength++;
+                size++;
                 return this;
             }
 
             // Here we are left with an insert somewhere else than the current focus.
             // Here the mutable version has a focus that's longer than the number of items used,
             // So we need to shorten it before pushing it into the tree.
-            if (super.focusLength > 0) {
-                super.root = super.root.pushFocus(super.focusStartIndex,
-                                                  arrayCopy(super.focus, super.focusLength, null));
+            if (focusLength > 0) {
+                root = root.pushFocus(focusStartIndex,
+                                                  arrayCopy(focus, focusLength, null));
             }
-            super.focus = singleElementArray(element);
-            super.focusStartIndex = idx;
-            super.focusLength = 1;
-            super.size++;
+            focus = singleElementArray(element);
+            focusStartIndex = idx;
+            focusLength = 1;
+            size++;
             return this;
         }
 
         /** {@inheritDoc} */
-        @Override public MutableRrbt<E> replace(int index, E item) {
-            return (MutableRrbt<E>) super.replace(index, item);
+        @Override public UnmodSortedIterator<E> iterator() {
+            return new Iter<>(root, focus, focusStartIndex, focusLength);
         }
 
         /** {@inheritDoc} */
         @Override Node<E> pushFocus() {
-            return (super.focusLength == 0)
-                   ? super.root
-                   : super.root.pushFocus(super.focusStartIndex,
-                                          arrayCopy(super.focus, super.focusLength, null));
+            return (focusLength == 0)
+                   ? root
+                   : root.pushFocus(focusStartIndex,
+                                          arrayCopy(focus, focusLength, null));
         }
 
+        /**
+         Joins the given tree to the right side of this tree (or this to the left side of that one) in
+         something like O(log n) time.
+         */
+        @SuppressWarnings("unchecked")
+        public RrbTree<E> join(RrbTree<E> that) {
+
+            // We don't want to wonder below if we're inserting leaves or branch-nodes.
+            // Also, it leaves the tree cleaner to just smash leaves onto the bigger tree.
+            // Ultimately, we might want to see if we can grab the tail and stick it where it belongs
+            // but for now, this should be alright.
+            if (that.size() < MAX_NODE_LENGTH) {
+                return concat(that);
+            }
+            if (this.size < MAX_NODE_LENGTH) {
+                for (int i = 0; i < size; i++) {
+                    that = that.insert(i, this.get(i));
+                }
+                return that;
+            }
+
+            // OK, here we've eliminated the case of merging a leaf into a tree.  We only have to
+            // deal with tree-into-tree merges below.
+            //
+            // Note that if the right-hand tree is bigger, we'll effectively add this tree to the
+            // left-hand side of that one.  It's logically the same as adding that tree to the right
+            // of this, but the mechanism by which it happens is a little different.
+            Node<E> leftRoot = pushFocus();
+            Node<E> rightRoot = that.pushFocus();
+
+//        if (leftRoot != eliminateUnnecessaryAncestors(leftRoot)) {
+//            throw new IllegalStateException("Left had unnecessary ancestors!");
+//        }
+
+//        if (rightRoot != eliminateUnnecessaryAncestors(rightRoot)) {
+//            throw new IllegalStateException("Right had unnecessary ancestors!");
+//        }
+
+            // Whether to add the right tree to the left one (true) or vice-versa (false).
+            // True also means left is taller, false: right is taller.
+            boolean leftIntoRight = leftRoot.height() < rightRoot.height();
+            Node<E> taller = leftIntoRight ? rightRoot : leftRoot;
+            Node<E> shorter = leftIntoRight ? leftRoot : rightRoot;
+
+            // Most compact: Descend the taller tree to shorter.height and find room for all
+            //     shorter children as children of that node.
+            //
+            // Next: add the shorter node, unchanged, as a child to the taller tree at
+            //       shorter.height + 1
+            //
+            // If that level of the taller tree is full, add an ancestor to the shorter node and try to
+            // fit at the next level up in the taller tree.
+            //
+            // If this brings us to the top of the taller tree (both trees are the same height), add a
+            // new parent node with leftRoot and rightRoot as children
+
+            // Walk down the taller tree to one below the shorter, remembering ancestors.
+            Node<E> n = taller;
+
+            // This is the maximum we can descend into the taller tree (before running out of tree)
+//        int maxDescent = taller.height() - 1;
+
+            // Actual amount we're going to descend.
+            int descentDepth = taller.height() - shorter.height();
+//        if ( (descentDepth < 0) || (descentDepth >= taller.height()) ) {
+//            throw new IllegalStateException("Illegal descent depth: " + descentDepth);
+//        }
+            Node<E>[] ancestors =  genericNodeArray(descentDepth);
+            int i = 0;
+            for (; i < ancestors.length; i++) {
+                // Add an ancestor to array
+                ancestors[i] = n;
+//            if (n instanceof Leaf) {
+//                throw new IllegalStateException("Somehow found a leaf node");
+//            }
+                n = n.endChild(leftIntoRight);
+            }
+            // i is incremented before leaving the loop, so decrement it here to make it point
+            // to ancestors.length - 1;
+            i--;
+
+//        if (n.height() != shorter.height()) {
+//            throw new IllegalStateException("Didn't get to proper height");
+//        }
+
+            // Most compact: Descend the taller tree to shorter.height and find room for all
+            //     shorter children as children of that node.
+            if (n.thisNodeHasRelaxedCapacity(shorter.numChildren())) {
+                // Adding kids of shorter to proper level of taller...
+                Node<E>[] kids;
+                if (shorter instanceof Strict) {
+                    kids = ((Strict) shorter).nodes;
+                } else if (shorter instanceof Relaxed) {
+                    kids = ((Relaxed) shorter).nodes;
+                } else {
+                    throw new IllegalStateException("Expected a strict or relaxed, but found " +
+                                                    shorter.getClass());
+                }
+                n = n.addEndChildren(leftIntoRight, kids);
+            }
+
+            if (i >= 0) {
+                // Go back up one after lowest check.
+                n = ancestors[i];
+                i--;
+//            if (n.height() != shorter.height() + 1) {
+//                throw new IllegalStateException("Didn't go back up enough");
+//            }
+            }
+
+            // TODO: Is this used?
+            // While nodes in the taller are full, add a parent to the shorter and try the next level
+            // up.
+            while (!n.thisNodeHasRelaxedCapacity(1) &&
+                   (i >= 0) ) {
+
+                // no room for short at this level (n has too many kids)
+                n = ancestors[i];
+                i--;
+
+                shorter = addAncestor(shorter);
+//            shorter.debugValidate();
+
+                // Sometimes we care about which is shorter and sometimes about left and right.
+                // Since we fixed the shorter tree, we have to update the left/right
+                // pointer to point to the new shorter.
+                if (leftIntoRight) {
+                    leftRoot = shorter;
+                } else {
+                    rightRoot = shorter;
+                }
+            }
+
+            // Here we either have 2 trees of equal height, or
+            // we have room in n for the shorter as a child.
+
+            if (shorter.height() == (n.height() - 1)) {
+//            if (!n.thisNodeHasRelaxedCapacity(1)) {
+//                throw new IllegalStateException("somehow got here without relaxed capacity...");
+//            }
+                // Shorter one level below n and there's room
+                // Trees are not equal height and there's room somewhere.
+                n = n.addEndChild(leftIntoRight, shorter);
+//            n.debugValidate();
+            } else if (i < 0) {
+                // 2 trees of equal height so we make a new parent
+//            if (shorter.height() != n.height()) {
+//                throw new IllegalStateException("Expected trees of equal height");
+//            }
+
+                @SuppressWarnings("unchecked")
+                Node<E>[] newRootArray = new Node[] {leftRoot, rightRoot};
+                int leftSize = leftRoot.size();
+                Node<E> newRoot =
+                        new Relaxed<>(new int[] {leftSize, leftSize + rightRoot.size()}, newRootArray);
+//            newRoot.debugValidate();
+                return new MutableRrbt<>(emptyArray(), 0, 0, newRoot, newRoot.size());
+            } else {
+                throw new IllegalStateException("How did we get here?");
+            }
+
+            // We've merged the nodes.  Now see if we need to create new parents
+            // to hold the changed sub-nodes...
+            while (i >= 0) {
+                Node<E> anc = ancestors[i];
+                // By definition, I think that if we need a new root node, then we aren't dealing with
+
+                // leaf nodes, but I could be wrong.
+                // I also think we should get rid of relaxed nodes and everything will be much
+                // easier.
+                Relaxed<E> rel = (anc instanceof Strict) ? ((Strict) anc).relax()
+                                                         : (Relaxed<E>) anc;
+
+                int repIdx = leftIntoRight ? 0 : rel.numChildren() - 1;
+                n = Relaxed.replaceInRelaxedAt(rel.cumulativeSizes, rel.nodes, n, repIdx,
+                                               n.size() - rel.nodes[repIdx].size());
+                i--;
+            }
+
+//        n.debugValidate();
+            return new MutableRrbt<>(emptyArray(), 0, 0, n, n.size());
+        }
+
+        /** {@inheritDoc} */
+        @Override public MutableRrbt<E> replace(int index, E item) {
+            if ( (index < 0) || (index > size) ) {
+                throw new IndexOutOfBoundsException("Index: " + index + " size: " + size);
+            }
+            if (index >= focusStartIndex) {
+                int focusOffset = index - focusStartIndex;
+                if (focusOffset < focusLength) {
+                    focus[focusOffset] = item;
+                    return new MutableRrbt<>(focus, focusOffset, focusLength, root, size);
+                }
+                index -= focusLength;
+            }
+            // About to do replace with maybe-adjusted index
+            return new MutableRrbt<>(focus, focusStartIndex, focusLength, root.replace(index, item),
+                                     size);
+        }
+
+        /**
+         Returns a new RrbTree minus the given item (all items to the right are shifted left one)
+         This is O(log n).
+         */
+        public RrbTree<E> without(int index) {
+            if ( (index > 0) && (index < size - 1) ) {
+                Tuple2<RrbTree<E>,RrbTree<E>> s1 = split(index);
+                Tuple2<RrbTree<E>,RrbTree<E>> s2 = s1._2().split(1);
+                return s1._1().join(s2._2());
+            } else if (index == 0) {
+                return split(1)._2();
+            } else if (index == size - 1) {
+                return split(size - 1)._1();
+            } else {
+                throw new IllegalArgumentException("out of bounds");
+            }
+        }
+
+        @Override public int size() { return size; }
+
+        /**
+         Divides this RRB-Tree such that every index less-than the given index ends up in the left-hand
+         tree and the indexed item and all subsequent ones end up in the right-hand tree.
+
+         @param splitIndex the split point (excluded from the left-tree, included in the right one)
+         @return two new sub-trees as determined by the split point.  If the point is 0 or this.size()
+         one tree will be empty (but never null).
+         */
+        public Tuple2<RrbTree<E>,RrbTree<E>> split(int splitIndex) {
+            if ( (splitIndex < 1) && (splitIndex > size) ) {
+                throw new IllegalArgumentException("Constraint violation failed: 1 <= splitIndex <= size");
+            }
+            // Push the focus before splitting.
+            Node<E> newRoot = pushFocus();
+
+            // If a leaf-node is split, the fragments become the new focus for each side of the split.
+            // Otherwise, the focus can be left empty, or the last node of each side can be made into
+            // the focus.
+
+            SplitNode<E> split = newRoot.splitAt(splitIndex);
+
+//        split.left().debugValidate();
+//        split.right().debugValidate();
+
+            E[] lFocus = split.leftFocus();
+            Node<E> left = eliminateUnnecessaryAncestors(split.left());
+
+            E[] rFocus = split.rightFocus();
+            Node<E> right = eliminateUnnecessaryAncestors(split.right());
+
+            // These branches are identical, just different classes.
+            return Tuple2.of(new MutableRrbt<>(lFocus, left.size(), lFocus.length,
+                                               left, left.size() + lFocus.length),
+                             new MutableRrbt<>(rFocus, 0, rFocus.length,
+                                               right, right.size() + rFocus.length));
+        }
     }
 
     /** Immutable version of an RRB Tree */
     public static class ImRrbt<E> extends RrbTree<E> implements ImList<E> {
-        ImRrbt(E[] f, int fi, int fl, Node<E> r, int s) { super (f, fi, fl, r, s); }
+        private final E[] focus;
+        private final int focusStartIndex;
+        private final int focusLength;
+        private final Node<E> root;
+        private final int size;
+
+        ImRrbt(E[] f, int fi, int fl, Node<E> r, int s) {
+            focus = f; focusStartIndex = fi; focusLength = fl; root = r; size = s;
+        }
 
         /** {@inheritDoc} */
         @Override public ImRrbt<E> append(E val) {
             // If our focus isn't set up for appends or if it's full, insert it into the data structure
             // where it belongs.  Then make a new focus
-            if ( (super.focusLength >= STRICT_NODE_LENGTH) ||
-                 ((super.focusLength > 0) && (super.focusStartIndex < super.root.size())) ) {
-                Node<E> newRoot = super.root.pushFocus(super.focusStartIndex, super.focus);
-                return new ImRrbt<>(singleElementArray(val), super.size, 1, newRoot,
-                                    super.size + 1);
+            if ( (focusLength >= STRICT_NODE_LENGTH) ||
+                 ((focusLength > 0) &&
+                  (focusStartIndex < (size - focusLength))) ) {
+                Node<E> newRoot = root.pushFocus(focusStartIndex, focus);
+                return new ImRrbt<>(singleElementArray(val), size, 1, newRoot,
+                                    size + 1);
             }
-            return new ImRrbt<>(insertIntoArrayAt(val, super.focus, super.focusLength, null),
-                                super.focusStartIndex, super.focusLength + 1, super.root,
-                                super.size + 1);
+            return new ImRrbt<>(insertIntoArrayAt(val, focus, focusLength, null),
+                                focusStartIndex, focusLength + 1, root,
+                                size + 1);
         }
 
         /** {@inheritDoc} */
@@ -219,55 +539,366 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
             return this.mutable().concat(es).immutable();
         }
 
+        void debugValidate() {
+            if (focusLength > STRICT_NODE_LENGTH) {
+                throw new IllegalStateException("focus len:" + focusLength +
+                                                " gt STRICT_NODE_LENGTH:" + STRICT_NODE_LENGTH +
+                                                "\n" + this.indentedStr(0));
+            }
+            int sz = root.debugValidate();
+            if (sz != size - focusLength) {
+                throw new IllegalStateException("Size incorrect.  Root size: " + root.size() +
+                                                " RrbSize: " + size +
+                                                " focusLen: " + focusLength + "\n" +
+                                                this.indentedStr(0));
+            }
+            if ( (focusStartIndex < 0) || (focusStartIndex > size) ) {
+                throw new IllegalStateException("focusStartIndex out of bounds!\n" +
+                                                this.indentedStr(0));
+            }
+            if (!root.equals(eliminateUnnecessaryAncestors(root))) {
+                throw new IllegalStateException("Unnecessary ancestors!\n" +
+                                                this.indentedStr(0));
+            }
+        }
+
+        /** {@inheritDoc} */
+        @Override public E get(int i) {
+            if ( (i < 0) || (i > size) ) {
+                throw new IndexOutOfBoundsException("Index: " + i + " size: " + size);
+            }
+
+            // This is a debugging assertion - can't be covered by a test.
+//        if ( (focusStartIndex < 0) || (focusStartIndex > size) ) {
+//            throw new IllegalStateException("focusStartIndex: " + focusStartIndex +
+//                                            " size: " + size);
+//        }
+
+            if (i >= focusStartIndex) {
+                int focusOffset = i - focusStartIndex;
+                if (focusOffset < focusLength) {
+                    return focus[focusOffset];
+                }
+                i -= focusLength;
+            }
+            return root.get(i);
+        }
+
         /** {@inheritDoc} */
         @Override public ImRrbt<E> insert(int idx, E element) {
             // If the focus is full, push it into the tree and make a new one with the new element.
-            if (super.focusLength >= STRICT_NODE_LENGTH) {
-                Node<E> newRoot = super.root.pushFocus(super.focusStartIndex, super.focus);
+            if (focusLength >= STRICT_NODE_LENGTH) {
+                Node<E> newRoot = root.pushFocus(focusStartIndex, focus);
                 E[] newFocus = singleElementArray(element);
-                return new ImRrbt<>(newFocus, idx, 1, newRoot, super.size + 1);
+                return new ImRrbt<>(newFocus, idx, 1, newRoot, size + 1);
             }
 
             // If the index is within the focus, add the item there.
-            int diff = idx - super.focusStartIndex;
+            int diff = idx - focusStartIndex;
 
-            if ( (diff >= 0) && (diff <= super.focusLength) ) {
+            if ( (diff >= 0) && (diff <= focusLength) ) {
                 // new focus
-                E[] newFocus = insertIntoArrayAt(element, super.focus, diff, null);
-                return new ImRrbt<>(newFocus, super.focusStartIndex, super.focusLength + 1, super.root, super.size + 1) ;
+                E[] newFocus = insertIntoArrayAt(element, focus, diff, null);
+                return new ImRrbt<>(newFocus, focusStartIndex, focusLength + 1, root, size + 1) ;
             }
 
             // Here we are left with an insert somewhere else than the current focus.
-            Node<E> newRoot = super.focusLength > 0 ? super.root.pushFocus(super.focusStartIndex,
-                                                                           super.focus)
-                                                    : super.root;
+            Node<E> newRoot = focusLength > 0 ? root.pushFocus(focusStartIndex,
+                                                                           focus)
+                                                    : root;
             E[] newFocus = singleElementArray(element);
-            return new ImRrbt<>(newFocus, idx, 1, newRoot, super.size + 1);
+            return new ImRrbt<>(newFocus, idx, 1, newRoot, size + 1);
         }
 
         /** {@inheritDoc} */
         @Override public MutableRrbt<E> mutable() {
             // TODO: Should we defensively copy the root as well?
-            return new MutableRrbt<>(arrayCopy(super.focus, super.focusLength, null),
-                                     super.focusStartIndex, super.focusLength,
-                                     super.root, super.size);
+            return new MutableRrbt<>(arrayCopy(focus, focusLength, null),
+                                     focusStartIndex, focusLength,
+                                     root, size);
         }
 
+        /** {@inheritDoc} */
+        @Override public UnmodSortedIterator<E> iterator() {
+            return new Iter<>(root, focus, focusStartIndex, focusLength);
+        }
+
+        /** {@inheritDoc} */
+        @Override Node<E> pushFocus() {
+            return (focusLength == 0)
+                   ? root
+                   : root.pushFocus(focusStartIndex, focus);
+        }
+
+        /**
+         Joins the given tree to the right side of this tree (or this to the left side of that one) in
+         something like O(log n) time.
+         */
+        @SuppressWarnings("unchecked")
+        public RrbTree<E> join(RrbTree<E> that) {
+
+            // We don't want to wonder below if we're inserting leaves or branch-nodes.
+            // Also, it leaves the tree cleaner to just smash leaves onto the bigger tree.
+            // Ultimately, we might want to see if we can grab the tail and stick it where it belongs
+            // but for now, this should be alright.
+            if (that.size() < MAX_NODE_LENGTH) {
+                return concat(that);
+            }
+            if (this.size < MAX_NODE_LENGTH) {
+                for (int i = 0; i < size; i++) {
+                    that = that.insert(i, this.get(i));
+                }
+                return that;
+            }
+
+            // OK, here we've eliminated the case of merging a leaf into a tree.  We only have to
+            // deal with tree-into-tree merges below.
+            //
+            // Note that if the right-hand tree is bigger, we'll effectively add this tree to the
+            // left-hand side of that one.  It's logically the same as adding that tree to the right
+            // of this, but the mechanism by which it happens is a little different.
+            Node<E> leftRoot = pushFocus();
+            Node<E> rightRoot = that.pushFocus();
+
+//        if (leftRoot != eliminateUnnecessaryAncestors(leftRoot)) {
+//            throw new IllegalStateException("Left had unnecessary ancestors!");
+//        }
+
+//        if (rightRoot != eliminateUnnecessaryAncestors(rightRoot)) {
+//            throw new IllegalStateException("Right had unnecessary ancestors!");
+//        }
+
+            // Whether to add the right tree to the left one (true) or vice-versa (false).
+            // True also means left is taller, false: right is taller.
+            boolean leftIntoRight = leftRoot.height() < rightRoot.height();
+            Node<E> taller = leftIntoRight ? rightRoot : leftRoot;
+            Node<E> shorter = leftIntoRight ? leftRoot : rightRoot;
+
+            // Most compact: Descend the taller tree to shorter.height and find room for all
+            //     shorter children as children of that node.
+            //
+            // Next: add the shorter node, unchanged, as a child to the taller tree at
+            //       shorter.height + 1
+            //
+            // If that level of the taller tree is full, add an ancestor to the shorter node and try to
+            // fit at the next level up in the taller tree.
+            //
+            // If this brings us to the top of the taller tree (both trees are the same height), add a
+            // new parent node with leftRoot and rightRoot as children
+
+            // Walk down the taller tree to one below the shorter, remembering ancestors.
+            Node<E> n = taller;
+
+            // This is the maximum we can descend into the taller tree (before running out of tree)
+//        int maxDescent = taller.height() - 1;
+
+            // Actual amount we're going to descend.
+            int descentDepth = taller.height() - shorter.height();
+//        if ( (descentDepth < 0) || (descentDepth >= taller.height()) ) {
+//            throw new IllegalStateException("Illegal descent depth: " + descentDepth);
+//        }
+            Node<E>[] ancestors =  genericNodeArray(descentDepth);
+            int i = 0;
+            for (; i < ancestors.length; i++) {
+                // Add an ancestor to array
+                ancestors[i] = n;
+//            if (n instanceof Leaf) {
+//                throw new IllegalStateException("Somehow found a leaf node");
+//            }
+                n = n.endChild(leftIntoRight);
+            }
+            // i is incremented before leaving the loop, so decrement it here to make it point
+            // to ancestors.length - 1;
+            i--;
+
+//        if (n.height() != shorter.height()) {
+//            throw new IllegalStateException("Didn't get to proper height");
+//        }
+
+            // Most compact: Descend the taller tree to shorter.height and find room for all
+            //     shorter children as children of that node.
+            if (n.thisNodeHasRelaxedCapacity(shorter.numChildren())) {
+                // Adding kids of shorter to proper level of taller...
+                Node<E>[] kids;
+                if (shorter instanceof Strict) {
+                    kids = ((Strict) shorter).nodes;
+                } else if (shorter instanceof Relaxed) {
+                    kids = ((Relaxed) shorter).nodes;
+                } else {
+                    throw new IllegalStateException("Expected a strict or relaxed, but found " +
+                                                    shorter.getClass());
+                }
+                n = n.addEndChildren(leftIntoRight, kids);
+            }
+
+            if (i >= 0) {
+                // Go back up one after lowest check.
+                n = ancestors[i];
+                i--;
+//            if (n.height() != shorter.height() + 1) {
+//                throw new IllegalStateException("Didn't go back up enough");
+//            }
+            }
+
+            // TODO: Is this used?
+            // While nodes in the taller are full, add a parent to the shorter and try the next level
+            // up.
+            while (!n.thisNodeHasRelaxedCapacity(1) &&
+                   (i >= 0) ) {
+
+                // no room for short at this level (n has too many kids)
+                n = ancestors[i];
+                i--;
+
+                shorter = addAncestor(shorter);
+//            shorter.debugValidate();
+
+                // Sometimes we care about which is shorter and sometimes about left and right.
+                // Since we fixed the shorter tree, we have to update the left/right
+                // pointer to point to the new shorter.
+                if (leftIntoRight) {
+                    leftRoot = shorter;
+                } else {
+                    rightRoot = shorter;
+                }
+            }
+
+            // Here we either have 2 trees of equal height, or
+            // we have room in n for the shorter as a child.
+
+            if (shorter.height() == (n.height() - 1)) {
+//            if (!n.thisNodeHasRelaxedCapacity(1)) {
+//                throw new IllegalStateException("somehow got here without relaxed capacity...");
+//            }
+                // Shorter one level below n and there's room
+                // Trees are not equal height and there's room somewhere.
+                n = n.addEndChild(leftIntoRight, shorter);
+//            n.debugValidate();
+            } else if (i < 0) {
+                // 2 trees of equal height so we make a new parent
+//            if (shorter.height() != n.height()) {
+//                throw new IllegalStateException("Expected trees of equal height");
+//            }
+
+                @SuppressWarnings("unchecked")
+                Node<E>[] newRootArray = new Node[] {leftRoot, rightRoot};
+                int leftSize = leftRoot.size();
+                Node<E> newRoot =
+                        new Relaxed<>(new int[] {leftSize, leftSize + rightRoot.size()}, newRootArray);
+//            newRoot.debugValidate();
+                return new ImRrbt<>(emptyArray(), 0, 0, newRoot, newRoot.size());
+            } else {
+                throw new IllegalStateException("How did we get here?");
+            }
+
+            // We've merged the nodes.  Now see if we need to create new parents
+            // to hold the changed sub-nodes...
+            while (i >= 0) {
+                Node<E> anc = ancestors[i];
+                // By definition, I think that if we need a new root node, then we aren't dealing with
+
+                // leaf nodes, but I could be wrong.
+                // I also think we should get rid of relaxed nodes and everything will be much
+                // easier.
+                Relaxed<E> rel = (anc instanceof Strict) ? ((Strict) anc).relax()
+                                                         : (Relaxed<E>) anc;
+
+                int repIdx = leftIntoRight ? 0 : rel.numChildren() - 1;
+                n = Relaxed.replaceInRelaxedAt(rel.cumulativeSizes, rel.nodes, n, repIdx,
+                                               n.size() - rel.nodes[repIdx].size());
+                i--;
+            }
+
+//        n.debugValidate();
+            return new ImRrbt<>(emptyArray(), 0, 0, n, n.size());
+        }
 
         /** {@inheritDoc} */
         @Override public ImRrbt<E> replace(int index, E item) {
-            return (ImRrbt<E>) super.replace(index, item);
+            if ( (index < 0) || (index > size) ) {
+                throw new IndexOutOfBoundsException("Index: " + index + " size: " + size);
+            }
+            if (index >= focusStartIndex) {
+                int focusOffset = index - focusStartIndex;
+                if (focusOffset < focusLength) {
+                    return new ImRrbt<>(replaceInArrayAt(item, focus, focusOffset, null),
+                                        focusStartIndex, focusLength, root, size);
+                }
+                index -= focusLength;
+            }
+            // About to do replace with maybe-adjusted index
+            return new ImRrbt<>(focus, focusStartIndex, focusLength, root.replace(index, item), size);
+        }
+
+        /**
+         Returns a new RrbTree minus the given item (all items to the right are shifted left one)
+         This is O(log n).
+         */
+        public RrbTree<E> without(int index) {
+            if ( (index > 0) && (index < size - 1) ) {
+                Tuple2<RrbTree<E>,RrbTree<E>> s1 = split(index);
+                Tuple2<RrbTree<E>,RrbTree<E>> s2 = s1._2().split(1);
+                return s1._1().join(s2._2());
+            } else if (index == 0) {
+                return split(1)._2();
+            } else if (index == size - 1) {
+                return split(size - 1)._1();
+            } else {
+                throw new IllegalArgumentException("out of bounds");
+            }
+        }
+
+        @Override public int size() { return size; }
+
+        /**
+         Divides this RRB-Tree such that every index less-than the given index ends up in the left-hand
+         tree and the indexed item and all subsequent ones end up in the right-hand tree.
+
+         @param splitIndex the split point (excluded from the left-tree, included in the right one)
+         @return two new sub-trees as determined by the split point.  If the point is 0 or this.size()
+         one tree will be empty (but never null).
+         */
+        public Tuple2<RrbTree<E>,RrbTree<E>> split(int splitIndex) {
+            if ( (splitIndex < 1) && (splitIndex > size) ) {
+                throw new IllegalArgumentException("Constraint violation failed: 1 <= splitIndex <= size");
+            }
+            // Push the focus before splitting.
+            Node<E> newRoot = pushFocus();
+
+            // If a leaf-node is split, the fragments become the new focus for each side of the split.
+            // Otherwise, the focus can be left empty, or the last node of each side can be made into
+            // the focus.
+
+            SplitNode<E> split = newRoot.splitAt(splitIndex);
+
+//        split.left().debugValidate();
+//        split.right().debugValidate();
+
+            E[] lFocus = split.leftFocus();
+            Node<E> left = eliminateUnnecessaryAncestors(split.left());
+
+            E[] rFocus = split.rightFocus();
+            Node<E> right = eliminateUnnecessaryAncestors(split.right());
+
+            // These branches are identical, just different classes.
+            return Tuple2.of(new ImRrbt<>(lFocus, left.size(), lFocus.length,
+                                          left, left.size() + lFocus.length),
+                             new ImRrbt<>(rFocus, 0, rFocus.length,
+                                          right, right.size() + rFocus.length));
+        }
+
+        /** {@inheritDoc} */
+        @Override public String indentedStr(int indent) {
+            return "RrbTree(size=" + size +
+                   " fsi=" + focusStartIndex +
+                   " focus=" + arrayString(focus) + "\n" +
+                   indentSpace(indent + 8) + "root=" +
+                   (root == null ? "null" : root.indentedStr(indent + 13)) +
+                   ")";
         }
 
         private static final ImRrbt EMPTY_IM_RRBT =
                 new ImRrbt<>(emptyArray(), 0, 0, emptyLeaf(), 0);
-
-        /** {@inheritDoc} */
-        @Override Node<E> pushFocus() {
-            return (super.focusLength == 0)
-                   ? super.root
-                   : super.root.pushFocus(super.focusStartIndex, super.focus);
-        }
     }
 
     /** Returns the empty, immutable RRB-Tree (there is only one) */
@@ -286,50 +917,11 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
     /** {@inheritDoc} */
     @Override abstract public RrbTree<E> append(E t);
 
-    void debugValidate() {
-        if (focusLength > STRICT_NODE_LENGTH) {
-            throw new IllegalStateException("focus len:" + focusLength +
-                                            " gt STRICT_NODE_LENGTH:" + STRICT_NODE_LENGTH +
-                                            "\n" + this.indentedStr(0));
-        }
-        int sz = root.debugValidate();
-        if (sz != size - focusLength) {
-            throw new IllegalStateException("Size incorrect.  Root size: " + root.size() +
-                                            " RrbSize: " + size +
-                                            " focusLen: " + focusLength + "\n" +
-                                            this.indentedStr(0));
-        }
-        if ( (focusStartIndex < 0) || (focusStartIndex > size) ) {
-            throw new IllegalStateException("focusStartIndex out of bounds!\n" +
-                                            this.indentedStr(0));
-        }
-        if (!root.equals(eliminateUnnecessaryAncestors(root))) {
-            throw new IllegalStateException("Unnecessary ancestors!\n" +
-                                            this.indentedStr(0));
-        }
-    }
+    /** Internal validation method for testing. */
+    abstract void debugValidate();
 
     /** {@inheritDoc} */
-    @Override public E get(int i) {
-        if ( (i < 0) || (i > size) ) {
-            throw new IndexOutOfBoundsException("Index: " + i + " size: " + size);
-        }
-
-        // This is a debugging assertion - can't be covered by a test.
-//        if ( (focusStartIndex < 0) || (focusStartIndex > size) ) {
-//            throw new IllegalStateException("focusStartIndex: " + focusStartIndex +
-//                                            " size: " + size);
-//        }
-
-        if (i >= focusStartIndex) {
-            int focusOffset = i - focusStartIndex;
-            if (focusOffset < focusLength) {
-                return focus[focusOffset];
-            }
-            i -= focusLength;
-        }
-        return root.get(i);
-    }
+    @Override abstract public E get(int i);
 
     /**
      Inserts an item in the RRB tree pushing the current element at that index and all subsequent
@@ -342,9 +934,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
     public abstract RrbTree<E> insert(int idx, E element);
 
     /** {@inheritDoc} */
-    @Override public UnmodSortedIterator<E> iterator() {
-        return new Iter();
-    }
+    @Override abstract public UnmodSortedIterator<E> iterator();
 
 /*
 I'm implementing something like the [Bagwell/Rompf RRB-Tree][1] and I'm a little unsatisfied with
@@ -380,9 +970,36 @@ involves changing more nodes than maybe necessary.
 
   [1]: https://infoscience.epfl.ch/record/169879/files/RMTrees.pdf
 */
+    /**
+     Joins the given tree to the right side of this tree (or this to the left side of that one) in
+     something like O(log n) time.
+     */
+    public abstract RrbTree<E> join(RrbTree<E> that);
 
     /** Internal method - do not use. */
     abstract Node<E> pushFocus();
+
+    /** {@inheritDoc} */
+    @Override abstract public RrbTree<E> replace(int index, E item);
+
+    /** {@inheritDoc} */
+    @Override abstract public int size();
+
+    /**
+     Divides this RRB-Tree such that every index less-than the given index ends up in the left-hand
+     tree and the indexed item and all subsequent ones end up in the right-hand tree.
+
+     @param splitIndex the split point (excluded from the left-tree, included in the right one)
+     @return two new sub-trees as determined by the split point.  If the point is 0 or this.size()
+     one tree will be empty (but never null).
+     */
+    abstract public Tuple2<RrbTree<E>,RrbTree<E>> split(int splitIndex);
+
+    /**
+     Returns a new RrbTree minus the given item (all items to the right are shifted left one)
+     This is O(log n).
+     */
+    abstract public RrbTree<E> without(int index);
 
     private static <E> Node<E> eliminateUnnecessaryAncestors(Node<E> n) {
         while ( !(n instanceof Leaf) &&
@@ -403,281 +1020,6 @@ involves changing more nodes than maybe necessary.
                                                     (Node<E>[]) new Node[]{n}) :
                new Relaxed<>(new int[] { n.size() },
                              (Node<E>[]) new Node[]{n});
-    }
-
-    /**
-     Joins the given tree to the right side of this tree (or this to the left side of that one) in
-     something like O(log n) time.
-     */
-    @SuppressWarnings("unchecked")
-    public RrbTree<E> join(RrbTree<E> that) {
-
-        // We don't want to wonder below if we're inserting leaves or branch-nodes.
-        // Also, it leaves the tree cleaner to just smash leaves onto the bigger tree.
-        // Ultimately, we might want to see if we can grab the tail and stick it where it belongs
-        // but for now, this should be alright.
-        if (that.size < MAX_NODE_LENGTH) {
-            return (this instanceof MutableRrbt)
-                   ? ((MutableRrbt) this).concat(that)
-                   : ((ImRrbt) this).concat(that);
-        }
-        if (this.size < MAX_NODE_LENGTH) {
-            for (int i = 0; i < size; i++) {
-                that = that.insert(i, this.get(i));
-            }
-            return that;
-        }
-
-        // OK, here we've eliminated the case of merging a leaf into a tree.  We only have to
-        // deal with tree-into-tree merges below.
-        //
-        // Note that if the right-hand tree is bigger, we'll effectively add this tree to the
-        // left-hand side of that one.  It's logically the same as adding that tree to the right
-        // of this, but the mechanism by which it happens is a little different.
-        Node<E> leftRoot = pushFocus();
-        Node<E> rightRoot = that.pushFocus();
-
-//        if (leftRoot != eliminateUnnecessaryAncestors(leftRoot)) {
-//            throw new IllegalStateException("Left had unnecessary ancestors!");
-//        }
-
-//        if (rightRoot != eliminateUnnecessaryAncestors(rightRoot)) {
-//            throw new IllegalStateException("Right had unnecessary ancestors!");
-//        }
-
-        // Whether to add the right tree to the left one (true) or vice-versa (false).
-        // True also means left is taller, false: right is taller.
-        boolean leftIntoRight = leftRoot.height() < rightRoot.height();
-        Node<E> taller = leftIntoRight ? rightRoot : leftRoot;
-        Node<E> shorter = leftIntoRight ? leftRoot : rightRoot;
-
-        // Most compact: Descend the taller tree to shorter.height and find room for all
-        //     shorter children as children of that node.
-        //
-        // Next: add the shorter node, unchanged, as a child to the taller tree at
-        //       shorter.height + 1
-        //
-        // If that level of the taller tree is full, add an ancestor to the shorter node and try to
-        // fit at the next level up in the taller tree.
-        //
-        // If this brings us to the top of the taller tree (both trees are the same height), add a
-        // new parent node with leftRoot and rightRoot as children
-
-        // Walk down the taller tree to one below the shorter, remembering ancestors.
-        Node<E> n = taller;
-
-        // This is the maximum we can descend into the taller tree (before running out of tree)
-//        int maxDescent = taller.height() - 1;
-
-        // Actual amount we're going to descend.
-        int descentDepth = taller.height() - shorter.height();
-//        if ( (descentDepth < 0) || (descentDepth >= taller.height()) ) {
-//            throw new IllegalStateException("Illegal descent depth: " + descentDepth);
-//        }
-        Node<E>[] ancestors =  genericNodeArray(descentDepth);
-        int i = 0;
-        for (; i < ancestors.length; i++) {
-            // Add an ancestor to array
-            ancestors[i] = n;
-//            if (n instanceof Leaf) {
-//                throw new IllegalStateException("Somehow found a leaf node");
-//            }
-            n = n.endChild(leftIntoRight);
-        }
-        // i is incremented before leaving the loop, so decrement it here to make it point
-        // to ancestors.length - 1;
-        i--;
-
-//        if (n.height() != shorter.height()) {
-//            throw new IllegalStateException("Didn't get to proper height");
-//        }
-
-        // Most compact: Descend the taller tree to shorter.height and find room for all
-        //     shorter children as children of that node.
-        if (n.thisNodeHasRelaxedCapacity(shorter.numChildren())) {
-            // Adding kids of shorter to proper level of taller...
-            Node<E>[] kids;
-            if (shorter instanceof Strict) {
-                kids = ((Strict) shorter).nodes;
-            } else if (shorter instanceof Relaxed) {
-                kids = ((Relaxed) shorter).nodes;
-            } else {
-                throw new IllegalStateException("Expected a strict or relaxed, but found " +
-                                                shorter.getClass());
-            }
-            n = n.addEndChildren(leftIntoRight, kids);
-        }
-
-        if (i >= 0) {
-            // Go back up one after lowest check.
-            n = ancestors[i];
-            i--;
-//            if (n.height() != shorter.height() + 1) {
-//                throw new IllegalStateException("Didn't go back up enough");
-//            }
-        }
-
-        // TODO: Is this used?
-        // While nodes in the taller are full, add a parent to the shorter and try the next level
-        // up.
-        while (!n.thisNodeHasRelaxedCapacity(1) &&
-                (i >= 0) ) {
-
-            // no room for short at this level (n has too many kids)
-            n = ancestors[i];
-            i--;
-
-            shorter = addAncestor(shorter);
-//            shorter.debugValidate();
-
-            // Sometimes we care about which is shorter and sometimes about left and right.
-            // Since we fixed the shorter tree, we have to update the left/right
-            // pointer to point to the new shorter.
-            if (leftIntoRight) {
-                leftRoot = shorter;
-            } else {
-                rightRoot = shorter;
-            }
-        }
-
-        // Here we either have 2 trees of equal height, or
-        // we have room in n for the shorter as a child.
-
-        if (shorter.height() == (n.height() - 1)) {
-//            if (!n.thisNodeHasRelaxedCapacity(1)) {
-//                throw new IllegalStateException("somehow got here without relaxed capacity...");
-//            }
-            // Shorter one level below n and there's room
-            // Trees are not equal height and there's room somewhere.
-            n = n.addEndChild(leftIntoRight, shorter);
-//            n.debugValidate();
-        } else if (i < 0) {
-            // 2 trees of equal height so we make a new parent
-//            if (shorter.height() != n.height()) {
-//                throw new IllegalStateException("Expected trees of equal height");
-//            }
-
-            @SuppressWarnings("unchecked")
-            Node<E>[] newRootArray = new Node[] {leftRoot, rightRoot};
-            int leftSize = leftRoot.size();
-            Node<E> newRoot =
-                    new Relaxed<>(new int[] {leftSize, leftSize + rightRoot.size()}, newRootArray);
-//            newRoot.debugValidate();
-            return (this instanceof MutableRrbt)
-                   ? new MutableRrbt<>(emptyArray(), 0, 0, newRoot, newRoot.size())
-                   : new ImRrbt<>(emptyArray(), 0, 0, newRoot, newRoot.size());
-        } else {
-            throw new IllegalStateException("How did we get here?");
-        }
-
-        // We've merged the nodes.  Now see if we need to create new parents
-        // to hold the changed sub-nodes...
-        while (i >= 0) {
-            Node<E> anc = ancestors[i];
-            // By definition, I think that if we need a new root node, then we aren't dealing with
-
-            // leaf nodes, but I could be wrong.
-            // I also think we should get rid of relaxed nodes and everything will be much
-            // easier.
-            Relaxed<E> rel = (anc instanceof Strict) ? ((Strict) anc).relax()
-                                                     : (Relaxed<E>) anc;
-
-            int repIdx = leftIntoRight ? 0 : rel.numChildren() - 1;
-            n = Relaxed.replaceInRelaxedAt(rel.cumulativeSizes, rel.nodes, n, repIdx,
-                                           n.size() - rel.nodes[repIdx].size());
-            i--;
-        }
-
-//        n.debugValidate();
-        return (this instanceof MutableRrbt)
-               ? new MutableRrbt<>(emptyArray(), 0, 0, n, n.size())
-               : new ImRrbt<>(emptyArray(), 0, 0, n, n.size());
-    }
-
-    /** {@inheritDoc} */
-    @Override public RrbTree<E> replace(int index, E item) {
-        if ( (index < 0) || (index > size) ) {
-            throw new IndexOutOfBoundsException("Index: " + index + " size: " + size);
-        }
-        if (index >= focusStartIndex) {
-            int focusOffset = index - focusStartIndex;
-            if (focusOffset < focusLength) {
-                if (this instanceof MutableRrbt) {
-                    focus[focusOffset] = item;
-                    return new MutableRrbt<>(focus, focusOffset, focusLength, root, size);
-                }
-                return new ImRrbt<>(replaceInArrayAt(item, focus, focusOffset, null),
-                                    focusStartIndex, focusLength, root, size);
-            }
-            index -= focusLength;
-        }
-        // About to do replace with maybe-adjusted index
-        return (this instanceof MutableRrbt)
-               ? new MutableRrbt<>(focus, focusStartIndex, focusLength, root.replace(index, item),
-                                   size)
-               : new ImRrbt<>(focus, focusStartIndex, focusLength, root.replace(index, item), size);
-    }
-
-    /**
-     Returns a new RrbTree minus the given item (all items to the right are shifted left one)
-     This is O(log n).
-     */
-    public RrbTree<E> without(int index) {
-        if ( (index > 0) && (index < size - 1) ) {
-            Tuple2<RrbTree<E>,RrbTree<E>> s1 = split(index);
-            Tuple2<RrbTree<E>,RrbTree<E>> s2 = s1._2().split(1);
-            return s1._1().join(s2._2());
-        } else if (index == 0) {
-            return split(1)._2();
-        } else if (index == size - 1) {
-            return split(size - 1)._1();
-        } else {
-            throw new IllegalArgumentException("out of bounds");
-        }
-    }
-
-    @Override public int size() { return size; }
-
-    /**
-     Divides this RRB-Tree such that every index less-than the given index ends up in the left-hand
-     tree and the indexed item and all subsequent ones end up in the right-hand tree.
-
-     @param splitIndex the split point (excluded from the left-tree, included in the right one)
-     @return two new sub-trees as determined by the split point.  If the point is 0 or this.size()
-     one tree will be empty (but never null).
-     */
-    public Tuple2<RrbTree<E>,RrbTree<E>> split(int splitIndex) {
-        if ( (splitIndex < 1) && (splitIndex > size) ) {
-            throw new IllegalArgumentException("Constraint violation failed: 1 <= splitIndex <= size");
-        }
-        // Push the focus before splitting.
-        Node<E> newRoot = pushFocus();
-
-        // If a leaf-node is split, the fragments become the new focus for each side of the split.
-        // Otherwise, the focus can be left empty, or the last node of each side can be made into
-        // the focus.
-
-        SplitNode<E> split = newRoot.splitAt(splitIndex);
-
-//        split.left().debugValidate();
-//        split.right().debugValidate();
-
-        E[] lFocus = split.leftFocus();
-        Node<E> left = eliminateUnnecessaryAncestors(split.left());
-
-        E[] rFocus = split.rightFocus();
-        Node<E> right = eliminateUnnecessaryAncestors(split.right());
-
-        // These branches are identical, just different classes.
-        return (this instanceof MutableRrbt)
-               ? Tuple2.of(new MutableRrbt<>(lFocus, left.size(), lFocus.length,
-                                             left, left.size() + lFocus.length),
-                           new MutableRrbt<>(rFocus, 0, rFocus.length,
-                                             right, right.size() + rFocus.length))
-               : Tuple2.of(new ImRrbt<>(lFocus, left.size(), lFocus.length,
-                                        left, left.size() + lFocus.length),
-                           new ImRrbt<>(rFocus, 0, rFocus.length,
-                                        right, right.size() + rFocus.length));
     }
 
     // ================================== Standard Object Methods ==================================
@@ -710,14 +1052,7 @@ involves changing more nodes than maybe necessary.
     }
 
     /** {@inheritDoc} */
-    @Override public String indentedStr(int indent) {
-        return "RrbTree(size=" + size +
-               " fsi=" + focusStartIndex +
-               " focus=" + arrayString(focus) + "\n" +
-               indentSpace(indent + 8) + "root=" +
-               (root == null ? "null" : root.indentedStr(indent + 13)) +
-               ")";
-    }
+    @Override abstract public String indentedStr(int indent);
 
     // ================================== Implementation Details ==================================
 
@@ -2105,7 +2440,7 @@ involves changing more nodes than maybe necessary.
 //        public String toString() { return "IdxNode(" + idx + " " + node + ")"; }
     }
 
-    private final class Iter implements UnmodSortedIterator<E> {
+    private static final class Iter<E> implements UnmodSortedIterator<E> {
 
         // We want this iterator to walk the node tree.
         private final IdxNode<E>[] stack;
@@ -2115,7 +2450,7 @@ involves changing more nodes than maybe necessary.
         private int leafArrayIdx;
 
         @SuppressWarnings("unchecked")
-        private Iter() {
+        private Iter(Node<E> root, E[] focus, int focusStartIndex, int focusLength) {
             // Push the focus so we don't have to ever check the index.
             Node<E> newRoot = ((focus != null) && focusLength > 0)
                               ? root.pushFocus(focusStartIndex, focus)

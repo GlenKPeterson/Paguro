@@ -37,10 +37,13 @@ Check that nothing blows up:
 java -jar target/benchmarks.jar -f 1 -i 1 -wi 0
 
 // A reasonably fast test
-java -jar target/benchmarks.jar -f 2 -i 5 -wi 3
+java -jar target/benchmarks.jar -f 1 -i 5 -wi 3
 
 // Takes 3-10 warmup iterations to settle in, so this is safer:
-java -jar target/benchmarks.jar -f 2 -i 5 -wi 8
+java -jar target/benchmarks.jar -f 1 -i 5 -wi 8
+
+// Little extra for accuracy - this is still half of the default.
+java -jar target/benchmarks.jar -f 2 -i 10 -wi 10
 
 -->
 

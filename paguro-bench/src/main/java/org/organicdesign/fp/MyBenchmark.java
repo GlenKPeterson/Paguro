@@ -261,5 +261,4 @@ public class MyBenchmark {
     @Benchmark public void GetEachList100000(List100000 list) { getEach(list.list); }
     @Benchmark public void GetEachList1000000(List1000000 list) { getEach(list.list); }
     @Benchmark public void GetEachList10000000(List10000000 list) { getEach(list.list); }
-
 }
