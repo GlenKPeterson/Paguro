@@ -6,6 +6,8 @@ Photo by [Rushen](https://www.flickr.com/photos/rushen/12171498934/in/photostrea
 Paguro is short for the Latin "Paguroidea" - the name of the Hermit Crab superfamily in Biology.  These collections grow by adding a new shell, leaving the insides the same, much the way [Hermit Crabs trade up to a new shell when they grow](https://www.youtube.com/watch?v=f1dnocPQXDQ).  This project used to be called UncleJim. 
 
 # News
+If you're new to Paguro, consider starting with the streamlined 3.0 Alpha version.  Details available on the [RRB Tree branch](https://github.com/GlenKPeterson/Paguro/tree/2016-05-22_RRB-Tree)
+
 A summary of recent updates is in the [Change Log](CHANGE_LOG.md)
 
 Future development priorities are further down this page.
@@ -36,6 +38,10 @@ Paguro takes advantage of Java's type inferencing.  It eschews void return types
 
 Available from the [Maven Repository](http://mvnrepository.com/artifact/org.organicdesign/Paguro) as:
 ```xml
+<!--
+If you're new to Paguro, consider starting with the streamlined
+3.0 Alpha version instead (on the 2016-05-22_RRB-Tree branch)
+ -->
 <dependency>
         <groupId>org.organicdesign</groupId>
         <artifactId>Paguro</artifactId>
