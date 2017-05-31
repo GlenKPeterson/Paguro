@@ -21,8 +21,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.organicdesign.fp.oneOf.Option;
 import org.organicdesign.fp.collections.PersistentTreeMap.Box;
+import org.organicdesign.fp.oneOf.Option;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import static org.organicdesign.fp.collections.UnmodIterator.emptyUnmodIterator;
@@ -40,7 +40,7 @@ import static org.organicdesign.fp.collections.UnmodIterator.emptyUnmodIterator;
  License 1.0 Copyright Rich Hickey.  Errors are Glen Peterson's.
  */
 public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
-        implements ImUnsortedMap<K,V>, Serializable {
+        implements ImMap<K,V>, Serializable {
 
 //    static private <K, V, R> R doKvreduce(Object[] array, Fn3<R,K,V,R> f, R init) {
 //        for (int i = 0; i < array.length; i += 2) {
@@ -69,6 +69,7 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
         private Iter(UnmodIterator<UnEntry<K,V>> ri, V nv) { rootIter = ri; nullValue = nv; }
 
         @Override public boolean hasNext() {
+            //noinspection SimplifiableIfStatement
             if (!seen) {
                 return true;
             } else {
@@ -149,6 +150,7 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
      Returns a new PersistentHashMap of the given keys and their paired values, skipping any null
      Entries.
      */
+    @SuppressWarnings("WeakerAccess")
     public static <K,V> PersistentHashMap<K,V> ofEq(Equator<K> eq, Iterable<Map.Entry<K,V>> es) {
         if (es == null) { return empty(eq); }
         MutableHashMap<K,V> map = emptyMutable(eq);
@@ -212,7 +214,7 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
     private static class SerializationProxy<K,V> implements Serializable {
         private final Equator<K> equator;
         private final int size;
-        private transient ImUnsortedMap<K,V> theMap;
+        private transient ImMap<K,V> theMap;
         SerializationProxy(PersistentHashMap<K,V> phm) {
             equator = phm.equator;
             size = phm.size;
@@ -235,13 +237,15 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
         @SuppressWarnings("unchecked")
         private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
             s.defaultReadObject();
-            theMap = new PersistentHashMap<K,V>(equator, 0, null, false, null).mutable();
+            MutableUnsortedMap tempMap =
+                    new PersistentHashMap<K,V>(equator, 0, null, false, null).mutable();
             for (int i = 0; i < size; i++) {
-                theMap.assoc((K) s.readObject(), (V) s.readObject());
+                tempMap.assoc(s.readObject(), s.readObject());
             }
+            theMap = tempMap.immutable();
         }
 
-        private Object readResolve() { return theMap.immutable(); }
+        private Object readResolve() { return theMap; }
     }
 
     private Object writeReplace() { return new SerializationProxy<>(this); }
@@ -295,8 +299,6 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
         return (hasNull) ? new Iter<>(rootIter, nullValue)
                          : rootIter;
     }
-
-    @Override public final PersistentHashMap<K,V> immutable() { return this; }
 
 //    public <R> R kvreduce(Fn3<R,K,V,R> f, R init) {
 //        init = hasNull ? f.apply(init, null, nullValue) : init;
@@ -739,7 +741,7 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
     private final static class BitmapIndexedNode<K,V> implements INode<K,V> {
 //        static final BitmapIndexedNode EMPTY = new BitmapIndexedNode(null, 0, new Object[0]);
 
-        static final <K,V> BitmapIndexedNode<K,V> empty(Equator<K> e) {
+        static <K,V> BitmapIndexedNode<K,V> empty(Equator<K> e) {
             return new BitmapIndexedNode(e, null, 0, new Object[0]);
         }
 
@@ -785,7 +787,7 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
                 }
                 addedLeaf.val = addedLeaf;
                 return new BitmapIndexedNode<>(equator, null, bitmap,
-                                               cloneAndSet(array, 2*idx, null, 2*idx+1,
+                                               cloneAndSet(array, 2*idx, 2*idx+1,
                                                            createNode(equator, shift + 5, keyOrNull,
                                                                       valOrNode, hash, key, val)));
             } else {
@@ -906,10 +908,10 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
             return editable;
         }
 
-        private BitmapIndexedNode<K,V> editAndSet(AtomicReference<Thread> edit, int i, Object a,
+        private BitmapIndexedNode<K,V> editAndSet(AtomicReference<Thread> edit, int i,
                                                   int j, Object b) {
             BitmapIndexedNode editable = ensureEditable(edit);
-            editable.array[i] = a;
+            editable.array[i] = null;
             editable.array[j] = b;
             return editable;
         }
@@ -947,7 +949,7 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
                     return editAndSet(edit, 2*idx+1, val);
                 }
                 addedLeaf.val = addedLeaf;
-                return editAndSet(edit, 2*idx, null, 2*idx+1,
+                return editAndSet(edit, 2*idx, 2*idx+1,
                                   createNode(equator, edit, shift + 5, keyOrNull, valOrNode, hash,
                                              key, val));
             } else {
@@ -1287,9 +1289,9 @@ public static void main(String[] args){
         return clone;
     }
 
-    private static Object[] cloneAndSet(Object[] array, int i, Object a, int j, Object b) {
+    private static Object[] cloneAndSet(Object[] array, int i, int j, Object b) {
         Object[] clone = array.clone();
-        clone[i] = a;
+        clone[i] = null;
         clone[j] = b;
         return clone;
     }
@@ -1395,6 +1397,7 @@ public static void main(String[] args){
         }
 
         @Override public boolean hasNext(){
+            //noinspection SimplifiableIfStatement
             if (nextEntry != Absent.ENTRY || nextIter != null) {
                 return true;
             }

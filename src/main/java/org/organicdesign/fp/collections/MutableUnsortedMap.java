@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  Interface for mutable (hash) map builder.
  */
-public interface MutableUnsortedMap<K,V> extends ImUnsortedMap<K,V> {
+public interface MutableUnsortedMap<K,V> extends BaseUnsortedMap<K,V> {
     /** {@inheritDoc} */
     @Override
     MutableUnsortedMap<K,V> assoc(K key, V val);
@@ -29,8 +29,18 @@ public interface MutableUnsortedMap<K,V> extends ImUnsortedMap<K,V> {
         return assoc(entry.getKey(), entry.getValue());
     }
 
-    /** Returns a mutable version of this immutable map. */
-    @Override default MutableUnsortedMap<K,V> mutable() { return this; }
+
+    @Override default MutableUnsortedSet<Entry<K,V>> entrySet() {
+        return map(e -> (Map.Entry<K,V>) e).toMutableSet();
+    }
+
+    /** Returns a mutable view of the keys contained in this map. */
+    @Override default MutableUnsortedSet<K> keySet() {
+        return map(e -> ((Map.Entry<K,V>) e).getKey()).toMutableSet();
+    }
+
+    /** Returns an immutable version of this mutable map. */
+    ImMap<K,V> immutable();
 
     /** {@inheritDoc} */
     @Override

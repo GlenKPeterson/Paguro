@@ -39,13 +39,6 @@ Rich Hickey for Clojure
 - First `mvn clean install` on: https://github.com/GlenKPeterson/TestUtils
 - Then `mvn clean test` on Paguro
 
-# Version 3.0 breaking changes
- - Renamed all functional interfaces from `Function1` to `Fn1`.  These show up in type signatures often enough to warrant brevity.
- - Renamed `Transformable.foldLeft()` to just `Transformable.fold()`.  The left and right only make sense on linked lists (they are reversed with vectors which is confusing).  Just drop the word "left."  People who care will look it up anyway and people who don't care don't need to know.
- - Remove empty() and EMPTY from all interfaces except maybe UnmodIterator.
- These are a problem when you inherit from the interface because you have to override them or suffer.
- These objects don't implement equals() and you end up expecting in UnmodWhatever.EMPTY to .append() or otherwise behave like an ImWhatever, which it probably should never do.
-
 # Think about:
  - Xform.MapDesc is not serializable.  Really none of xform is serializable.
  - Think about adding StaticImports.xform(String)
@@ -54,10 +47,8 @@ Rich Hickey for Clojure
    Hmm... Maybe have a SizedIterable that both maps and collections can extend?  Ditto UnmodSortedMap extend UnmodSortedCollection instead of UnmodSortedIterable.
  - Have an Ordered version of Transform as well as the (default) unreliable order.  Only the ordered version can be used for implementing things like equals() and hashCode()
  - Implement drop() for list with listIterator(dropAmount)
- - Consider `max(Comparator<T> c, Iterable<? extends T> is)` and min()...  Actually, these probably belong on Transformable.
  - Study monadic thinking and ensure that Or is "monad-friendly".
  Ensure you can chain together functions in a short-circuiting way, without exceptions or other side-effects.
- - Add a [Persistent RRB Tree](http://infoscience.epfl.ch/record/169879/files/RMTrees.pdf) and compare its performance to the PersistentVector.
  - Replace vector with RRBTree (assuming performance is good).
  - Re-implement Persistent collections under the Apache license.
  - Make pretty(int indent) methods on everything that returns a String of valid Cymling code to create that collection.

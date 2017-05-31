@@ -1,4 +1,4 @@
-// Copyright 2015-04-13 PlanBase Inc. & Glen Peterson
+// Copyright 2017 PlanBase Inc. & Glen Peterson
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,31 +13,28 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
-/** An immutable set with no guarantees about its ordering */
-public interface ImSet<E> extends BaseSet<E> {
-
-    /** Returns a mutable version of this immutable set. */
-    MutableUnsortedSet<E> mutable();
-
+/**
+ Adds copy-on-write, "fluent interface" methods to {@link UnmodSet}.
+ Lowest common ancestor of {@link MutableUnsortedSet}, {@link ImSet}, and {@link ImSortedSet}.
+ */
+public interface BaseSet<E> extends UnmodSet<E> {
     /**
-     Adds an element, returning a modified version of the set (leaving the original set unchanged).
+     Adds an element.
      If the element already exists in this set, the new value overwrites the old one.  If the new
      element is the same as an old element (based on the address of that item in memory, not an
-     equals test), the old set is returned unchanged.
+     equals test), the old set may be returned unchanged.
 
      @param e the element to add to this set
      @return a new set with the element added (see note above about adding duplicate elements).
      */
-    @Override ImSet<E> put(E e);
+    BaseSet<E> put(E e);
 
-    /** {@inheritDoc} */
-    default ImSet<E> union(Iterable<? extends E> iter) {
-        if (iter == null) { return this; }
-        ImSet<E> ret = this;
-        for (E e : iter) { ret = ret.put(e); }
-        return ret;
-    }
+    /** Returns a new set containing all the items. */
+    BaseSet<E> union(Iterable<? extends E> iter);
+//    {
+//        return concat(iter).toImSet();
+//    }
 
-    /** {@inheritDoc} */
-    @Override ImSet<E> without(E key);
+    /** Removes this key from the set */
+    BaseSet<E> without(E key);
 }

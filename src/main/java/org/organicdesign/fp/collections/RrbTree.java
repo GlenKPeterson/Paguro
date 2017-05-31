@@ -37,12 +37,6 @@ import static org.organicdesign.fp.collections.Indented.indentSpace;
  on B-Trees.  Also with an awareness of the Clojure PersistentVector by Rich Hickey.  All errors
  are by Glen Peterson.</p>
 
- <h4>Still TO-DO:</h4>
-   <ul>
-    <li>Consider mutable vector</li>
-    <li>Speed testing and optimization.</li>
- </ul>
-
  <h4>History (what little I know):</h4>
  1972: B-Tree: Rudolf Bayer and Ed McCreight<br>
  1998: Purely Functional Data Structures: Chris Okasaki<br>

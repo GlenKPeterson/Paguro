@@ -734,7 +734,7 @@ public class PersistentTreeMapTest {
 
         PersistentTreeMap<Integer,String> m =
                 PersistentTreeMap.of(vec(tup(1, "one"))).assoc(2, "two").assoc(3, "three").assoc(4, "four").assoc(5, "five");
-        ImSet<Map.Entry<Integer,String>> s =
+        ImSortedSet<Map.Entry<Integer,String>> s =
                 PersistentTreeSet.ofComp((a, b) -> a.getKey() - b.getKey(),
                                          vec(tup(1, "one"),
                                              tup(2, "two"),

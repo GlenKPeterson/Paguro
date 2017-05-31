@@ -13,11 +13,12 @@ import static org.organicdesign.fp.FunctionUtils.ordinal;
  Created by gpeterso on 9/13/16.
  */
 public class MutableUnsortedSetTest {
-    public static class TestSet<E> implements MutableUnsortedSet<E> {
+    public static class TestSet<E> extends UnmodSet.AbstractUnmodSet<E>
+            implements MutableUnsortedSet<E> {
         private final Set<E> inner;
         public TestSet(Set<E> s) { inner = s; }
 
-        @Override public ImUnsortedSet<E> immutable() {
+        @Override public ImSet<E> immutable() {
             return new ImUnsortedSetTest.TestSet<>(inner);
         }
 
@@ -55,6 +56,6 @@ public class MutableUnsortedSetTest {
             assertEquals(control, test);
         }
         PersistentHashSetTest.setIterTest(control, test.iterator());
-        assertTrue(test == test.mutable());
+        assertEquals(test, test.immutable());
     }
 }

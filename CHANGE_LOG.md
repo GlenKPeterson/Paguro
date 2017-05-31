@@ -8,6 +8,8 @@ tells you what to use instead.  Once we delete the deprecated methods, that docu
 # Release 3.0: RRB Tree
 Major changes:
  - Added Base___ for Im___ and Mutable___ interfaces to extend.  Mutable___ no longer extends Im___.
+ - ImUnsortedSet renamed to ImSet and ImUnsortedMap renamed to ImMap to follow the java.util conventions more closely and for brevity.
+   Mutable versions of both interfaces still contain the word "Unsorted" (verbose mutable names encourage immutability).
  - Renamed interfaces Function# to Fn#
  - Added an RRB Tree (still improving performance, but for insert at 0 in large lists it kills ArrayList)
  - Added foldUntil() to Transformable to replace the earlier version of foldLeft with a repeatUntil function parameter.

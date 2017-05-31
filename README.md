@@ -39,7 +39,7 @@ Available from the [Maven Repository](http://mvnrepository.com/artifact/org.orga
 <dependency>
         <groupId>org.organicdesign</groupId>
         <artifactId>Paguro</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.0.0-ALPHA</version>
 </dependency>
 ```
 
@@ -110,16 +110,13 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
 
 [Why Java?](https://github.com/GlenKPeterson/Paguro/wiki/Why-is-UncleJim-written-in-Java%3F)
 
-# Future Development Priorities (as of 2016-11-13)
-0. `Xform.toMutableList()` returns a java.util.List, but now that there's a MutableList class, should we use that instead?  Similarly for other toMutable... methods.
-2. Add reverseIterator() or similar to SortedUnmodIterable
-3. Transformable needs `first()` and `last()`, but maybe only on a SortedIterable.  Otherwise, `any(Fn1<Boolean>)`
-4. Ensure everything is as friendly as possible to Monadic thinking.
-5. Provide a Fn1v subclass of Fn1 (and similar for Fn0, Fn2, etc.) that returns void because sometimes you need one of those for backward compatibility and you don't want it to choke on checked exceptions.
-6. Consider adding interfaces to better split muable and immutable collections.  There should be a definitely unmodifiable, a definitely mutable, and an "unknown" one, but the two definitely's maybe shouldn't extend the "unknown" one.
-7. Make a Java 7 branch (and/or Java 6) and release (Paguro-JDK7).
-8. Consider adding `Class[] genericTypes` to every generic class so that generics could be known at runtime (for Cymling)
-9. Consider adding ImMap.assocIfAbsent(K key, Function1<V,V> howToUpdateValue, V newValIfAbsent).
+# Future Development Ideas (as of 2017-05-28)
+1. Add reverseIterator() or similar to SortedUnmodIterable
+2. Transformable needs `first()` and `last()`, but maybe only on a SortedIterable.  Otherwise, `any(Fn1<Boolean>)`
+3. Ensure everything is as friendly as possible to Monadic thinking.
+4. Provide a Fn1v subclass of Fn1 (and similar for Fn0, Fn2, etc.) that returns void because sometimes you need one of those for backward compatibility and you don't want it to choke on checked exceptions.
+5. Make a Kotlin branch and release (Paguro-K).
+6. Make a Java 7 branch and release (Paguro-J7).
 
 ### RRB-Tree
 Read the [current development status](https://github.com/GlenKPeterson/Paguro/issues/4#issuecomment-239825939) or check out the [latest version of the code](https://github.com/GlenKPeterson/Paguro/blob/2016-05-22_RRB-Tree/src/main/java/org/organicdesign/fp/experimental/RrbTree1.java).

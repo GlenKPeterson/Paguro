@@ -246,7 +246,7 @@ public class PersistentHashMapTest {
 
     @Test public void biggerHashMaps() {
         int NUM_ITEMS = 300;
-        ImUnsortedMap<String,Integer> m = PersistentHashMap.empty();
+        ImMap<String,Integer> m = PersistentHashMap.empty();
 
         for (int i = 0; i < NUM_ITEMS; i++) {
             m = m.assoc(ordinal(i), i);
@@ -276,7 +276,7 @@ public class PersistentHashMapTest {
         }
         assertFalse(m.containsValue(Integer.valueOf(NUM_ITEMS)));
 
-        assertTrue(m == m.immutable());
+        assertEquals(m, m.mutable());
 
         // If you remove a key that's not there, you should get back the original map.
         assertTrue(m == m.without(ordinal(NUM_ITEMS)));
@@ -333,7 +333,7 @@ public class PersistentHashMapTest {
         assertTrue(m.containsValue(Integer.valueOf(-1)));
         assertFalse(m.containsValue(Integer.valueOf(NUM_ITEMS)));
 
-        assertTrue(m == m.immutable());
+        assertEquals(m, m.mutable());
 
         m = m.without(null);
         assertEquals(NUM_ITEMS, m.size());
@@ -382,7 +382,8 @@ public class PersistentHashMapTest {
         assertTrue(t.containsValue(Integer.valueOf(-1)));
         assertFalse(t.containsValue(Integer.valueOf(NUM_ITEMS)));
 
-        assertTrue(t == t.mutable());
+        // Mutable used after immutable call
+//        assertEquals(t, t.immutable());
 
         t = t.without(null);
         assertEquals(NUM_ITEMS, t.size());

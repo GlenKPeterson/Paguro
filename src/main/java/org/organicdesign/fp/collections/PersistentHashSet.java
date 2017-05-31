@@ -27,7 +27,7 @@ import java.util.Map;
  License 1.0 Copyright Rich Hickey
 */
 public class PersistentHashSet<E> extends UnmodSet.AbstractUnmodSet<E>
-        implements ImUnsortedSet<E>, Serializable {
+        implements ImSet<E>, Serializable {
 
     // If you don't put this here, it inherits EMPTY from UnmodSet, which does not have .equals()
     // defined.  UnmodSet.empty won't put() either.
@@ -77,15 +77,15 @@ public class PersistentHashSet<E> extends UnmodSet.AbstractUnmodSet<E>
     }
 
     @SuppressWarnings("unchecked")
-    public static <E> PersistentHashSet<E> ofMap(ImUnsortedMap<E,?> map) {
-        return new PersistentHashSet<>((ImUnsortedMap<E,E>) map);
+    public static <E> PersistentHashSet<E> ofMap(ImMap<E,?> map) {
+        return new PersistentHashSet<>((ImMap<E,E>) map);
     }
 
     // ==================================== Instance Variables ====================================
-    private final ImUnsortedMap<E,E> impl;
+    private final ImMap<E,E> impl;
 
     // ======================================= Constructor =======================================
-    private PersistentHashSet(ImUnsortedMap<E,E> i) { impl = i; }
+    private PersistentHashSet(ImMap<E,E> i) { impl = i; }
 
     // ======================================= Serialization =======================================
     // This class has a custom serialized form designed to be as small as possible.  It does not
@@ -100,8 +100,8 @@ public class PersistentHashSet<E> extends UnmodSet.AbstractUnmodSet<E>
         private static final long serialVersionUID = 20160904155600L;
 
         private final int size;
-        private transient ImUnsortedMap<K,K> theMap;
-        SerializationProxy(ImUnsortedMap<K,K> phm) {
+        private transient ImMap<K,K> theMap;
+        SerializationProxy(ImMap<K,K> phm) {
             size = phm.size();
             theMap = phm;
         }
@@ -118,14 +118,15 @@ public class PersistentHashSet<E> extends UnmodSet.AbstractUnmodSet<E>
         @SuppressWarnings("unchecked")
         private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
             s.defaultReadObject();
-            theMap = PersistentHashMap.<K,K>empty().mutable();
+            MutableUnsortedMap tempMap = PersistentHashMap.<K,K>empty().mutable();
             for (int i = 0; i < size; i++) {
                 K k = (K) s.readObject();
-                theMap = theMap.assoc(k, k);
+                tempMap = tempMap.assoc(k, k);
             }
+            theMap = tempMap.immutable();
         }
 
-        private Object readResolve() { return PersistentHashSet.ofMap(theMap.immutable()); }
+        private Object readResolve() { return PersistentHashSet.ofMap(theMap); }
     }
 
     private Object writeReplace() { return new SerializationProxy<>(impl); }
@@ -143,9 +144,6 @@ public class PersistentHashSet<E> extends UnmodSet.AbstractUnmodSet<E>
 
     /** Returns the Equator used by this set for equals comparisons and hashCodes */
     public Equator<E> equator() { return impl.equator(); }
-
-    /** Returns a this set. */
-    @Override public ImUnsortedSet<E> immutable() { return this; }
 
     @Override public PersistentHashSet<E> without(E key) {
         if (contains(key))

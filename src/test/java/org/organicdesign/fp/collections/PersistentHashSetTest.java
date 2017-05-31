@@ -293,7 +293,7 @@ public class PersistentHashSetTest {
         setIterTest(control, test.iterator());
         // Reversed test.
         setIterTest(test, control.iterator());
-        ImUnsortedSet<Integer> immutable = test.immutable();
+        ImSet<Integer> immutable = test.immutable();
 
         setIterTest(control, immutable.iterator());
         setIterTest(control, serializeDeserialize(immutable).iterator());

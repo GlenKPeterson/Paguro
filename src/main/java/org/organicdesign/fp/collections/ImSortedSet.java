@@ -14,7 +14,7 @@
 package org.organicdesign.fp.collections;
 
 /** An immutable sorted set interface */
-public interface ImSortedSet<E> extends ImSet<E>, UnmodSortedSet<E> {
+public interface ImSortedSet<E> extends BaseSet<E>, UnmodSortedSet<E> {
     /** {@inheritDoc} */
     @Override ImSortedSet<E> put(E e);
 
@@ -31,16 +31,6 @@ public interface ImSortedSet<E> extends ImSet<E>, UnmodSortedSet<E> {
      Iterates over contents in a guaranteed order. {@inheritDoc}
      */
     @Override UnmodSortedIterator<E> iterator();
-
-//    /**
-//     * This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for
-//     * backwards compatibility in some performance-critical situations.
-//     * {@inheritDoc}
-//     */
-//    @Override default Object[] toArray() { return UnmodSortedSet.super.toArray(); }
-
-//    /** A sequence of the items contained in this set in order.  Just returns this SetOrdered. */
-//    @Override default Sequence<E> seq() { return this; }
 
     /**
      Return the elements in this set from the start element (inclusive) to the end element

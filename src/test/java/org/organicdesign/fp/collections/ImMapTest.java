@@ -36,6 +36,14 @@ public class ImMapTest {
             return new TestMap<>(m);
         }
 
+        @Override public Equator<K> equator() {
+            throw new UnsupportedOperationException("not implemented");
+        }
+
+        @Override public MutableUnsortedMap<K,V> mutable() {
+            throw new UnsupportedOperationException("not implemented");
+        }
+
         @Override public ImMap<K, V> without(K key) {
             Map<K,V> m = copyMap(inner);
             m.remove(key);

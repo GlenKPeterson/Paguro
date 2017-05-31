@@ -1,4 +1,4 @@
-// Copyright 2016 PlanBase Inc. & Glen Peterson
+// Copyright 2017 PlanBase Inc. & Glen Peterson
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,25 +11,13 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 package org.organicdesign.fp.collections;
 
 /**
- Interface for mutable (hash) set builder.
+ Adds {@link #equator()} to {@link BaseMap} which is an unsorted-only operation.
+ Lowest common ancestor of {@link MutableUnsortedMap} and {@link ImMap}.
  */
-public interface MutableUnsortedSet<E> extends BaseSet<E> {
-
-    /** Returns an immutable version of this immutable set. */
-    ImSet<E> immutable();
-
-    /** {@inheritDoc} */
-    @Override MutableUnsortedSet<E> put(E val);
-
-    /** {@inheritDoc} */
-    @Override default MutableUnsortedSet<E> union(Iterable<? extends E> iter) {
-        return concat(iter).toMutableSet();
-    }
-
-    /** {@inheritDoc} */
-    @Override MutableUnsortedSet<E> without(E key);
+public interface BaseUnsortedMap<K,V> extends BaseMap<K,V> {
+    /** Returns the Equator used by this map for equals comparisons and hashCodes */
+    Equator<K> equator();
 }
