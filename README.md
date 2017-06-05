@@ -113,10 +113,11 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
 # Future Development Ideas (as of 2017-05-28)
 1. Add reverseIterator() or similar to SortedUnmodIterable
 2. Transformable needs `first()` and `last()`, but maybe only on a SortedIterable.  Otherwise, `any(Fn1<Boolean>)`
-3. Ensure everything is as friendly as possible to Monadic thinking.
+3. Ensure everything is as friendly as possible to Monadic and Reactive thinking.
 4. Provide a Fn1v subclass of Fn1 (and similar for Fn0, Fn2, etc.) that returns void because sometimes you need one of those for backward compatibility and you don't want it to choke on checked exceptions.
 5. Make a Kotlin branch and release (Paguro-K).
-6. Make a Java 7 branch and release (Paguro-J7).
+6. Consider insertion-order maps and sets
+7. Make a Java 7 branch and release (Paguro-J7).
 
 ### RRB-Tree
 Read the [current development status](https://github.com/GlenKPeterson/Paguro/issues/4#issuecomment-239825939) or check out the [latest version of the code](https://github.com/GlenKPeterson/Paguro/blob/2016-05-22_RRB-Tree/src/main/java/org/organicdesign/fp/experimental/RrbTree1.java).

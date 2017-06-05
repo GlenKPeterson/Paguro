@@ -22,6 +22,8 @@ import java.util.Random;
 
 import org.junit.Test;
 import org.organicdesign.fp.TestUtilities;
+import org.organicdesign.fp.collections.RrbTree.ImRrbt;
+import org.organicdesign.fp.collections.RrbTree.MutableRrbt;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import static org.junit.Assert.*;
@@ -418,11 +420,13 @@ public class RrbTreeTest {
     }
 
     @Test public void strictSplitTest() {
-        RrbTree<Integer> is = RrbTree.empty();
+        ImRrbt<Integer> is = RrbTree.empty();
+        MutableRrbt<Integer> ms = RrbTree.emptyMutable();
         ArrayList<Integer> control = new ArrayList<>();
 //        int splitIndex = rand.nextInt(is.size() + 1);
         for (int i = 0; i < SEVERAL; i++) {
             is = is.append(i);
+            ms.append(i);
             control.add(i);
         }
         for (int splitIndex = 1; splitIndex <= SEVERAL; splitIndex++) {
@@ -432,8 +436,16 @@ public class RrbTreeTest {
             try {
                 testSplit(control, is, splitIndex);
             } catch (Exception e) {
-                System.out.println("Bad splitIndex: " + splitIndex); // print before blowing up...
-                System.out.println("before split: " + is.indentedStr(13)); // print before blowing up...
+                System.out.println("Bad splitIndex (im): " + splitIndex); // print before blowing up...
+                System.out.println("before split (im): " + is.indentedStr(13)); // print before blowing up...
+                // OK, now we can continue throwing exception.
+                throw e;
+            }
+            try {
+                testSplit(control, ms, splitIndex);
+            } catch (Exception e) {
+                System.out.println("Bad splitIndex (mu): " + splitIndex); // print before blowing up...
+                System.out.println("before split (mu): " + ms.indentedStr(13)); // print before blowing up...
                 // OK, now we can continue throwing exception.
                 throw e;
             }
@@ -441,7 +453,8 @@ public class RrbTreeTest {
     }
 
     @Test public void relaxedSplitTest() {
-        RrbTree<Integer> is = RrbTree.empty();
+        ImRrbt<Integer> is = RrbTree.empty();
+        MutableRrbt<Integer> ms = RrbTree.emptyMutable();
         ArrayList<Integer> control = new ArrayList<>();
         ArrayList<Integer> rands = new ArrayList<>();
         int splitIndex = 0;
@@ -450,13 +463,16 @@ public class RrbTreeTest {
                 int idx = rand.nextInt(is.size() + 1);
                 rands.add(idx);
                 is = is.insert(idx, j);
+                ms.insert(idx, j);
                 control.add(idx, j);
             }
             assertEquals(SEVERAL, is.size());
+            assertEquals(SEVERAL, ms.size());
 //            System.out.println("is:" + is.indentedStr(3));
             for (int j = 1; j <= SEVERAL; j++) {
                 splitIndex = j; // So we have it when exception is thrown.
                 testSplit(control, is, splitIndex);
+                testSplit(control, ms, splitIndex);
             }
         } catch (Exception e) {
             System.out.println("splitIndex:" + splitIndex + " rands:" + rands); // print before blowing up...
@@ -465,81 +481,114 @@ public class RrbTreeTest {
         }
     }
 
-    @Test public void replace() {
-        RrbTree<String> pv = RrbTree.empty();
-        pv = pv.append("Hello").append("World");
+    @Test public void replaceTest() {
+        ImRrbt<String> im = RrbTree.empty();
+        MutableRrbt<String> mu = RrbTree.emptyMutable();
+        im = im.append("Hello").append("World");
+        mu.append("Hello").append("World");
         assertArrayEquals(new String[] { "Hello", "World" },
-                          pv.toArray());
+                          im.toArray());
+        assertArrayEquals(new String[] { "Hello", "World" },
+                          mu.toArray());
 
         assertArrayEquals(new String[]{"Goodbye", "World"},
-                          pv.replace(0, "Goodbye").toArray());
-        pv.debugValidate();
+                          im.replace(0, "Goodbye").toArray());
+        im.debugValidate();
+        assertArrayEquals(new String[]{"Goodbye", "World"},
+                          mu.replace(0, "Goodbye").toArray());
+        mu.debugValidate();
 
-        RrbTree<Integer> pv2 = RrbTree.empty();
+        ImRrbt<Integer> im2 = RrbTree.empty();
+        MutableRrbt<Integer> mu2 = RrbTree.emptyMutable();
         int len = 999;
         Integer[] control = new Integer[len];
         // Build test vector
         for (int i = 0; i < len; i++) {
-            pv2 = pv2.append(i);
+            im2 = im2.append(i);
+            mu2.append(i);
             control[i] = i;
-            pv2.debugValidate();
+            im2.debugValidate();
+            mu2.debugValidate();
         }
-        assertArrayEquals(control, pv2.toArray());
+        assertArrayEquals(control, im2.toArray());
+        assertArrayEquals(control, mu2.toArray());
 
-        RrbTree<Integer> rrb3 = RrbTree.empty();
+        ImRrbt<Integer> im3 = RrbTree.empty();
+        MutableRrbt<Integer> mu3 = RrbTree.emptyMutable();
         for (int i = 0; i < len; i++) {
-            rrb3 = rrb3.insert(0, len - 1 - i);
+            im3 = im3.insert(0, len - 1 - i);
+            mu3.insert(0, len - 1 - i);
         }
-        assertArrayEquals(control, rrb3.toArray());
+        assertArrayEquals(control, im3.toArray());
+        assertArrayEquals(control, mu3.toArray());
 
         // Replace from end to start
         for (int i = len - 1; i >= 0; i--) {
             int replacement = len - i;
-            pv2 = pv2.replace(i, replacement);
-            rrb3 = rrb3.replace(i, replacement);
-            rrb3.debugValidate();
+            im2 = im2.replace(i, replacement);
+            mu2.replace(i, replacement);
+            im3 = im3.replace(i, replacement);
+            mu3.replace(i, replacement);
+            im2.debugValidate();
+            mu2.debugValidate();
+            im3.debugValidate();
+            mu3.debugValidate();
             control[i] = replacement;
         }
-        assertArrayEquals(control, pv2.toArray());
-        assertArrayEquals(control, rrb3.toArray());
+        assertArrayEquals(control, im2.toArray());
+        assertArrayEquals(control, mu2.toArray());
+        assertArrayEquals(control, im3.toArray());
+        assertArrayEquals(control, mu3.toArray());
 
         // Replace in random order
         for (int j = 0; j < len; j++) {
             int idx = rand.nextInt(len);
             int replacement = len - idx;
-            pv2 = pv2.replace(idx, replacement);
-            rrb3 = rrb3.replace(idx, replacement);
-            rrb3.debugValidate();
+            im2 = im2.replace(idx, replacement);
+            mu2.replace(idx, replacement);
+            im3 = im3.replace(idx, replacement);
+            mu3 = mu3.replace(idx, replacement);
+            im2.debugValidate();
+            mu2.debugValidate();
+            im3.debugValidate();
+            mu3.debugValidate();
             control[idx] = replacement;
         }
-        assertArrayEquals(control, pv2.toArray());
-        assertArrayEquals(control, rrb3.toArray());
+        assertArrayEquals(control, im2.toArray());
+        assertArrayEquals(control, mu2.toArray());
+        assertArrayEquals(control, im3.toArray());
+        assertArrayEquals(control, mu3.toArray());
     }
 
     @Test public void listIterator() {
-        RrbTree<Integer> pv2 = RrbTree.empty();
+        ImRrbt<Integer> im = RrbTree.empty();
+        MutableRrbt<Integer> mu = RrbTree.emptyMutable();
         int len = 99;
         Integer[] test = new Integer[len];
 
         for (int i = 0; i < len; i++) {
             int testVal = len - 1;
-            pv2 = pv2.append(testVal);
-            assertEquals(Integer.valueOf(testVal), pv2.get(i));
+            im = im.append(testVal);
+            mu.append(testVal);
+            assertEquals(Integer.valueOf(testVal), im.get(i));
+            assertEquals(Integer.valueOf(testVal), mu.get(i));
             test[i] = testVal;
         }
-        assertArrayEquals(test, pv2.toArray());
+        assertArrayEquals(test, im.toArray());
+        assertArrayEquals(test, mu.toArray());
 
         List<Integer> tList = Arrays.asList(test);
-        TestUtilities.listIteratorTest(tList, pv2);
+        TestUtilities.listIteratorTest(tList, im);
+        TestUtilities.listIteratorTest(tList, mu);
     }
 
     @Test public void equalsAndHashCode() {
         List<Integer> control = Arrays.asList(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
-        RrbTree<Integer> rrb1 =
+        ImRrbt<Integer> rrb1 =
                 xform(control).fold(RrbTree.<Integer>empty(),
                                     (accum, item) -> accum.append(item));
-        RrbTree<Integer> rrb2 =
-                xform(control).fold(RrbTree.<Integer>empty(),
+        MutableRrbt<Integer> rrb2 =
+                xform(control).fold(RrbTree.<Integer>emptyMutable(),
                                     (accum, item) -> accum.append(item));
 
         List<Integer> other = Arrays.asList(1,3,2,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
@@ -551,11 +600,11 @@ public class RrbTreeTest {
 
         List<Integer> hasNull = Arrays.asList(1,2,3,4,5,6,null,8,9,10,11,12,13,14,15,16,17,18,19,20);
 
-        RrbTree<Integer> rrb3 =
+        ImRrbt<Integer> rrb3 =
                 xform(hasNull).fold(RrbTree.<Integer>empty(),
                                     (accum, item) -> accum.append(item));
-        RrbTree<Integer> rrb4 =
-                xform(hasNull).fold(RrbTree.<Integer>empty(),
+        MutableRrbt<Integer> rrb4 =
+                xform(hasNull).fold(RrbTree.<Integer>emptyMutable(),
                                     (accum, item) -> accum.append(item));
 
         equalsDistinctHashCode(rrb3, rrb4, hasNull, other);
@@ -592,14 +641,14 @@ public class RrbTreeTest {
         assertTrue(s1.contains("RrbTree(size=9 "));
         assertTrue(s1.contains("        root="));
 
-        assertEquals("RrbTree(0,1,2,3,4,...)", rrb1.toString());
+        assertEquals("MutableRrbt(0,1,2,3,4,5,6,7,8)", rrb1.toString());
 
         RrbTree<Integer> rrb2 = randomInsertTest(new int[] {0, 1, 2, 1, 3, 2, 6, 1, 7});
         s1 = rrb2.indentedStr(0);
         assertTrue(s1.contains("RrbTree(size=9 "));
         assertTrue(s1.contains("        root="));
 
-        assertEquals("RrbTree(0,7,3,5,1,...)", rrb2.toString());
+        assertEquals("MutableRrbt(0,7,3,5,1,4,2,8,6)", rrb2.toString());
     }
 
     @SafeVarargs
@@ -611,7 +660,7 @@ public class RrbTreeTest {
         return ret;
     }
 
-    @Test public void joinTest() {
+    @Test public void joinImTest() {
         assertEquals(rrb(1,2,3,4,5,6), rrb(1,2,3).join(rrb(4,5,6)));
         RrbTree<Integer> r1 = rrb(1, 2, 3, 4, 5, 6, 7, 8, 9,
                                   10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
@@ -637,7 +686,7 @@ public class RrbTreeTest {
 
         assertEquals(r3, r1.join(r2));
 
-        int MAX_ITEMS = 100;
+        int MAX_ITEMS = 2000;
         List<Integer> control = new ArrayList<>();
         for (int j = 1; j < MAX_ITEMS; j++) {
             control.add(j);
@@ -675,29 +724,92 @@ public class RrbTreeTest {
 
     }
 
+    @SafeVarargs
+    private static <T> RrbTree<T> mut(T... ts) {
+        RrbTree<T> ret = RrbTree.emptyMutable();
+        for (T t : ts) {
+            ret = ret.append(t);
+        }
+        return ret;
+    }
+
+    @Test public void joinMutableTest() {
+        assertEquals(mut(1,2,3,4,5,6), mut(1,2,3).join(mut(4,5,6)));
+        RrbTree<Integer> r1 = mut(1, 2, 3, 4, 5, 6, 7, 8, 9,
+                                  10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+                                  20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+                                  30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
+                                  40, 41, 42, 43, 44, 45, 46, 47, 48, 49);
+        RrbTree<Integer> r2 = mut(50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
+                                  60, 61, 62, 63, 64, 65, 66, 67, 68, 69,
+                                  70, 71, 72, 73, 74, 75, 76, 77, 78, 79,
+                                  80, 81, 82, 83, 84, 85, 86, 87, 88, 89,
+                                  90, 91, 92, 93, 94, 95, 96, 97, 98, 99);
+
+        RrbTree<Integer> r3 = mut(1, 2, 3, 4, 5, 6, 7, 8, 9,
+                                  10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+                                  20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+                                  30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
+                                  40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
+                                  50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
+                                  60, 61, 62, 63, 64, 65, 66, 67, 68, 69,
+                                  70, 71, 72, 73, 74, 75, 76, 77, 78, 79,
+                                  80, 81, 82, 83, 84, 85, 86, 87, 88, 89,
+                                  90, 91, 92, 93, 94, 95, 96, 97, 98, 99);
+
+        assertEquals(r3, r1.join(r2));
+
+        int MAX_ITEMS = 2000;
+        List<Integer> control = new ArrayList<>();
+        for (int j = 1; j < MAX_ITEMS; j++) {
+            control.add(j);
+        }
+        for (int i = 1; i < MAX_ITEMS; i++) {
+            r1 = RrbTree.emptyMutable();
+            r2 = RrbTree.emptyMutable();
+            for (int j = 1; j < i; j++) {
+                r1 = r1.append(j);
+            }
+            for (int j = i; j < MAX_ITEMS; j++) {
+                r2 = r2.append(j);
+            }
+            r3 = r1.join(r2);
+            assertEquals(control, r3);
+            r3.debugValidate();
+        }
+    }
+
+
     @Test public void testWithout() {
         assertEquals(rrb(1,2,3,5,6), rrb(1,2,3,4,5,6).without(3));
+        assertEquals(mut(1,2,3,5,6), mut(1,2,3,4,5,6).without(3));
 
 //        for (int m = 1; m < 1000; m++) {
 //            System.out.println("m: " + m);
 
-            int MAX_ITEMS = 76; //m; //100; // TODO: Make this 76 to see issue
-            RrbTree<Integer> r1 = RrbTree.empty();
+        int MAX_ITEMS = 76; //m; //100; // TODO: Make this 76 to see issue
+        ImRrbt<Integer> im = RrbTree.empty();
+        MutableRrbt<Integer> mu = RrbTree.emptyMutable();
+        for (int j = 1; j < MAX_ITEMS; j++) {
+            im = im.append(j);
+            mu.append(j);
+        }
+        for (int i = 68; i < MAX_ITEMS - 1; i++) { // TODO: Start i = 68 to see issue.
+            List<Integer> control = new ArrayList<>();
             for (int j = 1; j < MAX_ITEMS; j++) {
-                r1 = r1.append(j);
+                control.add(j);
             }
-            for (int i = 68; i < MAX_ITEMS - 1; i++) { // TODO: Start i = 68 to see issue.
-                List<Integer> control = new ArrayList<>();
-                for (int j = 1; j < MAX_ITEMS; j++) {
-                    control.add(j);
-                }
 
 //            System.out.println("i: " + i);
-                control.remove(i);
-                RrbTree r2 = r1.without(i);
-                assertEquals(control, r2);
-                r2.debugValidate();
-            }
+            control.remove(i);
+            RrbTree im2 = im.without(i);
+            RrbTree mu2 = mu.without(i);
+            assertEquals(control, im2);
+            assertEquals(control, mu2);
+            im2.debugValidate();
+            mu2.debugValidate();
+            assertEquals(im2, mu2);
+        }
 //        }
     }
 }

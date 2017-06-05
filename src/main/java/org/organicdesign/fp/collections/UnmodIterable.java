@@ -124,7 +124,7 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
         Iterator iter = iterable.iterator();
         while (iter.hasNext()) {
             if (i > 0) { sB.append(","); }
-            if (i > 4) { break; }
+//            if (i > 4) { break; }
             Object item = iter.next();
             sB.append(stringify(item));
             i++;
