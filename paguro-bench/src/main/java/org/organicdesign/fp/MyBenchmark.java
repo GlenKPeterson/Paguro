@@ -12,6 +12,10 @@ import org.organicdesign.fp.collections.RrbTree.MutableRrbt;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+
+import static org.organicdesign.fp.collections.RrbTree.empty;
+import static org.organicdesign.fp.collections.RrbTree.emptyMutable;
 
 // Instructions: http://openjdk.java.net/projects/code-tools/jmh/
 
@@ -34,7 +38,7 @@ public class MyBenchmark {
     }
 
     public static ImRrbt<Integer> insertAtZeroRrb(int maxIdx) {
-        ImRrbt<Integer> empty = RrbTree.empty();
+        ImRrbt<Integer> empty = empty();
         for (int i = maxIdx; i >= 0; i--) {
             empty = empty.insert(0, i);
         }
@@ -57,6 +61,23 @@ public class MyBenchmark {
         return empty;
     }
 
+    public static RrbTree<Integer> randomInsertRrb(RrbTree empty, int maxIdx) {
+        Random rnd = new Random();
+        for (int i = 0; i < maxIdx; i++) {
+            empty = empty.insert(i > 1 ? rnd.nextInt(i) : 0, i);
+        }
+        return empty;
+    }
+
+    public static List<Integer> randomInsertList(int maxIdx) {
+        Random rnd = new Random();
+        List<Integer> empty = new ArrayList<>();
+        for (int i = 0; i < maxIdx; i++) {
+            empty.add(i > 1 ? rnd.nextInt(i) : 0, i);
+        }
+        return empty;
+    }
+
     public static Integer iterateList(Iterable<Integer> is) {
         Integer last = null;
         for (Integer item : is) {
@@ -75,28 +96,53 @@ public class MyBenchmark {
     }
 
     @State(Scope.Thread) public static class Rrb1 {
-        public ImList<Integer> rrb = buildList(RrbTree.empty(), 1);
+        public ImList<Integer> rrb = buildList(empty(), 1);
     }
     @State(Scope.Thread) public static class Rrb10 {
-        public ImList<Integer> rrb = buildList(RrbTree.empty(), 10);
+        public ImList<Integer> rrb = buildList(empty(), 10);
     }
     @State(Scope.Thread) public static class Rrb100 {
-        public ImList<Integer> rrb = buildList(RrbTree.empty(), 100);
+        public ImList<Integer> rrb = buildList(empty(), 100);
     }
     @State(Scope.Thread) public static class Rrb1000 {
-        public ImList<Integer> rrb = buildList(RrbTree.empty(), 1000);
+        public ImList<Integer> rrb = buildList(empty(), 1000);
     }
     @State(Scope.Thread) public static class Rrb10000 {
-        public ImList<Integer> rrb = buildList(RrbTree.empty(), 10000);
+        public ImList<Integer> rrb = buildList(empty(), 10000);
     }
     @State(Scope.Thread) public static class Rrb100000 {
-        public ImList<Integer> rrb = buildList(RrbTree.empty(), 100000);
+        public ImList<Integer> rrb = buildList(empty(), 100000);
     }
     @State(Scope.Thread) public static class Rrb1000000 {
-        public ImList<Integer> rrb = buildList(RrbTree.empty(), 1000000);
+        public ImList<Integer> rrb = buildList(empty(), 1000000);
     }
     @State(Scope.Thread) public static class Rrb10000000 {
-        public ImList<Integer> rrb = buildList(RrbTree.empty(), 10000000);
+        public ImList<Integer> rrb = buildList(empty(), 10000000);
+    }
+
+    @State(Scope.Thread) public static class RrbRel1 {
+        public RrbTree<Integer> rrb = randomInsertRrb(empty(), 1);
+    }
+    @State(Scope.Thread) public static class RrbRel10 {
+        public RrbTree<Integer> rrb = randomInsertRrb(empty(), 10);
+    }
+    @State(Scope.Thread) public static class RrbRel100 {
+        public RrbTree<Integer> rrb = randomInsertRrb(empty(), 100);
+    }
+    @State(Scope.Thread) public static class RrbRel1000 {
+        public RrbTree<Integer> rrb = randomInsertRrb(empty(), 1000);
+    }
+    @State(Scope.Thread) public static class RrbRel10000 {
+        public RrbTree<Integer> rrb = randomInsertRrb(empty(), 10000);
+    }
+    @State(Scope.Thread) public static class RrbRel100000 {
+        public RrbTree<Integer> rrb = randomInsertRrb(empty(), 100000);
+    }
+    @State(Scope.Thread) public static class RrbRel1000000 {
+        public RrbTree<Integer> rrb = randomInsertRrb(empty(), 1000000);
+    }
+    @State(Scope.Thread) public static class RrbRel10000000 {
+        public RrbTree<Integer> rrb = randomInsertRrb(empty(), 10000000);
     }
 
     @State(Scope.Thread) public static class Vec1 {
@@ -134,14 +180,14 @@ public class MyBenchmark {
     @State(Scope.Thread) public static class List10000000 { public List<Integer> list = buildList2(10000000); }
 
 
-    @Benchmark public void BuildRrb1() { buildList(RrbTree.empty(), 1); }
-    @Benchmark public void BuildRrb10() { buildList(RrbTree.empty(), 10); }
-    @Benchmark public void BuildRrb100() { buildList(RrbTree.empty(), 100); }
-    @Benchmark public void BuildRrb1000() { buildList(RrbTree.empty(), 1000); }
-    @Benchmark public void BuildRrb10000() { buildList(RrbTree.empty(), 10000); }
-    @Benchmark public void BuildRrb100000() { buildList(RrbTree.empty(), 100000); }
-    @Benchmark public void BuildRrb1000000() { buildList(RrbTree.empty(), 1000000); }
-    @Benchmark public void BuildRrb10000000() { buildList(RrbTree.empty(), 10000000); }
+    @Benchmark public void BuildRrb1() { buildList(empty(), 1); }
+    @Benchmark public void BuildRrb10() { buildList(empty(), 10); }
+    @Benchmark public void BuildRrb100() { buildList(empty(), 100); }
+    @Benchmark public void BuildRrb1000() { buildList(empty(), 1000); }
+    @Benchmark public void BuildRrb10000() { buildList(empty(), 10000); }
+    @Benchmark public void BuildRrb100000() { buildList(empty(), 100000); }
+    @Benchmark public void BuildRrb1000000() { buildList(empty(), 1000000); }
+    @Benchmark public void BuildRrb10000000() { buildList(empty(), 10000000); }
 
     @Benchmark public void BuildRrbMut1() { buildList(RrbTree.emptyMutable(), 1); }
     @Benchmark public void BuildRrbMut10() { buildList(RrbTree.emptyMutable(), 10); }
@@ -244,6 +290,16 @@ public class MyBenchmark {
     @Benchmark public void GetEachRrb1000000(Rrb1000000 rrb) { getEach(rrb.rrb); }
     @Benchmark public void GetEachRrb10000000(Rrb10000000 rrb) { getEach(rrb.rrb); }
 
+    @Benchmark public void GetEachRrbRel1(RrbRel1 rrb) { getEach(rrb.rrb); }
+    @Benchmark public void GetEachRrbRel10(RrbRel10 rrb) { getEach(rrb.rrb); }
+    @Benchmark public void GetEachRrbRel100(RrbRel100 rrb) { getEach(rrb.rrb); }
+    @Benchmark public void GetEachRrbRel1000(RrbRel1000 rrb) { getEach(rrb.rrb); }
+    @Benchmark public void GetEachRrbRel10000(RrbRel10000 rrb) { getEach(rrb.rrb); }
+    @Benchmark public void GetEachRrbRel100000(RrbRel100000 rrb) { getEach(rrb.rrb); }
+    @Benchmark public void GetEachRrbRel1000000(RrbRel1000000 rrb) { getEach(rrb.rrb); }
+    // Takes too long
+    //    @Benchmark public void GetEachRrbRel10000000(RrbRel10000000 rrb) { getEach(rrb.rrb); }
+
     @Benchmark public void GetEachVec1(Vec1 vec) { getEach(vec.vec); }
     @Benchmark public void GetEachVec10(Vec10 vec) { getEach(vec.vec); }
     @Benchmark public void GetEachVec100(Vec100 vec) { getEach(vec.vec); }
@@ -261,4 +317,28 @@ public class MyBenchmark {
     @Benchmark public void GetEachList100000(List100000 list) { getEach(list.list); }
     @Benchmark public void GetEachList1000000(List1000000 list) { getEach(list.list); }
     @Benchmark public void GetEachList10000000(List10000000 list) { getEach(list.list); }
+
+    @Benchmark public void RandInsertList1() { randomInsertList(1); }
+    @Benchmark public void RandInsertList10() { randomInsertList(10); }
+    @Benchmark public void RandInsertList100() { randomInsertList(100); }
+    @Benchmark public void RandInsertList1000() { randomInsertList(1000); }
+    @Benchmark public void RandInsertList10000() { randomInsertList(10000); }
+    @Benchmark public void RandInsertList100000() { randomInsertList(100000); }
+
+    @Benchmark public void RandInsertRrb1() { randomInsertRrb(empty(), 1); }
+    @Benchmark public void RandInsertRrb10() { randomInsertRrb(empty(), 10); }
+    @Benchmark public void RandInsertRrb100() { randomInsertRrb(empty(), 100); }
+    @Benchmark public void RandInsertRrb1000() { randomInsertRrb(empty(), 1000); }
+    @Benchmark public void RandInsertRrb10000() { randomInsertRrb(empty(), 10000); }
+    @Benchmark public void RandInsertRrb100000() { randomInsertRrb(empty(), 100000); }
+    @Benchmark public void RandInsertRrb1000000() { randomInsertRrb(empty(), 1000000); }
+
+    @Benchmark public void RandInsertRrbMut1() { randomInsertRrb(emptyMutable(), 1); }
+    @Benchmark public void RandInsertRrbMut10() { randomInsertRrb(emptyMutable(), 10); }
+    @Benchmark public void RandInsertRrbMut100() { randomInsertRrb(emptyMutable(), 100); }
+    @Benchmark public void RandInsertRrbMut1000() { randomInsertRrb(emptyMutable(), 1000); }
+    @Benchmark public void RandInsertRrbMut10000() { randomInsertRrb(emptyMutable(), 10000); }
+    @Benchmark public void RandInsertRrbMut100000() { randomInsertRrb(emptyMutable(), 100000); }
+    @Benchmark public void RandInsertRrbMut1000000() { randomInsertRrb(emptyMutable(), 1000000); }
+
 }

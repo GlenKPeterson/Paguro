@@ -503,13 +503,13 @@ public class PersistentTreeMapTest {
                      "4=\"four\",5=\"five\")",
                      PersistentTreeMap.of(vec(tup(1, "one"))).assoc(2, "two").assoc(3, "three")
                                       .assoc(4, "four").assoc(5, "five").toString());
-        assertEquals("PersistentTreeMap(1=\"one\",2=\"two\",3=\"three\"," +
-                     "4=\"four\",5=\"five\",...)",
+        assertEquals("PersistentTreeMap(1=\"one\",2=\"two\",3=\"three\",4=\"four\",5=\"five\"," +
+                     "6=\"six\")",
                      PersistentTreeMap.of(vec(tup(1, "one"))).assoc(2, "two").assoc(3, "three")
                                       .assoc(4, "four").assoc(5, "five").assoc(6, "six")
                                       .toString());
-        assertEquals("PersistentTreeMap(1=\"one\",2=\"two\",3=\"three\"," +
-                     "4=\"four\",5=\"five\",...)",
+        assertEquals("PersistentTreeMap(1=\"one\",2=\"two\",3=\"three\",4=\"four\",5=\"five\"," +
+                     "6=\"six\",7=\"seven\")",
                      PersistentTreeMap.of(vec(tup(1, "one"))).assoc(2, "two").assoc(3, "three")
                                       .assoc(4, "four").assoc(5, "five").assoc(6, "six")
                                       .assoc(7, "seven").toString());
