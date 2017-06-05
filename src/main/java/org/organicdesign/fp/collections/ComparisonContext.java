@@ -18,19 +18,25 @@ import java.util.Comparator;
 import java.util.Iterator;
 
 /**
+ <p>Represents a context for comparison because sometimes you order the same things differently.
+ For instance, a class of students might be sorted by height for the yearbook picture (shortest in
+ front), alphabetically for role call, and by GPA at honors ceremonies.  Sometimes you need
+ to sort non-compatible classes together for some reason.  If you didn't define those classes,
+ this provides an external means of ordering them.</p>
+
  <p>A Comparison Context represents both ordering and equality, since the two often need to be
- defined compatibly.  Implement compare() and hash() and you get a 100% compatible eq() for free.
+ defined compatibly.  Implement compare() and hash() and you get a compatible eq() for free!
  If you don't want ordering, use {@link Equator} instead.</p>
 
  <p>Typical implementations of {@link #compare(Object, Object)} throw an
  IllegalArgumentExceptions if one argument is null because most objects cannot be meaningfully
  be orderd with respect to null.  It's also OK if you want to return 0 when both arguments are null
- because null is equal to null  Default implementations of eq(), gte(), and lte() check for nulls
+ because null == null.  Default implementations of eq(), gte(), and lte() check for nulls
  first, before calling compare() so they will work either way you choose to implement
  compare().</p>
 
  <p>A common mistake is to implement a ComparisonContext, Equator, or Comparator as an anonymous
- class or lambda, then be surprised when it is can't be serialized, or is deserialized as null.
+ class or lambda, then be surprised when it can't be serialized, or is deserialized as null.
  These one-off classes are often singletons, which are easiest to serialize as enums.  If your
  implementation requires generic type parameters, look at how {@link #defCompCtx()} tricks the type
  system into using generic type parameters (correctly) with an enum.</p>
@@ -65,6 +71,10 @@ public interface ComparisonContext<T> extends Equator<T>, Comparator<T> {
         return compare(o1, o2) == 0;
     }
 
+    /**
+     Returns the minimum (as defined by this Comparison Context).  Nulls are skipped.  If there are
+     duplicate minimum values, the first one is returned.
+     */
     default T min(Iterable<T> is) {
         // Note: following code is identical to max() except for lt() vs. gt()
         if (is == null) { throw new IllegalArgumentException("null argument"); }
@@ -82,6 +92,10 @@ public interface ComparisonContext<T> extends Equator<T>, Comparator<T> {
         return ret; // could be null if all items are null.
     }
 
+    /**
+     Returns the maximum (as defined by this Comparison Context).  Nulls are skipped.  If there are
+     duplicate maximum values, the first one is returned.
+     */
     default T max(Iterable<T> is) {
         // Note: following code is identical to min() except for lt() vs. gt()
         if (is == null) { throw new IllegalArgumentException("null argument"); }
@@ -99,7 +113,11 @@ public interface ComparisonContext<T> extends Equator<T>, Comparator<T> {
         return ret; // could be null if all items are null.
     }
 
-    // Enums are serializable and lambdas are not.  Therefore enums make better singletons.
+    /**
+     Please access this type-safely through {@link #defCompCtx()} instead of calling directly.
+     This exists because Enums are serializable and lambdas are not.  Enums also make ideal
+     singletons.
+     */
     enum CompCtx implements ComparisonContext<Comparable<Object>> {
         DEFAULT {
             @Override
@@ -116,6 +134,10 @@ public interface ComparisonContext<T> extends Equator<T>, Comparator<T> {
         }
     }
 
+    /**
+     Returns a typed, serializable ComparisonContext that works on any class that implements
+     {@link Comparable}.
+     */
     @SuppressWarnings("unchecked")
     static <T> ComparisonContext<T> defCompCtx() { return (ComparisonContext<T>) CompCtx.DEFAULT; }
 }
