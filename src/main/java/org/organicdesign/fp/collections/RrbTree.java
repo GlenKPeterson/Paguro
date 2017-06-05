@@ -204,8 +204,10 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
                     focus = arrayCopy(focus, newLen, null);
                 }
                 // Shift existing items past insertion index to the right
-                for (int i = focusLength; (i >= diff) && (i > 0); i--) {
-                    focus[i] = focus[i - 1];
+                int numItemsToShift = focusLength - diff;
+                //                   src, srcPos, dest, destPos,  length
+                if (numItemsToShift > 0) {
+                    System.arraycopy(focus, diff, focus, diff + 1, numItemsToShift);
                 }
                 // Put new item into the focus.
                 focus[diff] = element;
@@ -218,8 +220,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
             // Here the mutable version has a focus that's longer than the number of items used,
             // So we need to shorten it before pushing it into the tree.
             if (focusLength > 0) {
-                root = root.pushFocus(focusStartIndex,
-                                                  arrayCopy(focus, focusLength, null));
+                root = root.pushFocus(focusStartIndex, arrayCopy(focus, focusLength, null));
             }
             focus = singleElementArray(element);
             focusStartIndex = idx;

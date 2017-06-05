@@ -9,6 +9,8 @@ import org.organicdesign.fp.collections.PersistentVector;
 import org.organicdesign.fp.collections.RrbTree;
 import org.organicdesign.fp.collections.RrbTree.ImRrbt;
 import org.organicdesign.fp.collections.RrbTree.MutableRrbt;
+import scala.collection.immutable.Vector$;
+import scala.collection.immutable.VectorIterator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,9 +21,10 @@ import static org.organicdesign.fp.collections.RrbTree.emptyMutable;
 
 // Instructions: http://openjdk.java.net/projects/code-tools/jmh/
 
+@SuppressWarnings("WeakerAccess")
 public class MyBenchmark {
 
-    public static List<Integer> buildList2(int maxIdx) {
+    static List<Integer> buildList2(int maxIdx) {
         List<Integer> empty = new ArrayList<>();
         for (int i = 0; i < maxIdx; i++) {
             empty.add(i);
@@ -29,15 +32,23 @@ public class MyBenchmark {
         return empty;
     }
 
+    static scala.collection.immutable.Vector<Integer> buildScala(int maxIdx) {
+        scala.collection.immutable.Vector<Integer> empty = Vector$.MODULE$.empty();
+        for (int i = 0; i < maxIdx; i++) {
+            empty = empty.appendBack(i);
+        }
+        return empty;
+    }
+
     @SuppressWarnings("unchecked")
-    public static <T extends BaseList<Integer>> T buildList(T empty, int maxIdx) {
+    static <T extends BaseList<Integer>> T buildList(T empty, int maxIdx) {
         for (int i = 0; i < maxIdx; i++) {
             empty = (T) empty.append(i);
         }
         return empty;
     }
 
-    public static ImRrbt<Integer> insertAtZeroRrb(int maxIdx) {
+    static ImRrbt<Integer> insertAtZeroRrb(int maxIdx) {
         ImRrbt<Integer> empty = empty();
         for (int i = maxIdx; i >= 0; i--) {
             empty = empty.insert(0, i);
@@ -61,6 +72,14 @@ public class MyBenchmark {
         return empty;
     }
 
+    public static scala.collection.immutable.Vector<Integer> insertAtZeroScala(int maxIdx) {
+        scala.collection.immutable.Vector<Integer> empty = Vector$.MODULE$.empty();
+        for (int i = maxIdx; i >= 0; i--) {
+            empty = empty.appendFront(i);
+        }
+        return empty;
+    }
+
     public static RrbTree<Integer> randomInsertRrb(RrbTree empty, int maxIdx) {
         Random rnd = new Random();
         for (int i = 0; i < maxIdx; i++) {
@@ -78,7 +97,18 @@ public class MyBenchmark {
         return empty;
     }
 
-    public static Integer iterateList(Iterable<Integer> is) {
+    // Is this supported?
+//    public static scala.collection.immutable.Vector<Integer> randomInsertScala(int maxIdx) {
+//        Random rnd = new Random();
+//        scala.collection.immutable.Vector<Integer> empty = Vector$.MODULE$.empty();
+//        for (int i = 0; i < maxIdx; i++) {
+    // This is a replace, not an insert!
+//            empty.updateAt(i > 1 ? rnd.nextInt(i) : 0, i);
+//        }
+//        return empty;
+//    }
+
+    static Integer iterateList(Iterable<Integer> is) {
         Integer last = null;
         for (Integer item : is) {
             last = item;
@@ -86,7 +116,16 @@ public class MyBenchmark {
         return last;
     }
 
-    public static Integer getEach(List<Integer> is) {
+    static Integer iterateScala(scala.collection.immutable.Vector<Integer> is) {
+        Integer last = null;
+        VectorIterator<Integer> iter = is.iterator();
+        while (iter.hasNext()) {
+            last = iter.next();
+        }
+        return last;
+    }
+
+    static Integer getEach(List<Integer> is) {
         Integer last = null;
         int size = is.size();
         for (int i = size - 1; i >= 0; i--) {
@@ -95,79 +134,122 @@ public class MyBenchmark {
         return last;
     }
 
+    static Integer getEachScala(scala.collection.immutable.Vector<Integer> is) {
+        Integer last = null;
+        int size = is.size();
+        for (int i = size - 1; i >= 0; i--) {
+            last = is.apply(i);
+        }
+        return last;
+    }
+
     @State(Scope.Thread) public static class Rrb1 {
-        public ImList<Integer> rrb = buildList(empty(), 1);
+        ImList<Integer> rrb = buildList(empty(), 1);
     }
     @State(Scope.Thread) public static class Rrb10 {
-        public ImList<Integer> rrb = buildList(empty(), 10);
+        ImList<Integer> rrb = buildList(empty(), 10);
     }
     @State(Scope.Thread) public static class Rrb100 {
-        public ImList<Integer> rrb = buildList(empty(), 100);
+        ImList<Integer> rrb = buildList(empty(), 100);
     }
     @State(Scope.Thread) public static class Rrb1000 {
-        public ImList<Integer> rrb = buildList(empty(), 1000);
+        ImList<Integer> rrb = buildList(empty(), 1000);
     }
     @State(Scope.Thread) public static class Rrb10000 {
-        public ImList<Integer> rrb = buildList(empty(), 10000);
+        ImList<Integer> rrb = buildList(empty(), 10000);
     }
     @State(Scope.Thread) public static class Rrb100000 {
-        public ImList<Integer> rrb = buildList(empty(), 100000);
+        ImList<Integer> rrb = buildList(empty(), 100000);
     }
     @State(Scope.Thread) public static class Rrb1000000 {
-        public ImList<Integer> rrb = buildList(empty(), 1000000);
+        ImList<Integer> rrb = buildList(empty(), 1000000);
     }
     @State(Scope.Thread) public static class Rrb10000000 {
-        public ImList<Integer> rrb = buildList(empty(), 10000000);
+        ImList<Integer> rrb = buildList(empty(), 10000000);
+    }
+    @State(Scope.Thread) public static class Rrb100000000 {
+        ImList<Integer> rrb = buildList(empty(), 100000000);
+    }
+
+    @State(Scope.Thread) public static class Scala1 {
+        scala.collection.immutable.Vector<Integer> scala = buildScala(1);
+    }
+    @State(Scope.Thread) public static class Scala10 {
+        scala.collection.immutable.Vector<Integer> scala = buildScala(10);
+    }
+    @State(Scope.Thread) public static class Scala100 {
+        scala.collection.immutable.Vector<Integer> scala = buildScala(100);
+    }
+    @State(Scope.Thread) public static class Scala1000 {
+        scala.collection.immutable.Vector<Integer> scala = buildScala(1000);
+    }
+    @State(Scope.Thread) public static class Scala10000 {
+        scala.collection.immutable.Vector<Integer> scala = buildScala(10000);
+    }
+    @State(Scope.Thread) public static class Scala100000 {
+        scala.collection.immutable.Vector<Integer> scala = buildScala(100000);
+    }
+    @State(Scope.Thread) public static class Scala1000000 {
+        scala.collection.immutable.Vector<Integer> scala = buildScala(1000000);
+    }
+    @State(Scope.Thread) public static class Scala10000000 {
+        scala.collection.immutable.Vector<Integer> scala = buildScala(10000000);
+    }
+    @State(Scope.Thread) public static class Scala100000000 {
+        scala.collection.immutable.Vector<Integer> scala = buildScala(100000000);
     }
 
     @State(Scope.Thread) public static class RrbRel1 {
-        public RrbTree<Integer> rrb = randomInsertRrb(empty(), 1);
+        RrbTree<Integer> rrb = randomInsertRrb(empty(), 1);
     }
     @State(Scope.Thread) public static class RrbRel10 {
-        public RrbTree<Integer> rrb = randomInsertRrb(empty(), 10);
+        RrbTree<Integer> rrb = randomInsertRrb(empty(), 10);
     }
     @State(Scope.Thread) public static class RrbRel100 {
-        public RrbTree<Integer> rrb = randomInsertRrb(empty(), 100);
+        RrbTree<Integer> rrb = randomInsertRrb(empty(), 100);
     }
     @State(Scope.Thread) public static class RrbRel1000 {
-        public RrbTree<Integer> rrb = randomInsertRrb(empty(), 1000);
+        RrbTree<Integer> rrb = randomInsertRrb(empty(), 1000);
     }
     @State(Scope.Thread) public static class RrbRel10000 {
-        public RrbTree<Integer> rrb = randomInsertRrb(empty(), 10000);
+        RrbTree<Integer> rrb = randomInsertRrb(empty(), 10000);
     }
     @State(Scope.Thread) public static class RrbRel100000 {
-        public RrbTree<Integer> rrb = randomInsertRrb(empty(), 100000);
+        RrbTree<Integer> rrb = randomInsertRrb(empty(), 100000);
     }
     @State(Scope.Thread) public static class RrbRel1000000 {
-        public RrbTree<Integer> rrb = randomInsertRrb(empty(), 1000000);
+        RrbTree<Integer> rrb = randomInsertRrb(empty(), 1000000);
     }
     @State(Scope.Thread) public static class RrbRel10000000 {
-        public RrbTree<Integer> rrb = randomInsertRrb(empty(), 10000000);
+        RrbTree<Integer> rrb = randomInsertRrb(empty(), 10000000);
     }
 
     @State(Scope.Thread) public static class Vec1 {
-        public ImList<Integer> vec = buildList(PersistentVector.empty(), 1);
+        ImList<Integer> vec = buildList(PersistentVector.empty(), 1);
     }
     @State(Scope.Thread) public static class Vec10 {
-        public ImList<Integer> vec = buildList(PersistentVector.empty(), 10);
+        ImList<Integer> vec = buildList(PersistentVector.empty(), 10);
     }
     @State(Scope.Thread) public static class Vec100 {
-        public ImList<Integer> vec = buildList(PersistentVector.empty(), 100);
+        ImList<Integer> vec = buildList(PersistentVector.empty(), 100);
     }
     @State(Scope.Thread) public static class Vec1000 {
-        public ImList<Integer> vec = buildList(PersistentVector.empty(), 1000);
+        ImList<Integer> vec = buildList(PersistentVector.empty(), 1000);
     }
     @State(Scope.Thread) public static class Vec10000 {
-        public ImList<Integer> vec = buildList(PersistentVector.empty(), 10000);
+        ImList<Integer> vec = buildList(PersistentVector.empty(), 10000);
     }
     @State(Scope.Thread) public static class Vec100000 {
-        public ImList<Integer> vec = buildList(PersistentVector.empty(), 100000);
+        ImList<Integer> vec = buildList(PersistentVector.empty(), 100000);
     }
     @State(Scope.Thread) public static class Vec1000000 {
-        public ImList<Integer> vec = buildList(PersistentVector.empty(), 1000000);
+        ImList<Integer> vec = buildList(PersistentVector.empty(), 1000000);
     }
     @State(Scope.Thread) public static class Vec10000000 {
-        public ImList<Integer> vec = buildList(PersistentVector.empty(), 10000000);
+        ImList<Integer> vec = buildList(PersistentVector.empty(), 10000000);
+    }
+    @State(Scope.Thread) public static class Vec100000000 {
+        ImList<Integer> vec = buildList(PersistentVector.empty(), 100000000);
     }
 
     @State(Scope.Thread) public static class List1 { public List<Integer> list = buildList2(1); }
@@ -178,7 +260,7 @@ public class MyBenchmark {
     @State(Scope.Thread) public static class List100000 { public List<Integer> list = buildList2(100000); }
     @State(Scope.Thread) public static class List1000000 { public List<Integer> list = buildList2(1000000); }
     @State(Scope.Thread) public static class List10000000 { public List<Integer> list = buildList2(10000000); }
-
+    @State(Scope.Thread) public static class List100000000 { public List<Integer> list = buildList2(100000000); }
 
     @Benchmark public void BuildRrb1() { buildList(empty(), 1); }
     @Benchmark public void BuildRrb10() { buildList(empty(), 10); }
@@ -225,6 +307,15 @@ public class MyBenchmark {
     @Benchmark public void BuildList1000000() { buildList2(1000000); }
     @Benchmark public void BuildList10000000() { buildList2(10000000); }
 
+    @Benchmark public void BuildScala1() { buildScala(1); }
+    @Benchmark public void BuildScala10() { buildScala(10); }
+    @Benchmark public void BuildScala100() { buildScala(100); }
+    @Benchmark public void BuildScala1000() { buildScala(1000); }
+    @Benchmark public void BuildScala10000() { buildScala(10000); }
+    @Benchmark public void BuildScala100000() { buildScala(100000); }
+    @Benchmark public void BuildScala1000000() { buildScala(1000000); }
+    @Benchmark public void BuildScala10000000() { buildScala(10000000); }
+
     @Benchmark public void InsertZeroList1() { insertAtZeroList(1); }
     @Benchmark public void InsertZeroList10() { insertAtZeroList(10); }
     @Benchmark public void InsertZeroList100() { insertAtZeroList(100); }
@@ -242,8 +333,7 @@ public class MyBenchmark {
     @Benchmark public void InsertZeroRrb10000() { insertAtZeroRrb(10000); }
     @Benchmark public void InsertZeroRrb100000() { insertAtZeroRrb(100000); }
     @Benchmark public void InsertZeroRrb1000000() { insertAtZeroRrb(1000000); }
-    // Takes more than a second.
-//    @Benchmark public void InsertZeroRrb10000000() { insertAtZeroRrb(10000000); }
+    @Benchmark public void InsertZeroRrb10000000() { insertAtZeroRrb(10000000); }
 
     @Benchmark public void InsertZeroRrbMut1() { insertAtZeroRrbMut(1); }
     @Benchmark public void InsertZeroRrbMut10() { insertAtZeroRrbMut(10); }
@@ -253,6 +343,15 @@ public class MyBenchmark {
     @Benchmark public void InsertZeroRrbMut100000() { insertAtZeroRrbMut(100000); }
     @Benchmark public void InsertZeroRrbMut1000000() { insertAtZeroRrbMut(1000000); }
     @Benchmark public void InsertZeroRrbMut10000000() { insertAtZeroRrbMut(10000000); }
+
+    @Benchmark public void InsertZeroScala1() { insertAtZeroScala(1); }
+    @Benchmark public void InsertZeroScala10() { insertAtZeroScala(10); }
+    @Benchmark public void InsertZeroScala100() { insertAtZeroScala(100); }
+    @Benchmark public void InsertZeroScala1000() { insertAtZeroScala(1000); }
+    @Benchmark public void InsertZeroScala10000() { insertAtZeroScala(10000); }
+    @Benchmark public void InsertZeroScala100000() { insertAtZeroScala(100000); }
+    @Benchmark public void InsertZeroScala1000000() { insertAtZeroScala(1000000); }
+    @Benchmark public void InsertZeroScala10000000() { insertAtZeroScala(10000000); }
 
     @Benchmark public void IterateRrb1(Rrb1 rrb) { iterateList(rrb.rrb); }
     @Benchmark public void IterateRrb10(Rrb10 rrb) { iterateList(rrb.rrb); }
@@ -281,33 +380,14 @@ public class MyBenchmark {
     @Benchmark public void IterateList1000000(List1000000 list) { iterateList(list.list); }
     @Benchmark public void IterateList10000000(List10000000 list) { iterateList(list.list); }
 
-    @Benchmark public void GetEachRrb1(Rrb1 rrb) { getEach(rrb.rrb); }
-    @Benchmark public void GetEachRrb10(Rrb10 rrb) { getEach(rrb.rrb); }
-    @Benchmark public void GetEachRrb100(Rrb100 rrb) { getEach(rrb.rrb); }
-    @Benchmark public void GetEachRrb1000(Rrb1000 rrb) { getEach(rrb.rrb); }
-    @Benchmark public void GetEachRrb10000(Rrb10000 rrb) { getEach(rrb.rrb); }
-    @Benchmark public void GetEachRrb100000(Rrb100000 rrb) { getEach(rrb.rrb); }
-    @Benchmark public void GetEachRrb1000000(Rrb1000000 rrb) { getEach(rrb.rrb); }
-    @Benchmark public void GetEachRrb10000000(Rrb10000000 rrb) { getEach(rrb.rrb); }
-
-    @Benchmark public void GetEachRrbRel1(RrbRel1 rrb) { getEach(rrb.rrb); }
-    @Benchmark public void GetEachRrbRel10(RrbRel10 rrb) { getEach(rrb.rrb); }
-    @Benchmark public void GetEachRrbRel100(RrbRel100 rrb) { getEach(rrb.rrb); }
-    @Benchmark public void GetEachRrbRel1000(RrbRel1000 rrb) { getEach(rrb.rrb); }
-    @Benchmark public void GetEachRrbRel10000(RrbRel10000 rrb) { getEach(rrb.rrb); }
-    @Benchmark public void GetEachRrbRel100000(RrbRel100000 rrb) { getEach(rrb.rrb); }
-    @Benchmark public void GetEachRrbRel1000000(RrbRel1000000 rrb) { getEach(rrb.rrb); }
-    // Takes too long
-    //    @Benchmark public void GetEachRrbRel10000000(RrbRel10000000 rrb) { getEach(rrb.rrb); }
-
-    @Benchmark public void GetEachVec1(Vec1 vec) { getEach(vec.vec); }
-    @Benchmark public void GetEachVec10(Vec10 vec) { getEach(vec.vec); }
-    @Benchmark public void GetEachVec100(Vec100 vec) { getEach(vec.vec); }
-    @Benchmark public void GetEachVec1000(Vec1000 vec) { getEach(vec.vec); }
-    @Benchmark public void GetEachVec10000(Vec10000 vec) { getEach(vec.vec); }
-    @Benchmark public void GetEachVec100000(Vec100000 vec) { getEach(vec.vec); }
-    @Benchmark public void GetEachVec1000000(Vec1000000 vec) { getEach(vec.vec); }
-    @Benchmark public void GetEachVec10000000(Vec10000000 vec) { getEach(vec.vec); }
+    @Benchmark public void IterateScala1(Scala1 scala) { iterateScala(scala.scala); }
+    @Benchmark public void IterateScala10(Scala10 scala) { iterateScala(scala.scala); }
+    @Benchmark public void IterateScala100(Scala100 scala) { iterateScala(scala.scala); }
+    @Benchmark public void IterateScala1000(Scala1000 scala) { iterateScala(scala.scala); }
+    @Benchmark public void IterateScala10000(Scala10000 scala) { iterateScala(scala.scala); }
+    @Benchmark public void IterateScala100000(Scala100000 scala) { iterateScala(scala.scala); }
+    @Benchmark public void IterateScala1000000(Scala1000000 scala) { iterateScala(scala.scala); }
+    @Benchmark public void IterateScala10000000(Scala10000000 scala) { iterateScala(scala.scala); }
 
     @Benchmark public void GetEachList1(List1 list) { getEach(list.list); }
     @Benchmark public void GetEachList10(List10 list) { getEach(list.list); }
@@ -317,6 +397,46 @@ public class MyBenchmark {
     @Benchmark public void GetEachList100000(List100000 list) { getEach(list.list); }
     @Benchmark public void GetEachList1000000(List1000000 list) { getEach(list.list); }
     @Benchmark public void GetEachList10000000(List10000000 list) { getEach(list.list); }
+    @Benchmark public void GetEachList100000000(List100000000 list) { getEach(list.list); }
+
+    @Benchmark public void GetEachRrb1(Rrb1 rrb) { getEach(rrb.rrb); }
+    @Benchmark public void GetEachRrb10(Rrb10 rrb) { getEach(rrb.rrb); }
+    @Benchmark public void GetEachRrb100(Rrb100 rrb) { getEach(rrb.rrb); }
+    @Benchmark public void GetEachRrb1000(Rrb1000 rrb) { getEach(rrb.rrb); }
+    @Benchmark public void GetEachRrb10000(Rrb10000 rrb) { getEach(rrb.rrb); }
+    @Benchmark public void GetEachRrb100000(Rrb100000 rrb) { getEach(rrb.rrb); }
+    @Benchmark public void GetEachRrb1000000(Rrb1000000 rrb) { getEach(rrb.rrb); }
+    @Benchmark public void GetEachRrb10000000(Rrb10000000 rrb) { getEach(rrb.rrb); }
+    @Benchmark public void GetEachRrb100000000(Rrb100000000 rrb) { getEach(rrb.rrb); }
+
+    @Benchmark public void GetEachRrbRel1(RrbRel1 rrb) { getEach(rrb.rrb); }
+    @Benchmark public void GetEachRrbRel10(RrbRel10 rrb) { getEach(rrb.rrb); }
+    @Benchmark public void GetEachRrbRel100(RrbRel100 rrb) { getEach(rrb.rrb); }
+    @Benchmark public void GetEachRrbRel1000(RrbRel1000 rrb) { getEach(rrb.rrb); }
+    @Benchmark public void GetEachRrbRel10000(RrbRel10000 rrb) { getEach(rrb.rrb); }
+    @Benchmark public void GetEachRrbRel100000(RrbRel100000 rrb) { getEach(rrb.rrb); }
+    @Benchmark public void GetEachRrbRel1000000(RrbRel1000000 rrb) { getEach(rrb.rrb); }
+    @Benchmark public void GetEachRrbRel10000000(RrbRel10000000 rrb) { getEach(rrb.rrb); }
+
+    @Benchmark public void GetEachScala1(Scala1 scala) { getEachScala(scala.scala); }
+    @Benchmark public void GetEachScala10(Scala10 scala) { getEachScala(scala.scala); }
+    @Benchmark public void GetEachScala100(Scala100 scala) { getEachScala(scala.scala); }
+    @Benchmark public void GetEachScala1000(Scala1000 scala) { getEachScala(scala.scala); }
+    @Benchmark public void GetEachScala10000(Scala10000 scala) { getEachScala(scala.scala); }
+    @Benchmark public void GetEachScala100000(Scala100000 scala) { getEachScala(scala.scala); }
+    @Benchmark public void GetEachScala1000000(Scala1000000 scala) { getEachScala(scala.scala); }
+    @Benchmark public void GetEachScala10000000(Scala10000000 scala) { getEachScala(scala.scala); }
+    @Benchmark public void GetEachScala100000000(Scala100000000 scala) { getEachScala(scala.scala); }
+
+    @Benchmark public void GetEachVec1(Vec1 vec) { getEach(vec.vec); }
+    @Benchmark public void GetEachVec10(Vec10 vec) { getEach(vec.vec); }
+    @Benchmark public void GetEachVec100(Vec100 vec) { getEach(vec.vec); }
+    @Benchmark public void GetEachVec1000(Vec1000 vec) { getEach(vec.vec); }
+    @Benchmark public void GetEachVec10000(Vec10000 vec) { getEach(vec.vec); }
+    @Benchmark public void GetEachVec100000(Vec100000 vec) { getEach(vec.vec); }
+    @Benchmark public void GetEachVec1000000(Vec1000000 vec) { getEach(vec.vec); }
+    @Benchmark public void GetEachVec10000000(Vec10000000 vec) { getEach(vec.vec); }
+    @Benchmark public void GetEachVec100000000(Vec100000000 vec) { getEach(vec.vec); }
 
     @Benchmark public void RandInsertList1() { randomInsertList(1); }
     @Benchmark public void RandInsertList10() { randomInsertList(10); }
@@ -341,4 +461,13 @@ public class MyBenchmark {
     @Benchmark public void RandInsertRrbMut100000() { randomInsertRrb(emptyMutable(), 100000); }
     @Benchmark public void RandInsertRrbMut1000000() { randomInsertRrb(emptyMutable(), 1000000); }
 
+    // Don't think it supports random inserts!
+//    @Benchmark public void RandInsertScala1() { randomInsertScala(1); }
+//    @Benchmark public void RandInsertScala10() { randomInsertScala(10); }
+//    @Benchmark public void RandInsertScala100() { randomInsertScala(100); }
+//    @Benchmark public void RandInsertScala1000() { randomInsertScala(1000); }
+//    @Benchmark public void RandInsertScala10000() { randomInsertScala(10000); }
+//    @Benchmark public void RandInsertScala100000() { randomInsertScala(100000); }
+//    @Benchmark public void RandInsertScala1000000() { randomInsertScala(1000000); }
+//    @Benchmark public void RandInsertScala10000000() { randomInsertScala(10000000); }
 }
