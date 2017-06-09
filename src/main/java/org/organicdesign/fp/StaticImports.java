@@ -28,6 +28,8 @@ import org.organicdesign.fp.collections.PersistentTreeMap;
 import org.organicdesign.fp.collections.PersistentTreeSet;
 import org.organicdesign.fp.collections.PersistentVector;
 import org.organicdesign.fp.collections.RrbTree;
+import org.organicdesign.fp.collections.RrbTree.ImRrbt;
+import org.organicdesign.fp.collections.RrbTree.MutableRrbt;
 import org.organicdesign.fp.collections.UnmodIterable;
 import org.organicdesign.fp.tuple.Tuple2;
 import org.organicdesign.fp.tuple.Tuple3;
@@ -38,22 +40,24 @@ import java.util.Comparator;
 import java.util.Map;
 
 /**
- <p>A mini data definition language composed of vec(), tup(), map(), set(), plus xform() which makes
- java.util collections transformable.</p>
+ <p>A mini data definition language composed of short methods like vec(), tup(), map(),
+ set(), plus xform() which makes java.util collections transformable.</p>
 
  <pre><code>import org.organicdesign.fp.StaticImports.*
 
- // Create a new vector of integers
- vec(1, 2, 3, 4);
+// Create a new vector of integers
+vec(1, 2, 3, 4);
 
- // Create a new set of Strings
- set("a", "b", "c");
+// Create a new set of Strings
+set("a", "b", "c");
 
- // Create a tuple of an int and a string (a type-safe heterogeneous container)
- tup("a", 1);
+// Create a tuple of an int and a string (a type-safe heterogeneous container)
+tup("a", 1);
 
- // Create a map with a few key value pairs
- map(tup("a", 1), tup("b", 2), tup("c", 3);</code></pre>
+// Create a map with a few key value pairs
+map(tup("a", 1),
+    tup("b", 2),
+    tup("c", 3));</code></pre>
 
  <p>There are only a few methods in this project to take varargs and they are all in this file.
  Writing out versions that took multiple type-safe arguments caused IntelliJ to present all of them
@@ -62,15 +66,13 @@ import java.util.Map;
  dangerous) way.</p>
 
  <p>If you're used to Clojure/JSON, you'll find that what's a map (dictionary) in those languages
- usually becomes a tuple in Paguro. A true map data structure in a type-safe language is
+ sometimes becomes a tuple in Paguro and sometimes becomes a map. A map in a type-safe language is
  homogeneous, meaning that every member is of the same type (or a descendant of a common ancestor).
  Tuples are designed to contain unrelated data types and enforce those types.</p>
 
  <p>As with any usage of import *, there could be issues if you import 2 different versions of this
- file in your classpath.  Java needs a data definition language so badly that I think it is worth
- the risk.  Also, I don't anticipate this file changing much, except to add more tup()
- implementations, which shouldn't break anything.  Let me know if you find that the danger outweighs
- convenience or have advice on what to do about it.</p>
+ file in your classpath, or if a method is ever removed from this file.  Java needs a data
+ definition language so badly that I think it is worth this small risk.</p>
  */
 @SuppressWarnings("UnusedDeclaration")
 public final class StaticImports {
@@ -118,6 +120,22 @@ public final class StaticImports {
     }
 
     /**
+     Returns a mutable RRB Tree {@link MutableRrbt} of the given items.
+     The RRB Tree is a list-type data structure that supports random inserts, split, and join
+     (the PersistentVector does not).  The mutable RRB Tree append() method is only about half
+     as fast as the PersistentVector method of the same name.  If you build it entirely with random
+     inserts, then the RRB tree get() method may be about 5x slower.  Otherwise, performance
+     is about the same.
+     This data definition method is one of the few methods in this project that support varargs.
+     */
+    @SafeVarargs
+    static public <T> MutableRrbt<T> mutableRrb(T... items) {
+        if ( (items == null) || (items.length < 1) ) { return RrbTree.emptyMutable(); }
+        return RrbTree.<T>emptyMutable()
+                .concat(Arrays.asList(items));
+    }
+
+    /**
      Returns a new MutableUnsortedSet of the values.  This data definition method is one of the few
      methods in this project that support varargs.  If the input contains duplicate elements, later
      values overwrite earlier ones.
@@ -147,19 +165,18 @@ public final class StaticImports {
     }
 
     /**
-     Returns a mutable RRB Tree {@link RrbTree.MutableRrbt} of the given items.
-     The RRB Tree is a list-type data structure that supports random inserts, split, and join
-     (the PersistentVector does not).  The mutable RRB Tree append() method is only about half
-     as fast as the PersistentVector method of the same name.  If you build it entirely with random
+     Returns a new immutable RRB Tree {@link ImRrbt} of the given items.  An RRB Tree
+     is an immutable list that supports random inserts, split, and join (the PersistentVector does
+     not).  If you build it entirely with random
      inserts, then the RRB tree get() method may be about 5x slower.  Otherwise, performance
      is about the same.
+
      This data definition method is one of the few methods in this project that support varargs.
      */
     @SafeVarargs
-    static public <T> RrbTree.MutableRrbt<T> mutableRrb(T... items) {
-        if ( (items == null) || (items.length < 1) ) { return RrbTree.emptyMutable(); }
-        return RrbTree.<T>emptyMutable()
-                .concat(Arrays.asList(items));
+    static public <T> ImRrbt<T> rrb(T... items) {
+        if ( (items == null) || (items.length < 1) ) { return RrbTree.empty(); }
+        return mutableRrb(items).immutable();
     }
 
     /**
@@ -232,32 +249,13 @@ public final class StaticImports {
     public static <T,U,V> Tuple3<T,U,V> tup(T t, U u, V v) { return Tuple3.of(t, u, v); }
 
     /**
-     Returns a new immutable RRB Tree {@link RrbTree.ImRrbt} of the given items.  An RRB Tree
-     is an immutable list that supports random inserts, split, and join (the PersistentVector does
-     not).  If you build it entirely with random
-     inserts, then the RRB tree get() method may be about 5x slower.  Otherwise, performance
-     is about the same.
-
-     This data definition method is one of the few methods in this project that support varargs.
-     */
-    @SafeVarargs
-    static public <T> RrbTree.ImRrbt<T> rrb(T... items) {
-        if ( (items == null) || (items.length < 1) ) { return RrbTree.empty(); }
-        return RrbTree.<T>emptyMutable()
-                .concat(Arrays.asList(items))
-                .immutable();
-    }
-
-    /**
      Returns a new PersistentVector of the given items.  This data definition method is one of the
      few methods in this project that support varargs.
      */
     @SafeVarargs
     static public <T> ImList<T> vec(T... items) {
         if ( (items == null) || (items.length < 1) ) { return PersistentVector.empty(); }
-        return PersistentVector.<T>emptyMutable()
-                .concat(Arrays.asList(items))
-                .immutable();
+        return mutableVec(items).immutable();
     }
 
     /**

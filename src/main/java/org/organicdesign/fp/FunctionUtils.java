@@ -15,14 +15,8 @@
 package org.organicdesign.fp;
 
 /**
- A dumping ground for utility functions that aren't useful enough to belong in StaticImports.
-
- The unmod___() methods are an alternative to Collections.unmodifiable____().  They provide
- unmodifiable wrappers to protect mutable collections for sharing.  Except for the Iterators,
- the returned classes are Serializable.  These will never return null, the closest they get is to
- return an empty unmodifiable collection.  The unmodifiable interfaces they return have deprecated
- the modification methods so that any attempt to use those methods causes a warning in your IDE and
- compiler.
+ A dumping ground for utility functions that aren't useful enough to belong in
+ {@link StaticImports}.
  */
 public class FunctionUtils {
 

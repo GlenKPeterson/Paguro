@@ -52,7 +52,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
     // inserts to the same area of a vector to be done in constant time.  Tail only handles appends
     // but this can handle repeated inserts to any area of a vector.
 
-    /** Mutable version of an RRB Tree */
+    /** Mutable version of an {@link RrbTree} */
     public static class MutableRrbt<E> extends RrbTree<E> implements MutableList<E> {
         private E[] focus;
         private int focusStartIndex;
@@ -487,7 +487,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         }
     }
 
-    /** Immutable version of an RRB Tree */
+    /** Immutable version of an {@link RrbTree} */
     public static class ImRrbt<E> extends RrbTree<E> implements ImList<E> {
         private final E[] focus;
         private final int focusStartIndex;

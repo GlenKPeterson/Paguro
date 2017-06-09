@@ -19,9 +19,6 @@ import java.io.Serializable;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
 
-// Consider replacing with RRB-Tree
-// https://github.com/clojure/core.rrb-vector/blob/master/src/main/clojure/clojure/core/rrb_vector.clj
-
 /**
  This started out as Rich Hickey's PersistentVector class from Clojure in late 2014.  Glen added
  generic types, tried to make it a little more pure-Java friendly, and removed dependencies on other
@@ -120,28 +117,6 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
         }
         return ret.immutable();
     }
-
-//    /** Public static factory method. */
-//    @SafeVarargs
-//    static public <T> PersistentVector<T> of(T... items) {
-//        MutableVector<T> ret = emptyMutable();
-//        for (T item : items) {
-//            ret = ret.append(item);
-//        }
-//        return ret.immutable();
-//    }
-
-//    @SafeVarargs
-//    public static <T> PersistentVector<T> ofSkipNull(T... items) {
-//        if (items == null) { return empty(); }
-//        PersistentVector<T> ret = empty();
-//        for (T item : items) {
-//            if (item != null) {
-//                ret = ret.append(item);
-//            }
-//        }
-//        return ret;
-//    }
 
     // ==================================== Instance Variables ====================================
     // The number of items in this Vector.
