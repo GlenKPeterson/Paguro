@@ -17,6 +17,7 @@ Major changes:
  - Removed a bunch of deprecated and unused items
  - Added JavaDoc to Git site
  - Changed toString to show entire collection
+ - Added rrb() and mutableRrb() to StaticImports for constructing RRB Trees.
 
 Here is a script to ease your upgrade from 2.1.1 to 3.0:
 ```bash
