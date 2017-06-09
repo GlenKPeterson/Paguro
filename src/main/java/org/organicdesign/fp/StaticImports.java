@@ -27,6 +27,7 @@ import org.organicdesign.fp.collections.PersistentHashSet;
 import org.organicdesign.fp.collections.PersistentTreeMap;
 import org.organicdesign.fp.collections.PersistentTreeSet;
 import org.organicdesign.fp.collections.PersistentVector;
+import org.organicdesign.fp.collections.RrbTree;
 import org.organicdesign.fp.collections.UnmodIterable;
 import org.organicdesign.fp.tuple.Tuple2;
 import org.organicdesign.fp.tuple.Tuple3;
@@ -146,6 +147,22 @@ public final class StaticImports {
     }
 
     /**
+     Returns a mutable RRB Tree {@link RrbTree.MutableRrbt} of the given items.
+     The RRB Tree is a list-type data structure that supports random inserts, split, and join
+     (the PersistentVector does not).  The mutable RRB Tree append() method is only about half
+     as fast as the PersistentVector method of the same name.  If you build it entirely with random
+     inserts, then the RRB tree get() method may be about 5x slower.  Otherwise, performance
+     is about the same.
+     This data definition method is one of the few methods in this project that support varargs.
+     */
+    @SafeVarargs
+    static public <T> RrbTree.MutableRrbt<T> mutableRrb(T... items) {
+        if ( (items == null) || (items.length < 1) ) { return RrbTree.emptyMutable(); }
+        return RrbTree.<T>emptyMutable()
+                .concat(Arrays.asList(items));
+    }
+
+    /**
      Returns a new PersistentHashSet of the values.  This data definition method is one of the few
      methods in this project that support varargs.  If the input contains duplicate elements, later
      values overwrite earlier ones.
@@ -215,13 +232,32 @@ public final class StaticImports {
     public static <T,U,V> Tuple3<T,U,V> tup(T t, U u, V v) { return Tuple3.of(t, u, v); }
 
     /**
+     Returns a new immutable RRB Tree {@link RrbTree.ImRrbt} of the given items.  An RRB Tree
+     is an immutable list that supports random inserts, split, and join (the PersistentVector does
+     not).  If you build it entirely with random
+     inserts, then the RRB tree get() method may be about 5x slower.  Otherwise, performance
+     is about the same.
+
+     This data definition method is one of the few methods in this project that support varargs.
+     */
+    @SafeVarargs
+    static public <T> RrbTree.ImRrbt<T> rrb(T... items) {
+        if ( (items == null) || (items.length < 1) ) { return RrbTree.empty(); }
+        return RrbTree.<T>emptyMutable()
+                .concat(Arrays.asList(items))
+                .immutable();
+    }
+
+    /**
      Returns a new PersistentVector of the given items.  This data definition method is one of the
      few methods in this project that support varargs.
      */
     @SafeVarargs
     static public <T> ImList<T> vec(T... items) {
         if ( (items == null) || (items.length < 1) ) { return PersistentVector.empty(); }
-        return PersistentVector.ofIter(Arrays.asList(items));
+        return PersistentVector.<T>emptyMutable()
+                .concat(Arrays.asList(items))
+                .immutable();
     }
 
     /**

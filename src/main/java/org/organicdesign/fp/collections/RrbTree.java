@@ -97,11 +97,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
 
         /** {@inheritDoc} */
         @Override public MutableRrbt<E> concat(Iterable<? extends E> es) {
-            MutableRrbt<E> ret = this;
-            for (E e : es) {
-                ret = ret.append(e);
-            }
-            return ret;
+            return (MutableRrbt<E>) MutableList.super.concat(es);
         }
 
         void debugValidate() {
