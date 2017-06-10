@@ -262,6 +262,18 @@ public class MyBenchmark {
     @State(Scope.Thread) public static class List10000000 { public List<Integer> list = buildList2(10000000); }
     @State(Scope.Thread) public static class List100000000 { public List<Integer> list = buildList2(100000000); }
 
+    // ===================================================== Tests =====================================================
+
+    @Benchmark public void BuildList1() { buildList2(1); }
+    @Benchmark public void BuildList10() { buildList2(10); }
+    @Benchmark public void BuildList100() { buildList2(100); }
+    @Benchmark public void BuildList1000() { buildList2(1000); }
+    @Benchmark public void BuildList10000() { buildList2(10000); }
+    @Benchmark public void BuildList100000() { buildList2(100000); }
+    @Benchmark public void BuildList1000000() { buildList2(1000000); }
+    @Benchmark public void BuildList10000000() { buildList2(10000000); }
+    @Benchmark public void BuildList100000000() { buildList2(100000000); }
+
     @Benchmark public void BuildRrb1() { buildList(empty(), 1); }
     @Benchmark public void BuildRrb10() { buildList(empty(), 10); }
     @Benchmark public void BuildRrb100() { buildList(empty(), 100); }
@@ -279,6 +291,7 @@ public class MyBenchmark {
     @Benchmark public void BuildRrbMut100000() { buildList(RrbTree.emptyMutable(), 100000); }
     @Benchmark public void BuildRrbMut1000000() { buildList(RrbTree.emptyMutable(), 1000000); }
     @Benchmark public void BuildRrbMut10000000() { buildList(RrbTree.emptyMutable(), 10000000); }
+    @Benchmark public void BuildRrbMut100000000() { buildList(RrbTree.emptyMutable(), 100000000); }
 
     @Benchmark public void BuildVec1() { buildList(PersistentVector.empty(), 1); }
     @Benchmark public void BuildVec10() { buildList(PersistentVector.empty(), 10); }
@@ -297,15 +310,7 @@ public class MyBenchmark {
     @Benchmark public void BuildVecMut100000() { buildList(PersistentVector.emptyMutable(), 100000); }
     @Benchmark public void BuildVecMut1000000() { buildList(PersistentVector.emptyMutable(), 1000000); }
     @Benchmark public void BuildVecMut10000000() { buildList(PersistentVector.emptyMutable(), 10000000); }
-
-    @Benchmark public void BuildList1() { buildList2(1); }
-    @Benchmark public void BuildList10() { buildList2(10); }
-    @Benchmark public void BuildList100() { buildList2(100); }
-    @Benchmark public void BuildList1000() { buildList2(1000); }
-    @Benchmark public void BuildList10000() { buildList2(10000); }
-    @Benchmark public void BuildList100000() { buildList2(100000); }
-    @Benchmark public void BuildList1000000() { buildList2(1000000); }
-    @Benchmark public void BuildList10000000() { buildList2(10000000); }
+    @Benchmark public void BuildVecMut100000000() { buildList(PersistentVector.emptyMutable(), 100000000); }
 
     @Benchmark public void BuildScala1() { buildScala(1); }
     @Benchmark public void BuildScala10() { buildScala(10); }
@@ -353,23 +358,6 @@ public class MyBenchmark {
     @Benchmark public void InsertZeroScala1000000() { insertAtZeroScala(1000000); }
     @Benchmark public void InsertZeroScala10000000() { insertAtZeroScala(10000000); }
 
-    @Benchmark public void IterateRrb1(Rrb1 rrb) { iterateList(rrb.rrb); }
-    @Benchmark public void IterateRrb10(Rrb10 rrb) { iterateList(rrb.rrb); }
-    @Benchmark public void IterateRrb100(Rrb100 rrb) { iterateList(rrb.rrb); }
-    @Benchmark public void IterateRrb1000(Rrb1000 rrb) { iterateList(rrb.rrb); }
-    @Benchmark public void IterateRrb10000(Rrb10000 rrb) { iterateList(rrb.rrb); }
-    @Benchmark public void IterateRrb100000(Rrb100000 rrb) { iterateList(rrb.rrb); }
-    @Benchmark public void IterateRrb1000000(Rrb1000000 rrb) { iterateList(rrb.rrb); }
-    @Benchmark public void IterateRrb10000000(Rrb10000000 rrb) { iterateList(rrb.rrb); }
-
-    @Benchmark public void IterateVec1(Vec1 vec) { iterateList(vec.vec); }
-    @Benchmark public void IterateVec10(Vec10 vec) { iterateList(vec.vec); }
-    @Benchmark public void IterateVec100(Vec100 vec) { iterateList(vec.vec); }
-    @Benchmark public void IterateVec1000(Vec1000 vec) { iterateList(vec.vec); }
-    @Benchmark public void IterateVec10000(Vec10000 vec) { iterateList(vec.vec); }
-    @Benchmark public void IterateVec100000(Vec100000 vec) { iterateList(vec.vec); }
-    @Benchmark public void IterateVec1000000(Vec1000000 vec) { iterateList(vec.vec); }
-    @Benchmark public void IterateVec10000000(Vec10000000 vec) { iterateList(vec.vec); }
 
     @Benchmark public void IterateList1(List1 list) { iterateList(list.list); }
     @Benchmark public void IterateList10(List10 list) { iterateList(list.list); }
@@ -380,6 +368,15 @@ public class MyBenchmark {
     @Benchmark public void IterateList1000000(List1000000 list) { iterateList(list.list); }
     @Benchmark public void IterateList10000000(List10000000 list) { iterateList(list.list); }
 
+    @Benchmark public void IterateRrb1(Rrb1 rrb) { iterateList(rrb.rrb); }
+    @Benchmark public void IterateRrb10(Rrb10 rrb) { iterateList(rrb.rrb); }
+    @Benchmark public void IterateRrb100(Rrb100 rrb) { iterateList(rrb.rrb); }
+    @Benchmark public void IterateRrb1000(Rrb1000 rrb) { iterateList(rrb.rrb); }
+    @Benchmark public void IterateRrb10000(Rrb10000 rrb) { iterateList(rrb.rrb); }
+    @Benchmark public void IterateRrb100000(Rrb100000 rrb) { iterateList(rrb.rrb); }
+    @Benchmark public void IterateRrb1000000(Rrb1000000 rrb) { iterateList(rrb.rrb); }
+    @Benchmark public void IterateRrb10000000(Rrb10000000 rrb) { iterateList(rrb.rrb); }
+
     @Benchmark public void IterateScala1(Scala1 scala) { iterateScala(scala.scala); }
     @Benchmark public void IterateScala10(Scala10 scala) { iterateScala(scala.scala); }
     @Benchmark public void IterateScala100(Scala100 scala) { iterateScala(scala.scala); }
@@ -388,6 +385,15 @@ public class MyBenchmark {
     @Benchmark public void IterateScala100000(Scala100000 scala) { iterateScala(scala.scala); }
     @Benchmark public void IterateScala1000000(Scala1000000 scala) { iterateScala(scala.scala); }
     @Benchmark public void IterateScala10000000(Scala10000000 scala) { iterateScala(scala.scala); }
+
+    @Benchmark public void IterateVec1(Vec1 vec) { iterateList(vec.vec); }
+    @Benchmark public void IterateVec10(Vec10 vec) { iterateList(vec.vec); }
+    @Benchmark public void IterateVec100(Vec100 vec) { iterateList(vec.vec); }
+    @Benchmark public void IterateVec1000(Vec1000 vec) { iterateList(vec.vec); }
+    @Benchmark public void IterateVec10000(Vec10000 vec) { iterateList(vec.vec); }
+    @Benchmark public void IterateVec100000(Vec100000 vec) { iterateList(vec.vec); }
+    @Benchmark public void IterateVec1000000(Vec1000000 vec) { iterateList(vec.vec); }
+    @Benchmark public void IterateVec10000000(Vec10000000 vec) { iterateList(vec.vec); }
 
     @Benchmark public void GetEachList1(List1 list) { getEach(list.list); }
     @Benchmark public void GetEachList10(List10 list) { getEach(list.list); }
