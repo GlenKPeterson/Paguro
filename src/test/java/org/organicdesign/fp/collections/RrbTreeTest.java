@@ -58,6 +58,18 @@ public class RrbTreeTest {
         buildInOrderTest(RrbTree.emptyMutable(), 100000);
     }
 
+//    @Test public void testAppendSpeed() {
+//        MutableRrbt<Integer> is = RrbTree.emptyMutable();
+//        for (int j = 0; j < 1000000000; j++) {
+//            is.append(j);
+//        }
+////        System.out.println("timer1: " + MutableRrbt.timer1);
+////        System.out.println("timer2: " + MutableRrbt.timer2);
+////        System.out.println("timer3: " + MutableRrbt.timer3);
+////        System.out.println("timer4: " + MutableRrbt.timer4);
+////        System.out.println("timer5: " + MutableRrbt.timer5);
+//    }
+
     private static RrbTree<Integer> buildReverseOrderTest(RrbTree<Integer> is, int iterations) {
         ArrayList<Integer> control = new ArrayList<>();
         for (int j = 0; j < iterations; j++){

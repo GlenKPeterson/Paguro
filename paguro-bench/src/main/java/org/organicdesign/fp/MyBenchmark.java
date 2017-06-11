@@ -291,7 +291,7 @@ public class MyBenchmark {
     @Benchmark public void BuildRrbMut100000() { buildList(RrbTree.emptyMutable(), 100000); }
     @Benchmark public void BuildRrbMut1000000() { buildList(RrbTree.emptyMutable(), 1000000); }
     @Benchmark public void BuildRrbMut10000000() { buildList(RrbTree.emptyMutable(), 10000000); }
-    @Benchmark public void BuildRrbMut100000000() { buildList(RrbTree.emptyMutable(), 100000000); }
+    // TOO Long: @Benchmark public void BuildRrbMut100000000() { buildList(RrbTree.emptyMutable(), 100000000); }
 
     @Benchmark public void BuildVec1() { buildList(PersistentVector.empty(), 1); }
     @Benchmark public void BuildVec10() { buildList(PersistentVector.empty(), 10); }

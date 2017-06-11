@@ -72,8 +72,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
             if ( (focusLength >= STRICT_NODE_LENGTH) ||
                  ((focusLength > 0) &&
                   (focusStartIndex < (size - focusLength))) ) {
-                root = root.pushFocus(focusStartIndex,
-                                                  arrayCopy(focus, focusLength, null));
+                root = root.pushFocus(focusStartIndex, arrayCopy(focus, focusLength, null));
                 focus = (E[]) new Object[STRICT_NODE_LENGTH];
                 focus[0] = val;
                 focusStartIndex = size;
@@ -82,8 +81,6 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
                 return this;
             }
 
-            // TODO: 1. Make sure to defensively copy mutable arrays before pushFocus
-            // TODO: 2. Get rid of "new MutableRrbt" because we should just mutate the old one.
             // TODO: 3. Make the root the first argument to RrbTree, MutableRrbt and ImRrbt.
 
             if (focus.length <= focusLength) {
@@ -1492,10 +1489,12 @@ involves changing more nodes than maybe necessary.
 
         @Override public int size() { return size; }
 
-        private boolean thisNodeHasCapacity() { return nodes.length < STRICT_NODE_LENGTH; }
+//        private boolean thisNodeHasCapacity() { return nodes.length < STRICT_NODE_LENGTH; }
 
         @Override public boolean hasStrictCapacity() {
-            return thisNodeHasCapacity() || nodes[nodes.length - 1].hasStrictCapacity();
+//            return thisNodeHasCapacity() || nodes[nodes.length - 1].hasStrictCapacity();
+            // Haha!  Can calculate instead of walking the tree!
+            return highBits(size) != 32;
         }
 
         @Override public boolean hasRelaxedCapacity(int index, int size) {
@@ -1619,7 +1618,12 @@ involves changing more nodes than maybe necessary.
                     Node<T> lastNode = nodes[nodes.length - 1];
                     if (lastNode.hasStrictCapacity()) {
                         // Pushing focus down to lower-level node with capacity.
-                        Node<T> newNode = lastNode.pushFocus(lowBits(index), oldFocus);
+                        // TODO: This line appears to be the slowest part.
+
+                        // This variable is my attempt to prevent dynamic dispatch on the call
+                        // to pushFocus()
+                        Strict<T> strict = (Strict<T>) lastNode;
+                        Node<T> newNode = strict.pushFocus(lowBits(index), oldFocus);
                         Node<T>[] newNodes = replaceInArrayAt(newNode, nodes, nodes.length - 1,
                                                               Node.class);
                         return new Strict<>(shift, size + oldFocus.length, newNodes);
