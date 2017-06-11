@@ -43,6 +43,22 @@ import static org.organicdesign.fp.collections.Indented.indentSpace;
  2007: Clojure's Persistent Vector (and HashMap) implementations: Rich Hickey<br>
  2012: RRB-Tree: Phil Bagwell and Tiark Rompf<br>
 
+ <p>Compared to other collections (timings summary from 2017-06-11):</p>
+
+ <ul>
+ <li>append() - {@link ImRrbt} varies between 90% and 100% of the speed of {@link PersistentVector} (biggest difference above 100K).
+ {@link MutableRrbt} varies between 45% and 80% of the speed of
+ {@link org.organicdesign.fp.collections.PersistentVector.MutableVector} (biggest difference from 100 to 1M).</li>
+ <li>get() - varies between 50% and 150% of the speed of PersistentVector (PV wins above 1K) if you build RRB using append().
+ If you build rrb using random inserts (worst case), it goes from 90% at 10 items down to 15% of the speed of the PV at 1M items.</li>
+ <li>iterate() - is about the same speed as PersistentVector</li>
+ <li>insert(0, item) - beats ArrayList above 1K items (worse than ArrayList below 100 items).</li>
+ <li>insert(random, item) - beats ArrayList above 10K items (worse than ArrayList until then).</li>
+ <li>Supports split(), join(), and remove() (not timed yet).</li>
+ </ul>
+
+ <p>Latest detailed timing results are
+ <a target="_blank" href="https://docs.google.com/spreadsheets/d/1D0bjfsHpmK7aJzyE2WwArlioI6w69YhZ2f-x0yM6_Z0/edit?usp=sharing">here</a>.</p>
  */
 @SuppressWarnings("WeakerAccess")
 public abstract class RrbTree<E> implements BaseList<E>, Indented {
@@ -52,7 +68,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
     // inserts to the same area of a vector to be done in constant time.  Tail only handles appends
     // but this can handle repeated inserts to any area of a vector.
 
-    /** Mutable version of an {@link RrbTree} */
+    /** Mutable version of an {@link RrbTree}.  Timing information is available there. */
     public static class MutableRrbt<E> extends RrbTree<E> implements MutableList<E> {
         private E[] focus;
         private int focusStartIndex;
@@ -484,7 +500,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         }
     }
 
-    /** Immutable version of an {@link RrbTree} */
+    /** Immutable version of an {@link RrbTree}.  Timing information is available there. */
     public static class ImRrbt<E> extends RrbTree<E> implements ImList<E> {
         private final E[] focus;
         private final int focusStartIndex;
