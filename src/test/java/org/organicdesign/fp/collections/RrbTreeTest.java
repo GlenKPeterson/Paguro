@@ -58,17 +58,25 @@ public class RrbTreeTest {
         buildInOrderTest(RrbTree.emptyMutable(), 100000);
     }
 
+//    private static final Integer[] INTS =
+//            new Integer[] { Integer.valueOf(0), Integer.valueOf(1), Integer.valueOf(2),
+//                            Integer.valueOf(3), Integer.valueOf(4), Integer.valueOf(5),
+//                            Integer.valueOf(6), Integer.valueOf(7), Integer.valueOf(8),
+//                            Integer.valueOf(9), Integer.valueOf(10), Integer.valueOf(11),
+//                            Integer.valueOf(12), Integer.valueOf(13), Integer.valueOf(14),
+//                            Integer.valueOf(15) };
+
 //    @Test public void testAppendSpeed() {
 //        MutableRrbt<Integer> is = RrbTree.emptyMutable();
 //        for (int j = 0; j < 1000000000; j++) {
-//            is.append(j);
+//            is.append(INTS[j & 0xf]);
 //        }
+//    }
 ////        System.out.println("timer1: " + MutableRrbt.timer1);
 ////        System.out.println("timer2: " + MutableRrbt.timer2);
 ////        System.out.println("timer3: " + MutableRrbt.timer3);
 ////        System.out.println("timer4: " + MutableRrbt.timer4);
 ////        System.out.println("timer5: " + MutableRrbt.timer5);
-//    }
 
     private static RrbTree<Integer> buildReverseOrderTest(RrbTree<Integer> is, int iterations) {
         ArrayList<Integer> control = new ArrayList<>();

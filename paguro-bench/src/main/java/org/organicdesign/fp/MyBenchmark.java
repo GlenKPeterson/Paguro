@@ -24,10 +24,18 @@ import static org.organicdesign.fp.collections.RrbTree.emptyMutable;
 @SuppressWarnings("WeakerAccess")
 public class MyBenchmark {
 
+    private static final Integer[] INTS =
+            new Integer[] { Integer.valueOf(0), Integer.valueOf(1), Integer.valueOf(2),
+                            Integer.valueOf(3), Integer.valueOf(4), Integer.valueOf(5),
+                            Integer.valueOf(6), Integer.valueOf(7), Integer.valueOf(8),
+                            Integer.valueOf(9), Integer.valueOf(10), Integer.valueOf(11),
+                            Integer.valueOf(12), Integer.valueOf(13), Integer.valueOf(14),
+                            Integer.valueOf(15) };
+
     static List<Integer> buildList2(int maxIdx) {
         List<Integer> empty = new ArrayList<>();
         for (int i = 0; i < maxIdx; i++) {
-            empty.add(i);
+            empty.add(INTS[i & 0xf]);
         }
         return empty;
     }
@@ -35,7 +43,7 @@ public class MyBenchmark {
     static scala.collection.immutable.Vector<Integer> buildScala(int maxIdx) {
         scala.collection.immutable.Vector<Integer> empty = Vector$.MODULE$.empty();
         for (int i = 0; i < maxIdx; i++) {
-            empty = empty.appendBack(i);
+            empty = empty.appendBack(INTS[i & 0xf]);
         }
         return empty;
     }
@@ -43,7 +51,7 @@ public class MyBenchmark {
     @SuppressWarnings("unchecked")
     static <T extends BaseList<Integer>> T buildList(T empty, int maxIdx) {
         for (int i = 0; i < maxIdx; i++) {
-            empty = (T) empty.append(i);
+            empty = (T) empty.append(INTS[i & 0xf]);
         }
         return empty;
     }
@@ -51,7 +59,7 @@ public class MyBenchmark {
     static ImRrbt<Integer> insertAtZeroRrb(int maxIdx) {
         ImRrbt<Integer> empty = empty();
         for (int i = maxIdx; i >= 0; i--) {
-            empty = empty.insert(0, i);
+            empty = empty.insert(0, INTS[i & 0xf]);
         }
         return empty;
     }
@@ -59,7 +67,7 @@ public class MyBenchmark {
     public static MutableRrbt<Integer> insertAtZeroRrbMut(int maxIdx) {
         MutableRrbt<Integer> empty = RrbTree.emptyMutable();
         for (int i = maxIdx; i >= 0; i--) {
-            empty = empty.insert(0, i);
+            empty = empty.insert(0, INTS[i & 0xf]);
         }
         return empty;
     }
@@ -67,7 +75,7 @@ public class MyBenchmark {
     public static List<Integer> insertAtZeroList(int maxIdx) {
         ArrayList<Integer> empty = new ArrayList<>();
         for (int i = maxIdx; i >= 0; i--) {
-            empty.add(0, i);
+            empty.add(0, INTS[i & 0xf]);
         }
         return empty;
     }
@@ -75,7 +83,7 @@ public class MyBenchmark {
     public static scala.collection.immutable.Vector<Integer> insertAtZeroScala(int maxIdx) {
         scala.collection.immutable.Vector<Integer> empty = Vector$.MODULE$.empty();
         for (int i = maxIdx; i >= 0; i--) {
-            empty = empty.appendFront(i);
+            empty = empty.appendFront(INTS[i & 0xf]);
         }
         return empty;
     }
@@ -83,7 +91,7 @@ public class MyBenchmark {
     public static RrbTree<Integer> randomInsertRrb(RrbTree empty, int maxIdx) {
         Random rnd = new Random();
         for (int i = 0; i < maxIdx; i++) {
-            empty = empty.insert(i > 1 ? rnd.nextInt(i) : 0, i);
+            empty = empty.insert(i > 1 ? rnd.nextInt(i) : 0, INTS[i & 0xf]);
         }
         return empty;
     }
@@ -92,7 +100,7 @@ public class MyBenchmark {
         Random rnd = new Random();
         List<Integer> empty = new ArrayList<>();
         for (int i = 0; i < maxIdx; i++) {
-            empty.add(i > 1 ? rnd.nextInt(i) : 0, i);
+            empty.add(i > 1 ? rnd.nextInt(i) : 0, INTS[i & 0xf]);
         }
         return empty;
     }
@@ -272,7 +280,7 @@ public class MyBenchmark {
     @Benchmark public void BuildList100000() { buildList2(100000); }
     @Benchmark public void BuildList1000000() { buildList2(1000000); }
     @Benchmark public void BuildList10000000() { buildList2(10000000); }
-    @Benchmark public void BuildList100000000() { buildList2(100000000); }
+    // TOO Long: @Benchmark public void BuildList100000000() { buildList2(100000000); }
 
     @Benchmark public void BuildRrb1() { buildList(empty(), 1); }
     @Benchmark public void BuildRrb10() { buildList(empty(), 10); }

@@ -51,7 +51,7 @@ java -jar target/benchmarks.jar -f 2 -i 10 -wi 10
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.organicdesign.fp</groupId>
+    <groupId>org.organicdesign</groupId>
     <artifactId>paguro-bench</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
@@ -71,7 +71,7 @@ java -jar target/benchmarks.jar -f 2 -i 10 -wi 10
         <dependency>
             <groupId>org.organicdesign</groupId>
             <artifactId>Paguro</artifactId>
-            <version>3.0.1-ALPHA</version>
+            <version>3.0.3-ALPHA</version>
         </dependency>
         <dependency>
             <groupId>org.openjdk.jmh</groupId>
