@@ -1492,9 +1492,23 @@ involves changing more nodes than maybe necessary.
 //        private boolean thisNodeHasCapacity() { return nodes.length < STRICT_NODE_LENGTH; }
 
         @Override public boolean hasStrictCapacity() {
-//            return thisNodeHasCapacity() || nodes[nodes.length - 1].hasStrictCapacity();
-            // Haha!  Can calculate instead of walking the tree!
-            return highBits(size) != 32;
+//            boolean ret = thisNodeHasCapacity() || nodes[nodes.length - 1].hasStrictCapacity();
+//            boolean ret2 = highBits(size) != STRICT_NODE_LENGTH;
+//            if (ret != ret2) {
+//                System.out.println("size: " + size);
+//                System.out.println("hasStrict: " + ret);
+//                System.out.println("highBits(size)" + highBits(size));
+//                System.out.println("lowBits(size)" + lowBits(size));
+//                throw new IllegalStateException("Won't work!");
+//            }
+
+            // This works because when a strict node is not full, it's highest child index is
+            // STRICT_NODE_LENGTH - 1 (which is what highBits(size) will return.
+            // This used to then walk down the right hand side of the tree checking for room.
+            // But it turns out that the highest index would have lowBits() equals all ones.
+            // size is the maxIndex + 1, so that flips the lowest bit of highBits() and makes
+            // all lowBits() zeros so that the following line works:
+            return highBits(size) != STRICT_NODE_LENGTH;
         }
 
         @Override public boolean hasRelaxedCapacity(int index, int size) {
