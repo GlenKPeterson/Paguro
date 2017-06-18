@@ -361,13 +361,46 @@ public class RrbTreeTest {
     @Test(expected = IndexOutOfBoundsException.class)
     public void emptyEx00() { RrbTree.empty().get(Integer.MIN_VALUE); }
     @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx01() { RrbTree.empty().get(-1); }
+    public void emptyEx01() { RrbTree.emptyMutable().get(-1); }
     @Test(expected = IndexOutOfBoundsException.class)
     public void emptyEx02() { RrbTree.empty().get(0); }
     @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx03() { RrbTree.empty().get(1); }
+    public void emptyEx03() { RrbTree.emptyMutable().get(1); }
     @Test(expected = IndexOutOfBoundsException.class)
     public void emptyEx04() { RrbTree.empty().get(Integer.MAX_VALUE); }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void emptyEx10() { RrbTree.emptyMutable().replace(Integer.MIN_VALUE, null); }
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void emptyEx11() { RrbTree.empty().replace(-1, null); }
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void emptyEx12() { RrbTree.emptyMutable().replace(0, null); }
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void emptyEx13() { RrbTree.empty().replace(1, null); }
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void emptyEx14() { RrbTree.emptyMutable().replace(Integer.MAX_VALUE, null); }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void emptyEx20() { RrbTree.empty().split(Integer.MIN_VALUE); }
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void emptyEx21() { RrbTree.emptyMutable().split(-1); }
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void emptyEx22() { RrbTree.empty().split(0); }
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void emptyEx23() { RrbTree.emptyMutable().split(1); }
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void emptyEx24() { RrbTree.empty().split(Integer.MAX_VALUE); }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void emptyEx30() { RrbTree.emptyMutable().without(Integer.MIN_VALUE); }
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void emptyEx31() { RrbTree.empty().without(-1); }
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void emptyEx32() { RrbTree.emptyMutable().without(0); }
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void emptyEx33() { RrbTree.empty().without(1); }
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void emptyEx34() { RrbTree.emptyMutable().without(Integer.MAX_VALUE); }
 
     @Test public void addSeveralItems() throws NoSuchAlgorithmException {
 //        System.out.println("addSeveral start");

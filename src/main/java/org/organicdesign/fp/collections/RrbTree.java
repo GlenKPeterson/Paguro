@@ -471,8 +471,9 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
          one tree will be empty (but never null).
          */
         public Tuple2<RrbTree<E>,RrbTree<E>> split(int splitIndex) {
-            if ( (splitIndex < 1) && (splitIndex > size) ) {
-                throw new IllegalArgumentException("Constraint violation failed: 1 <= splitIndex <= size");
+            if ( (splitIndex < 1) || (splitIndex > size) ) {
+                throw new IndexOutOfBoundsException(
+                        "Constraint violation failed: 1 <= splitIndex <= size");
             }
             // Push the focus before splitting.
             Node<E> newRoot = pushFocus();
@@ -838,8 +839,9 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
          one tree will be empty (but never null).
          */
         public Tuple2<RrbTree<E>,RrbTree<E>> split(int splitIndex) {
-            if ( (splitIndex < 1) && (splitIndex > size) ) {
-                throw new IllegalArgumentException("Constraint violation failed: 1 <= splitIndex <= size");
+            if ( (splitIndex < 1) || (splitIndex > size) ) {
+                throw new IndexOutOfBoundsException(
+                        "Constraint violation failed: 1 <= splitIndex <= size");
             }
             // Push the focus before splitting.
             Node<E> newRoot = pushFocus();
@@ -994,7 +996,7 @@ involves changing more nodes than maybe necessary.
         } else if (index == size() - 1) {
             return split(size() - 1)._1();
         } else {
-            throw new IllegalArgumentException("out of bounds");
+            throw new IndexOutOfBoundsException("Failed test: 0 <= index < size");
         }
     }
 
