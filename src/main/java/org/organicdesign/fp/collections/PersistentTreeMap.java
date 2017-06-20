@@ -42,7 +42,7 @@ import static org.organicdesign.fp.FunctionUtils.stringify;
          extend Tuple2.  All errors are Glen's.
  */
 
-public class PersistentTreeMap<K,V> extends UnmodSortedMap.AbstractUnmodMap<K,V>
+public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
         implements ImSortedMap<K,V>, Serializable {
 
     /**

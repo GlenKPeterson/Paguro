@@ -12,8 +12,8 @@ Future development priorities are further down this page.
 
 # Features
 
-* [Immutable collections](src/main/java/org/organicdesign/fp/collections) - type-safe generic Java versions of Clojure's immutable collections - arguably the best immutable collections on the JVM.
-* [Functional transformations](src/main/java/org/organicdesign/fp/xform/Transformable.java#L42) are a simplified immutable alternative to Java 8 Streams, wrapping checked exceptions and avoiding primitives (you can still use Java 8 streams if you want to).
+* [Immutable collections](src/main/java/org/organicdesign/fp/collections) - type-safe generic Java versions of Clojure's immutable (HAMT = 'Hash Array Mapped Trie') collections - arguably the best immutable collections on the JVM.  Plus an RRB Tree!
+* [Functional transformations](src/main/java/org/organicdesign/fp/xform/Transformable.java#L42) are like a type-safe version of Clojure's Transducers, or a simplified immutable alternative to Java 8 Streams, wrapping checked exceptions and avoiding primitives (you can still use Java 8 streams if you want to).
 * [Brief collection constructors](src/main/java/org/organicdesign/fp/StaticImports.java#L36) are like a tiny, type-safe data definition language:
   * `vec("one", "two", "three")` - an immutable vector/list of three strings
   * `set(3, 5, 7)` - an immutable set of three integers
@@ -39,7 +39,7 @@ Available from the [Maven Repository](http://mvnrepository.com/artifact/org.orga
 <dependency>
         <groupId>org.organicdesign</groupId>
         <artifactId>Paguro</artifactId>
-        <version>3.0.1-ALPHA</version>
+        <version>3.0.4-ALPHA</version>
 </dependency>
 ```
 
@@ -93,6 +93,10 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
 * Minimal, easy-to-understand interface covering the most critical building blocks for higher functionality.
 
 # FAQ
+
+### Q: Why are you doing this?
+
+It started with a Software Engineering Stack Exchange question: [Why doesn't Java provide immutable collections?](https://softwareengineering.stackexchange.com/questions/221762/why-doesnt-java-8-include-immutable-collections)
 
 ### Q: How does this compare to PCollections?
 

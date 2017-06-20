@@ -39,7 +39,7 @@ import static org.organicdesign.fp.collections.UnmodIterator.emptyUnmodIterator;
  This file is a derivative work based on a Clojure collection licensed under the Eclipse Public
  License 1.0 Copyright Rich Hickey.  Errors are Glen Peterson's.
  */
-public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
+public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
         implements ImMap<K,V>, Serializable {
 
 //    static private <K, V, R> R doKvreduce(Object[] array, Fn3<R,K,V,R> f, R init) {
@@ -351,7 +351,7 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
         return new PersistentHashMap<>(equator, size - 1, newroot, hasNull, nullValue);
     }
 
-    public static final class MutableHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
+    public static final class MutableHashMap<K,V> extends AbstractUnmodMap<K,V>
             implements MutableUnsortedMap<K,V> {
 
         private AtomicReference<Thread> edit;

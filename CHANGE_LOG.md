@@ -18,6 +18,7 @@ Major changes:
  - Added JavaDoc to Git site
  - Changed toString to show entire collection
  - Added rrb() and mutableRrb() to StaticImports for constructing RRB Trees.
+ - Moved AbstractUnmodMap from inner class of UnmodMap to top-level class (ebean complained about the inner class).
 
 Here is a script to ease your upgrade from 2.1.1 to 3.0:
 ```bash
