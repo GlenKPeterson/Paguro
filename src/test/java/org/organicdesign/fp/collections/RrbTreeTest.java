@@ -35,7 +35,23 @@ import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class RrbTreeTest {
 
-    private Random rand = new java.security.SecureRandom();
+    // Ensures that we've got at least height=1 + a full focus.
+    private static final int ONE_LEVEL_SZ = STRICT_NODE_LENGTH * (STRICT_NODE_LENGTH + 2);
+    // Ensures that we've got at least height=2 + a full focus.
+    private static final int TWO_LEVEL_SZ =
+            STRICT_NODE_LENGTH * STRICT_NODE_LENGTH * (STRICT_NODE_LENGTH + 2);
+
+    private static Random rand = new java.security.SecureRandom();
+
+    @SuppressWarnings("unchecked")
+    private static <T extends RrbTree<Integer>> T generateRelaxed(int size, T rs) {
+        Random rand = new java.security.SecureRandom();
+        for (int j = 0; j < size; j++) {
+            int idx = rand.nextInt(rs.size() + 1);
+            rs = (T) rs.insert(idx, j);
+        }
+        return rs;
+    }
 
     private static RrbTree<Integer> buildInOrderTest(RrbTree<Integer> is, int iterations) {
         ArrayList<Integer> control = new ArrayList<>();
@@ -616,6 +632,21 @@ public class RrbTreeTest {
         assertArrayEquals(control, mu3.toArray());
     }
 
+    private void testReplaceGuts(RrbTree<Integer> im) {
+        for (int i = 0; i < im.size(); i++) {
+            im = im.replace(i, i);
+        }
+        im.debugValidate();
+        for (int i = 0; i < im.size(); i++) {
+            assertEquals(Integer.valueOf(i), im.get(i));
+        }
+    }
+
+    @Test public void testReplace2() {
+        testReplaceGuts(generateRelaxed(TWO_LEVEL_SZ, RrbTree.empty()));
+        testReplaceGuts(generateRelaxed(TWO_LEVEL_SZ, RrbTree.emptyMutable()));
+    }
+
     @Test public void listIterator() {
         ImRrbt<Integer> im = RrbTree.empty();
         MutableRrbt<Integer> mu = RrbTree.emptyMutable();
@@ -847,11 +878,6 @@ public class RrbTreeTest {
             r3.debugValidate();
         }
     }
-
-    // Ensures that we've got at least height=2 + a full focus.
-    int ONE_LEVEL_SZ = STRICT_NODE_LENGTH * (STRICT_NODE_LENGTH + 2);
-    // Ensures that we've got at least height=3 + a full focus.
-    int TWO_LEVEL_SZ = STRICT_NODE_LENGTH * STRICT_NODE_LENGTH * (STRICT_NODE_LENGTH + 2);
 
     @Test public void testBiggerJoin() {
         ImRrbt<Integer> is = RrbTree.empty();
