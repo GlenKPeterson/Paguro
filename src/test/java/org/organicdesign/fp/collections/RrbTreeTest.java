@@ -30,6 +30,7 @@ import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.xform;
 import static org.organicdesign.fp.TestUtilities.compareIterators;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
+import static org.organicdesign.fp.collections.RrbTree.STRICT_NODE_LENGTH;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class RrbTreeTest {
@@ -441,7 +442,7 @@ public class RrbTreeTest {
             throw new IllegalArgumentException("Constraint violation failed: 1 <= splitIndex <= size");
         }
 //        System.out.println("test=" + test.indentedStr(5));
-        Tuple2<RrbTree<T>,RrbTree<T>> split = test.split(splitIndex);
+        Tuple2<? extends RrbTree<T>,? extends RrbTree<T>> split = test.split(splitIndex);
 //        System.out.println("leftSplit=" + split._1().indentedStr(10));
 //        System.out.println("rightSplit=" + split._2().indentedStr(11));
         List<T> leftControl = control.subList(0, splitIndex);
@@ -478,12 +479,13 @@ public class RrbTreeTest {
         MutableRrbt<Integer> ms = RrbTree.emptyMutable();
         ArrayList<Integer> control = new ArrayList<>();
 //        int splitIndex = rand.nextInt(is.size() + 1);
-        for (int i = 0; i < SEVERAL; i++) {
+        for (int i = 0; i < TWO_LEVEL_SZ; i++) {
             is = is.append(i);
             ms.append(i);
             control.add(i);
         }
-        for (int splitIndex = 1; splitIndex <= SEVERAL; splitIndex++) {
+        for (int splitIndex = 1; splitIndex <= TWO_LEVEL_SZ;
+             splitIndex += (STRICT_NODE_LENGTH * STRICT_NODE_LENGTH * 0.333)) {
 //            int splitIndex = i; //rand.nextInt(is.size() + 1);
 //            System.out.println("splitIndex=" + splitIndex);
 //        System.out.println("empty=" + RrbTree.empty().indentedStr(6));
@@ -513,17 +515,17 @@ public class RrbTreeTest {
         ArrayList<Integer> rands = new ArrayList<>();
         int splitIndex = 0;
         try {
-            for (int j = 0; j < SEVERAL; j++) {
+            for (int j = 0; j < TWO_LEVEL_SZ; j++) {
                 int idx = rand.nextInt(is.size() + 1);
                 rands.add(idx);
                 is = is.insert(idx, j);
                 ms.insert(idx, j);
                 control.add(idx, j);
             }
-            assertEquals(SEVERAL, is.size());
-            assertEquals(SEVERAL, ms.size());
+            assertEquals(TWO_LEVEL_SZ, is.size());
+            assertEquals(TWO_LEVEL_SZ, ms.size());
 //            System.out.println("is:" + is.indentedStr(3));
-            for (int j = 1; j <= SEVERAL; j++) {
+            for (int j = 1; j <= ONE_LEVEL_SZ; j+= ONE_LEVEL_SZ / 10) {
                 splitIndex = j; // So we have it when exception is thrown.
                 testSplit(control, is, splitIndex);
                 testSplit(control, ms, splitIndex);
@@ -704,6 +706,18 @@ public class RrbTreeTest {
         assertTrue(s1.contains("        root="));
 
         assertEquals("MutableRrbt(0,7,3,5,1,4,2,8,6)", rrb2.toString());
+
+        ImRrbt<Integer> im = RrbTree.empty();
+        MutableRrbt<Integer> mu = RrbTree.emptyMutable();
+        for (int j = 1; j < SEVERAL; j++) {
+            im = im.append(j);
+            mu.append(j);
+        }
+        assertTrue(im.indentedStr(7).startsWith("RrbTree(size=99 fsi=96 focus="));
+        assertTrue(im.indentedStr(7).contains("               root=Strict"));
+
+        assertTrue(mu.indentedStr(7).startsWith("RrbTree(size=99 fsi=96 focus="));
+        assertTrue(mu.indentedStr(7).contains("               root=Strict"));
     }
 
     @SafeVarargs
@@ -831,6 +845,29 @@ public class RrbTreeTest {
             r3 = r1.join(r2);
             assertEquals(control, r3);
             r3.debugValidate();
+        }
+    }
+
+    // Ensures that we've got at least height=2 + a full focus.
+    int ONE_LEVEL_SZ = STRICT_NODE_LENGTH * (STRICT_NODE_LENGTH + 2);
+    // Ensures that we've got at least height=3 + a full focus.
+    int TWO_LEVEL_SZ = STRICT_NODE_LENGTH * STRICT_NODE_LENGTH * (STRICT_NODE_LENGTH + 2);
+
+    @Test public void testBiggerJoin() {
+        ImRrbt<Integer> is = RrbTree.empty();
+        MutableRrbt<Integer> ms = RrbTree.emptyMutable();
+        for (int i = 0; i < TWO_LEVEL_SZ; i++) {
+            is = is.append(i);
+            ms.append(i);
+        }
+        assertEquals(is, serializeDeserialize(is));
+        for (int splitIndex = 1; splitIndex <= TWO_LEVEL_SZ;
+             splitIndex += STRICT_NODE_LENGTH * STRICT_NODE_LENGTH * 0.333) {
+            Tuple2<ImRrbt<Integer>,ImRrbt<Integer>> isSplit = is.split(splitIndex);
+            assertEquals(is, isSplit._1().join(isSplit._2()));
+
+            Tuple2<MutableRrbt<Integer>,MutableRrbt<Integer>> msSplit = ms.split(splitIndex);
+            assertEquals(ms, msSplit._1().join(msSplit._2()));
         }
     }
 

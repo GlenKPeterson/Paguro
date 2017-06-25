@@ -468,14 +468,14 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         @Override public int size() { return size; }
 
         /**
-         Divides this RRB-Tree such that every index less-than the given index ends up in the left-hand
-         tree and the indexed item and all subsequent ones end up in the right-hand tree.
+         Divides this RRB-Tree such that every index less-than the given index ends up in the
+         left-hand tree and the indexed item and all subsequent ones end up in the right-hand tree.
 
          @param splitIndex the split point (excluded from the left-tree, included in the right one)
-         @return two new sub-trees as determined by the split point.  If the point is 0 or this.size()
-         one tree will be empty (but never null).
+         @return two new sub-trees as determined by the split point.  If the point is 0 or
+         this.size() one tree will be empty (but never null).
          */
-        public Tuple2<RrbTree<E>,RrbTree<E>> split(int splitIndex) {
+        public Tuple2<MutableRrbt<E>,MutableRrbt<E>> split(int splitIndex) {
             if ( (splitIndex < 1) || (splitIndex > size) ) {
                 throw new IndexOutOfBoundsException(
                         "Constraint violation failed: 1 <= splitIndex <= size");
@@ -565,12 +565,12 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
             throw new InvalidObjectException("Proxy required");
         }
 
-        // ===================================== Instance Methods =====================================
+        // =================================== Instance Methods ===================================
 
         /** {@inheritDoc} */
         @Override public ImRrbt<E> append(E val) {
-            // If our focus isn't set up for appends or if it's full, insert it into the data structure
-            // where it belongs.  Then make a new focus
+            // If our focus isn't set up for appends or if it's full, insert it into the data
+            // structure where it belongs.  Then make a new focus
             if ( (focus.length >= STRICT_NODE_LENGTH) ||
                  ((focus.length > 0) &&
                   (focusStartIndex < (size - focus.length))) ) {
@@ -688,8 +688,8 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
 
             // We don't want to wonder below if we're inserting leaves or branch-nodes.
             // Also, it leaves the tree cleaner to just smash leaves onto the bigger tree.
-            // Ultimately, we might want to see if we can grab the tail and stick it where it belongs
-            // but for now, this should be alright.
+            // Ultimately, we might want to see if we can grab the tail and stick it where it
+            // belongs but for now, this should be alright.
             if (that.size() < MAX_NODE_LENGTH) {
                 return concat(that);
             }
@@ -893,7 +893,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
          @return two new sub-trees as determined by the split point.  If the point is 0 or this.size()
          one tree will be empty (but never null).
          */
-        public Tuple2<RrbTree<E>,RrbTree<E>> split(int splitIndex) {
+        public Tuple2<ImRrbt<E>,ImRrbt<E>> split(int splitIndex) {
             if ( (splitIndex < 1) || (splitIndex > size) ) {
                 throw new IndexOutOfBoundsException(
                         "Constraint violation failed: 1 <= splitIndex <= size");
@@ -1035,7 +1035,7 @@ involves changing more nodes than maybe necessary.
      @return two new sub-trees as determined by the split point.  If the point is 0 or this.size()
      one tree will be empty (but never null).
      */
-    abstract public Tuple2<RrbTree<E>,RrbTree<E>> split(int splitIndex);
+    abstract public Tuple2<? extends RrbTree<E>,? extends RrbTree<E>> split(int splitIndex);
 
     /**
      Returns a new RrbTree minus the given item (all items to the right are shifted left one)
@@ -1043,8 +1043,8 @@ involves changing more nodes than maybe necessary.
      */
     public RrbTree<E> without(int index) {
         if ( (index > 0) && (index < size() - 1) ) {
-            Tuple2<RrbTree<E>,RrbTree<E>> s1 = split(index);
-            Tuple2<RrbTree<E>,RrbTree<E>> s2 = s1._2().split(1);
+            Tuple2<? extends RrbTree<E>,? extends RrbTree<E>> s1 = split(index);
+            Tuple2<? extends RrbTree<E>,? extends RrbTree<E>> s2 = s1._2().split(1);
             return s1._1().join(s2._2());
         } else if (index == 0) {
             return split(1)._2();
@@ -1121,7 +1121,7 @@ involves changing more nodes than maybe necessary.
     private static final int NODE_LENGTH_POW_2 = 5; // 2 for testing, 5 for real
 
     // 0b00000000000000000000000000100000 = 0x20 = 32
-    private static final int STRICT_NODE_LENGTH = 1 << NODE_LENGTH_POW_2;
+    static final int STRICT_NODE_LENGTH = 1 << NODE_LENGTH_POW_2;
 
     private static final int HALF_STRICT_NODE_LENGTH = STRICT_NODE_LENGTH >> 1;
 
