@@ -283,7 +283,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
 
     @Override public Option<UnmodMap.UnEntry<K,V>> entry(K key) {
         if (key == null) {
-            return hasNull ? Option.of(Tuple2.of(null, nullValue)) : Option.none();
+            return hasNull ? Option.some(Tuple2.of(null, nullValue)) : Option.none();
         }
         if (root == null) {
             return Option.none();
@@ -412,7 +412,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
         @Override public Option<UnEntry<K,V>> entry(K key) {
             ensureEditable();
             if (key == null) {
-                return hasNull ? Option.of(Tuple2.of(null, nullValue)) : Option.none();
+                return hasNull ? Option.some(Tuple2.of(null, nullValue)) : Option.none();
             }
             if (root == null) {
                 return Option.none();

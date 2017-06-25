@@ -36,7 +36,7 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
      Implements equals and hashCode() methods compatible with java.util.List (which ignores order)
      to make defining unmod lists easier.
      */
-    abstract class AbstractUnmodList<E> extends UnmodIterable.AbstractUnmodIterable<E>
+    abstract class AbstractUnmodList<E> extends AbstractUnmodIterable<E>
             implements UnmodList<E> {
         @SuppressWarnings("unchecked")
         @Override public boolean equals(Object other) {

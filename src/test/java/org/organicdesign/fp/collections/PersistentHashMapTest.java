@@ -533,14 +533,15 @@ public class PersistentHashMapTest {
 
     @Test public void seq3() {
         PersistentHashMap<String,Integer> m1 = PersistentHashMap.of(vec(tup("c", 1)));
-        assertEquals(Option.of(tup("c", 1)),
+        assertEquals(Option.some(tup("c", 1)),
                      m1.head());
 
         ImMap<String,Integer> m2 = map(tup("c", 1), tup("b", 2), tup("a", 3));
 
-        Set<Option<Tuple2<String,Integer>>> s = new HashSet<>(Arrays.asList(Option.of(tup("c", 1)),
-                                                                            Option.of(tup("b", 2)),
-                                                                            Option.of(tup("a", 3))));
+        Set<Option<Tuple2<String,Integer>>> s =
+                new HashSet<>(Arrays.asList(Option.some(tup("c", 1)),
+                                            Option.some(tup("b", 2)),
+                                            Option.some(tup("a", 3))));
 
         UnmodIterable<UnmodMap.UnEntry<String,Integer>> seq = m2;
         Option o = seq.head();

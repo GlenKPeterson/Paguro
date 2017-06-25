@@ -13,8 +13,6 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
-import org.organicdesign.fp.tuple.Tuple2;
-
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Map;
@@ -213,7 +211,7 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
      {@inheritDoc}
      */
     @Override default UnmodSet<Entry<K,V>> entrySet() {
-        class EntrySet extends UnmodSet.AbstractUnmodSet<Entry<K,V>>
+        class EntrySet extends AbstractUnmodSet<Entry<K,V>>
                 implements Serializable {
             // For serializable.  Make sure to change whenever internal data format changes.
             private static final long serialVersionUID = 20160903104400L;
@@ -293,7 +291,7 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
      {@inheritDoc}
      */
     @Override default UnmodSet<K> keySet() {
-        class KeySet extends UnmodSet.AbstractUnmodSet<K> implements Serializable {
+        class KeySet extends AbstractUnmodSet<K> implements Serializable {
             // For serializable.  Make sure to change whenever internal data format changes.
             private static final long serialVersionUID = 20160903104400L;
 

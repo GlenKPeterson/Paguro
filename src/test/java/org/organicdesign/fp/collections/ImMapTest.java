@@ -26,7 +26,7 @@ public class ImMapTest {
         private TestMap(Map<K,V> m) { inner = m; }
 
         @Override public Option<UnEntry<K, V>> entry(K key) {
-            return inner.containsKey(key) ? Option.of(Tuple2.of(key, inner.get(key)))
+            return inner.containsKey(key) ? Option.some(Tuple2.of(key, inner.get(key)))
                                           : Option.none();
         }
 

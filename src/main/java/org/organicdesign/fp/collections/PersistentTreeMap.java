@@ -459,7 +459,7 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
                 t = t.left();
             }
         }
-        return Option.of(t);
+        return Option.some(t);
     }
 
     /** {@inheritDoc} */
@@ -711,7 +711,7 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
         while (t != null) {
             int c = comp.compare(key, t.getKey());
             if (c == 0)
-                return Option.of(t);
+                return Option.some(t);
             else if (c < 0)
                 t = t.left();
             else

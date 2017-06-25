@@ -273,7 +273,7 @@ public interface Fn1<T,U> extends Function<T,U>, Consumer<T> {
                 Option<B> val = memo.get(a);
                 if ( (val != null) && val.isSome() ) { return val.get(); }
                 B ret = f.apply(a);
-                memo.put(a, Option.of(ret));
+                memo.put(a, Option.some(ret));
                 return ret;
             }
         };

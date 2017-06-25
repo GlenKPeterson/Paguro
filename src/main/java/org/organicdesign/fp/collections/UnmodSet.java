@@ -20,22 +20,6 @@ import java.util.function.Predicate;
 /** An unmodifiable set */
 public interface UnmodSet<E> extends UnmodCollection<E>, Set<E> {
 
-    // ========================================== Static ==========================================
-
-    /**
-     Implements equals and hashCode() methods compatible with java.util.Set (which ignores order)
-     to make defining unmod sets easier, especially for implementing Map.keySet() and such.
-     */
-    abstract class AbstractUnmodSet<T> extends AbstractUnmodIterable<T> implements UnmodSet<T> {
-        @Override public boolean equals(Object other) {
-            if (this == other) { return true; }
-            if ( !(other instanceof Set) ) { return false; }
-            Set that = (Set) other;
-            return (size() == that.size()) &&
-                   containsAll(that);
-        }
-    }
-
     // ========================================= Instance =========================================
 
     /** Not allowed - this is supposed to be unmodifiable */

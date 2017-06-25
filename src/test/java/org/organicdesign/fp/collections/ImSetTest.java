@@ -13,7 +13,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class ImSetTest {
-    static class TestSet<E> extends UnmodSet.AbstractUnmodSet<E> implements ImSet<E> {
+    static class TestSet<E> extends AbstractUnmodSet<E> implements ImSet<E> {
         static <T> Set<T> dup(Collection<T> in) {
             Set<T> out = new HashSet<>();
             out.addAll(in);

@@ -55,11 +55,22 @@ public interface Option<T> extends Serializable { // extends UnmodSortedIterable
     @SuppressWarnings("unchecked")
     static <T> Option<T> none() { return NONE; }
 
-    /** Public static factory method for contructing Options. */
-    static <T> Option<T> of(T t) {
+    /**
+     Would {@link #some(Object)} be better for your purposes?  For some reason, this returns none
+     if you pass it a none.  This is like flatmapping Options.  Is this good for chaining or
+     is this just weird?  If the first, I'm going to rename it flatten() or flatmap() or something.
+     If the second, it should be deleted.  Remember, you also have {@link Or} for chaining or
+     returning an error which is probably a better choice than Option for that kind of thing.
+     */
+    @Deprecated static <T> Option<T> of(T t) {
         if (NONE.equals(t)) {
             return none();
         }
+        return new Some<>(t);
+    }
+
+    /** Public static factory method for constructing the Some Option. */
+    static <T> Option<T> some(T t) {
         return new Some<>(t);
     }
 

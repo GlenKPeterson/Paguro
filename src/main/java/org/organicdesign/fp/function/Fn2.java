@@ -64,7 +64,7 @@ public interface Fn2<A,B,R> extends BiFunction<A,B,R> {
                 Option<Z> val = map.get(t);
                 if (val != null) { return val.get(); }
                 Z ret = f.apply(a, b);
-                map.put(t, Option.of(ret));
+                map.put(t, Option.some(ret));
                 return ret;
             }
         };

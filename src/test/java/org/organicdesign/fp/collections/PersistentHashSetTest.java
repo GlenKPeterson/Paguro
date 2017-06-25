@@ -180,14 +180,14 @@ public class PersistentHashSetTest {
 
     @Test public void seq3() {
         PersistentHashSet<String> m1 = PersistentHashSet.of(vec("c"));
-        assertEquals(Option.of("c"),
+        assertEquals(Option.some("c"),
                      m1.head());
 
         PersistentHashSet<String> m2 = PersistentHashSet.of(vec("c", "b", "a"));
 
-        Set<Option<String>> s = new HashSet<>(Arrays.asList(Option.of("c"),
-                                                            Option.of("b"),
-                                                            Option.of("a")));
+        Set<Option<String>> s = new HashSet<>(Arrays.asList(Option.some("c"),
+                                                            Option.some("b"),
+                                                            Option.some("a")));
 
         UnmodIterable<String> seq = m2;
         Option o = seq.head();

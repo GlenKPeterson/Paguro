@@ -26,7 +26,7 @@ import java.util.Map;
  This file is a derivative work based on a Clojure collection licensed under the Eclipse Public
  License 1.0 Copyright Rich Hickey
 */
-public class PersistentHashSet<E> extends UnmodSet.AbstractUnmodSet<E>
+public class PersistentHashSet<E> extends AbstractUnmodSet<E>
         implements ImSet<E>, Serializable {
 
     // If you don't put this here, it inherits EMPTY from UnmodSet, which does not have .equals()
@@ -167,7 +167,7 @@ public class PersistentHashSet<E> extends UnmodSet.AbstractUnmodSet<E>
         return new MutableHashSet<>(impl.mutable());
     }
 
-    public static final class MutableHashSet<E> extends UnmodSet.AbstractUnmodSet<E>
+    public static final class MutableHashSet<E> extends AbstractUnmodSet<E>
             implements MutableUnsortedSet<E> {
 
         MutableUnsortedMap<E,E> impl;

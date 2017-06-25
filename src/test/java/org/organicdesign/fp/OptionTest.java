@@ -10,14 +10,14 @@ import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 public class OptionTest {
 
     @Test public void basics() {
-        Option<Integer> o1a = Option.of(1);
+        Option<Integer> o1a = Option.some(1);
         assertTrue(o1a.isSome());
         assertEquals(Integer.valueOf(1), o1a.get());
         assertEquals(Integer.valueOf(1), o1a.getOrElse(2));
         assertEquals("One", o1a.match(s -> "One",
                                       () -> "Two"));
 
-        Option<Integer> z = Option.of(null);
+        Option<Integer> z = Option.some(null);
         assertTrue(z.isSome());
         assertEquals(null, z.get());
         assertEquals(null, z.getOrElse(2));
@@ -79,28 +79,28 @@ public class OptionTest {
 //    }
 
     @Test public void equalsHash() {
-        Option<Integer> o1a = Option.of(1);
-        Option<Integer> o1b = Option.of(new Integer(2 - 1));
-        Option<Integer> o1c = Option.of(Integer.valueOf("1"));
+        Option<Integer> o1a = Option.some(1);
+        Option<Integer> o1b = Option.some(new Integer(2 - 1));
+        Option<Integer> o1c = Option.some(Integer.valueOf("1"));
 
-        equalsDistinctHashCode(o1a, o1b, o1c, Option.of(0));
+        equalsDistinctHashCode(o1a, o1b, o1c, Option.some(0));
 
-        equalsDistinctHashCode(o1a, serializeDeserialize(o1b), o1c, Option.of(0));
+        equalsDistinctHashCode(o1a, serializeDeserialize(o1b), o1c, Option.some(0));
 
-        equalsDistinctHashCode(o1a, o1b, o1c, Option.of(2));
+        equalsDistinctHashCode(o1a, o1b, o1c, Option.some(2));
 
-        equalsDistinctHashCode(o1a, o1b, o1c, Option.of(null));
+        equalsDistinctHashCode(o1a, o1b, o1c, Option.some(null));
 
         equalsDistinctHashCode(o1a, o1b, o1c, Option.none());
 
-        equalsDistinctHashCode(Option.of(null), Option.of(null), Option.of(null), o1a);
-        equalsDistinctHashCode(Option.of(null), serializeDeserialize(Option.of(null)),
-                               Option.of(null), o1a);
+        equalsDistinctHashCode(Option.some(null), Option.some(null), Option.some(null), o1a);
+        equalsDistinctHashCode(Option.some(null), serializeDeserialize(Option.some(null)),
+                               Option.some(null), o1a);
 
-        Option<Integer> z = Option.of(null);
+        Option<Integer> z = Option.some(null);
         Option<Integer> n1 = Option.none();
         Option<Integer> n2 = Option.someOrNullNoneOf(null);
-        Option n3 = Option.of(Option.NONE);
+        @SuppressWarnings("deprecation") Option n3 = Option.of(Option.NONE);
 
         assertTrue(n1 == n2);
         assertTrue(n2 == n3);
@@ -124,7 +124,7 @@ public class OptionTest {
 
         equalsDistinctHashCode(o1a, o1b, o1c, n1);
 
-        equalsDistinctHashCode(Option.of(null), Option.of(null), Option.of(null), n2);
+        equalsDistinctHashCode(Option.some(null), Option.some(null), Option.some(null), n2);
 
         // None is a serializable singleton.
         assertTrue(n1 == serializeDeserialize(n1));
@@ -132,14 +132,14 @@ public class OptionTest {
     }
 
     @Test public void thenTest() {
-        Option<Integer> o1 = Option.of(1);
-        assertEquals(Option.none(), o1.then(i -> i > 3 ? Option.of("good")
+        Option<Integer> o1 = Option.some(1);
+        assertEquals(Option.none(), o1.then(i -> i > 3 ? Option.some("good")
                                                        : Option.none()));
-        assertEquals(Option.of("good"), o1.then(i -> i < 3 ? Option.of("good")
-                                                           : Option.none()));
+        assertEquals(Option.some("good"), o1.then(i -> i < 3 ? Option.some("good")
+                                                             : Option.none()));
 
         Option<Integer> o2 = Option.none();
-        assertEquals(Option.none(), o2.then(i -> i < 3 ? Option.of("good")
+        assertEquals(Option.none(), o2.then(i -> i < 3 ? Option.some("good")
                                                        : Option.none()));
     }
 }

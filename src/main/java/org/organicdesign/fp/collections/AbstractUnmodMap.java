@@ -9,7 +9,7 @@ import java.util.Map;
  AbstractUnmodIterable.
  */
 public abstract class AbstractUnmodMap<K,V>
-        extends UnmodIterable.AbstractUnmodIterable<UnmodMap.UnEntry<K,V>>
+        extends AbstractUnmodIterable<UnmodMap.UnEntry<K,V>>
         implements UnmodMap<K,V> {
 
     /** Compatible with {@link AbstractMap#equals(Object)} */

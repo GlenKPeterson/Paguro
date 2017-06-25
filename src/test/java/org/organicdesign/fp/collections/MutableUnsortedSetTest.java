@@ -13,7 +13,7 @@ import static org.organicdesign.fp.FunctionUtils.ordinal;
  Created by gpeterso on 9/13/16.
  */
 public class MutableUnsortedSetTest {
-    public static class TestSet<E> extends UnmodSet.AbstractUnmodSet<E>
+    public static class TestSet<E> extends AbstractUnmodSet<E>
             implements MutableUnsortedSet<E> {
         private final Set<E> inner;
         public TestSet(Set<E> s) { inner = s; }

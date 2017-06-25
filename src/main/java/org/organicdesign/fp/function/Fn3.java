@@ -55,7 +55,7 @@ public interface Fn3<A,B,C,R> {
                 Option<Z> val = map.get(t3);
                 if (val != null) { return val.get(); }
                 Z ret = f.apply(a, b, c);
-                map.put(t3, Option.of(ret));
+                map.put(t3, Option.some(ret));
                 return ret;
             }
         };
