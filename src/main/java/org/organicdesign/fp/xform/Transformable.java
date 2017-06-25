@@ -27,8 +27,8 @@ import org.organicdesign.fp.collections.ImSet;
 import org.organicdesign.fp.collections.ImSortedMap;
 import org.organicdesign.fp.collections.ImSortedSet;
 import org.organicdesign.fp.collections.MutableList;
-import org.organicdesign.fp.collections.MutableUnsortedMap;
-import org.organicdesign.fp.collections.MutableUnsortedSet;
+import org.organicdesign.fp.collections.MutableMap;
+import org.organicdesign.fp.collections.MutableSet;
 import org.organicdesign.fp.collections.PersistentHashMap;
 import org.organicdesign.fp.collections.PersistentHashSet;
 import org.organicdesign.fp.collections.PersistentTreeMap;
@@ -247,9 +247,9 @@ public interface Transformable<T> {
 
      @return A map with the keys from the given set, mapped to values using the given function.
      */
-    default <K,V> MutableUnsortedMap<K,V> toMutableMap(final Fn1<? super T,Entry<K,V>> f1) {
+    default <K,V> MutableMap<K,V> toMutableMap(final Fn1<? super T,Entry<K,V>> f1) {
         return fold(PersistentHashMap.emptyMutable(),
-                    (MutableUnsortedMap<K,V> ts, T t) -> ts.assoc(f1.apply(t)));
+                    (MutableMap<K,V> ts, T t) -> ts.assoc(f1.apply(t)));
     }
 
     /**
@@ -276,7 +276,7 @@ public interface Transformable<T> {
 
      @return A mutable set (with duplicates removed)
      */
-    default MutableUnsortedSet<T> toMutableSet() {
+    default MutableSet<T> toMutableSet() {
         return fold(PersistentHashSet.emptyMutable(),
                     PersistentHashSet.MutableHashSet::put);
     }

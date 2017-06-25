@@ -20,8 +20,8 @@ import org.organicdesign.fp.collections.ImSet;
 import org.organicdesign.fp.collections.ImSortedMap;
 import org.organicdesign.fp.collections.ImSortedSet;
 import org.organicdesign.fp.collections.MutableList;
-import org.organicdesign.fp.collections.MutableUnsortedMap;
-import org.organicdesign.fp.collections.MutableUnsortedSet;
+import org.organicdesign.fp.collections.MutableMap;
+import org.organicdesign.fp.collections.MutableSet;
 import org.organicdesign.fp.collections.PersistentHashMap;
 import org.organicdesign.fp.collections.PersistentHashSet;
 import org.organicdesign.fp.collections.PersistentTreeMap;
@@ -98,7 +98,7 @@ public final class StaticImports {
     }
 
     /**
-     Returns a new MutableUnsortedMap of the given keys and their paired values.  Use the
+     Returns a new MutableMap of the given keys and their paired values.  Use the
      {@link StaticImports#tup(Object, Object)} method to define those key/value pairs briefly and
      easily.  This data definition method is one of the few methods in this project that support
      varargs.
@@ -107,11 +107,11 @@ public final class StaticImports {
      values in the input list overwrite the earlier ones.  The resulting map can contain zero or one
      null key and any number of null values.  Null k/v pairs will be silently ignored.
 
-     @return a new MutableUnsortedMap of the given key/value pairs
+     @return a new MutableMap of the given key/value pairs
      */
     @SafeVarargs
-    public static <K,V> MutableUnsortedMap<K,V> mutableMap(Map.Entry<K,V>... kvPairs) {
-        MutableUnsortedMap<K,V> ret = PersistentHashMap.emptyMutable();
+    public static <K,V> MutableMap<K,V> mutableMap(Map.Entry<K,V>... kvPairs) {
+        MutableMap<K,V> ret = PersistentHashMap.emptyMutable();
         if (kvPairs == null) { return ret; }
         for (Map.Entry<K,V> me : kvPairs) {
             ret.assoc(me);
@@ -136,13 +136,13 @@ public final class StaticImports {
     }
 
     /**
-     Returns a new MutableUnsortedSet of the values.  This data definition method is one of the few
+     Returns a new MutableSet of the values.  This data definition method is one of the few
      methods in this project that support varargs.  If the input contains duplicate elements, later
      values overwrite earlier ones.
      */
     @SafeVarargs
-    public static <T> MutableUnsortedSet<T> mutableSet(T... items) {
-        MutableUnsortedSet<T> ret = PersistentHashSet.emptyMutable();
+    public static <T> MutableSet<T> mutableSet(T... items) {
+        MutableSet<T> ret = PersistentHashSet.emptyMutable();
         if (items == null) { return ret; }
         for (T t : items) {
             ret.put(t);

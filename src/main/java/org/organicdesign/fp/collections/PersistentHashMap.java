@@ -237,7 +237,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
         @SuppressWarnings("unchecked")
         private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
             s.defaultReadObject();
-            MutableUnsortedMap tempMap =
+            MutableMap tempMap =
                     new PersistentHashMap<K,V>(equator, 0, null, false, null).mutable();
             for (int i = 0; i < size; i++) {
                 tempMap.assoc(s.readObject(), s.readObject());
@@ -352,7 +352,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
     }
 
     public static final class MutableHashMap<K,V> extends AbstractUnmodMap<K,V>
-            implements MutableUnsortedMap<K,V> {
+            implements MutableMap<K,V> {
 
         private AtomicReference<Thread> edit;
         private final Equator<K> equator;

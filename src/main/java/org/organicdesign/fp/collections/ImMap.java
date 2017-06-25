@@ -32,6 +32,6 @@ public interface ImMap<K,V> extends BaseUnsortedMap<K,V> {
     }
 
     /** Returns a mutable version of this mutable map. */
-    MutableUnsortedMap<K,V> mutable();
+    MutableMap<K,V> mutable();
 
 }
