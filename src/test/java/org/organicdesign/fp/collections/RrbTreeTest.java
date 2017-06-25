@@ -29,6 +29,7 @@ import org.organicdesign.fp.tuple.Tuple2;
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.xform;
 import static org.organicdesign.fp.TestUtilities.compareIterators;
+import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class RrbTreeTest {
@@ -629,6 +630,7 @@ public class RrbTreeTest {
         }
         assertArrayEquals(test, im.toArray());
         assertArrayEquals(test, mu.toArray());
+        assertArrayEquals(test, serializeDeserialize(im.toArray()));
 
         List<Integer> tList = Arrays.asList(test);
         TestUtilities.listIteratorTest(tList, im);

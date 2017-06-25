@@ -13,6 +13,11 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
+import java.io.IOException;
+import java.io.InvalidObjectException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
@@ -502,7 +507,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
     }
 
     /** Immutable version of an {@link RrbTree}.  Timing information is available there. */
-    public static class ImRrbt<E> extends RrbTree<E> implements ImList<E> {
+    public static class ImRrbt<E> extends RrbTree<E> implements ImList<E>, Serializable {
         private final E[] focus;
         private final int focusStartIndex;
         private final Node<E> root;
@@ -511,6 +516,56 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         ImRrbt(E[] f, int fi, Node<E> r, int s) {
             focus = f; focusStartIndex = fi; root = r; size = s;
         }
+
+        // ===================================== Serialization =====================================
+        // This class has a custom serialized form designed to be as small as possible.  It does not
+        // have the same internal structure as an instance of this class.
+
+        // For serializable.  Make sure to change whenever internal data format changes.
+        private static final long serialVersionUID = 20170625165600L;
+
+        // Check out Josh Bloch Item 78, p. 312 for an explanation of what's going on here.
+        private static class SerializationProxy<E> implements Serializable {
+            // For serializable.  Make sure to change whenever internal data format changes.
+            private static final long serialVersionUID = 20160904155600L;
+
+            private final int size;
+            private transient RrbTree<E> rrbTree;
+            SerializationProxy(RrbTree<E> v) {
+                size = v.size();
+                rrbTree = v;
+            }
+
+            // Taken from Josh Bloch Item 75, p. 298
+            private void writeObject(ObjectOutputStream s) throws IOException {
+                s.defaultWriteObject();
+                // Write out all elements in the proper order
+                for (E entry : rrbTree) {
+                    s.writeObject(entry);
+                }
+            }
+
+            @SuppressWarnings("unchecked")
+            private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
+                s.defaultReadObject();
+                MutableRrbt<E> temp = emptyMutable();
+                for (int i = 0; i < size; i++) {
+                    temp.append((E) s.readObject());
+                }
+                rrbTree = temp.immutable();
+            }
+
+            private Object readResolve() { return rrbTree; }
+        }
+
+        private Object writeReplace() { return new SerializationProxy<>(this); }
+
+        private void readObject(java.io.ObjectInputStream in) throws IOException,
+                                                                     ClassNotFoundException {
+            throw new InvalidObjectException("Proxy required");
+        }
+
+        // ===================================== Instance Methods =====================================
 
         /** {@inheritDoc} */
         @Override public ImRrbt<E> append(E val) {
