@@ -31,6 +31,7 @@ import org.organicdesign.fp.collections.RrbTree;
 import org.organicdesign.fp.collections.RrbTree.ImRrbt;
 import org.organicdesign.fp.collections.RrbTree.MutableRrbt;
 import org.organicdesign.fp.collections.UnmodIterable;
+import org.organicdesign.fp.collections.UnmodIterator;
 import org.organicdesign.fp.tuple.Tuple2;
 import org.organicdesign.fp.tuple.Tuple3;
 import org.organicdesign.fp.xform.Xform;
@@ -279,23 +280,23 @@ public final class StaticImports {
 //        return Xform.of(map.entrySet());
 //    }
 //
-//    /** Wrap a String to perform a transformation on it. */
-//    public static Transformable<Character> xform(CharSequence seq) {
-//        //noinspection Convert2Lambda
-//        return Xform.of(new Iterable<Character>() {
-//            @Override public Iterator<Character> iterator() {
-//                return new Iterator<Character>() {
-//                    private int idx = 0;
-//                    @Override public boolean hasNext() { return idx < seq.length(); }
-//
-//                    @Override public Character next() {
-//                        int nextIdx = idx + 1;
-//                        Character c = seq.charAt(idx);
-//                        idx = nextIdx;
-//                        return c;
-//                    }
-//                };
-//            }
-//        });
-//    }
+    /** Wrap a String (or CharSequence) to perform a Character-by-Character transformation on it. */
+    public static UnmodIterable<Character> xformChars(CharSequence seq) {
+        //noinspection Convert2Lambda
+        return new UnmodIterable<Character>() {
+            @Override public UnmodIterator<Character> iterator() {
+                return new UnmodIterator<Character>() {
+                    private int idx = 0;
+                    @Override public boolean hasNext() { return idx < seq.length(); }
+
+                    @Override public Character next() {
+                        int nextIdx = idx + 1;
+                        Character c = seq.charAt(idx);
+                        idx = nextIdx;
+                        return c;
+                    }
+                };
+            }
+        };
+    }
 }

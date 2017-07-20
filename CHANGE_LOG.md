@@ -20,6 +20,7 @@ Major changes:
  - Added rrb() and mutableRrb() to StaticImports for constructing RRB Trees.
  - Moved AbstractUnmodMap, AbstractUnmodSet, and AbstractUnmodIterable from inner classes to top-level classes.
  - Option.of() is now Option.some() and it no longer returns None if you pass it a None.
+ - Added StaticImports.xformChars(CharSequence).
 
 Here is a script to ease your upgrade from 2.1.1 to 3.0:
 ```bash
