@@ -92,7 +92,7 @@ x.str().contains("goody!");
 
  </code></pre>
  */
-// TODO: Should we enforce not-null on the contained value?  Or, if you want a null, the whole OneOf2 should be null?
+// TODO: Remove RuntimeTypes and do it like OneOf2OrNone instead.  It's too messy otherwise.
 // TODO: Should this implement javax.lang.model.type.UnionType somehow?
 public class OneOf2<A,B> {
 

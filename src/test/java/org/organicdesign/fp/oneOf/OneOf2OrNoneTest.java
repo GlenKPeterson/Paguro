@@ -1,22 +1,23 @@
 package org.organicdesign.fp.oneOf;
 
 import org.junit.Test;
-import org.organicdesign.fp.collections.ImList;
-import org.organicdesign.fp.type.RuntimeTypes;
 import org.organicdesign.testUtils.EqualsContract;
 
 import static org.junit.Assert.assertEquals;
-import static org.organicdesign.fp.StaticImports.vec;
 
 public class OneOf2OrNoneTest {
 
     static class Str_Int_None extends OneOf2OrNone<String,Integer> {
-        // Ensure we use the one and only instance of this runtime types array to prevent duplicate array creation.
-        transient static final ImList<Class> CLASS_STRING_INTEGER_NONE =
-                RuntimeTypes.registerClasses(vec(String.class, Integer.class, Option.None.class));
 
         // Constructor
-        private Str_Int_None(String s, Integer i, int n) { super(CLASS_STRING_INTEGER_NONE, s, i, n); }
+        private Str_Int_None(String s, Integer i, int n) { super(s, i, n); }
+
+        private transient static final Class[] CLASS_STRING_INTEGER_NONE =
+                { String.class, Integer.class, None.class };
+        @Override
+        protected Class classFor(int selIdx) {
+            return CLASS_STRING_INTEGER_NONE[selIdx - 1];
+        }
 
         // Static factory methods
         static Str_Int_None ofStr(String s) { return new Str_Int_None(s, null, 1); }
@@ -29,16 +30,19 @@ public class OneOf2OrNoneTest {
         assertEquals(Integer.valueOf(57), sin.match(x -> -99,
                                                     y -> y,
                                                     () -> -99));
+        assertEquals("Integer(57)", sin.toString());
 
         sin = Str_Int_None.ofStr("right");
         assertEquals("right", sin.match(x -> x,
                                         y -> "wrong",
                                         () -> "wrong"));
+        assertEquals("String(\"right\")", sin.toString());
 
         sin = Str_Int_None.ofNone();
         assertEquals("right", sin.match(x -> "wrong",
                                         y -> "wrong",
                                         () -> "right"));
+        assertEquals("None", sin.toString());
     }
 
     @Test public void testEquality() {
@@ -57,20 +61,12 @@ public class OneOf2OrNoneTest {
 
     @Test(expected = IllegalArgumentException.class)
     @SuppressWarnings("unchecked")
-    public void testEx01() {
-        new OneOf2OrNone(OneOf2Test.String_Integer.CLASS_STRING_INTEGER, null, null, 3) {  };
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    @SuppressWarnings("unchecked")
-    public void testEx02() {
-        new OneOf2OrNone(OneOf2Test.String_Integer.CLASS_STRING_INTEGER.append(String.class), null, null, 3) {  };
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    @SuppressWarnings("unchecked")
     public void testEx03() {
-        new OneOf2OrNone(Str_Int_None.CLASS_STRING_INTEGER_NONE, null, null, 4) {  };
+        new OneOf2OrNone(null, null, 4) {
+            @Override
+            protected Class classFor(int selIdx) {
+                return Str_Int_None.CLASS_STRING_INTEGER_NONE[selIdx - 1];
+            }
+        };
     }
-
 }

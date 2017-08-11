@@ -1,6 +1,5 @@
 package org.organicdesign.fp.oneOf;
 
-import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.function.Fn0;
 import org.organicdesign.fp.function.Fn1;
 import org.organicdesign.fp.type.RuntimeTypes;
@@ -9,21 +8,13 @@ import java.util.Objects;
 
 import static org.organicdesign.fp.FunctionUtils.stringify;
 
-public class OneOf2OrNone<A,B> {
+/** Holds one of 2 values or {@link None}. */
+public abstract class OneOf2OrNone<A,B> {
 
     protected final Object item;
     protected final int sel;
-    private final ImList<Class> types;
 
-    protected OneOf2OrNone(ImList<Class> runtimeTypes, A a, B b, int s) {
-        if (runtimeTypes.size() != 3) {
-            throw new IllegalArgumentException("OneOf2OrNone requires exactly 3 types, the third being Option.None.class");
-        }
-        if (!Option.None.class.equals(runtimeTypes.get(2))) {
-            throw new IllegalArgumentException("The third type for OneOf2OrNone must be Option.None.class");
-        }
-        types = RuntimeTypes.registerClasses(runtimeTypes);
-
+    protected OneOf2OrNone(A a, B b, int s) {
         sel = s;
         if (sel == 1) {
             item = a;
@@ -32,11 +23,26 @@ public class OneOf2OrNone<A,B> {
         } else if (sel == 3) {
             item = null;
         } else {
-            throw new IllegalArgumentException("You must specify whether this holds a(n) " +
-                                               RuntimeTypes.name(types.get(0)) + ", a(n) " +
-                                               RuntimeTypes.name(types.get(1)) + ", or nothing");
+            throw new IllegalArgumentException("You must specify whether this holds 1. a(n) " +
+                                               RuntimeTypes.name(classFor(1)) + ", 2. a(n) " +
+                                               RuntimeTypes.name(classFor(2)) + ", or 3. " +
+                                               RuntimeTypes.name(classFor(3)));
         }
     }
+
+    /**
+     This should be implemented as
+     <pre><code>
+private transient static final Class[] CLASSES =
+        { String.class, Integer.class, None.class };
+&#64;Override
+protected Class classFor(int selIdx) {
+    return CLASSES[selIdx - 1];
+}</code></pre>
+
+     Be sure to use the right number of classes and make None (from this package) the final class.
+     */
+    protected abstract Class classFor(int selIdx);
 
     // We only store one item and it's type is erased, so we have to cast it at runtime.
     // If sel is managed correctly, it ensures that the cast is accurate.
@@ -69,6 +75,8 @@ public class OneOf2OrNone<A,B> {
     }
 
     @Override public String toString() {
-        return RuntimeTypes.name(types.get(sel - 1)) + "(" + stringify(item) + ")";
+        Class c = classFor(sel);
+        return None.class.equals(c) ? "None"
+                                    : RuntimeTypes.name(c) + "(" + stringify(item) + ")";
     }
 }
