@@ -21,6 +21,7 @@ Major changes:
  - Moved AbstractUnmodMap, AbstractUnmodSet, and AbstractUnmodIterable from inner classes to top-level classes.
  - Option.of() is now Option.some() and it no longer returns None if you pass it a None.
  - Added StaticImports.xformChars(CharSequence).
+ - Added oneOf.OneOf2OrNone class.
 
 Here is a script to ease your upgrade from 2.1.1 to 3.0:
 ```bash

@@ -14,7 +14,7 @@ public class OneOf2Test {
 
     static class String_Integer extends OneOf2<String,Integer> {
         // Ensure we use the one and only instance of this runtime types array to prevent duplicate array creation.
-        transient private static final ImList<Class> CLASS_STRING_INTEGER =
+        transient static final ImList<Class> CLASS_STRING_INTEGER =
                 RuntimeTypes.registerClasses(vec(String.class, Integer.class));
 
         // Constructor
