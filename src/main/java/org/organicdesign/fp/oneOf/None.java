@@ -6,10 +6,14 @@ import org.organicdesign.fp.function.Fn1;
 /** Represents the absence of a value */
 public final class None<T> implements Option<T> {
     // For serializable.  Make sure to change whenever internal data format changes.
-    private static final long serialVersionUID = 20160915081300L;
+    private static final long serialVersionUID = 20170810211300L;
+
+    // ========================================== Static ==========================================
+    /** None is a singleton and this is its only instance. */
+    public static final Option NONE = new None();
 
     /** Private constructor for singleton. */
-    None() {}
+    private None() {}
 
     /** {@inheritDoc} */
     @Override public T get() { throw new IllegalStateException("Called get on None"); }

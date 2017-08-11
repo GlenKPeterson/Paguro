@@ -2,7 +2,6 @@ package org.organicdesign.fp.oneOf;
 
 import org.organicdesign.fp.function.Fn0;
 import org.organicdesign.fp.function.Fn1;
-import org.organicdesign.fp.type.RuntimeTypes;
 
 import java.util.Objects;
 
@@ -24,25 +23,25 @@ public abstract class OneOf2OrNone<A,B> {
             item = null;
         } else {
             throw new IllegalArgumentException("You must specify whether this holds 1. a(n) " +
-                                               RuntimeTypes.name(classFor(1)) + ", 2. a(n) " +
-                                               RuntimeTypes.name(classFor(2)) + ", or 3. " +
-                                               RuntimeTypes.name(classFor(3)));
+                                               typeName(1) + ", 2. a(n) " +
+                                               typeName(2) + ", or 3. " +
+                                               typeName(3));
         }
     }
 
     /**
      This should be implemented as
      <pre><code>
-private transient static final Class[] CLASSES =
-        { String.class, Integer.class, None.class };
-&#64;Override
-protected Class classFor(int selIdx) {
-    return CLASSES[selIdx - 1];
+private transient static final String[] NAMES =
+        { "String", "Integer", "None" };
+
+&#64;Override protected String typeName(int selIdx) {
+    return NAMES[selIdx - 1];
 }</code></pre>
 
-     Be sure to use the right number of classes and make None (from this package) the final class.
+     Be sure to use the right number of names and make "None" the final one.
      */
-    protected abstract Class classFor(int selIdx);
+    protected abstract String typeName(int selIdx);
 
     // We only store one item and it's type is erased, so we have to cast it at runtime.
     // If sel is managed correctly, it ensures that the cast is accurate.
@@ -75,8 +74,8 @@ protected Class classFor(int selIdx) {
     }
 
     @Override public String toString() {
-        Class c = classFor(sel);
-        return None.class.equals(c) ? "None"
-                                    : RuntimeTypes.name(c) + "(" + stringify(item) + ")";
+        String tn = typeName(sel);
+        return sel == 3 ? tn
+                        : tn + "(" + stringify(item) + ")";
     }
 }

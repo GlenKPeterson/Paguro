@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.organicdesign.testUtils.EqualsContract;
 
 import static org.junit.Assert.assertEquals;
+import static org.organicdesign.testUtils.Serialization.serializeDeserialize;
 
 public class OneOf2OrNoneTest {
 
@@ -12,12 +13,8 @@ public class OneOf2OrNoneTest {
         // Constructor
         private Str_Int_None(String s, Integer i, int n) { super(s, i, n); }
 
-        private transient static final Class[] CLASS_STRING_INTEGER_NONE =
-                { String.class, Integer.class, None.class };
-        @Override
-        protected Class classFor(int selIdx) {
-            return CLASS_STRING_INTEGER_NONE[selIdx - 1];
-        }
+        private transient static final String[] NAMES = { "String", "Integer", "None" };
+        @Override protected String typeName(int selIdx) { return NAMES[selIdx - 1]; }
 
         // Static factory methods
         static Str_Int_None ofStr(String s) { return new Str_Int_None(s, null, 1); }
@@ -43,6 +40,8 @@ public class OneOf2OrNoneTest {
                                         y -> "wrong",
                                         () -> "right"));
         assertEquals("None", sin.toString());
+
+        assertEquals(None.NONE, serializeDeserialize(None.NONE));
     }
 
     @Test public void testEquality() {
@@ -64,8 +63,8 @@ public class OneOf2OrNoneTest {
     public void testEx03() {
         new OneOf2OrNone(null, null, 4) {
             @Override
-            protected Class classFor(int selIdx) {
-                return Str_Int_None.CLASS_STRING_INTEGER_NONE[selIdx - 1];
+            protected String typeName(int selIdx) {
+                return Str_Int_None.NAMES[selIdx - 1];
             }
         };
     }

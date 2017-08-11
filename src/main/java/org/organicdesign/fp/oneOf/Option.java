@@ -49,11 +49,11 @@ public interface Option<T> extends Serializable { // extends UnmodSortedIterable
 
     // ========================================== Static ==========================================
     /** None is a singleton and this is its only instance. */
-    Option NONE = new None();
+    Option NONE = None.NONE;
 
     /** Calling this instead of referring to NONE directly can make the type infrencer happy. */
     @SuppressWarnings("unchecked")
-    static <T> Option<T> none() { return NONE; }
+    static <T> Option<T> none() { return None.NONE; }
 
     /**
      Would {@link #some(Object)} be better for your purposes?  For some reason, this returns none
@@ -63,7 +63,7 @@ public interface Option<T> extends Serializable { // extends UnmodSortedIterable
      returning an error which is probably a better choice than Option for that kind of thing.
      */
     @Deprecated static <T> Option<T> of(T t) {
-        if (NONE.equals(t)) {
+        if (None.NONE.equals(t)) {
             return none();
         }
         return new Some<>(t);
@@ -76,7 +76,7 @@ public interface Option<T> extends Serializable { // extends UnmodSortedIterable
 
     /** Construct an option, but if t is null, make it None instead of Some. */
     static <T> Option<T> someOrNullNoneOf(T t) {
-        if ( (t == null) || NONE.equals(t) ) {
+        if ( (t == null) || None.NONE.equals(t) ) {
             return none();
         }
         return new Some<>(t);
