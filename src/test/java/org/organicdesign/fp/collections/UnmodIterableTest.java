@@ -72,6 +72,10 @@ public class UnmodIterableTest {
 
         assertEquals(Arrays.asList("How", "now"),
                      testIterable.takeWhile((String s) -> s.length() < 4).toMutableList());
+
+        assertEquals(Arrays.asList("brown", "cow"),
+                     testIterable.dropWhile((s) -> !"brown".equals(s)).toMutableList());
+
     }
 
     @Test public void equalsHashcode() {

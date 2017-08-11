@@ -151,6 +151,11 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
     }
 
     /** {@inheritDoc} */
+    @Override default UnmodIterable<T> dropWhile(Fn1<? super T,Boolean> predicate) {
+        return Xform.of(this).dropWhile(predicate);
+    }
+
+    /** {@inheritDoc} */
     @Override default <B> B fold(B ident, Fn2<? super B,? super T,B> reducer) {
         return Xform.of(this).fold(ident, reducer);
     }

@@ -143,6 +143,18 @@ public class XformTest extends TestCase {
                        }));
     }
 
+    @Test public void testDropWhile() {
+        Xform<Integer> xf = Xform.of(Arrays.asList(1,2,3,4,5,6,7,8,9));
+        assertEquals(Arrays.asList(5,6,7,8,9), xf.dropWhile(x -> x < 5).toImList());
+        assertEquals(Arrays.asList(5,6,7,8,9), xf.dropWhile(x -> x < 5).toImList());
+        assertEquals(Arrays.asList(1,2,3,4,5,6,7,8,9), xf.dropWhile(x -> x < 1).toImList());
+        assertEquals(Arrays.asList(2,3,4,5,6,7,8,9), xf.dropWhile(x -> x < 2).toImList());
+        assertEquals(Arrays.asList(3,4,5,6,7,8,9), xf.dropWhile(x -> x < 3).toImList());
+        assertEquals(Arrays.asList(8,9), xf.dropWhile(x -> x < 8).toImList());
+        assertEquals(Collections.singletonList(9), xf.dropWhile(x -> x < 9).toImList());
+        assertEquals(Collections.emptyList(), xf.dropWhile(x -> x < 10).toImList());
+    }
+
     @Test public void testEqualsHashCode() {
         equalsDistinctHashCode(new Xform.SourceProviderIterableDesc<>(Arrays.asList("Hi", "Pleased", "Bye")),
                                Xform.of(Arrays.asList("Hi", "Pleased", "Bye")),

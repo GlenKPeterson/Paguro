@@ -65,6 +65,13 @@ public interface Transformable<T> {
     Transformable<T> drop(long numItems);
 
     /**
+     Ignore leading items until the given predicate returns false.
+     @param predicate the predicate (test function)
+     @return a Transformable with the matching leading items ignored.
+     */
+    Transformable<T> dropWhile(Fn1<? super T,Boolean> predicate);
+
+    /**
      Return only the items for which the given predicate returns true.
      @return a Transformable of only the filtered items.
      @param predicate a function that returns true for items to keep, false for items to drop

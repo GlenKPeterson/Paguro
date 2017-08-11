@@ -14,25 +14,20 @@
 
 package org.organicdesign.fp.xform;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
-
-import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.collections.UnmodIterable;
 import org.organicdesign.fp.collections.UnmodIterator;
 import org.organicdesign.fp.function.Fn1;
 import org.organicdesign.fp.function.Fn2;
 import org.organicdesign.fp.oneOf.Or;
 
+import java.util.*;
+
 /**
  An immutable description of operations to be performed (a transformation, transform, or x-form).
- When fold() is called, the Xform definition is "compiled" into a mutable transformation which
- is then carried out.  This allows certain performance shortcuts (such as doing a drop with index
- addition instead of iteration) and also hides the mutability otherwise inherent in a
- transformation.
+ When fold() (or another terminating function) is called, the Xform definition is "compiled" into
+ a one-time mutable transformation which is then carried out.  This allows certain performance
+ shortcuts (such as doing a drop with index addition instead of iteration) and also hides the
+ mutability otherwise inherent in a transformation.
 
  Xform is an abstract class.  Most of the methods on Xform produce immutable descriptions of actions
  to take at a later time.  These are represented by ___Desc classes.  When fold() is called
@@ -270,7 +265,7 @@ public abstract class Xform<A> implements UnmodIterable<A> {
             RunList ret = prevOp.toRunList();
             int i = ret.list.size() - 1;
 //              System.out.println("\tchecking previous items to see if they can handle a drop...");
-            Or<Long,OpStrategy> earlierDs = null;
+            Or<Long,OpStrategy> earlierDs;
             for (; i >= 0; i--) {
                 Operation op = ret.list.get(i);
                 earlierDs = op.drop(dropAmt);
@@ -297,6 +292,34 @@ public abstract class Xform<A> implements UnmodIterable<A> {
 //                System.out.println("\tSource could not handle drop.");
 //                System.out.println("\tMake a drop for " + dropAmt + " items.");
             ret.list.add(new Operation.DropOp(dropAmt));
+            return ret;
+        }
+    }
+
+    /** Describes a dropWhile() operation (implemented as a filter), but does not perform it. */
+    private static class DropWhileDesc<T> extends Xform<T> {
+        final Fn1<? super T,Boolean> f;
+
+        DropWhileDesc(Xform<T> prev, Fn1<? super T,Boolean> func) { super(prev); f = func; }
+
+        @SuppressWarnings("unchecked")
+        @Override protected RunList toRunList() {
+            RunList ret = prevOp.toRunList();
+            ret.list.add(new Operation.FilterOp(new Fn1<Object, Boolean>() {
+                // Starts out active (meaning dropping items until the inner function returns true).
+                // Once inner function returns true, switches into passive mode in which this (outer)
+                // function always returns true.
+                // There are probably more efficient ways to do this, but I'm going for correct first.
+                private boolean active = true;
+                @Override public Boolean applyEx(Object o) throws Exception {
+                    if (!active) {
+                        return true;
+                    }
+                    boolean ret = ! ((Fn1<Object, Boolean>) f).apply(o);
+                    if (ret) { active = false; }
+                    return ret;
+                }
+            }));
             return ret;
         }
     }
@@ -361,7 +384,7 @@ public abstract class Xform<A> implements UnmodIterable<A> {
             RunList ret = prevOp.toRunList();
             int i = ret.list.size() - 1;
 //              System.out.println("\tchecking previous items to see if they can handle a take...");
-            OpStrategy earlierTs = null;
+            OpStrategy earlierTs;
             for (; i >= 0; i--) {
                 Operation op = ret.list.get(i);
                 earlierTs = op.take(take);
@@ -397,6 +420,7 @@ public abstract class Xform<A> implements UnmodIterable<A> {
         @Override public int hashCode() { return UnmodIterable.hash(this); }
         @Override public boolean equals(Object other) {
             if (this == other) { return true; }
+            //noinspection SimplifiableIfStatement
             if ( !(other instanceof SourceProviderIterableDesc) ) { return false; }
             return Objects.equals(this.list, ((SourceProviderIterableDesc) other).list);
         }
@@ -519,7 +543,11 @@ public abstract class Xform<A> implements UnmodIterable<A> {
         return new DropDesc<>(this, n);
     }
 
-    // Do we need a dropWhile???
+    /** The number of items to drop from the beginning of the output. */
+    @Override public Xform<A> dropWhile(Fn1<? super A,Boolean> predicate) {
+        if (predicate == null) { throw new IllegalArgumentException("Can't dropWhile without a function."); }
+        return new DropWhileDesc<>(this, predicate);
+    }
 
     /** Provides a way to collect the results of the transformation. */
     @Override public <B> B fold(B ident, Fn2<? super B,? super A,B> reducer) {
