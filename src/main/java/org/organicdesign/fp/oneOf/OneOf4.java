@@ -6,12 +6,11 @@ import java.util.Objects;
 
 import static org.organicdesign.fp.FunctionUtils.stringify;
 
-/** Holds one of 2 values. */
-abstract public class OneOf3<A,B,C> {
+public abstract class OneOf4<A,B,C,D> {
     protected final Object item;
     protected final int sel;
 
-    protected OneOf3(A a, B b, C c, int s) {
+    protected OneOf4(A a, B b, C c, D d, int s) {
         sel = s;
         if (sel == 1) {
             item = a;
@@ -19,11 +18,14 @@ abstract public class OneOf3<A,B,C> {
             item = b;
         } else if (sel == 3) {
             item = c;
+        } else if (sel == 4) {
+            item = d;
         } else {
             throw new IllegalArgumentException("You must specify whether this holds a(n) 1. " +
                                                typeName(1) + ", 2. " +
-                                               typeName(2) + ", or 3. " +
-                                               typeName(3));
+                                               typeName(2) + ", 3. " +
+                                               typeName(3) + ", or 4. " +
+                                               typeName(4));
         }
     }
 
@@ -31,7 +33,7 @@ abstract public class OneOf3<A,B,C> {
      This should be implemented as
      <pre><code>
      private transient static final String[] NAMES =
-     { "String", "Integer", "Float" };
+     { "String", "Integer", "Float", "Double" };
 
      &#64;Override protected String typeName(int selIdx) {
      return NAMES[selIdx - 1];
@@ -46,13 +48,16 @@ abstract public class OneOf3<A,B,C> {
     @SuppressWarnings("unchecked")
     public <R> R match(Fn1<A, R> fa,
                        Fn1<B, R> fb,
-                       Fn1<C, R> fc) {
+                       Fn1<C, R> fc,
+                       Fn1<D, R> fd) {
         if (sel == 1) {
             return fa.apply((A) item);
         } else if (sel == 2) {
             return fb.apply((B) item);
-        } else {
+        } else if (sel == 3) {
             return fc.apply((C) item);
+        } else {
+            return fd.apply((D) item);
         }
     }
 
@@ -64,9 +69,9 @@ abstract public class OneOf3<A,B,C> {
     @SuppressWarnings("unchecked")
     @Override public boolean equals(Object other) {
         if (this == other) { return true; }
-        if (!(other instanceof OneOf3)) { return false; }
+        if (!(other instanceof OneOf4)) { return false; }
 
-        OneOf3 that = (OneOf3) other;
+        OneOf4 that = (OneOf4) other;
         return (sel == that.sel) &&
                Objects.equals(item, that.item);
     }
