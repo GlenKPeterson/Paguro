@@ -1,47 +1,55 @@
 package org.organicdesign.fp.oneOf;
 
+import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.function.Fn1;
+import org.organicdesign.fp.type.RuntimeTypes;
 
 import java.util.Objects;
 
 import static org.organicdesign.fp.FunctionUtils.stringify;
 
 public abstract class OneOf4<A,B,C,D> {
-    protected final Object item;
-    protected final int sel;
+    private final Object item;
+    private final int sel;
+    private final ImList<Class> types;
 
-    protected OneOf4(A a, B b, C c, D d, int s) {
+    protected OneOf4(A a, Class<A> ca,
+                     B b, Class<B> cb,
+                     C c, Class<C> cc,
+                     D d, Class<D> cd,
+                     int s) {
+        types = RuntimeTypes.registerClasses(ca, cb, cc, cd);
         sel = s;
-        if (sel == 1) {
-            item = a;
-        } else if (sel == 2) {
-            item = b;
-        } else if (sel == 3) {
-            item = c;
-        } else if (sel == 4) {
-            item = d;
+        if (s < 2) {
+            if (s == 0) {
+                item = a;
+                if (b != null) { throw new IllegalArgumentException("Only one item can be non-null"); }
+                if (c != null) { throw new IllegalArgumentException("Only one item can be non-null"); }
+                if (d != null) { throw new IllegalArgumentException("Only one item can be non-null"); }
+            } else if (s == 1) {
+                item = b;
+                if (a != null) { throw new IllegalArgumentException("Only one item can be non-null"); }
+                if (c != null) { throw new IllegalArgumentException("Only one item can be non-null"); }
+                if (d != null) { throw new IllegalArgumentException("Only one item can be non-null"); }
+            } else {
+                throw new IllegalArgumentException("Selected item index must be 0-3");
+            }
         } else {
-            throw new IllegalArgumentException("You must specify whether this holds a(n) 1. " +
-                                               typeName(1) + ", 2. " +
-                                               typeName(2) + ", 3. " +
-                                               typeName(3) + ", or 4. " +
-                                               typeName(4));
+            if (s == 2) {
+                item = c;
+                if (a != null) { throw new IllegalArgumentException("Only one item can be non-null"); }
+                if (b != null) { throw new IllegalArgumentException("Only one item can be non-null"); }
+                if (d != null) { throw new IllegalArgumentException("Only one item can be non-null"); }
+            } else if (s == 3) {
+                item = d;
+                if (a != null) { throw new IllegalArgumentException("Only one item can be non-null"); }
+                if (b != null) { throw new IllegalArgumentException("Only one item can be non-null"); }
+                if (c != null) { throw new IllegalArgumentException("Only one item can be non-null"); }
+            } else {
+                throw new IllegalArgumentException("Selected item index must be 0-3");
+            }
         }
     }
-
-    /**
-     This should be implemented as
-     <pre><code>
-     private transient static final String[] NAMES =
-     { "String", "Integer", "Float", "Double" };
-
-     &#64;Override protected String typeName(int selIdx) {
-     return NAMES[selIdx - 1];
-     }</code></pre>
-
-     Be sure to use the right number of names and make "None" the final one.
-     */
-    protected abstract String typeName(int selIdx);
 
     // We only store one item and it's type is erased, so we have to cast it at runtime.
     // If sel is managed correctly, it ensures that the cast is accurate.
@@ -50,11 +58,11 @@ public abstract class OneOf4<A,B,C,D> {
                        Fn1<B, R> fb,
                        Fn1<C, R> fc,
                        Fn1<D, R> fd) {
-        if (sel == 1) {
+        if (sel == 0) {
             return fa.apply((A) item);
-        } else if (sel == 2) {
+        } else if (sel == 1) {
             return fb.apply((B) item);
-        } else if (sel == 3) {
+        } else if (sel == 2) {
             return fc.apply((C) item);
         } else {
             return fd.apply((D) item);
@@ -77,6 +85,6 @@ public abstract class OneOf4<A,B,C,D> {
     }
 
     @Override public String toString() {
-        return typeName(sel) + "(" + stringify(item) + ")";
+        return RuntimeTypes.name(types.get(sel)) + "/4(" + stringify(item) + ")";
     }
 }

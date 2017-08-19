@@ -92,29 +92,26 @@ x.str().contains("goody!");
 
  </code></pre>
  */
-// TODO: Remove RuntimeTypes and do it like OneOf2OrNone instead.  It's too messy otherwise.
 // TODO: Should this implement javax.lang.model.type.UnionType somehow?
 public class OneOf2<A,B> {
 
-    protected final Object item;
-    protected final int sel;
+    private final Object item;
+    private final int sel;
     private final ImList<Class> types;
 
-    protected OneOf2(ImList<Class> runtimeTypes, A a, B b, int s) {
-        if (runtimeTypes.size() != 2) {
-            throw new IllegalArgumentException("OneOf2 requires exactly 2 types");
-        }
-        types = RuntimeTypes.registerClasses(runtimeTypes);
-
+    protected OneOf2(A a, Class<A> ca,
+                     B b, Class<B> cb,
+                     int s) {
+        types = RuntimeTypes.registerClasses(ca, cb);
         sel = s;
-        if (sel == 1) {
+        if (s == 0) {
             item = a;
-        } else if (sel == 2) {
+            if (b != null) { throw new IllegalArgumentException("Only one item can be non-null"); }
+        } else if (s == 1) {
             item = b;
+            if (a != null) { throw new IllegalArgumentException("Only one item can be non-null"); }
         } else {
-            throw new IllegalArgumentException("You must specify whether this holds a(n) " +
-                                               RuntimeTypes.name(types.get(0)) + " or a(n) " +
-                                               RuntimeTypes.name(types.get(1)));
+            throw new IllegalArgumentException("Selected item index must be 0-3");
         }
     }
 
@@ -127,7 +124,7 @@ public class OneOf2<A,B> {
     @SuppressWarnings("unchecked")
     public <R> R match(Fn1<A, R> fa,
                        Fn1<B, R> fb) {
-        if (sel == 1) {
+        if (sel == 0) {
             return fa.apply((A) item);
         }
         return fb.apply((B) item);
@@ -165,6 +162,6 @@ public class OneOf2<A,B> {
     }
 
     @Override public String toString() {
-        return RuntimeTypes.name(types.get(sel - 1)) + "(" + stringify(item) + ")";
+        return RuntimeTypes.name(types.get(sel)) + "/2(" + stringify(item) + ")";
     }
 }

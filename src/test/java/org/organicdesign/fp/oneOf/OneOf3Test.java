@@ -11,16 +11,14 @@ public class OneOf3Test {
     static class Str_Int_Float extends OneOf3<String,Integer,Float> {
 
         // Constructor
-        private Str_Int_Float(String s, Integer i, Float f, int n) { super(s, i, f, n); }
+        private Str_Int_Float(String s, Integer i, Float f, int n) {
+            super(s, String.class, i, Integer.class, f, Float.class, n);
+        }
 
         // Static factory methods
-        static Str_Int_Float ofStr(String s) { return new Str_Int_Float(s, null, null, 1); }
-        static Str_Int_Float ofInt(Integer i) { return new Str_Int_Float(null, i, null, 2); }
-        static Str_Int_Float ofFloat(Float f) { return new Str_Int_Float(null, null, f, 3); }
-
-        // Ensure we use the one and only instance of this array
-        transient static final String[] NAMES = { "Str", "Int", "Float"};
-        @Override protected String typeName(int selIdx) { return NAMES[selIdx - 1]; }
+        static Str_Int_Float ofStr(String s) { return new Str_Int_Float(s, null, null, 0); }
+        static Str_Int_Float ofInt(Integer i) { return new Str_Int_Float(null, i, null, 1); }
+        static Str_Int_Float ofFloat(Float f) { return new Str_Int_Float(null, null, f, 2); }
     }
 
     @Test
@@ -29,27 +27,25 @@ public class OneOf3Test {
         assertEquals("right", oots.match(s -> s,
                                          i -> "wrong",
                                          f -> "bad"));
-        assertEquals("Str(\"right\")", oots.toString());
+        assertEquals("String/3(\"right\")", oots.toString());
 
         Str_Int_Float ooti = Str_Int_Float.ofInt(57);
         assertEquals(Integer.valueOf(57), ooti.match(s -> -99,
                                                      i -> i,
                                                      f -> 99));
-        assertEquals("Int(57)", ooti.toString());
+        assertEquals("Integer/3(57)", ooti.toString());
 
         Str_Int_Float ootf = Str_Int_Float.ofFloat(57.2f);
         assertEquals(Float.valueOf(57.2f), ootf.match(s -> -99f,
                                                      i -> 99f,
                                                      f -> f));
-        assertEquals("Float(57.2)", ootf.toString());
-
-
+        assertEquals("Float/3(57.2)", ootf.toString());
     }
 
     @Test public void testEquality() {
-        assertEquals(1, Str_Int_Float.ofStr(null).hashCode());
-        assertEquals(2, Str_Int_Float.ofInt(null).hashCode());
-        assertEquals(3, Str_Int_Float.ofFloat(null).hashCode());
+        assertEquals(0, Str_Int_Float.ofStr(null).hashCode());
+        assertEquals(1, Str_Int_Float.ofInt(null).hashCode());
+        assertEquals(2, Str_Int_Float.ofFloat(null).hashCode());
 
         assertFalse(Str_Int_Float.ofFloat(5f).equals(Str_Int_Float.ofInt(5)));
         assertFalse(Str_Int_Float.ofInt(41).equals(Str_Int_Float.ofStr("A")));
@@ -74,10 +70,10 @@ public class OneOf3Test {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx1() { new Str_Int_Float(null, null, null, 4); }
+    public void subClassEx1() { new Str_Int_Float(null, null, null, 3); }
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx2() { new Str_Int_Float(null, null, null, 0); }
+    public void subClassEx2() { new Str_Int_Float(null, null, null, -1); }
 
     @Test(expected = IllegalArgumentException.class)
     public void subClassEx3() { new Str_Int_Float(null, null, null, -99); }

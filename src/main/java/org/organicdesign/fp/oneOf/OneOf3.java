@@ -1,45 +1,41 @@
 package org.organicdesign.fp.oneOf;
 
+import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.function.Fn1;
+import org.organicdesign.fp.type.RuntimeTypes;
 
 import java.util.Objects;
 
 import static org.organicdesign.fp.FunctionUtils.stringify;
 
-/** Holds one of 2 values. */
-abstract public class OneOf3<A,B,C> {
-    protected final Object item;
-    protected final int sel;
+/** Holds one of 3 values.  If you're passing the same type, you probably want a tuple instead. */
+public class OneOf3<A,B,C> {
+    private final Object item;
+    private final int sel;
+    private final ImList<Class> types;
 
-    protected OneOf3(A a, B b, C c, int s) {
+    protected OneOf3(A a, Class<A> ca,
+                     B b, Class<B> cb,
+                     C c, Class<C> cc,
+                     int s) {
+        types = RuntimeTypes.registerClasses(ca, cb, cc);
         sel = s;
-        if (sel == 1) {
+        if (s == 0) {
             item = a;
-        } else if (sel == 2) {
+            if (b != null) { throw new IllegalArgumentException("Only one item can be non-null"); }
+            if (c != null) { throw new IllegalArgumentException("Only one item can be non-null"); }
+        } else if (s == 1) {
             item = b;
-        } else if (sel == 3) {
+            if (a != null) { throw new IllegalArgumentException("Only one item can be non-null"); }
+            if (c != null) { throw new IllegalArgumentException("Only one item can be non-null"); }
+        } else if (s == 2) {
             item = c;
+            if (a != null) { throw new IllegalArgumentException("Only one item can be non-null"); }
+            if (b != null) { throw new IllegalArgumentException("Only one item can be non-null"); }
         } else {
-            throw new IllegalArgumentException("You must specify whether this holds a(n) 1. " +
-                                               typeName(1) + ", 2. " +
-                                               typeName(2) + ", or 3. " +
-                                               typeName(3));
+            throw new IllegalArgumentException("Selected item index must be 0-2");
         }
     }
-
-    /**
-     This should be implemented as
-     <pre><code>
-     private transient static final String[] NAMES =
-     { "String", "Integer", "Float" };
-
-     &#64;Override protected String typeName(int selIdx) {
-     return NAMES[selIdx - 1];
-     }</code></pre>
-
-     Be sure to use the right number of names and make "None" the final one.
-     */
-    protected abstract String typeName(int selIdx);
 
     // We only store one item and it's type is erased, so we have to cast it at runtime.
     // If sel is managed correctly, it ensures that the cast is accurate.
@@ -47,9 +43,9 @@ abstract public class OneOf3<A,B,C> {
     public <R> R match(Fn1<A, R> fa,
                        Fn1<B, R> fb,
                        Fn1<C, R> fc) {
-        if (sel == 1) {
+        if (sel == 0) {
             return fa.apply((A) item);
-        } else if (sel == 2) {
+        } else if (sel == 1) {
             return fb.apply((B) item);
         } else {
             return fc.apply((C) item);
@@ -72,6 +68,6 @@ abstract public class OneOf3<A,B,C> {
     }
 
     @Override public String toString() {
-        return typeName(sel) + "(" + stringify(item) + ")";
+        return RuntimeTypes.name(types.get(sel)) + "/3(" + stringify(item) + ")";
     }
 }

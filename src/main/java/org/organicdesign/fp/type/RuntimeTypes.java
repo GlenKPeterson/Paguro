@@ -5,10 +5,12 @@ import org.organicdesign.fp.oneOf.OneOf2;
 
 import java.util.HashMap;
 
+import static org.organicdesign.fp.StaticImports.vec;
+
 /**
  Stores the classes from the compile-time generic type parameters in a vector in the *same order* as the
  generics in the type signature of that class.
- Store them here using {@link #registerClasses(ImList)} to avoid duplication.  For example:
+ Store them here using {@link #registerClasses(Class[])} to avoid duplication.  For example:
 
  <pre><code>private static final ImList<Class> CLASS_STRING_INTEGER =
     RuntimeTypes.registerClasses(vec(String.class, Integer.class));</code></pre>
@@ -32,22 +34,33 @@ public final class RuntimeTypes {
     // Keep a single copy of combinations of generic parameters at runtime. These are all arrays for size,
     // cache-closeness, and speed.  But arrays can be modified, so this must be kept private to guard against
     // modification.
-    private static final HashMap<ImList<Class>,ImList<Class>> typeMap = new HashMap<>();
+    private static final HashMap<ArrayHolder<Class>,ImList<Class>> typeMap = new HashMap<>();
 
     /**
      Use this to prevent duplicate runtime types.
      @param cs an immutable vector of classes to register
      */
-    public static ImList<Class> registerClasses(ImList<Class> cs) {
+    public static ImList<Class> registerClasses(Class... cs) {
         if (cs == null) {
             throw new IllegalArgumentException("Can't register a null type array");
         }
+        if (cs.length == 0) {
+            throw new IllegalArgumentException("Can't register a zero-length type array");
+        }
+        for (Class c : cs) {
+            if (c == null) {
+                throw new IllegalArgumentException("There shouldn't be any null types in this array!");
+            }
+        }
+
+        ArrayHolder<Class> ah = new ArrayHolder<>(cs);
         ImList<Class> registeredTypes;
         synchronized (Lock.INSTANCE) {
-            registeredTypes = typeMap.get(cs);
+            registeredTypes = typeMap.get(ah);
             if (registeredTypes == null) {
-                typeMap.put(cs, cs);
-                registeredTypes = cs;
+                ImList<Class> vecCs = vec(cs);
+                typeMap.put(ah, vecCs);
+                registeredTypes = vecCs;
             }
         }
         // We are returning the original array.  If we returned our safe copy, it could be modified!

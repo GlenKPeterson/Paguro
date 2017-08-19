@@ -13,16 +13,12 @@ import static org.organicdesign.fp.StaticImports.vec;
 public class OneOf2Test {
 
     static class String_Integer extends OneOf2<String,Integer> {
-        // Ensure we use the one and only instance of this runtime types array to prevent duplicate array creation.
-        transient static final ImList<Class> CLASS_STRING_INTEGER =
-                RuntimeTypes.registerClasses(vec(String.class, Integer.class));
-
         // Constructor
-        private String_Integer(String s, Integer i, int n) { super(CLASS_STRING_INTEGER, s, i, n); }
+        private String_Integer(String s, Integer i, int n) { super(s, String.class, i, Integer.class, n); }
 
         // Static factory methods
-        public static String_Integer ofStr(String s) { return new String_Integer(s, null, 1); }
-        public static String_Integer ofInt(Integer i) { return new String_Integer(null, i, 2); }
+        public static String_Integer ofStr(String s) { return new String_Integer(s, null, 0); }
+        public static String_Integer ofInt(Integer i) { return new String_Integer(null, i, 1); }
 
         // Object methods
         public String str() {
@@ -54,8 +50,8 @@ public class OneOf2Test {
     public void testEx2() { String_Integer.ofStr("good").throw2(23); }
 
     @Test public void testEquality() {
-        assertEquals(1, String_Integer.ofStr(null).hashCode());
-        assertEquals(2, String_Integer.ofInt(null).hashCode());
+        assertEquals(0, String_Integer.ofStr(null).hashCode());
+        assertEquals(1, String_Integer.ofInt(null).hashCode());
 
         assertFalse(String_Integer.ofInt(41).equals(String_Integer.ofStr("A")));
         assertFalse(String_Integer.ofStr("A").equals(String_Integer.ofInt(41)));
@@ -75,10 +71,10 @@ public class OneOf2Test {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx1() { new String_Integer(null, null, 3); }
+    public void subClassEx1() { new String_Integer(null, null, 2); }
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx2() { new String_Integer(null, null, 0); }
+    public void subClassEx2() { new String_Integer(null, null, -1); }
 
     @Test(expected = IllegalArgumentException.class)
     public void subClassEx3() { new String_Integer(null, null, -99); }
@@ -91,17 +87,4 @@ public class OneOf2Test {
 
     @Test(expected = IllegalArgumentException.class)
     public void subClassEx6() { new String_Integer(null, null, Integer.MIN_VALUE); }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void subEx7() {
-
-        class BooBoo extends OneOf2<String, Integer> {
-            private BooBoo(String s, Integer i, int n) {
-                super(vec(String.class), s, i, n);
-            }
-        }
-        // Blows up because of wrong number of types in the type array.
-        new BooBoo("hi", 2, 1);
-    }
-
 }

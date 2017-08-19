@@ -11,15 +11,12 @@ public class OneOf2OrNoneTest {
     static class Str_Int_None extends OneOf2OrNone<String,Integer> {
 
         // Constructor
-        private Str_Int_None(String s, Integer i, int n) { super(s, i, n); }
-
-        private transient static final String[] NAMES = { "String", "Integer", "None" };
-        @Override protected String typeName(int selIdx) { return NAMES[selIdx - 1]; }
+        private Str_Int_None(String s, Integer i, int n) { super(s, String.class, i, Integer.class, n); }
 
         // Static factory methods
-        static Str_Int_None ofStr(String s) { return new Str_Int_None(s, null, 1); }
-        static Str_Int_None ofInt(Integer i) { return new Str_Int_None(null, i, 2); }
-        static Str_Int_None ofNone() { return new Str_Int_None(null, null, 3); }
+        static Str_Int_None ofStr(String s) { return new Str_Int_None(s, null, 0); }
+        static Str_Int_None ofInt(Integer i) { return new Str_Int_None(null, i, 1); }
+        static Str_Int_None ofNone() { return new Str_Int_None(null, null, 2); }
     }
 
     @Test public void testBasics() {
@@ -27,13 +24,13 @@ public class OneOf2OrNoneTest {
         assertEquals(Integer.valueOf(57), sin.match(x -> -99,
                                                     y -> y,
                                                     () -> -99));
-        assertEquals("Integer(57)", sin.toString());
+        assertEquals("Integer/2n(57)", sin.toString());
 
         sin = Str_Int_None.ofStr("right");
         assertEquals("right", sin.match(x -> x,
                                         y -> "wrong",
                                         () -> "wrong"));
-        assertEquals("String(\"right\")", sin.toString());
+        assertEquals("String/2n(\"right\")", sin.toString());
 
         sin = Str_Int_None.ofNone();
         assertEquals("right", sin.match(x -> "wrong",
@@ -45,6 +42,10 @@ public class OneOf2OrNoneTest {
     }
 
     @Test public void testEquality() {
+        assertEquals(0, Str_Int_None.ofStr(null).hashCode());
+        assertEquals(1, Str_Int_None.ofInt(null).hashCode());
+        assertEquals(2, Str_Int_None.ofNone().hashCode());
+
         EqualsContract.equalsDistinctHashCode(Str_Int_None.ofStr("one"), Str_Int_None.ofStr("one"),
                                               Str_Int_None.ofStr("one"),
                                               Str_Int_None.ofStr("onf"));
@@ -56,16 +57,5 @@ public class OneOf2OrNoneTest {
         EqualsContract.equalsDistinctHashCode(Str_Int_None.ofNone(), Str_Int_None.ofNone(),
                                               Str_Int_None.ofNone(),
                                               Str_Int_None.ofInt(-97));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    @SuppressWarnings("unchecked")
-    public void testEx03() {
-        new OneOf2OrNone(null, null, 4) {
-            @Override
-            protected String typeName(int selIdx) {
-                return Str_Int_None.NAMES[selIdx - 1];
-            }
-        };
     }
 }

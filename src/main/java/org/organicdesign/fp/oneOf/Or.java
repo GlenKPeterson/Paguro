@@ -13,10 +13,9 @@
 // limitations under the License.
 package org.organicdesign.fp.oneOf;
 
-import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.type.RuntimeTypes;
 
-import static org.organicdesign.fp.StaticImports.vec;
+import static org.organicdesign.fp.FunctionUtils.stringify;
 
 /**
  `Or` represents the presence of a successful outcome, or an error.
@@ -35,19 +34,19 @@ import static org.organicdesign.fp.StaticImports.vec;
  Any errors are my own.
  */
 public class Or<G,B> extends OneOf2<G,B> {
-    private static final ImList<Class> GOOD_BAD_TYPES = RuntimeTypes.registerClasses(vec(Good.class, Bad.class));
-    private Or(G g, B b, int n) { super(GOOD_BAD_TYPES, g, b, n); }
+    @SuppressWarnings("unchecked")
+    private Or(G g, B b, int s) { super(g, (Class<G>) Or.Good.class, b, (Class<B>) Or.Bad.class, s); }
 
     /** Construct a new Good from the given object. */
-    public static <G,B> Or<G,B> good(G good) { return new Or<>(good, null, 1); }
+    public static <G,B> Or<G,B> good(G good) { return new Or<>(good, null, 0); }
 
     /** Construct a new Bad from the given object. */
-    public static <G,B> Or<G,B> bad(B bad) { return new Or<>(null, bad, 2); }
+    public static <G,B> Or<G,B> bad(B bad) { return new Or<>(null, bad, 1); }
 
     /** Returns true if this Or has a good value. */
-    public boolean isGood() { return sel == 1; }
+    public boolean isGood() { return match(g -> true, f -> false); }
     /** Returns true if this Or has a bad value. */
-    public boolean isBad() { return sel == 2; }
+    public boolean isBad() { return match(g -> false, f -> true); }
 
     /** Returns the good value if this is a Good, or throws an exception if this is a Bad. */
     public G good() {
@@ -66,4 +65,9 @@ public class Or<G,B> extends OneOf2<G,B> {
 
     /** Represents the presence of a Bad value (and absence of a Good). */
     private static final class Bad {}
+
+    @Override public String toString() {
+        return match(g -> "Good(" + stringify(g) + ")",
+                     b -> "Bad(" + stringify(b) + ")");
+    }
 } // end interface Or
