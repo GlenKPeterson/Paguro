@@ -58,4 +58,42 @@ public class OneOf2OrNoneTest {
                                               Str_Int_None.ofNone(),
                                               Str_Int_None.ofInt(-97));
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassEx__n() { new Str_Int_None(null, null, -1); }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassExa_n() { new Str_Int_None("hi", null, -1); }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassEx_bn() { new Str_Int_None(null, 1, -1); }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassExab_0() { new Str_Int_None("hi", 1, 0); }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassEx_b0() { new Str_Int_None(null, 1, 0); }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassExa_1() { new Str_Int_None("hi", null, 1); }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassExab1() { new Str_Int_None("hi", 1, 1); }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassExa_2() { new Str_Int_None("hi", null,2); }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassEx_b2() { new Str_Int_None(null, 1, 2); }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassExa_3() { new Str_Int_None("hi", null, 3); }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassEx_b3() { new Str_Int_None(null, 1, 3); }
+
 }

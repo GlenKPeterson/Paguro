@@ -90,59 +90,73 @@ public class OneOf4Test {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx1000n() { new Str_Int_Float_Dub("hi", null, null, null, -1); }
+    public void subClassEx____n() { new Str_Int_Float_Dub(null, null, null, null, -1); }
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx10001() { new Str_Int_Float_Dub("hi", null, null, null, 1); }
+    public void subClassExa___n() { new Str_Int_Float_Dub("hi", null, null, null, -1); }
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx10002() { new Str_Int_Float_Dub("hi", null, null, null, 2); }
+    public void subClassEx_b__n() { new Str_Int_Float_Dub(null, 1, null, null, -1); }
+
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx10003() { new Str_Int_Float_Dub("hi", null, null, null, 3); }
+    public void subClassExab__0() { new Str_Int_Float_Dub("hi", 1, null, null, 0); }
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx10004() { new Str_Int_Float_Dub("hi", null, null, null, 4); }
+    public void subClassExa_c_0() { new Str_Int_Float_Dub("hi", null, 2f, null, 0); }
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx11000() { new Str_Int_Float_Dub("hi", 1, null, null, 0); }
+    public void subClassExa__d0() { new Str_Int_Float_Dub("hi", null, null, 3.0, 0); }
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx11001() { new Str_Int_Float_Dub("hi", 1, null, null, 1); }
+    public void subClassEx_b__0() { new Str_Int_Float_Dub(null, 1, null, null, 0); }
+
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx10100() { new Str_Int_Float_Dub("hi", null, 2f, null, 0); }
+    public void subClassExa___1() { new Str_Int_Float_Dub("hi", null, null, null, 1); }
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx10010() { new Str_Int_Float_Dub("hi", null, null, 3.0, 0); }
+    public void subClassEx_bc_1() { new Str_Int_Float_Dub(null, 1, 2f, null, 1); }
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx0100n() { new Str_Int_Float_Dub(null, 1, null, null, -1); }
+    public void subClassEx_b_c1() { new Str_Int_Float_Dub(null, 1, null, 3.0, 1); }
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx01000() { new Str_Int_Float_Dub(null, 1, null, null, 0); }
+    public void subClassExab__1() { new Str_Int_Float_Dub("hi", 1, null, null, 1); }
+
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx01002() { new Str_Int_Float_Dub(null, 1, null, null, 2); }
+    public void subClassExa___2() { new Str_Int_Float_Dub("hi", null, null, null, 2); }
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx01003() { new Str_Int_Float_Dub(null, 1, null, null, 3); }
+    public void subClassEx__cd2() { new Str_Int_Float_Dub(null, null, 2f, 3.0, 2); }
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx01004() { new Str_Int_Float_Dub(null, 1, null, null, 4); }
+    public void subClassEx_b__2() { new Str_Int_Float_Dub(null, 1, null, null, 2); }
+
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx01101() { new Str_Int_Float_Dub(null, 1, 2f, null, 1); }
+    public void subClassExa___3() { new Str_Int_Float_Dub("hi", null, null, null, 3); }
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx5() { new Str_Int_Float_Dub(null, 1, null, 3.0, 1); }
+    public void subClassEx_b__3() { new Str_Int_Float_Dub(null, 1, null, null, 3); }
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx6() { new Str_Int_Float_Dub(null, null, 2f, 3.0, 2); }
+    public void subClassEx__c_3() { new Str_Int_Float_Dub(null, null, 2f, null, 3); }
+
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx0000n() { new Str_Int_Float_Dub(null, null, null, null, -1); }
+    public void subClassExa___4() { new Str_Int_Float_Dub("hi", null, null, null, 4); }
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx00004() { new Str_Int_Float_Dub(null, null, null, null, 4); }
+    public void subClassEx_b__4() { new Str_Int_Float_Dub(null, 1, null, null, 4); }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassEx__c_4() { new Str_Int_Float_Dub(null, null, 2f, null, 4); }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassEx___d4() { new Str_Int_Float_Dub(null, null, null, 3.0, 4); }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassEx____4() { new Str_Int_Float_Dub(null, null, null, null, 4); }
 }

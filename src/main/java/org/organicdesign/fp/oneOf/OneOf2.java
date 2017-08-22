@@ -23,11 +23,13 @@ import java.util.Objects;
 import static org.organicdesign.fp.FunctionUtils.stringify;
 
 /**
- Like {@link org.organicdesign.fp.tuple.Tuple2}, OneOf2 is designed to be sub-classed so you can add descriptive names.
- Also because that's just the cleanest way for it to work in Java.
+ This is designed to represent a union of 2 types, meaning an object that can be one type, or another.
+ Instead of a get() method, pass 2 functions to match(), one to handle the case where this contains the first thing,
+ the other if it contains the second thing.  In theory, this could work with two things of the same type, but
+ Java has polymorphism to handle that more easily.  Before using a OneOf2, make sure you don't really need a
+ {@link org.organicdesign.fp.tuple.Tuple2}.
 
- When Java users say "Pattern Matching" they mean Regular Expressions so the method that behaves
- like what Scala and ML would call Pattern Matching is called "match" instead.  The safest way
+ OneOf2 is designed to be sub-classed so you can add descriptive names.  The safest way
  to use Union classes is to always call match() because it forces you to think about how to
  handle each type you could possibly receive.
 
@@ -44,39 +46,19 @@ oneOf.match(fst -&gt; fst.doOneThing(),
                 sec -&gt; { throw new IllegalStateException("Asked for a 2nd; only had a 1st."); });
  </code></pre>
 
- As a shortcut, you can call (using method references) oneOf::throw1 or oneOf::throw2
- <pre><code>
-oneOf.match(fst -&gt; fst.doOneThing(),
-                oneOf::throw2);
- </code></pre>
-
  For the shortest syntax and best names, define your own subclass.  This is similar to sub-classing Tuples.
  <pre><code>
 static class String_Integer extends OneOf2&lt;String,Integer&gt; {
-    // Ensure we use the one and only instance of this runtime types array to prevent duplicate array creation.
-    private static final ImList&lt;Class&gt; CLASS_STRING_INTEGER =
-            RuntimeTypes.registerClasses(vec(String.class, Integer.class));
 
     // Constructor
-    private String_Integer(String s, Integer i, int n) { super(CLASS_STRING_INTEGER, s, i, n); }
+    private String_Integer(String s, Integer i, int n) { super(s, String.class, i, Integer.class, n); }
 
     // Static factory methods
-    public static String_Integer ofStr(String s) { return new String_Integer(s, null, 1); }
-    public static String_Integer ofInt(Integer i) { return new String_Integer(null, i, 2); }
-
-    // (Optional) "getter" methods that throw a detailed exception if the type isn't what you're expecting.
-    public String str() {
-        return super.match(s -&gt; s,
-                               super::throw2);
-    }
-    public Integer integer() {
-        return super.match(super::throw1,
-                               i -&gt; i);
-    }
+    public static String_Integer ofStr(String s) { return new String_Integer(s, null, 0); }
+    public static String_Integer ofInt(Integer i) { return new String_Integer(null, i, 1); }
 }</code></pre>
 
- OK, so that's kind of wordy, but it's Java, and you only have to do this once to presumably use it many times.
- equals, hashcode, and toString are all taken care of for you.
+ equals(), hashcode(), and toString() are all taken care of for you.
 
  Now you use descriptive and extremely brief syntax:
  <pre><code>
@@ -99,17 +81,31 @@ public class OneOf2<A,B> {
     private final int sel;
     private final ImList<Class> types;
 
-    protected OneOf2(A a, Class<A> ca,
-                     B b, Class<B> cb,
-                     int s) {
-        types = RuntimeTypes.registerClasses(ca, cb);
-        sel = s;
-        if (s == 0) {
+    /**
+     Protected constructor for subclassing.  Both A and B parameters can be null, but if one is non-null, the index
+     must specify the non-null value (to keep you from assigning a bogus index value).
+
+     @param a the first possibility.
+     @param aClass the class of item A (to have at runtime for descriptive error messages and toString()).
+     @param b the second possibility
+     @param bClass the class of item B (to have at runtime for descriptive error messages and toString()).
+     @param index 0 means this represents an a, 1 represents a b.
+     */
+    protected OneOf2(A a, Class<A> aClass,
+                     B b, Class<B> bClass,
+                     int index) {
+        types = RuntimeTypes.registerClasses(aClass, bClass);
+        sel = index;
+        if (index == 0) {
             item = a;
-            if (b != null) { throw new IllegalArgumentException("Only one item can be non-null"); }
-        } else if (s == 1) {
+            if (b != null) {
+                throw new IllegalArgumentException("You specified item A (index = 0), but passed a non-null item B");
+            }
+        } else if (index == 1) {
             item = b;
-            if (a != null) { throw new IllegalArgumentException("Only one item can be non-null"); }
+            if (a != null) {
+                throw new IllegalArgumentException("You specified item B (index = 1), but passed a non-null item A");
+            }
         } else {
             throw new IllegalArgumentException("Selected item index must be 0-3");
         }
@@ -119,6 +115,13 @@ public class OneOf2<A,B> {
 //
 //    static <A,B> OneOf2<A,B> _2(B b) { return new OneOf2<>(null, b, 2); }
 
+    /**
+     Languages that have union types built in have a match statement that works like this method.
+     Exactly one of these functions will be executed - determined by which type of item this object holds.
+     @param fa the function to be executed if this OneOf stores the first type.
+     @param fb the function to be executed if this OneOf stores the second type.
+     @return the return value of whichever function is executed.
+     */
     // We only store one item and it's type is erased, so we have to cast it at runtime.
     // If sel is managed correctly, it ensures that the cast is accurate.
     @SuppressWarnings("unchecked")

@@ -12,13 +12,13 @@ import static org.organicdesign.fp.StaticImports.vec;
 
 public class OneOf2Test {
 
-    static class String_Integer extends OneOf2<String,Integer> {
-        // Constructor
-        private String_Integer(String s, Integer i, int n) { super(s, String.class, i, Integer.class, n); }
+static class Str_Int extends OneOf2<String,Integer> {
+    // Constructor
+    private Str_Int(String s, Integer i, int n) { super(s, String.class, i, Integer.class, n); }
 
-        // Static factory methods
-        public static String_Integer ofStr(String s) { return new String_Integer(s, null, 0); }
-        public static String_Integer ofInt(Integer i) { return new String_Integer(null, i, 1); }
+    // Static factory methods
+    public static Str_Int ofStr(String s) { return new Str_Int(s, null, 0); }
+    public static Str_Int ofInt(Integer i) { return new Str_Int(null, i, 1); }
 
         // Object methods
         public String str() {
@@ -32,59 +32,91 @@ public class OneOf2Test {
     }
 
     @Test public void testBasics() {
-        String_Integer oota = String_Integer.ofInt(57);
+        Str_Int oota = Str_Int.ofInt(57);
         assertEquals(Integer.valueOf(57), oota.match(x -> -99,
                                                      y -> y));
         assertEquals(Integer.valueOf(57), oota.integer());
 
-        String_Integer ootb = String_Integer.ofStr("right");
+        Str_Int ootb = Str_Int.ofStr("right");
         assertEquals("right", ootb.match(x -> x,
                                          y -> "wrong"));
         assertEquals("right", ootb.str());
     }
 
     @Test(expected = IllegalStateException.class)
-    public void testEx1() { String_Integer.ofInt(57).throw1("hi"); }
+    public void testEx1() { Str_Int.ofInt(57).throw1("hi"); }
 
     @Test(expected = IllegalStateException.class)
-    public void testEx2() { String_Integer.ofStr("good").throw2(23); }
+    public void testEx2() { Str_Int.ofStr("good").throw2(23); }
 
     @Test public void testEquality() {
-        assertEquals(0, String_Integer.ofStr(null).hashCode());
-        assertEquals(1, String_Integer.ofInt(null).hashCode());
+        assertEquals(0, Str_Int.ofStr(null).hashCode());
+        assertEquals(1, Str_Int.ofInt(null).hashCode());
 
-        assertFalse(String_Integer.ofInt(41).equals(String_Integer.ofStr("A")));
-        assertFalse(String_Integer.ofStr("A").equals(String_Integer.ofInt(41)));
+        assertFalse(Str_Int.ofInt(41).equals(Str_Int.ofStr("A")));
+        assertFalse(Str_Int.ofStr("A").equals(Str_Int.ofInt(41)));
 
-        assertFalse(String_Integer.ofInt(65).equals(String_Integer.ofStr("A")));
-        assertFalse(String_Integer.ofStr("A").equals(String_Integer.ofInt(65)));
+        assertFalse(Str_Int.ofInt(65).equals(Str_Int.ofStr("A")));
+        assertFalse(Str_Int.ofStr("A").equals(Str_Int.ofInt(65)));
 
-        assertTrue(String_Integer.ofInt(37).equals(String_Integer.ofInt(37)));
+        assertTrue(Str_Int.ofInt(37).equals(Str_Int.ofInt(37)));
 
-        EqualsContract.equalsDistinctHashCode(String_Integer.ofStr("one"), String_Integer.ofStr("one"),
-                                              String_Integer.ofStr("one"),
-                                              String_Integer.ofStr("onf"));
+        EqualsContract.equalsDistinctHashCode(Str_Int.ofStr("one"), Str_Int.ofStr("one"),
+                                              Str_Int.ofStr("one"),
+                                              Str_Int.ofStr("onf"));
 
-        EqualsContract.equalsDistinctHashCode(String_Integer.ofInt(97), String_Integer.ofInt(97),
-                                              String_Integer.ofInt(97),
-                                              String_Integer.ofInt(-97));
+        EqualsContract.equalsDistinctHashCode(Str_Int.ofInt(97), Str_Int.ofInt(97),
+                                              Str_Int.ofInt(97),
+                                              Str_Int.ofInt(-97));
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx1() { new String_Integer(null, null, 2); }
+    public void subClassEx1() { new Str_Int(null, null, 2); }
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx2() { new String_Integer(null, null, -1); }
+    public void subClassEx2() { new Str_Int(null, null, -1); }
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx3() { new String_Integer(null, null, -99); }
+    public void subClassEx3() { new Str_Int(null, null, -99); }
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx4() { new String_Integer(null, null, 537); }
+    public void subClassEx4() { new Str_Int(null, null, 537); }
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx5() { new String_Integer(null, null, Integer.MAX_VALUE); }
+    public void subClassEx5() { new Str_Int(null, null, Integer.MAX_VALUE); }
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx6() { new String_Integer(null, null, Integer.MIN_VALUE); }
+    public void subClassEx6() { new Str_Int(null, null, Integer.MIN_VALUE); }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassEx__n() { new Str_Int(null, null, -1); }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassExa_n() { new Str_Int("hi", null, -1); }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassEx_bn() { new Str_Int(null, 1, -1); }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassExab_0() { new Str_Int("hi", 1, 0); }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassEx_b0() { new Str_Int(null, 1, 0); }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassExa_1() { new Str_Int("hi", null, 1); }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassExab1() { new Str_Int("hi", 1, 1); }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassExa_2() { new Str_Int("hi", null,2); }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassEx_b2() { new Str_Int(null, 1, 2); }
+
 }

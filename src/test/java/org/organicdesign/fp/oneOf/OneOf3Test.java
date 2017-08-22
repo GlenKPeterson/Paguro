@@ -86,4 +86,50 @@ public class OneOf3Test {
 
     @Test(expected = IllegalArgumentException.class)
     public void subClassEx6() { new Str_Int_Float(null, null, null, Integer.MIN_VALUE); }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassEx___n() { new Str_Int_Float(null, null, null, -1); }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassExa__n() { new Str_Int_Float("hi", null, null, -1); }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassEx_b_n() { new Str_Int_Float(null, 1, null, -1); }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassExab_0() { new Str_Int_Float("hi", 1, null, 0); }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassExa_c0() { new Str_Int_Float("hi", null, 2f, 0); }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassEx_b__0() { new Str_Int_Float(null, 1, null, 0); }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassExa___1() { new Str_Int_Float("hi", null, null, 1); }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassEx_bc_1() { new Str_Int_Float(null, 1, 2f, 1); }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassExab__1() { new Str_Int_Float("hi", 1, null, 1); }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassExa___2() { new Str_Int_Float("hi", null, null, 2); }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassEx_b__2() { new Str_Int_Float(null, 1, null, 2); }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassExa___3() { new Str_Int_Float("hi", null, null, 3); }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassEx_b__3() { new Str_Int_Float(null, 1, null, 3); }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void subClassEx__c_3() { new Str_Int_Float(null, null, 2f, 3); }
 }
