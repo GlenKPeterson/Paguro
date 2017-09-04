@@ -10,7 +10,11 @@ public final class None<T> implements Option<T> {
 
     // ========================================== Static ==========================================
     /** None is a singleton and this is its only instance. */
-    public static final Option NONE = new None();
+    static final Option NONE = new None();
+
+    /** Generic version of the singleton instance. */
+    @SuppressWarnings("unchecked")
+    public static <T> None<T> none() { return (None<T>) NONE; }
 
     /** Private constructor for singleton. */
     private None() {}
@@ -48,4 +52,6 @@ public final class None<T> implements Option<T> {
 
     /** Defend our singleton property in the face of deserialization. */
     private Object readResolve() { return NONE; }
+
+    @Override public String toString() { return "None"; }
 }

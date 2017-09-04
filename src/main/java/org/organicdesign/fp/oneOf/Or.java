@@ -13,7 +13,9 @@
 // limitations under the License.
 package org.organicdesign.fp.oneOf;
 
-import org.organicdesign.fp.type.RuntimeTypes;
+import org.organicdesign.fp.function.Fn1;
+
+import java.util.Objects;
 
 import static org.organicdesign.fp.FunctionUtils.stringify;
 
@@ -32,42 +34,107 @@ import static org.organicdesign.fp.FunctionUtils.stringify;
  functional return type (like Or).  Throw exceptions for things a program can't handle without developer intervention.
 
  Any errors are my own.
- */
-public class Or<G,B> extends OneOf2<G,B> {
-    @SuppressWarnings("unchecked")
-    private Or(G g, B b, int s) { super(g, (Class<G>) Or.Good.class, b, (Class<B>) Or.Bad.class, s); }
 
+ This implementation is more like a sealed trait (in Kotlin or Scala) than a simple {@link OneOf2} union type.
+ This makes it a little less general, and more meaningful to use.
+ */
+public interface Or<G,B> {
     /** Construct a new Good from the given object. */
-    public static <G,B> Or<G,B> good(G good) { return new Or<>(good, null, 0); }
+    static <G,B> Or<G,B> good(G good) { return new Good<>(good); }
 
     /** Construct a new Bad from the given object. */
-    public static <G,B> Or<G,B> bad(B bad) { return new Or<>(null, bad, 1); }
+    static <G,B> Or<G,B> bad(B bad) { return new Bad<>(bad); }
 
     /** Returns true if this Or has a good value. */
-    public boolean isGood() { return match(g -> true, f -> false); }
+    boolean isGood();
     /** Returns true if this Or has a bad value. */
-    public boolean isBad() { return match(g -> false, f -> true); }
+    boolean isBad();
 
     /** Returns the good value if this is a Good, or throws an exception if this is a Bad. */
-    public G good() {
-        return match(g -> g,
-                     super::throw2);
-    }
+    G good();
 
     /** Returns the bad value if this is a Bad, or throws an exception if this is a Good. */
-    public B bad() {
-        return match(super::throw1,
-                         b -> b);
-    }
+    B bad();
+
+    /**
+     Exactly one of these functions will be executed - determined by whether this is a Good or a Bad.
+     @param fg the function to be executed if this OneOf stores the first type.
+     @param fb the function to be executed if this OneOf stores the second type.
+     @return the return value of whichever function is executed.
+     */
+    <R> R match(Fn1<G, R> fg,
+                Fn1<B, R> fb);
+
 
     /** Represents the presence of a Good value (and absence of a Bad). */
-    private static final class Good { }
+    final class Good<G,B> implements Or<G,B> {
+        private final G g;
+        private Good(G good) { g = good; }
+
+        /** {@inheritDoc} */
+        @Override public boolean isGood() { return true; }
+
+        /** {@inheritDoc} */
+        @Override public boolean isBad() { return false; }
+
+        /** {@inheritDoc} */
+        @Override public G good() { return g; }
+
+        /** {@inheritDoc} */
+        @Override public B bad() { throw new IllegalStateException("Cant call bad() on a Good."); }
+
+        /** {@inheritDoc} */
+        @Override public <R> R match(Fn1<G, R> fg, Fn1<B, R> fb) { return fg.apply(g); }
+
+        /** {@inheritDoc} */
+        @Override public int hashCode() { return g.hashCode(); }
+
+        /** {@inheritDoc} */
+        @Override public boolean equals(Object other) {
+            //noinspection SimplifiableIfStatement
+            if (this == other) { return true; }
+            return other instanceof Good &&
+                   Objects.equals(this.g, ((Good) other).g);
+        }
+
+        /** {@inheritDoc} */
+        @Override public String toString() { return "Good(" + stringify(g) + ")"; }
+    }
 
     /** Represents the presence of a Bad value (and absence of a Good). */
-    private static final class Bad {}
+    final class Bad<G,B> implements Or<G,B> {
+        private final B b;
+        private Bad(B bad) { b = bad; }
 
-    @Override public String toString() {
-        return match(g -> "Good(" + stringify(g) + ")",
-                     b -> "Bad(" + stringify(b) + ")");
+        /** {@inheritDoc} */
+        @Override public boolean isGood() { return false; }
+
+        /** {@inheritDoc} */
+        @Override public boolean isBad() { return true; }
+
+        /** {@inheritDoc} */
+        @Override public G good() { throw new IllegalStateException("Cant call good() on a Bad."); }
+
+        /** {@inheritDoc} */
+        @Override public B bad() { return b; }
+
+        /** {@inheritDoc} */
+        @Override public <R> R match(Fn1<G, R> fg, Fn1<B, R> fb) { return fb.apply(b); }
+
+
+        /** {@inheritDoc} */
+        // Returns twos compliment of contained item.
+        @Override public int hashCode() { return ~ b.hashCode(); }
+
+        /** {@inheritDoc} */
+        @Override public boolean equals(Object other) {
+            //noinspection SimplifiableIfStatement
+            if (this == other) { return true; }
+            return other instanceof Bad &&
+                   Objects.equals(this.b, ((Bad) other).b);
+        }
+
+        /** {@inheritDoc} */
+        @Override public String toString() { return "Bad(" + stringify(b) + ")"; }
     }
 } // end interface Or

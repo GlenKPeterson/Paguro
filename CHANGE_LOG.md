@@ -5,6 +5,10 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
+# Release 3.0.12: RRB Tree
+ - Changed all OneOf classes to take a single Object argument, plus each of the classes they can hold.
+ This great simplification is thanks to Atul Agrawal!
+
 # Release 3.0.11: RRB Tree
  - All OneOf classes now use a ZERO-BASED INDEX (used to use one-based).
 

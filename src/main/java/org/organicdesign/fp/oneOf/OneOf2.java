@@ -20,7 +20,7 @@ import org.organicdesign.fp.type.RuntimeTypes;
 
 import java.util.Objects;
 
-import static org.organicdesign.fp.FunctionUtils.stringify;
+import static org.organicdesign.fp.type.RuntimeTypes.union2Str;
 
 /**
  This is designed to represent a union of 2 types, meaning an object that can be one type, or another.
@@ -50,12 +50,12 @@ oneOf.match(fst -&gt; fst.doOneThing(),
  <pre><code>
 static class String_Integer extends OneOf2&lt;String,Integer&gt; {
 
-    // Constructor
-    private String_Integer(String s, Integer i, int n) { super(s, String.class, i, Integer.class, n); }
+    // Private Constructor because the o parameter is not type safe.
+    private String_Integer(Object o, int n) { super(o, String.class, Integer.class, n); }
 
-    // Static factory methods
-    public static String_Integer ofStr(String s) { return new String_Integer(s, null, 0); }
-    public static String_Integer ofInt(Integer i) { return new String_Integer(null, i, 1); }
+    // Static factory methods ensure type-safe construction.
+    public static String_Integer ofStr(String o) { return new String_Integer(o, 0); }
+    public static String_Integer ofInt(Integer o) { return new String_Integer(o, 1); }
 }</code></pre>
 
  equals(), hashcode(), and toString() are all taken care of for you.
@@ -82,38 +82,29 @@ public class OneOf2<A,B> {
     private final ImList<Class> types;
 
     /**
-     Protected constructor for subclassing.  Both A and B parameters can be null, but if one is non-null, the index
+     Protected constructor for subclassing.  A, B, and C parameters can be null, but if one is non-null, the index
      must specify the non-null value (to keep you from assigning a bogus index value).
 
-     @param a the first possibility.
-     @param aClass the class of item A (to have at runtime for descriptive error messages and toString()).
-     @param b the second possibility
-     @param bClass the class of item B (to have at runtime for descriptive error messages and toString()).
-     @param index 0 means this represents an a, 1 represents a b.
+     @param o the item
+     @param aClass class 0 (to have at runtime for descriptive error messages and toString()).
+     @param bClass class 1 (to have at runtime for descriptive error messages and toString()).
+     @param index 0 means this represents an A, 1 represents a B, 2 represents a C, 3 means D
      */
-    protected OneOf2(A a, Class<A> aClass,
-                     B b, Class<B> bClass,
-                     int index) {
+    protected OneOf2(Object o, Class<A> aClass, Class<B> bClass, int index) {
         types = RuntimeTypes.registerClasses(aClass, bClass);
         sel = index;
-        if (index == 0) {
-            item = a;
-            if (b != null) {
-                throw new IllegalArgumentException("You specified item A (index = 0), but passed a non-null item B");
-            }
-        } else if (index == 1) {
-            item = b;
-            if (a != null) {
-                throw new IllegalArgumentException("You specified item B (index = 1), but passed a non-null item A");
-            }
-        } else {
-            throw new IllegalArgumentException("Selected item index must be 0-3");
+        item = o;
+        if (index < 0) {
+            throw new IllegalArgumentException("Selected item index must be 0-1");
+        } else if (index > 1) {
+            throw new IllegalArgumentException("Selected item index must be 0-1");
+        }
+        if ( (o != null) && (!types.get(index).isInstance(o)) ) {
+            throw new ClassCastException("You specified index " + index + ", indicating a(n) " +
+                                         types.get(index).getCanonicalName() + "," +
+                                         " but passed a " + o.getClass().getCanonicalName());
         }
     }
-
-//    static <A,B> OneOf2<A,B> _1(A a) { return new OneOf2<>(a, null, 1); }
-//
-//    static <A,B> OneOf2<A,B> _2(B b) { return new OneOf2<>(null, b, 2); }
 
     /**
      Languages that have union types built in have a match statement that works like this method.
@@ -133,21 +124,22 @@ public class OneOf2<A,B> {
         return fb.apply((B) item);
     }
 
-    // The A parameter ensures that this is used in the proper branch of the guard
-    @SuppressWarnings("UnusedParameters")
-    protected <R> R throw1(A a) {
-        throw new IllegalStateException("Expected a(n) " +
-                                        RuntimeTypes.name(types.get(0)) + " but found a(n) " +
-                                        RuntimeTypes.name(types.get(1)));
-    }
-
-    // The B parameter ensures that this is used in the proper branch of the guard
-    @SuppressWarnings("UnusedParameters")
-    protected <R> R throw2(B b){
-        throw new IllegalStateException("Expected a(n) " +
-                                        RuntimeTypes.name(types.get(1)) + " but found a(n) " +
-                                        RuntimeTypes.name(types.get(0)));
-    }
+//    // The A parameter ensures that this is used in the proper branch of the guard
+//    // Not sure this is a good idea.  Using match() is probably better.
+//    @SuppressWarnings("UnusedParameters")
+//    protected <R> R throw1(A a) {
+//        throw new ClassCastException("Expected a(n) " +
+//                                     RuntimeTypes.name(types.get(0)) + " but found a(n) " +
+//                                     RuntimeTypes.name(types.get(1)));
+//    }
+//
+//    // The B parameter ensures that this is used in the proper branch of the guard
+//    @SuppressWarnings("UnusedParameters")
+//    protected <R> R throw2(B b){
+//        throw new ClassCastException("Expected a(n) " +
+//                                     RuntimeTypes.name(types.get(1)) + " but found a(n) " +
+//                                     RuntimeTypes.name(types.get(0)));
+//    }
 
     public int hashCode() {
         // Simplest way to make the two items different.
@@ -164,7 +156,5 @@ public class OneOf2<A,B> {
                Objects.equals(item, that.item);
     }
 
-    @Override public String toString() {
-        return RuntimeTypes.name(types.get(sel)) + "/2(" + stringify(item) + ")";
-    }
+    @Override public String toString() { return union2Str(item, types); }
 }

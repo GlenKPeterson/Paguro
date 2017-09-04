@@ -38,7 +38,7 @@ http://mvnrepository.com/artifact/org.organicdesign/Paguro
 	-->
 	<groupId>org.organicdesign</groupId>
 	<artifactId>Paguro</artifactId>
-	<version>3.0.11-BETA</version>
+	<version>3.0.12-BETA</version>
 	<packaging>jar</packaging>
 
 	<name>Paguro</name>

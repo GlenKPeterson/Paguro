@@ -6,7 +6,7 @@ import org.organicdesign.fp.type.RuntimeTypes;
 
 import java.util.Objects;
 
-import static org.organicdesign.fp.FunctionUtils.stringify;
+import static org.organicdesign.fp.type.RuntimeTypes.union2Str;
 
 /**
  Holds one of 4 values. See {@link OneOf2} for a full description.  If you're passing the same type, you probably
@@ -18,88 +18,28 @@ public abstract class OneOf4<A,B,C,D> {
     private final ImList<Class> types;
 
     /**
-     Protected constructor for subclassing.  A, B, and C parameters can be null, but if one is non-null, the index
-     must specify the non-null value (to keep you from assigning a bogus index value).
+     Protected constructor for subclassing.
 
-     @param a the first possibility.
-     @param aClass the class of item A (to have at runtime for descriptive error messages and toString()).
-     @param b the second possibility
-     @param bClass the class of item B (to have at runtime for descriptive error messages and toString()).
-     @param c the third possibility
-     @param cClass the class of item C (to have at runtime for descriptive error messages and toString()).
-     @param index 0 means this represents an A, 1 represents a B, 2 represents a C.
+     @param o the item (may be null)
+     @param aClass class 0 (to have at runtime for descriptive error messages and toString()).
+     @param bClass class 1 (to have at runtime for descriptive error messages and toString()).
+     @param cClass class 2 (to have at runtime for descriptive error messages and toString()).
+     @param dClass class 3 (to have at runtime for descriptive error messages and toString()).
+     @param index 0 means this represents an A, 1 represents a B, 2 represents a C, 3 means D
      */
-    protected OneOf4(A a, Class<A> aClass,
-                     B b, Class<B> bClass,
-                     C c, Class<C> cClass,
-                     D d, Class<D> dClass,
-                     int index) {
+    protected OneOf4(Object o, Class<A> aClass, Class<B> bClass, Class<C> cClass, Class<D> dClass, int index) {
         types = RuntimeTypes.registerClasses(aClass, bClass, cClass, dClass);
         sel = index;
-        if (index < 2) {
-            if (index == 0) {
-                item = a;
-                if (b != null) {
-                    throw new IllegalArgumentException("You specified item A (index = 0)," +
-                                                       " but passed a non-null item B");
-                }
-                if (c != null) {
-                    throw new IllegalArgumentException("You specified item A (index = 0)," +
-                                                       " but passed a non-null item C");
-                }
-                if (d != null) {
-                    throw new IllegalArgumentException("You specified item A (index = 0)," +
-                                                       " but passed a non-null item D");
-                }
-            } else if (index == 1) {
-                item = b;
-                if (a != null) {
-                    throw new IllegalArgumentException("You specified item B (index = 1)," +
-                                                       " but passed a non-null item A");
-                }
-                if (c != null) {
-                    throw new IllegalArgumentException("You specified item B (index = 1)," +
-                                                       " but passed a non-null item C");
-                }
-                if (d != null) {
-                    throw new IllegalArgumentException("You specified item B (index = 1)," +
-                                                       " but passed a non-null item D");
-                }
-            } else {
-                throw new IllegalArgumentException("Selected item index must be 0-3");
-            }
-        } else {
-            if (index == 2) {
-                item = c;
-                if (a != null) {
-                    throw new IllegalArgumentException("You specified item C (index = 2)," +
-                                                       " but passed a non-null item A");
-                }
-                if (b != null) {
-                    throw new IllegalArgumentException("You specified item C (index = 2)," +
-                                                       " but passed a non-null item B");
-                }
-                if (d != null) {
-                    throw new IllegalArgumentException("You specified item C (index = 2)," +
-                                                       " but passed a non-null item D");
-                }
-            } else if (index == 3) {
-                item = d;
-                if (a != null) {
-                    throw new IllegalArgumentException("You specified item D (index = 3)," +
-                                                       " but passed a non-null item A");
-                }
-                if (b != null) {
-                    throw new IllegalArgumentException("You specified item D (index = 3)," +
-                                                       " but passed a non-null item B");
-                }
-                if (c != null) {
-                    throw new IllegalArgumentException("You specified item D (index = 3)," +
-                                                       " but passed a non-null item C");
-                }
-            } else {
-                throw new IllegalArgumentException("Selected item index must be 0-3");
-            }
+        item = o;
+        if (index < 0) {
+            throw new IllegalArgumentException("Selected item index must be 0-3");
+        } else if (index > 3) {
+            throw new IllegalArgumentException("Selected item index must be 0-3");
+        }
+        if ( (o != null) && (!types.get(index).isInstance(o)) ) {
+            throw new ClassCastException("You specified index " + index + ", indicating a(n) " +
+                                         types.get(index).getCanonicalName() + "," +
+                                         " but passed a " + o.getClass().getCanonicalName());
         }
     }
 
@@ -145,7 +85,5 @@ public abstract class OneOf4<A,B,C,D> {
                Objects.equals(item, that.item);
     }
 
-    @Override public String toString() {
-        return RuntimeTypes.name(types.get(sel)) + "/4(" + stringify(item) + ")";
-    }
+    @Override public String toString() { return union2Str(item, types); }
 }

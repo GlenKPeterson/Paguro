@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package org.organicdesign.fp;
+package org.organicdesign.fp.oneOf;
 
 import org.junit.Test;
 import org.organicdesign.fp.oneOf.Or;

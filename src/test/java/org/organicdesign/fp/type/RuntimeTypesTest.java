@@ -6,6 +6,7 @@ import org.organicdesign.fp.collections.ImList;
 
 import static org.junit.Assert.assertEquals;
 import static org.organicdesign.fp.StaticImports.vec;
+import static org.organicdesign.fp.type.RuntimeTypes.union2Str;
 
 /**
  Created by gpeterso on 4/23/17.
@@ -80,5 +81,10 @@ public class RuntimeTypesTest {
     @Test(expected = IllegalArgumentException.class)
     public void testClassArrayContainsNull() {
         RuntimeTypes.registerClasses(String.class, null, Integer.class);
+    }
+
+    @Test public void testUnion2Str() {
+        assertEquals("3:Integer|String", union2Str(3, vec(Integer.class, String.class)));
+        assertEquals("\"hi\":Integer|String", union2Str("hi", vec(Integer.class, String.class)));
     }
 }

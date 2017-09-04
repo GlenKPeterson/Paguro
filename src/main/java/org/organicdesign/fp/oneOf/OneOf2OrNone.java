@@ -7,7 +7,7 @@ import org.organicdesign.fp.type.RuntimeTypes;
 
 import java.util.Objects;
 
-import static org.organicdesign.fp.FunctionUtils.stringify;
+import static org.organicdesign.fp.type.RuntimeTypes.union2Str;
 
 /**
  Holds one of 3 values or {@link None}. See {@link OneOf2} for a full description.  If you're passing the same type,
@@ -20,37 +20,29 @@ public abstract class OneOf2OrNone<A,B> {
     private final ImList<Class> types;
 
     /**
-     Protected constructor for subclassing.  Both A and B parameters can be null, but if one is non-null, the index
-     must specify the non-null value (to keep you from assigning a bogus index value).
+     Protected constructor for subclassing.
 
-     @param a the first possibility.
-     @param aClass the class of item A (to have at runtime for descriptive error messages and toString()).
-     @param b the second possibility
-     @param bClass the class of item B (to have at runtime for descriptive error messages and toString()).
-     @param index 0 means this represents an a, 1 represents a b, 2 represents None.
+     @param o the item (may be null)
+     @param aClass class 0 (to have at runtime for descriptive error messages and toString()).
+     @param bClass class 1 (to have at runtime for descriptive error messages and toString()).
+     @param index 0 means this represents an A, 1 represents a B, 2 represents a None
      */
-    protected OneOf2OrNone(A a, Class<A> aClass,
-                           B b, Class<B> bClass,
-                           int index) {
+    protected OneOf2OrNone(Object o, Class<A> aClass, Class<B> bClass, int index) {
         types = RuntimeTypes.registerClasses(aClass, bClass, None.class);
         sel = index;
-        if (index == 0) {
-            item = a;
-            if (b != null) {
-                throw new IllegalArgumentException("You specified item A (index = 0), but passed a non-null item B");
-            }
-        } else if (index == 1) {
-            item = b;
-            if (a != null) {
-                throw new IllegalArgumentException("You specified item B (index = 1), but passed a non-null item A");
-            }
-        } else if (index == 2) {
-            item = null;
-            if ( (a != null) || (b != null) ) {
-                throw new IllegalArgumentException("For None, all items must be null");
-            }
-        } else {
-            throw new IllegalArgumentException("Selected item index must be 0-2 where 2 selects None");
+        item = o;
+        if (index < 0) {
+            throw new IllegalArgumentException("Selected item index must be 0-2");
+        } else if (index > 2) {
+            throw new IllegalArgumentException("Selected item index must be 0-2");
+        } else if ( (index == 2) && (o != null) ) {
+            throw new IllegalArgumentException("You specified the index " + index +
+                                               " meaning 'None' but passed a value: " + o);
+        }
+        if ( (o != null) && (!types.get(index).isInstance(o)) ) {
+            throw new ClassCastException("You specified index " + index + ", indicating a(n) " +
+                                         types.get(index).getCanonicalName() + "," +
+                                         " but passed a " + o.getClass().getCanonicalName());
         }
     }
 
@@ -92,9 +84,5 @@ public abstract class OneOf2OrNone<A,B> {
                Objects.equals(item, that.item);
     }
 
-    @Override public String toString() {
-        String tn = RuntimeTypes.name(types.get(sel));
-        return sel == 2 ? tn
-                        : tn + "/2n(" + stringify(item) + ")";
-    }
+    @Override public String toString() { return union2Str(sel == 2 ? None.NONE : item, types); }
 }

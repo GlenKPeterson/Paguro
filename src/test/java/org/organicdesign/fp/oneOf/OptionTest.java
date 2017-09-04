@@ -1,4 +1,4 @@
-package org.organicdesign.fp;
+package org.organicdesign.fp.oneOf;
 
 import org.junit.Test;
 import org.organicdesign.fp.oneOf.Option;
@@ -92,6 +92,10 @@ public class OptionTest {
         equalsDistinctHashCode(o1a, o1b, o1c, Option.some(null));
 
         equalsDistinctHashCode(o1a, o1b, o1c, Option.none());
+
+        @SuppressWarnings("deprecation") Option<Integer> weird = Option.of(1);
+
+        equalsDistinctHashCode(o1a, o1b, weird, Option.none());
 
         equalsDistinctHashCode(Option.some(null), Option.some(null), Option.some(null), o1a);
         equalsDistinctHashCode(Option.some(null), serializeDeserialize(Option.some(null)),

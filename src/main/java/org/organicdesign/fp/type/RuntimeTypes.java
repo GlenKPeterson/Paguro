@@ -5,6 +5,7 @@ import org.organicdesign.fp.oneOf.OneOf2;
 
 import java.util.HashMap;
 
+import static org.organicdesign.fp.FunctionUtils.stringify;
 import static org.organicdesign.fp.StaticImports.vec;
 
 /**
@@ -85,6 +86,21 @@ public final class RuntimeTypes {
 //    }
 
     public static String name(Class c) { return (c == null) ? "null" : c.getSimpleName(); }
+
+    public static String union2Str(Object item, ImList<Class> types) {
+            StringBuilder sB = new StringBuilder();
+            sB.append(stringify(item)).append(":");
+            boolean isFirst = true;
+            for (Class c : types) {
+                if (isFirst) {
+                    isFirst = false;
+                } else {
+                    sB.append("|");
+                }
+                sB.append(RuntimeTypes.name(c));
+            }
+            return sB.toString();
+    }
 
     static int size() { return typeMap.size(); }
 }

@@ -11,14 +11,14 @@ public class OneOf3Test {
     static class Str_Int_Float extends OneOf3<String,Integer,Float> {
 
         // Constructor
-        private Str_Int_Float(String s, Integer i, Float f, int n) {
-            super(s, String.class, i, Integer.class, f, Float.class, n);
+        private Str_Int_Float(Object o, int n) {
+            super(o, String.class, Integer.class, Float.class, n);
         }
 
         // Static factory methods
-        static Str_Int_Float ofStr(String s) { return new Str_Int_Float(s, null, null, 0); }
-        static Str_Int_Float ofInt(Integer i) { return new Str_Int_Float(null, i, null, 1); }
-        static Str_Int_Float ofFloat(Float f) { return new Str_Int_Float(null, null, f, 2); }
+        static Str_Int_Float ofStr(String o) { return new Str_Int_Float(o, 0); }
+        static Str_Int_Float ofInt(Integer o) { return new Str_Int_Float(o, 1); }
+        static Str_Int_Float ofFloat(Float o) { return new Str_Int_Float(o, 2); }
     }
 
     @Test
@@ -27,19 +27,19 @@ public class OneOf3Test {
         assertEquals("right", oots.match(s -> s,
                                          i -> "wrong",
                                          f -> "bad"));
-        assertEquals("String/3(\"right\")", oots.toString());
+        assertEquals("\"right\":String|Integer|Float", oots.toString());
 
         Str_Int_Float ooti = Str_Int_Float.ofInt(57);
         assertEquals(Integer.valueOf(57), ooti.match(s -> -99,
                                                      i -> i,
                                                      f -> 99));
-        assertEquals("Integer/3(57)", ooti.toString());
+        assertEquals("57:String|Integer|Float", ooti.toString());
 
         Str_Int_Float ootf = Str_Int_Float.ofFloat(57.2f);
         assertEquals(Float.valueOf(57.2f), ootf.match(s -> -99f,
                                                      i -> 99f,
                                                      f -> f));
-        assertEquals("Float/3(57.2)", ootf.toString());
+        assertEquals("57.2:String|Integer|Float", ootf.toString());
     }
 
     @Test public void testEquality() {
@@ -70,66 +70,49 @@ public class OneOf3Test {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx1() { new Str_Int_Float(null, null, null, 3); }
+    public void subClassEx____n() { new Str_Int_Float(null, -1); }
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx2() { new Str_Int_Float(null, null, null, -1); }
+    public void subClassExa___n() { new Str_Int_Float("hi", -1); }
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx3() { new Str_Int_Float(null, null, null, -99); }
+    public void subClassEx_b__n() { new Str_Int_Float(1, -1); }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void subClassEx4() { new Str_Int_Float(null, null, null, 537); }
+    @Test(expected = ClassCastException.class)
+    public void subClassExa_c_0() { new Str_Int_Float(2f, 0); }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void subClassEx5() { new Str_Int_Float(null, null, null, Integer.MAX_VALUE); }
+    @Test(expected = ClassCastException.class)
+    public void subClassExa__d0() { new Str_Int_Float(3.0, 0); }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void subClassEx6() { new Str_Int_Float(null, null, null, Integer.MIN_VALUE); }
+    @Test(expected = ClassCastException.class)
+    public void subClassExa___1() { new Str_Int_Float("hi", 1); }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void subClassEx___n() { new Str_Int_Float(null, null, null, -1); }
+    @Test(expected = ClassCastException.class)
+    public void subClassEx_bc_1() { new Str_Int_Float(2f, 1); }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void subClassExa__n() { new Str_Int_Float("hi", null, null, -1); }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void subClassEx_b_n() { new Str_Int_Float(null, 1, null, -1); }
+    @Test(expected = ClassCastException.class)
+    public void subClassEx_b_c1() { new Str_Int_Float(3.0, 1); }
 
 
-    @Test(expected = IllegalArgumentException.class)
-    public void subClassExab_0() { new Str_Int_Float("hi", 1, null, 0); }
+    @Test(expected = ClassCastException.class)
+    public void subClassExa___2() { new Str_Int_Float("hi", 2); }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void subClassExa_c0() { new Str_Int_Float("hi", null, 2f, 0); }
+    @Test(expected = ClassCastException.class)
+    public void subClassEx_b__2() { new Str_Int_Float(1, 2); }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void subClassEx_b__0() { new Str_Int_Float(null, 1, null, 0); }
+    @Test(expected = ClassCastException.class)
+    public void subClassEx__cd2() { new Str_Int_Float(3.0, 2); }
 
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassExa___1() { new Str_Int_Float("hi", null, null, 1); }
+    public void subClassExa___3() { new Str_Int_Float("hi", 3); }
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx_bc_1() { new Str_Int_Float(null, 1, 2f, 1); }
+    public void subClassEx_b__3() { new Str_Int_Float(1, 3); }
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassExab__1() { new Str_Int_Float("hi", 1, null, 1); }
-
-
-    @Test(expected = IllegalArgumentException.class)
-    public void subClassExa___2() { new Str_Int_Float("hi", null, null, 2); }
+    public void subClassEx__c_3() { new Str_Int_Float(2f, 3); }
 
     @Test(expected = IllegalArgumentException.class)
-    public void subClassEx_b__2() { new Str_Int_Float(null, 1, null, 2); }
-
-
-    @Test(expected = IllegalArgumentException.class)
-    public void subClassExa___3() { new Str_Int_Float("hi", null, null, 3); }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void subClassEx_b__3() { new Str_Int_Float(null, 1, null, 3); }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void subClassEx__c_3() { new Str_Int_Float(null, null, 2f, 3); }
+    public void subClassEx____4() { new Str_Int_Float(null, 3); }
 }
