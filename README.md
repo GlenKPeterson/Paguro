@@ -1,4 +1,4 @@
-Type-safe versions of Clojure's immutable collections, an immutable alternative to Java 8 Streams, and other tools to make functional programming in Java easier.
+Type-safe versions of Clojure's immutable/persistent collections, an immutable alternative to Java 8 Streams, and other tools to make functional programming in Java easier.
 
 ![Hermit Crab](https://c7.staticflickr.com/8/7413/12171498934_2934c7ef28_n.jpg)
 Photo by [Rushen](https://www.flickr.com/photos/rushen/12171498934/in/photostream/)
@@ -6,9 +6,48 @@ Photo by [Rushen](https://www.flickr.com/photos/rushen/12171498934/in/photostrea
 Paguro is short for the Latin "Paguroidea" - the name of the Hermit Crab superfamily in Biology.  These collections grow by adding a new shell, leaving the insides the same, much the way [Hermit Crabs trade up to a new shell when they grow](https://www.youtube.com/watch?v=f1dnocPQXDQ).  This project used to be called UncleJim. 
 
 # News
+### RRB Tree Released!
+An RRB Tree is an immutable List (like Clojure's PersistentVector) that also supports random inserts, deletes, and can be split and joined back together in logarithmic time.
+There's been one for Scala for a while (Bagwell/Rompf who wrote the paper were Scala people), and a native Clojure one, but neither is super helpful for Java programmers.
+This is an entirely new Apache 2.0 Java implementation.
+
+It's easy to use:
+```java
+import org.organicdesign.fp.collections.RrbTree.ImRrbt;
+import static org.organicdesign.fp.StaticImports.rrb;
+
+class Foo {
+    public static void main(String[] args) {
+        ImRrbt<String> rrb = rrb("This", "is", "a", "list");
+        rrb = rrb.insert(0, "Hello!");
+        System.out.println("rrb: " + rrb);
+    }
+}
+```
+
+This implementation:
+1. Has a faster insertAt(0) than java.util.ArrayList.
+2. Has a mutable version that builds the same internal data structure as the immutable version, but without mutable sharing.
+Meaning that you can call mutable() and immutable() as much as you want.  The core data is shared immutably without locking/synchronization.
+3. The immutable version is about as fast as the Clojure PersistentVector and Scala's RRB Tree.
+The mutable RRB tree is only a little slower than the Clojure PersistentVector (Scala's RRB Tree lacks a mutable counterpart)
+
+### How to update
 A summary of recent updates is in the [Change Log](CHANGE_LOG.md)
 
-Future development priorities are further down this page.
+### Other features
+[docs/apidocs/org/organicdesign/fp/oneOf/package-frame.html](Union types) for Java!
+
+### Next Major Release will be Paguro 4.0, "Kotlin Compatibility"
+
+Some things will have to be renamed in order to fit better with the Kotlin standard library.
+Notably MutableList, MutableMap, and MutableSet conflict with the same-named classes in Kotlin.
+
+The primary programmer on this project is writing more Kotlin than Java.
+If you like Paguro, you'll probably prefer Kotlin too.
+Kotlin seems nearly 100% compatible with Java, meaning when you call Kotlin from Java, you could think you're calling native Java.
+So even if this becomes an all Kotlin project, Java programmers will have no trouble using it.
+If that happens, and Java-only programmers object for some reason, we can make a Java-only branch from the 3.x release.
 
 # Features
 
@@ -39,7 +78,7 @@ Available from the [Maven Repository](http://mvnrepository.com/artifact/org.orga
 <dependency>
         <groupId>org.organicdesign</groupId>
         <artifactId>Paguro</artifactId>
-        <version>3.0.12-BETA</version>
+        <version>3.0.14</version>
 </dependency>
 ```
 
