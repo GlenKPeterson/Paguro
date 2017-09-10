@@ -1,7 +1,6 @@
 package org.organicdesign.fp.type;
 
 import org.organicdesign.fp.collections.ImList;
-import org.organicdesign.fp.oneOf.OneOf2;
 
 import java.util.HashMap;
 
@@ -17,7 +16,7 @@ import static org.organicdesign.fp.StaticImports.vec;
     RuntimeTypes.registerClasses(vec(String.class, Integer.class));</code></pre>
 
  Now you if you use CLASS_STRING_INTEGER, you are never creating a new vector.
- For a full example of how to use these RuntimeTypes, see {@link OneOf2}.
+ For a full example of how to use these RuntimeTypes, see {@link org.organicdesign.fp.oneOf.OneOf2}.
 
  This is an experiment in runtime types for Java.  Constructive criticism is appreciated!
  If you write a programming language, your compiler can manage these vectors so that humans don't have to

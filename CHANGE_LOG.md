@@ -34,16 +34,74 @@ Major changes:
 Here is a script to ease your upgrade from 2.1.1 to 3.0:
 ```bash
 # USE CAUTION AND HAVE A BACKUP OF YOUR SOURCE CODE (VERSION CONTROL) - NO GUARANTEES
-oldString='import org.organicdesign.fp.LazyRef'
-newString='import org.organicdesign.fp.function.LazyRef'
+oldString='org.organicdesign.fp.LazyRef'
+newString='org.organicdesign.fp.function.LazyRef'
+sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir='.git' -rIl "$oldString" *)
+
+oldString='org.organicdesign.fp.either.OneOf2'
+newString='org.organicdesign.fp.oneOf.OneOf2'
+sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir='.git' -rIl "$oldString" *)
+
+oldString='org.organicdesign.fp.Option'
+newString='org.organicdesign.fp.oneOf.Option'
+sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir='.git' -rIl "$oldString" *)
+
+oldString='org.organicdesign.fp.Or'
+newString='org.organicdesign.fp.oneOf.Or'
 sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir='.git' -rIl "$oldString" *)
 
 oldString='.foldLeft('
 newString='.fold('
 sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir='.git' -rIl "$oldString" *)
 
+oldString='.typeMatch('
+newString='.match('
+sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir='.git' -rIl "$oldString" *)
+
 sed -i -e 's/\<Function\([0-3]\)\>/Fn\1/g' $(egrep --exclude-dir='.svn' --exclude-dir='.git' -wrIl 'Function[0-3]' *)
 ```
+If you subclassed OneOf, you can clean up your code.  From:
+```java
+public class String_Integer extends OneOf2<String,Integer> {
+    String_Integer(String cre, Integer rev, int s) { super(cre, rev, s); }
+
+    public static String_Integer str(String cre) { return new String_Integer(cre, null, 1); }
+    public static String_Integer in(Integer rev) { return new String_Integer(null, rev, 2); }
+```
+to (MAKE SURE TO USE ZERO-BASED INDICES!):
+```java
+public class String_Integer extends OneOf2<String,Integer> {
+    String_Integer(Object o, int s) { super(o, String.class, Integer.class, s); }
+
+    public static String_Integer str(String cre) { return new String_Integer(cre, 0); }
+    public static String_Integer in(Integer rev) { return new String_Integer(rev, 1); }
+```
+
+If you used the super::throw1 and super::throw2 methods, those have disappeared in favor of just using match everywhere.
+
+Anywhere you have FunctionUtils unmmodSet, unmodList, unmodWhatever, you probably want to replace that with StaticImports.xform().
+
+For instance:
+```java
+// Old 'n busted
+UnmodList<Number> foo(List<Integer> is, List<Double> ds) {
+    List<Number> ms = new ArrayList<>(is.size() + ds.size());
+    ms.addAll(is);
+    ms.addAll(ds);
+    return FunctionUtils.unmodList(ms);
+}
+
+// New 'n awesome
+ImList<Number> foo2(List<Integer> is, List<Double> ds) {
+    return xform(is)
+    // Little trick to tell Java's type system that we're making a List of Numbers.
+                   .map(m -> (Number) m)
+                   .concat(ds)
+                   .toImList();
+}
+
+```
+
 Manual upgrade tasks:
  - Do a clean build of your project
    - IntelliJ users right-click on the /src/java/ folder in your project and choose `Rebuild '<default>'`
