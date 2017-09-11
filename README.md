@@ -36,7 +36,7 @@ The mutable RRB tree is only a little slower than the Clojure PersistentVector (
 A summary of recent updates is in the [Change Log](CHANGE_LOG.md)
 
 ### Other features
-[docs/apidocs/org/organicdesign/fp/oneOf/package-frame.html](Union types) for Java!
+[Union types](docs/apidocs/org/organicdesign/fp/oneOf/package-frame.html) for Java!
 
 ### Next Major Release will be Paguro 4.0, "Kotlin Compatibility"
 
