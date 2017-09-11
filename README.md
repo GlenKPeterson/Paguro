@@ -26,10 +26,10 @@ class Foo {
 ```
 
 ### How to update
-A summary of recent updates is in the [Change Log](CHANGE_LOG.md)
+An upgrade script is in the [Change Log](CHANGE_LOG.md#30-upgrade) along with a description of the 3.0 changes (there were may!).
 
-### Other features
-[Union types](https://glenkpeterson.github.io/Paguro/apidocs/index.html?org/organicdesign/fp/oneOf/package-summary.html) for Java!
+### Other new features
+[Union types](https://glenkpeterson.github.io/Paguro/apidocs/index.html?org/organicdesign/fp/oneOf/package-summary.html) for Java!  Well, an approximation of them anyway.
 
 ### Next Major Release will be Paguro 4.0, "Kotlin Compatibility"
 
