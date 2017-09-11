@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
-import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.TestUtilities;
 import org.organicdesign.fp.tuple.Tuple2;
 
@@ -42,33 +41,6 @@ public class UnmodListTest {
         assertTrue(answerSet.contains(Tuple2.of(2, 3)));
         assertTrue(answerSet.contains(Tuple2.of(2, 4)));
         assertTrue(answerSet.contains(Tuple2.of(3, 4)));
-    }
-
-    @Test public void indexOf() {
-        assertEquals(-1, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider"))
-                                      .indexOf("hamster"));
-        assertEquals(0, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider"))
-                                     .indexOf("Along"));
-        assertEquals(2, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider"))
-                                     .indexOf("a"));
-        assertEquals(3, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider"))
-                                     .indexOf("spider"));
-
-        assertEquals(-1, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider"))
-                                      .lastIndexOf("hamster"));
-        assertEquals(0, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider"))
-                                     .lastIndexOf("Along"));
-        assertEquals(2, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider"))
-                                     .lastIndexOf("a"));
-        assertEquals(3, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider"))
-                                     .lastIndexOf("spider"));
-
-        assertEquals(5, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider", "and",
-                                                              "a", "poodle")).lastIndexOf("a"));
-        assertEquals(5, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider", "and",
-                                                              "a")).lastIndexOf("a"));
-        assertEquals(6, FunctionUtils.unmodList(Arrays.asList("Along", "came", "a", "spider", "and",
-                                                              "a", "Along")).lastIndexOf("Along"));
     }
 
     private static final String[] sticksAndStones = new String[] {

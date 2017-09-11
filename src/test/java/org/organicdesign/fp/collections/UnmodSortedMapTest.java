@@ -9,7 +9,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.junit.Test;
-import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.TestUtilities;
 
 import static org.junit.Assert.*;
@@ -52,12 +51,12 @@ public class UnmodSortedMapTest {
 
         @Override
         public UnmodSortedMap<K,V> subMap(K fromKey, K toKey) {
-            return FunctionUtils.unmodSortedMap(inner.subMap(fromKey, toKey));
+            return new TestMap<>(inner.subMap(fromKey, toKey), inner.comparator());
         }
 
         @Override
         public UnmodSortedMap<K,V> tailMap(K fromKey) {
-            return FunctionUtils.unmodSortedMap(inner.tailMap(fromKey));
+            return new TestMap<>(inner.tailMap(fromKey), inner.comparator());
         }
 
         @Override

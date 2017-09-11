@@ -16,14 +16,8 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
-
-import org.organicdesign.fp.xform.Transformable;
-
-// Consider replacing with RRB-Tree
-// https://github.com/clojure/core.rrb-vector/blob/master/src/main/clojure/clojure/core/rrb_vector.clj
 
 /**
  This started out as Rich Hickey's PersistentVector class from Clojure in late 2014.  Glen added
@@ -48,10 +42,6 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
     // 0b00000000000000000000000000011111 = 0x1f
     private static final int LOW_BITS = MAX_NODE_LENGTH - 1;
 
-    /** Use {@link org.organicdesign.fp.xform.Transformable#toImList()} instead. */
-    @Deprecated
-    public static <T> ImList<T> fromXform(Transformable<T> trans) { return trans.toImList(); }
-
     // Java shift operator review:
     // The signed left shift operator "<<" shifts a bit pattern to the left, and
     // the signed right shift operator ">>" shifts a bit pattern to the right.
@@ -67,9 +57,16 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
     // The bitwise | operator performs a bitwise inclusive OR operation
 
     private static class Node {
-        // Every node in a Vector (mutable or persistent) shares a single atomic reference value.
-        // I'm not sure why this is on the node instead of on the vector.  You know, if we do that,
-        // we don't need this class at all and could just use arrays instead.
+        // The same data structure backs both the mutable and immutable vector.  The immutable
+        // one uses copy-on-write for all operations.  The mutable one still uses copy-on-write
+        // for the tree, but not for the tail.  Instead of creating a new tail one bigger after
+        // each append, it creates a STRICT_NODE_SIZE tail and inserts items into it in place.
+        //
+        // The reason we need this AtomicReference is that some mutable vector could still have
+        // a pointer to the Tail array that's in the tree.  When first mutating, the current thread
+        // is placed in here.  After the mutable structure is made immutable, a null is placed in
+        // here.  Subsequent attempts to mutate anything check and if they find the null, they
+        // throw an exception.
         transient public final AtomicReference<Thread> edit;
 
         // This is either the data in the node (for a leaf node), or it's pointers to sub-nodes (for
@@ -121,28 +118,6 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
         return ret.immutable();
     }
 
-//    /** Public static factory method. */
-//    @SafeVarargs
-//    static public <T> PersistentVector<T> of(T... items) {
-//        MutableVector<T> ret = emptyMutable();
-//        for (T item : items) {
-//            ret = ret.append(item);
-//        }
-//        return ret.immutable();
-//    }
-
-//    @SafeVarargs
-//    public static <T> PersistentVector<T> ofSkipNull(T... items) {
-//        if (items == null) { return empty(); }
-//        PersistentVector<T> ret = empty();
-//        for (T item : items) {
-//            if (item != null) {
-//                ret = ret.append(item);
-//            }
-//        }
-//        return ret;
-//    }
-
     // ==================================== Instance Variables ====================================
     // The number of items in this Vector.
     private final int size;
@@ -190,13 +165,14 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
         @SuppressWarnings("unchecked")
         private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
             s.defaultReadObject();
-            vector = emptyMutable();
+            MutableList<E> temp = emptyMutable();
             for (int i = 0; i < size; i++) {
-                vector.append((E) s.readObject());
+                temp.append((E) s.readObject());
             }
+            vector = temp.immutable();
         }
 
-        private Object readResolve() { return vector.immutable(); }
+        private Object readResolve() { return vector; }
     }
 
     private Object writeReplace() { return new SerializationProxy<>(this); }
@@ -213,8 +189,6 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
 //    @Override
     // We could make this public some day, maybe.
     @Override public MutableVector<E> mutable() { return new MutableVector<>(this); }
-
-    @Override public ImList<E> immutable() { return this; }
 
     // Returns the high (gt 5) bits of the index of the last item.
     // I think this is the index of the start of the last array in the tree.
@@ -424,7 +398,7 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
 //    }
 
 //    @SuppressWarnings("unchecked")
-//    public <U> U reduce(Function2<U, E, U> f, U init) {
+//    public <U> U reduce(Fn2<U, E, U> f, U init) {
 //        int step = 0;
 //        for (int i = 0; i < size; i += step) {
 //            E[] array = leafNodeArrayFor(i);
@@ -560,8 +534,6 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
             //		root = editableRoot(root);
             //		tail = editableTail(tail);
         }
-
-        @Override public MutableList<F> mutable() { return this; }
 
         @Override  public int size() {
             ensureEditable();

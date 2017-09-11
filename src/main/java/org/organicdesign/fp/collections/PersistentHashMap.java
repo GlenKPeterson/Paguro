@@ -21,11 +21,11 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.organicdesign.fp.oneOf.Option;
 import org.organicdesign.fp.collections.PersistentTreeMap.Box;
+import org.organicdesign.fp.oneOf.Option;
 import org.organicdesign.fp.tuple.Tuple2;
 
-import static org.organicdesign.fp.FunctionUtils.emptyUnmodIterator;
+import static org.organicdesign.fp.collections.UnmodIterator.emptyUnmodIterator;
 
 /**
  Rich Hickey's immutable rendition of Phil Bagwell's Hash Array Mapped Trie.
@@ -39,10 +39,10 @@ import static org.organicdesign.fp.FunctionUtils.emptyUnmodIterator;
  This file is a derivative work based on a Clojure collection licensed under the Eclipse Public
  License 1.0 Copyright Rich Hickey.  Errors are Glen Peterson's.
  */
-public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
-        implements ImUnsortedMap<K,V>, Serializable {
+public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
+        implements ImMap<K,V>, Serializable {
 
-//    static private <K, V, R> R doKvreduce(Object[] array, Function3<R,K,V,R> f, R init) {
+//    static private <K, V, R> R doKvreduce(Object[] array, Fn3<R,K,V,R> f, R init) {
 //        for (int i = 0; i < array.length; i += 2) {
 //            if (array[i] != null) {
 //                init = f.apply(init, k(array, i), v(array, i + 1));
@@ -69,6 +69,7 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
         private Iter(UnmodIterator<UnEntry<K,V>> ri, V nv) { rootIter = ri; nullValue = nv; }
 
         @Override public boolean hasNext() {
+            //noinspection SimplifiableIfStatement
             if (!seen) {
                 return true;
             } else {
@@ -149,6 +150,7 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
      Returns a new PersistentHashMap of the given keys and their paired values, skipping any null
      Entries.
      */
+    @SuppressWarnings("WeakerAccess")
     public static <K,V> PersistentHashMap<K,V> ofEq(Equator<K> eq, Iterable<Map.Entry<K,V>> es) {
         if (es == null) { return empty(eq); }
         MutableHashMap<K,V> map = emptyMutable(eq);
@@ -212,7 +214,7 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
     private static class SerializationProxy<K,V> implements Serializable {
         private final Equator<K> equator;
         private final int size;
-        private transient ImUnsortedMap<K,V> theMap;
+        private transient ImMap<K,V> theMap;
         SerializationProxy(PersistentHashMap<K,V> phm) {
             equator = phm.equator;
             size = phm.size;
@@ -235,13 +237,15 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
         @SuppressWarnings("unchecked")
         private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
             s.defaultReadObject();
-            theMap = new PersistentHashMap<K,V>(equator, 0, null, false, null).mutable();
+            MutableMap tempMap =
+                    new PersistentHashMap<K,V>(equator, 0, null, false, null).mutable();
             for (int i = 0; i < size; i++) {
-                theMap.assoc((K) s.readObject(), (V) s.readObject());
+                tempMap.assoc(s.readObject(), s.readObject());
             }
+            theMap = tempMap.immutable();
         }
 
-        private Object readResolve() { return theMap.immutable(); }
+        private Object readResolve() { return theMap; }
     }
 
     private Object writeReplace() { return new SerializationProxy<>(this); }
@@ -279,7 +283,7 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
 
     @Override public Option<UnmodMap.UnEntry<K,V>> entry(K key) {
         if (key == null) {
-            return hasNull ? Option.of(Tuple2.of(null, nullValue)) : Option.none();
+            return hasNull ? Option.some(Tuple2.of(null, nullValue)) : Option.none();
         }
         if (root == null) {
             return Option.none();
@@ -296,9 +300,7 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
                          : rootIter;
     }
 
-    @Override public final PersistentHashMap<K,V> immutable() { return this; }
-
-//    public <R> R kvreduce(Function3<R,K,V,R> f, R init) {
+//    public <R> R kvreduce(Fn3<R,K,V,R> f, R init) {
 //        init = hasNull ? f.apply(init, null, nullValue) : init;
 //        if(RT.isReduced(init))
 //            return ((IDeref)init).deref();
@@ -312,11 +314,11 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
 //        return init;
 //    }
 
-//    public <R> R fold(long n, final Function2<R,R,R> combinef, final Function3<R,K,V,R> reducef,
-//                      Function1<Function0<R>,R> fjinvoke, final Function1<Function0,R> fjtask,
-//                      final Function1<R,Object> fjfork, final Function1<Object,R> fjjoin){
+//    public <R> R fold(long n, final Fn2<R,R,R> combinef, final Fn3<R,K,V,R> reducef,
+//                      Fn1<Fn0<R>,R> fjinvoke, final Fn1<Fn0,R> fjtask,
+//                      final Fn1<R,Object> fjfork, final Fn1<Object,R> fjjoin){
 //        //we are ignoring n for now
-//        Function0<R> top = () -> {
+//        Fn0<R> top = () -> {
 //            R ret = combinef.apply(null,null);
 //            if(root != null)
 //                ret = combinef.apply(ret, root.fold(combinef, reducef, fjtask, fjfork, fjjoin));
@@ -349,8 +351,8 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
         return new PersistentHashMap<>(equator, size - 1, newroot, hasNull, nullValue);
     }
 
-    public static final class MutableHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
-            implements MutableUnsortedMap<K,V> {
+    public static final class MutableHashMap<K,V> extends AbstractUnmodMap<K,V>
+            implements MutableMap<K,V> {
 
         private AtomicReference<Thread> edit;
         private final Equator<K> equator;
@@ -410,7 +412,7 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
         @Override public Option<UnEntry<K,V>> entry(K key) {
             ensureEditable();
             if (key == null) {
-                return hasNull ? Option.of(Tuple2.of(null, nullValue)) : Option.none();
+                return hasNull ? Option.some(Tuple2.of(null, nullValue)) : Option.none();
             }
             if (root == null) {
                 return Option.none();
@@ -487,11 +489,11 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
         INode<K,V> without(AtomicReference<Thread> edit, int shift, int hash, K key,
                            Box<Box> removedLeaf);
 
-//        <R> R kvreduce(Function3<R,K,V,R> f, R init);
+//        <R> R kvreduce(Fn3<R,K,V,R> f, R init);
 
-//        <R> R fold(Function2<R,R,R> combinef, Function3<R,K,V,R> reducef,
-//                   final Function1<Function0,R> fjtask,
-//                   final Function1<R,Object> fjfork, final Function1<Object,R> fjjoin);
+//        <R> R fold(Fn2<R,R,R> combinef, Fn3<R,K,V,R> reducef,
+//                   final Fn1<Fn0,R> fjtask,
+//                   final Fn1<R,Object> fjfork, final Fn1<Object,R> fjjoin);
 
         UnmodIterator<UnEntry<K,V>> iterator();
     }
@@ -564,7 +566,7 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
             return new Iter<>(array);
         }
 
-//        @Override public <R> R kvreduce(Function3<R,K,V,R> f, R init){
+//        @Override public <R> R kvreduce(Fn3<R,K,V,R> f, R init){
 //            for(INode<K,V> node : array){
 //                if(node != null){
 //                    init = node.kvreduce(f,init);
@@ -574,10 +576,10 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
 //            }
 //            return init;
 //        }
-//        @Override public <R> R fold(Function2<R,R,R> combinef, Function3<R,K,V,R> reducef,
-//                                    final Function1<Function0,R> fjtask,
-//                                    final Function1<R,Object> fjfork,
-//                                    final Function1<Object,R> fjjoin){
+//        @Override public <R> R fold(Fn2<R,R,R> combinef, Fn3<R,K,V,R> reducef,
+//                                    final Fn1<Fn0,R> fjtask,
+//                                    final Fn1<R,Object> fjfork,
+//                                    final Fn1<Object,R> fjjoin){
 //            List<Callable<R>> tasks = new ArrayList<>();
 //            for(final INode<K,V> node : array){
 //                if(node != null){
@@ -588,10 +590,10 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
 //            return foldTasks(tasks,combinef,fjtask,fjfork,fjjoin);
 //        }
 
-//        static private <R> R foldTasks(List<Callable<R>> tasks, final Function2<R,R,R> combinef,
-//                                       final Function1<Function0,R> fjtask,
-//                                       final Function1<R,Object> fjfork,
-//                                       final Function1<Object,R> fjjoin) {
+//        static private <R> R foldTasks(List<Callable<R>> tasks, final Fn2<R,R,R> combinef,
+//                                       final Fn1<Fn0,R> fjtask,
+//                                       final Fn1<R,Object> fjfork,
+//                                       final Fn1<Object,R> fjjoin) {
 //
 //            if(tasks.isEmpty())
 //                return combinef.apply(null,null);
@@ -739,7 +741,7 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
     private final static class BitmapIndexedNode<K,V> implements INode<K,V> {
 //        static final BitmapIndexedNode EMPTY = new BitmapIndexedNode(null, 0, new Object[0]);
 
-        static final <K,V> BitmapIndexedNode<K,V> empty(Equator<K> e) {
+        static <K,V> BitmapIndexedNode<K,V> empty(Equator<K> e) {
             return new BitmapIndexedNode(e, null, 0, new Object[0]);
         }
 
@@ -785,7 +787,7 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
                 }
                 addedLeaf.val = addedLeaf;
                 return new BitmapIndexedNode<>(equator, null, bitmap,
-                                               cloneAndSet(array, 2*idx, null, 2*idx+1,
+                                               cloneAndSet(array, 2*idx, 2*idx+1,
                                                            createNode(equator, shift + 5, keyOrNull,
                                                                       valOrNode, hash, key, val)));
             } else {
@@ -880,14 +882,14 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
             return new NodeIter<>(array);
         }
 
-//        @Override public <R> R kvreduce(Function3<R,K,V,R> f, R init){
+//        @Override public <R> R kvreduce(Fn3<R,K,V,R> f, R init){
 //            return doKvreduce(array, f, init);
 //        }
 
-//        @Override public <R> R fold(Function2<R,R,R> combinef, Function3<R,K,V,R> reducef,
-//                                    final Function1<Function0,R> fjtask,
-//                                    final Function1<R,Object> fjfork,
-//                                    final Function1<Object,R> fjjoin){
+//        @Override public <R> R fold(Fn2<R,R,R> combinef, Fn3<R,K,V,R> reducef,
+//                                    final Fn1<Fn0,R> fjtask,
+//                                    final Fn1<R,Object> fjfork,
+//                                    final Fn1<Object,R> fjjoin){
 //            return doKvreduce(array, reducef, combinef.apply(null, null));
 //        }
 
@@ -906,10 +908,10 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
             return editable;
         }
 
-        private BitmapIndexedNode<K,V> editAndSet(AtomicReference<Thread> edit, int i, Object a,
+        private BitmapIndexedNode<K,V> editAndSet(AtomicReference<Thread> edit, int i,
                                                   int j, Object b) {
             BitmapIndexedNode editable = ensureEditable(edit);
-            editable.array[i] = a;
+            editable.array[i] = null;
             editable.array[j] = b;
             return editable;
         }
@@ -947,7 +949,7 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
                     return editAndSet(edit, 2*idx+1, val);
                 }
                 addedLeaf.val = addedLeaf;
-                return editAndSet(edit, 2*idx, null, 2*idx+1,
+                return editAndSet(edit, 2*idx, 2*idx+1,
                                   createNode(equator, edit, shift + 5, keyOrNull, valOrNode, hash,
                                              key, val));
             } else {
@@ -1091,14 +1093,14 @@ public class PersistentHashMap<K,V> extends UnmodMap.AbstractUnmodMap<K,V>
 
         @Override public UnmodIterator<UnEntry<K,V>> iterator() { return new NodeIter<>(array); }
 
-//        @Override public <R> R kvreduce(Function3<R,K,V,R> f, R init){
+//        @Override public <R> R kvreduce(Fn3<R,K,V,R> f, R init){
 //            return doKvreduce(array, f, init);
 //        }
 
-//        @Override public <R> R fold(Function2<R,R,R> combinef, Function3<R,K,V,R> reducef,
-//                                    final Function1<Function0,R> fjtask,
-//                                    final Function1<R,Object> fjfork,
-//                                    final Function1<Object,R> fjjoin){
+//        @Override public <R> R fold(Fn2<R,R,R> combinef, Fn3<R,K,V,R> reducef,
+//                                    final Fn1<Fn0,R> fjtask,
+//                                    final Fn1<R,Object> fjfork,
+//                                    final Fn1<Object,R> fjjoin){
 //            return doKvreduce(array, reducef, combinef.apply(null, null));
 //        }
 
@@ -1287,9 +1289,9 @@ public static void main(String[] args){
         return clone;
     }
 
-    private static Object[] cloneAndSet(Object[] array, int i, Object a, int j, Object b) {
+    private static Object[] cloneAndSet(Object[] array, int i, int j, Object b) {
         Object[] clone = array.clone();
-        clone[i] = a;
+        clone[i] = null;
         clone[j] = b;
         return clone;
     }
@@ -1395,6 +1397,7 @@ public static void main(String[] args){
         }
 
         @Override public boolean hasNext(){
+            //noinspection SimplifiableIfStatement
             if (nextEntry != Absent.ENTRY || nextIter != null) {
                 return true;
             }

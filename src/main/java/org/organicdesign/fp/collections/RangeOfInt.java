@@ -63,15 +63,6 @@ public class RangeOfInt implements UnmodList<Integer>, Serializable {
         }
     }
 
-    /**
-     Use Equat.LIST instead.
-     Being an enum, it's serializable and makes a better singleton.
-     Deprecated as of 1.1.0, 2016-08-27
-     */
-    @Deprecated
-    public static final Equator<List<Integer>> LIST_EQUATOR = Equat.LIST;
-
-
 //    public static RangeOfInt of(int s, int e) {
 //        if (e < s) {
 //            throw new IllegalArgumentException("end of range must be >= start of range");

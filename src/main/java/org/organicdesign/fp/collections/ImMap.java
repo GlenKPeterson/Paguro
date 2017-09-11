@@ -2,24 +2,19 @@ package org.organicdesign.fp.collections;
 
 import java.util.Map;
 
-import org.organicdesign.fp.oneOf.Option;
-
 /** An immutable map with no guarantees about its ordering. */
-public interface ImMap<K,V> extends UnmodMap<K,V> {
-    Option<UnmodMap.UnEntry<K,V>> entry(K key);
-
-//    Sequence<UnEntry<K,V>> seq();
+public interface ImMap<K,V> extends BaseUnsortedMap<K,V> {
 
     /** Returns a new map with the given key/value added */
-    ImMap<K,V> assoc(K key, V val);
+    @Override ImMap<K,V> assoc(K key, V val);
 
     /** Returns a new map with an immutable copy of the given entry added */
-    default ImMap<K,V> assoc(Map.Entry<K,V> entry) {
+    @Override default ImMap<K,V> assoc(Map.Entry<K,V> entry) {
         return assoc(entry.getKey(), entry.getValue());
     }
 
     /** Returns a new map with the given key/value removed */
-    ImMap<K,V> without(K key);
+    @Override ImMap<K,V> without(K key);
 
     /**
      Returns a view of the mappings contained in this map.  The set should actually contain
@@ -31,24 +26,12 @@ public interface ImMap<K,V> extends UnmodMap<K,V> {
                 .toImSet();
     }
 
-    /** Returns a view of the keys contained in this map. */
-    @Override ImSet<K> keySet();
-
-    @SuppressWarnings("unchecked")
-    @Override default boolean containsKey(Object key) { return entry((K) key).isSome(); }
-
-    @SuppressWarnings("unchecked")
-    @Override default V get(Object key) {
-        Option<UnEntry<K,V>> entry = entry((K) key);
-        return entry.isSome() ? entry.get().getValue() : null;
+    /** Returns an immutable view of the keys contained in this map. */
+    @Override default ImSet<K> keySet() {
+        return mutable().keySet().immutable();
     }
 
-    default V getOrElse(K key, V notFound) {
-        Option<UnEntry<K,V>> entry = entry(key);
-        return entry.isSome() ? entry.get().getValue() : notFound;
-    }
+    /** Returns a mutable version of this mutable map. */
+    MutableMap<K,V> mutable();
 
-//    @Override default UnmodCollection<V> values() { return map(e -> e.getValue()).toImSet(); }
-
-//    @Override default UnmodIterator<UnEntry<K,V>> iterator() { return seq().iterator(); }
 }

@@ -5,7 +5,7 @@ This file contains additional information for contributors, or maybe people who 
 # Additional features:
 * Simplified [functional interfaces](src/main/java/org/organicdesign/fp/function) that wrap checked exceptions
 * An [Equator](src/main/java/org/organicdesign/fp/collections/Equator.java) and [ComparisonContext](src/main/java/org/organicdesign/fp/collections/Equator.java#L45) which work like `java.util.Comparator`, but for hash-based collections.
-* [Memoization](src/main/java/org/organicdesign/fp/function/Function2.java#L59) for functions
+* [Memoization](src/main/java/org/organicdesign/fp/function/Fn2.java#L59) for functions
 * Unmodifiable interfaces which deprecate mutator methods and throw exceptions to retrofit legacy code and catch errors in your IDE instead of at runtime.
 These were useful before the Clojure collections and Transformable were fully integrated, but may still provide a useful extension point for integrating your own immutable collections into the traditional Java ecosystem.
 
@@ -39,15 +39,6 @@ Rich Hickey for Clojure
 - First `mvn clean install` on: https://github.com/GlenKPeterson/TestUtils
 - Then `mvn clean test` on Paguro
 
-# Version 3.0 breaking changes
- - Rename all functional interfaces from `Function1` to `Fn1`.  These show up in type signatures often enough to warrant brevity.
- - Rename `Transformable.foldLeft()` to just `Transformable.fold()`.  The left and right only make sense on linked lists (they are reversed with vectors which is confusing).  Just drop the word "left."  People who care will look it up anyway and people who don't care don't need to know.
- - Remove empty() and EMPTY from all interfaces except maybe UnmodIterator.
- These are a problem when you inherit from the interface because you have to override them or suffer.
- These objects don't implement equals() and you end up expecting in UnmodWhatever.EMPTY to .append() or otherwise behave like an ImWhatever, which it probably should never do.
- - Rename foldLeft() to just fold().  It's too confusing for people used to linked list implementations
- to think about what foldLeft() means in terms of ordering.
-
 # Think about:
  - Xform.MapDesc is not serializable.  Really none of xform is serializable.
  - Think about adding StaticImports.xform(String)
@@ -56,10 +47,8 @@ Rich Hickey for Clojure
    Hmm... Maybe have a SizedIterable that both maps and collections can extend?  Ditto UnmodSortedMap extend UnmodSortedCollection instead of UnmodSortedIterable.
  - Have an Ordered version of Transform as well as the (default) unreliable order.  Only the ordered version can be used for implementing things like equals() and hashCode()
  - Implement drop() for list with listIterator(dropAmount)
- - Consider `max(Comparator<T> c, Iterable<? extends T> is)` and min()...  Actually, these probably belong on Transformable.
  - Study monadic thinking and ensure that Or is "monad-friendly".
  Ensure you can chain together functions in a short-circuiting way, without exceptions or other side-effects.
- - Add a [Persistent RRB Tree](http://infoscience.epfl.ch/record/169879/files/RMTrees.pdf) and compare its performance to the PersistentVector.
  - Replace vector with RRBTree (assuming performance is good).
  - Re-implement Persistent collections under the Apache license.
  - Make pretty(int indent) methods on everything that returns a String of valid Cymling code to create that collection.
@@ -70,20 +59,20 @@ Rich Hickey for Clojure
 Use with filter(...).head() instead
 
 ### T reduceLeft(BiFunction<T, T, T> fun)
-reduceLeft() is like foldLeft without the "u" parameter.
-I implemented it, but deleted it because it seemed like a very special case of foldLeft that only operated on items of the same type as the original collection.
+reduceLeft() is like fold without the "u" parameter.
+I implemented it, but deleted it because it seemed like a very special case of fold that only operated on items of the same type as the original collection.
 I didn't think it improved readability or ease of use to have both methods.
-How hard is it to pass a 0 or 1 to foldLeft?
-It's easy enough to implement if there is a compelling use case where it's significantly better than foldLeft.
+How hard is it to pass a 0 or 1 to fold?
+It's easy enough to implement if there is a compelling use case where it's significantly better than fold.
 Otherwise, fewer methods means a simpler interface to learn.
 
-### Transformable<T> forEach(Function1<? super T,?> consumer)
+### Transformable<T> forEach(Fn1<? super T,?> consumer)
 Java 8 has `void forEach(Consumer<? super T> action)` on both Iterable and Stream that does what
 Transformable.forEach() used to do.  The old Transformable method overloaded (but did not override)
 this method which is problematic for the reasons Josh Bloch gives in his Item 41.  Either make
 use of the Java 8 `void forEach(i -> log(i))` or pass a constant function like
 `i -> { print(i); return Boolean.TRUE; }` to
-`Transformable<T> filter(Function1<? super T,Boolean> predicate)` instead. 
+`Transformable<T> filter(Fn1<? super T,Boolean> predicate)` instead. 
 
 ### Transformable<T> interpose(T item)
 I also implemented interpose(), but took it out because my only use case was to add commas to a list to display

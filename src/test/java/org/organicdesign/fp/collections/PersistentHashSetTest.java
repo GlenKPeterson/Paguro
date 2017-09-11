@@ -1,9 +1,13 @@
 package org.organicdesign.fp.collections;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import org.junit.Test;
-import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.oneOf.Option;
 
 import static org.junit.Assert.*;
@@ -176,14 +180,14 @@ public class PersistentHashSetTest {
 
     @Test public void seq3() {
         PersistentHashSet<String> m1 = PersistentHashSet.of(vec("c"));
-        assertEquals(Option.of("c"),
+        assertEquals(Option.some("c"),
                      m1.head());
 
         PersistentHashSet<String> m2 = PersistentHashSet.of(vec("c", "b", "a"));
 
-        Set<Option<String>> s = new HashSet<>(Arrays.asList(Option.of("c"),
-                                                            Option.of("b"),
-                                                            Option.of("a")));
+        Set<Option<String>> s = new HashSet<>(Arrays.asList(Option.some("c"),
+                                                            Option.some("b"),
+                                                            Option.some("a")));
 
         UnmodIterable<String> seq = m2;
         Option o = seq.head();
@@ -271,7 +275,7 @@ public class PersistentHashSetTest {
 
     @Test public void mutableTest() {
         Set<Integer> control = new HashSet<>();
-        MutableUnsortedSet<Integer> test = PersistentHashSet.emptyMutable();
+        MutableSet<Integer> test = PersistentHashSet.emptyMutable();
         assertEquals(control.size(), test.size());
         assertEquals(control.contains(-1), test.contains(-1));
 
@@ -289,7 +293,7 @@ public class PersistentHashSetTest {
         setIterTest(control, test.iterator());
         // Reversed test.
         setIterTest(test, control.iterator());
-        ImUnsortedSet<Integer> immutable = test.immutable();
+        ImSet<Integer> immutable = test.immutable();
 
         setIterTest(control, immutable.iterator());
         setIterTest(control, serializeDeserialize(immutable).iterator());
@@ -366,7 +370,7 @@ public class PersistentHashSetTest {
         ss1.add("work");
         ss1.add("an");
         ss1.add("hello");
-        equalsDistinctHashCode(s1, ss1, FunctionUtils.unmodSet(ss1),
+        equalsDistinctHashCode(s1, ss1, Collections.unmodifiableSet(ss1),
                                PersistentHashSet.of(vec("hello", "an", "work", "the")));
     }
 

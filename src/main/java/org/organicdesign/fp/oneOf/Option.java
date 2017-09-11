@@ -13,8 +13,8 @@
 
 package org.organicdesign.fp.oneOf;
 
-import org.organicdesign.fp.function.Function0;
-import org.organicdesign.fp.function.Function1;
+import org.organicdesign.fp.function.Fn0;
+import org.organicdesign.fp.function.Fn1;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -39,79 +39,47 @@ public interface Option<T> extends Serializable { // extends UnmodSortedIterable
      together, failing fast at the first none() or continuing through as many operations that return
      some as possible.
      */
-    <U> Option<U> then(Function1<T,Option<U>> f);
+    <U> Option<U> then(Fn1<T,Option<U>> f);
 
     /** Is this Some? */
     boolean isSome();
 
     /** Pass in a function to execute if its Some and another to execute if its None. */
-    <U> U match(Function1<T,U> has, Function0<U> hasNot);
+    <U> U match(Fn1<T,U> has, Fn0<U> hasNot);
 
     // ========================================== Static ==========================================
     /** None is a singleton and this is its only instance. */
-    Option NONE = new None();
+    Option NONE = None.NONE;
 
     /** Calling this instead of referring to NONE directly can make the type infrencer happy. */
     @SuppressWarnings("unchecked")
-    static <T> Option<T> none() { return NONE; }
+    static <T> Option<T> none() { return None.NONE; }
 
-    /** Public static factory method for contructing Options. */
-    static <T> Option<T> of(T t) {
-        if (NONE.equals(t)) {
+    /**
+     Would {@link #some(Object)} be better for your purposes?  For some reason, this returns none
+     if you pass it a none.  This is like flatmapping Options.  Is this good for chaining or
+     is this just weird?  If the first, I'm going to rename it flatten() or flatmap() or something.
+     If the second, it should be deleted.  Remember, you also have {@link Or} for chaining or
+     returning an error which is probably a better choice than Option for that kind of thing.
+     */
+    @Deprecated static <T> Option<T> of(T t) {
+        if (None.NONE.equals(t)) {
             return none();
         }
+        return new Some<>(t);
+    }
+
+    /** Public static factory method for constructing the Some Option. */
+    static <T> Option<T> some(T t) {
         return new Some<>(t);
     }
 
     /** Construct an option, but if t is null, make it None instead of Some. */
     static <T> Option<T> someOrNullNoneOf(T t) {
-        if ( (t == null) || NONE.equals(t) ) {
+        if ( (t == null) || None.NONE.equals(t) ) {
             return none();
         }
         return new Some<>(t);
-    }
-
-    /** Represents the absence of a value */
-    final class None<T> implements Option<T> {
-        // For serializable.  Make sure to change whenever internal data format changes.
-        private static final long serialVersionUID = 20160915081300L;
-
-        /** Private constructor for singleton. */
-        private None() {}
-
-        /** {@inheritDoc} */
-        @Override public T get() { throw new IllegalStateException("Called get on None"); }
-
-        /** {@inheritDoc} */
-        @Override public T getOrElse(T t) { return t; }
-
-        /** {@inheritDoc} */
-        @Override public boolean isSome() { return false; }
-//
-//        @Override public UnmodSortedIterator<T> iterator() {
-//            return UnmodSortedIterator.empty();
-//        }
-
-        /** {@inheritDoc} */
-        @Override public <U> U match(Function1<T,U> has, Function0<U> hasNot) {
-            return hasNot.get();
-        }
-
-        /** {@inheritDoc} */
-        @Override public <U> Option<U> then(Function1<T,Option<U>> f) { return none(); }
-
-        /** Valid, but deprecated because it's usually an error to call this in client code. */
-        @Deprecated // Has no effect.  Darn!
-        @Override public int hashCode() { return 0; }
-
-        /** Valid, but deprecated because it's usually an error to call this in client code. */
-        @Deprecated // Has no effect.  Darn!
-        @Override public boolean equals(Object other) {
-            return (this == other) || (other instanceof None);
-        }
-
-        /** Defend our singleton property in the face of deserialization. */
-        private Object readResolve() { return NONE; }
     }
 
     /** Represents the presence of a value, even if that value is null. */
@@ -148,12 +116,12 @@ public interface Option<T> extends Serializable { // extends UnmodSortedIterable
 //        }
 
         /** {@inheritDoc} */
-        @Override public <U> U match(Function1<T,U> has, Function0<U> hasNot) {
+        @Override public <U> U match(Fn1<T,U> has, Fn0<U> hasNot) {
             return has.apply(item);
         }
 
         /** {@inheritDoc} */
-        @Override public <U> Option<U> then(Function1<T,Option<U>> f) { return f.apply(item); }
+        @Override public <U> Option<U> then(Fn1<T,Option<U>> f) { return f.apply(item); }
 
         /** Valid, but deprecated because it's usually an error to call this in client code. */
         @Deprecated // Has no effect.  Darn!

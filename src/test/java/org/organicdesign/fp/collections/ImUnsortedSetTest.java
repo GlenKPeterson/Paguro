@@ -11,7 +11,7 @@ import static org.organicdesign.fp.FunctionUtils.ordinal;
  Created by gpeterso on 9/13/16.
  */
 public class ImUnsortedSetTest {
-    static class TestSet<E> implements ImUnsortedSet<E> {
+    static class TestSet<E> implements ImSet<E> {
         static <T> Set<T> dup(Collection<T> in) {
             Set<T> out = new HashSet<>();
             out.addAll(in);
@@ -24,19 +24,17 @@ public class ImUnsortedSetTest {
             inner.addAll(s);
         }
 
-        @Override public ImUnsortedSet<E> immutable() { return this; }
-
-        @Override public MutableUnsortedSet<E> mutable() {
-            return new MutableUnsortedSetTest.TestSet<>(dup(inner));
+        @Override public MutableSet<E> mutable() {
+            return new MutableSetTest.TestSet<>(dup(inner));
         }
 
-        @Override public ImUnsortedSet<E> put(E val){
+        @Override public ImSet<E> put(E val){
             Set<E> next = dup(inner);
             next.add(val);
             return new TestSet<>(next);
         }
 
-        @Override public ImUnsortedSet<E> without(E key) {
+        @Override public ImSet<E> without(E key) {
             Set<E> next = dup(inner);
             next.remove(key);
             return new ImUnsortedSetTest.TestSet<>(next);
@@ -73,7 +71,7 @@ public class ImUnsortedSetTest {
         List<String> origItems = Arrays.asList("This", "is", "a", "test");
         Set<String> control = new HashSet<>();
         control.addAll(origItems);
-        ImUnsortedSet<String> test = new TestSet<>(origItems);
+        ImSet<String> test = new TestSet<>(origItems);
 
         assertEquals(control, test);
 

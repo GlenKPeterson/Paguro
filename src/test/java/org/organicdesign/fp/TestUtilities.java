@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
-import org.organicdesign.fp.function.Function0;
+import org.organicdesign.fp.function.Fn0;
 
 import static org.junit.Assert.*;
 
@@ -97,7 +97,7 @@ public class TestUtilities {
         assertFalse("When a has no next, b shouldn't either", b.hasNext());
     }
 
-    public static <T extends Throwable> void assertEx(Function0<?> f, String beforeText,
+    public static <T extends Throwable> void assertEx(Fn0<?> f, String beforeText,
                                                       Class<T> exType) {
         try {
             f.apply();

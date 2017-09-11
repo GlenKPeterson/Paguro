@@ -20,14 +20,18 @@ import org.organicdesign.fp.collections.ImSet;
 import org.organicdesign.fp.collections.ImSortedMap;
 import org.organicdesign.fp.collections.ImSortedSet;
 import org.organicdesign.fp.collections.MutableList;
-import org.organicdesign.fp.collections.MutableUnsortedMap;
-import org.organicdesign.fp.collections.MutableUnsortedSet;
+import org.organicdesign.fp.collections.MutableMap;
+import org.organicdesign.fp.collections.MutableSet;
 import org.organicdesign.fp.collections.PersistentHashMap;
 import org.organicdesign.fp.collections.PersistentHashSet;
 import org.organicdesign.fp.collections.PersistentTreeMap;
 import org.organicdesign.fp.collections.PersistentTreeSet;
 import org.organicdesign.fp.collections.PersistentVector;
+import org.organicdesign.fp.collections.RrbTree;
+import org.organicdesign.fp.collections.RrbTree.ImRrbt;
+import org.organicdesign.fp.collections.RrbTree.MutableRrbt;
 import org.organicdesign.fp.collections.UnmodIterable;
+import org.organicdesign.fp.collections.UnmodIterator;
 import org.organicdesign.fp.tuple.Tuple2;
 import org.organicdesign.fp.tuple.Tuple3;
 import org.organicdesign.fp.xform.Xform;
@@ -37,22 +41,24 @@ import java.util.Comparator;
 import java.util.Map;
 
 /**
- <p>A mini data definition language composed of vec(), tup(), map(), set(), plus xform() which makes
- java.util collections transformable.</p>
+ <p>A mini data definition language composed of short methods like vec(), tup(), map(),
+ set(), plus xform() which makes java.util collections transformable.</p>
 
  <pre><code>import org.organicdesign.fp.StaticImports.*
 
- // Create a new vector of integers
- vec(1, 2, 3, 4);
+// Create a new vector of integers
+vec(1, 2, 3, 4);
 
- // Create a new set of Strings
- set("a", "b", "c");
+// Create a new set of Strings
+set("a", "b", "c");
 
- // Create a tuple of an int and a string (a type-safe heterogeneous container)
- tup("a", 1);
+// Create a tuple of an int and a string (a type-safe heterogeneous container)
+tup("a", 1);
 
- // Create a map with a few key value pairs
- map(tup("a", 1), tup("b", 2), tup("c", 3);</code></pre>
+// Create a map with a few key value pairs
+map(tup("a", 1),
+    tup("b", 2),
+    tup("c", 3));</code></pre>
 
  <p>There are only a few methods in this project to take varargs and they are all in this file.
  Writing out versions that took multiple type-safe arguments caused IntelliJ to present all of them
@@ -61,28 +67,18 @@ import java.util.Map;
  dangerous) way.</p>
 
  <p>If you're used to Clojure/JSON, you'll find that what's a map (dictionary) in those languages
- usually becomes a tuple in Paguro. A true map data structure in a type-safe language is
+ sometimes becomes a tuple in Paguro and sometimes becomes a map. A map in a type-safe language is
  homogeneous, meaning that every member is of the same type (or a descendant of a common ancestor).
  Tuples are designed to contain unrelated data types and enforce those types.</p>
 
  <p>As with any usage of import *, there could be issues if you import 2 different versions of this
- file in your classpath.  Java needs a data definition language so badly that I think it is worth
- the risk.  Also, I don't anticipate this file changing much, except to add more tup()
- implementations, which shouldn't break anything.  Let me know if you find that the danger outweighs
- convenience or have advice on what to do about it.</p>
+ file in your classpath, or if a method is ever removed from this file.  Java needs a data
+ definition language so badly that I think it is worth this small risk.</p>
  */
 @SuppressWarnings("UnusedDeclaration")
 public final class StaticImports {
     // Prevent instantiation
     private StaticImports() { throw new UnsupportedOperationException("No instantiation"); }
-
-//    /**
-//     This turned out to be a bad idea due to the complexity and slowness of serializing
-//     a class extended from an immutable tuple.  I made tuples serializable and was able to back out
-//     other breaking changes.
-//     */
-//    @Deprecated
-//    public static <K,V> Tuple2<K,V> kv(K t, V u) { return Tuple2.of(t, u); }
 
     /**
      Returns a new PersistentHashMap of the given keys and their paired values.  Use the
@@ -103,7 +99,7 @@ public final class StaticImports {
     }
 
     /**
-     Returns a new MutableUnsortedMap of the given keys and their paired values.  Use the
+     Returns a new MutableMap of the given keys and their paired values.  Use the
      {@link StaticImports#tup(Object, Object)} method to define those key/value pairs briefly and
      easily.  This data definition method is one of the few methods in this project that support
      varargs.
@@ -112,11 +108,11 @@ public final class StaticImports {
      values in the input list overwrite the earlier ones.  The resulting map can contain zero or one
      null key and any number of null values.  Null k/v pairs will be silently ignored.
 
-     @return a new MutableUnsortedMap of the given key/value pairs
+     @return a new MutableMap of the given key/value pairs
      */
     @SafeVarargs
-    public static <K,V> MutableUnsortedMap<K,V> mutableMap(Map.Entry<K,V>... kvPairs) {
-        MutableUnsortedMap<K,V> ret = PersistentHashMap.emptyMutable();
+    public static <K,V> MutableMap<K,V> mutableMap(Map.Entry<K,V>... kvPairs) {
+        MutableMap<K,V> ret = PersistentHashMap.emptyMutable();
         if (kvPairs == null) { return ret; }
         for (Map.Entry<K,V> me : kvPairs) {
             ret.assoc(me);
@@ -125,13 +121,29 @@ public final class StaticImports {
     }
 
     /**
-     Returns a new MutableUnsortedSet of the values.  This data definition method is one of the few
+     Returns a mutable RRB Tree {@link MutableRrbt} of the given items.
+     The RRB Tree is a list-type data structure that supports random inserts, split, and join
+     (the PersistentVector does not).  The mutable RRB Tree append() method is only about half
+     as fast as the PersistentVector method of the same name.  If you build it entirely with random
+     inserts, then the RRB tree get() method may be about 5x slower.  Otherwise, performance
+     is about the same.
+     This data definition method is one of the few methods in this project that support varargs.
+     */
+    @SafeVarargs
+    static public <T> MutableRrbt<T> mutableRrb(T... items) {
+        if ( (items == null) || (items.length < 1) ) { return RrbTree.emptyMutable(); }
+        return RrbTree.<T>emptyMutable()
+                .concat(Arrays.asList(items));
+    }
+
+    /**
+     Returns a new MutableSet of the values.  This data definition method is one of the few
      methods in this project that support varargs.  If the input contains duplicate elements, later
      values overwrite earlier ones.
      */
     @SafeVarargs
-    public static <T> MutableUnsortedSet<T> mutableSet(T... items) {
-        MutableUnsortedSet<T> ret = PersistentHashSet.emptyMutable();
+    public static <T> MutableSet<T> mutableSet(T... items) {
+        MutableSet<T> ret = PersistentHashSet.emptyMutable();
         if (items == null) { return ret; }
         for (T t : items) {
             ret.put(t);
@@ -144,13 +156,28 @@ public final class StaticImports {
      few methods in this project that support varargs.
      */
     @SafeVarargs
-    static public <T> MutableList<T> mutableVec(T... items) {
+    public static <T> MutableList<T> mutableVec(T... items) {
         MutableList<T> ret = PersistentVector.emptyMutable();
         if (items == null) { return ret; }
         for (T t : items) {
             ret.append(t);
         }
         return ret;
+    }
+
+    /**
+     Returns a new immutable RRB Tree {@link ImRrbt} of the given items.  An RRB Tree
+     is an immutable list that supports random inserts, split, and join (the PersistentVector does
+     not).  If you build it entirely with random
+     inserts, then the RRB tree get() method may be about 5x slower.  Otherwise, performance
+     is about the same.
+
+     This data definition method is one of the few methods in this project that support varargs.
+     */
+    @SafeVarargs
+    static public <T> ImRrbt<T> rrb(T... items) {
+        if ( (items == null) || (items.length < 1) ) { return RrbTree.empty(); }
+        return mutableRrb(items).immutable();
     }
 
     /**
@@ -229,7 +256,7 @@ public final class StaticImports {
     @SafeVarargs
     static public <T> ImList<T> vec(T... items) {
         if ( (items == null) || (items.length < 1) ) { return PersistentVector.empty(); }
-        return PersistentVector.ofIter(Arrays.asList(items));
+        return mutableVec(items).immutable();
     }
 
     /**
@@ -245,5 +272,31 @@ public final class StaticImports {
     @SafeVarargs
     public static <T> UnmodIterable<T> xformArray(T... items) {
         return Xform.of(Arrays.asList(items));
+    }
+
+    // TODO: Enable this to make Maps, Strings, and StringBuilders work like other collections.
+//    /** Wrap a Java.util.Map to perform a transformation on it. */
+//    public static <K,V> UnmodIterable<Map.Entry<K,V>> xform(Map<K,V> map) {
+//        return Xform.of(map.entrySet());
+//    }
+//
+    /** Wrap a String (or CharSequence) to perform a Character-by-Character transformation on it. */
+    public static UnmodIterable<Character> xformChars(CharSequence seq) {
+        //noinspection Convert2Lambda
+        return new UnmodIterable<Character>() {
+            @Override public UnmodIterator<Character> iterator() {
+                return new UnmodIterator<Character>() {
+                    private int idx = 0;
+                    @Override public boolean hasNext() { return idx < seq.length(); }
+
+                    @Override public Character next() {
+                        int nextIdx = idx + 1;
+                        Character c = seq.charAt(idx);
+                        idx = nextIdx;
+                        return c;
+                    }
+                };
+            }
+        };
     }
 }

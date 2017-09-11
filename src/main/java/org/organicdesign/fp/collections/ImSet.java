@@ -13,8 +13,12 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
-/** An immutable set interface */
-public interface ImSet<E> extends UnmodSet<E> {
+/** An immutable set with no guarantees about its ordering */
+public interface ImSet<E> extends BaseSet<E> {
+
+    /** Returns a mutable version of this immutable set. */
+    MutableSet<E> mutable();
+
     /**
      Adds an element, returning a modified version of the set (leaving the original set unchanged).
      If the element already exists in this set, the new value overwrites the old one.  If the new
@@ -24,20 +28,9 @@ public interface ImSet<E> extends UnmodSet<E> {
      @param e the element to add to this set
      @return a new set with the element added (see note above about adding duplicate elements).
      */
-    ImSet<E> put(E e);
+    @Override ImSet<E> put(E e);
 
-    /**
-     Removes the given item, returning a modified version of the set (leaving the original set
-     unchanged).
-     */
-    ImSet<E> without(E key);
-
-//    /**
-//     A sequence of the items contained in this set.  Note that for some implementations, multiple
-//     calls to seq() will yield sequences with different ordering of the same elements.
-//     */
-//    Sequence<E> seq();
-
+    /** {@inheritDoc} */
     default ImSet<E> union(Iterable<? extends E> iter) {
         if (iter == null) { return this; }
         ImSet<E> ret = this;
@@ -45,15 +38,6 @@ public interface ImSet<E> extends UnmodSet<E> {
         return ret;
     }
 
-//    /** {@inheritDoc} */
-//    @Override UnmodIterator<E> iterator();
-
-//    /**
-//     This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for
-//     backwards compatibility in some performance-critical situations.  If you really need an array,
-//     consider using the somewhat type-safe version of this method instead, but read the caveats
-//     first.
-//     {@inheritDoc}
-//     */
-//    @Override default Object[] toArray() { return UnmodSet.super.toArray(); }
+    /** {@inheritDoc} */
+    @Override ImSet<E> without(E key);
 }

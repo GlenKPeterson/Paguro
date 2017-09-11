@@ -18,7 +18,7 @@ import org.organicdesign.fp.oneOf.Option;
 import java.util.Map;
 
 /** An immutable sorted map. */
-public interface ImSortedMap<K,V> extends UnmodSortedMap<K,V> {
+public interface ImSortedMap<K,V> extends UnmodSortedMap<K,V>, BaseMap<K,V> {
 
     Option<UnmodMap.UnEntry<K,V>> entry(K key);
 
@@ -33,6 +33,9 @@ public interface ImSortedMap<K,V> extends UnmodSortedMap<K,V> {
 
     @SuppressWarnings("unchecked")
     @Override default boolean containsKey(Object key) { return entry((K) key).isSome(); }
+
+    /** {@inheritDoc} */
+    @Override ImSortedSet<Entry<K,V>> entrySet();
 
     @SuppressWarnings("unchecked")
     @Override default V get(Object key) {

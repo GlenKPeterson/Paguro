@@ -42,7 +42,7 @@ import static org.organicdesign.fp.FunctionUtils.stringify;
          extend Tuple2.  All errors are Glen's.
  */
 
-public class PersistentTreeMap<K,V> extends UnmodSortedMap.AbstractUnmodMap<K,V>
+public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
         implements ImSortedMap<K,V>, Serializable {
 
     /**
@@ -295,22 +295,8 @@ public class PersistentTreeMap<K,V> extends UnmodSortedMap.AbstractUnmodMap<K,V>
      */
     @Override public ImSortedSet<Entry<K,V>> entrySet() {
         // This is the pretty way to do it.
-        return this.foldLeft(PersistentTreeSet.ofComp(new KeyComparator<>(comp)),
-                             PersistentTreeSet::put);
-
-        // This may be faster, but I haven't timed it.
-
-        // Preserve comparator!
-//        ImSortedSet<Entry<K,V>> ret = PersistentTreeSet.ofComp(new KeyComparator<>(comp));
-//
-//        // It is ABSOLUTELY CRITICAL to turn each item into a KeyVal.  What our iterator returns
-//        // are actually huge chunks of the TreeMap which should not be serializable.  I don't know
-//        // if we should change the iterator to wrap all these values, or if it's better to do it
-//        // here.
-//        for (Entry<K,V> entry : this) {
-//            ret = ret.put(Tuple2.of(entry));
-//        }
-//        return ret;
+        return this.fold(PersistentTreeSet.ofComp(new KeyComparator<>(comp)),
+                         PersistentTreeSet::put);
     }
 
 //    public static final Equator<SortedMap> EQUATOR = new Equator<SortedMap>() {
@@ -440,8 +426,8 @@ public class PersistentTreeMap<K,V> extends UnmodSortedMap.AbstractUnmodMap<K,V>
 //    /** {@inheritDoc} */
 //    @Override public UnmodCollection<V> values() {
 //        class ValueColl<B,Z> implements UnmodCollection<B>, UnmodSortedIterable<B> {
-//            private final Function0<UnmodSortedIterator<UnEntry<Z,B>>> iterFactory;
-//            private ValueColl(Function0<UnmodSortedIterator<UnEntry<Z, B>>> f) { iterFactory = f; }
+//            private final Fn0<UnmodSortedIterator<UnEntry<Z,B>>> iterFactory;
+//            private ValueColl(Fn0<UnmodSortedIterator<UnEntry<Z, B>>> f) { iterFactory = f; }
 //
 //            @Override public int size() { return size; }
 //
@@ -473,7 +459,7 @@ public class PersistentTreeMap<K,V> extends UnmodSortedMap.AbstractUnmodMap<K,V>
                 t = t.left();
             }
         }
-        return Option.of(t);
+        return Option.some(t);
     }
 
     /** {@inheritDoc} */
@@ -550,7 +536,7 @@ public class PersistentTreeMap<K,V> extends UnmodSortedMap.AbstractUnmodMap<K,V>
 
     /**
      Returns the comparator used to order the keys in this map, or null if it uses
-     Function2.DEFAULT_COMPARATOR (for compatibility with java.util.SortedMap).
+     Fn2.DEFAULT_COMPARATOR (for compatibility with java.util.SortedMap).
      */
     @Override public Comparator<? super K> comparator() {
         return (comp == Equator.Comp.DEFAULT) ? null : comp;
@@ -725,7 +711,7 @@ public class PersistentTreeMap<K,V> extends UnmodSortedMap.AbstractUnmodMap<K,V>
         while (t != null) {
             int c = comp.compare(key, t.getKey());
             if (c == 0)
-                return Option.of(t);
+                return Option.some(t);
             else if (c < 0)
                 t = t.left();
             else
@@ -973,7 +959,7 @@ public class PersistentTreeMap<K,V> extends UnmodSortedMap.AbstractUnmodMap<K,V>
             return stringify(_1) + "=" + stringify(_2);
         }
 
-//        public <R> R kvreduce(Function3<R,K,V,R> f, R init) {
+//        public <R> R kvreduce(Fn3<R,K,V,R> f, R init) {
 //            if (left() != null) {
 //                init = left().kvreduce(f, init);
 //                if (init instanceof Reduced)
@@ -1157,7 +1143,7 @@ public class PersistentTreeMap<K,V> extends UnmodSortedMap.AbstractUnmodMap<K,V>
     /**
      This currently returns chunks of the inner tree structure that implement Map.Entry.
      They are not serializable and should not be made so.  I can alter this to return nice,
-     neat, KeyVal objects which are serializable, but we've made it this far without so...
+     neat, Tuple2 objects which are serializable, but we've made it this far without so...
      */
     private static class NodeIterator<K, V> implements UnmodSortedIterator<UnEntry<K,V>> {
         //, Serializable {

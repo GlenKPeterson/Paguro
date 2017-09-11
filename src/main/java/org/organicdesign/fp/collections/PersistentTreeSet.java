@@ -29,7 +29,7 @@ import static org.organicdesign.fp.collections.Equator.defaultComparator;
  This file is a derivative work based on a Clojure collection licensed under the Eclipse Public
  License 1.0 Copyright Rich Hickey.  Errors by Glen Peterson.
  */
-public class PersistentTreeSet<E> extends UnmodSortedSet.AbstractUnmodSet<E>
+public class PersistentTreeSet<E> extends AbstractUnmodSet<E>
         implements ImSortedSet<E>, Serializable {
 
     /**
@@ -171,7 +171,7 @@ public class PersistentTreeSet<E> extends UnmodSortedSet.AbstractUnmodSet<E>
     // ===================================== Instance Methods =====================================
     /**
      Returns the comparator used to order the items in this set, or null if it uses
-     Function2.DEFAULT_COMPARATOR (for compatibility with java.util.SortedSet).
+     Fn2.DEFAULT_COMPARATOR (for compatibility with java.util.SortedSet).
      */
     @Override public Comparator<? super E> comparator() { return impl.comparator(); }
 
@@ -231,7 +231,7 @@ public class PersistentTreeSet<E> extends UnmodSortedSet.AbstractUnmodSet<E>
 
     /** {@inheritDoc} */
     @Override public Option<E> head() {
-        return size() > 0 ? Option.of(impl.firstKey()) : Option.none();
+        return size() > 0 ? Option.some(impl.firstKey()) : Option.none();
     }
 
     /** {@inheritDoc} */

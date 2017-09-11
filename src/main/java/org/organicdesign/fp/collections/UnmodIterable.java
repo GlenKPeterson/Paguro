@@ -1,8 +1,9 @@
 package org.organicdesign.fp.collections;
 
+import org.organicdesign.fp.function.Fn1;
+import org.organicdesign.fp.function.Fn2;
 import org.organicdesign.fp.oneOf.Option;
-import org.organicdesign.fp.function.Function1;
-import org.organicdesign.fp.function.Function2;
+import org.organicdesign.fp.oneOf.Or;
 import org.organicdesign.fp.xform.Transformable;
 import org.organicdesign.fp.xform.Xform;
 
@@ -13,17 +14,6 @@ import static org.organicdesign.fp.FunctionUtils.stringify;
 /** An unmodifiable Iterable, without any guarantee about order. */
 public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
     // ========================================== Static ==========================================
-
-    /**
-     Implements equals and hashCode() methods compatible with all java.util collections (this
-     algorithm is not order-dependent) and toString which takes the name of the sub-class.
-     */
-    abstract class AbstractUnmodIterable<T> implements UnmodIterable<T> {
-        @Override public int hashCode() { return UnmodIterable.hash(this); }
-        @Override public String toString() {
-            return UnmodIterable.toString(getClass().getSimpleName(), this);
-        }
-    }
 
     //    /**
 // Caution: this is a convenient optimization for immutable data structures and a nightmare
@@ -95,13 +85,6 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
 //    }
 
     /**
-     Renamed to {@link UnmodIterable#hash(Iterable)} to avoid confusion with instance method
-     {@link Object#hashCode()} 2016-09-17
-     */
-    @Deprecated
-    static int hashCode(Iterable is) { return hash(is); }
-
-    /**
      This is correct, but O(n).  It also works regardless of the order of the items because
      a + b = b + a, even when an overflow occurs.
      */
@@ -130,14 +113,14 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
         Iterator iter = iterable.iterator();
         while (iter.hasNext()) {
             if (i > 0) { sB.append(","); }
-            if (i > 4) { break; }
+//            if (i > 4) { break; }
             Object item = iter.next();
             sB.append(stringify(item));
             i++;
         }
-        if (iter.hasNext()) {
-            sB.append("...");
-        }
+//        if (iter.hasNext()) {
+//            sB.append("...");
+//        }
         return sB.append(")").toString();
     }
 
@@ -168,28 +151,35 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
     }
 
     /** {@inheritDoc} */
-    @Override default <B> B foldLeft(B ident, Function2<B,? super T,B> reducer) {
-        return Xform.of(this).foldLeft(ident, reducer);
+    @Override default UnmodIterable<T> dropWhile(Fn1<? super T,Boolean> predicate) {
+        return Xform.of(this).dropWhile(predicate);
     }
 
     /** {@inheritDoc} */
-    @Override default <B> B foldLeft(B ident, Function2<B,? super T,B> reducer,
-                                    Function1<? super B,Boolean> terminateWhen) {
-        return Xform.of(this).foldLeft(ident, reducer, terminateWhen);
+    @Override default <B> B fold(B ident, Fn2<? super B,? super T,B> reducer) {
+        return Xform.of(this).fold(ident, reducer);
     }
 
     /** {@inheritDoc} */
-    @Override default UnmodIterable<T> filter(Function1<? super T,Boolean> f) {
+    @Override default <G,B> Or<G,B> foldUntil(G accum,
+                                              Fn2<? super G,? super T,B> terminator,
+                                              Fn2<? super G,? super T,G> reducer) {
+
+        return Xform.of(this).foldUntil(accum, terminator, reducer);
+    }
+
+    /** {@inheritDoc} */
+    @Override default UnmodIterable<T> filter(Fn1<? super T,Boolean> f) {
         return Xform.of(this).filter(f);
     }
 
     /** {@inheritDoc} */
-    @Override default <B> UnmodIterable<B> flatMap(Function1<? super T,Iterable<B>> f) {
+    @Override default <B> UnmodIterable<B> flatMap(Fn1<? super T,Iterable<B>> f) {
         return Xform.of(this).flatMap(f);
     }
 
     /** {@inheritDoc} */
-    @Override default <B> UnmodIterable<B> map(Function1<? super T, ? extends B> f) {
+    @Override default <B> UnmodIterable<B> map(Fn1<? super T, ? extends B> f) {
         return Xform.of(this).map(f);
     }
 
@@ -199,7 +189,7 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
     }
 
     /** {@inheritDoc} */
-    @Override default UnmodIterable<T> takeWhile(Function1<? super T,Boolean> f) {
+    @Override default UnmodIterable<T> takeWhile(Fn1<? super T,Boolean> f) {
         return Xform.of(this).takeWhile(f);
     }
 
@@ -210,7 +200,7 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
      */
     default Option<T> head() {
         Iterator<T> iter = iterator();
-        return iter.hasNext() ? Option.of(iter.next())
+        return iter.hasNext() ? Option.some(iter.next())
                               : Option.none();
     }
 

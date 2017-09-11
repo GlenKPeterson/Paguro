@@ -14,6 +14,7 @@
 
 package org.organicdesign.fp.collections;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -27,7 +28,7 @@ import org.junit.runners.JUnit4;
 import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.FunctionUtilsTest;
 import org.organicdesign.fp.TestUtilities;
-import org.organicdesign.fp.function.Function1;
+import org.organicdesign.fp.function.Fn1;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import static org.junit.Assert.*;
@@ -220,7 +221,7 @@ public class PersistentTreeMapTest {
 
         equalsDistinctHashCode(test,
                                control,
-                               FunctionUtils.unmodSortedMap(control),
+                               Collections.unmodifiableSortedMap(control),
                                PersistentTreeMap.of(vec(tup("two", 2),
                                                         tup("three", 3),
                                                         tup("four", 4))));
@@ -502,13 +503,13 @@ public class PersistentTreeMapTest {
                      "4=\"four\",5=\"five\")",
                      PersistentTreeMap.of(vec(tup(1, "one"))).assoc(2, "two").assoc(3, "three")
                                       .assoc(4, "four").assoc(5, "five").toString());
-        assertEquals("PersistentTreeMap(1=\"one\",2=\"two\",3=\"three\"," +
-                     "4=\"four\",5=\"five\",...)",
+        assertEquals("PersistentTreeMap(1=\"one\",2=\"two\",3=\"three\",4=\"four\",5=\"five\"," +
+                     "6=\"six\")",
                      PersistentTreeMap.of(vec(tup(1, "one"))).assoc(2, "two").assoc(3, "three")
                                       .assoc(4, "four").assoc(5, "five").assoc(6, "six")
                                       .toString());
-        assertEquals("PersistentTreeMap(1=\"one\",2=\"two\",3=\"three\"," +
-                     "4=\"four\",5=\"five\",...)",
+        assertEquals("PersistentTreeMap(1=\"one\",2=\"two\",3=\"three\",4=\"four\",5=\"five\"," +
+                     "6=\"six\",7=\"seven\")",
                      PersistentTreeMap.of(vec(tup(1, "one"))).assoc(2, "two").assoc(3, "three")
                                       .assoc(4, "four").assoc(5, "five").assoc(6, "six")
                                       .assoc(7, "seven").toString());
@@ -733,7 +734,7 @@ public class PersistentTreeMapTest {
 
         PersistentTreeMap<Integer,String> m =
                 PersistentTreeMap.of(vec(tup(1, "one"))).assoc(2, "two").assoc(3, "three").assoc(4, "four").assoc(5, "five");
-        ImSet<Map.Entry<Integer,String>> s =
+        ImSortedSet<Map.Entry<Integer,String>> s =
                 PersistentTreeSet.ofComp((a, b) -> a.getKey() - b.getKey(),
                                          vec(tup(1, "one"),
                                              tup(2, "two"),
@@ -760,7 +761,7 @@ public class PersistentTreeMapTest {
 
         assertArrayEquals(s.toArray(),
                           m.entrySet()
-                           .map(Function1.identity())
+                           .map(Fn1.identity())
                            .toMutableList()
                            .toArray());
 
@@ -836,13 +837,13 @@ public class PersistentTreeMapTest {
                 vec(tup(1, "One"), null, tup(3, "Three"), null, tup(5, "Five"), null,
                     tup(7, "Seven"), null, tup(9, "Nine"), null)
                         .filter(t -> t != null)
-                        .toImSortedMap(Equator.defaultComparator(), Function1.identity()),
+                        .toImSortedMap(Equator.defaultComparator(), Fn1.identity()),
                 max);
         FunctionUtilsTest.mapHelperEven(
                 vec(null, tup(2, "Two"), null, tup(4, "Four"), null,
                     tup(6, "Six"), null, tup(8, "Eight"), null, tup(10, "Ten"))
                         .filter(t -> t != null)
-                        .toImSortedMap(Equator.defaultComparator(), Function1.identity()),
+                        .toImSortedMap(Equator.defaultComparator(), Fn1.identity()),
                 max);
     }
 
@@ -851,7 +852,7 @@ public class PersistentTreeMapTest {
         Map<Integer,String> a = PersistentTreeMap.of(vec(tup(1, "One")));
         FunctionUtilsTest.mapHelper(a, max);
         Map<Integer,String> b = vec(tup(1, "One"))
-                .toImSortedMap(Equator.defaultComparator(), Function1.identity());
+                .toImSortedMap(Equator.defaultComparator(), Fn1.identity());
         FunctionUtilsTest.mapHelper(b, max);
         Map<Integer,String> c = PersistentTreeMap.ofComp(Equator.defaultComparator(),
                                                          vec(tup(1, "One")));
@@ -865,12 +866,12 @@ public class PersistentTreeMapTest {
         assertEquals(a.hashCode(), c.hashCode());
         FunctionUtilsTest.mapHelperOdd(vec(tup(1, "One"))
                                                .toImSortedMap(Equator.defaultComparator(),
-                                                              Function1.identity()),
+                                                              Fn1.identity()),
                                        max);
         FunctionUtilsTest.mapHelperEven(vec((Map.Entry<Integer,String>) null)
                                                 .filter(t -> t != null)
                                                 .toImSortedMap(Equator.defaultComparator(),
-                                                               Function1.identity()),
+                                                               Fn1.identity()),
                                         max);
     }
 
@@ -878,7 +879,7 @@ public class PersistentTreeMapTest {
         int max = 0;
         Map<Integer,String> b = vec((Tuple2<Integer,String>) null)
                 .filter(t -> t != null)
-                .toImSortedMap(Equator.defaultComparator(), Function1.identity());
+                .toImSortedMap(Equator.defaultComparator(), Fn1.identity());
         FunctionUtilsTest.mapHelper(b, max);
         Map<Integer,String> c = empty(Equator.defaultComparator());
         assertEquals(b, c);
@@ -887,12 +888,12 @@ public class PersistentTreeMapTest {
         FunctionUtilsTest.mapHelperOdd(vec((Tuple2<Integer,String>) null)
                                                .filter(t -> t != null)
                                                .toImSortedMap(Equator.defaultComparator(),
-                                                              Function1.identity()),
+                                                              Fn1.identity()),
                                        max);
         FunctionUtilsTest.mapHelperEven(vec((Tuple2<Integer,String>) null)
                                                 .filter(t -> t != null)
                                                 .toImSortedMap(Equator.defaultComparator(),
-                                                               Function1.identity()),
+                                                               Fn1.identity()),
                                         max);
     }
 }

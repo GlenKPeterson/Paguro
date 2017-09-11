@@ -49,9 +49,6 @@ public class MutableListTest {
             assertEquals(control, test);
         }
 
-        assertEquals(test, test.mutable());
-        assertTrue(test == test.mutable());
-
         List<String> moreStuff = Arrays.asList("this", "is", "more", "stuff");
         control.addAll(moreStuff);
         test.concat(moreStuff);

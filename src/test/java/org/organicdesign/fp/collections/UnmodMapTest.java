@@ -69,15 +69,6 @@ public class UnmodMapTest {
         mm.put("A", -1);
         mm.put("test", -2);
 
-        UnmodMap<String,Integer> m = FunctionUtils.unmodMap(mm);
-        assertFalse(m.containsValue(Integer.MAX_VALUE));
-        assertFalse(m.containsValue(4));
-        assertTrue(m.containsValue(3));
-        assertTrue(m.containsValue(0));
-        assertTrue(m.containsValue(-2));
-        assertFalse(m.containsValue(-3));
-        assertFalse(m.containsValue(Integer.MIN_VALUE));
-
         assertFalse(unMap.containsValue(null));
         assertFalse(unMap.containsValue(Integer.MIN_VALUE));
         assertFalse(unMap.containsValue(Integer.MAX_VALUE));

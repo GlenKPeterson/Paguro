@@ -21,21 +21,22 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
-import org.organicdesign.fp.function.Function2;
+import org.organicdesign.fp.function.Fn2;
 
 /**
- An unmodifiable version of {@link java.util.List} which formalizes the return type of
- Collections.unmodifiableList()
+ Formalizes the return type of {@link java.util.Collections#unmodifiableList(List)}, deprecating
+ mutator methods and implementing them to throw exceptions.  You could think of this as
+ "clearing the slate" to a point where immutable, functional, fluent interfaces can be built again.
  */
 public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
 
     // ========================================== Static ==========================================
 
     /**
-     Implements equals and hashCode() methods compatible with java.util.Set (which ignores order)
-     to make defining unmod sets easier, especially for implementing Map.keySet() and such.
+     Implements equals and hashCode() methods compatible with java.util.List (which ignores order)
+     to make defining unmod lists easier.
      */
-    abstract class AbstractUnmodList<E> extends UnmodIterable.AbstractUnmodIterable<E>
+    abstract class AbstractUnmodList<E> extends AbstractUnmodIterable<E>
             implements UnmodList<E> {
         @SuppressWarnings("unchecked")
         @Override public boolean equals(Object other) {
@@ -46,7 +47,7 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
                    UnmodSortedIterable.equal(this, UnmodSortedIterable.castFromList(that));
         }
 
-        /** This is correct, but O(n). This implementation is compatible with java.util.AbstractList. */
+        /** This implementation is compatible with java.util.AbstractList but O(n). */
         @Override public int hashCode() {
             int ret = 1;
             for (E item : this) {
@@ -61,9 +62,9 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
 
     /**
      Apply the given function against all unique pairings of items in the list.  Does this belong on
-     Function2 instead of List?
+     Fn2 instead of List?
      */
-    static <T> void permutations(List<T> items, Function2<? super T,? super T,?> f) {
+    static <T> void permutations(List<T> items, Fn2<? super T,? super T,?> f) {
         for (int i = 0; i < items.size(); i++) {
             for (int j = i + 1; j < items.size(); j++) {
                 f.apply(items.get(i), items.get(j));
@@ -112,8 +113,7 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
      deprecation warning, but include a description of why you need to use a List instead of some
      kind of Set or Map!
      */
-    @Deprecated
-    @Override default boolean contains(Object o) {
+    @Override @Deprecated default boolean contains(Object o) {
         for (Object item : this) {
             if (Objects.equals(item, o)) { return true; }
         }
@@ -212,7 +212,7 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
             }
 
             @Override public int nextIndex() { return idx; }
-        };
+        }
         return new Impl(index);
     }
 

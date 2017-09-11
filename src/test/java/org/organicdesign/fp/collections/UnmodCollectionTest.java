@@ -14,19 +14,20 @@
 
 package org.organicdesign.fp.collections;
 
-import org.junit.Test;
-import org.organicdesign.fp.FunctionUtils;
-
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import org.junit.Test;
+
 import static org.junit.Assert.*;
 
+@SuppressWarnings("WeakerAccess")
 public class UnmodCollectionTest {
 
     static class TestColl<T> implements UnmodCollection<T> {
@@ -113,8 +114,8 @@ public class UnmodCollectionTest {
         assertTrue(Arrays.asList(sticksMay).containsAll(unColl));
 
         assertTrue(unColl.containsAll(null));
-        assertTrue(unColl.containsAll(FunctionUtils.emptyUnmodCollection()));
-        assertFalse(FunctionUtils.emptyUnmodCollection().containsAll(unColl));
+        assertTrue(unColl.containsAll(Collections.unmodifiableCollection(Collections.emptySet())));
+        assertFalse(Collections.emptySet().containsAll(unColl));
     }
 
     // I don't think equals() can be implemented on a Collection.  It's the return type for

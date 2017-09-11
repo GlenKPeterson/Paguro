@@ -5,6 +5,119 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
+# Release 3.0.14: RRB Tree
+ - This is just a version number bump for the official release.
+
+# Release 3.0.12: RRB Tree
+ - Changed all OneOf classes to take a single Object argument, plus each of the classes they can hold.
+ This great simplification is thanks to Atul Agrawal!
+
+# Release 3.0.11: RRB Tree
+ - All OneOf classes now use a ZERO-BASED INDEX (used to use one-based).
+
+#### Release 3.0: RRB Tree
+Major changes:
+ - Added Base___ for Im___ and Mutable___ interfaces to extend.  Mutable___ no longer extends Im___.
+ - ImUnsortedSet renamed to ImSet and ImUnsortedMap renamed to ImMap to follow the java.util conventions more closely and for brevity.
+   Mutable versions of both interfaces still contain the word "Unsorted" (verbose mutable names encourage immutability).
+ - Renamed interfaces Function# to Fn#
+ - Added an RRB Tree (still improving performance, but for insert at 0 in large lists it kills ArrayList)
+ - Added foldUntil() to Transformable to replace the earlier version of foldLeft with a repeatUntil function parameter.
+   Thanks to cal101 for inspiring this!
+ - Removed a bunch of deprecated and unused items
+ - Added JavaDoc to Git site
+ - Changed toString to show entire collection
+ - Added rrb() and mutableRrb() to StaticImports for constructing RRB Trees.
+ - Moved AbstractUnmodMap, AbstractUnmodSet, and AbstractUnmodIterable from inner classes to top-level classes.
+ - Option.of() is now Option.some() and it no longer returns None if you pass it a None.
+ - Added StaticImports.xformChars(CharSequence).
+ - Added "Union type" classes in oneOf package: OneOf2OrNone, OneOf3 and OneOf4.
+ - Added Xform.dropWhile()
+
+Here is a script to ease your upgrade from 2.1.1 to 3.0:
+```bash
+# USE CAUTION AND HAVE A BACKUP OF YOUR SOURCE CODE (VERSION CONTROL) - NO GUARANTEES
+oldString='org.organicdesign.fp.LazyRef'
+newString='org.organicdesign.fp.function.LazyRef'
+sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir='.git' -rIl "$oldString" *)
+
+oldString='org.organicdesign.fp.either.OneOf2'
+newString='org.organicdesign.fp.oneOf.OneOf2'
+sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir='.git' -rIl "$oldString" *)
+
+oldString='org.organicdesign.fp.Option'
+newString='org.organicdesign.fp.oneOf.Option'
+sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir='.git' -rIl "$oldString" *)
+
+oldString='org.organicdesign.fp.Or'
+newString='org.organicdesign.fp.oneOf.Or'
+sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir='.git' -rIl "$oldString" *)
+
+oldString='.foldLeft('
+newString='.fold('
+sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir='.git' -rIl "$oldString" *)
+
+oldString='.typeMatch('
+newString='.match('
+sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir='.git' -rIl "$oldString" *)
+
+sed -i -e 's/\<Function\([0-3]\)\>/Fn\1/g' $(egrep --exclude-dir='.svn' --exclude-dir='.git' -wrIl 'Function[0-3]' *)
+```
+If you subclassed OneOf, you can clean up your code.  From:
+```java
+public class String_Integer extends OneOf2<String,Integer> {
+    String_Integer(String cre, Integer rev, int s) { super(cre, rev, s); }
+
+    public static String_Integer str(String cre) { return new String_Integer(cre, null, 1); }
+    public static String_Integer in(Integer rev) { return new String_Integer(null, rev, 2); }
+```
+to (MAKE SURE TO USE ZERO-BASED INDICES!):
+```java
+public class String_Integer extends OneOf2<String,Integer> {
+    String_Integer(Object o, int s) { super(o, String.class, Integer.class, s); }
+
+    public static String_Integer str(String cre) { return new String_Integer(cre, 0); }
+    public static String_Integer in(Integer rev) { return new String_Integer(rev, 1); }
+```
+
+If you used the super::throw1 and super::throw2 methods, those have disappeared in favor of just using match everywhere.
+
+Anywhere you have FunctionUtils unmmodSet, unmodList, unmodWhatever, you probably want to replace that with StaticImports.xform().
+
+For instance:
+```java
+// Old 'n busted
+UnmodList<Number> foo(List<Integer> is, List<Double> ds) {
+    List<Number> ms = new ArrayList<>(is.size() + ds.size());
+    ms.addAll(is);
+    ms.addAll(ds);
+    return FunctionUtils.unmodList(ms);
+}
+
+// New 'n awesome
+ImList<Number> foo2(List<Integer> is, List<Double> ds) {
+    return xform(is)
+    // Little trick to tell Java's type system that we're making a List of Numbers.
+                   .map(m -> (Number) m)
+                   .concat(ds)
+                   .toImList();
+}
+
+```
+
+Manual upgrade tasks:
+ - Do a clean build of your project
+   - IntelliJ users right-click on the /src/java/ folder in your project and choose `Rebuild '<default>'`
+   - Maven users: `mvn clean package`
+ - There will be type errors where you pass a Mutable___ as an Im___.
+   If the variable is myVar, simply change it to myVar.immutable() wherever errors show up.
+     Unless you really wanted a Mutable___ in which case, you need to change the type signature.
+
+##### Oops!
+I'm sorry I ever made Mutable___ extend Im___.  It's an embarrassing rookie mistake.
+I wasn't sure exposing mutable collections was worthwhile, I was "just trying them out" and suddenly found myself using them everywhere.
+Well, they're fixed now.  ["Go forth and spread beauty and light!"](https://www.youtube.com/watch?v=9oRctV5Fygc&t=12m28s)
+
 ## 2017-05-04 Release 2.1.1
 Fixed array class cast exception bug reported by @BrenoTrancoso https://github.com/GlenKPeterson/Paguro/issues/17
 Thank you for finding and reporting this tricky issue!
@@ -266,12 +379,12 @@ DEFAULT_CONTEXT      is now   org.organicdesign.fp.collections.ComparisonContext
 org.organicdesign.fp.collections.RangeOfInt:
 LIST_EQUATOR  is now Equat.LIST
 
-org.organicdesign.fp.function.Function0:
+org.organicdesign.fp.function.Fn0:
 NULL   is now   Const.NULL
 New serializable sub-class for functions that always return the same value:
 Constant (Function0.Constant)
 
-org.organicdesign.fp.function.Function1
+org.organicdesign.fp.function.Fn1
 IDENTITY  is now  Const.IDENTITY
 ACCEPT    is now  ConstBool.ACCEPT
 REJECT    is now  ConstBool.REJECT

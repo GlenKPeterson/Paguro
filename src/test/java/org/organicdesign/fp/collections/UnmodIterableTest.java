@@ -8,7 +8,6 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.organicdesign.fp.FunctionUtils;
 
 import static org.junit.Assert.*;
 
@@ -44,18 +43,18 @@ public class UnmodIterableTest {
                      testIterable.drop(1).toMutableList());
 
         assertEquals(Arrays.asList("Howz", "nowz", "brownz", "cowz"),
-                     testIterable.foldLeft(new ArrayList<>(),
-                                           (List<String> accum, String str) -> {
+                     testIterable.fold(new ArrayList<>(),
+                                       (List<String> accum, String str) -> {
                                                accum.add(str + "z");
                                                return accum;
                                            }));
         assertEquals(Arrays.asList("Howz", "nowz"),
-                     testIterable.foldLeft(new ArrayList<>(),
-                                           (List<String> accum, String str) -> {
+                     testIterable.foldUntil(new ArrayList<>(),
+                                            (List<String> list, String str) -> (list.size() > 1) ? list : null,
+                                            (List<String> accum, String str) -> {
                                                accum.add(str + "z");
                                                return accum;
-                                           },
-                                           (List<String> list) -> list.size() > 1));
+                                           }).bad());
 
         assertEquals(Arrays.asList("How", "now", "cow"),
                      testIterable.filter((String s) -> s.endsWith("w")).toMutableList());
@@ -73,31 +72,10 @@ public class UnmodIterableTest {
 
         assertEquals(Arrays.asList("How", "now"),
                      testIterable.takeWhile((String s) -> s.length() < 4).toMutableList());
-    }
 
-    @Test public void equalsHashcodeTest() {
-        UnmodSortedIterable<Integer> a = () -> FunctionUtils.emptyUnmodSortedIterator();
-        UnmodSortedIterable<Integer> b = () -> FunctionUtils.emptyUnmodSortedIterator();
-        UnmodSortedIterable<Integer> c = () -> new UnmodSortedIterator<Integer>() {
-            private final Iterator<Integer> intern = Arrays.asList(1).iterator();
-            @Override public boolean hasNext() { return intern.hasNext(); }
-            @Override public Integer next() { return intern.next(); }
-        };
+        assertEquals(Arrays.asList("brown", "cow"),
+                     testIterable.dropWhile((s) -> !"brown".equals(s)).toMutableList());
 
-        assertEquals(UnmodIterable.hash(a), UnmodIterable.hash(a));
-        assertEquals(UnmodIterable.hash(a), UnmodIterable.hash(b));
-        assertNotEquals(UnmodIterable.hash(a), UnmodIterable.hash(c));
-
-        assertEquals(0, UnmodIterable.hash(Arrays.asList(new String[] {null })));
-
-        assertTrue(UnmodSortedIterable.equal(a, a));
-        assertTrue(UnmodSortedIterable.equal(a, b));
-        assertTrue(UnmodSortedIterable.equal(b, a));
-        assertTrue(UnmodSortedIterable.equal(null, null));
-        assertFalse(UnmodSortedIterable.equal(a, null));
-        assertFalse(UnmodSortedIterable.equal(null, a));
-        assertFalse(UnmodSortedIterable.equal(a, c));
-        assertFalse(UnmodSortedIterable.equal(c, a));
     }
 
     @Test public void equalsHashcode() {

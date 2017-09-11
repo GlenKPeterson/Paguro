@@ -13,8 +13,6 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
-import org.organicdesign.fp.tuple.Tuple2;
-
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Map;
@@ -30,44 +28,6 @@ import java.util.function.Function;
  */
 public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<K,V>>, Sized {
     // ========================================== Static ==========================================
-
-    /**
-     Implements equals and hashCode() methods compatible with java.util.Map (which ignores order)
-     to make defining unmod Maps easier.  Inherits hashCode() and toString() from
-     AbstractUnmodIterable.
-     */
-    abstract class AbstractUnmodMap<K,V> extends AbstractUnmodIterable<UnmodMap.UnEntry<K,V>>
-            implements UnmodMap<K,V> {
-
-        @Override public boolean equals(Object other) {
-            if (this == other) { return true; }
-            if (!(other instanceof Map)) { return false; }
-
-            Map<?, ?> that = (Map<?, ?>) other;
-            if (that.size() != size()) { return false; }
-
-            try {
-                for (Entry<K, V> e : this) {
-                    K key = e.getKey();
-                    V value = e.getValue();
-                    if (value == null) {
-                        if (!(that.get(key) == null && that.containsKey(key))) {
-                            return false;
-                        }
-                    } else {
-                        if (!value.equals(that.get(key))) {
-                            return false;
-                        }
-                    }
-                }
-            } catch (ClassCastException unused) {
-                return false;
-            } catch (NullPointerException unused) {
-                return false;
-            }
-            return true;
-        }
-    }
 
     /**
      * A map entry (key-value pair).  The <tt>UnmodMap.entrySet</tt> method returns
@@ -168,14 +128,6 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
             UnmodSortedValIter(Iterator<? extends Map.Entry<K,V>> i) { super(i); }
         }
 
-        /**
-         Use {@link org.organicdesign.fp.tuple.Tuple2#of(java.util.Map.Entry)} instead.
-         */
-        @Deprecated
-        static <K,V> UnEntry<K,V> entryToUnEntry(Map.Entry<K,V> entry) {
-            return Tuple2.of(entry);
-        }
-
         static <K,V>
         UnmodIterator<UnEntry<K,V>> entryIterToUnEntryUnIter(Iterator<Entry<K,V>> innerIter) {
             return new EntryToUnEntryIter<>(innerIter);
@@ -259,7 +211,7 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
      {@inheritDoc}
      */
     @Override default UnmodSet<Entry<K,V>> entrySet() {
-        class EntrySet extends UnmodSet.AbstractUnmodSet<Entry<K,V>>
+        class EntrySet extends AbstractUnmodSet<Entry<K,V>>
                 implements Serializable {
             // For serializable.  Make sure to change whenever internal data format changes.
             private static final long serialVersionUID = 20160903104400L;
@@ -339,7 +291,7 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
      {@inheritDoc}
      */
     @Override default UnmodSet<K> keySet() {
-        class KeySet extends UnmodSet.AbstractUnmodSet<K> implements Serializable {
+        class KeySet extends AbstractUnmodSet<K> implements Serializable {
             // For serializable.  Make sure to change whenever internal data format changes.
             private static final long serialVersionUID = 20160903104400L;
 
@@ -418,7 +370,7 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
 
      If you want to keep a count of duplicates, try something like this, but it has a different
      signature:
-     <pre><code>ImMap&lt;V,Integer&gt; valueCounts = myMap.foldLeft(PersistentHashMap.empty(),
+     <pre><code>ImMap&lt;V,Integer&gt; valueCounts = myMap.fold(PersistentHashMap.empty(),
                      (ImMap&lt;V,Integer&gt; accum, UnEntry&lt;K,V&gt; origEntry) -&gt; {
                              V inVal = origEntry.getValue();
                              return accum.assoc(inVal,
@@ -439,8 +391,7 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
 
      {@inheritDoc}
      */
-    @Deprecated
-    @Override default UnmodCollection<V> values() {
+    @Override @Deprecated default UnmodCollection<V> values() {
         class Impl implements UnmodCollection<V>, Serializable {
             // For serializable.  Make sure to change whenever internal data format changes.
             private static final long serialVersionUID = 20160903104400L;

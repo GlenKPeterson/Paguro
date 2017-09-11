@@ -16,11 +16,11 @@ package org.organicdesign.fp;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.organicdesign.fp.function.Function1;
+import org.organicdesign.fp.function.Fn1;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.organicdesign.fp.StaticImports.vec;
-import static org.organicdesign.fp.function.Function1.ConstBool.*;
+import static org.organicdesign.fp.function.Fn1.ConstObjBool.*;
 
 @RunWith(JUnit4.class)
 public class BooleanCombinerTest {
@@ -28,26 +28,26 @@ public class BooleanCombinerTest {
     @Test
     @SuppressWarnings("unchecked")
     public void combineAnd() {
-//        assertTrue(Function1.BooleanCombiner.AND.combineArray() == ACCEPT);
-        assertTrue(Function1.BooleanCombiner.AND.combine(null) == ACCEPT);
+//        assertTrue(Fn1.BooleanCombiner.AND.combineArray() == ACCEPT);
+        assertTrue(Fn1.BooleanCombiner.AND.combine(null) == ACCEPT);
 
-//        assertTrue(Function1.BooleanCombiner.AND.combineArray(accept()) == ACCEPT);
-        assertTrue(Function1.BooleanCombiner.AND.combine(vec(Function1.accept())) == ACCEPT);
+//        assertTrue(Fn1.BooleanCombiner.AND.combineArray(accept()) == ACCEPT);
+        assertTrue(Fn1.BooleanCombiner.AND.combine(vec(Fn1.accept())) == ACCEPT);
 
-//        assertTrue(Function1.BooleanCombiner.AND.combineArray(reject()) == REJECT);
-        assertTrue(Function1.BooleanCombiner.AND.combine(vec(Function1.reject())) == REJECT);
+//        assertTrue(Fn1.BooleanCombiner.AND.combineArray(reject()) == REJECT);
+        assertTrue(Fn1.BooleanCombiner.AND.combine(vec(Fn1.reject())) == REJECT);
     }
 
     @Test
     @SuppressWarnings("unchecked")
     public void combineOr() {
-//        assertTrue(Function1.BooleanCombiner.OR.combineArray() == REJECT);
-        assertTrue(Function1.BooleanCombiner.OR.combine(null) == REJECT);
+//        assertTrue(Fn1.BooleanCombiner.OR.combineArray() == REJECT);
+        assertTrue(Fn1.BooleanCombiner.OR.combine(null) == REJECT);
 
-//        assertTrue(Function1.BooleanCombiner.OR.combineArray(accept()) == ACCEPT);
-        assertTrue(Function1.BooleanCombiner.OR.combine(vec(Function1.accept())) == ACCEPT);
+//        assertTrue(Fn1.BooleanCombiner.OR.combineArray(accept()) == ACCEPT);
+        assertTrue(Fn1.BooleanCombiner.OR.combine(vec(Fn1.accept())) == ACCEPT);
 
-//        assertTrue(Function1.BooleanCombiner.OR.combineArray(reject()) == REJECT);
-        assertTrue(Function1.BooleanCombiner.OR.combine(vec(Function1.reject())) == REJECT);
+//        assertTrue(Fn1.BooleanCombiner.OR.combineArray(reject()) == REJECT);
+        assertTrue(Fn1.BooleanCombiner.OR.combine(vec(Fn1.reject())) == REJECT);
     }
 }

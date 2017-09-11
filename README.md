@@ -1,4 +1,4 @@
-Type-safe versions of Clojure's immutable collections, an immutable alternative to Java 8 Streams, and other tools to make functional programming in Java easier.
+Type-safe versions of Clojure's immutable/persistent collections, an immutable alternative to Java 8 Streams, and other tools to make functional programming in Java easier.
 
 ![Hermit Crab](https://c7.staticflickr.com/8/7413/12171498934_2934c7ef28_n.jpg)
 Photo by [Rushen](https://www.flickr.com/photos/rushen/12171498934/in/photostream/)
@@ -6,16 +6,53 @@ Photo by [Rushen](https://www.flickr.com/photos/rushen/12171498934/in/photostrea
 Paguro is short for the Latin "Paguroidea" - the name of the Hermit Crab superfamily in Biology.  These collections grow by adding a new shell, leaving the insides the same, much the way [Hermit Crabs trade up to a new shell when they grow](https://www.youtube.com/watch?v=f1dnocPQXDQ).  This project used to be called UncleJim. 
 
 # News
-If you're new to Paguro, consider starting with the streamlined 3.0 Alpha version.  Details available on the [RRB Tree branch](https://github.com/GlenKPeterson/Paguro/tree/2016-05-22_RRB-Tree)
+### RRB Tree Released!
+An RRB Tree is an immutable List (like Clojure's PersistentVector) that also supports random inserts, deletes, and can be split and joined back together in logarithmic time.
+There's been one for Scala for a while (Bagwell/Rompf who wrote the paper were Scala people), and a native Clojure one, but neither is super helpful for Java programmers.
+This is an entirely new Apache 2.0 Java implementation.
 
+It's easy to use:
+```java
+import org.organicdesign.fp.collections.RrbTree.ImRrbt;
+import static org.organicdesign.fp.StaticImports.rrb;
+
+class Foo {
+    public static void main(String[] args) {
+        ImRrbt<String> rrb = rrb("This", "is", "a", "list");
+        rrb = rrb.insert(0, "Hello!");
+        System.out.println("rrb: " + rrb);
+    }
+}
+```
+
+This implementation:
+1. Has a faster insertAt(0) than java.util.ArrayList.
+2. Has a mutable version that builds the same internal data structure as the immutable version, but without mutable sharing.
+Meaning that you can call mutable() and immutable() as much as you want.  The core data is shared immutably without locking/synchronization.
+3. The immutable version is about as fast as the Clojure PersistentVector and Scala's RRB Tree.
+The mutable RRB tree is only a little slower than the Clojure PersistentVector (Scala's RRB Tree lacks a mutable counterpart)
+
+### How to update
 A summary of recent updates is in the [Change Log](CHANGE_LOG.md)
 
-Future development priorities are further down this page.
+### Other features
+[docs/apidocs/org/organicdesign/fp/oneOf/package-frame.html](Union types) for Java!
+
+### Next Major Release will be Paguro 4.0, "Kotlin Compatibility"
+
+Some things will have to be renamed in order to fit better with the Kotlin standard library.
+Notably MutableList, MutableMap, and MutableSet conflict with the same-named classes in Kotlin.
+
+The primary programmer on this project is writing more Kotlin than Java.
+If you like Paguro, you'll probably prefer Kotlin too.
+Kotlin seems nearly 100% compatible with Java, meaning when you call Kotlin from Java, you could think you're calling native Java.
+So even if this becomes an all Kotlin project, Java programmers will have no trouble using it.
+If that happens, and Java-only programmers object for some reason, we can make a Java-only branch from the 3.x release.
 
 # Features
 
-* [Immutable collections](src/main/java/org/organicdesign/fp/collections) - type-safe generic Java versions of Clojure's immutable collections - arguably the best immutable collections on the JVM.
-* [Functional transformations](src/main/java/org/organicdesign/fp/xform/Transformable.java#L42) are a simplified immutable alternative to Java 8 Streams, wrapping checked exceptions and avoiding primitives (you can still use Java 8 streams if you want to).
+* [Immutable collections](src/main/java/org/organicdesign/fp/collections) - type-safe generic Java versions of Clojure's immutable (HAMT = 'Hash Array Mapped Trie') collections - arguably the best immutable collections on the JVM.  Plus an RRB Tree!
+* [Functional transformations](src/main/java/org/organicdesign/fp/xform/Transformable.java#L42) are like a type-safe version of Clojure's Transducers, or a simplified immutable alternative to Java 8 Streams, wrapping checked exceptions and avoiding primitives (you can still use Java 8 streams if you want to).
 * [Brief collection constructors](src/main/java/org/organicdesign/fp/StaticImports.java#L36) are like a tiny, type-safe data definition language:
   * `vec("one", "two", "three")` - an immutable vector/list of three strings
   * `set(3, 5, 7)` - an immutable set of three integers
@@ -23,7 +60,7 @@ Future development priorities are further down this page.
   * `map(tup(1, "single"), tup(2, "double"), tup(3, "triple"))` - an immutable map that uses integers to look up appropriate strings.
 * [Extensible, immutable tuples](src/main/java/org/organicdesign/fp/tuple) - use them for rapid prototyping, then later extend them to make your own lightweight, immutable Java classes with correct `equals()`, `hashCode()`, and `toString()` implementations.
 * [Lazy initialization](src/main/java/org/organicdesign/fp/LazyRef.java#L5) - LazyRef thread-safely performs initialization and frees initialization resources on first use.  Subsequent uses get the now-constant initialized value.  Use this instead of static initializers to avoid initialization loops.  Cache results of expensive operations for reuse.
-* [Memoization](src/main/java/org/organicdesign/fp/function/Function3.java#L42) - Turns function calls into hashtable lookups to speed up slow functions over a limited range of inputs.
+* [Memoization](src/main/java/org/organicdesign/fp/function/Fn3.java#L42) - Turns function calls into hashtable lookups to speed up slow functions over a limited range of inputs.
 * Tiny with no dependencies - The entire project fits in a 230K jar file that is compiled in the compact1 profile.
 
 For complete API documentation, please build the javadoc:
@@ -45,7 +82,7 @@ If you're new to Paguro, consider starting with the streamlined
 <dependency>
         <groupId>org.organicdesign</groupId>
         <artifactId>Paguro</artifactId>
-        <version>2.1.1</version>
+        <version>3.0.14</version>
 </dependency>
 ```
 
@@ -100,6 +137,10 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
 
 # FAQ
 
+### Q: Why are you doing this?
+
+It started with a Software Engineering Stack Exchange question: [Why doesn't Java provide immutable collections?](https://softwareengineering.stackexchange.com/questions/221762/why-doesnt-java-8-include-immutable-collections)
+
 ### Q: How does this compare to PCollections?
 
 [Paguro is based on Clojure, faster and has additional features](https://github.com/GlenKPeterson/Paguro/wiki/UncleJim-vs.-PCollections)
@@ -116,17 +157,14 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
 
 [Why Java?](https://github.com/GlenKPeterson/Paguro/wiki/Why-is-UncleJim-written-in-Java%3F)
 
-# Future Development Priorities (as of 2016-11-13)
-0. `Xform.toMutableList()` returns a java.util.List, but now that there's a MutableList class, should we use that instead?  Similarly for other toMutable... methods.
-1. Implement an RRB-Tree (lacking O(log n) version of concat())
-2. Add reverseIterator() or similar to SortedUnmodIterable
-3. Transformable needs `first()` and `last()`, but maybe only on a SortedIterable.  Otherwise, `any(Function1<Boolean>)`
-4. Ensure everything is as friendly as possible to Monadic thinking.
-5. Rename functional interfaces from Function1 to Fn1 (start by making a briefer sub-class and deprecating the long-named one).  Provide a Fn1v subclass of Fn1 (and similar for Fn0, Fn2, etc.) that returns void because sometimes you need one of those for backward compatibility and you don't want it to choke on checked exceptions.
-6. Consider adding interfaces to better split muable and immutable collections.  There should be a definitely unmodifiable, a definitely mutable, and an "unknown" one, but the two definitely's maybe shouldn't extend the "unknown" one.
-7. Make a Java 7 branch (and/or Java 6) and release (Paguro-JDK7).
-8. Consider adding `Class[] genericTypes` to every generic class so that generics could be known at runtime (for Cymling)
-9. Consider adding ImMap.assocIfAbsent(K key, Function1<V,V> howToUpdateValue, V newValIfAbsent).
+# Future Development Ideas (as of 2017-09-10)
+1. Make all collections sub-classes of Kotlin's collections
+2. Improve RRB ListIterator implementation.  Iterator is fast, ListIterator is slow.
+I have made some strides toward this, but it's slow work, PersistentVector never got this feature, and Kotlin compatibility is a higher priority. 
+3. Transformable maybe needs `first()` and `last()`, but maybe only on a SortedIterable.  Otherwise, `any(Fn1<Boolean>)`
+4. Ensure everything is as friendly as possible to Monadic and Reactive thinking.
+5. Consider a Fn1v subclass of Fn1 (and similar for Fn0, Fn2, etc.) that returns void because sometimes you need one of those for backward compatibility and you don't want it to choke on checked exceptions.
+6. Consider insertion-order maps and sets
 
 ### RRB-Tree
 Read the [current development status](https://github.com/GlenKPeterson/Paguro/issues/4#issuecomment-239825939) or check out the [latest version of the code](https://github.com/GlenKPeterson/Paguro/blob/2016-05-22_RRB-Tree/src/main/java/org/organicdesign/fp/experimental/RrbTree1.java).

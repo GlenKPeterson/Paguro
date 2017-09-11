@@ -200,4 +200,7 @@ public class StaticImportsTest {
                      xformArray(1, 2, 3).toImList());
     }
 
+    @Test public void testXformChars() {
+        assertEquals(vec('H', 'e', 'l', 'l', 'o'), xformChars("Hello").toImList());
+    }
 }
