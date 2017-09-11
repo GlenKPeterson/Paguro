@@ -63,8 +63,7 @@ If that happens, and Java-only programmers object for some reason, we can make a
 * [Memoization](src/main/java/org/organicdesign/fp/function/Fn3.java#L42) - Turns function calls into hashtable lookups to speed up slow functions over a limited range of inputs.
 * Tiny with no dependencies - The entire project fits in a 230K jar file that is compiled in the compact1 profile.
 
-For complete API documentation, please build the javadoc:
-`mvn javadoc:javadoc`
+[API Docs](https://glenkpeterson.github.io/Paguro/apidocs/index.html)
 
 Paguro takes advantage of Java's type inferencing.  It eschews void return types, arrays, primatives, and checked exceptions in lambdas.  It can decrease the amount of code you need to write by a factor of at 2x-3x.  Using functional transfomrations instead of loops focuses you on choosing the right collections which leads to more readable code AND better Big O complexity/scalability.
 
@@ -121,8 +120,6 @@ vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
 
 * Get started now by following the [Usage Tips](https://github.com/GlenKPeterson/Paguro/wiki/Usage-Tips)
 
-* For complete API documentation, please build the javadoc: `mvn javadoc:javadoc`
-
 * [JimTrainer self-guided training](https://github.com/GlenKPeterson/JimTrainer) consists of a few short problem-sets for learning Paguro
 
 * [Comparison with Traditional Java and Java 8 Streams](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java#L22)
@@ -165,11 +162,6 @@ I have made some strides toward this, but it's slow work, PersistentVector never
 4. Ensure everything is as friendly as possible to Monadic and Reactive thinking.
 5. Consider a Fn1v subclass of Fn1 (and similar for Fn0, Fn2, etc.) that returns void because sometimes you need one of those for backward compatibility and you don't want it to choke on checked exceptions.
 6. Consider insertion-order maps and sets
-
-### RRB-Tree
-Read the [current development status](https://github.com/GlenKPeterson/Paguro/issues/4#issuecomment-239825939) or check out the [latest version of the code](https://github.com/GlenKPeterson/Paguro/blob/2016-05-22_RRB-Tree/src/main/java/org/organicdesign/fp/experimental/RrbTree1.java).
-
-As Norm Zeck pointed out by sending me [Ropes: an Alternative to Strings](http://citeseer.ist.psu.edu/viewdoc/download?doi=10.1.1.14.9450&rep=rep1&type=pdf), an RRB-Tree might make a great implementation of *both* String and StringBuilder.  We might want to add a Char8 (UTF-8 Character class pronounced "crate") and make Str8 (UTF-8 String pronounced "straight") a sub-class of RRB-Tree.  Just a thought.
 
 # Licenses
 Java&trade; is a registered trademark of the Oracle Corporation in the US and other countries.
