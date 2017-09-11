@@ -12,6 +12,8 @@ These were useful before the Clojure collections and Transformable were fully in
 # Thank You
 Some of the people I'm listing as contributors may not actually be aware of this project, but I found them inspiring in various ways.
 
+As Norm Zeck pointed out by sending me [Ropes: an Alternative to Strings](http://citeseer.ist.psu.edu/viewdoc/download?doi=10.1.1.14.9450&rep=rep1&type=pdf), an RRB-Tree might make a great implementation of *both* String and StringBuilder.  We might want to add a Char8 (UTF-8 Character class pronounced "crate") and make Str8 (UTF-8 String pronounced "straight") a sub-class of RRB-Tree.  Just a thought.
+
 The bulk of this project started as a simple question on StackExchange: [Why doesn't Java 8 include immutable collections?](http://programmers.stackexchange.com/questions/221762/why-doesnt-java-8-include-immutable-collections)  People's answers were a big help in figuring out what this project should and shouldn't do.
 
 Paul Philips [Scala Collections talk](https://www.youtube.com/watch?v=uiJycy6dFSQ&t=26m19s) was a huge inspiration to me.  I watched it over and over and tried to learn from his experience as much as possible.
