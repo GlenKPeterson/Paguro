@@ -44,15 +44,15 @@ If Java-only programmers object for some reason, we can make a Java-only branch.
 
 # Features
 
-* [Immutable collections](src/main/java/org/organicdesign/fp/collections) - type-safe generic Java versions of Clojure's immutable (HAMT = 'Hash Array Mapped Trie') collections - arguably the best immutable collections on the JVM.  Plus an RRB Tree!
-* [Functional transformations](src/main/java/org/organicdesign/fp/xform/Transformable.java#L42) are like a type-safe version of Clojure's Transducers, or a simplified immutable alternative to Java 8 Streams, wrapping checked exceptions and avoiding primitives (you can still use Java 8 streams if you want to).
-* [Brief collection constructors](src/main/java/org/organicdesign/fp/StaticImports.java#L36) are like a tiny, type-safe data definition language:
+* Immutable collections [api](https://glenkpeterson.github.io/Paguro/apidocs/index.html?org/organicdesign/fp/collections/package-summary.html) [src](src/main/java/org/organicdesign/fp/collections) - type-safe generic Java versions of Clojure's immutable (HAMT = 'Hash Array Mapped Trie') collections - arguably the best immutable collections on the JVM.  Plus an RRB Tree!
+* Functional transformations [api](https://glenkpeterson.github.io/Paguro/apidocs/index.html?org/organicdesign/fp/xform/package-summary.html) [src](src/main/java/org/organicdesign/fp/xform/Transformable.java#L42) are like a type-safe version of Clojure's Transducers, or a simplified immutable alternative to Java 8 Streams, wrapping checked exceptions and avoiding primitives (you can still use Java 8 streams if you want to).
+* Brief collection constructors [api](https://glenkpeterson.github.io/Paguro/apidocs/index.html?org/organicdesign/fp/StaticImports.html) [src](src/main/java/org/organicdesign/fp/StaticImports.java#L36) are like a tiny, type-safe data definition language:
   * `vec("one", "two", "three")` - an immutable vector/list of three strings
   * `set(3, 5, 7)` - an immutable set of three integers
   * `tup("Alice", 11, 3.14)` - an immutable 3-field tuple or record
   * `map(tup(1, "single"), tup(2, "double"), tup(3, "triple"))` - an immutable map that uses integers to look up appropriate strings.
-* [Extensible, immutable tuples](src/main/java/org/organicdesign/fp/tuple) - use them for rapid prototyping, then later extend them to make your own lightweight, immutable Java classes with correct `equals()`, `hashCode()`, and `toString()` implementations.
-* [Lazy initialization](src/main/java/org/organicdesign/fp/LazyRef.java#L5) - LazyRef thread-safely performs initialization and frees initialization resources on first use.  Subsequent uses get the now-constant initialized value.  Use this instead of static initializers to avoid initialization loops.  Cache results of expensive operations for reuse.
+* Extensible, immutable tuples [api](https://glenkpeterson.github.io/Paguro/apidocs/index.html?org/organicdesign/fp/tuple/package-summary.html) [src](src/main/java/org/organicdesign/fp/tuple) - use them for rapid prototyping, then later extend them to make your own lightweight, immutable Java classes with correct `equals()`, `hashCode()`, and `toString()` implementations.
+* Lazy initialization [api](https://glenkpeterson.github.io/Paguro/apidocs/index.html?org/organicdesign/fp/function/LazyRef.html) [src](src/main/java/org/organicdesign/fp/LazyRef.java#L5) - LazyRef thread-safely performs initialization and frees initialization resources on first use.  Subsequent uses get the now-constant initialized value.  Use this instead of static initializers to avoid initialization loops.  Cache results of expensive operations for reuse.
 * [Memoization](src/main/java/org/organicdesign/fp/function/Fn3.java#L42) - Turns function calls into hashtable lookups to speed up slow functions over a limited range of inputs.
 * Tiny with no dependencies - The entire project fits in a 270K jar file that is compiled in the compact1 profile.
 
@@ -146,6 +146,7 @@ It started with a Software Engineering Stack Exchange question: [Why doesn't Jav
 ### Q: Why Java instead of another/better JVM language?
 
 [Why Java?](https://github.com/GlenKPeterson/Paguro/wiki/Why-is-UncleJim-written-in-Java%3F)
+That said, this could become a Kotlin-based project.
 
 # Future Development Ideas (as of 2017-09-10)
 1. Make all collections sub-classes of Kotlin's collections
