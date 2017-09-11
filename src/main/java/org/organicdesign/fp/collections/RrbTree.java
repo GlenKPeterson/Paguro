@@ -29,7 +29,9 @@ import static org.organicdesign.fp.collections.Indented.arrayString;
 import static org.organicdesign.fp.collections.Indented.indentSpace;
 
 /**
- <p>This is based on the paper, "RRB-Trees: Efficient Immutable Vectors" by Phil Bagwell and
+ <p>An RRB Tree is an immutable List (like Clojure's PersistentVector) that also supports random inserts, deletes,
+ and can be split and joined back together in logarithmic time.
+ This is based on the paper, "RRB-Trees: Efficient Immutable Vectors" by Phil Bagwell and
  Tiark Rompf, with the following differences:</p>
 
  <ul>
@@ -59,7 +61,7 @@ import static org.organicdesign.fp.collections.Indented.indentSpace;
  <li>iterate() - is about the same speed as PersistentVector</li>
  <li>insert(0, item) - beats ArrayList above 1K items (worse than ArrayList below 100 items).</li>
  <li>insert(random, item) - beats ArrayList above 10K items (worse than ArrayList until then).</li>
- <li>Supports split(), join(), and remove() (not timed yet).</li>
+ <li>O(log n) split(), join(), and remove() (not timed yet).</li>
  </ul>
 
  <p>Latest detailed timing results are

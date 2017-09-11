@@ -10,7 +10,7 @@ import java.util.Objects;
 import static org.organicdesign.fp.type.RuntimeTypes.union2Str;
 
 /**
- Holds one of 3 values or {@link None}. See {@link OneOf2} for a full description.  If you're passing the same type,
+ Holds one of 2 values or {@link None}. See {@link OneOf2} for a full description.  If you're passing the same type,
  you probably want a tuple instead.
  */
 public abstract class OneOf2OrNone<A,B> {

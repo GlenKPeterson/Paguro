@@ -25,13 +25,6 @@ class Foo {
 }
 ```
 
-This implementation:
-1. Has a faster insertAt(0) than java.util.ArrayList.
-2. Has a mutable version that builds the same internal data structure as the immutable version, but without mutable sharing.
-Meaning that you can call mutable() and immutable() as much as you want.  The core data is shared immutably without locking/synchronization.
-3. The immutable version is about as fast as the Clojure PersistentVector and Scala's RRB Tree.
-The mutable RRB tree is only a little slower than the Clojure PersistentVector (Scala's RRB Tree lacks a mutable counterpart)
-
 ### How to update
 A summary of recent updates is in the [Change Log](CHANGE_LOG.md)
 
@@ -43,11 +36,11 @@ A summary of recent updates is in the [Change Log](CHANGE_LOG.md)
 Some things will have to be renamed in order to fit better with the Kotlin standard library.
 Notably MutableList, MutableMap, and MutableSet conflict with the same-named classes in Kotlin.
 
-The primary programmer on this project is writing more Kotlin than Java.
+The primary programmer on this project is now writing more Kotlin than Java.
 If you like Paguro, you'll probably prefer Kotlin too.
 Kotlin seems nearly 100% compatible with Java, meaning when you call Kotlin from Java, you could think you're calling native Java.
-So even if this becomes an all Kotlin project, Java programmers will have no trouble using it.
-If that happens, and Java-only programmers object for some reason, we can make a Java-only branch from the 3.x release.
+So even if this becomes an all Kotlin project, Java programmers should have no trouble using it.
+If Java-only programmers object for some reason, we can make a Java-only branch.
 
 # Features
 
