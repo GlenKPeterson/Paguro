@@ -54,7 +54,7 @@ If Java-only programmers object for some reason, we can make a Java-only branch.
 * [Extensible, immutable tuples](src/main/java/org/organicdesign/fp/tuple) - use them for rapid prototyping, then later extend them to make your own lightweight, immutable Java classes with correct `equals()`, `hashCode()`, and `toString()` implementations.
 * [Lazy initialization](src/main/java/org/organicdesign/fp/LazyRef.java#L5) - LazyRef thread-safely performs initialization and frees initialization resources on first use.  Subsequent uses get the now-constant initialized value.  Use this instead of static initializers to avoid initialization loops.  Cache results of expensive operations for reuse.
 * [Memoization](src/main/java/org/organicdesign/fp/function/Fn3.java#L42) - Turns function calls into hashtable lookups to speed up slow functions over a limited range of inputs.
-* Tiny with no dependencies - The entire project fits in a 230K jar file that is compiled in the compact1 profile.
+* Tiny with no dependencies - The entire project fits in a 270K jar file that is compiled in the compact1 profile.
 
 [API Docs](https://glenkpeterson.github.io/Paguro/apidocs/index.html)
 
