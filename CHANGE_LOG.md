@@ -34,7 +34,9 @@ Major changes:
  - Added "Union type" classes in oneOf package: OneOf2OrNone, OneOf3 and OneOf4.
  - Added Xform.dropWhile()
 
-Here is a script to ease your upgrade from 2.1.1 to 3.0:
+# 3.0 Upgrade
+
+Here is a script to ease your upgrade from 2.1.1 to 3.0.14:
 ```bash
 # USE CAUTION AND HAVE A BACKUP OF YOUR SOURCE CODE (VERSION CONTROL) - NO GUARANTEES
 oldString='org.organicdesign.fp.LazyRef'
@@ -61,6 +63,18 @@ oldString='.typeMatch('
 newString='.match('
 sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir='.git' -rIl "$oldString" *)
 
+oldString='.patMat('
+newString='.match('
+sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir='.git' -rIl "$oldString" *)
+
+oldString='MutableUnsortedMap'
+newString='MutableMap'
+sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir='.git' -rIl "$oldString" *)
+
+oldString='MutableUnsortedSet'
+newString='MutableSet'
+sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir='.git' -rIl "$oldString" *)
+
 sed -i -e 's/\<Function\([0-3]\)\>/Fn\1/g' $(egrep --exclude-dir='.svn' --exclude-dir='.git' -wrIl 'Function[0-3]' *)
 ```
 If you subclassed OneOf, you can clean up your code.  From:
@@ -81,6 +95,11 @@ public class String_Integer extends OneOf2<String,Integer> {
 ```
 
 If you used the super::throw1 and super::throw2 methods, those have disappeared in favor of just using match everywhere.
+If you're relied on super::throwN, you may have to manually throw an exception:
+```java
+match(a -> a,
+      b -> { throw new IllegalStateException("Can't call a() on a B"); });
+```
 
 Anywhere you have FunctionUtils unmmodSet, unmodList, unmodWhatever, you probably want to replace that with StaticImports.xform().
 
@@ -95,14 +114,14 @@ UnmodList<Number> foo(List<Integer> is, List<Double> ds) {
 }
 
 // New 'n awesome
-ImList<Number> foo2(List<Integer> is, List<Double> ds) {
-    return xform(is)
-    // Little trick to tell Java's type system that we're making a List of Numbers.
-                   .map(m -> (Number) m)
+ImList<Number> foo3(List<Integer> is, List<Double> ds) {
+    // Have to specify StaticImports.<Number> to tell Java's type system that we're making a List of Numbers.
+    // I think Kotlin can figure this out without hints.
+    return StaticImports.<Number>mutableVec()
+                   .concat(is)
                    .concat(ds)
-                   .toImList();
+                   .immutable();
 }
-
 ```
 
 Manual upgrade tasks:
@@ -112,6 +131,8 @@ Manual upgrade tasks:
  - There will be type errors where you pass a Mutable___ as an Im___.
    If the variable is myVar, simply change it to myVar.immutable() wherever errors show up.
      Unless you really wanted a Mutable___ in which case, you need to change the type signature.
+
+# 2.0 Releases
 
 ##### Oops!
 I'm sorry I ever made Mutable___ extend Im___.  It's an embarrassing rookie mistake.
@@ -145,6 +166,7 @@ Non-breaking Changes:
    The Cymling programming language basically splits the difference between Clojure (collections and xforms, assumption of immutability),
    ML (types without objects, records/tuples instead of Clojure's maps), and Kotlin (dot syntax, function syntax, null safety),
    Anyone who likes Paguro might want to keep an eye on Cymling development.
+
 
 Upgrade Instructions:
 You can use sed to fix imports for moved classes.
