@@ -7,7 +7,7 @@ Paguro is short for the Latin "Paguroidea" - the name of the Hermit Crab superfa
 
 # News
 ### RRB Tree Released!
-An RRB Tree is an immutable List (like Clojure's PersistentVector) that also supports random inserts, deletes, and can be split and joined back together in logarithmic time.
+An [RRB Tree](https://glenkpeterson.github.io/Paguro/apidocs/index.html?org/organicdesign/fp/collections/RrbTree.html) is an immutable List (like Clojure's PersistentVector) that also supports random inserts, deletes, and can be split and joined back together in logarithmic time.
 There's been one for Scala for a while (Bagwell/Rompf who wrote the paper were Scala people), and a native Clojure one, but neither is super helpful for Java programmers.
 This is an entirely new Apache 2.0 Java implementation.
 
