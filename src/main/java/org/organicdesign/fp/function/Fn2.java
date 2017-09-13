@@ -69,4 +69,41 @@ public interface Fn2<A,B,R> extends BiFunction<A,B,R> {
             }
         };
     }
+
+    enum Singletons implements Fn2 {
+        /**
+         A static function that always returns the first argument it is given.
+         For type safety, please use {@link Fn2#first()} instead of accessing this dirctly.
+         */
+        FIRST {
+            @Override
+            public Object applyEx(Object a, Object b) throws Exception {
+                return a;
+            }
+        },
+        /**
+         A static function that always returns the second argument it is given.
+         For type safety, please use {@link Fn2#second()} instead of accessing this dirctly.
+         */
+        SECOND {
+            @Override
+            public Object applyEx(Object a, Object b) throws Exception {
+                return b;
+            }
+        },
+    }
+
+    /**
+     Returns a static function that always returns the first argument it is given.
+     @return the first argument, unmodified.
+     */
+    @SuppressWarnings("unchecked")
+    static <A1,B1> Fn2<A1,? super B1,A1> first() { return Singletons.FIRST; }
+
+    /**
+     Returns a static function that always returns the second argument it is given.
+     @return the second argument, unmodified.
+     */
+    @SuppressWarnings("unchecked")
+    static <A1,B1> Fn2<A1,? super B1,B1> second() { return Singletons.SECOND; }
 }

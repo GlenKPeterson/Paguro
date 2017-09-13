@@ -20,7 +20,11 @@ import org.organicdesign.fp.function.Fn1;
 import org.organicdesign.fp.function.Fn2;
 import org.organicdesign.fp.oneOf.Or;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 
 /**
  An immutable description of operations to be performed (a transformation, transform, or x-form).
@@ -452,6 +456,12 @@ public abstract class Xform<A> implements UnmodIterable<A> {
     // Constructor
     Xform(Xform pre) { prevOp = pre; }
 
+    // TODO: Everything should be implemented in terms of foldUntil now that we have that.
+    /**
+     @param reducer combines each value in the list with the result so far.  The result so far is the first argument.
+     the current value to combine with it is the second argument.  The return type is the same as the result so far.
+     Fn2&lt;? super U,? super T,U&gt;
+     */
     // This is the main method of this whole file.  Everything else lives to serve this.
     // We used a linked-list to build the type-safe operations so if that code compiles, the types
     // should work out here too.  However, for performance, we don't want to be stuck creating and

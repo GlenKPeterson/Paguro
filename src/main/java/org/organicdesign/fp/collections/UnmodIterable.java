@@ -193,12 +193,8 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
         return Xform.of(this).takeWhile(f);
     }
 
-    // TODO: This is for temporary Sequence backward-compatibility.  Remove once Sequence is deleted.
-    /**
-     The first item in this sequence.  This was originally called first() but that conflicted with
-     SortedSet.first() which did not return an Option and threw an exception when the set was empty.
-     */
-    default Option<T> head() {
+    /** The first item in this iterable. */
+    @Override default Option<T> head() {
         Iterator<T> iter = iterator();
         return iter.hasNext() ? Option.some(iter.next())
                               : Option.none();

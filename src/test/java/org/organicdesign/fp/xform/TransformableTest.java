@@ -1,16 +1,6 @@
 package org.organicdesign.fp.xform;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 
 import org.junit.Test;
 import org.organicdesign.fp.collections.ImMap;
@@ -18,6 +8,7 @@ import org.organicdesign.fp.collections.ImSortedMap;
 import org.organicdesign.fp.collections.PersistentHashMap;
 import org.organicdesign.fp.collections.PersistentTreeMap;
 import org.organicdesign.fp.collections.UnmodSortedIterable;
+import org.organicdesign.fp.oneOf.Option;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import static org.junit.Assert.assertEquals;
@@ -108,5 +99,14 @@ public class TransformableTest {
         Set<Integer> control = new HashSet<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9));
         Transformable<Integer> trans = Xform.of(control);
         assertEquals(control, trans.toMutableSet());
+    }
+
+    @Test public void testHead() {
+        // TODO: I'm not getting test coverage from this.  It seems to be using the UnmodIterable implementation instead (which is probably more efficient)
+        Transformable<Integer> tint1 = Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9));
+        assertEquals(Option.some(1), ((Transformable<Integer>) tint1).head());
+
+        Transformable<Integer> tint2 = Xform.of(Collections.emptyList());
+        assertEquals(Option.none(), ((Transformable<Integer>) tint2).head());
     }
 }

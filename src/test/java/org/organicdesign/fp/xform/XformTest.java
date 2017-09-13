@@ -18,6 +18,7 @@ import junit.framework.TestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.organicdesign.fp.oneOf.Option;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -780,6 +781,29 @@ public class XformTest extends TestCase {
                                      (items, item) -> items.contains(16) ? items : null,
                                      (alist, item) -> { alist.add(item); return alist; })
                           .match(g->g,b->b));
+    }
+
+    @Test public void testFirst() {
+        assertEquals(Option.some(4),
+                     Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
+                          .filter(i -> i > 3)
+                          .head());
+        assertEquals(Option.some(1),
+                     Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
+                          .filter(i -> i > 0)
+                          .head());
+        assertEquals(Option.some(9),
+                     Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
+                          .filter(i -> i > 8)
+                          .head());
+        assertEquals(Option.none(),
+                     Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
+                          .filter(i -> i < 1)
+                          .head());
+        assertEquals(Option.none(),
+                     Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
+                          .filter(i -> i > 9)
+                          .head());
     }
 
     @Test public void toIterator() {

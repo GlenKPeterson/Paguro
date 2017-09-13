@@ -74,7 +74,7 @@ If you're new to Paguro, consider starting with the streamlined
 <dependency>
         <groupId>org.organicdesign</groupId>
         <artifactId>Paguro</artifactId>
-        <version>3.0.14</version>
+        <version>3.0.15</version>
 </dependency>
 ```
 
@@ -150,9 +150,9 @@ That said, this could become a Kotlin-based project.
 
 # Future Development Ideas (as of 2017-09-10)
 1. Make all collections sub-classes of Kotlin's collections
-2. Improve RRB ListIterator implementation.  Iterator is fast, ListIterator is slow.
+2. Add a fast ListIterator to RRB implementation.
 I have made some strides toward this, but it's slow work, PersistentVector never got this feature, and Kotlin compatibility is a higher priority. 
-3. Transformable maybe needs `first()` and `last()`, but maybe only on a SortedIterable.  Otherwise, `any(Fn1<Boolean>)`
+3. All methods of Xform can be implemented in terms of foldUntil().  Try doing that instead of _fold.
 4. Ensure everything is as friendly as possible to Monadic and Reactive thinking.
 5. Consider a Fn1v subclass of Fn1 (and similar for Fn0, Fn2, etc.) that returns void because sometimes you need one of those for backward compatibility and you don't want it to choke on checked exceptions.
 6. Consider insertion-order maps and sets

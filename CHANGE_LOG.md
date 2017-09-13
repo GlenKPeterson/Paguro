@@ -5,6 +5,13 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
+# Release 3.0.15: RRB Tree
+ - Added Transformable.head():Option.
+ If you want .any(Fn1<T,Boolean>):Boolean like Kotlin, call .filter(Fn1<T,Boolean>).head().isSome()
+ Couldn't call this first() because SortedSet already has .first() which returns null if the set is empty.
+ That's ambiguous if the set contains nulls, so use head() instead.
+ - Improved test coverage a little.
+
 # Release 3.0.14: RRB Tree
  - This is just a version number bump for the official release.
 

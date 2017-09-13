@@ -213,17 +213,17 @@ final class Cowry {
         return split;
     }
 
-    static <T> T[] truncateArray(T[] origItems, int newLength, Class<T> tClass) {
-        if (origItems.length == newLength) {
-            return origItems;
-        }
-
-        @SuppressWarnings("unchecked")
-        T[] newItems = (T[]) ((tClass == null) ? new Object[newLength]
-                                               : Array.newInstance(tClass, newLength) );
-
-        //                      src, srcPos,    dest,destPos, length
-        System.arraycopy(origItems, 0, newItems, 0, newLength);
-        return newItems;
-    }
+//    static <T> T[] truncateArray(T[] origItems, int newLength, Class<T> tClass) {
+//        if (origItems.length == newLength) {
+//            return origItems;
+//        }
+//
+//        @SuppressWarnings("unchecked")
+//        T[] newItems = (T[]) ((tClass == null) ? new Object[newLength]
+//                                               : Array.newInstance(tClass, newLength) );
+//
+//        //                      src, srcPos,    dest,destPos, length
+//        System.arraycopy(origItems, 0, newItems, 0, newLength);
+//        return newItems;
+//    }
 }

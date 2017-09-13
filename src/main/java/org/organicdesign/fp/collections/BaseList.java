@@ -13,6 +13,8 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
+import org.organicdesign.fp.oneOf.Option;
+
 /**
  Adds copy-on-write, "fluent interface" methods to {@link UnmodList}.
  Lowest common ancestor of {@link MutableList} and {@link ImList}.
@@ -52,6 +54,11 @@ public interface BaseList<E> extends UnmodList<E> {
         if (i >= 0 && i < size())
             return get(i);
         return notFound;
+    }
+
+    /** {@inheritDoc} */
+    @Override default Option<E> head() {
+        return size() > 0 ? Option.some(get(0)) : Option.none();
     }
 
     /**

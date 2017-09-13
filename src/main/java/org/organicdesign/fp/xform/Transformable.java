@@ -36,6 +36,7 @@ import org.organicdesign.fp.collections.PersistentTreeSet;
 import org.organicdesign.fp.collections.PersistentVector;
 import org.organicdesign.fp.function.Fn1;
 import org.organicdesign.fp.function.Fn2;
+import org.organicdesign.fp.oneOf.Option;
 import org.organicdesign.fp.oneOf.Or;
 
 /**
@@ -77,6 +78,25 @@ public interface Transformable<T> {
      @param predicate a function that returns true for items to keep, false for items to drop
      */
     Transformable<T> filter(Fn1<? super T,Boolean> predicate);
+
+    /**
+     Returns the first item produced by this transform.  If the source is unordered, there is no guarantee about which
+     item will make it through the transform first.
+
+     This was going to be called first(), but that conflicts with SortedSet.first() which is used by
+     SortedMap.entrySet().  The contract for that is to return the first item or null, so that if it returns null,
+     you don't know whether that means the set is empty or that the first item is null.  I guess your comparator
+     would have to understand nulls, but it could happen.
+
+     @return an eagerly evaluated result which is a single item.
+     */
+    default Option<T> head() {
+        return foldUntil(Option.none(),
+                         (accum, item) -> Option.someOrNullNoneOf(item),
+                         Fn2.first())
+                .match(g -> Option.none(),
+                       b -> b);
+    }
 
     /**
      Transform each item into zero or more new items using the given function.
