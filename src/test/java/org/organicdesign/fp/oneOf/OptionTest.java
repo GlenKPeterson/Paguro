@@ -1,7 +1,6 @@
 package org.organicdesign.fp.oneOf;
 
 import org.junit.Test;
-import org.organicdesign.fp.oneOf.Option;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
@@ -145,5 +144,11 @@ public class OptionTest {
         Option<Integer> o2 = Option.none();
         assertEquals(Option.none(), o2.then(i -> i < 3 ? Option.some("good")
                                                        : Option.none()));
+    }
+
+    @Test public void testToString() {
+        assertEquals("Some(3)", Option.some(3).toString());
+        assertEquals("Some(\"hi\")", Option.some("hi").toString());
+        assertEquals("Some(7.5)", Option.some(7.5).toString());
     }
 }

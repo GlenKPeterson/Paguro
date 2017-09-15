@@ -13,6 +13,7 @@
 
 package org.organicdesign.fp.oneOf;
 
+import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.function.Fn0;
 import org.organicdesign.fp.function.Fn1;
 
@@ -100,6 +101,9 @@ public interface Option<T> extends Serializable { // extends UnmodSortedIterable
 
         /** {@inheritDoc} */
         @Override public boolean isSome() { return true; }
+
+        /** {@inheritDoc} */
+        @Override public String toString() { return "Some(" + FunctionUtils.stringify(item) + ")"; }
 //
 //        @Override public UnmodSortedIterator<T> iterator() {
 //            return new UnmodSortedIterator<T>() {
