@@ -15,7 +15,7 @@ package org.organicdesign.fp.collections;
 
 /**
  Adds {@link #equator()} to {@link BaseMap} which is an unsorted-only operation.
- Lowest common ancestor of {@link MutableMap} and {@link ImMap}.
+ Lowest common ancestor of {@link MutMap} and {@link ImMap}.
  */
 public interface BaseUnsortedMap<K,V> extends BaseMap<K,V> {
     /** Returns the Equator used by this map for equals comparisons and hashCodes */

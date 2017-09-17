@@ -54,8 +54,8 @@ import static org.organicdesign.fp.collections.Indented.indentSpace;
 
  <ul>
  <li>append() - {@link ImRrbt} varies between 90% and 100% of the speed of {@link PersistentVector} (biggest difference above 100K).
- {@link MutableRrbt} varies between 45% and 80% of the speed of
- {@link org.organicdesign.fp.collections.PersistentVector.MutableVector} (biggest difference from 100 to 1M).</li>
+ {@link MutRrbt} varies between 45% and 80% of the speed of
+ {@link PersistentVector.MutVector} (biggest difference from 100 to 1M).</li>
  <li>get() - varies between 50% and 150% of the speed of PersistentVector (PV wins above 1K) if you build RRB using append().
  If you build rrb using random inserts (worst case), it goes from 90% at 10 items down to 15% of the speed of the PV at 1M items.</li>
  <li>iterate() - is about the same speed as PersistentVector</li>
@@ -76,20 +76,20 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
     // but this can handle repeated inserts to any area of a vector.
 
     /** Mutable version of an {@link RrbTree}.  Timing information is available there. */
-    public static class MutableRrbt<E> extends RrbTree<E> implements MutableList<E> {
+    public static class MutRrbt<E> extends RrbTree<E> implements MutList<E> {
         private E[] focus;
         private int focusStartIndex;
         private int focusLength;
         private Node<E> root;
         private int size;
 
-        MutableRrbt(E[] f, int fi, int fl, Node<E> r, int s) {
+        MutRrbt(E[] f, int fi, int fl, Node<E> r, int s) {
             focus = f; focusStartIndex = fi; focusLength = fl; root = r; size = s;
         }
 
         /** {@inheritDoc} */
         @SuppressWarnings("unchecked")
-        @Override public MutableRrbt<E> append(E val) {
+        @Override public MutRrbt<E> append(E val) {
             // If our focus isn't set up for appends or if it's full, insert it into the data structure
             // where it belongs.  Then make a new focus
             if ( (focusLength >= STRICT_NODE_LENGTH) ||
@@ -104,7 +104,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
                 return this;
             }
 
-            // TODO: 3. Make the root the first argument to RrbTree, MutableRrbt and ImRrbt.
+            // TODO: 3. Make the root the first argument to RrbTree, MutRrbt and ImRrbt.
 
             if (focus.length <= focusLength) {
                 focus = arrayCopy(focus, STRICT_NODE_LENGTH, null);
@@ -116,8 +116,8 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         }
 
         /** {@inheritDoc} */
-        @Override public MutableRrbt<E> concat(Iterable<? extends E> es) {
-            return (MutableRrbt<E>) MutableList.super.concat(es);
+        @Override public MutRrbt<E> concat(Iterable<? extends E> es) {
+            return (MutRrbt<E>) MutList.super.concat(es);
         }
 
         void debugValidate() {
@@ -183,7 +183,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         }
 
         /** {@inheritDoc} */
-        @Override public MutableRrbt<E> insert(int idx, E element)  {
+        @Override public MutRrbt<E> insert(int idx, E element)  {
             // If the focus is full, push it into the tree and make a new one with the new element.
             if (focusLength >= STRICT_NODE_LENGTH) {
                 root = root.pushFocus(focusStartIndex,
@@ -260,7 +260,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
 
         /** {@inheritDoc} */
         @Override public String toString() {
-            return UnmodIterable.toString("MutableRrbt", this);
+            return UnmodIterable.toString("MutRrbt", this);
         }
 
         /**
@@ -419,7 +419,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
                 Node<E> newRoot =
                         new Relaxed<>(new int[] {leftSize, leftSize + rightRoot.size()}, newRootArray);
 //            newRoot.debugValidate();
-                return new MutableRrbt<>(emptyArray(), 0, 0, newRoot, newRoot.size());
+                return new MutRrbt<>(emptyArray(), 0, 0, newRoot, newRoot.size());
             } else {
                 throw new IllegalStateException("How did we get here?");
             }
@@ -443,11 +443,11 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
             }
 
 //        n.debugValidate();
-            return new MutableRrbt<>(emptyArray(), 0, 0, n, n.size());
+            return new MutRrbt<>(emptyArray(), 0, 0, n, n.size());
         }
 
         /** {@inheritDoc} */
-        @Override public MutableRrbt<E> replace(int index, E item) {
+        @Override public MutRrbt<E> replace(int index, E item) {
             if ( (index < 0) || (index > size) ) {
                 throw new IndexOutOfBoundsException("Index: " + index + " size: " + size);
             }
@@ -465,7 +465,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         }
 
         /** {@inheritDoc} */
-        public MutableRrbt<E> without(int index) { return (MutableRrbt<E>) super.without(index); }
+        public MutRrbt<E> without(int index) { return (MutRrbt<E>) super.without(index); }
 
         @Override public int size() { return size; }
 
@@ -477,7 +477,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
          @return two new sub-trees as determined by the split point.  If the point is 0 or
          this.size() one tree will be empty (but never null).
          */
-        public Tuple2<MutableRrbt<E>,MutableRrbt<E>> split(int splitIndex) {
+        public Tuple2<MutRrbt<E>,MutRrbt<E>> split(int splitIndex) {
             if ( (splitIndex < 1) || (splitIndex > size) ) {
                 throw new IndexOutOfBoundsException(
                         "Constraint violation failed: 1 <= splitIndex <= size");
@@ -501,10 +501,10 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
             Node<E> right = eliminateUnnecessaryAncestors(split.right());
 
             // These branches are identical, just different classes.
-            return Tuple2.of(new MutableRrbt<>(lFocus, left.size(), lFocus.length,
-                                               left, left.size() + lFocus.length),
-                             new MutableRrbt<>(rFocus, 0, rFocus.length,
-                                               right, right.size() + rFocus.length));
+            return Tuple2.of(new MutRrbt<>(lFocus, left.size(), lFocus.length,
+                                           left, left.size() + lFocus.length),
+                             new MutRrbt<>(rFocus, 0, rFocus.length,
+                                           right, right.size() + rFocus.length));
         }
     }
 
@@ -550,7 +550,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
             @SuppressWarnings("unchecked")
             private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
                 s.defaultReadObject();
-                MutableRrbt<E> temp = emptyMutable();
+                MutRrbt<E> temp = emptyMutable();
                 for (int i = 0; i < size; i++) {
                     temp.append((E) s.readObject());
                 }
@@ -662,11 +662,11 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         }
 
         /** {@inheritDoc} */
-        @Override public MutableRrbt<E> mutable() {
+        @Override public MutRrbt<E> mutable() {
             // TODO: Should we defensively copy the root as well?
-            return new MutableRrbt<>(arrayCopy(focus, focus.length, null),
-                                     focusStartIndex, focus.length,
-                                     root, size);
+            return new MutRrbt<>(arrayCopy(focus, focus.length, null),
+                                 focusStartIndex, focus.length,
+                                 root, size);
         }
 
         /** {@inheritDoc} */
@@ -951,8 +951,8 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
 
     /** Returns the empty, mutable RRB-Tree (there is only one) */
     @SuppressWarnings("unchecked")
-    public static <T> MutableRrbt<T> emptyMutable() {
-        return (MutableRrbt<T>) empty().mutable();
+    public static <T> MutRrbt<T> emptyMutable() {
+        return (MutRrbt<T>) empty().mutable();
     }
 
 

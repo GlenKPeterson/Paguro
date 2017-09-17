@@ -40,7 +40,7 @@ public class ImMapTest {
             throw new UnsupportedOperationException("not implemented");
         }
 
-        @Override public MutableMap<K,V> mutable() {
+        @Override public MutMap<K,V> mutable() {
             throw new UnsupportedOperationException("not implemented");
         }
 

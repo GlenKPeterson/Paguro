@@ -24,8 +24,8 @@ public class ImUnsortedSetTest {
             inner.addAll(s);
         }
 
-        @Override public MutableSet<E> mutable() {
-            return new MutableSetTest.TestSet<>(dup(inner));
+        @Override public MutSet<E> mutable() {
+            return new MutSetTest.TestSet<>(dup(inner));
         }
 
         @Override public ImSet<E> put(E val){

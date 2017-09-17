@@ -16,19 +16,20 @@ package org.organicdesign.fp.collections;
 /**
  A mutate-in-place interface using the same copy-on-write methods as {@link BaseList} and
  {@link ImList} so that you can treat mutable and immutable lists the same.
- You could think of this as a builder for an ImList, or just a stand-alone MutableList
+ You could think of this as a builder for an ImList, or just a stand-alone MutList
  that behaves similarly (extends {@link org.organicdesign.fp.xform.Transformable}).
  Being mutable, this is inherently NOT thread-safe.
  */
-public interface MutableList<E> extends BaseList<E> {
+public interface MutList<E> extends BaseList<E> {
     /** {@inheritDoc} */
-    @Override MutableList<E> append(E val);
+    @Override
+    MutList<E> append(E val);
 
     /** Returns a immutable version of this mutable list. */
     ImList<E> immutable();
 
     /** {@inheritDoc} */
-    @Override default MutableList<E> concat(Iterable<? extends E> es) {
+    @Override default MutList<E> concat(Iterable<? extends E> es) {
         for (E e : es) {
             this.append(e);
         }
@@ -36,11 +37,12 @@ public interface MutableList<E> extends BaseList<E> {
     }
 
     /** {@inheritDoc} */
-    @Override MutableList<E> replace(int idx, E e);
+    @Override
+    MutList<E> replace(int idx, E e);
 
     /** {@inheritDoc} */
-    @Override default MutableList<E> reverse() {
-        MutableList<E> ret = PersistentVector.emptyMutable();
+    @Override default MutList<E> reverse() {
+        MutList<E> ret = PersistentVector.emptyMutable();
         UnmodListIterator<E> iter = listIterator(size());
         while (iter.hasPrevious()) {
             ret.append(iter.previous());

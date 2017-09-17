@@ -79,21 +79,21 @@ public class ImListTest {
 
         @Override public T get(int index) { return inner.get(index); }
 
-        @Override public MutableList<T> mutable() {
-            return new MutableList<T>() {
+        @Override public MutList<T> mutable() {
+            return new MutList<T>() {
                 private final List<T> mutable = dup(inner);
 
                 @Override public int size() { return mutable.size(); }
 
                 @Override public T get(int i) { return mutable.get(i); }
 
-                @Override public MutableList<T> append(T val) { mutable.add(val); return this; }
+                @Override public MutList<T> append(T val) { mutable.add(val); return this; }
 
                 @Override public ImList<T> immutable() {
                     return new TestList<>(dup(mutable));
                 }
 
-                @Override public MutableList<T> replace(int idx, T t) {
+                @Override public MutList<T> replace(int idx, T t) {
                     mutable.set(idx, t); return this;
                 }
             };

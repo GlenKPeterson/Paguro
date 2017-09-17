@@ -124,7 +124,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
     public static <K,V> PersistentHashMap<K,V> empty() { return (PersistentHashMap<K,V>) EMPTY; }
 
     /** Works around some type inference limitations of Java 8. */
-    public static <K,V> MutableHashMap<K,V> emptyMutable() {
+    public static <K,V> MutHashMap<K,V> emptyMutable() {
         return PersistentHashMap.<K,V>empty().mutable();
     }
 
@@ -134,7 +134,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
     }
 
     /** Works around some type inference limitations of Java 8. */
-    public static <K,V> MutableHashMap<K,V> emptyMutable(Equator<K> e) {
+    public static <K,V> MutHashMap<K,V> emptyMutable(Equator<K> e) {
         return PersistentHashMap.<K,V>empty(e).mutable();
     }
 
@@ -153,7 +153,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
     @SuppressWarnings("WeakerAccess")
     public static <K,V> PersistentHashMap<K,V> ofEq(Equator<K> eq, Iterable<Map.Entry<K,V>> es) {
         if (es == null) { return empty(eq); }
-        MutableHashMap<K,V> map = emptyMutable(eq);
+        MutHashMap<K,V> map = emptyMutable(eq);
         for (Map.Entry<K,V> entry : es) {
             if (entry != null) {
                 map.assoc(entry.getKey(), entry.getValue());
@@ -177,7 +177,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
     public static <K,V> PersistentHashMap<K,V> of(Iterable<Map.Entry<K,V>> kvPairs) {
         if (kvPairs == null) { return empty(); }
         PersistentHashMap<K,V> m = empty();
-        MutableHashMap<K,V> map = m.mutable();
+        MutHashMap<K,V> map = m.mutable();
         for (Map.Entry<K,V> entry : kvPairs) {
             if (entry != null) {
                 map.assoc(entry.getKey(), entry.getValue());
@@ -237,7 +237,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
         @SuppressWarnings("unchecked")
         private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
             s.defaultReadObject();
-            MutableMap tempMap =
+            MutMap tempMap =
                     new PersistentHashMap<K,V>(equator, 0, null, false, null).mutable();
             for (int i = 0; i < size; i++) {
                 tempMap.assoc(s.readObject(), s.readObject());
@@ -277,8 +277,8 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
                                        hasNull, nullValue);
     }
 
-    @Override public MutableHashMap<K,V> mutable() {
-        return new MutableHashMap<>(this);
+    @Override public MutHashMap<K,V> mutable() {
+        return new MutHashMap<>(this);
     }
 
     @Override public Option<UnmodMap.UnEntry<K,V>> entry(K key) {
@@ -351,8 +351,8 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
         return new PersistentHashMap<>(equator, size - 1, newroot, hasNull, nullValue);
     }
 
-    public static final class MutableHashMap<K,V> extends AbstractUnmodMap<K,V>
-            implements MutableMap<K,V> {
+    public static final class MutHashMap<K,V> extends AbstractUnmodMap<K,V>
+            implements MutMap<K,V> {
 
         private AtomicReference<Thread> edit;
         private final Equator<K> equator;
@@ -363,7 +363,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
         // This is a boolean reference, with value either being null, or set to point to the
         // box itself.  It might be clearer to replace this with an AtomicBoolean or similar.
         // I think the reason this can be a field instead of a local variable is that the
-        // MutableHashMap is not intended to be thread safe, thus no-one will call one method
+        // MutHashMap is not intended to be thread safe, thus no-one will call one method
         // while another thread calls another method.  Presumably having this here saves the cost
         // of allocating a local variable.  Setting it to null or itself saves storing anything
         // in memory.  Why did Rich go to all of this trouble?  Does it make a difference, or
@@ -371,13 +371,13 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
         // and INode) or even OneOf(left INode, right INode)?
         private final Box<Box> leafFlag = new Box<>(null);
 
-        private MutableHashMap(PersistentHashMap<K,V> m) {
+        private MutHashMap(PersistentHashMap<K,V> m) {
             this(m.equator(), new AtomicReference<>(Thread.currentThread()), m.root, m.size,
                  m.hasNull, m.nullValue);
         }
 
-        private MutableHashMap(Equator<K> e, AtomicReference<Thread> edit, INode<K,V> root,
-                               int count, boolean hasNull, V nullValue) {
+        private MutHashMap(Equator<K> e, AtomicReference<Thread> edit, INode<K,V> root,
+                           int count, boolean hasNull, V nullValue) {
             this.equator = (e == null) ? Equator.defaultEquator() : e;
             this.edit = edit;
             this.root = root;
@@ -388,7 +388,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
 
         @Override public Equator<K> equator() { return equator; }
 
-        @Override public MutableHashMap<K,V> assoc(K key, V val) {
+        @Override public MutHashMap<K,V> assoc(K key, V val) {
             ensureEditable();
             if (key == null) {
                 if (this.nullValue != val)
@@ -436,7 +436,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
                              : rootIter;
         }
 
-        @Override public final MutableHashMap<K,V> without(K key) {
+        @Override public final MutHashMap<K,V> without(K key) {
             ensureEditable();
             if (key == null) {
                 if (!hasNull) return this;

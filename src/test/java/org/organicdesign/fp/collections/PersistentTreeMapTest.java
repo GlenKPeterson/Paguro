@@ -25,7 +25,6 @@ import java.util.TreeMap;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.FunctionUtilsTest;
 import org.organicdesign.fp.TestUtilities;
 import org.organicdesign.fp.function.Fn1;
@@ -118,7 +117,7 @@ public class PersistentTreeMapTest {
 
         // Values are a sorted set as well...
         assertArrayEquals(new Integer[]{3, 2, 1},
-                          m1.map(e -> e.getValue()).toMutableList().toArray());
+                          m1.map(e -> e.getValue()).toMutList().toArray());
 
         assertArrayEquals(new String[]{"a", "b", "c"},
                           PersistentTreeMap.of(vec(tup("a", 3),
@@ -431,7 +430,7 @@ public class PersistentTreeMapTest {
                           PersistentTreeMap.of(vec(tup(1, "one"))).assoc(2, "two").assoc(3, "three")
                                            .drop(1)
                                            .map((u) -> tup(u.getKey(), u.getValue()))
-                                           .toMutableList().toArray());
+                                           .toMutList().toArray());
 
         assertFalse(PersistentTreeMap.of(vec(tup(1, "one"))).drop(1).iterator().hasNext());
     }
@@ -762,18 +761,18 @@ public class PersistentTreeMapTest {
         assertArrayEquals(s.toArray(),
                           m.entrySet()
                            .map(Fn1.identity())
-                           .toMutableList()
+                           .toMutList()
                            .toArray());
 
         assertArrayEquals(s.toArray(),
                           serializeDeserialize(m).entrySet()
-                                  .map((u) -> tup(u.getKey(), u.getValue()))
-                                  .toMutableList().toArray());
+                                                 .map((u) -> tup(u.getKey(), u.getValue()))
+                                                 .toMutList().toArray());
 
         assertArrayEquals(s.toArray(),
                           serializeDeserialize(m.entrySet())
                                   .map((u) -> tup(u.getKey(), u.getValue()))
-                                  .toMutableList().toArray());
+                                  .toMutList().toArray());
     }
 
     @Test public void values() throws Exception {
@@ -782,10 +781,10 @@ public class PersistentTreeMapTest {
                                  .assoc(5, "five").assoc(2, "two").assoc(3, "three").assoc(1, "one");
 
         assertArrayEquals(new String[]{"one", "two", "three", "four", "five"},
-                          m1.map(e -> e.getValue()).toMutableList().toArray());
+                          m1.map(e -> e.getValue()).toMutList().toArray());
 
         assertArrayEquals(new String[]{"one", "two", "three", "four", "five"},
-                          serializeDeserialize(m1).map(e -> e.getValue()).toMutableList().toArray());
+                          serializeDeserialize(m1).map(e -> e.getValue()).toMutList().toArray());
 
 //        assertTrue(m.values().equals(Arrays.asList("one", "two", "three", "four", "five")));
         assertNotEquals(0, m1.values().hashCode());

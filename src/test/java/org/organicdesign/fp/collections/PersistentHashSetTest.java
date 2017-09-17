@@ -118,7 +118,7 @@ public class PersistentHashSetTest {
         // System.out.println("Four: " + s1);
 
         // System.out.println("Four map:" + s1.impl);
-        // System.out.println("s1.seq().toMutableList()" + s1.seq().toMutableList());
+        // System.out.println("s1.seq().toMutList()" + s1.seq().toMutList());
 
         s1 = s1.put("five");
         assertEquals(5, s1.size());
@@ -275,7 +275,7 @@ public class PersistentHashSetTest {
 
     @Test public void mutableTest() {
         Set<Integer> control = new HashSet<>();
-        MutableSet<Integer> test = PersistentHashSet.emptyMutable();
+        MutSet<Integer> test = PersistentHashSet.emptyMutable();
         assertEquals(control.size(), test.size());
         assertEquals(control.contains(-1), test.contains(-1));
 

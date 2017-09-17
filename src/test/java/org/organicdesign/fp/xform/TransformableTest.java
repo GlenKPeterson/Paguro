@@ -20,7 +20,7 @@ public class TransformableTest {
     @Test public void testToMutableList() throws Exception {
         List<Integer> control = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9);
         Transformable<Integer> trans = Xform.of(control);
-        assertEquals(control, trans.toMutableList());
+        assertEquals(control, trans.toMutList());
     }
 
     @Test public void testToImList() throws Exception {
@@ -35,7 +35,7 @@ public class TransformableTest {
             control.put(i, ordinal(i));
         }
         Transformable<Map.Entry<Integer,String>> trans = Xform.of(control.entrySet());
-        assertEquals(control, trans.toMutableMap(x -> x));
+        assertEquals(control, trans.toMutMap(x -> x));
     }
 
     @Test public void testToMutableSortedMap() throws Exception {
@@ -46,7 +46,7 @@ public class TransformableTest {
             control.put(i, ordinal(i));
         }
         Transformable<Integer> trans = Xform.of(items);
-        assertEquals(control, trans.toMutableSortedMap(comp, i -> Tuple2.of(i, ordinal(i))));
+        assertEquals(control, trans.toMutSortedMap(comp, i -> Tuple2.of(i, ordinal(i))));
     }
 
     @Test public void testToImMap() throws Exception {
@@ -74,7 +74,7 @@ public class TransformableTest {
         SortedSet<Integer> control = new TreeSet<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9));
         Transformable<Integer> trans = Xform.of(control);
         assertTrue(UnmodSortedIterable.equal(UnmodSortedIterable.castFromSortedSet(control),
-                                             UnmodSortedIterable.castFromSortedSet(trans.toMutableSortedSet((a, b) -> a - b))));
+                                             UnmodSortedIterable.castFromSortedSet(trans.toMutSortedSet((a, b) -> a - b))));
     }
 
     @Test public void testToImSet() throws Exception {
@@ -98,7 +98,7 @@ public class TransformableTest {
     @Test public void testToMutableSet() throws Exception {
         Set<Integer> control = new HashSet<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9));
         Transformable<Integer> trans = Xform.of(control);
-        assertEquals(control, trans.toMutableSet());
+        assertEquals(control, trans.toMutSet());
     }
 
     @Test public void testHead() {

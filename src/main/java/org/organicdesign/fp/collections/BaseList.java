@@ -17,7 +17,7 @@ import org.organicdesign.fp.oneOf.Option;
 
 /**
  Adds copy-on-write, "fluent interface" methods to {@link UnmodList}.
- Lowest common ancestor of {@link MutableList} and {@link ImList}.
+ Lowest common ancestor of {@link MutList} and {@link ImList}.
  */
 public interface BaseList<E> extends UnmodList<E> {
     /**

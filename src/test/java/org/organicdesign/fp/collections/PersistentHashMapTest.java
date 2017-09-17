@@ -30,7 +30,6 @@ import java.util.Set;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.FunctionUtilsTest;
 import org.organicdesign.fp.function.Fn1;
 import org.organicdesign.fp.oneOf.Option;
@@ -354,7 +353,7 @@ public class PersistentHashMapTest {
 
     @Test public void mutableWithNull() {
         int NUM_ITEMS = 300;
-        PersistentHashMap.MutableHashMap<String,Integer> t = PersistentHashMap.emptyMutable();
+        PersistentHashMap.MutHashMap<String,Integer> t = PersistentHashMap.emptyMutable();
         t = t.assoc(null, -1);
         assertEquals(1, t.size());
 
@@ -405,7 +404,7 @@ public class PersistentHashMapTest {
     @Test (expected = IllegalAccessError.class)
     public void mutableHashEx1() {
         PersistentHashMap<String,Integer> m = PersistentHashMap.empty();
-        PersistentHashMap.MutableHashMap<String,Integer> t = m.mutable();
+        PersistentHashMap.MutHashMap<String,Integer> t = m.mutable();
         t.immutable();
         t.size();
     }
@@ -460,7 +459,7 @@ public class PersistentHashMapTest {
     @Test public void biggerHashCollisionMutableWithNull() {
         int NUM_ITEMS = 300;
         Map<HashCollision,Integer> control = new HashMap<>();
-        PersistentHashMap.MutableHashMap<HashCollision,Integer> m =
+        PersistentHashMap.MutHashMap<HashCollision,Integer> m =
                 PersistentHashMap.<HashCollision,Integer>empty().mutable();
 
         assertEquals(control.size(), m.size());
@@ -651,7 +650,7 @@ public class PersistentHashMapTest {
         showSeq(s1);
         // System.out.println("Four: " + s1);
 
-//        System.out.println("s1.seq().toMutableList()" + s1.seq().toMutableList());
+//        System.out.println("s1.seq().toMutList()" + s1.seq().toMutList());
 
     }
 
@@ -1038,8 +1037,8 @@ public class PersistentHashMapTest {
         // System.out.println("m: " + m);
         // System.out.println("m.hasNull(): " + m.hasNull());
         // System.out.println("m.seq(): " + m.seq());
-        // System.out.println("m.seq().map(e -> e.getValue()).toMutableList(): " + m.seq().map(e -> e.getValue()).toMutableList());
-        // System.out.println("m.seq().map(e -> e.getValue()).toMutableSet(): " + m.seq().map(e -> e.getValue()).toMutableSet());
+        // System.out.println("m.seq().map(e -> e.getValue()).toMutList(): " + m.seq().map(e -> e.getValue()).toMutList());
+        // System.out.println("m.seq().map(e -> e.getValue()).toMutSet(): " + m.seq().map(e -> e.getValue()).toMutSet());
         // System.out.println("m.seq().map(e -> e.getValue()).toImSortedSet(): " + m.seq().map(e -> e.getValue()).toImSortedSet(String.CASE_INSENSITIVE_ORDER));
 
         UnmodIterable<String> seq = m.map(e -> e.getValue());

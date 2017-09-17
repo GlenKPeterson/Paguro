@@ -23,7 +23,7 @@ import java.util.Random;
 import org.junit.Test;
 import org.organicdesign.fp.TestUtilities;
 import org.organicdesign.fp.collections.RrbTree.ImRrbt;
-import org.organicdesign.fp.collections.RrbTree.MutableRrbt;
+import org.organicdesign.fp.collections.RrbTree.MutRrbt;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import static org.junit.Assert.*;
@@ -85,16 +85,16 @@ public class RrbTreeTest {
 //                            Integer.valueOf(15) };
 
 //    @Test public void testAppendSpeed() {
-//        MutableRrbt<Integer> is = RrbTree.emptyMutable();
+//        MutRrbt<Integer> is = RrbTree.emptyMutable();
 //        for (int j = 0; j < 1000000000; j++) {
 //            is.append(INTS[j & 0xf]);
 //        }
 //    }
-////        System.out.println("timer1: " + MutableRrbt.timer1);
-////        System.out.println("timer2: " + MutableRrbt.timer2);
-////        System.out.println("timer3: " + MutableRrbt.timer3);
-////        System.out.println("timer4: " + MutableRrbt.timer4);
-////        System.out.println("timer5: " + MutableRrbt.timer5);
+////        System.out.println("timer1: " + MutRrbt.timer1);
+////        System.out.println("timer2: " + MutRrbt.timer2);
+////        System.out.println("timer3: " + MutRrbt.timer3);
+////        System.out.println("timer4: " + MutRrbt.timer4);
+////        System.out.println("timer5: " + MutRrbt.timer5);
 
     private static RrbTree<Integer> buildReverseOrderTest(RrbTree<Integer> is, int iterations) {
         ArrayList<Integer> control = new ArrayList<>();
@@ -492,7 +492,7 @@ public class RrbTreeTest {
 
     @Test public void strictSplitTest() {
         ImRrbt<Integer> is = RrbTree.empty();
-        MutableRrbt<Integer> ms = RrbTree.emptyMutable();
+        MutRrbt<Integer> ms = RrbTree.emptyMutable();
         ArrayList<Integer> control = new ArrayList<>();
 //        int splitIndex = rand.nextInt(is.size() + 1);
         for (int i = 0; i < TWO_LEVEL_SZ; i++) {
@@ -526,7 +526,7 @@ public class RrbTreeTest {
 
     @Test public void relaxedSplitTest() {
         ImRrbt<Integer> is = RrbTree.empty();
-        MutableRrbt<Integer> ms = RrbTree.emptyMutable();
+        MutRrbt<Integer> ms = RrbTree.emptyMutable();
         ArrayList<Integer> control = new ArrayList<>();
         ArrayList<Integer> rands = new ArrayList<>();
         int splitIndex = 0;
@@ -555,7 +555,7 @@ public class RrbTreeTest {
 
     @Test public void replaceTest() {
         ImRrbt<String> im = RrbTree.empty();
-        MutableRrbt<String> mu = RrbTree.emptyMutable();
+        MutRrbt<String> mu = RrbTree.emptyMutable();
         im = im.append("Hello").append("World");
         mu.append("Hello").append("World");
         assertArrayEquals(new String[] { "Hello", "World" },
@@ -571,7 +571,7 @@ public class RrbTreeTest {
         mu.debugValidate();
 
         ImRrbt<Integer> im2 = RrbTree.empty();
-        MutableRrbt<Integer> mu2 = RrbTree.emptyMutable();
+        MutRrbt<Integer> mu2 = RrbTree.emptyMutable();
         int len = 999;
         Integer[] control = new Integer[len];
         // Build test vector
@@ -586,7 +586,7 @@ public class RrbTreeTest {
         assertArrayEquals(control, mu2.toArray());
 
         ImRrbt<Integer> im3 = RrbTree.empty();
-        MutableRrbt<Integer> mu3 = RrbTree.emptyMutable();
+        MutRrbt<Integer> mu3 = RrbTree.emptyMutable();
         for (int i = 0; i < len; i++) {
             im3 = im3.insert(0, len - 1 - i);
             mu3.insert(0, len - 1 - i);
@@ -649,7 +649,7 @@ public class RrbTreeTest {
 
     @Test public void listIterator() {
         ImRrbt<Integer> im = RrbTree.empty();
-        MutableRrbt<Integer> mu = RrbTree.emptyMutable();
+        MutRrbt<Integer> mu = RrbTree.emptyMutable();
         int len = 99;
         Integer[] test = new Integer[len];
 
@@ -675,7 +675,7 @@ public class RrbTreeTest {
         ImRrbt<Integer> rrb1 =
                 xform(control).fold(RrbTree.<Integer>empty(),
                                     (accum, item) -> accum.append(item));
-        MutableRrbt<Integer> rrb2 =
+        MutRrbt<Integer> rrb2 =
                 xform(control).fold(RrbTree.<Integer>emptyMutable(),
                                     (accum, item) -> accum.append(item));
 
@@ -691,7 +691,7 @@ public class RrbTreeTest {
         ImRrbt<Integer> rrb3 =
                 xform(hasNull).fold(RrbTree.<Integer>empty(),
                                     (accum, item) -> accum.append(item));
-        MutableRrbt<Integer> rrb4 =
+        MutRrbt<Integer> rrb4 =
                 xform(hasNull).fold(RrbTree.<Integer>emptyMutable(),
                                     (accum, item) -> accum.append(item));
 
@@ -729,17 +729,17 @@ public class RrbTreeTest {
         assertTrue(s1.contains("RrbTree(size=9 "));
         assertTrue(s1.contains("        root="));
 
-        assertEquals("MutableRrbt(0,1,2,3,4,5,6,7,8)", rrb1.toString());
+        assertEquals("MutRrbt(0,1,2,3,4,5,6,7,8)", rrb1.toString());
 
         RrbTree<Integer> rrb2 = randomInsertTest(new int[] {0, 1, 2, 1, 3, 2, 6, 1, 7});
         s1 = rrb2.indentedStr(0);
         assertTrue(s1.contains("RrbTree(size=9 "));
         assertTrue(s1.contains("        root="));
 
-        assertEquals("MutableRrbt(0,7,3,5,1,4,2,8,6)", rrb2.toString());
+        assertEquals("MutRrbt(0,7,3,5,1,4,2,8,6)", rrb2.toString());
 
         ImRrbt<Integer> im = RrbTree.empty();
-        MutableRrbt<Integer> mu = RrbTree.emptyMutable();
+        MutRrbt<Integer> mu = RrbTree.emptyMutable();
         for (int j = 1; j < SEVERAL; j++) {
             im = im.append(j);
             mu.append(j);
@@ -881,7 +881,7 @@ public class RrbTreeTest {
 
     @Test public void testBiggerJoin() {
         ImRrbt<Integer> is = RrbTree.empty();
-        MutableRrbt<Integer> ms = RrbTree.emptyMutable();
+        MutRrbt<Integer> ms = RrbTree.emptyMutable();
         for (int i = 0; i < TWO_LEVEL_SZ; i++) {
             is = is.append(i);
             ms.append(i);
@@ -892,7 +892,7 @@ public class RrbTreeTest {
             Tuple2<ImRrbt<Integer>,ImRrbt<Integer>> isSplit = is.split(splitIndex);
             assertEquals(is, isSplit._1().join(isSplit._2()));
 
-            Tuple2<MutableRrbt<Integer>,MutableRrbt<Integer>> msSplit = ms.split(splitIndex);
+            Tuple2<RrbTree.MutRrbt<Integer>,MutRrbt<Integer>> msSplit = ms.split(splitIndex);
             assertEquals(ms, msSplit._1().join(msSplit._2()));
         }
     }
@@ -907,7 +907,7 @@ public class RrbTreeTest {
 
         int MAX_ITEMS = 76; //m; //100; // TODO: Make this 76 to see issue
         ImRrbt<Integer> im = RrbTree.empty();
-        MutableRrbt<Integer> mu = RrbTree.emptyMutable();
+        MutRrbt<Integer> mu = RrbTree.emptyMutable();
         for (int j = 1; j < MAX_ITEMS; j++) {
             im = im.append(j);
             mu.append(j);

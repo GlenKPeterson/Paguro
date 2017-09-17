@@ -15,7 +15,7 @@ package org.organicdesign.fp.collections;
 
 /**
  Adds copy-on-write, "fluent interface" methods to {@link UnmodSet}.
- Lowest common ancestor of {@link MutableSet}, {@link ImSet}, and {@link ImSortedSet}.
+ Lowest common ancestor of {@link MutSet}, {@link ImSet}, and {@link ImSortedSet}.
  */
 public interface BaseSet<E> extends UnmodSet<E> {
     /**

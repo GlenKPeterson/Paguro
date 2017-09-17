@@ -34,7 +34,7 @@ public interface ImList<E> extends BaseList<E> {
     }
 
     /** Returns a mutable list (builder) */
-    MutableList<E> mutable();
+    MutList<E> mutable();
 
     /** {@inheritDoc} */
     ImList<E> replace(int idx, E e);

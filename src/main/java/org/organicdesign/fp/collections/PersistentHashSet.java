@@ -38,7 +38,7 @@ public class PersistentHashSet<E> extends AbstractUnmodSet<E>
     public static <E> PersistentHashSet<E> empty() { return (PersistentHashSet<E>) EMPTY; }
 
     /** Works around some type inference limitations of Java 8. */
-    public static <E> MutableHashSet<E> emptyMutable() {
+    public static <E> MutHashSet<E> emptyMutable() {
         return PersistentHashSet.<E>empty().mutable();
     }
 
@@ -47,7 +47,7 @@ public class PersistentHashSet<E> extends AbstractUnmodSet<E>
     }
 
     /** Works around some type inference limitations of Java 8. */
-    public static <E> MutableHashSet<E> emptyMutable(Equator<E> eq) {
+    public static <E> MutHashSet<E> emptyMutable(Equator<E> eq) {
         return empty(eq).mutable();
     }
 
@@ -61,7 +61,7 @@ public class PersistentHashSet<E> extends AbstractUnmodSet<E>
      */
     public static <E> PersistentHashSet<E> of(Iterable<E> elements) {
         PersistentHashSet<E> empty = empty();
-        MutableSet<E> ret = empty.mutable();
+        MutSet<E> ret = empty.mutable();
         for (E e : elements) {
             ret.put(e);
         }
@@ -69,7 +69,7 @@ public class PersistentHashSet<E> extends AbstractUnmodSet<E>
     }
 
     public static <E> PersistentHashSet<E> ofEq(Equator<E> eq, Iterable<E> init) {
-        MutableSet<E> ret = emptyMutable(eq);
+        MutSet<E> ret = emptyMutable(eq);
         for (E e : init) {
             ret.put(e);
         }
@@ -118,7 +118,7 @@ public class PersistentHashSet<E> extends AbstractUnmodSet<E>
         @SuppressWarnings("unchecked")
         private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
             s.defaultReadObject();
-            MutableMap tempMap = PersistentHashMap.<K,K>empty().mutable();
+            MutMap tempMap = PersistentHashMap.<K,K>empty().mutable();
             for (int i = 0; i < size; i++) {
                 K k = (K) s.readObject();
                 tempMap = tempMap.assoc(k, k);
@@ -163,21 +163,21 @@ public class PersistentHashSet<E> extends AbstractUnmodSet<E>
 
     @Override public int size() { return impl.size(); }
 
-    public MutableHashSet<E> mutable() {
-        return new MutableHashSet<>(impl.mutable());
+    public MutHashSet<E> mutable() {
+        return new MutHashSet<>(impl.mutable());
     }
 
-    public static final class MutableHashSet<E> extends AbstractUnmodSet<E>
-            implements MutableSet<E> {
+    public static final class MutHashSet<E> extends AbstractUnmodSet<E>
+            implements MutSet<E> {
 
-        MutableMap<E,E> impl;
+        MutMap<E,E> impl;
 
-        MutableHashSet(MutableMap<E,E> impl) { this.impl = impl; }
+        MutHashSet(MutMap<E,E> impl) { this.impl = impl; }
 
         @Override public int size() { return impl.size(); }
 
-        @Override public MutableHashSet<E> put(E val) {
-            MutableMap<E,E> m = impl.assoc(val, val);
+        @Override public MutHashSet<E> put(E val) {
+            MutMap<E,E> m = impl.assoc(val, val);
             if (m != impl) this.impl = m;
             return this;
         }
@@ -190,8 +190,8 @@ public class PersistentHashSet<E> extends AbstractUnmodSet<E>
             return impl.entry((E) key).isSome();
         }
 
-        @Override public MutableHashSet<E> without(E key) {
-            MutableMap<E,E> m = impl.without(key);
+        @Override public MutHashSet<E> without(E key) {
+            MutMap<E,E> m = impl.without(key);
             if (m != impl) this.impl = m;
             return this;
         }

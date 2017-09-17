@@ -407,7 +407,7 @@ public class PersistentVectorTest {
 
     @Test public void testMutable() {
         List<Integer> control = new ArrayList<>();
-        MutableList<Integer> test = PersistentVector.emptyMutable();
+        MutList<Integer> test = PersistentVector.emptyMutable();
         final int SEVERAL = 2000; // more than 1024 so 3 levels deep.
         for (int i = 0; i < SEVERAL; i++) {
             control.add(i);
@@ -447,7 +447,7 @@ public class PersistentVectorTest {
         equalsDistinctHashCode(emptyMutable(), emptyMutable(), emptyMutable(),
                                emptyMutable().append(new Object()));
 
-        MutableList<Integer> m = emptyMutable();
+        MutList<Integer> m = emptyMutable();
         assertEquals(Arrays.asList(3, 5, 7), m.append(3).append(5).append(7));
         assertEquals(Arrays.asList(3, 5, 7), m.immutable());
         assertEquals(Arrays.asList(3, 5, 7), emptyMutable().append(3).append(5).append(7));

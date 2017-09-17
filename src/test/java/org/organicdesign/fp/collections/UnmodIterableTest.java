@@ -31,16 +31,16 @@ public class UnmodIterableTest {
 
         assertEquals(Arrays.asList("How", "now", "brown", "cow"),
                      testIterable.concat(Arrays.asList("brown", "cow"))
-                                 .toMutableList());
+                                 .toMutList());
 
         assertEquals(Arrays.asList("My", "poem:", "How", "now"),
                      testIterable.precat(Arrays.asList("My", "poem:"))
-                                 .toMutableList());
+                                 .toMutList());
 
         testIterable = new TestIterable<>(Arrays.asList("How", "now", "brown", "cow"));
 
         assertEquals(Arrays.asList("now", "brown", "cow"),
-                     testIterable.drop(1).toMutableList());
+                     testIterable.drop(1).toMutList());
 
         assertEquals(Arrays.asList("Howz", "nowz", "brownz", "cowz"),
                      testIterable.fold(new ArrayList<>(),
@@ -57,24 +57,24 @@ public class UnmodIterableTest {
                                            }).bad());
 
         assertEquals(Arrays.asList("How", "now", "cow"),
-                     testIterable.filter((String s) -> s.endsWith("w")).toMutableList());
+                     testIterable.filter((String s) -> s.endsWith("w")).toMutList());
 
         assertEquals(Arrays.asList("How", "are", "you", "now", "are", "you", "brown", "are", "you",
                                    "cow", "are", "you"),
                      testIterable.flatMap((String s) ->
-                                                  Arrays.asList(s, "are", "you")).toMutableList());
+                                                  Arrays.asList(s, "are", "you")).toMutList());
 
         assertEquals(Arrays.asList(3, 3, 5, 3),
-                     testIterable.map((String s) -> s.length()).toMutableList());
+                     testIterable.map((String s) -> s.length()).toMutList());
 
         assertEquals(Arrays.asList("How", "now", "brown"),
-                     testIterable.take(3).toMutableList());
+                     testIterable.take(3).toMutList());
 
         assertEquals(Arrays.asList("How", "now"),
-                     testIterable.takeWhile((String s) -> s.length() < 4).toMutableList());
+                     testIterable.takeWhile((String s) -> s.length() < 4).toMutList());
 
         assertEquals(Arrays.asList("brown", "cow"),
-                     testIterable.dropWhile((s) -> !"brown".equals(s)).toMutableList());
+                     testIterable.dropWhile((s) -> !"brown".equals(s)).toMutList());
 
     }
 

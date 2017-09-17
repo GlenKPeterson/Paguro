@@ -181,39 +181,39 @@ public class Fn1Test {
         assertArrayEquals(oneToNineArray,
                           oneToNine.filter(Fn1.or(i -> i < 3,
                                                   Fn1.accept()))
-                                   .toMutableList()
+                                   .toMutList()
                                    .toArray());
 
         assertArrayEquals(oneToNineArray,
                           oneToNine.filter(Fn1.or(Fn1.accept(),
                                                         i -> i > 5))
-                                   .toMutableList()
+                                   .toMutList()
                                    .toArray());
 
 
         assertArrayEquals(new Integer[]{6, 7, 8, 9},
                           oneToNine.filter(Fn1.or(Fn1.reject(),
                                                         i -> i > 5))
-                                   .toMutableList()
+                                   .toMutList()
                                    .toArray());
 
         assertArrayEquals(new Integer[]{1, 2},
                           oneToNine.filter(Fn1.or(i -> i < 3,
                                                   Fn1.reject()))
-                                   .toMutableList()
+                                   .toMutList()
                                    .toArray());
 
         assertArrayEquals(new Integer[]{1, 2, 6, 7, 8, 9},
                           oneToNine.filter(Fn1.or(i -> i < 3,
                                                         i -> i > 5))
-                                   .toMutableList()
+                                   .toMutList()
                                    .toArray());
 
         assertArrayEquals(new Integer[]{1, 2, 4, 6, 7, 8, 9},
                           oneToNine.filter(Fn1.or(vec(i -> i < 3,
                                                             i -> i == 4,
                                                             i -> i > 5)))
-                                   .toMutableList()
+                                   .toMutList()
                                    .toArray());
 
         // and(a, b)
@@ -223,38 +223,38 @@ public class Fn1Test {
         assertArrayEquals(new Integer[]{},
                           oneToNine.filter(Fn1.and((i) -> i > 2,
                                                    Fn1.reject()))
-                                   .toMutableList()
+                                   .toMutList()
                                    .toArray());
 
         assertArrayEquals(new Integer[]{},
                           oneToNine.filter(Fn1.and(Fn1.reject(),
                                                    (i) -> i > 2))
-                                   .toMutableList()
+                                   .toMutList()
                                    .toArray());
 
         assertArrayEquals(new Integer[]{3, 4, 5, 6, 7, 8, 9},
                           oneToNine.filter(Fn1.and((i) -> i > 2,
                                                    Fn1.accept()))
-                                   .toMutableList()
+                                   .toMutList()
                                    .toArray());
 
         assertArrayEquals(new Integer[]{1, 2, 3, 4, 5},
                           oneToNine.filter(Fn1.and(Fn1.accept(),
                                                    (i) -> i < 6))
-                                   .toMutableList()
+                                   .toMutList()
                                    .toArray());
 
         assertArrayEquals(new Integer[]{3, 4, 5},
                           oneToNine.filter(Fn1.and((i) -> i > 2,
                                                    (i) -> i < 6))
-                                   .toMutableList()
+                                   .toMutList()
                                    .toArray());
 
         assertArrayEquals(new Integer[]{4, 5},
                           oneToNine.filter(Fn1.and(vec(i -> i > 2,
                                                              i -> i > 3,
                                                              i -> i < 6)))
-                                   .toMutableList()
+                                   .toMutList()
                                    .toArray());
 
         assertEquals(REJECT, Fn1.negate(Fn1.accept()));
@@ -262,7 +262,7 @@ public class Fn1Test {
 
         assertArrayEquals(new Integer[]{1, 2},
                           oneToNine.filter(Fn1.negate(i -> i > 2))
-                                   .toMutableList()
+                                   .toMutList()
                                    .toArray());
     }
 

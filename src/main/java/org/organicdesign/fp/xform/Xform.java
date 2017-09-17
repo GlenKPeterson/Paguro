@@ -509,7 +509,7 @@ public abstract class Xform<A> implements UnmodIterable<A> {
 
     @Override public UnmodIterator<A> iterator() {
         // TODO: I had a really fast array-list implementation that I could probably hack into this for performance (assuming it actually works).
-        return toMutableList().iterator();
+        return toMutList().iterator();
     }
 
     // =============================================================================================
@@ -600,7 +600,7 @@ public abstract class Xform<A> implements UnmodIterable<A> {
         // return from the recursion, it may have too many elements already.
         // In XformTest.java, there's something marked "Early termination test" that illustrates
         // this exact problem.
-        List<A> as = this.toMutableList();
+        List<A> as = this.toMutList();
         for (A a : as) {
             B term = terminator.apply(accum, a);
             if (term != null) {

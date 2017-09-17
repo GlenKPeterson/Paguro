@@ -19,9 +19,9 @@ import org.organicdesign.fp.collections.ImMap;
 import org.organicdesign.fp.collections.ImSet;
 import org.organicdesign.fp.collections.ImSortedMap;
 import org.organicdesign.fp.collections.ImSortedSet;
-import org.organicdesign.fp.collections.MutableList;
-import org.organicdesign.fp.collections.MutableMap;
-import org.organicdesign.fp.collections.MutableSet;
+import org.organicdesign.fp.collections.MutList;
+import org.organicdesign.fp.collections.MutMap;
+import org.organicdesign.fp.collections.MutSet;
 import org.organicdesign.fp.collections.PersistentHashMap;
 import org.organicdesign.fp.collections.PersistentHashSet;
 import org.organicdesign.fp.collections.PersistentTreeMap;
@@ -29,7 +29,7 @@ import org.organicdesign.fp.collections.PersistentTreeSet;
 import org.organicdesign.fp.collections.PersistentVector;
 import org.organicdesign.fp.collections.RrbTree;
 import org.organicdesign.fp.collections.RrbTree.ImRrbt;
-import org.organicdesign.fp.collections.RrbTree.MutableRrbt;
+import org.organicdesign.fp.collections.RrbTree.MutRrbt;
 import org.organicdesign.fp.collections.UnmodIterable;
 import org.organicdesign.fp.collections.UnmodIterator;
 import org.organicdesign.fp.tuple.Tuple2;
@@ -99,7 +99,7 @@ public final class StaticImports {
     }
 
     /**
-     Returns a new MutableMap of the given keys and their paired values.  Use the
+     Returns a new MutMap of the given keys and their paired values.  Use the
      {@link StaticImports#tup(Object, Object)} method to define those key/value pairs briefly and
      easily.  This data definition method is one of the few methods in this project that support
      varargs.
@@ -108,11 +108,11 @@ public final class StaticImports {
      values in the input list overwrite the earlier ones.  The resulting map can contain zero or one
      null key and any number of null values.  Null k/v pairs will be silently ignored.
 
-     @return a new MutableMap of the given key/value pairs
+     @return a new MutMap of the given key/value pairs
      */
     @SafeVarargs
-    public static <K,V> MutableMap<K,V> mutableMap(Map.Entry<K,V>... kvPairs) {
-        MutableMap<K,V> ret = PersistentHashMap.emptyMutable();
+    public static <K,V> MutMap<K,V> mutableMap(Map.Entry<K,V>... kvPairs) {
+        MutMap<K,V> ret = PersistentHashMap.emptyMutable();
         if (kvPairs == null) { return ret; }
         for (Map.Entry<K,V> me : kvPairs) {
             ret.assoc(me);
@@ -121,7 +121,7 @@ public final class StaticImports {
     }
 
     /**
-     Returns a mutable RRB Tree {@link MutableRrbt} of the given items.
+     Returns a mutable RRB Tree {@link RrbTree} of the given items.
      The RRB Tree is a list-type data structure that supports random inserts, split, and join
      (the PersistentVector does not).  The mutable RRB Tree append() method is only about half
      as fast as the PersistentVector method of the same name.  If you build it entirely with random
@@ -130,20 +130,20 @@ public final class StaticImports {
      This data definition method is one of the few methods in this project that support varargs.
      */
     @SafeVarargs
-    static public <T> MutableRrbt<T> mutableRrb(T... items) {
+    static public <T> MutRrbt<T> mutableRrb(T... items) {
         if ( (items == null) || (items.length < 1) ) { return RrbTree.emptyMutable(); }
         return RrbTree.<T>emptyMutable()
                 .concat(Arrays.asList(items));
     }
 
     /**
-     Returns a new MutableSet of the values.  This data definition method is one of the few
+     Returns a new MutSet of the values.  This data definition method is one of the few
      methods in this project that support varargs.  If the input contains duplicate elements, later
      values overwrite earlier ones.
      */
     @SafeVarargs
-    public static <T> MutableSet<T> mutableSet(T... items) {
-        MutableSet<T> ret = PersistentHashSet.emptyMutable();
+    public static <T> MutSet<T> mutableSet(T... items) {
+        MutSet<T> ret = PersistentHashSet.emptyMutable();
         if (items == null) { return ret; }
         for (T t : items) {
             ret.put(t);
@@ -152,12 +152,12 @@ public final class StaticImports {
     }
 
     /**
-     Returns a MutableVector of the given items.  This data definition method is one of the
+     Returns a MutVector of the given items.  This data definition method is one of the
      few methods in this project that support varargs.
      */
     @SafeVarargs
-    public static <T> MutableList<T> mutableVec(T... items) {
-        MutableList<T> ret = PersistentVector.emptyMutable();
+    public static <T> MutList<T> mutableVec(T... items) {
+        MutList<T> ret = PersistentVector.emptyMutable();
         if (items == null) { return ret; }
         for (T t : items) {
             ret.append(t);

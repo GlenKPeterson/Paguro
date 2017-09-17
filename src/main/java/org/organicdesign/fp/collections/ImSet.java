@@ -17,7 +17,7 @@ package org.organicdesign.fp.collections;
 public interface ImSet<E> extends BaseSet<E> {
 
     /** Returns a mutable version of this immutable set. */
-    MutableSet<E> mutable();
+    MutSet<E> mutable();
 
     /**
      Adds an element, returning a modified version of the set (leaving the original set unchanged).

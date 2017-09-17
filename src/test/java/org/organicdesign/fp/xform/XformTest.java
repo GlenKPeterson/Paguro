@@ -290,133 +290,133 @@ public class XformTest extends TestCase {
     @Test public void doubleNull() {
         assertArrayEquals(new Integer[0],
                           Xform.of(Collections.emptyList())
-                               .concat(Collections.emptyList()).toMutableList().toArray());
+                               .concat(Collections.emptyList()).toMutList().toArray());
         assertArrayEquals(new Integer[0],
                           Xform.of(Collections.emptyList())
-                               .precat(Collections.emptyList()).toMutableList().toArray());
+                               .precat(Collections.emptyList()).toMutList().toArray());
     }
 
     @Test public void precat() {
         assertArrayEquals(new Integer[] { 5, 6, 7, 8, 9 },
                           Xform.of(Arrays.asList(5, 6, 7, 8, 9))
-                                  .precat(Collections.emptyList()).toMutableList().toArray());
+                               .precat(Collections.emptyList()).toMutList().toArray());
         assertArrayEquals(new Integer[]{4, 5, 6, 7, 8, 9},
                           Xform.of(Arrays.asList(5, 6, 7, 8, 9))
-                                  .precat(Xform.of(Collections.singletonList(4))).toMutableList().toArray());
+                               .precat(Xform.of(Collections.singletonList(4))).toMutList().toArray());
         assertArrayEquals(new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9},
                           Xform.of(Arrays.asList(5, 6, 7, 8, 9))
-                                  .precat(Xform.of(Arrays.asList(1, 2, 3, 4))).toMutableList().toArray());
+                               .precat(Xform.of(Arrays.asList(1, 2, 3, 4))).toMutList().toArray());
         assertArrayEquals(new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9},
                           Xform.of(Arrays.asList(5, 6, 7, 8, 9))
-                               .precat(Arrays.asList(1, 2, 3, 4)).toMutableList().toArray());
+                               .precat(Arrays.asList(1, 2, 3, 4)).toMutList().toArray());
     }
 
     @Test
     public void concat() {
         assertArrayEquals(new Integer[] { 1, 2, 3, 4 },
                           Xform.of(Arrays.asList(1, 2, 3, 4))
-                                  .concat(Collections.emptyList()).toMutableList().toArray());
+                               .concat(Collections.emptyList()).toMutList().toArray());
 
 //        assertArrayEquals(new Integer[] { 1, 2, 3, 4 },
 //                          Xform.of(Arrays.asList(1, 2, 3, 4))
-//                                  .concat(Xform.emptyXform()).toMutableList().toArray());
+//                                  .concat(Xform.emptyXform()).toMutList().toArray());
 
         assertArrayEquals(new Integer[]{1, 2, 3, 4, 5},
                           Xform.of(Arrays.asList(1, 2, 3, 4))
-                               .concat(Xform.of(Collections.singletonList(5))).toMutableList().toArray());
+                               .concat(Xform.of(Collections.singletonList(5))).toMutList().toArray());
 
         assertArrayEquals(new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9},
                           Xform.of(Arrays.asList(1, 2, 3, 4))
-                               .concat(Xform.of(Arrays.asList(5, 6, 7, 8, 9))).toMutableList().toArray());
+                               .concat(Xform.of(Arrays.asList(5, 6, 7, 8, 9))).toMutList().toArray());
     }
 
     @Test
     public void chainedPrependAppend() {
         assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
                           Xform.of(Collections.singletonList(5))                     //         5
-                                  .precat(Xform.of(Collections.singletonList(4)))   //       4,5
-                                  .concat(Xform.of(Collections.singletonList(6)))    //       4,5,6
-                                  .precat(Xform.of(Arrays.asList(2, 3))) //   2,3,4,5,6
-                                  .concat(Xform.of(Arrays.asList(7, 8)))  //   2,3,4,5,6,7,8
-                                  .precat(Xform.of(Collections.singletonList(1)))   // 1,2,3,4,5,6,7,8
-                                  .concat(Xform.of(Collections.singletonList(9)))    // 1,2,3,4,5,6,7,8,9
-                                  .toMutableList().toArray());
+                               .precat(Xform.of(Collections.singletonList(4)))   //       4,5
+                               .concat(Xform.of(Collections.singletonList(6)))    //       4,5,6
+                               .precat(Xform.of(Arrays.asList(2, 3))) //   2,3,4,5,6
+                               .concat(Xform.of(Arrays.asList(7, 8)))  //   2,3,4,5,6,7,8
+                               .precat(Xform.of(Collections.singletonList(1)))   // 1,2,3,4,5,6,7,8
+                               .concat(Xform.of(Collections.singletonList(9)))    // 1,2,3,4,5,6,7,8,9
+                               .toMutList().toArray());
 
         assertArrayEquals(new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
                           Xform.of(Collections.singletonList(5))
-                                  .precat(Xform.of(Collections.emptyList())).precat(Xform.of(Collections.emptyList()))
-                                  .concat(Xform.of(Collections.emptyList())).concat(Xform.of(Collections.emptyList()))
-                                  .precat(Xform.of(Collections.singletonList(4)))
-                                  .precat(Xform.of(Collections.emptyList())).precat(Xform.of(Collections.emptyList()))
-                                  .concat(Xform.of(Collections.emptyList())).concat(Xform.of(Collections.emptyList()))
-                                  .concat(Xform.of(Collections.singletonList(6)))
-                                  .precat(Xform.of(Collections.emptyList())).precat(Xform.of(Collections.emptyList()))
-                                  .concat(Xform.of(Collections.emptyList())).concat(Xform.of(Collections.emptyList()))
-                                  .precat(Xform.of(Arrays.asList(2, 3)))
-                                  .precat(Xform.of(Collections.emptyList())).precat(Xform.of(Collections.emptyList()))
-                                  .concat(Xform.of(Collections.emptyList())).concat(Xform.of(Collections.emptyList()))
-                                  .concat(Xform.of(Arrays.asList(7, 8)))
-                                  .precat(Xform.of(Collections.emptyList())).precat(Xform.of(Collections.emptyList()))
-                                  .concat(Xform.of(Collections.emptyList())).concat(Xform.of(Collections.emptyList()))
-                                  .precat(Xform.of(Collections.singletonList(1)))
-                                  .precat(Xform.of(Collections.emptyList())).precat(Xform.of(Collections.emptyList()))
-                                  .concat(Xform.of(Collections.emptyList())).concat(Xform.of(Collections.emptyList()))
-                                  .concat(Xform.of(Collections.singletonList(9)))
-                                  .precat(Xform.of(Collections.emptyList())).precat(Xform.of(Collections.emptyList()))
-                                  .concat(Xform.of(Collections.emptyList())).concat(Xform.of(Collections.emptyList()))
-                                  .toMutableList().toArray());
+                               .precat(Xform.of(Collections.emptyList())).precat(Xform.of(Collections.emptyList()))
+                               .concat(Xform.of(Collections.emptyList())).concat(Xform.of(Collections.emptyList()))
+                               .precat(Xform.of(Collections.singletonList(4)))
+                               .precat(Xform.of(Collections.emptyList())).precat(Xform.of(Collections.emptyList()))
+                               .concat(Xform.of(Collections.emptyList())).concat(Xform.of(Collections.emptyList()))
+                               .concat(Xform.of(Collections.singletonList(6)))
+                               .precat(Xform.of(Collections.emptyList())).precat(Xform.of(Collections.emptyList()))
+                               .concat(Xform.of(Collections.emptyList())).concat(Xform.of(Collections.emptyList()))
+                               .precat(Xform.of(Arrays.asList(2, 3)))
+                               .precat(Xform.of(Collections.emptyList())).precat(Xform.of(Collections.emptyList()))
+                               .concat(Xform.of(Collections.emptyList())).concat(Xform.of(Collections.emptyList()))
+                               .concat(Xform.of(Arrays.asList(7, 8)))
+                               .precat(Xform.of(Collections.emptyList())).precat(Xform.of(Collections.emptyList()))
+                               .concat(Xform.of(Collections.emptyList())).concat(Xform.of(Collections.emptyList()))
+                               .precat(Xform.of(Collections.singletonList(1)))
+                               .precat(Xform.of(Collections.emptyList())).precat(Xform.of(Collections.emptyList()))
+                               .concat(Xform.of(Collections.emptyList())).concat(Xform.of(Collections.emptyList()))
+                               .concat(Xform.of(Collections.singletonList(9)))
+                               .precat(Xform.of(Collections.emptyList())).precat(Xform.of(Collections.emptyList()))
+                               .concat(Xform.of(Collections.emptyList())).concat(Xform.of(Collections.emptyList()))
+                               .toMutList().toArray());
     }
 
     @Test public void emptiness() {
         Xform<Integer> seq = Xform.of(Collections.emptyList());
-        assertArrayEquals(new Integer[0], seq.drop(0).toMutableList().toArray());
-        assertArrayEquals(new Integer[0], seq.drop(1).toMutableList().toArray());
-        assertArrayEquals(new Integer[0], seq.drop(2).toMutableList().toArray());
+        assertArrayEquals(new Integer[0], seq.drop(0).toMutList().toArray());
+        assertArrayEquals(new Integer[0], seq.drop(1).toMutList().toArray());
+        assertArrayEquals(new Integer[0], seq.drop(2).toMutList().toArray());
     }
 
     @Test public void singleElement() {
         Xform<Integer> seq = Xform.of(Collections.singletonList(1));
-        assertArrayEquals(new Integer[]{1}, seq.drop(0).toMutableList().toArray());
-        assertArrayEquals(new Integer[0], seq.drop(1).toMutableList().toArray());
-        assertArrayEquals(new Integer[0], seq.drop(2).toMutableList().toArray());
+        assertArrayEquals(new Integer[]{1}, seq.drop(0).toMutList().toArray());
+        assertArrayEquals(new Integer[0], seq.drop(1).toMutList().toArray());
+        assertArrayEquals(new Integer[0], seq.drop(2).toMutList().toArray());
     }
 
     @Test public void twoElement() {
         Xform<Integer> seq = Xform.of(Arrays.asList(1, 2));
-        assertArrayEquals(new Integer[]{1, 2}, seq.drop(0).toMutableList().toArray());
-        assertArrayEquals(new Integer[]{2}, seq.drop(1).toMutableList().toArray());
-        assertArrayEquals(new Integer[0], seq.drop(2).toMutableList().toArray());
+        assertArrayEquals(new Integer[]{1, 2}, seq.drop(0).toMutList().toArray());
+        assertArrayEquals(new Integer[]{2}, seq.drop(1).toMutList().toArray());
+        assertArrayEquals(new Integer[0], seq.drop(2).toMutList().toArray());
     }
 
     @Test
     public void singleDrops() {
         Integer[] ints = new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9};
         Xform<Integer> xform = Xform.of(Arrays.asList(ints));
-        assertArrayEquals(ints, xform.drop(0).toMutableList().toArray());
-        assertArrayEquals(new Integer[]{2, 3, 4, 5, 6, 7, 8, 9}, xform.drop(1).toMutableList().toArray());
-        assertArrayEquals(new Integer[]{3, 4, 5, 6, 7, 8, 9}, xform.drop(2).toMutableList().toArray());
-        assertArrayEquals(new Integer[]{4, 5, 6, 7, 8, 9}, xform.drop(3).toMutableList().toArray());
-        assertArrayEquals(new Integer[]{9}, xform.drop(8).toMutableList().toArray());
-        assertArrayEquals(new Integer[0], Xform.of(Collections.emptyList()).toMutableList().toArray());
-        assertArrayEquals(new Integer[0], xform.drop(9).toMutableList().toArray());
-        assertArrayEquals(new Integer[0], xform.drop(10).toMutableList().toArray());
-        assertArrayEquals(new Integer[0], xform.drop(10000).toMutableList().toArray());
+        assertArrayEquals(ints, xform.drop(0).toMutList().toArray());
+        assertArrayEquals(new Integer[]{2, 3, 4, 5, 6, 7, 8, 9}, xform.drop(1).toMutList().toArray());
+        assertArrayEquals(new Integer[]{3, 4, 5, 6, 7, 8, 9}, xform.drop(2).toMutList().toArray());
+        assertArrayEquals(new Integer[]{4, 5, 6, 7, 8, 9}, xform.drop(3).toMutList().toArray());
+        assertArrayEquals(new Integer[]{9}, xform.drop(8).toMutList().toArray());
+        assertArrayEquals(new Integer[0], Xform.of(Collections.emptyList()).toMutList().toArray());
+        assertArrayEquals(new Integer[0], xform.drop(9).toMutList().toArray());
+        assertArrayEquals(new Integer[0], xform.drop(10).toMutList().toArray());
+        assertArrayEquals(new Integer[0], xform.drop(10000).toMutList().toArray());
         assertArrayEquals(new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9},
-                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).drop(0).toMutableList().toArray());
+                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).drop(0).toMutList().toArray());
         assertArrayEquals(new Integer[]{2, 3, 4, 5, 6, 7, 8, 9},
-                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).drop(1).toMutableList().toArray());
+                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).drop(1).toMutList().toArray());
         assertArrayEquals(new Integer[]{3, 4, 5, 6, 7, 8, 9},
-                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).drop(2).toMutableList().toArray());
+                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).drop(2).toMutList().toArray());
         assertArrayEquals(new Integer[]{4, 5, 6, 7, 8, 9},
-                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).drop(3).toMutableList().toArray());
+                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).drop(3).toMutList().toArray());
         assertArrayEquals(new Integer[]{9},
-                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).drop(8).toMutableList().toArray());
+                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).drop(8).toMutList().toArray());
         assertArrayEquals(new Integer[]{},
-                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).drop(9).toMutableList().toArray());
+                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).drop(9).toMutList().toArray());
         assertArrayEquals(new Integer[]{},
-                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).drop(10).toMutableList().toArray());
+                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).drop(10).toMutList().toArray());
         assertArrayEquals(new Integer[]{},
-                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).drop(10000).toMutableList().toArray());
+                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).drop(10000).toMutList().toArray());
     }
 
     @Test
@@ -424,62 +424,62 @@ public class XformTest extends TestCase {
         Integer[] ints = new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9};
         Xform<Integer> seq = Xform.of(Arrays.asList(ints));
         assertArrayEquals(new Integer[] {3,4,5,6,7,8,9},
-                seq.drop(1).drop(1).toMutableList().toArray());
+                seq.drop(1).drop(1).toMutList().toArray());
         assertArrayEquals(new Integer[] {4,5,6,7,8,9},
-                seq.drop(1).drop(1).drop(1).toMutableList().toArray());
+                seq.drop(1).drop(1).drop(1).toMutList().toArray());
         assertArrayEquals(new Integer[] {9},
                 seq
-                                  .drop(1).drop(1).drop(1).drop(1).drop(1)
-                                  .drop(1).drop(1).drop(1).toMutableList().toArray());
+                        .drop(1).drop(1).drop(1).drop(1).drop(1)
+                        .drop(1).drop(1).drop(1).toMutList().toArray());
         assertArrayEquals(new Integer[] {},
                 seq
-                                  .drop(1).drop(1).drop(1).drop(1).drop(1)
-                                  .drop(1).drop(1).drop(1).drop(1).toMutableList().toArray());
+                        .drop(1).drop(1).drop(1).drop(1).drop(1)
+                        .drop(1).drop(1).drop(1).drop(1).toMutList().toArray());
         assertArrayEquals(new Integer[] {},
                 seq
-                                  .drop(1).drop(1).drop(1).drop(1).drop(1)
-                                  .drop(1).drop(1).drop(1).drop(1).drop(1).toMutableList().toArray());
+                        .drop(1).drop(1).drop(1).drop(1).drop(1)
+                        .drop(1).drop(1).drop(1).drop(1).drop(1).toMutList().toArray());
         assertArrayEquals(new Integer[] {},
                 seq
-                                  .drop(1).drop(1).drop(1).drop(1).drop(1)
-                                  .drop(1).drop(1).drop(1).drop(1).drop(1)
-                                  .drop(1).drop(1).drop(1).drop(1).drop(1).toMutableList().toArray());
+                        .drop(1).drop(1).drop(1).drop(1).drop(1)
+                        .drop(1).drop(1).drop(1).drop(1).drop(1)
+                        .drop(1).drop(1).drop(1).drop(1).drop(1).toMutList().toArray());
 
         assertArrayEquals(new Integer[] {7,8,9},
                 seq
-                                  .drop(0).drop(1).drop(2).drop(3).toMutableList().toArray());
+                        .drop(0).drop(1).drop(2).drop(3).toMutList().toArray());
         assertArrayEquals(new Integer[] {7,8,9},
                 seq
-                                  .drop(3).drop(2).drop(1).drop(0).toMutableList().toArray());
+                        .drop(3).drop(2).drop(1).drop(0).toMutList().toArray());
 
         assertArrayEquals(new Integer[] {3,4,5,6,7,8,9},
-                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).drop(1).drop(1).toMutableList().toArray());
+                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).drop(1).drop(1).toMutList().toArray());
         assertArrayEquals(new Integer[] {4,5,6,7,8,9},
-                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).drop(1).drop(1).drop(1).toMutableList().toArray());
+                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).drop(1).drop(1).drop(1).toMutList().toArray());
         assertArrayEquals(new Integer[] {9},
                           Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                                  .drop(1).drop(1).drop(1).drop(1).drop(1)
-                                  .drop(1).drop(1).drop(1).toMutableList().toArray());
+                               .drop(1).drop(1).drop(1).drop(1).drop(1)
+                               .drop(1).drop(1).drop(1).toMutList().toArray());
         assertArrayEquals(new Integer[] {},
                           Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                                  .drop(1).drop(1).drop(1).drop(1).drop(1)
-                                  .drop(1).drop(1).drop(1).drop(1).toMutableList().toArray());
+                               .drop(1).drop(1).drop(1).drop(1).drop(1)
+                               .drop(1).drop(1).drop(1).drop(1).toMutList().toArray());
         assertArrayEquals(new Integer[] {},
                           Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                                  .drop(1).drop(1).drop(1).drop(1).drop(1)
-                                  .drop(1).drop(1).drop(1).drop(1).drop(1).toMutableList().toArray());
+                               .drop(1).drop(1).drop(1).drop(1).drop(1)
+                               .drop(1).drop(1).drop(1).drop(1).drop(1).toMutList().toArray());
         assertArrayEquals(new Integer[]{},
                           Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                              .drop(1).drop(1).drop(1).drop(1).drop(1)
-                              .drop(1).drop(1).drop(1).drop(1).drop(1)
-                              .drop(1).drop(1).drop(1).drop(1).drop(1).toMutableList().toArray());
+                               .drop(1).drop(1).drop(1).drop(1).drop(1)
+                               .drop(1).drop(1).drop(1).drop(1).drop(1)
+                               .drop(1).drop(1).drop(1).drop(1).drop(1).toMutList().toArray());
 
         assertArrayEquals(new Integer[]{7, 8, 9},
                           Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                              .drop(0).drop(1).drop(2).drop(3).toMutableList().toArray());
+                               .drop(0).drop(1).drop(2).drop(3).toMutList().toArray());
         assertArrayEquals(new Integer[]{7, 8, 9},
                           Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                               .drop(3).drop(2).drop(1).drop(0).toMutableList().toArray());
+                               .drop(3).drop(2).drop(1).drop(0).toMutList().toArray());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -494,34 +494,34 @@ public class XformTest extends TestCase {
     @Test(expected = IllegalArgumentException.class)
     public void nullException() {
         assertArrayEquals(new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9},
-                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).filter(null).toMutableList().toArray());
+                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).filter(null).toMutList().toArray());
     }
 
     @Test
     public void singleFilter() {
         assertArrayEquals(new Integer[] {1, 2, 3, 4, 5, 6, 7, 8, 9},
-                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).filter(accept()).toMutableList().toArray());
+                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).filter(accept()).toMutList().toArray());
 
         assertArrayEquals(new Integer[] {},
-                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).filter(reject()).toMutableList().toArray());
+                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).filter(reject()).toMutList().toArray());
 
         assertArrayEquals(new Integer[] {5,6,7,8,9},
-                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).filter(i -> i > 4).toMutableList().toArray());
+                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).filter(i -> i > 4).toMutList().toArray());
 
         assertArrayEquals(new Integer[] {},
-                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).filter(i -> i < 1).toMutableList().toArray());
+                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).filter(i -> i < 1).toMutList().toArray());
 
         assertArrayEquals(new Integer[] {3},
-                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).filter(i -> i == 3).toMutableList().toArray());
+                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).filter(i -> i == 3).toMutList().toArray());
 
         assertArrayEquals(new Integer[] {1},
-                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).filter(i -> i == 1).toMutableList().toArray());
+                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).filter(i -> i == 1).toMutList().toArray());
 
         assertArrayEquals(new Integer[] {9},
-                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).filter(i -> i == 9).toMutableList().toArray());
+                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).filter(i -> i == 9).toMutList().toArray());
 
         assertArrayEquals(new Integer[]{1, 2, 3, 4, 5, 6},
-                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).filter(i -> i < 7).toMutableList().toArray());
+                          Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).filter(i -> i < 7).toMutList().toArray());
 
     }
 
@@ -529,33 +529,33 @@ public class XformTest extends TestCase {
     public void chainedFilters() {
         assertArrayEquals(new Integer[] {1, 2, 3, 4, 5, 6, 7, 8, 9},
                           Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                                  .filter(accept()).filter(accept()).filter(accept())
-                                  .filter(accept()).filter(accept()).filter(accept())
-                                  .filter(accept()).filter(accept()).toMutableList().toArray());
+                               .filter(accept()).filter(accept()).filter(accept())
+                               .filter(accept()).filter(accept()).filter(accept())
+                               .filter(accept()).filter(accept()).toMutList().toArray());
 
         assertArrayEquals(new Integer[] {},
                           Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                                  .filter(reject()).filter(accept()).filter(accept())
-                                  .filter(accept()).filter(accept()).filter(accept())
-                                  .filter(accept()).filter(accept()).toMutableList().toArray());
+                               .filter(reject()).filter(accept()).filter(accept())
+                               .filter(accept()).filter(accept()).filter(accept())
+                               .filter(accept()).filter(accept()).toMutList().toArray());
 
         assertArrayEquals(new Integer[] {},
                           Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                                  .filter(accept()).filter(accept()).filter(accept())
-                                  .filter(accept()).filter(reject()).filter(accept())
-                                  .filter(accept()).filter(accept()).toMutableList().toArray());
+                               .filter(accept()).filter(accept()).filter(accept())
+                               .filter(accept()).filter(reject()).filter(accept())
+                               .filter(accept()).filter(accept()).toMutList().toArray());
 
         assertArrayEquals(new Integer[] {},
                           Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                                  .filter(accept()).filter(accept()).filter(accept())
-                                  .filter(accept()).filter(accept()).filter(accept())
-                                  .filter(accept()).filter(reject()).toMutableList().toArray());
+                               .filter(accept()).filter(accept()).filter(accept())
+                               .filter(accept()).filter(accept()).filter(accept())
+                               .filter(accept()).filter(reject()).toMutList().toArray());
 
         assertArrayEquals(new Integer[] {3, 4, 6},
                           Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                                  .filter(i -> i > 2)
-                                  .filter(i -> i < 7)
-                                  .filter(i -> i != 5).toMutableList().toArray());
+                               .filter(i -> i > 2)
+                               .filter(i -> i < 7)
+                               .filter(i -> i != 5).toMutList().toArray());
 
     }
 
@@ -573,13 +573,13 @@ public class XformTest extends TestCase {
         assertArrayEquals(new Integer[] { 1,2,3, 2,4,6, 3,6,9, 4,8,12, 5,10,15, 6,12,18,
                                           7,14,21, 8,16,24, 9,18,27},
                           Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                              .flatMap(i -> Xform.of(Arrays.asList(i, i * 2, i * 3))).toMutableList().toArray());
+                               .flatMap(i -> Xform.of(Arrays.asList(i, i * 2, i * 3))).toMutList().toArray());
 
         assertArrayEquals(new String[] { "1","2", "2","3", "3","4"},
                           Xform.of(Arrays.asList(1, 2, 3))
                                .flatMap(i -> Xform.of(Arrays.asList(String.valueOf(i),
                                                                     String.valueOf(i + 1))))
-                               .toMutableList().toArray());
+                               .toMutList().toArray());
     }
 
     @Test public void flatEmpty() {
@@ -600,7 +600,7 @@ public class XformTest extends TestCase {
                                .flatMap((a) ->  (count.incrementAndGet() > 8)
                                                 ? Xform.of(Arrays.asList("a" + a, "b" + a))
                                                 : Xform.of(Collections.emptyList()))
-                               .toMutableList().toArray());
+                               .toMutList().toArray());
 
         count.set(0);
         assertArrayEquals(new String[]{"c8", "d8", "c9", "d9"},
@@ -612,7 +612,7 @@ public class XformTest extends TestCase {
 //                              System.out.println("Item " + item);
 //                              return null;
 //                          })
-                               .toMutableList().toArray());
+                               .toMutList().toArray());
 
         count.set(0);
         assertArrayEquals(new String[]{"e1", "f1", "e2", "f2"},
@@ -624,14 +624,14 @@ public class XformTest extends TestCase {
 //                              System.out.println("count: " + count.value() + " Item " + item);
 //                              return null;
 //                          })
-                               .toMutableList().toArray());
+                               .toMutList().toArray());
 
         AtomicReference<Xform<Integer>> shrinkSeq =
                 new AtomicReference<>(Xform.of(Arrays.asList(1, 2, 3)));
         assertArrayEquals(new Integer[]{2, 3, 3},
                           Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                                  .flatMap((a) -> shrinkSeq.updateAndGet(seq -> seq.drop(1)))
-                                  .toMutableList().toArray());
+                               .flatMap((a) -> shrinkSeq.updateAndGet(seq -> seq.drop(1)))
+                               .toMutList().toArray());
 
         // Now start by returning an ofArray, then a seq of length 1, then length 2, etc.
         // The first ofArray should not end the processing.
@@ -647,7 +647,7 @@ public class XformTest extends TestCase {
                                    incInt.getAndIncrement();
                                    return growSeq.get();
                                })
-                               .toMutableList().toArray());
+                               .toMutList().toArray());
     }
 
     @Test public void flatMapChain() {
@@ -669,20 +669,20 @@ public class XformTest extends TestCase {
                           Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
                                .flatMap((i) -> () -> emptyUnmodIterator())
                                .flatMap((i) -> () -> emptyUnmodIterator())
-                               .flatMap((i) -> () -> emptyUnmodIterator()).toMutableList().toArray());
+                               .flatMap((i) -> () -> emptyUnmodIterator()).toMutList().toArray());
 
         assertArrayEquals(new Integer[] { 1,2, 2,3, 3,4, 10,11, 20,21, 30,31},
                           Xform.of(Arrays.asList(1, 10))
-                                  .flatMap(i -> Xform.of(Arrays.asList(i, i * 2, i * 3)))
-                                  .flatMap(i -> Xform.of(Arrays.asList(i, i + 1)))
-                                  .toMutableList().toArray());
+                               .flatMap(i -> Xform.of(Arrays.asList(i, i * 2, i * 3)))
+                               .flatMap(i -> Xform.of(Arrays.asList(i, i + 1)))
+                               .toMutList().toArray());
     }
 
     // Below here taken from SequenceTest
     @Test public void construction() {
         Integer[] ints = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-        assertArrayEquals(ints, Xform.of(Arrays.asList(ints)).toMutableList().toArray());
-        assertArrayEquals(ints, Xform.of(Arrays.asList(ints)).toMutableList().toArray());
+        assertArrayEquals(ints, Xform.of(Arrays.asList(ints)).toMutList().toArray());
+        assertArrayEquals(ints, Xform.of(Arrays.asList(ints)).toMutList().toArray());
     }
 
     @Test public void testNullConstruction() {
@@ -872,38 +872,38 @@ public class XformTest extends TestCase {
     @Test
     public void takeAndDrop() {
         assertArrayEquals(Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                                  .drop(0).take(8888).toMutableList().toArray(),
+                               .drop(0).take(8888).toMutList().toArray(),
                           new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9});
         assertArrayEquals(Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                                  .drop(1).take(1).toMutableList().toArray(),
+                               .drop(1).take(1).toMutList().toArray(),
                           new Integer[]{2});
         assertArrayEquals(Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                                  .drop(2).take(2).toMutableList().toArray(),
+                               .drop(2).take(2).toMutList().toArray(),
                    new Integer[] { 3,4 });
         assertArrayEquals(Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                                  .drop(3).take(3).toMutableList().toArray(),
+                               .drop(3).take(3).toMutList().toArray(),
                    new Integer[] { 4,5,6 });
         assertArrayEquals(Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                                  .drop(9999).take(3).toMutableList().toArray(),
+                               .drop(9999).take(3).toMutList().toArray(),
                           new Integer[]{});
         assertArrayEquals(Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                                  .drop(3).take(0).toMutableList().toArray(),
+                               .drop(3).take(0).toMutList().toArray(),
                    new Integer[] { });
     }
 
     @Test public void chain1() {
         assertArrayEquals(Xform.of(Collections.singletonList(5))                      //         5
-                                  .precat(Xform.of(Collections.singletonList(4)))    //       4,5
-                                  .concat(Xform.of(Collections.singletonList(6)))     //       4,5,6
-                                  .precat(Xform.of(Arrays.asList(2, 3))) //   2,3,4,5,6
-                                  .concat(Xform.of(Arrays.asList(7, 8)))  //   2,3,4,5,6,7,8
-                                  .precat(Xform.of(Collections.singletonList(1)))    // 1,2,3,4,5,6,7,8
-                                  .concat(Xform.of(Collections.singletonList(9)))     // 1,2,3,4,5,6,7,8,9
-                                  .filter(i -> i > 3)              //       4,5,6,7,8,9
-                                  .map(i -> i - 2)                 //   2,3,4,5,6,7
-                                  .take(5)                         //   2,3,4,5,6
-                                  .drop(2)                         //       4,5,6
-                                  .toMutableList().toArray(),
+                               .precat(Xform.of(Collections.singletonList(4)))    //       4,5
+                               .concat(Xform.of(Collections.singletonList(6)))     //       4,5,6
+                               .precat(Xform.of(Arrays.asList(2, 3))) //   2,3,4,5,6
+                               .concat(Xform.of(Arrays.asList(7, 8)))  //   2,3,4,5,6,7,8
+                               .precat(Xform.of(Collections.singletonList(1)))    // 1,2,3,4,5,6,7,8
+                               .concat(Xform.of(Collections.singletonList(9)))     // 1,2,3,4,5,6,7,8,9
+                               .filter(i -> i > 3)              //       4,5,6,7,8,9
+                               .map(i -> i - 2)                 //   2,3,4,5,6,7
+                               .take(5)                         //   2,3,4,5,6
+                               .drop(2)                         //       4,5,6
+                               .toMutList().toArray(),
                           new Integer[]{4, 5, 6});
     }
     // Above here taken from SequenceTest.

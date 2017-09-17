@@ -17,21 +17,21 @@ package org.organicdesign.fp.collections;
 /**
  Interface for mutable (hash) set builder.
  */
-public interface MutableSet<E> extends BaseSet<E> {
+public interface MutSet<E> extends BaseSet<E> {
 
     /** Returns an immutable version of this immutable set. */
     ImSet<E> immutable();
 
     /** {@inheritDoc} */
     @Override
-    MutableSet<E> put(E val);
+    MutSet<E> put(E val);
 
     /** {@inheritDoc} */
-    @Override default MutableSet<E> union(Iterable<? extends E> iter) {
-        return concat(iter).toMutableSet();
+    @Override default MutSet<E> union(Iterable<? extends E> iter) {
+        return concat(iter).toMutSet();
     }
 
     /** {@inheritDoc} */
     @Override
-    MutableSet<E> without(E key);
+    MutSet<E> without(E key);
 }

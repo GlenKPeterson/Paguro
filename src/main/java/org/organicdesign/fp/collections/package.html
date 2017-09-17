@@ -4,9 +4,9 @@
     immutable collection interfaces that fit these collections into the java.util interfaces.
     This is a multi-step process.  The Unmod____ interfaces deprecate the mutate-in-place methods.
     The Base___ interfaces add the fluent/copy-on-write mutator methods.  Those are extended
-    by Im___ immutable interfaces and Mutable___ interfaces which are reflections of each other.
-    The Mutable___ interfaces represent faster builders for the immutable collections, but
-    sometimes a Mutable collection is useful in its own right.</p>
+    by Im___ immutable interfaces and Mut___ mutable interfaces which are reflections of each other.
+    The Mut___ interfaces represent faster builders for the immutable collections, but
+    sometimes a mutable collection is useful in its own right.</p>
 
 <h3>Definitions</h3>
 <dl>
@@ -18,7 +18,7 @@
         In general, the "Unmod-" interfaces do not add functionality, except UnmodIterable adds transformation to all collections and UnmodMap adds Iterable&lt;Map.Entry&gt; to Map.</dd>
 
     <dt>Base</dt>
-    <dd>This adds the fluent copy-on-write "modification" methods and is the common ancestor of Im___ and Mutable___ interfaces.</dd>
+    <dd>This adds the fluent copy-on-write "modification" methods and is the common ancestor of Im___ and Mut___ interfaces.</dd>
 
     <dt>Immutable</dt>
     <dd>The collection itself cannot be changed in place.  Fluent "modification" methods return a new immutable collection reflecting the change

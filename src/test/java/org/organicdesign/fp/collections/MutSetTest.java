@@ -12,9 +12,9 @@ import static org.organicdesign.fp.FunctionUtils.ordinal;
 /**
  Created by gpeterso on 9/13/16.
  */
-public class MutableSetTest {
+public class MutSetTest {
     public static class TestSet<E> extends AbstractUnmodSet<E>
-            implements MutableSet<E> {
+            implements MutSet<E> {
         private final Set<E> inner;
         public TestSet(Set<E> s) { inner = s; }
 
@@ -22,12 +22,12 @@ public class MutableSetTest {
             return new ImUnsortedSetTest.TestSet<>(inner);
         }
 
-        @Override public MutableSet<E> put(E val) {
+        @Override public MutSet<E> put(E val) {
             inner.add(val);
             return this;
         }
 
-        @Override public MutableSet<E> without(E key) {
+        @Override public MutSet<E> without(E key) {
             inner.remove(key);
             return this;
         }
