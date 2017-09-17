@@ -15,6 +15,18 @@ import static org.organicdesign.fp.FunctionUtils.stringify;
 public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
     // ========================================== Static ==========================================
 
+    enum UnIterable implements UnmodIterable {
+        EMPTY {
+            @Override public UnmodIterator iterator() { return UnmodIterator.emptyUnmodIterator(); }
+        }
+    }
+
+    /** We only ever need one empty iterable in memory. */
+    @SuppressWarnings("unchecked")
+    static <T> UnmodIterable<T> emptyUnmodIterable() {
+        return (UnmodIterable<T>) UnIterable.EMPTY;
+    }
+
     //    /**
 // Caution: this is a convenient optimization for immutable data structures and a nightmare
 // waiting to happen to mutable ones.  Don't go slapping this on immutable wrappers for mutable

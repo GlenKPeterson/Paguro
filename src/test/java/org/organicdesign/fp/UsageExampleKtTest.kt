@@ -103,16 +103,23 @@ class UsageExampleKtTest {
         // Notice that the tuples are smart enough to take their new names, Person and Email instead
         // of Tuple3 and Tuple2.  This aids readability when debugging.
         assertEquals("PersistentVector(" +
-                     "Person(\"Jane\",\"Smith\"," +
-                     "PersistentVector(Email(HOME,\"a@b.c\"),Email(WORK,\"b@c.d\")))," +
-                     "Person(\"Fred\",\"Tase\"," +
-                     "PersistentVector(Email(HOME,\"c@d.e\"),Email(WORK,\"d@e.f\"))))",
+                     "Person(first=Jane, last=Smith," +
+                     " emailAddrs=PersistentVector(" +
+                     "Email(mailType=HOME, address=a@b.c)," +
+                     "Email(mailType=WORK, address=b@c.d)))," +
+                     "Person(first=Fred, last=Tase," +
+                     " emailAddrs=PersistentVector(" +
+                     "Email(mailType=HOME, address=c@d.e)," +
+                     "Email(mailType=WORK, address=d@e.f))))",
                      people.toString())
 
         // This type signature couldn't be simpler (or more descriptive):
         val jane = people[0]
 
-        assertEquals("Person(\"Jane\",\"Smith\"," + "PersistentVector(Email(HOME,\"a@b.c\"),Email(WORK,\"b@c.d\")))",
+        assertEquals("Person(first=Jane, last=Smith," +
+                     " emailAddrs=PersistentVector(" +
+                     "Email(mailType=HOME, address=a@b.c)," +
+                     "Email(mailType=WORK, address=b@c.d)))",
                      jane.toString())
 
         // Let's use our new, descriptive field getter methods:
@@ -131,14 +138,26 @@ class UsageExampleKtTest {
                 .toImMap<String, Person>(Fn1.identity())
 
         assertEquals("PersistentHashMap(" +
-                     "Tuple2(\"d@e.f\",Person(\"Fred\",\"Tase\",PersistentVector(Email(HOME,\"c@d.e\")," +
-                     "Email(WORK,\"d@e.f\"))))," +
-                     "Tuple2(\"a@b.c\",Person(\"Jane\",\"Smith\",PersistentVector(Email(HOME,\"a@b.c\")," +
-                     "Email(WORK,\"b@c.d\"))))," +
-                     "Tuple2(\"b@c.d\",Person(\"Jane\",\"Smith\",PersistentVector(Email(HOME,\"a@b.c\")," +
-                     "Email(WORK,\"b@c.d\"))))," +
-                     "Tuple2(\"c@d.e\",Person(\"Fred\",\"Tase\",PersistentVector(Email(HOME,\"c@d.e\")," +
-                     "Email(WORK,\"d@e.f\")))))",
+                     "Tuple2(\"d@e.f\"," +
+                     "Person(first=Fred, last=Tase," +
+                     " emailAddrs=PersistentVector(" +
+                     "Email(mailType=HOME, address=c@d.e)," +
+                     "Email(mailType=WORK, address=d@e.f))))," +
+                     "Tuple2(\"a@b.c\"," +
+                     "Person(first=Jane, last=Smith," +
+                     " emailAddrs=PersistentVector(" +
+                     "Email(mailType=HOME, address=a@b.c)," +
+                     "Email(mailType=WORK, address=b@c.d))))," +
+                     "Tuple2(\"b@c.d\"," +
+                     "Person(first=Jane, last=Smith," +
+                     " emailAddrs=PersistentVector(" +
+                     "Email(mailType=HOME, address=a@b.c)," +
+                     "Email(mailType=WORK, address=b@c.d))))," +
+                     "Tuple2(\"c@d.e\"," +
+                     "Person(first=Fred, last=Tase," +
+                     " emailAddrs=PersistentVector(" +
+                     "Email(mailType=HOME, address=c@d.e)," +
+                     "Email(mailType=WORK, address=d@e.f)))))",
                      peopleByEmail.toString())
 
         // Now look Jane up by her address.
