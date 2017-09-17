@@ -12,16 +12,37 @@ Here is a script to ease your upgrade from 3.0 to 3.1 (INCOMPLETE work in progre
 ```bash
 # USE CAUTION AND HAVE A BACKUP OF YOUR SOURCE CODE (VERSION CONTROL) - NO GUARANTEES
 
-oldString='MutableUnsortedMap'
+oldString='MutableList'
+newString=MutList
+sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir='.git' -rIl "$oldString" *)
+
+oldString='MutableMap'
 newString=MutMap
 sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir='.git' -rIl "$oldString" *)
 
-oldString='MutableUnsortedSet'
+oldString='MutableSet'
 newString=MutSet
 sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir='.git' -rIl "$oldString" *)
 
-sed -i -e 's/\<Function\([0-3]\)\>/Fn\1/g' $(egrep --exclude-dir='.svn' --exclude-dir='.git' -wrIl 'Function[0-3]' *)
+oldString='toMutableSortedSet'
+newString=toMutSortedSet
+sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir='.git' -rIl "$oldString" *)
+
+oldString='toMutableSortedMap'
+newString=toMutSortedMap
+sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir='.git' -rIl "$oldString" *)
+
+oldString='MutableHashSet'
+newString=MutHashSet
+sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir='.git' -rIl "$oldString" *)
+
+oldString='MutableHashMap'
+newString=MutHashMap
+sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir='.git' -rIl "$oldString" *)
 ```
+
+After the above, you probably want to check out any Kotlin files.  Sorry.
+If you use MutableMap/MutableList/etc. inside a Kotlin file, you have to fix it manually.  Sorry.
 
 # Release 3.0.16: RRB Tree
  - Added Option.Some.toString() and unit test for same.
