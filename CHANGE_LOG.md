@@ -5,9 +5,23 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
-# Release 3.1.0: Kotlin compatibility phase I
- - Renamed all Mutable collections from Mutable___ to Mut___.
- - Added Kotlin as a Test dependency - Paguro's jar file is still around 270K, so Kotlin sold separately for now.
+# Release 3.1.0: Kotlin compatibility
+ - Renamed all mutable collections from Mutable___ to Mut___.
+
+Here is a script to ease your upgrade from 3.0 to 3.1 (INCOMPLETE work in progress)
+```bash
+# USE CAUTION AND HAVE A BACKUP OF YOUR SOURCE CODE (VERSION CONTROL) - NO GUARANTEES
+
+oldString='MutableUnsortedMap'
+newString=MutMap
+sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir='.git' -rIl "$oldString" *)
+
+oldString='MutableUnsortedSet'
+newString=MutSet
+sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir='.git' -rIl "$oldString" *)
+
+sed -i -e 's/\<Function\([0-3]\)\>/Fn\1/g' $(egrep --exclude-dir='.svn' --exclude-dir='.git' -wrIl 'Function[0-3]' *)
+```
 
 # Release 3.0.16: RRB Tree
  - Added Option.Some.toString() and unit test for same.

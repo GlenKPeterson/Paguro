@@ -2,6 +2,7 @@ package org.organicdesign.fp.collections;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import static org.junit.Assert.*;
+import static org.organicdesign.fp.collections.UnmodIterable.emptyUnmodIterable;
 
 @RunWith(JUnit4.class)
 public class UnmodIterableTest {
@@ -63,6 +65,9 @@ public class UnmodIterableTest {
                                    "cow", "are", "you"),
                      testIterable.flatMap((String s) ->
                                                   Arrays.asList(s, "are", "you")).toMutList());
+
+        assertEquals(Collections.emptyList(),
+                     testIterable.flatMap((String s) -> emptyUnmodIterable()).toMutList());
 
         assertEquals(Arrays.asList(3, 3, 5, 3),
                      testIterable.map((String s) -> s.length()).toMutList());

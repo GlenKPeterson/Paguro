@@ -74,7 +74,7 @@ If you're new to Paguro, consider starting with the streamlined
 <dependency>
         <groupId>org.organicdesign</groupId>
         <artifactId>Paguro</artifactId>
-        <version>3.0.16</version>
+        <version>3.1.0</version>
 </dependency>
 ```
 
