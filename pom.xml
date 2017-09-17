@@ -214,6 +214,7 @@ http://mvnrepository.com/artifact/org.organicdesign/Paguro
 							<goal>test-compile</goal>
 						</goals>
 						<configuration>
+							<jvmTarget>1.8</jvmTarget>
 							<sourceDirs>
 								<sourceDir>${project.basedir}/src/test/kotlin</sourceDir>
 								<sourceDir>${project.basedir}/src/test/java</sourceDir>
