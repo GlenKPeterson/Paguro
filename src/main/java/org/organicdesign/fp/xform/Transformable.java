@@ -38,6 +38,15 @@ import org.organicdesign.fp.oneOf.Or;
  */
 public interface Transformable<T> {
     /**
+     Return only the items for which the given predicate returns true.
+     @return a Transformable of only the filtered items.
+     @param predicate a function that returns true for items to keep, false for items to drop
+     */
+    default boolean any(Fn1<? super T,Boolean> predicate) {
+        return filter(predicate).head().isSome();
+    }
+
+    /**
      Add items to the end of this Transformable (precat() adds to the beginning)
      @param list the items to add
      @return a new Transformable with the items added.

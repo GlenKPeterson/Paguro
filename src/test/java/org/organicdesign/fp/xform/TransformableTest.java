@@ -8,14 +8,35 @@ import org.organicdesign.fp.collections.ImSortedMap;
 import org.organicdesign.fp.collections.PersistentHashMap;
 import org.organicdesign.fp.collections.PersistentTreeMap;
 import org.organicdesign.fp.collections.UnmodSortedIterable;
+import org.organicdesign.fp.function.Fn1;
 import org.organicdesign.fp.oneOf.Option;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.organicdesign.fp.FunctionUtils.ordinal;
 
 public class TransformableTest {
+
+    @Test public void testAny() throws Exception {
+        assertTrue(Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
+                        .any(i -> i > 3));
+        assertTrue(Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
+                        .any(i -> i > 8));
+        assertTrue(Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
+                        .any(i -> i < 2));
+        assertTrue(Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
+                        .any(i -> i == 5));
+        assertFalse(Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
+                        .any(i -> i == 0));
+        assertFalse(Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
+                         .any(Fn1.reject()));
+        assertFalse(Xform.of(Collections.emptyList())
+                         .any(Fn1.accept()));
+        assertTrue(Xform.of(Collections.singletonList(1))
+                         .any(Fn1.accept()));
+    }
 
     @Test public void testToMutableList() throws Exception {
         List<Integer> control = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9);

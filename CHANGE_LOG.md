@@ -5,6 +5,9 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
+### Release 3.1.1: Kotlin compatibility
+ - Added Transform.any(Fn1<Boolean>) which returns true if anything matches the given predicate.
+
 # Release 3.1.0: Kotlin compatibility
  - Renamed all mutable collections from Mutable___ to Mut___.
 
