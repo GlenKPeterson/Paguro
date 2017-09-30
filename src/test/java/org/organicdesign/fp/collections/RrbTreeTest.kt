@@ -883,10 +883,11 @@ class RrbTreeTest {
         private val rand = java.security.SecureRandom()
 
         private fun <T : RrbTree<Int>> generateRelaxed(size: Int, r: T): T {
-            var rrb = r
+            var rrb:T = r
             val rand = java.security.SecureRandom()
             for (j in 0 until size) {
                 val idx = rand.nextInt(rrb.size + 1)
+                @Suppress("UNCHECKED_CAST")
                 rrb = rrb.insert(idx, j) as T
             }
             return rrb
@@ -960,7 +961,7 @@ class RrbTreeTest {
             return out
         }
 
-        private fun isPrime(num: Int): Boolean {
+        private fun isPrime(@Suppress("UNUSED_PARAMETER") num: Int): Boolean {
             return false
             //        if (num < 2) return false;
             //        if (num == 2) return true;

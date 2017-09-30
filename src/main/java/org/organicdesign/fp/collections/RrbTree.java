@@ -974,7 +974,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
      @param element the item to insert
      @return a new RRB-Tree with the item inserted.
      */
-    @SuppressWarnings("WeakerAccess")
+//    @SuppressWarnings("WeakerAccess")
     public abstract RrbTree<E> insert(int idx, E element);
 
     /** {@inheritDoc} */
