@@ -19,7 +19,7 @@ import org.organicdesign.fp.StaticImports.xform
 import org.organicdesign.fp.TestUtilities
 import org.organicdesign.fp.TestUtilities.compareIterators
 import org.organicdesign.fp.TestUtilities.serializeDeserialize
-import org.organicdesign.fp.collections.RrbTree.STRICT_NODE_LENGTH
+import org.organicdesign.fp.collections.RrbTree.Companion.STRICT_NODE_LENGTH
 import org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode
 import java.security.NoSuchAlgorithmException
 import java.util.ArrayList
@@ -285,8 +285,8 @@ class RrbTreeTest {
             control.add(i)
             test = test.append(i)
         }
-        //        System.out.println("control:" + control);
-        //        System.out.println("test:" + test.indentedStr(0));
+//        println("control:" + control);
+//        println("test:" + test.indentedStr(0));
         compareIterators(control.iterator(), test.iterator())
         test.debugValidate()
     }
@@ -829,10 +829,10 @@ class RrbTreeTest {
         var splitIndex = 1
         while (splitIndex <= TWO_LEVEL_SZ) {
             val isSplit = rrb.split(splitIndex)
-            assertEquals(rrb, isSplit._1().join(isSplit._2()))
+            assertEquals(rrb, isSplit.first.join(isSplit.second))
 
             val msSplit = ms.split(splitIndex)
-            assertEquals(ms, msSplit._1().join(msSplit._2()))
+            assertEquals(ms, msSplit.first.join(msSplit.second))
             splitIndex += (STRICT_NODE_LENGTH.toDouble() * STRICT_NODE_LENGTH.toDouble() * 0.333).toInt()
         }
     }
@@ -977,12 +977,12 @@ class RrbTreeTest {
             }
             //        System.out.println("test=" + test.indentedStr(5));
             val split = test.split(splitIndex)
-            //        System.out.println("leftSplit=" + split._1().indentedStr(10));
-            //        System.out.println("rightSplit=" + split._2().indentedStr(11));
+            //        System.out.println("leftSplit=" + split.first.indentedStr(10));
+            //        System.out.println("rightSplit=" + split.second.indentedStr(11));
             val leftControl = control.subList(0, splitIndex)
             val rightControl = control.subList(splitIndex, control.size)
-            val leftSplit = split._1()
-            val rightSplit = split._2()
+            val leftSplit = split.first
+            val rightSplit = split.second
             if (isPrime(splitIndex)) {
                 println("original=\n" + test.indentedStr(0))
                 println("splitIndex=" + splitIndex)

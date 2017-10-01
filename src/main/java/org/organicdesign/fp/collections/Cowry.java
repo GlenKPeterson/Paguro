@@ -1,9 +1,9 @@
 package org.organicdesign.fp.collections;
 
+import kotlin.Pair;
+
 import java.lang.reflect.Array;
 import java.util.Arrays;
-
-import org.organicdesign.fp.tuple.Tuple2;
 
 /**
  Cowry is short for Copy On Write aRraY and contains utilities for doing this quickly and correctly.
@@ -161,7 +161,7 @@ final class Cowry {
      @param splitIndex items less than this index go in the left, equal or greater in the right.
      @return a 2D array of leftItems then rightItems
      */
-    static <T> Tuple2<T[],T[]> splitArray(T[] orig, int splitIndex) { //, Class<T> tClass) {
+    static <T> Pair<T[],T[]> splitArray(T[] orig, int splitIndex) { //, Class<T> tClass) {
 //        if (splitIndex < 1) {
 //            throw new IllegalArgumentException("Called split when splitIndex < 1");
 //        }
@@ -180,8 +180,8 @@ final class Cowry {
 //                                          (T[]) Array.newInstance(tClass, rightLength));
 //
         // Tuple2<T[],T[]> split =
-        return Tuple2.of(Arrays.copyOf(orig, splitIndex),
-                         Arrays.copyOfRange(orig, splitIndex, orig.length));
+        return new Pair<>(Arrays.copyOf(orig, splitIndex),
+                          Arrays.copyOfRange(orig, splitIndex, orig.length));
 
 //        // original array, offset, newArray, offset, length
 //        System.arraycopy(orig, 0, split._1(), 0, splitIndex);

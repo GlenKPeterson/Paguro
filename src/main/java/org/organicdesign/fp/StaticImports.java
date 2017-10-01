@@ -131,8 +131,8 @@ public final class StaticImports {
      */
     @SafeVarargs
     static public <T> MutRrbt<T> mutableRrb(T... items) {
-        if ( (items == null) || (items.length < 1) ) { return RrbTree.emptyMutable(); }
-        return RrbTree.<T>emptyMutable()
+        if ( (items == null) || (items.length < 1) ) { return RrbTree.Companion.emptyMutable(); }
+        return RrbTree.Companion.<T>emptyMutable()
                 .concat(Arrays.asList(items));
     }
 
@@ -176,7 +176,7 @@ public final class StaticImports {
      */
     @SafeVarargs
     static public <T> ImRrbt<T> rrb(T... items) {
-        if ( (items == null) || (items.length < 1) ) { return RrbTree.empty(); }
+        if ( (items == null) || (items.length < 1) ) { return RrbTree.Companion.empty(); }
         return mutableRrb(items).immutable();
     }
 
