@@ -2304,7 +2304,7 @@ involves changing more nodes than maybe necessary.
                 if (subNodeIndex > 0) {
                     System.arraycopy(ints, 0, newCumSizes, 0, subNodeIndex)
                 }
-                for (i in ints.indices) {
+                for (i in subNodeIndex until ints.size) {
                     newCumSizes[i] = ints[i] + insertSize
                 }
                 return Relaxed(newCumSizes, newNodes)

@@ -641,12 +641,10 @@ class RrbTreeTest {
         val shorter = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19)
         equalsDistinctHashCode(control, rrb1, rrb2, shorter)
 
-        val hasNull = Arrays.asList<Int>(1, 2, 3, 4, 5, 6, null, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20)
+        val hasNull = Arrays.asList(1, 2, 3, 4, 5, 6, null, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20)
 
-        val rrb3 = xform(hasNull).fold(RrbTree.empty<Int>()
-        ) { accum, item -> accum.append(item) }
-        val rrb4 = xform(hasNull).fold(RrbTree.emptyMutable<Int>()
-        ) { accum, item -> accum.append(item) }
+        val rrb3 = xform(hasNull).fold(RrbTree.empty<Int?>()) { accum, item -> accum.append(item) }
+        val rrb4 = xform(hasNull).fold(RrbTree.emptyMutable<Int?>()) { accum, item -> accum.append(item) }
 
         equalsDistinctHashCode(rrb3, rrb4, hasNull, other)
     }
