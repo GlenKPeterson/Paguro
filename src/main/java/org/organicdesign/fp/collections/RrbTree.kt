@@ -2210,8 +2210,8 @@ involves changing more nodes than maybe necessary.
             }
 
             // Insert the new item.
-            @Suppress("UNCHECKED_CAST") // TODO: HERE!
-            (newNodes as Array<Relaxed<T>>)[subNodeIndex] = node1
+            @Suppress("UNCHECKED_CAST")
+            (newNodes as Array<Node<T>>)[subNodeIndex] = node1
             newNodes[subNodeIndex + 1] = node2
 
             // If we aren't inserting at the last item, array-copy the nodes after the insert
