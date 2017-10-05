@@ -1593,7 +1593,7 @@ involves changing more nodes than maybe necessary.
             // We know all sub-nodes (except the last) have the same size because they are
             // packed-left.
             val subNodeSize = nodes[0].size()
-            for (i in nodes.indices) {
+            for (i in 0 until nodes.size - 1) {
                 cumulativeSize += subNodeSize
                 newCumSizes[i] = cumulativeSize
             }
@@ -2210,7 +2210,7 @@ involves changing more nodes than maybe necessary.
             }
 
             // Insert the new item.
-            @Suppress("UNCHECKED_CAST")
+            @Suppress("UNCHECKED_CAST") // TODO: HERE!
             (newNodes as Array<Relaxed<T>>)[subNodeIndex] = node1
             newNodes[subNodeIndex + 1] = node2
 
