@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
+  <component name="AutoImportedSourceRoots">
+    <option name="directories">
+      <list>
+        <option value="$MODULE_DIR$/src/main/java" />
+        <option value="$MODULE_DIR$/src/main/kotlin" />
+        <option value="$MODULE_DIR$/src/test/java" />
+        <option value="$MODULE_DIR$/src/test/kotlin" />
+      </list>
+    </option>
+  </component>
   <component name="FacetManager">
     <facet type="kotlin-language" name="Kotlin">
       <configuration version="3" platform="JVM 1.8" useProjectSettings="false">

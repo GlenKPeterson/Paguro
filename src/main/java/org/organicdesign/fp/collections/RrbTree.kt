@@ -19,7 +19,6 @@ import java.io.ObjectOutputStream
 import java.io.Serializable
 import java.util.Arrays
 
-import org.organicdesign.fp.collections.Cowry.*
 import org.organicdesign.fp.collections.Indented.arrayString
 import org.organicdesign.fp.collections.Indented.indentSpace
 
@@ -564,7 +563,7 @@ abstract class RrbTree<E> : BaseList<E>, Indented {
                 return ImRrbt(singleElementArray(item), size, newRoot,
                               size + 1)
             }
-            return ImRrbt(insertIntoArrayAt(item, focus, focus.size, null),
+            return ImRrbt(insertIntoArrayAt(item, focus, focus.size),
                           focusStartIndex, root,
                           size + 1)
         }
@@ -632,7 +631,7 @@ abstract class RrbTree<E> : BaseList<E>, Indented {
 
             if (diff >= 0 && diff <= focus.size) {
                 // new focus
-                val newFocus = insertIntoArrayAt(element, focus, diff, null)
+                val newFocus = insertIntoArrayAt(element, focus, diff)
                 return ImRrbt(newFocus, focusStartIndex, root, size + 1)
             }
 
@@ -853,7 +852,7 @@ abstract class RrbTree<E> : BaseList<E>, Indented {
             if (index >= focusStartIndex) {
                 val focusOffset = index - focusStartIndex
                 if (focusOffset < focus.size) {
-                    return ImRrbt(replaceInArrayAt(item, focus, focusOffset, null),
+                    return ImRrbt(replaceInArrayAt(item, focus, focusOffset),
                                   focusStartIndex, root, size)
                 }
                 index -= focus.size
@@ -1185,10 +1184,9 @@ involves changing more nodes than maybe necessary.
         }
     }
 
-    private class Leaf<T>// It can only be Strict if items.length == STRICT_NODE_LENGTH and if its parents
-    // are strict.
-    //        boolean isStrict;
-    internal constructor(internal val items: Array<T?>) : Node<T> {
+    private class Leaf<T>(internal val items: Array<T?>) : Node<T> {
+        // It can only be Strict if items.length == STRICT_NODE_LENGTH and if its parents are strict.
+        //        boolean isStrict;
 
         override fun child(childIdx: Int): Node<T> {
             throw UnsupportedOperationException("Don't call this on a leaf")
@@ -1259,10 +1257,10 @@ involves changing more nodes than maybe necessary.
 
             // Should we just ensure that the split is between 1 and items.length (exclusive)?
             if (splitIndex == 0) {
-                return SplitNode(emptyLeaf(), emptyArray<T?>(), emptyLeaf(), items)
+                return SplitNode<T>(emptyLeaf(), emptyArray(), emptyLeaf(), items)
             }
             if (splitIndex == items.size) {
-                return SplitNode(emptyLeaf(), items, emptyLeaf(), emptyArray<T?>())
+                return SplitNode<T>(emptyLeaf(), items, emptyLeaf(), emptyArray())
             }
             val split = splitArray(items, splitIndex)
             var splitL = split.first
@@ -1340,7 +1338,7 @@ involves changing more nodes than maybe necessary.
             //            if (idx >= size()) {
             //                throw new IllegalArgumentException("Invalid index " + idx + " >= " + size());
             //            }
-            return Leaf(replaceInArrayAt(t, items, idx, null))
+            return Leaf(replaceInArrayAt(t, items, idx))
         }
 
         override fun thisNodeHasRelaxedCapacity(numItems: Int): Boolean {
@@ -1418,7 +1416,7 @@ involves changing more nodes than maybe necessary.
             return if (leftMost || shorter !is Strict<*>) {
                 relax().addEndChild(leftMost, shorter)
             } else Strict(shift, size + shorter.size(),
-                          insertIntoArrayAt<Node<T>>(shorter, nodes, nodes.size, nodeClass()))
+                          insertIntoArrayAt(shorter, nodes, nodes.size, nodeClass()))
         }
 
         /** Adds kids as leftmost or rightmost of current children  */
@@ -1521,10 +1519,10 @@ involves changing more nodes than maybe necessary.
             //                throw new IllegalArgumentException("Bad splitIndex: " + splitIndex);
             //            }
             if (splitIndex == 0) {
-                return SplitNode(emptyLeaf(), emptyArray<T?>(), this, emptyArray())
+                return SplitNode<T>(emptyLeaf(), emptyArray(), this, emptyArray())
             }
             if (splitIndex == size) {
-                return SplitNode(this, emptyArray<T?>(), emptyLeaf(), emptyArray())
+                return SplitNode<T>(this, emptyArray(), emptyLeaf(), emptyArray())
             }
 
             // Not split on a child boundary, so find which child to split and pass it the
@@ -1628,7 +1626,7 @@ involves changing more nodes than maybe necessary.
                         // to pushFocus()
                         val strict = lastNode as Strict<T>
                         val newNode = strict.pushFocus(lowBits(index), oldFocus)
-                        val newNodes = replaceInArrayAt<Node<T>>(newNode, nodes, nodes.size - 1, nodeClass())
+                        val newNodes = replaceInArrayAt(newNode, nodes, nodes.size - 1, nodeClass())
                         return Strict(shift, size + oldFocus.size, newNodes)
                     }
                     // Regardless of what else happens, we're going to add a new node.
@@ -1649,13 +1647,13 @@ involves changing more nodes than maybe necessary.
                     // Make the skinny-branch of single-element strict nodes:
                     while (newShift < maxShift) {
                         // Add a skinny branch node
-                        newNode = Strict(newShift, oldFocus.size, singleElementArray<Node<T>>(newNode, nodeClass()))
+                        newNode = Strict(newShift, oldFocus.size, singleElementArray(newNode, nodeClass()))
                         newShift += NODE_LENGTH_POW_2
                     }
 
                     return if (nodes.size < STRICT_NODE_LENGTH) {
                         // Add a node to the existing array
-                        val newNodes = insertIntoArrayAt<Node<T>>(newNode, nodes, subNodeIndex, nodeClass())
+                        val newNodes = insertIntoArrayAt(newNode, nodes, subNodeIndex, nodeClass())
                         // This could allow cheap strict inserts on any leaf-node boundary...
                         Strict(shift, size + oldFocus.size, newNodes)
                     } else {
@@ -1678,7 +1676,7 @@ involves changing more nodes than maybe necessary.
                     // Regardless of what else happens, we're going to add a new node.
                     val newNode = Leaf(oldFocus)
 
-                    val newNodes = insertIntoArrayAt<Node<T>>(newNode, nodes, subNodeIndex, nodeClass())
+                    val newNodes = insertIntoArrayAt(newNode, nodes, subNodeIndex, nodeClass())
                     // This allows cheap strict inserts on any leaf-node boundary...
                     return Strict(shift, size + oldFocus.size, newNodes)
                 }
@@ -1694,7 +1692,7 @@ involves changing more nodes than maybe necessary.
             val thisNodeIdx = highBits(idx)
             val newNode = nodes[thisNodeIdx].replace(lowBits(idx), t)
             return Strict(shift, size,
-                          replaceInArrayAt<Node<T>>(newNode, nodes, thisNodeIdx, nodeClass()))
+                          replaceInArrayAt(newNode, nodes, thisNodeIdx, nodeClass()))
         }
 
         override fun thisNodeHasRelaxedCapacity(numItems: Int): Boolean {
@@ -1793,11 +1791,9 @@ involves changing more nodes than maybe necessary.
             //            if (nodes[0].height() != newKids[0].height()) {
             //                throw new IllegalStateException("Kids not same height");
             //            }
-            val res = spliceIntoArrayAt<Node<T>>(newKids, nodes,
-                                                 if (leftMost)
-                                                     0
-                                                 else
-                                                     nodes.size, nodeClass())
+            val res = spliceIntoArrayAt(newKids, nodes,
+                                        if (leftMost) 0 else nodes.size,
+                                        nodeClass())
             // TODO: Figure out which side we inserted on and do the math to adjust counts instead
             // of looking them up.
             return Relaxed(makeSizeArray(res), res)
@@ -1982,7 +1978,7 @@ involves changing more nodes than maybe necessary.
                 return SplitNode(emptyLeaf(), emptyArray<T?>(), emptyLeaf(), emptyArray<T?>())
             }
             if (splitIndex == size) {
-                return SplitNode(this, emptyArray<T?>(), emptyLeaf(), emptyArray())
+                return SplitNode<T>(this, emptyArray(), emptyLeaf(), emptyArray())
             }
 
             val subNodeIndex = subNodeIndex(splitIndex)
@@ -2004,7 +2000,7 @@ involves changing more nodes than maybe necessary.
                 val right = Relaxed(rightCumSizes, splitNodes.second)
                 //                right.debugValidate();
 
-                return SplitNode(left, emptyArray<T?>(), right, emptyArray())
+                return SplitNode<T>(left, emptyArray(), right, emptyArray())
             }
 
             val subNodeAdjustedIndex = subNodeAdjustedIndex(splitIndex, subNodeIndex)
@@ -2127,7 +2123,7 @@ involves changing more nodes than maybe necessary.
                         subNodeIndex++
                     }
 
-                    newNodes = insertIntoArrayAt<Node<T>>(newNode, nodes, subNodeIndex, nodeClass())
+                    newNodes = insertIntoArrayAt(newNode, nodes, subNodeIndex, nodeClass())
                     // Increment newCumSizes for the changed item and all items to the right.
                     newCumSizes = IntArray(cumulativeSizes.size + 1)
                     var cumulativeSize = 0
@@ -2244,7 +2240,7 @@ involves changing more nodes than maybe necessary.
         override fun replace(idx: Int, t: T?): Node<T> {
             val subNodeIndex = subNodeIndex(idx)
             val alteredNode = nodes[subNodeIndex].replace(subNodeAdjustedIndex(idx, subNodeIndex), t)
-            val newNodes = replaceInArrayAt<Node<T>>(alteredNode, nodes, subNodeIndex, nodeClass())
+            val newNodes = replaceInArrayAt(alteredNode, nodes, subNodeIndex, nodeClass())
             return Relaxed(cumulativeSizes, newNodes)
         }
 
@@ -2298,7 +2294,7 @@ involves changing more nodes than maybe necessary.
              */
             internal fun <T> replaceInRelaxedAt(ints: IntArray, ns: Array<out Node<T>>, newNode: Node<T>,
                                                 subNodeIndex: Int, insertSize: Int): Relaxed<T> {
-                val newNodes = replaceInArrayAt<Node<T>>(newNode, ns, subNodeIndex, nodeClass())
+                val newNodes = replaceInArrayAt(newNode, ns, subNodeIndex, nodeClass())
                 // Increment newCumSizes for the changed item and all items to the right.
                 val newCumSizes = IntArray(ints.size)
                 if (subNodeIndex > 0) {

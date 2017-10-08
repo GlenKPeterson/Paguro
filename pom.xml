@@ -160,24 +160,25 @@ http://mvnrepository.com/artifact/org.organicdesign/Paguro
 				</configuration>
 				<groupId>org.jetbrains.kotlin</groupId>
 				<version>${kotlin.version}</version>
-
 				<executions>
 					<execution>
 						<id>compile</id>
-						<phase>compile</phase>
 						<goals> <goal>compile</goal> </goals>
 						<configuration>
-							<jvmTarget>1.8</jvmTarget>
+							<sourceDirs>
+								<sourceDir>${project.basedir}/src/main/kotlin</sourceDir>
+								<sourceDir>${project.basedir}/src/main/java</sourceDir>
+							</sourceDirs>
 						</configuration>
 					</execution>
 					<execution>
 						<id>test-compile</id>
-						<phase>test-compile</phase>
-						<goals>
-							<goal>test-compile</goal>
-						</goals>
+						<goals> <goal>test-compile</goal> </goals>
 						<configuration>
-							<jvmTarget>1.8</jvmTarget>
+							<sourceDirs>
+								<sourceDir>${project.basedir}/src/test/kotlin</sourceDir>
+								<sourceDir>${project.basedir}/src/test/java</sourceDir>
+							</sourceDirs>
 						</configuration>
 					</execution>
 				</executions>
@@ -200,9 +201,14 @@ http://mvnrepository.com/artifact/org.organicdesign/Paguro
 					</compilerArgs>
 				</configuration>
 				<executions>
-					<!--
+					<!-- Replacing default-compile as it is treated specially by maven -->
 					<execution>
 						<id>default-compile</id>
+						<phase>none</phase>
+					</execution>
+					<!-- Replacing default-testCompile as it is treated specially by maven -->
+					<execution>
+						<id>default-testCompile</id>
 						<phase>none</phase>
 					</execution>
 					<execution>
@@ -210,25 +216,10 @@ http://mvnrepository.com/artifact/org.organicdesign/Paguro
 						<phase>compile</phase>
 						<goals> <goal>compile</goal> </goals>
 					</execution>
-					-->
-					<!-- Replacing default-testCompile as it is treated specially by maven -->
-					<execution>
-						<id>default-testCompile</id>
-						<phase>none</phase>
-					</execution>
 					<execution>
 						<id>java-test-compile</id>
 						<phase>test-compile</phase>
-						<goals>
-							<goal>testCompile</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>compile</id>
-						<phase>compile</phase>
-						<goals>
-							<goal>compile</goal>
-						</goals>
+						<goals> <goal>testCompile</goal> </goals>
 					</execution>
 				</executions>
 			</plugin>
