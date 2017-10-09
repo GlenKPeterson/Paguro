@@ -68,8 +68,8 @@ Paguro takes advantage of Java's type inferencing.  It eschews void return types
 Available from the [Maven Repository](http://mvnrepository.com/artifact/org.organicdesign/Paguro) as:
 ```xml
 <!--
-If you're new to Paguro, consider starting with the streamlined
-3.0 Alpha version instead (on the 2016-05-22_RRB-Tree branch)
+If you're using Kotlin and Java, you want the 3.1 version in the KotlinFootWetting branch.
+Java-only users want 3.0 from the main branch.
  -->
 <dependency>
         <groupId>org.organicdesign</groupId>
