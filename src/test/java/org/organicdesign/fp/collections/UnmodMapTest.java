@@ -24,12 +24,11 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.junit.Test;
-import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.TestUtilities;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import static org.junit.Assert.*;
-import static org.organicdesign.fp.StaticImports.tup;
+import static org.organicdesign.fp.StaticImportsKt.tup;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
@@ -302,7 +301,7 @@ public class UnmodMapTest {
     }
 
     static Map.Entry<String,Integer> me = new TestEntry<>("Hello", 37);
-    static UnmodMap.UnEntry<String,Integer> ue = Tuple2.of(me);
+    static UnmodMap.UnEntry<String,Integer> ue = Tuple2.Companion.of(me);
 
     @Test public void unEntryTest() {
 

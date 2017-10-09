@@ -12,7 +12,7 @@ import org.junit.Test;
 import org.organicdesign.fp.TestUtilities;
 
 import static org.junit.Assert.*;
-import static org.organicdesign.fp.StaticImports.*;
+import static org.organicdesign.fp.StaticImportsKt.*;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 import static org.organicdesign.fp.collections.Equator.defaultComparator;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;

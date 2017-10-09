@@ -60,7 +60,7 @@ public interface Fn2<A,B,R> extends BiFunction<A,B,R> {
             private final Map<Tuple2<A,B>,Option<Z>> map = new HashMap<>();
             @Override
             public synchronized Z applyEx(A a, B b) throws Exception {
-                Tuple2<A,B> t = Tuple2.of(a, b);
+                Tuple2<A,B> t = new Tuple2<>(a, b);
                 Option<Z> val = map.get(t);
                 if (val != null) { return val.get(); }
                 Z ret = f.apply(a, b);

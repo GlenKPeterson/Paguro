@@ -26,14 +26,7 @@ public class ArrayHolderTest {
                                               new ArrayHolder<>(true, false),
                                               new ArrayHolder<>(false, false));
 
-
         // https://stackoverflow.com/questions/15576009/how-to-make-hashmap-work-with-arrays-as-key
-
-
-
-
-
-
 
     // boolean[] a = {false, false};
     ArrayHolder<Boolean> a = new ArrayHolder<>(false, false);

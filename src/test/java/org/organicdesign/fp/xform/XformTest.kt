@@ -19,12 +19,11 @@ import org.junit.Assert.assertArrayEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import org.organicdesign.fp.StaticImports.vec
-import org.organicdesign.fp.StaticImports.xform
 import org.organicdesign.fp.collections.UnmodIterable.emptyUnmodIterable
 import org.organicdesign.fp.function.Fn1.accept
 import org.organicdesign.fp.function.Fn1.reject
 import org.organicdesign.fp.oneOf.Option
+import org.organicdesign.fp.vec
 import org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode
 import java.util.ArrayList
 import java.util.concurrent.atomic.AtomicInteger
@@ -533,8 +532,7 @@ class XformTest : TestCase() {
     @Test
     fun testNullConstruction() {
         assertEquals(Xform.EMPTY, Xform.of<Any>(null))
-        assertEquals(Xform.EMPTY, xform<Any>(null))
-    }
+   }
 
     //    @Test public void emptyXform() {
     //        assertEquals(0, Xform.EMPTY.hashCode());

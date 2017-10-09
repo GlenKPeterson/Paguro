@@ -16,8 +16,6 @@ package org.organicdesign.fp
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.organicdesign.fp.StaticImports.tup
-import org.organicdesign.fp.StaticImports.vec
 import org.organicdesign.fp.UsageExampleKtTest.EmailType.HOME
 import org.organicdesign.fp.UsageExampleKtTest.EmailType.WORK
 import org.organicdesign.fp.collections.ImList

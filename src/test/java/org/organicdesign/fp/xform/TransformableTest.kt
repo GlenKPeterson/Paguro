@@ -69,7 +69,7 @@ class TransformableTest {
             control.put(i, ordinal(i))
         }
         val trans = Xform.of(items)
-        assertEquals(control, trans.toMutSortedMap(comp, { i -> Tuple2.of(i, ordinal(i)) }))
+        assertEquals(control, trans.toMutSortedMap(comp, { i -> Tuple2(i, ordinal(i)) }))
     }
 
     @Test
@@ -94,7 +94,7 @@ class TransformableTest {
             control = control.assoc(i, ordinal(i))
         }
         val trans = Xform.of(items)
-        assertEquals(control, trans.toImSortedMap(comp) { i -> Tuple2.of(i, ordinal(i!!)) })
+        assertEquals(control, trans.toImSortedMap(comp) { i -> Tuple2(i, ordinal(i!!)) })
     }
 
     @Test

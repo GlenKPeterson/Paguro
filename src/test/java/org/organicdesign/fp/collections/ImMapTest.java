@@ -26,7 +26,7 @@ public class ImMapTest {
         private TestMap(Map<K,V> m) { inner = m; }
 
         @Override public Option<UnEntry<K, V>> entry(K key) {
-            return inner.containsKey(key) ? Option.some(Tuple2.of(key, inner.get(key)))
+            return inner.containsKey(key) ? Option.some(new Tuple2<>(key, inner.get(key)))
                                           : Option.none();
         }
 
@@ -65,7 +65,7 @@ public class ImMapTest {
         Map<String,Integer> control = new HashMap<>();
         ImMap<String,Integer> test = new TestMap<>(new HashMap<>());
         for (int i = 0; i < 20; i++) {
-            Tuple2<String,Integer> entry = Tuple2.of(ordinal(i), i);
+            Tuple2<String,Integer> entry = new Tuple2<>(ordinal(i), i);
             control.put(entry.getKey(), entry.getValue());
             test = test.assoc(entry);
             assertEquals(control.size(), test.size());

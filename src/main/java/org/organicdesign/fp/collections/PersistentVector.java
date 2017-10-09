@@ -108,7 +108,7 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
 
     /**
      Public static factory method to create a vector from an Iterable.  A varargs version of this
-     method is: {@link org.organicdesign.fp.StaticImports#vec(Object...)}.
+     method is: {@link org.organicdesign.fp.StaticImportsKt#vec(Object...)}.
      */
     static public <T> PersistentVector<T> ofIter(Iterable<T> items) {
         MutVector<T> ret = emptyMutable();

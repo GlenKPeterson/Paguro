@@ -33,21 +33,21 @@ public class Tuple2Test {
     public void constructionAndAccess() {
         Tuple2<Integer,String> a = new Tuple2<>(7, "Hello");
 
-        assertEquals(new Integer(7), a._1());
+        assertEquals(new Integer(7), a.get_1());
         assertEquals(new Integer(7), a.getKey());
 
-        assertEquals("Hello", a._2());
+        assertEquals("Hello", a.get_2());
         assertEquals("Hello", a.getValue());
 
         assertEquals(a, a);
         assertEquals(a.hashCode(), a.hashCode());
 
-        Tuple2<Integer,String> b = Tuple2.of(5, "hello");
+        Tuple2<Integer,String> b = new Tuple2<>(5, "hello");
 
-        assertEquals(new Integer(5), b._1());
+        assertEquals(new Integer(5), b.get_1());
         assertEquals(new Integer(5), b.getKey());
 
-        assertEquals("hello", b._2());
+        assertEquals("hello", b.get_2());
         assertEquals("hello", b.getValue());
 
         assertEquals(b, b);
@@ -59,10 +59,10 @@ public class Tuple2Test {
 
         Tuple2<Integer,String> c = new Tuple2<>(7, null);
 
-        assertEquals(new Integer(7), c._1());
+        assertEquals(new Integer(7), c.get_1());
         assertEquals(new Integer(7), c.getKey());
 
-        assertEquals(null, c._2());
+        assertEquals(null, c.get_2());
         assertEquals(null, c.getValue());
 
         assertEquals(c, c);
@@ -75,12 +75,12 @@ public class Tuple2Test {
         assertNotEquals(c.hashCode(), a.hashCode());
         assertNotEquals(c.hashCode(), b.hashCode());
 
-        Tuple2<Integer,String> d = Tuple2.of(null, "Hello");
+        Tuple2<Integer,String> d = new Tuple2<>(null, "Hello");
 
-        assertEquals(null, d._1());
+        assertEquals(null, d.get_1());
         assertEquals(null, d.getKey());
 
-        assertEquals("Hello", d._2());
+        assertEquals("Hello", d.get_2());
         assertEquals("Hello", d.getValue());
 
         assertEquals(d, d);
@@ -114,7 +114,7 @@ public class Tuple2Test {
         assertEquals(serializeDeserialize(a), realEntry);
 
         equalsDistinctHashCode(a,
-                               Tuple2.of(realEntry),
+                               Tuple2.Companion.of(realEntry),
                                realEntry,
                                new Tuple2<>(7, "hello"));
 
@@ -122,15 +122,41 @@ public class Tuple2Test {
         assertEquals(b, serializeDeserialize(b));
         assertEquals(c, serializeDeserialize(c));
         assertEquals(d, serializeDeserialize(d));
-        assertEquals(realEntry, serializeDeserialize(Tuple2.of(realEntry)));
-        assertEquals(serializeDeserialize(Tuple2.of(realEntry)), realEntry);
+        assertEquals(realEntry, serializeDeserialize(Tuple2.Companion.of(realEntry)));
+        assertEquals(serializeDeserialize(Tuple2.Companion.of(realEntry)), realEntry);
+    }
+
+    public <K,V> void testHashVsEntry(K k, V v) {
+        Map<K,V> realMap = new HashMap<>();
+        realMap.put(k, v);
+        Map.Entry<K,V> realEntry = realMap.entrySet().iterator().next();
+        assertEquals(realEntry.hashCode(), new Tuple2<>(k, v).hashCode());
+
+        if (k != null) {
+            TreeMap<K, V> treeMap = new TreeMap<>();
+            treeMap.put(k, v);
+            Map.Entry<K, V> treeEntry = treeMap.entrySet().iterator().next();
+            assertEquals(treeEntry.hashCode(), new Tuple2<>(k, v).hashCode());
+        }
+    }
+
+    @Test public void compareHashCodeWithMapEntries() {
+        testHashVsEntry(0, 1);
+        testHashVsEntry(1, 0);
+        testHashVsEntry(3, 4);
+        testHashVsEntry(4, 3);
+        testHashVsEntry("Hello", 7.5);
+        testHashVsEntry(29.7, "Cuckoo");
+        testHashVsEntry(5, null);
+        testHashVsEntry(null, 5);
+        testHashVsEntry(null, null);
     }
 
     @Test public void treeMapEntryTest() {
         TreeMap<String,Integer> control = new TreeMap<>();
         control.put("one", 1);
         Map.Entry<String,Integer> realEntry = control.entrySet().iterator().next();
-        Tuple2<String,Integer> test = Tuple2.of("one", 1);
+        Tuple2<String,Integer> test = new Tuple2<>("one", 1);
 
         assertEquals(realEntry.hashCode(), test.hashCode());
 
@@ -146,7 +172,7 @@ public class Tuple2Test {
     @SuppressWarnings("deprecation")
     @Test
     public void modification() {
-        Tuple2<Integer,String> t = Tuple2.of(19, "World");
+        Tuple2<Integer,String> t = new Tuple2<>(19, "World");
         thrown.expect(UnsupportedOperationException.class);
         t.setValue("Boom!");
     }

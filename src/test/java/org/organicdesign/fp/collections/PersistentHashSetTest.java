@@ -11,7 +11,7 @@ import org.junit.Test;
 import org.organicdesign.fp.oneOf.Option;
 
 import static org.junit.Assert.*;
-import static org.organicdesign.fp.StaticImports.vec;
+import static org.organicdesign.fp.StaticImportsKt.vec;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 import static org.organicdesign.fp.collections.PersistentHashSetTest.Ctx.mod3Eq;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;

@@ -23,8 +23,8 @@ import org.organicdesign.fp.tuple.Tuple2;
 import org.organicdesign.fp.tuple.Tuple3;
 
 import static org.junit.Assert.assertEquals;
-import static org.organicdesign.fp.StaticImports.tup;
-import static org.organicdesign.fp.StaticImports.vec;
+import static org.organicdesign.fp.StaticImportsKt.tup;
+import static org.organicdesign.fp.StaticImportsKt.vec;
 import static org.organicdesign.fp.UsageExampleTest.EmailType.HOME;
 import static org.organicdesign.fp.UsageExampleTest.EmailType.WORK;
 
@@ -116,7 +116,7 @@ public class UsageExampleTest {
                                                // Tuple2 implements Map.Entry making it easy to
                                                // create the pair right here.
                                                // Note: mail._2() is the address string
-                                               .map(mail -> tup(mail._2(), person)))
+                                               .map(mail -> tup(mail.get_2(), person)))
                         // Convert the result into an immutable map.  The function argument is
                         // normally used to convert data into key/value pairs, but we already have
                         // key/value pairs, so we just pass the identity function (returns its
@@ -155,8 +155,8 @@ public class UsageExampleTest {
         Email(EmailType t, String s) { super(t, s); }
 
         // Give descriptive names to the field getters
-        EmailType mailType() { return _1; }
-        String address() { return _2; }
+        EmailType mailType() { return get_1(); }
+        String address() { return get_2(); }
     }
 
     // Notice in this type signature, we have replaced Tuple2<EmailType,String> with Email

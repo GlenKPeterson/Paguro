@@ -16,7 +16,6 @@ package org.organicdesign.fp
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.organicdesign.fp.StaticImports.*
 import org.organicdesign.fp.collections.ImList
 import org.organicdesign.fp.collections.ImSortedMap
 import org.organicdesign.fp.collections.ImSortedSet
@@ -28,7 +27,6 @@ import org.organicdesign.fp.collections.PersistentVector
 import org.organicdesign.fp.tuple.Tuple2
 import org.organicdesign.fp.tuple.Tuple3
 import org.organicdesign.fp.xform.Xform
-import java.lang.reflect.InvocationTargetException
 import java.util.ArrayList
 import java.util.Arrays
 import java.util.Collections
@@ -85,28 +83,14 @@ class StaticImportsTest {
                      mutableVec(1, 2, 3))
     }
 
-    @Test(expected = UnsupportedOperationException::class)
-    @Throws(Throwable::class)
-    fun instantiationEx() {
-        val c = StaticImports::class.java
-        val defCons = c.getDeclaredConstructor()
-        defCons.isAccessible = true
-        try {
-            // This catches the exception and wraps it in an InvocationTargetException
-            defCons.newInstance()
-        } catch (ite: InvocationTargetException) {
-            // Here we throw the original exception.
-            throw ite.targetException
-        }
-
-    }
-
     @Test
     @Throws(Exception::class)
     fun testMap() {
         assertEquals(PersistentHashMap.EMPTY, map<Any,Any>())
 //        assertEquals(PersistentHashMap.EMPTY, map<Any,Any>(*null as Array<Entry<Any, Any>>?))
-        assertEquals(PersistentHashMap.EMPTY, map<Any, Any>(*arrayOfNulls<Entry<*, *>>(0)))
+        @Suppress("UNCHECKED_CAST")
+        assertEquals(PersistentHashMap.EMPTY,
+                     map(*arrayOfNulls<Entry<Any,Any>>(0) as Array<out Entry<Any, Any>>))
         val phm = PersistentHashMap.empty<String, Int>()
                 .assoc("Hi", 43)
         assertEquals(phm, map(tup("Hi", 43)))
@@ -117,7 +101,8 @@ class StaticImportsTest {
     fun testSet() {
         assertEquals(PersistentHashSet.EMPTY, set<Any>())
 //        assertEquals(PersistentHashSet.EMPTY, set<Entry>(*null as Array<Entry<*, *>>?))
-        assertEquals(PersistentHashSet.EMPTY, set<Any>(*arrayOfNulls(0)))
+        @Suppress("UNCHECKED_CAST")
+        assertEquals(PersistentHashSet.EMPTY, set(*arrayOfNulls<Any>(0) as Array<out Any>))
         val phm = PersistentHashSet.empty<String>()
                 .put("Hi")
         assertEquals(phm, set("Hi"))
@@ -129,11 +114,11 @@ class StaticImportsTest {
 
         var ls: ImList<Entry<String, Int>> = PersistentVector.empty<Entry<String, Int>>()
         ls = ls.append(tup("Hi", 1))
-                .append(Tuple2.of("Bye", -99))
-                .append(Tuple2.of("hi", 33))
+                .append(Tuple2("Bye", -99))
+                .append(Tuple2("hi", 33))
                 .append(tup("bye", -9999))
         var refMap: ImSortedMap<String, Int> = PersistentTreeMap.ofComp(String.CASE_INSENSITIVE_ORDER, ls)
-        var testMap = sortedMap<String, Int>(String.CASE_INSENSITIVE_ORDER, ls)
+        var testMap = sortedMap(String.CASE_INSENSITIVE_ORDER, ls)
         assertEquals(refMap, testMap)
         // Because equals is meant to be compatible with an unsorted map, the comparator is not
         // considered.  Check the comparators to see that they are truly identical.
@@ -177,7 +162,7 @@ class StaticImportsTest {
     @Test
     @Throws(Exception::class)
     fun testTup() {
-        assertEquals(Tuple2.of("Hello", -32), tup("Hello", -32))
+        assertEquals(Tuple2("Hello", -32), tup("Hello", -32))
         assertEquals(Tuple3.of("Hello", -32, 9.5), tup("Hello", -32, 9.5))
     }
 

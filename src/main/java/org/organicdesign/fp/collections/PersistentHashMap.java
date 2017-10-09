@@ -80,7 +80,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
         @Override public UnEntry<K,V> next(){
             if (!seen) {
                 seen = true;
-                return Tuple2.of(null, nullValue);
+                return new Tuple2<>(null, nullValue);
             } else {
                 return rootIter.next();
             }
@@ -164,8 +164,8 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
 
     /**
      Returns a new PersistentHashMap of the given keys and their paired values.  There is also a
-     varargs version of this method: {@link org.organicdesign.fp.StaticImports#map(Map.Entry...)}.  Use
-     the {@link org.organicdesign.fp.StaticImports#tup(Object, Object)} method to define key/value
+     varargs version of this method: {@link org.organicdesign.fp.StaticImportsKt#map(Map.Entry...)}.  Use
+     the {@link org.organicdesign.fp.StaticImportsKt#tup(Object, Object)} method to define key/value
      pairs briefly and easily.
 
      @param kvPairs Key/value pairs (to go into the map).  In the case of a duplicate key, later
@@ -283,7 +283,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
 
     @Override public Option<UnmodMap.UnEntry<K,V>> entry(K key) {
         if (key == null) {
-            return hasNull ? Option.some(Tuple2.of(null, nullValue)) : Option.none();
+            return hasNull ? Option.some(new Tuple2<>(null, nullValue)) : Option.none();
         }
         if (root == null) {
             return Option.none();
@@ -412,7 +412,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
         @Override public Option<UnEntry<K,V>> entry(K key) {
             ensureEditable();
             if (key == null) {
-                return hasNull ? Option.some(Tuple2.of(null, nullValue)) : Option.none();
+                return hasNull ? Option.some(new Tuple2<>(null, nullValue)) : Option.none();
             }
             if (root == null) {
                 return Option.none();
@@ -855,7 +855,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
             if(keyOrNull == null)
                 return ((INode) valOrNode).find(shift + 5, hash, key);
             if(equator.eq(key, keyOrNull))
-                return Tuple2.of(keyOrNull, (V) valOrNode);
+                return new Tuple2<>(keyOrNull, (V) valOrNode);
             return null;
         }
 
@@ -1075,7 +1075,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
             if(idx < 0)
                 return null;
             if(equator.eq(key, k(array, idx)))
-                return Tuple2.of(k(array, idx), v(array, idx + 1));
+                return new Tuple2<>(k(array, idx), v(array, idx + 1));
             return null;
         }
 
@@ -1380,7 +1380,7 @@ public static void main(String[] args){
                 int i = mutableIndex;
                 mutableIndex = i + 2;
                 if (array[i] != null) {
-                    nextEntry = Tuple2.of(k(array, i), v(array, i + 1));
+                    nextEntry = new Tuple2<>(k(array, i), v(array, i + 1));
                     return true;
                 } else {
                     INode<K,V> node = iNode(array, i + 1);

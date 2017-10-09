@@ -31,16 +31,16 @@ public class UnmodListTest {
         Set<Tuple2<Integer,Integer>> answerSet = new HashSet<>();
         UnmodList.permutations(Arrays.asList(1,2,3,4),
                                (a, b) -> {
-                                   answerSet.add(Tuple2.of(a, b));
+                                   answerSet.add(new Tuple2<>(a, b));
                                    return answerSet;
                                });
         assertEquals(6, answerSet.size());
-        assertTrue(answerSet.contains(Tuple2.of(1, 2)));
-        assertTrue(answerSet.contains(Tuple2.of(1, 3)));
-        assertTrue(answerSet.contains(Tuple2.of(1, 4)));
-        assertTrue(answerSet.contains(Tuple2.of(2, 3)));
-        assertTrue(answerSet.contains(Tuple2.of(2, 4)));
-        assertTrue(answerSet.contains(Tuple2.of(3, 4)));
+        assertTrue(answerSet.contains(new Tuple2<>(1, 2)));
+        assertTrue(answerSet.contains(new Tuple2<>(1, 3)));
+        assertTrue(answerSet.contains(new Tuple2<>(1, 4)));
+        assertTrue(answerSet.contains(new Tuple2<>(2, 3)));
+        assertTrue(answerSet.contains(new Tuple2<>(2, 4)));
+        assertTrue(answerSet.contains(new Tuple2<>(3, 4)));
     }
 
     private static final String[] sticksAndStones = new String[] {

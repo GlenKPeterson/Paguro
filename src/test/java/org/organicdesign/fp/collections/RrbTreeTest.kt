@@ -15,11 +15,11 @@ package org.organicdesign.fp.collections
 
 import org.junit.Assert.*
 import org.junit.Test
-import org.organicdesign.fp.StaticImports.xform
 import org.organicdesign.fp.TestUtilities
 import org.organicdesign.fp.TestUtilities.compareIterators
 import org.organicdesign.fp.TestUtilities.serializeDeserialize
 import org.organicdesign.fp.collections.RrbTree.Companion.STRICT_NODE_LENGTH
+import org.organicdesign.fp.xform
 import org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode
 import java.security.NoSuchAlgorithmException
 import java.util.ArrayList

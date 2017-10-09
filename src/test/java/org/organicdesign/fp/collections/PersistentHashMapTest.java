@@ -37,7 +37,7 @@ import org.organicdesign.fp.tuple.Tuple2;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.FunctionUtils.ordinal;
-import static org.organicdesign.fp.StaticImports.*;
+import static org.organicdesign.fp.StaticImportsKt.*;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 import static org.organicdesign.fp.collections.PersistentHashMapTest.CompCtxt.BY_DATE;
 import static org.organicdesign.fp.collections.PersistentHashMapTest.CompCtxt.BY_INT;

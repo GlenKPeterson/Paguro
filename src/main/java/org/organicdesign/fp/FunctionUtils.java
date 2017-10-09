@@ -16,7 +16,7 @@ package org.organicdesign.fp;
 
 /**
  A dumping ground for utility functions that aren't useful enough to belong in
- {@link StaticImports}.
+ {@link StaticImportsKt}.
  */
 public class FunctionUtils {
 

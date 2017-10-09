@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.organicdesign.fp.collections.ImList;
 
 import static org.junit.Assert.assertEquals;
-import static org.organicdesign.fp.StaticImports.vec;
+import static org.organicdesign.fp.StaticImportsKt.vec;
 import static org.organicdesign.fp.type.RuntimeTypes.union2Str;
 
 /**

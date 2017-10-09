@@ -32,7 +32,7 @@ import org.organicdesign.fp.tuple.Tuple2;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.FunctionUtils.ordinal;
-import static org.organicdesign.fp.StaticImports.*;
+import static org.organicdesign.fp.StaticImportsKt.*;
 import static org.organicdesign.fp.TestUtilities.compareIterators;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 import static org.organicdesign.fp.collections.PersistentTreeMap.empty;
@@ -274,6 +274,12 @@ public class PersistentTreeMapTest {
         assertEquals(control.hashCode(), ser.hashCode());
         assertTrue(control.equals(ser));
         assertTrue(ser.equals(control));
+
+        System.out.println("control: " + control);
+        System.out.println("test: " + test);
+        System.out.println("ser: " + ser);
+        System.out.println("map(tup(\"one\", 1), tup(\"twp\", 2), tup(\"three\", 3)): " +
+                           map(tup("one", 1), tup("twp", 2), tup("three", 3)));
 
         equalsDistinctHashCode(control, test, ser, map(tup("one", 1), tup("twp", 2), tup("three", 3)));
     }

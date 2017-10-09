@@ -13,7 +13,7 @@ import org.organicdesign.fp.collections.ImList;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.organicdesign.fp.FunctionUtils.ordinal;
-import static org.organicdesign.fp.StaticImports.vec;
+import static org.organicdesign.fp.StaticImportsKt.vec;
 import static org.organicdesign.fp.function.Fn1.ConstObjObj.IDENTITY;
 import static org.organicdesign.fp.function.Fn1.ConstObjBool.ACCEPT;
 import static org.organicdesign.fp.function.Fn1.ConstObjBool.REJECT;
@@ -161,7 +161,7 @@ public class Fn1Test {
         assertEquals("two", h.apply(2));
         assertEquals("unknown", h.apply(3));
 
-        Fn1<String,String> i = Fn1.compose(vec(s -> s.substring(0, s.indexOf(" hundred")),
+        Fn1<String,String> i = Fn1.compose(vec((Fn1<String, String>) s -> s.substring(0, s.indexOf(" hundred")),
                                                wordToOrdinal));
         assertEquals("zillion", i.apply("zillion hundred"));
         assertEquals("zero", i.apply("zero hundred"));
@@ -210,9 +210,9 @@ public class Fn1Test {
                                    .toArray());
 
         assertArrayEquals(new Integer[]{1, 2, 4, 6, 7, 8, 9},
-                          oneToNine.filter(Fn1.or(vec(i -> i < 3,
-                                                            i -> i == 4,
-                                                            i -> i > 5)))
+                          oneToNine.filter(Fn1.or(vec((Fn1<Integer,Boolean>) i -> i < 3,
+                                                      (Fn1<Integer,Boolean>) i -> i == 4,
+                                                      (Fn1<Integer,Boolean>) i -> i > 5)))
                                    .toMutList()
                                    .toArray());
 
@@ -251,9 +251,9 @@ public class Fn1Test {
                                    .toArray());
 
         assertArrayEquals(new Integer[]{4, 5},
-                          oneToNine.filter(Fn1.and(vec(i -> i > 2,
-                                                             i -> i > 3,
-                                                             i -> i < 6)))
+                          oneToNine.filter(Fn1.and(vec((Fn1<Integer,Boolean>) i -> i > 2,
+                                                       (Fn1<Integer,Boolean>) i -> i > 3,
+                                                       (Fn1<Integer,Boolean>) i -> i < 6)))
                                    .toMutList()
                                    .toArray());
 

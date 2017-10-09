@@ -53,7 +53,7 @@ public class PersistentHashSet<E> extends AbstractUnmodSet<E>
 
     /**
      Returns a new PersistentHashSet of the values.  The vararg version of this method is
-     {@link org.organicdesign.fp.StaticImports#set(Object...)}   If the input contains duplicate
+     {@link org.organicdesign.fp.StaticImportsKt#set(Object...)}   If the input contains duplicate
      elements, later values overwrite earlier ones.
 
      @param elements The items to put into a vector.

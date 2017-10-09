@@ -34,7 +34,7 @@ public class FunctionUtilsTest {
     @Test public void stringifyTest() {
         assertEquals("null", stringify(null));
         assertEquals("\"Hello\"", stringify("Hello"));
-        assertEquals("Tuple2(\"a\",3)", stringify(Tuple2.of("a", 3)));
+        assertEquals("Tuple2(\"a\",3)", stringify(new Tuple2<>("a", 3)));
     }
 
     @Test (expected = UnsupportedOperationException.class)

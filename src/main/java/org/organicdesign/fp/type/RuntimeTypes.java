@@ -5,7 +5,7 @@ import org.organicdesign.fp.collections.ImList;
 import java.util.HashMap;
 
 import static org.organicdesign.fp.FunctionUtils.stringify;
-import static org.organicdesign.fp.StaticImports.vec;
+import static org.organicdesign.fp.StaticImportsKt.vec;
 
 /**
  Stores the classes from the compile-time generic type parameters in a vector in the *same order* as the

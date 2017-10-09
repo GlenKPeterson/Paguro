@@ -26,7 +26,7 @@ import org.junit.runners.JUnit4;
 import org.organicdesign.fp.TestUtilities;
 
 import static org.junit.Assert.*;
-import static org.organicdesign.fp.StaticImports.vec;
+import static org.organicdesign.fp.StaticImportsKt.vec;
 import static org.organicdesign.fp.TestUtilities.compareIterators;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
