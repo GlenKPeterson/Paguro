@@ -13,14 +13,15 @@
 // limitations under the License.
 package org.organicdesign.fp.collections
 
+import org.organicdesign.fp.collections.Indented.Companion.arrayString
+import org.organicdesign.fp.collections.Indented.Companion.indentSpace
+import org.organicdesign.fp.collections.RrbTree.ImRrbt
+import org.organicdesign.fp.collections.RrbTree.MutRrbt
 import java.io.InvalidObjectException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
 import java.util.Arrays
-
-import org.organicdesign.fp.collections.Indented.arrayString
-import org.organicdesign.fp.collections.Indented.indentSpace
 
 /**
  *
@@ -80,7 +81,7 @@ abstract class RrbTree<E> : BaseList<E>, Indented {
                                           override var size: Int) : RrbTree<E>(), MutList<E> {
 
         /** {@inheritDoc}  */
-        override fun append(item: E): MutRrbt<E> {
+        override fun append(item: E?): MutRrbt<E> {
             // If our focus isn't set up for appends or if it's full, insert it into the data structure
             // where it belongs.  Then make a new focus
             if (focusLength >= STRICT_NODE_LENGTH || focusLength > 0 && focusStartIndex < size - focusLength) {
@@ -555,7 +556,7 @@ abstract class RrbTree<E> : BaseList<E>, Indented {
         // =================================== Instance Methods ===================================
 
         /** {@inheritDoc}  */
-        override fun append(item: E): ImRrbt<E> {
+        override fun append(item: E?): ImRrbt<E> {
             // If our focus isn't set up for appends or if it's full, insert it into the data
             // structure where it belongs.  Then make a new focus
             if (focus.size >= STRICT_NODE_LENGTH || focus.isNotEmpty() && focusStartIndex < size - focus.size) {
@@ -942,7 +943,7 @@ abstract class RrbTree<E> : BaseList<E>, Indented {
     // ===================================== Instance Methods =====================================
 
     /** {@inheritDoc}  */
-    abstract override fun append(item: E): RrbTree<E>
+    abstract override fun append(item: E?): RrbTree<E>
 
     /** Internal validation method for testing.  */
     internal abstract fun debugValidate()
@@ -1647,7 +1648,7 @@ involves changing more nodes than maybe necessary.
                     // Make the skinny-branch of single-element strict nodes:
                     while (newShift < maxShift) {
                         // Add a skinny branch node
-                        newNode = Strict(newShift, oldFocus.size, singleElementArray(newNode, nodeClass()))
+                        newNode = Strict(newShift, oldFocus.size, arrayOf(newNode))
                         newShift += NODE_LENGTH_POW_2
                     }
 
