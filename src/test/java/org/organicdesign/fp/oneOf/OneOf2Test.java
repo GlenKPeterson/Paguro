@@ -9,23 +9,13 @@ import static org.junit.Assert.assertFalse;
 
 public class OneOf2Test {
 
-static class Str_Int extends OneOf2<String,Integer> {
-    // Constructor
-    private Str_Int(Object o, int n) { super(o, String.class, Integer.class, n); }
+    static class Str_Int extends OneOf2<String,Integer> {
+        // Constructor
+        private Str_Int(Object o, int n) { super(o, String.class, Integer.class, n); }
 
-    // Static factory methods
-    static Str_Int ofStr(String o) { return new Str_Int(o, 0); }
-    static Str_Int ofInt(Integer o) { return new Str_Int(o, 1); }
-
-//        // Object methods - not sure these are good ideas.  match() is probably better.
-//        public String str() {
-//            return super.match(s -> s,
-//                               super::throw2);
-//        }
-//        public Integer integer() {
-//            return super.match(super::throw1,
-//                               i -> i);
-//        }
+        // Static factory methods
+        static Str_Int ofStr(String o) { return new Str_Int(o, 0); }
+        static Str_Int ofInt(Integer o) { return new Str_Int(o, 1); }
     }
 
     @Test public void testBasics() {

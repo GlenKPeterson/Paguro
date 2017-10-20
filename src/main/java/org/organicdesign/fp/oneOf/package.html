@@ -19,5 +19,24 @@
     evolving spec for the
     <a href="https://github.com/GlenKPeterson/Cymling" target="_blank">Cymling</a> programming
     language.  It may need some help to become reality.</p>
+
+<p>This package has Option which has Some() and None() which is useful for indicating "Not-Found"
+    or "End-of-stream/file".  It also has Or which has Good() and Bad() for functional error
+    handling.  A third option is to roll-your own union-type wrappers.  Here's an example using
+    OneOf2:</p>
+
+<pre><code>static class Str_Int extends OneOf2<String,Integer> {
+    // Constructor
+    private Str_Int(Object o, int n) { super(o, String.class, Integer.class, n); }
+
+    // Static factory methods
+    static Str_Int ofStr(String o) { return new Str_Int(o, 0); }
+    static Str_Int ofInt(Integer o) { return new Str_Int(o, 1); }
+}
+
+Str_Int oota = Str_Int.ofInt(57);
+
+System.out.println(oota.match(str -> "This is a string: " + str,
+                              i -> "This is an integer: " + i));</code></pre>
 </body>
 </html>
