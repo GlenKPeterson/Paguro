@@ -77,7 +77,8 @@ Java-only users want 3.0 from the main branch.
         <version>3.0.16</version>
 </dependency>
 ```
-The Maven artifact is the easiest way to use Paguro.  If you want to build from source anyway, there are instructions further down this page.
+
+The Maven artifact is the easiest way to use Paguro, but you can [build from source](#build-from-source-uncommon) if you want to.
 
 # Details
 
