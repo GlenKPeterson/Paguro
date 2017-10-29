@@ -196,19 +196,19 @@ export PATH=$PATH:$M2
 
 ##### Build
 ```bash
-// Start in an appropriate directory
+# Start in an appropriate directory
 
-// You need TestUtils for Paguro's equality testing.
-// Get a local copy of that and Paguro
+# You need TestUtils for Paguro's equality testing.
+# Get a local copy of that and Paguro
 git clone https://github.com/GlenKPeterson/TestUtils.git
 git clone https://github.com/GlenKPeterson/Paguro.git
 
-// Build TestUtils:
+# Build TestUtils:
 cd TestUtils
 git pull
 mvn clean install
 
-// Build Paguro:
+# Build Paguro:
 cd ../Paguro
 git pull
 mvn clean install
