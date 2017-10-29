@@ -199,7 +199,7 @@ export PATH=$PATH:$M2
 # Start in an appropriate directory
 
 # You need TestUtils for Paguro's equality testing.
-# Get a local copy of that and Paguro
+# The first time you build, get a local copy of that and Paguro
 git clone https://github.com/GlenKPeterson/TestUtils.git
 git clone https://github.com/GlenKPeterson/Paguro.git
 
