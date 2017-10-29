@@ -186,11 +186,13 @@ git clone https://github.com/GlenKPeterson/Paguro.git
 cd TestUtils
 git pull
 mvn clean install
+cd ..
 
 # Build Paguro:
-cd ../Paguro
+cd Paguro
 git pull
 mvn clean install
+cd ..
 ```
 
 # More
