@@ -65,6 +65,8 @@ Paguro takes advantage of Java's type inferencing.  It eschews void return types
 
 [![Join the chat at https://gitter.im/GlenKPeterson/Paguro](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/GlenKPeterson/Paguro?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+# Maven Artifact
+
 Available from the [Maven Repository](http://mvnrepository.com/artifact/org.organicdesign/Paguro) as:
 ```xml
 <!--
@@ -78,7 +80,7 @@ Java-only users want 3.0 from the main branch.
 </dependency>
 ```
 
-The Maven artifact is the easiest way to use Paguro, but you can [build from source](#build-from-source-uncommon) if you want to.
+The Maven artifact is the easiest way to use Paguro, but you can [build from source](#build-from-source) if you want to.
 
 # Details
 
@@ -175,9 +177,9 @@ Unless otherwise stated, the rest of this work is licensed under the Apache 2.0 
 New contributions should be made under the Apache 2.0 license whenever practical.
 I believe it is more popular, clearer, and has been better tested in courts of law.
 
-# Build from Source (Uncommon)
+# Build from Source
 
-Most people will use the pre-built maven artifact.  Only build from source if you want to contribute to Paguro, or just want to learn more about it, or have to for some other reason.
+The [pre-built maven artifact](#maven-artifact) is the easiest way to use Paguro.  Mose users do not need to build Paguro from source.
 
 #### Prerequisites
 Paguro should build on Ubuntu 16.04 and later with `openjdk-8-jdk`, `git`, and `maven` installed from the official repositories.  A compiler bug in javac 1.8.0_31 prevents building Paguro, but OpenJDK 1.8.0.91 and later (or Oracle) should work on Windows or Mac.
