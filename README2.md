@@ -34,13 +34,6 @@ Joshua Bloch for his book, Effective Java.
 
 Rich Hickey for Clojure
 
-# Build from Source
-
-- Java 8
-- Maven
-- First `mvn clean install` on: https://github.com/GlenKPeterson/TestUtils
-- Then `mvn clean test` on Paguro
-
 # Think about:
  - Xform.MapDesc is not serializable.  Really none of xform is serializable.
  - Think about adding StaticImports.xform(String)
