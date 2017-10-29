@@ -7,26 +7,8 @@ Paguro is short for the Latin "Paguroidea" - the name of the Hermit Crab superfa
 
 # News
 ### RRB Tree Released!
-An [RRB Tree](https://glenkpeterson.github.io/Paguro/apidocs/index.html?org/organicdesign/fp/collections/RrbTree.html) is an immutable List (like Clojure's PersistentVector) that also supports random inserts, deletes, and can be split and joined back together in logarithmic time.
-There's been one for Scala for a while (Bagwell/Rompf who wrote the paper were Scala people), and a native Clojure one, but neither is super helpful for Java programmers.
-This is an entirely new Apache 2.0 Java implementation.
 
-It's easy to use:
-```java
-import org.organicdesign.fp.collections.RrbTree.ImRrbt;
-import static org.organicdesign.fp.StaticImports.rrb;
-
-class Foo {
-    public static void main(String[] args) {
-        ImRrbt<String> rrb = rrb("This", "is", "a", "list");
-        rrb = rrb.insert(0, "Hello!");
-        System.out.println("rrb: " + rrb);
-    }
-}
-```
-
-### How to update
-An upgrade script is in the [Change Log](CHANGE_LOG.md#30-upgrade) along with a description of the 3.0 changes (there were may!).
+An [RRB Tree](https://glenkpeterson.github.io/Paguro/apidocs/index.html?org/organicdesign/fp/collections/RrbTree.html) is an immutable List (like Clojure's PersistentVector) that also supports random inserts, deletes, and can be split and joined back together in logarithmic time.  Details: https://github.com/GlenKPeterson/Paguro/releases/tag/3.0.16
 
 ### Other new features
 [Union types](https://glenkpeterson.github.io/Paguro/apidocs/index.html?org/organicdesign/fp/oneOf/package-summary.html) for Java!  Well, an approximation of them anyway.
