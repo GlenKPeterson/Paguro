@@ -77,6 +77,7 @@ Java-only users want 3.0 from the main branch.
         <version>3.0.16</version>
 </dependency>
 ```
+The Maven artifact is the easiest way to use Paguro.  If you want to build from source anyway, there are instructions further down this page.
 
 # Details
 
@@ -172,6 +173,43 @@ These files are still derivative works under the EPL.
 Unless otherwise stated, the rest of this work is licensed under the Apache 2.0 license.
 New contributions should be made under the Apache 2.0 license whenever practical.
 I believe it is more popular, clearer, and has been better tested in courts of law.
+
+# Build from Source (Uncommon)
+
+Most people will use the pre-built maven artifact.  Only build from source if you want to contribute to Paguro, or just want to learn more about it, or have to for some other reason.
+
+#### Prerequisites
+Paguro should build on Ubuntu 16.04 and later with `openjdk-8-jdk`, `git`, and `maven` installed from the official repositories.  A compiler bug in javac 1.8.0_31 prevents building Paguro, but OpenJDK 1.8.0.91 and later (or Oracle) should work on Windows or Mac.
+
+##### Environment Variables
+Depending on how you installd Java and Maven, you may need to set some of the following in your `~/.profile` file and reboot (or source that file like `. ~/.profile` from the command line you will use for the build).  Or do whatever Windows does.  If your tools are installed in different directories, you will have to fix the following:
+```bash
+export JDK_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export JAVA_HOME=$JDK_HOME/jre
+export M2_HOME=$TOOLS/apache-maven-3.3.9/
+export M2="$M2_HOME"bin
+export PATH=$PATH:$M2
+```
+
+##### Build
+```bash
+// Start in an appropriate directory
+
+// You need TestUtils for Paguro's equality testing.
+// Get a local copy of that and Paguro
+git clone https://github.com/GlenKPeterson/TestUtils.git
+git clone https://github.com/GlenKPeterson/Paguro.git
+
+// Build TestUtils:
+cd TestUtils
+git pull
+mvn clean install
+
+// Build Paguro:
+cd ../Paguro
+git pull
+mvn clean install
+```
 
 # More
 Additional information is in: [README2.md](README2.md).
