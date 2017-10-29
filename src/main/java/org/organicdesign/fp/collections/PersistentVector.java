@@ -122,7 +122,7 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
     // The number of items in this Vector.
     private final int size;
     private final int shift;
-    private final Node root;
+    private transient final Node root;
     private final E[] tail;
 
     // ======================================= Constructor =======================================

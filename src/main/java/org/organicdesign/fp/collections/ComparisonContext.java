@@ -125,11 +125,7 @@ public interface ComparisonContext<T> extends Equator<T>, Comparator<T> {
 
             @SuppressWarnings("ConstantConditions")
             @Override public int compare(Comparable<Object> o1, Comparable<Object> o2) {
-                if (o1 == o2) { return 0; }
-                if (o1 == null) {
-                    return - (o2.compareTo(o1));
-                }
-                return o1.compareTo(o2);
+                return Equator.doCompare(o1, o2);
             }
         }
     }

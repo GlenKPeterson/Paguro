@@ -21,12 +21,13 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
+import org.organicdesign.fp.indent.Indented;
 import org.organicdesign.fp.tuple.Tuple2;
 import org.organicdesign.fp.tuple.Tuple4;
 
 import static org.organicdesign.fp.collections.Cowry.*;
-import static org.organicdesign.fp.collections.Indented.arrayString;
-import static org.organicdesign.fp.collections.Indented.indentSpace;
+import static org.organicdesign.fp.indent.IndentUtils.arrayString;
+import static org.organicdesign.fp.indent.IndentUtils.indentSpace;
 
 /**
  <p>An RRB Tree is an immutable List (like Clojure's PersistentVector) that also supports random inserts, deletes,
@@ -512,7 +513,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
     public static class ImRrbt<E> extends RrbTree<E> implements ImList<E>, Serializable {
         private final E[] focus;
         private final int focusStartIndex;
-        private final Node<E> root;
+        private transient final Node<E> root;
         private final int size;
 
         ImRrbt(E[] f, int fi, Node<E> r, int s) {

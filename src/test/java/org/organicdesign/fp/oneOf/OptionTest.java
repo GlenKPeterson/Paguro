@@ -41,10 +41,11 @@ public class OptionTest {
         assertEquals("Hello", os.getOrElse("Goodbye"));
         assertEquals(Integer.valueOf(1), o1a.match(s -> 1,
                                                    () -> 2));
-        assertEquals(Option.NONE, Option.someOrNullNoneOf(Option.NONE));
+        assertEquals(None.NONE, Option.someOrNullNoneOf(None.NONE));
 
-        assertTrue(Option.NONE.equals(Option.NONE));
-        assertTrue(Option.NONE.equals(Option.someOrNullNoneOf(null)));
+        //noinspection EqualsWithItself
+        assertTrue(None.NONE.equals(None.NONE));
+        assertTrue(None.NONE.equals(Option.someOrNullNoneOf(null)));
     }
 
     @Test(expected = IllegalStateException.class) public void noneEx() {
@@ -79,7 +80,7 @@ public class OptionTest {
 
     @Test public void equalsHash() {
         Option<Integer> o1a = Option.some(1);
-        Option<Integer> o1b = Option.some(new Integer(2 - 1));
+        @SuppressWarnings("UnnecessaryBoxing") Option<Integer> o1b = Option.some(new Integer(2 - 1));
         Option<Integer> o1c = Option.some(Integer.valueOf("1"));
 
         equalsDistinctHashCode(o1a, o1b, o1c, Option.some(0));
@@ -103,7 +104,7 @@ public class OptionTest {
         Option<Integer> z = Option.some(null);
         Option<Integer> n1 = Option.none();
         Option<Integer> n2 = Option.someOrNullNoneOf(null);
-        @SuppressWarnings("deprecation") Option n3 = Option.of(Option.NONE);
+        @SuppressWarnings("deprecation") Option n3 = Option.of(None.NONE);
 
         assertTrue(n1 == n2);
         assertTrue(n2 == n3);

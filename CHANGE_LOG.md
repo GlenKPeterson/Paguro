@@ -5,7 +5,16 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
-# Release 3.0.16: RRB Tree
+# Release 3.0.17: RRB Tree
+Fixed bugs found using FindBugs - thanks to @cprice404.  There are still some reported bugs, but
+I think they are rare corner cases that lack clear solutions.  This was the low-hanging fruit.
+ - Option.NONE is removed to avoid possible circular instantiation.  Use None.NONE instead.
+ - Moved Indented to new indent package.
+ - Moved static methods from the Indented interface to a new IndentedUtils class.
+ - STRINGS array constant from Indented interface is now private to the IndentedUtils class.
+ - UnmodMap.UnEntry.EntryToUnEntryIter.next() now returns a Tuple2 instead of some other one-off class. 
+
+#### Release 3.0.16: RRB Tree
  - Added Option.Some.toString() and unit test for same.
 
 See [3.0 Upgrade](#30-upgrade) notes below if upgrading from 2.x
