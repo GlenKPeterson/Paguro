@@ -15,11 +15,11 @@ An [RRB Tree](https://glenkpeterson.github.io/Paguro/apidocs/index.html?org/orga
 
 ### Next Major Release will be Paguro 4.0, "Kotlin Compatibility"
 
-This announcement is making some people nervous even as it makes others happy.  The primary curator (Glen) will still continue using Paguro in both Java and Kotlin for at least a year, maybe forever.  Kotlin as nearly 100% backward-compatible with Java 8 as it could possibly be.  I've met several people who know Paguro but not Kotlin, but I have yet to meet the person who knows both and likes Paguro but not Kotlin.
+This announcement is making some people nervous even as it makes others happy.  The primary curator (Glen) will still continue using Paguro in both Java and Kotlin for at least a year, maybe forever.  Kotlin is nearly 100% backward-compatible with Java 8.  I've met several people who know Paguro but not Kotlin, but I have yet to meet the person who knows both and likes Paguro but not Kotlin.
 
-You are probably interested in Paguro because you like Immutability, Functional Programming (maybe not as pure as Haskell), and Types.  Kotlin is a briefer Java that assumes immutability, makes Functional Programming easier, and plugs 3/4 of the quirks in Java's generic type system.  If you're concerned about the future of Paguro, I think the best way to put your worries to rest is to try Kotlin.  It's pretty great!
+You are probably interested in Paguro because you like Immutability, Functional Programming (maybe as pure as Haskell, maybe not), and Types.  Kotlin is a briefer Java that assumes immutability, makes Functional Programming easier, and plugs 3/4 of the quirks in Java's generic type system.  If you're concerned about the future of Paguro, I think the best way to put your worries to rest is to try Kotlin.  It's pretty great!
 
-That said, some things will have to be renamed in order to fit better with the Kotlin standard library.  MutableList, MutableMap, and MutableSet conflict with the same-named classes in Kotlin.  This is actually a sign of how much the design of Kotlin and Paguro make sense together!  Check back for more details as the 4.x release progresses.
+Check back for more details as the 4.x release progresses.
 
 # Features
 
