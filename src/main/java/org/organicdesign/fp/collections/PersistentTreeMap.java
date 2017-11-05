@@ -314,63 +314,6 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
 //        }
 //    };
 
-    /**
-     When comparing against a SortedMap, this is correct and O(n) fast, but BEWARE! It is also
-     compatible with java.util.Map which unfortunately means equality as defined by this method
-     (and java.util.AbstractMap) is not commutative when comparing ordered and unordered maps (it is
-     also O(n log n) slow).  The Equator defined by this class prevents comparison with unordered
-     Maps.
-     */
-    @Override public boolean equals(Object other) {
-        if (this == other) { return true; }
-        // Note: It does not make sense to compare an ordered map with an unordered map.
-        // This is a bug, but it's the *same* bug that java.util.AbstractMap has.
-        // there is a javaBug unit test.  When that fails, we can fix this to be correct instead of
-        // what it currently is (most politely called "compatible with existing API's").
-        if ( !(other instanceof Map) ) { return false; }
-
-        Map<?,?> that = (Map) other;
-
-        if (size != that.size()) { return false; }
-
-        // Yay, this makes sense, and we can compare these with O(n) efficiency while still
-        // maintaining compatibility with java.util.Map.
-        if (other instanceof UnmodSortedMap) {
-            return UnmodSortedIterable.equal(this, (UnmodSortedMap<?,?>) other);
-        }
-        if (other instanceof SortedMap) {
-            return UnmodSortedIterable.equal(this,
-                                             UnmodSortedIterable.castFromSortedMap(
-                                                     (SortedMap<?,?>) other));
-        }
-
-        // This makes no sense and takes O(n log n) or something.
-        // It's here to be compatible with java.util.AbstractMap.
-        // java.util.TreeMap doesn't involve the comparator, and its effect plays out in the order
-        // of the values.  I'm uncomfortable with this, but for now I'm aiming for
-        // Compatibility with TreeMap.
-        try {
-            for (Entry<K,V> e : this) {
-                K key = e.getKey();
-                V value = e.getValue();
-                Object thatValue = that.get(key);
-                if (value == null) {
-                    if ( (thatValue != null) || !that.containsKey(key) )
-                        return false;
-                } else {
-                    if ( !value.equals(thatValue) )
-                        return false;
-                }
-            }
-        } catch (ClassCastException ignore) {
-            return false;
-        } catch (NullPointerException ignore) {
-            return false;
-        }
-
-        return true;
-    }
-
 //    /** Returns a view of the keys contained in this map. */
 //    @Override public ImSet<K> keySet() { return PersistentTreeSet.ofMap(this); }
 

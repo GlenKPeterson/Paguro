@@ -7,40 +7,19 @@ Paguro is short for the Latin "Paguroidea" - the name of the Hermit Crab superfa
 
 # News
 ### RRB Tree Released!
-An [RRB Tree](https://glenkpeterson.github.io/Paguro/apidocs/index.html?org/organicdesign/fp/collections/RrbTree.html) is an immutable List (like Clojure's PersistentVector) that also supports random inserts, deletes, and can be split and joined back together in logarithmic time.
-There's been one for Scala for a while (Bagwell/Rompf who wrote the paper were Scala people), and a native Clojure one, but neither is super helpful for Java programmers.
-This is an entirely new Apache 2.0 Java implementation.
 
-It's easy to use:
-```java
-import org.organicdesign.fp.collections.RrbTree.ImRrbt;
-import static org.organicdesign.fp.StaticImports.rrb;
-
-class Foo {
-    public static void main(String[] args) {
-        ImRrbt<String> rrb = rrb("This", "is", "a", "list");
-        rrb = rrb.insert(0, "Hello!");
-        System.out.println("rrb: " + rrb);
-    }
-}
-```
-
-### How to update
-An upgrade script is in the [Change Log](CHANGE_LOG.md#30-upgrade) along with a description of the 3.0 changes (there were may!).
+An [RRB Tree](https://glenkpeterson.github.io/Paguro/apidocs/index.html?org/organicdesign/fp/collections/RrbTree.html) is an immutable List (like Clojure's PersistentVector) that also supports random inserts, deletes, and can be split and joined back together in logarithmic time.  Details: https://github.com/GlenKPeterson/Paguro/releases/tag/3.0.16
 
 ### Other new features
 [Union types](https://glenkpeterson.github.io/Paguro/apidocs/index.html?org/organicdesign/fp/oneOf/package-summary.html) for Java!  Well, an approximation of them anyway.
 
 ### Next Major Release will be Paguro 4.0, "Kotlin Compatibility"
 
-Some things will have to be renamed in order to fit better with the Kotlin standard library.
-Notably MutableList, MutableMap, and MutableSet conflict with the same-named classes in Kotlin.
+This announcement is making some people nervous even as it makes others happy.  The primary curator (Glen) will still continue using Paguro in both Java and Kotlin for at least a year, maybe forever.  Kotlin is nearly 100% backward-compatible with Java 8.  I've met several people who know Paguro but not Kotlin, but I have yet to meet the person who knows both and likes Paguro but not Kotlin.
 
-The primary programmer on this project is now writing more Kotlin than Java.
-If you like Paguro, you'll probably prefer Kotlin too.
-Kotlin seems nearly 100% compatible with Java, meaning when you call Kotlin from Java, you could think you're calling native Java.
-So even if this becomes an all Kotlin project, Java programmers should have no trouble using it.
-If Java-only programmers object for some reason, we can make a Java-only branch.
+You are probably interested in Paguro because you like Immutability, Functional Programming (maybe as pure as Haskell, maybe not), and Types.  Kotlin is a briefer Java that assumes immutability, makes Functional Programming easier, and plugs 3/4 of the quirks in Java's generic type system.  If you're concerned about the future of Paguro, I think the best way to put your worries to rest is to try Kotlin.  It's pretty great!
+
+Check back for more details as the 4.x release progresses.
 
 # Features
 
@@ -65,18 +44,21 @@ Paguro takes advantage of Java's type inferencing.  It eschews void return types
 
 [![Join the chat at https://gitter.im/GlenKPeterson/Paguro](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/GlenKPeterson/Paguro?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+# Maven Artifact
+
 Available from the [Maven Repository](http://mvnrepository.com/artifact/org.organicdesign/Paguro) as:
 ```xml
 <!--
-If you're new to Paguro, consider starting with the streamlined
-3.0 Alpha version instead (on the 2016-05-22_RRB-Tree branch)
- -->
+4.0 Requires Kotlin
+-->
 <dependency>
         <groupId>org.organicdesign</groupId>
         <artifactId>Paguro</artifactId>
         <version>4.0.0-SNAPSHOT</version>
 </dependency>
 ```
+
+The Maven artifact is the easiest way to use Paguro, but you can [build from source](#build-from-source) if you want to.
 
 # Details
 
@@ -172,6 +154,45 @@ These files are still derivative works under the EPL.
 Unless otherwise stated, the rest of this work is licensed under the Apache 2.0 license.
 New contributions should be made under the Apache 2.0 license whenever practical.
 I believe it is more popular, clearer, and has been better tested in courts of law.
+
+# Build from Source
+
+The [pre-built maven artifact](#maven-artifact) is the easiest way to use Paguro.  Mose users do not need to build Paguro from source.
+
+#### Prerequisites
+Paguro should build on Ubuntu 16.04 and later with `openjdk-8-jdk`, `git`, and `maven` installed from the official repositories.  A compiler bug in javac 1.8.0_31 prevents building Paguro, but OpenJDK 1.8.0.91 and later (or Oracle) should work on Windows or Mac.
+
+##### Environment Variables
+Depending on how you installd Java and Maven, you may need to set some of the following in your `~/.profile` file and reboot (or source that file like `. ~/.profile` from the command line you will use for the build).  Or do whatever Windows does.  If your tools are installed in different directories, you will have to fix the following:
+```bash
+export JDK_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export JAVA_HOME=$JDK_HOME/jre
+export M2_HOME=$TOOLS/apache-maven-3.3.9/
+export M2="$M2_HOME"bin
+export PATH=$PATH:$M2
+```
+
+##### Build
+```bash
+# Start in an appropriate directory
+
+# You need TestUtils for Paguro's equality testing.
+# The first time you build, get a local copy of that and Paguro
+git clone https://github.com/GlenKPeterson/TestUtils.git
+git clone https://github.com/GlenKPeterson/Paguro.git
+
+# Build TestUtils:
+cd TestUtils
+git pull
+mvn clean install
+cd ..
+
+# Build Paguro:
+cd Paguro
+git pull
+mvn clean install
+cd ..
+```
 
 # More
 Additional information is in: [README2.md](README2.md).

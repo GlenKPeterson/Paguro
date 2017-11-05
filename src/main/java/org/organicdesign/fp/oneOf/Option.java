@@ -49,8 +49,6 @@ public interface Option<T> extends Serializable { // extends UnmodSortedIterable
     <U> U match(Fn1<T,U> has, Fn0<U> hasNot);
 
     // ========================================== Static ==========================================
-    /** None is a singleton and this is its only instance. */
-    Option NONE = None.NONE;
 
     /** Calling this instead of referring to NONE directly can make the type infrencer happy. */
     @SuppressWarnings("unchecked")

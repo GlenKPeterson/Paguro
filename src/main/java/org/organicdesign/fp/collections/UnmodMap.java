@@ -13,6 +13,8 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
+import org.organicdesign.fp.tuple.Tuple2;
+
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Map;
@@ -47,36 +49,7 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
             EntryToUnEntryIter(Iterator<Entry<K,V>> i) { innerIter = i; }
 
             @Override public boolean hasNext() { return innerIter.hasNext(); }
-            @Override public UnEntry<K, V> next() {
-                class Wrapper implements UnEntry<K,V>, Serializable {
-                    // For serializable.  Make sure to change whenever internal data format changes.
-                    private static final long serialVersionUID = 20160903082500L;
-
-                    private final Entry<K,V> entry;
-                    private Wrapper(Entry<K,V> e) { entry = e; }
-                    @Override public K getKey() { return entry.getKey(); }
-                    @Override public V getValue() { return entry.getValue(); }
-                    @Override
-                    public boolean equals(Object other) {
-                        if (this == other) { return true; }
-                        if ( !(other instanceof Entry) ) { return false; }
-
-                        Entry that = (Entry) other;
-                        return Objects.equals(entry.getKey(), that.getKey()) &&
-                               Objects.equals(entry.getValue(), that.getValue());
-                    }
-
-                    @Override public int hashCode() {
-                        return entry.hashCode();
-                    }
-
-                    @Override public String toString() {
-                        return "entry(" + entry.getKey() + "," + entry.getValue() + ")";
-                    }
-                };
-
-                return new Wrapper(innerIter.next());
-            }
+            @Override public UnEntry<K, V> next() { return Tuple2.Companion.of(innerIter.next()); }
         }
 
         class EntryToUnEntrySortedIter<K,V> extends EntryToUnEntryIter<K,V>
@@ -409,7 +382,7 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
             @Override public String toString() {
                 return UnmodIterable.toString("UnmodMap.values", this);
             }
-        };
+        }
         return new Impl(this);
     }
 }

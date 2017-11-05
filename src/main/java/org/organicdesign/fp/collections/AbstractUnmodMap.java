@@ -12,7 +12,13 @@ public abstract class AbstractUnmodMap<K,V>
         extends AbstractUnmodIterable<UnmodMap.UnEntry<K,V>>
         implements UnmodMap<K,V> {
 
-    /** Compatible with {@link AbstractMap#equals(Object)} */
+    /**
+     When comparing against a SortedMap, this is correct and O(n) fast, but BEWARE! It is also
+     Compatible with {@link AbstractMap#equals(Object)} which unfortunately means equality as defined by this method
+     (and java.util.AbstractMap) is not commutative when comparing ordered and unordered maps (it is
+     also O(n log n) slow).  The Equator defined by this class prevents comparison with unordered
+     Maps.
+     */
     @Override public boolean equals(Object other) {
         if (this == other) { return true; }
         if (!(other instanceof Map)) { return false; }

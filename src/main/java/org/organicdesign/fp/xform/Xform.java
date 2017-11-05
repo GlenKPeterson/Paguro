@@ -176,15 +176,15 @@ public abstract class Xform<A> implements UnmodIterable<A> {
     protected static class RunList implements Iterable {
         Iterable source;
         List<Operation> list = new ArrayList<>();
-        RunList next = null;
+//        RunList next = null;
         RunList prev = null;
 
         private RunList(RunList prv, Iterable src) { prev = prv; source = src; }
 
         public static RunList of(RunList prv, Iterable src) {
-            RunList ret = new RunList(prv, src);
-            if (prv != null) { prv.next = ret; }
-            return ret;
+            return new RunList(prv, src);
+//            if (prv != null) { prv.next = ret; }
+//            return ret;
         }
 
         Operation[] opArray() {
@@ -436,7 +436,7 @@ public abstract class Xform<A> implements UnmodIterable<A> {
 //        return new SourceProviderIterableDesc<>(Arrays.asList(list));
 //    }
 
-    public static Xform EMPTY = new SourceProviderIterableDesc<>(Collections.emptyList());
+    public static final Xform EMPTY = new SourceProviderIterableDesc<>(Collections.emptyList());
 
     @SuppressWarnings("unchecked")
     public static <T> Xform<T> empty() { return (Xform<T>) EMPTY; }
