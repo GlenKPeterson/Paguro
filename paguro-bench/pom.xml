@@ -71,7 +71,7 @@ java -jar target/benchmarks.jar -f 2 -i 10 -wi 10
         <dependency>
             <groupId>org.organicdesign</groupId>
             <artifactId>Paguro</artifactId>
-            <version>3.0.3-ALPHA</version>
+            <version>4.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.openjdk.jmh</groupId>
