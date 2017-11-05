@@ -73,7 +73,7 @@ public interface Fn2<A,B,R> extends BiFunction<A,B,R> {
     enum Singletons implements Fn2 {
         /**
          A static function that always returns the first argument it is given.
-         For type safety, please use {@link Fn2#first()} instead of accessing this dirctly.
+         For type safety, please use {@link Fn2#first()} instead of accessing this directly.
          */
         FIRST {
             @Override
@@ -83,7 +83,7 @@ public interface Fn2<A,B,R> extends BiFunction<A,B,R> {
         },
         /**
          A static function that always returns the second argument it is given.
-         For type safety, please use {@link Fn2#second()} instead of accessing this dirctly.
+         For type safety, please use {@link Fn2#second()} instead of accessing this directly.
          */
         SECOND {
             @Override
