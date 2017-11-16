@@ -19,6 +19,8 @@ This announcement is making some people nervous even as it makes others happy.  
 
 You are probably interested in Paguro because you like Immutability, Functional Programming (maybe as pure as Haskell, maybe not), and Types.  Kotlin is a briefer Java that assumes immutability, makes Functional Programming easier, and plugs 3/4 of the quirks in Java's generic type system.  If you're concerned about the future of Paguro, I think the best way to put your worries to rest is to try Kotlin.  It's pretty great!
 
+If a rewrite in Kotlin sounds good to you, consider voting for [this issue](https://youtrack.jetbrains.com/issue/KT-4779) because without it, I'll have to maintain separate Java and Kotlin code.
+
 Check back for more details as the 4.x release progresses.
 
 # Features
