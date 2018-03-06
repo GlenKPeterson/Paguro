@@ -5,7 +5,10 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
-# Release 3.0.17: RRB Tree
+# Release 3.0.18: RRB Tree
+ - Added Transformable.toImRrbt() and .toMutableRrbt() to make it convenient to transform things into RRB-Trees.
+
+### Release 3.0.17: RRB Tree
 Fixed bugs found using FindBugs - thanks to @cprice404.  There are still some reported bugs, but
 I think they are rare corner cases that lack clear solutions.  This was the low-hanging fruit.
  - Option.NONE is removed to avoid possible circular instantiation.  Use None.NONE instead.
