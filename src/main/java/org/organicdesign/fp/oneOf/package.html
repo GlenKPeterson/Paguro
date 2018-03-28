@@ -1,9 +1,13 @@
 <html>
 <body>
-<p>This approximates union types for Java - for when something (like a return type) can be
-    exactly one of a few different things.  This is NOT variance or inheritance
-    (Cars and Trucks are Vehicles), this is one un-related thing or another (a set of things that
-    are either Trucks, Happiness, or Timestamps).</p>
+<p>This approximates union types for Java - for when an object can be exactly one of a few different things.
+    This is the opposite of inheritance and an alternative to variance.  Instead of the Object-Oriented
+    "Cars and Trucks are both Vehicles", this is one un-related thing or another.
+    When your return value can only be a User or a Group, you no longer have to code it as Object and make the client
+    cast to one or the other.  Nor do you have to create a UserOrGroup interface
+    and make User and Group both extend that.  Well, it's still cleanest to do that if you can, but many times
+    you can't do that without recompiling someone else's code and the method names wouldn't match up, or maybe
+    you don't have access to the sources.  Union types are your answer.</p>
 
 <p>Java has specifically avoided union types in favor of defining a super-type and making those
     other two types extend the new parent.  But sometimes you don't have control of the two types to
@@ -23,15 +27,16 @@
 <p>This package has Option which has Some() and None() which is useful for indicating "Not-Found"
     or "End-of-stream/file".  It also has Or which has Good() and Bad() for functional error
     handling.  A third option is to roll-your own union-type wrappers.  Here's an example using
-    OneOf2:</p>
+    OneOf2.  This forces all client code to handle both types, or in the case of OneOf3 or OneOf4, all types.
+    So, type safety, without the hierarchy.</p>
 
 <pre><code>
 // You need to subclass a OneOf class with your own class like this:
-static class Str_Int extends OneOf2<String,Integer> {
+static class Str_Int extends OneOf2&lt;String,Integer&gt; {
     // Constructor
     private Str_Int(Object o, int n) { super(o, String.class, Integer.class, n); }
 
-    // Static factory methods
+    // Static Factory Methods:
     // Make sure to use consecutive integers starting from zero
     // for the second constructor argument.  These ints represent
     // indices that select the classes you passed to the call to
@@ -43,14 +48,17 @@ static class Str_Int extends OneOf2<String,Integer> {
 }
 
 // Now create a new instance with your constructor
-Str_Int oota = Str_Int.ofInt(57);
+Str_Int soi = Str_Int.ofInt(57);
 
 // Here's how to use your new instance.  Notice that this forces you
 // to account for all cases of what the union type could contain.
 // The return types of the match() function is the same as the return
 // type of the lambdas you pass to it (they all have to match).  In this
 // case, that type is String.
-oota.match(str -> "This is a string: " + str,
-             i -> "This is an integer: " + i));</code></pre>
+return "This is " + soi.match(str -> "a string: " + str,
+                              i   -> "an integer: " + i));</code></pre>
+
+<p>Let me know if you need more than 4, or if you need more "OrNone" classes.</p>
+
 </body>
 </html>

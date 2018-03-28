@@ -10,9 +10,6 @@ Paguro is short for the Latin "Paguroidea" - the name of the Hermit Crab superfa
 
 An [RRB Tree](https://glenkpeterson.github.io/Paguro/apidocs/index.html?org/organicdesign/fp/collections/RrbTree.html) is an immutable List (like Clojure's PersistentVector) that also supports random inserts, deletes, and can be split and joined back together in logarithmic time.  Details: https://github.com/GlenKPeterson/Paguro/releases/tag/3.0.16
 
-### Other new features
-[Union types](https://glenkpeterson.github.io/Paguro/apidocs/index.html?org/organicdesign/fp/oneOf/package-summary.html) for Java!  Well, an approximation of them anyway.
-
 ### Next Major Release will be Paguro 4.0, "Kotlin Compatibility"
 
 This announcement is making some people nervous even as it makes others happy.  The primary curator (Glen) will still continue using Paguro in both Java and Kotlin for at least a year, maybe forever.  Kotlin is nearly 100% backward-compatible with Java 8.  I've met several people who know Paguro but not Kotlin, but I have yet to meet the person who knows both and likes Paguro but not Kotlin.
@@ -33,6 +30,7 @@ Check back for more details as the 4.x release progresses.
   * `tup("Alice", 11, 3.14)` - an immutable 3-field tuple or record
   * `map(tup(1, "single"), tup(2, "double"), tup(3, "triple"))` - an immutable map that uses integers to look up appropriate strings.
 * **Extensible, immutable tuples** [api](https://glenkpeterson.github.io/Paguro/apidocs/index.html?org/organicdesign/fp/tuple/package-summary.html)/[src](src/main/java/org/organicdesign/fp/tuple) - use them for rapid prototyping, then later extend them to make your own lightweight, immutable Java classes with correct `equals()`, `hashCode()`, and `toString()` implementations.
+* **Union types** [api](https://glenkpeterson.github.io/Paguro/apidocs/index.html?org/organicdesign/fp/oneOf/package-summary.html)/[src](src/main/java/org/organicdesign/fp/oneOf) for Java!  They are a little clunky, but they let you have type safety outside of OOP.
 * **Lazy initialization** [api](https://glenkpeterson.github.io/Paguro/apidocs/index.html?org/organicdesign/fp/function/LazyRef.html)/[src](src/main/java/org/organicdesign/fp/function/LazyRef.java) - LazyRef thread-safely performs initialization and frees initialization resources on first use.  Subsequent uses get the now-constant initialized value.  Use this instead of static initializers to avoid initialization loops.  Cache results of expensive operations for reuse.
 * **Memoization** [api](https://glenkpeterson.github.io/Paguro/apidocs/org/organicdesign/fp/function/Fn3.html#memoize-org.organicdesign.fp.function.Fn3-)/[src](src/main/java/org/organicdesign/fp/function/Fn3.java#L42) - Turns function calls into hashtable lookups to speed up slow functions over a limited range of inputs.
 * **Tiny** with no dependencies - The entire project fits in a 270K jar file that is compiled in the compact1 profile.
