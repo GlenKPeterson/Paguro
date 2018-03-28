@@ -1,6 +1,10 @@
 <html>
 <body>
-<p>This approximates union types for Java - for when an object can be exactly one of a few different types.
+<p>This package contains Option which has Some() and None() which is useful for indicating "Not-Found"
+    or "End-of-stream/file".  It also has Or which has Good() and Bad() for functional error
+    handling.  A third option is to roll-your own union-type wrappers.</p>
+
+<p>The OneOf classes in this package approximates union types for Java - for when an object can be exactly one of a few different types.
     Java has specifically avoided union types in favor of defining a super-type and making all interchangeable types
     implement it.  That's still the easiest way to go when practical.
     But sometimes you don't have control of the two types to make them inherit from a common ancestor.
@@ -37,11 +41,8 @@ String showThing(String s, Integer i) {
     Then Object Oriented programming took the world by storm and types without Objects waned.
     In retrospect, we may have missed something.</p>
 
-<p>This package contains Option which has Some() and None() which is useful for indicating "Not-Found"
-    or "End-of-stream/file".  It also has Or which has Good() and Bad() for functional error
-    handling.  A third option is to roll-your own union-type wrappers.  Here's an example using
-    OneOf2.  This forces all client code to handle both types.
-    Type safety, without the hierarchy.</p>
+<p>Here's an example using OneOf2.
+    This forces all client code to handle both types: type safety, outside the class hierarchy.</p>
 
 <pre><code>
 // You need to subclass a OneOf class with your own class like this:
@@ -60,10 +61,10 @@ static class Str_Int extends OneOf2&lt;String,Integer&gt; {
     static Str_Int ofInt(Integer o) { return new Str_Int(o, 1); }
 }
 
-// Now create a new instance with your constructor
+// Now create a new instance with your factory
 Str_Int soi = Str_Int.ofInt(57);
 
-// Here's how to use your new instance.  Notice that this forces you
+// Finally, use your new instance.  Notice that this forces you
 // to account for all cases of what the union type could contain.
 // The return types of the match() function is the same as the return
 // type of the lambdas you pass to it (they all have to match).  In this
