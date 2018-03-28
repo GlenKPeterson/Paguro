@@ -107,15 +107,15 @@ if (parent instanceof Document) {
 
 <pre><code>
 public static class Doc_Para_Li_Cell
-        extends OneOf3&lt;com.itextpdf.layout.Document,Paragraph,Cell&gt; {
+        extends OneOf3&lt;Document,Paragraph,Cell&gt; {
 
     // Constructor
     protected Doc_Para_Li_Cell(Object o, int s) {
-        super(o, com.itextpdf.layout.Document.class, Paragraph.class, Cell.class, s);
+        super(o, Document.class, Paragraph.class, Cell.class, s);
     }
 
     // Static factory methods
-    public static Doc_Para_Li_Cell ofDoc(com.itextpdf.layout.Document document) {
+    public static Doc_Para_Li_Cell ofDoc(Document document) {
         return new Doc_Para_Li_Cell(document, 0);
     }
     public static Doc_Para_Li_Cell ofPara(Paragraph p) { return new Doc_Para_Li_Cell(p, 1); }
