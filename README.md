@@ -164,7 +164,7 @@ The [pre-built maven artifact](#maven-artifact) is the easiest way to use Paguro
 Paguro should build on Ubuntu 16.04 and later with `openjdk-8-jdk`, `git`, and `maven` installed from the official repositories.  A compiler bug in javac 1.8.0_31 prevents building Paguro, but OpenJDK 1.8.0.91 and later (or Oracle) should work on Windows or Mac.
 
 ##### Environment Variables
-Depending on how you installd Java and Maven, you may need to set some of the following in your `~/.profile` file and reboot (or source that file like `. ~/.profile` from the command line you will use for the build).  Or do whatever Windows does.  If your tools are installed in different directories, you will have to fix the following:
+Depending on how you installed Java and Maven, you may need to set some of the following in your `~/.profile` file and reboot (or source that file like `. ~/.profile` from the command line you will use for the build).  Or do whatever Windows does.  If your tools are installed in different directories, you will have to fix the following:
 ```bash
 export JDK_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 export JAVA_HOME=$JDK_HOME/jre
