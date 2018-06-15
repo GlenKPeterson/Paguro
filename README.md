@@ -195,5 +195,14 @@ mvn clean install
 cd ..
 ```
 
+# Contributing
+
+If you submit a patch, please:
+ - Keep the changes minimal (don't let your IDE reformat whole files).
+ - Try to match the code style as best you can.
+ - Clearly document your changes.
+ - Update the unit tests to clearly and simply prove that your code works.
+ - It's a good idea to discuss proposed changes by opening an issue on github before you spend time coding.
+
 # More
 Additional information is in: [README2.md](README2.md).
