@@ -479,9 +479,20 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
          this.size() one tree will be empty (but never null).
          */
         public Tuple2<MutableRrbt<E>,MutableRrbt<E>> split(int splitIndex) {
-            if ( (splitIndex < 1) || (splitIndex > size) ) {
-                throw new IndexOutOfBoundsException(
-                        "Constraint violation failed: 1 <= splitIndex <= size");
+            if (splitIndex < 1) {
+                if (splitIndex == 0) {
+                    return Tuple2.of(emptyMutable(), this);
+                } else {
+                    throw new IndexOutOfBoundsException(
+                            "Constraint violation failed: 1 <= splitIndex <= size");
+                }
+            } else if (splitIndex >= size) {
+                if (splitIndex == size) {
+                    return Tuple2.of(this, emptyMutable());
+                } else {
+                    throw new IndexOutOfBoundsException(
+                            "Constraint violation failed: 1 <= splitIndex <= size");
+                }
             }
             // Push the focus before splitting.
             Node<E> newRoot = pushFocus();
@@ -897,9 +908,20 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
          one tree will be empty (but never null).
          */
         public Tuple2<ImRrbt<E>,ImRrbt<E>> split(int splitIndex) {
-            if ( (splitIndex < 1) || (splitIndex > size) ) {
-                throw new IndexOutOfBoundsException(
-                        "Constraint violation failed: 1 <= splitIndex <= size");
+            if (splitIndex < 1) {
+                if (splitIndex == 0) {
+                    return Tuple2.of(empty(), this);
+                } else {
+                    throw new IndexOutOfBoundsException(
+                            "Constraint violation failed: 1 <= splitIndex <= size");
+                }
+            } else if (splitIndex >= size) {
+                if (splitIndex == size) {
+                    return Tuple2.of(this, empty());
+                } else {
+                    throw new IndexOutOfBoundsException(
+                            "Constraint violation failed: 1 <= splitIndex <= size");
+                }
             }
             // Push the focus before splitting.
             Node<E> newRoot = pushFocus();

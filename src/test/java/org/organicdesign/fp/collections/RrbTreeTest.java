@@ -402,8 +402,8 @@ public class RrbTreeTest {
     public void emptyEx20() { RrbTree.empty().split(Integer.MIN_VALUE); }
     @Test(expected = IndexOutOfBoundsException.class)
     public void emptyEx21() { RrbTree.emptyMutable().split(-1); }
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx22() { RrbTree.empty().split(0); }
+//    @Test(expected = IndexOutOfBoundsException.class)
+//    public void emptyEx22() { RrbTree.empty().split(0); }
     @Test(expected = IndexOutOfBoundsException.class)
     public void emptyEx23() { RrbTree.emptyMutable().split(1); }
     @Test(expected = IndexOutOfBoundsException.class)
@@ -454,7 +454,7 @@ public class RrbTreeTest {
     }
 
     private static <T> void testSplit(ArrayList<T> control, RrbTree<T> test, int splitIndex) {
-        if ( (splitIndex < 1) && (splitIndex > control.size()) ) {
+        if ( (splitIndex < 0) || (splitIndex > control.size()) ) {
             throw new IllegalArgumentException("Constraint violation failed: 1 <= splitIndex <= size");
         }
 //        System.out.println("test=" + test.indentedStr(5));
@@ -500,27 +500,24 @@ public class RrbTreeTest {
             ms.append(i);
             control.add(i);
         }
-        for (int splitIndex = 1; splitIndex <= TWO_LEVEL_SZ;
-             splitIndex += (STRICT_NODE_LENGTH * STRICT_NODE_LENGTH * 0.333)) {
+        int splitIndex = 0;
+        try {
+            for (splitIndex = 0; splitIndex <= TWO_LEVEL_SZ;
+                 splitIndex += (STRICT_NODE_LENGTH * STRICT_NODE_LENGTH * 0.333)) {
 //            int splitIndex = i; //rand.nextInt(is.size() + 1);
 //            System.out.println("splitIndex=" + splitIndex);
 //        System.out.println("empty=" + RrbTree.empty().indentedStr(6));
-            try {
                 testSplit(control, is, splitIndex);
-            } catch (Exception e) {
-                System.out.println("Bad splitIndex (im): " + splitIndex); // print before blowing up...
-                System.out.println("before split (im): " + is.indentedStr(13)); // print before blowing up...
-                // OK, now we can continue throwing exception.
-                throw e;
-            }
-            try {
                 testSplit(control, ms, splitIndex);
-            } catch (Exception e) {
-                System.out.println("Bad splitIndex (mu): " + splitIndex); // print before blowing up...
-                System.out.println("before split (mu): " + ms.indentedStr(13)); // print before blowing up...
-                // OK, now we can continue throwing exception.
-                throw e;
             }
+            splitIndex = TWO_LEVEL_SZ;
+            testSplit(control, is, splitIndex);
+            testSplit(control, ms, splitIndex);
+        } catch (Exception e) {
+            System.out.println("Bad splitIndex (im): " + splitIndex); // print before blowing up...
+            System.out.println("before split (im): " + is.indentedStr(13)); // print before blowing up...
+            // OK, now we can continue throwing exception.
+            throw e;
         }
     }
 
@@ -541,11 +538,14 @@ public class RrbTreeTest {
             assertEquals(TWO_LEVEL_SZ, is.size());
             assertEquals(TWO_LEVEL_SZ, ms.size());
 //            System.out.println("is:" + is.indentedStr(3));
-            for (int j = 1; j <= ONE_LEVEL_SZ; j+= ONE_LEVEL_SZ / 10) {
+            for (int j = 0; j <= ONE_LEVEL_SZ; j+= ONE_LEVEL_SZ / 10) {
                 splitIndex = j; // So we have it when exception is thrown.
                 testSplit(control, is, splitIndex);
                 testSplit(control, ms, splitIndex);
             }
+            splitIndex = ONE_LEVEL_SZ;
+            testSplit(control, is, splitIndex);
+            testSplit(control, ms, splitIndex);
         } catch (Exception e) {
             System.out.println("splitIndex:" + splitIndex + " rands:" + rands); // print before blowing up...
             // OK, now we can continue throwing exception.
