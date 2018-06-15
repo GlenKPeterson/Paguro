@@ -188,7 +188,7 @@ http://mvnrepository.com/artifact/org.organicdesign/Paguro
 		<dependency>
 			<groupId>org.organicdesign.testUtils</groupId>
 			<artifactId>TestUtils</artifactId>
-			<version>0.0.6</version>
+			<version>0.0.7</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
