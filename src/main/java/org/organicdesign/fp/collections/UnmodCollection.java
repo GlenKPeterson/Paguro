@@ -18,6 +18,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.function.Predicate;
 
 /**
@@ -173,7 +175,15 @@ public interface UnmodCollection<E> extends Collection<E>, UnmodIterable<E>, Siz
     }
 
 //int	size()
-//default Spliterator<E> spliterator()
+
+    // TODO: I think this is the right thing to do, but it breaks a lot of other stuff and I want to make a check-in.
+//    /**
+//     * Overridden to avoid inheriting unrelated defaults between java.util.Collections and kotlin.collections.Iterable.
+//     * Copied implementation from Collections.spliterator() because for a Collection the size is known.
+//     */
+//    @Override
+//    default Spliterator<E> spliterator() { return Spliterators.spliterator(this, 0); }
+
 //default Stream<E>	stream()
 
     /**

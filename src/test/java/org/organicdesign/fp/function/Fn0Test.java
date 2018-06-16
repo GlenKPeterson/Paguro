@@ -1,39 +1,95 @@
 package org.organicdesign.fp.function;
 
-import java.io.IOException;
-import java.util.concurrent.Callable;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.organicdesign.fp.StaticImportsTest.Companion.A;
+import org.organicdesign.fp.StaticImportsTest.Companion.B;
 
-import static org.junit.Assert.*;
-import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
+import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.junit.Assert.assertEquals;
+import static org.organicdesign.fp.StaticImportsTest.getAFromF;
 
 @RunWith(JUnit4.class)
 public class Fn0Test {
+
+//    class A {
+//        public String foo() { return "A"; }
+//    }
+//    class B extends A {
+//        public String foo() { return "B"; }
+//    }
+//
+//    private A getAFromF(Fn0<? extends A> f) { return f.invoke(); }
+
+    @Test public void testBasics() {
+        AtomicInteger i = new AtomicInteger(0);
+        assertEquals("A", getAFromF(A::new).foo());
+        assertEquals("B", getAFromF(B::new).foo());
+
+        assertEquals("B", getAFromF(new Fn0<B>() {
+            @Override
+            public B invokeEx() throws Exception {
+                if (i.getAndIncrement() > 33) {
+                    throw new Exception("Hiya!");
+                }
+                return new B();
+            }
+        }).foo());
+
+        // Fn0.Companion.toFn0() will be a handy way to cast in Java once Kotlin 1.3 comes out and lets you static import
+        // Fn0.toFn0.
+        assertEquals("B", getAFromF(Fn0.Companion.toFn0(() -> {
+            if (i.getAndIncrement() > 33) {
+                throw new Exception("Hiya!");
+            }
+            return new B();
+        })).foo());
+
+        assertEquals("B", getAFromF(new Fn0<A>() {
+            @Override
+            public B invokeEx() throws Exception {
+                if (i.getAndIncrement() > 33) {
+                    throw new Exception("Hiya!");
+                }
+                return new B();
+            }
+        }).foo());
+        assertEquals("B", getAFromF(new Fn0<A>() {
+            @Override
+            public A invokeEx() throws Exception {
+                if (i.getAndIncrement() > 33) {
+                    throw new Exception("Hiya!");
+                }
+                return new B();
+            }
+        }).foo());
+    }
+
     @Test(expected = RuntimeException.class)
     public void applyIOException() {
         new Fn0<Integer>() {
-            @Override public Integer applyEx() throws Exception {
+            @Override public Integer invokeEx() throws Exception {
                 throw new IOException("test exception");
             }
-        }.apply();
+        }.invoke();
     }
 
     @Test(expected = IllegalStateException.class)
     public void applyIllegalStateException() {
         new Fn0<Integer>() {
-            @Override public Integer applyEx() throws Exception {
+            @Override public Integer invokeEx() throws Exception {
                 throw new IllegalStateException("test exception");
             }
-        }.apply();
+        }.invoke();
     }
 
 //    @Test public void constantFunction() throws Exception {
 //        Fn0<Integer> f = Fn0.constantFunction(7);
-//        assertEquals(Integer.valueOf(7), f.apply());
-//        assertEquals(Integer.valueOf(7), f.applyEx());
+//        assertEquals(Integer.valueOf(7), f.invoke());
+//        assertEquals(Integer.valueOf(7), f.invokeEx());
 //        assertEquals(Integer.valueOf(7), f.get());
 //        assertEquals(Integer.valueOf(7), f.call());
 //        assertEquals(f.hashCode(), Fn0.constantFunction(Integer.valueOf(7)).hashCode());
@@ -56,14 +112,13 @@ public class Fn0Test {
     @Test(expected = IllegalStateException.class)
     public void testCall() throws Exception {
         new Fn0<Integer>() {
-            @Override public Integer applyEx() throws Exception {
+            @Override public Integer invokeEx() throws Exception {
                 throw new IllegalStateException("test exception");
             }
         }.call();
-
     }
 
 //    @Test public void testNull() {
-//        assertNull(Fn0.ConstObjObj.NULL.apply());
+//        assertNull(Fn0.ConstObjObj.NULL.invoke());
 //    }
 }

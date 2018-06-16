@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.ImMap;
 import org.organicdesign.fp.collections.RangeOfInt;
+import org.organicdesign.fp.function.Fn2;
 import org.organicdesign.fp.tuple.Tuple3;
 
 import static org.junit.Assert.*;
@@ -191,8 +192,9 @@ public class TradJavaStreamComparisonTest {
 
         ImMap<Integer,Integer> greenCounts = imgData
                 .fold(map(),
-                      (accum, color) -> accum.assoc(color.green(),
-                                                        accum.getOrElse(color.green(), 0) + 1));
+                      (Fn2<ImMap<Integer,Integer>,Color,ImMap<Integer,Integer>>)
+                              ((accum, color) -> accum.assoc(color.green(),
+                                                             accum.getOrElse(color.green(), 0) + 1)));
 
         assertEquals(256, greenCounts.size());
         assertEquals(Integer.valueOf(3), greenCounts.get(0));

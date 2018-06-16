@@ -29,8 +29,8 @@ public interface MutList<E> extends BaseList<E> {
     ImList<E> immutable();
 
     /** {@inheritDoc} */
-    @Override default MutList<E> concat(Iterable<? extends E> es) {
-        for (E e : es) {
+    @Override default MutList<E> concat(Iterable<? extends E> iterable) {
+        for (E e : iterable) {
             this.append(e);
         }
         return this;

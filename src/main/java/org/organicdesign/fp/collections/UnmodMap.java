@@ -219,7 +219,7 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
             @Override public int size() { return parent.size(); }
 
             @Override public String toString() {
-                return UnmodIterable.toString("UnmodMap.entrySet", this);
+                return UnmodIterable.Companion.toString("UnmodMap.entrySet", this);
             }
         }
         return new EntrySet(this);
@@ -280,7 +280,7 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
             @Override public int size() { return parent.size(); }
 
             @Override public String toString() {
-                return UnmodIterable.toString("UnmodMap.keySet", this);
+                return UnmodIterable.Companion.toString("UnmodMap.keySet", this);
             }
         }
         return new KeySet(this);
@@ -380,7 +380,7 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
             @Override public int size() { return parent.size(); }
 
             @Override public String toString() {
-                return UnmodIterable.toString("UnmodMap.values", this);
+                return UnmodIterable.Companion.toString("UnmodMap.values", this);
             }
         }
         return new Impl(this);

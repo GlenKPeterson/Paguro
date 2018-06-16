@@ -100,7 +100,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>,
                 return new Tuple2<>(key, parentMap.get(key));
             }
 
-            @Override public int hashCode() { return UnmodIterable.hash(this); }
+            @Override public int hashCode() { return UnmodIterable.Companion.hash(this); }
 
             @SuppressWarnings("unchecked")
             @Override public boolean equals(Object o) {
@@ -143,7 +143,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>,
             }
 
             @Override public String toString() {
-                return UnmodIterable.toString("UnmodSortedMap.entrySet", this);
+                return UnmodIterable.Companion.toString("UnmodSortedMap.entrySet", this);
             }
         }
         return new Implementation(this);
@@ -195,7 +195,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>,
             @Override
             public K last() { return parentMap.lastKey(); }
 
-            @Override public int hashCode() { return UnmodIterable.hash(this); }
+            @Override public int hashCode() { return UnmodIterable.Companion.hash(this); }
 
             @SuppressWarnings("unchecked")
             @Override public boolean equals(Object o) {
@@ -247,7 +247,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>,
                 return !as.hasNext() && !bs.hasNext();
             }
             @Override public String toString() {
-                return UnmodIterable.toString("UnmodSortedMap.entrySet", this);
+                return UnmodIterable.Companion.toString("UnmodSortedMap.entrySet", this);
             }
 
         }
@@ -292,7 +292,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>,
             @Override public int size() { return parent.size(); }
 
             @Override public int hashCode() {
-                return UnmodIterable.hash(this);
+                return UnmodIterable.Companion.hash(this);
             }
 
             @Override public boolean equals(Object o) {
@@ -304,7 +304,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>,
             }
 
             @Override public String toString() {
-                return UnmodIterable.toString("UnmodSortedMap.values", this);
+                return UnmodIterable.Companion.toString("UnmodSortedMap.values", this);
             }
         }
         return new Impl(this);

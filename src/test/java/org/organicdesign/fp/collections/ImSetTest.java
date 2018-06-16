@@ -63,7 +63,7 @@ public class ImSetTest {
                    containsAll(that);
         }
 
-        @Override public int hashCode() { return UnmodIterable.hash(this); }
+        @Override public int hashCode() { return UnmodIterable.Companion.hash(this); }
     }
 
     @Test public void testUnion() {

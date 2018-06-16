@@ -65,7 +65,7 @@ public abstract class OneOf2OrNone<A,B> {
         } else if (sel == 1) {
             return fb.apply((B) item);
         } else {
-            return fz.apply();
+            return fz.invoke();
         }
     }
 

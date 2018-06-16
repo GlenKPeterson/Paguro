@@ -375,7 +375,7 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
 //            @Override public int size() { return size; }
 //
 //            @Override public UnmodSortedIterator<B> iterator() {
-//                final UnmodSortedIterator<UnmodMap.UnEntry<Z,B>> iter = iterFactory.apply();
+//                final UnmodSortedIterator<UnmodMap.UnEntry<Z,B>> iter = iterFactory.invoke();
 //                return new UnmodSortedIterator<B>() {
 //                    @Override public boolean hasNext() { return iter.hasNext(); }
 //                    @Override public B next() { return iter.next().getValue(); }
@@ -908,7 +908,7 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
 //                if (init instanceof Reduced)
 //                    return init;
 //            }
-//            init = f.apply(init, key(), val());
+//            init = f.invoke(init, key(), val());
 //            if (init instanceof Reduced)
 //                return init;
 //

@@ -766,7 +766,7 @@ public class PersistentTreeMapTest {
 
         assertArrayEquals(s.toArray(),
                           m.entrySet()
-                           .map(Fn1.identity())
+                           .map(Fn1.Companion.identity())
                            .toMutList()
                            .toArray());
 
@@ -841,14 +841,14 @@ public class PersistentTreeMapTest {
         FunctionUtilsTest.mapHelperOdd(
                 vec(tup(1, "One"), null, tup(3, "Three"), null, tup(5, "Five"), null,
                     tup(7, "Seven"), null, tup(9, "Nine"), null)
-                        .filter(t -> t != null)
-                        .toImSortedMap(Equator.defaultComparator(), Fn1.identity()),
+                        .allowWhere(t -> t != null)
+                        .toImSortedMap(Equator.defaultComparator(), Fn1.Companion.identity()),
                 max);
         FunctionUtilsTest.mapHelperEven(
                 vec(null, tup(2, "Two"), null, tup(4, "Four"), null,
                     tup(6, "Six"), null, tup(8, "Eight"), null, tup(10, "Ten"))
-                        .filter(t -> t != null)
-                        .toImSortedMap(Equator.defaultComparator(), Fn1.identity()),
+                        .allowWhere(t -> t != null)
+                        .toImSortedMap(Equator.defaultComparator(), Fn1.Companion.identity()),
                 max);
     }
 
@@ -857,7 +857,7 @@ public class PersistentTreeMapTest {
         Map<Integer,String> a = PersistentTreeMap.of(vec(tup(1, "One")));
         FunctionUtilsTest.mapHelper(a, max);
         Map<Integer,String> b = vec(tup(1, "One"))
-                .toImSortedMap(Equator.defaultComparator(), Fn1.identity());
+                .toImSortedMap(Equator.defaultComparator(), Fn1.Companion.identity());
         FunctionUtilsTest.mapHelper(b, max);
         Map<Integer,String> c = PersistentTreeMap.ofComp(Equator.defaultComparator(),
                                                          vec(tup(1, "One")));
@@ -871,34 +871,34 @@ public class PersistentTreeMapTest {
         assertEquals(a.hashCode(), c.hashCode());
         FunctionUtilsTest.mapHelperOdd(vec(tup(1, "One"))
                                                .toImSortedMap(Equator.defaultComparator(),
-                                                              Fn1.identity()),
+                                                              Fn1.Companion.identity()),
                                        max);
         FunctionUtilsTest.mapHelperEven(vec((Map.Entry<Integer,String>) null)
-                                                .filter(t -> t != null)
+                                                .allowWhere(t -> t != null)
                                                 .toImSortedMap(Equator.defaultComparator(),
-                                                               Fn1.identity()),
+                                                               Fn1.Companion.identity()),
                                         max);
     }
 
     @Test public void testImMap0() {
         int max = 0;
         Map<Integer,String> b = vec((Tuple2<Integer,String>) null)
-                .filter(t -> t != null)
-                .toImSortedMap(Equator.defaultComparator(), Fn1.identity());
+                .allowWhere(t -> t != null)
+                .toImSortedMap(Equator.defaultComparator(), Fn1.Companion.identity());
         FunctionUtilsTest.mapHelper(b, max);
         Map<Integer,String> c = empty(Equator.defaultComparator());
         assertEquals(b, c);
         assertEquals(c, b);
         assertEquals(b.hashCode(), c.hashCode());
         FunctionUtilsTest.mapHelperOdd(vec((Tuple2<Integer,String>) null)
-                                               .filter(t -> t != null)
+                                               .allowWhere(t -> t != null)
                                                .toImSortedMap(Equator.defaultComparator(),
-                                                              Fn1.identity()),
+                                                              Fn1.Companion.identity()),
                                        max);
         FunctionUtilsTest.mapHelperEven(vec((Tuple2<Integer,String>) null)
-                                                .filter(t -> t != null)
+                                                .allowWhere(t -> t != null)
                                                 .toImSortedMap(Equator.defaultComparator(),
-                                                               Fn1.identity()),
+                                                               Fn1.Companion.identity()),
                                         max);
     }
 }

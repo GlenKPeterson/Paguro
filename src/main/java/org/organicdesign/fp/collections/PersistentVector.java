@@ -403,7 +403,7 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
 //        for (int i = 0; i < size; i += step) {
 //            E[] array = leafNodeArrayFor(i);
 //            for (int j = 0; j < array.length; ++j) {
-//                init = f.apply(init, array[j]);
+//                init = f.invoke(init, array[j]);
 //
 //                if ( (init != null) && (init instanceof Reduced) ) {
 //                    return ((Reduced<U>) init).val;

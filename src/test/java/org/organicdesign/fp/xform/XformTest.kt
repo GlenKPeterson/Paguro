@@ -19,9 +19,10 @@ import org.junit.Assert.assertArrayEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import org.organicdesign.fp.collections.UnmodIterable.emptyUnmodIterable
-import org.organicdesign.fp.function.Fn1.accept
-import org.organicdesign.fp.function.Fn1.reject
+import org.organicdesign.fp.collections.UnmodIterable.Companion.emptyUnmodIterable
+import org.organicdesign.fp.function.Fn1.Companion.accept
+import org.organicdesign.fp.function.Fn1.Companion.reject
+import org.organicdesign.fp.function.Fn2
 import org.organicdesign.fp.oneOf.Option
 import org.organicdesign.fp.vec
 import org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode
@@ -47,7 +48,7 @@ class XformTest : TestCase() {
 
     @Test
     fun testEqualsHashCode() {
-        equalsDistinctHashCode(Xform.SourceProviderIterableDesc(listOf("Hi", "Pleased", "Bye")),
+        equalsDistinctHashCode(Xform.Companion.SourceProviderIterableDesc(listOf("Hi", "Pleased", "Bye")),
                                Xform.of(listOf("Hi", "Pleased", "Bye")),
                                Xform.of(listOf("Hi", "Pleased", "Bye")),
                                Xform.of(listOf("Hi", "PleaZed", "Bye")))
@@ -58,7 +59,7 @@ class XformTest : TestCase() {
         val src:List<Int> = listOf(1, 2, 3)
         println("src: $src")
         basics(Xform.of(src))
-        basics(Xform.of(Xform.of(src).toImSortedSet { a, b -> a!! - b!! }))
+        basics(Xform.of(Xform.of(src).toImSortedSet(Comparator { a, b -> a!! - b!! })))
         basics(Xform.of(src))
     }
 
@@ -66,19 +67,19 @@ class XformTest : TestCase() {
     fun longerCombinations() {
         val src = arrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9)
         longerCombinations(Xform.of(listOf(*src)))
-        longerCombinations(Xform.of(Xform.of(listOf(*src)).toImSortedSet { a, b -> a!! - b!! }))
+        longerCombinations(Xform.of(Xform.of(listOf(*src)).toImSortedSet(Comparator{ a, b -> a!! - b!! })))
         longerCombinations(Xform.of(listOf(*src)))
     }
 
-    @Test(expected = IllegalArgumentException::class)
-    fun concatEx() {
-        Xform.of(emptyList<Any>()).concat(null)
-    }
-
-    @Test(expected = IllegalArgumentException::class)
-    fun precatEx() {
-        Xform.of(emptyList<Any>()).precat(null)
-    }
+//    @Test(expected = IllegalArgumentException::class)
+//    fun concatEx() {
+//        Xform.of(emptyList<Any>()).concat(null)
+//    }
+//
+//    @Test(expected = IllegalArgumentException::class)
+//    fun precatEx() {
+//        Xform.of(emptyList<Any>()).precat(null)
+//    }
 
     @Test
     fun doubleNull() {
@@ -129,11 +130,11 @@ class XformTest : TestCase() {
     fun chainedPrependAppend() {
         assertArrayEquals(arrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9),
                           Xform.of(listOf(5))                     //         5
-                                  .precat(Xform.of(listOf(4)))   //       4,5
+                                  .precat(Xform.of(listOf(4)))    //       4,5
                                   .concat(Xform.of(listOf(6)))    //       4,5,6
                                   .precat(Xform.of(listOf(2, 3))) //   2,3,4,5,6
-                                  .concat(Xform.of(listOf(7, 8)))  //   2,3,4,5,6,7,8
-                                  .precat(Xform.of(listOf(1)))   // 1,2,3,4,5,6,7,8
+                                  .concat(Xform.of(listOf(7, 8))) //   2,3,4,5,6,7,8
+                                  .precat(Xform.of(listOf(1)))    // 1,2,3,4,5,6,7,8
                                   .concat(Xform.of(listOf(9)))    // 1,2,3,4,5,6,7,8,9
                                   .toMutList().toTypedArray())
 
@@ -299,59 +300,59 @@ class XformTest : TestCase() {
         Xform.of(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9)).drop(-99)
     }
 
-    @Test(expected = IllegalArgumentException::class)
-    fun nullException() {
-        assertArrayEquals(arrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9),
-                          Xform.of(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9)).filter(null).toMutList().toTypedArray())
-    }
+//    @Test(expected = IllegalArgumentException::class)
+//    fun nullException() {
+//        assertArrayEquals(arrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9),
+//                          Xform.of(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9)).allowWhere(null).toMutList().toTypedArray())
+//    }
 
     @Test
-    fun singleFilter() {
+    fun singleallowWhere() {
         assertArrayEquals(arrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9),
                           Xform.of(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                                  .filter(accept())
+                                  .allowWhere(accept())
                                   .toMutList()
                                   .toTypedArray())
 
         assertArrayEquals(arrayOf<Int>(),
                           Xform.of(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                                  .filter(reject())
+                                  .allowWhere(reject())
                                   .toMutList()
                                   .toTypedArray())
 
         assertArrayEquals(arrayOf(5, 6, 7, 8, 9),
                           Xform.of(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                                  .filter { i -> i > 4 }
+                                  .allowWhere { i -> i > 4 }
                                   .toMutList()
                                   .toTypedArray())
 
         assertArrayEquals(arrayOf<Int>(),
                           Xform.of(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                                  .filter { i -> i < 1 }
+                                  .allowWhere { i -> i < 1 }
                                   .toMutList()
                                   .toTypedArray())
 
         assertArrayEquals(arrayOf(3),
                           Xform.of(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                                  .filter { i -> i == 3 }
+                                  .allowWhere { i -> i == 3 }
                                   .toMutList()
                                   .toTypedArray())
 
         assertArrayEquals(arrayOf(1),
                           Xform.of(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                                  .filter { i -> i == 1 }
+                                  .allowWhere { i -> i == 1 }
                                   .toMutList()
                                   .toTypedArray())
 
         assertArrayEquals(arrayOf(9),
                           Xform.of(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                                  .filter { i -> i == 9 }
+                                  .allowWhere { i -> i == 9 }
                                   .toMutList()
                                   .toTypedArray())
 
         assertArrayEquals(arrayOf(1, 2, 3, 4, 5, 6),
                           Xform.of(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                                  .filter { i -> i < 7 }
+                                  .allowWhere { i -> i < 7 }
                                   .toMutList()
                                   .toTypedArray())
 
@@ -361,33 +362,33 @@ class XformTest : TestCase() {
     fun chainedFilters() {
         assertArrayEquals(arrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9),
                           Xform.of(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                                  .filter(accept()).filter(accept()).filter(accept())
-                                  .filter(accept()).filter(accept()).filter(accept())
-                                  .filter(accept()).filter(accept()).toMutList().toTypedArray())
+                                  .allowWhere(accept()).allowWhere(accept()).allowWhere(accept())
+                                  .allowWhere(accept()).allowWhere(accept()).allowWhere(accept())
+                                  .allowWhere(accept()).allowWhere(accept()).toMutList().toTypedArray())
 
         assertArrayEquals(arrayOf<Int>(),
                           Xform.of(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                                  .filter(reject()).filter(accept()).filter(accept())
-                                  .filter(accept()).filter(accept()).filter(accept())
-                                  .filter(accept()).filter(accept()).toMutList().toTypedArray())
+                                  .allowWhere(reject()).allowWhere(accept()).allowWhere(accept())
+                                  .allowWhere(accept()).allowWhere(accept()).allowWhere(accept())
+                                  .allowWhere(accept()).allowWhere(accept()).toMutList().toTypedArray())
 
         assertArrayEquals(arrayOf<Int>(),
                           Xform.of(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                                  .filter(accept()).filter(accept()).filter(accept())
-                                  .filter(accept()).filter(reject()).filter(accept())
-                                  .filter(accept()).filter(accept()).toMutList().toTypedArray())
+                                  .allowWhere(accept()).allowWhere(accept()).allowWhere(accept())
+                                  .allowWhere(accept()).allowWhere(reject()).allowWhere(accept())
+                                  .allowWhere(accept()).allowWhere(accept()).toMutList().toTypedArray())
 
         assertArrayEquals(arrayOf<Int>(),
                           Xform.of(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                                  .filter(accept()).filter(accept()).filter(accept())
-                                  .filter(accept()).filter(accept()).filter(accept())
-                                  .filter(accept()).filter(reject()).toMutList().toTypedArray())
+                                  .allowWhere(accept()).allowWhere(accept()).allowWhere(accept())
+                                  .allowWhere(accept()).allowWhere(accept()).allowWhere(accept())
+                                  .allowWhere(accept()).allowWhere(reject()).toMutList().toTypedArray())
 
         assertArrayEquals(arrayOf(3, 4, 6),
                           Xform.of(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                                  .filter { i -> i > 2 }
-                                  .filter { i -> i < 7 }
-                                  .filter { i -> i != 5 }.toMutList().toTypedArray())
+                                  .allowWhere { i -> i > 2 }
+                                  .allowWhere { i -> i < 7 }
+                                  .allowWhere { i -> i != 5 }.toMutList().toTypedArray())
 
     }
 
@@ -405,13 +406,13 @@ class XformTest : TestCase() {
 
         assertArrayEquals(arrayOf(1, 2, 3, 2, 4, 6, 3, 6, 9, 4, 8, 12, 5, 10, 15, 6, 12, 18, 7, 14, 21, 8, 16, 24, 9, 18, 27),
                           Xform.of(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                                  .flatMap { i -> Xform.of(listOf(i, i!! * 2, i * 3)) }.toMutList().toTypedArray())
+                                  .flatMap { i -> Xform.of(listOf(i, i * 2, i * 3)) }.toMutList().toTypedArray())
 
         assertArrayEquals(arrayOf("1", "2", "2", "3", "3", "4"),
                           Xform.of(listOf(1, 2, 3))
                                   .flatMap { i ->
                                       Xform.of(listOf(i.toString(),
-                                                             (i!! + 1).toString()))
+                                                             (i + 1).toString()))
                                   }
                                   .toMutList().toTypedArray())
     }
@@ -434,7 +435,7 @@ class XformTest : TestCase() {
                           Xform.of(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9))
                                   .flatMap { a ->
                                       if (count.incrementAndGet() > 8)
-                                          Xform.of(listOf("a" + a!!, "b" + a))
+                                          Xform.of(listOf("a" + a, "b" + a))
                                       else
                                           Xform.of(emptyList())
                                   }
@@ -445,7 +446,7 @@ class XformTest : TestCase() {
                           Xform.of(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9))
                                   .flatMap { a ->
                                       if (count.incrementAndGet() > 7)
-                                          Xform.of(listOf("c" + a!!, "d" + a))
+                                          Xform.of(listOf("c" + a, "d" + a))
                                       else
                                           Xform.of(emptyList())
                                   }
@@ -460,7 +461,7 @@ class XformTest : TestCase() {
                           Xform.of(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9))
                                   .flatMap { a ->
                                       if (count.incrementAndGet() < 3)
-                                          Xform.of(listOf("e" + a!!, "f" + a))
+                                          Xform.of(listOf("e" + a, "f" + a))
                                       else
                                           Xform.of(emptyList())
                                   }
@@ -516,8 +517,8 @@ class XformTest : TestCase() {
 
         assertArrayEquals(arrayOf(1, 2, 2, 3, 3, 4, 10, 11, 20, 21, 30, 31),
                           Xform.of(listOf(1, 10))
-                                  .flatMap { i -> Xform.of(listOf(i, i!! * 2, i * 3)) }
-                                  .flatMap { i -> Xform.of(listOf(i, i!! + 1)) }
+                                  .flatMap { i -> Xform.of(listOf(i, i * 2, i * 3)) }
+                                  .flatMap { i -> Xform.of(listOf(i, i + 1)) }
                                   .toMutList().toTypedArray())
     }
 
@@ -531,7 +532,7 @@ class XformTest : TestCase() {
 
     @Test
     fun testNullConstruction() {
-        assertEquals(Xform.EMPTY, Xform.of<Any>(null))
+        assertEquals(Xform.emptyXform<Any>(), Xform.of<Any>(null))
    }
 
     //    @Test public void emptyXform() {
@@ -553,32 +554,33 @@ class XformTest : TestCase() {
         val ints = arrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9)
 
         assertEquals(Integer.valueOf(45),
-                     Xform.of(listOf(*ints)).fold(0) { accum, i -> accum!! + i!! })
+                     Xform.of(listOf(*ints)).fold(0) { accum, i -> accum + i })
     }
 
-    @Test(expected = IllegalArgumentException::class)
-    fun foldEx() {
-        assertEquals(Integer.valueOf(45),
-                     Xform.of(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                             .fold(0, null))
-    }
-
-    @Test(expected = IllegalArgumentException::class)
-    fun foldEx2() {
-        assertEquals(45,
-                     Xform.of(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                             .foldUntil<Any, Any>(null, { a, _ -> a }, null).good())
-    }
-
-    @Test(expected = IllegalArgumentException::class)
-    fun flatMapEx() {
-        Xform.of(listOf(1, 2, 3)).flatMap<Any>(null)
-    }
-
-    @Test(expected = IllegalArgumentException::class)
-    fun mapEx() {
-        Xform.of(listOf(1, 2, 3)).map<Any>(null)
-    }
+    // Type system now prevents all these cases.
+//    @Test(expected = IllegalArgumentException::class)
+//    fun foldEx() {
+//        assertEquals(Integer.valueOf(45),
+//                     Xform.of(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9))
+//                             .fold(0, null))
+//    }
+//
+//    @Test(expected = IllegalArgumentException::class)
+//    fun foldEx2() {
+//        assertEquals(45,
+//                     Xform.of(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9))
+//                             .foldUntil(null, Fn2.first(), null).good())
+//    }
+//
+//    @Test(expected = IllegalArgumentException::class)
+//    fun flatMapEx() {
+//        Xform.of(listOf(1, 2, 3)).flatMap<Any>(null)
+//    }
+//
+//    @Test(expected = IllegalArgumentException::class)
+//    fun mapEx() {
+//        Xform.of(listOf(1, 2, 3)).map<Any>(null)
+//    }
 
     @Test
     fun foldTerm() {
@@ -586,36 +588,64 @@ class XformTest : TestCase() {
 
         assertEquals(Integer.valueOf(45),
                      Xform.of(listOf(*ints))
-                             .foldUntil<Int, Any>(0, null) { accum, i -> accum!! + i!! }.good())
+                             .fold<Int,Int>(0,
+                                            object: Fn2<Int,Int,Int> {
+                                                @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
+                                                override fun invokeEx(accum: Int, i: Int): Int =
+                                                        accum + i
+                                            }))
 
         assertEquals(Integer.valueOf(45),
                      Xform.of(listOf(*ints))
-                             .foldUntil<Int, Any>(0, null) { accum, i -> accum!! + i!! }.good())
+                             .fold(0,
+                                   object: Fn2<Int,Int,Int> {
+                                       @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
+                                       override fun invokeEx(accum: Int, i: Int): Int =
+                                               accum + i
+                                   }))
 
-        assertArrayEquals(arrayOf(2, 3, 4),
-                          Xform.of(listOf(*ints))
-                                  .foldUntil(mutableListOf<Int>(),
-                                             { accum, _ -> if (accum.size == 3) accum else null }
-                                  ) { accum, i ->
-                                      accum.add(i!! + 1)
-                                      accum
-                                  }.match({ g -> g }
-                          ) { b -> b }!!.toTypedArray())
-        assertArrayEquals(arrayOf(2, 3, 4, 5, 6, 7, 8, 9, 10),
-                          Xform.of(listOf(*ints))
-                                  .foldUntil(ArrayList<Int>(),
-                                             { accum, _ -> if (accum.size == 20) accum else null }
-                                  ) { accum, i ->
-                                      accum.add(i!! + 1)
-                                      accum
-                                  }.match({ g -> g }) { b -> b }!!.toTypedArray())
+        assertEquals(listOf(2, 3, 4),
+                     Xform.of(listOf(*ints))
+                             .foldUntil(mutableListOf(),
+                                        object: Fn2<MutableList<Int>,Int,MutableList<Int>?> {
+                                            @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
+                                            override fun invokeEx(accum: MutableList<Int>, i: Int): MutableList<Int>? =
+                                                    if (accum.size == 3) accum else null
+                                        },
+                                        object: Fn2<MutableList<Int>, Int, MutableList<Int>> {
+                                            @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
+                                            override fun invokeEx(accum: MutableList<Int>, i: Int): MutableList<Int> {
+                                                accum.add(i + 1)
+                                                return accum
+                                            }
+                                        })
+                             .match({ g -> g },
+                                    { b -> b }))
+
+        assertEquals(listOf(2, 3, 4, 5, 6, 7, 8, 9, 10),
+                     Xform.of(listOf(*ints))
+                             .foldUntil(mutableListOf(),
+                                        object: Fn2<MutableList<Int>,Int,MutableList<Int>?> {
+                                            @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
+                                            override fun invokeEx(accum: MutableList<Int>, i: Int): MutableList<Int>? =
+                                                    if (accum.size == 20) accum else null
+                                        },
+                                        object: Fn2<MutableList<Int>, Int, MutableList<Int>> {
+                                            @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
+                                            override fun invokeEx(accum: MutableList<Int>, i: Int): MutableList<Int> {
+                                                accum.add(i + 1)
+                                                return accum
+                                            }
+                                        })
+                             .match({ g -> g },
+                                    { b -> b }))
 
         // This is fun and it should work.  But it really sets up for the early-termination test
         // next.
         assertEquals(listOf(1, 2, 3, 2, 4, 6, 3, 6, 9, 4, 8, 12, 5, 10, 15, 6, 12, 18,
                                    7, 14, 21, 8, 16, 24, 9, 18, 27),
                      Xform.of(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                             .flatMap { i -> Xform.of(listOf(i, i!! * 2, i * 3)) }
+                             .flatMap { i -> Xform.of(listOf(i, i * 2, i * 3)) }
                              .fold(ArrayList<Any>()
                              ) { alist, item ->
                                  alist.add(item)
@@ -626,37 +656,48 @@ class XformTest : TestCase() {
         assertEquals(listOf(1, 2, 3, 2, 4, 6, 3, 6, 9, 4, 8, 12, 5, 10, 15, 6, 12, 18,
                                    7, 14, 21, 8, 16),
                      Xform.of(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                             .flatMap { i -> Xform.of(listOf(i, i!! * 2, i * 3)) }
-                             .foldUntil(ArrayList<Int>(),
-                                        { items, _ -> if (items.contains(16)) items else null }
-                             ) { alist, item ->
-                                 alist.add(item)
-                                 alist
-                             }
-                             .match({ g -> g }) { b -> b })
+                             .flatMap { i -> Xform.of(listOf(i, i * 2, i * 3)) }
+                             .foldUntil(mutableListOf(),
+                                        object: Fn2<MutableList<Int>,Int,MutableList<Int>?> {
+                                            @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
+                                            override fun invokeEx(items: MutableList<Int>, ignore: Int): MutableList<Int>? =
+                                                    if (items.contains(16)) items else null
+                                        },
+                                        object: Fn2<MutableList<Int>, Int, MutableList<Int>> {
+                                            @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
+                                            override fun invokeEx(
+                                                    alist: MutableList<Int>,
+                                                    item: Int
+                                            ): MutableList<Int> {
+                                                alist.add(item)
+                                                return alist
+                                            }
+                                        })
+                             .match({ g -> g },
+                                    { b -> b }))
     }
 
     @Test
     fun testFirst() {
         assertEquals(Option.some(4),
                      Xform.of(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                             .filter { i -> i > 3 }
+                             .allowWhere { i -> i > 3 }
                              .head())
         assertEquals(Option.some(1),
                      Xform.of(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                             .filter { i -> i > 0 }
+                             .allowWhere { i -> i > 0 }
                              .head())
         assertEquals(Option.some(9),
                      Xform.of(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                             .filter { i -> i > 8 }
+                             .allowWhere { i -> i > 8 }
                              .head())
         assertEquals(Option.none<Any>(),
                      Xform.of(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                             .filter { i -> i < 1 }
+                             .allowWhere { i -> i < 1 }
                              .head())
         assertEquals(Option.none<Any>(),
                      Xform.of(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9))
-                             .filter { i -> i > 9 }
+                             .allowWhere { i -> i > 9 }
                              .head())
     }
 
@@ -720,9 +761,9 @@ class XformTest : TestCase() {
         val seq = Xform.of(listOf(*ints))
 
         // TODO: We may want a head() method that returns an option because this gets ugly.
-        assertEquals(Integer.valueOf(1), seq.filter { i -> i == 1 }.take(1).toImList().head().get())
-        assertEquals(Integer.valueOf(3), seq.filter { i -> i > 2 }.take(1).toImList().head().get())
-        TestCase.assertFalse(seq.filter { i -> i > 10 }.take(1).toImList().head().isSome)
+        assertEquals(Integer.valueOf(1), seq.allowWhere { i -> i == 1 }.take(1).toImList().head().get())
+        assertEquals(Integer.valueOf(3), seq.allowWhere { i -> i > 2 }.take(1).toImList().head().get())
+        TestCase.assertFalse(seq.allowWhere { i -> i > 10 }.take(1).toImList().head().isSome)
     }
 
     @Test
@@ -749,17 +790,17 @@ class XformTest : TestCase() {
 
     @Test
     fun chain1() {
-        assertArrayEquals(Xform.of(listOf(5))                      //         5
+        assertArrayEquals(Xform.of(listOf(5))                     //         5
                                   .precat(Xform.of(listOf(4)))    //       4,5
-                                  .concat(Xform.of(listOf(6)))     //       4,5,6
+                                  .concat(Xform.of(listOf(6)))    //       4,5,6
                                   .precat(Xform.of(listOf(2, 3))) //   2,3,4,5,6
-                                  .concat(Xform.of(listOf(7, 8)))  //   2,3,4,5,6,7,8
+                                  .concat(Xform.of(listOf(7, 8))) //   2,3,4,5,6,7,8
                                   .precat(Xform.of(listOf(1)))    // 1,2,3,4,5,6,7,8
-                                  .concat(Xform.of(listOf(9)))     // 1,2,3,4,5,6,7,8,9
-                                  .filter { i -> i > 3 }              //       4,5,6,7,8,9
-                                  .map { i -> i!! - 2 }                 //   2,3,4,5,6,7
-                                  .take(5)                         //   2,3,4,5,6
-                                  .drop(2)                         //       4,5,6
+                                  .concat(Xform.of(listOf(9)))    // 1,2,3,4,5,6,7,8,9
+                                  .allowWhere { i -> i > 3 }      //       4,5,6,7,8,9
+                                  .map { i -> i - 2 }             //   2,3,4,5,6,7
+                                  .take(5)                        //   2,3,4,5,6
+                                  .drop(2)                        //       4,5,6
                                   .toMutList().toTypedArray(),
                           arrayOf(4, 5, 6))
     }
@@ -770,13 +811,13 @@ class XformTest : TestCase() {
             assertEquals(listOf(1, 2, 3),
                          td.fold(listOf(), { accum: List<Int>, i: Int -> accum.plus(i) }))
             assertEquals(listOf(2, 3, 4),
-                         td.map { i -> i!! + 1 }
+                         td.map { i -> i + 1 }
                                  .fold(listOf(), { accum: List<Int>, i: Int -> accum.plus(i) }))
             assertEquals(listOf(1, 3),
-                         td.filter { i -> i != 2 }
+                         td.allowWhere { i -> i != 2 }
                                  .fold(listOf(), { accum: List<Int>, i: Int -> accum.plus(i) }))
             assertEquals(listOf(1, 10, 100, 2, 20, 200, 3, 30, 300),
-                         td.flatMap { i -> vec(i, i!! * 10, i * 100) }
+                         td.flatMap { i -> vec(i, i * 10, i * 100) }
                                  .fold(ArrayList()) { accum:List<Int>, i:Int -> accum.plus(i) })
             assertEquals(listOf(2, 3),
                          td.drop(1)
@@ -809,7 +850,7 @@ class XformTest : TestCase() {
                          td.concat(listOf(4, 5, 6))
                                  .fold(listOf(), { accum: List<Int>, i: Int -> accum.plus(i) }))
             assertEquals(listOf(1, 2, 3, 4, 5, 6),
-                         td.concat(Xform.of(listOf(4, 5, 6)).toImSortedSet { a, b -> a!! - b!! })
+                         td.concat(Xform.of(listOf(4, 5, 6)).toImSortedSet(Comparator{ p0, p1 -> p0!! - p1!! }))
                                  .fold(listOf(), { accum: List<Int>, i: Int -> accum.plus(i) }))
             //        assertEquals(listOf(1, 2, 3, 4, 5, 6),
             //                     td.concatArray(new Integer[]{4, 5, 6})
@@ -819,7 +860,7 @@ class XformTest : TestCase() {
             //                       }));
             assertEquals(listOf(2, 3, 4, 5, 6, 7),
                          td.concat(listOf(4, 5, 6))
-                                 .map { i -> i!! + 1 }
+                                 .map { i -> i + 1 }
                                  .fold(listOf(), { accum: List<Int>, i: Int -> accum.plus(i) }))
         }
 
@@ -827,61 +868,61 @@ class XformTest : TestCase() {
             assertEquals(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9),
                          td.fold(listOf(), { accum: List<Int>, i: Int -> accum.plus(i) }))
             assertEquals(listOf(2, 4, 6, 8),
-                         td.filter { i -> i!! % 2 == 0 }
+                         td.allowWhere { i -> i % 2 == 0 }
                                  .fold(listOf(), { accum: List<Int>, i: Int -> accum.plus(i) }))
             assertEquals(listOf(1, 2, 3, 4, 5),
                          td.take(5)
                                  .fold(listOf(), { accum: List<Int>, i: Int -> accum.plus(i) }))
             assertEquals(listOf(3, 5, 7, 9),
-                         td.filter { i -> i!! % 2 == 0 }
-                                 .map { i -> i!! + 1 }
+                         td.allowWhere { i -> i % 2 == 0 }
+                                 .map { i -> i + 1 }
                                  .fold(listOf(), { accum: List<Int>, i: Int -> accum.plus(i) }))
             assertEquals(listOf(3, 5, 7),
-                         td.filter { i -> i!! % 2 == 0 }
-                                 .map { i -> i!! + 1 }
+                         td.allowWhere { i -> i % 2 == 0 }
+                                 .map { i -> i + 1 }
                                  .take(3)
                                  .fold(listOf(), { accum: List<Int>, i: Int -> accum.plus(i) }))
             assertEquals(listOf(3, 30, 300, 5, 50, 500, 7, 70, 700, 9, 90, 900),
-                         td.filter { i -> i!! % 2 == 0 }
-                                 .map { i -> i!! + 1 }
-                                 .flatMap { i -> vec(i, i!! * 10, i * 100) }
+                         td.allowWhere { i -> i % 2 == 0 }
+                                 .map { i -> i + 1 }
+                                 .flatMap { i -> vec(i, i * 10, i * 100) }
                                  .fold(listOf(), { accum: List<Int>, i: Int -> accum.plus(i) }))
             assertEquals(listOf(5, 50, 500, 7, 70, 700, 9, 90, 900),
                          td.drop(2)
-                                 .filter { i -> i!! % 2 == 0 }
-                                 .map { i -> i!! + 1 }
-                                 .flatMap { i -> vec(i, i!! * 10, i * 100) }
+                                 .allowWhere { i -> i % 2 == 0 }
+                                 .map { i -> i + 1 }
+                                 .flatMap { i -> vec(i, i * 10, i * 100) }
                                  .fold(listOf(), { accum: List<Int>, i: Int -> accum.plus(i) }))
             //        System.out.println("Testing separate drop.");
             assertEquals(listOf(7, 9),
-                         td.filter { i -> i!! % 2 == 0 }
-                                 .map { i -> i!! + 1 }
+                         td.allowWhere { i -> i % 2 == 0 }
+                                 .map { i -> i + 1 }
                                  .drop(2)
                                  .fold(listOf(), { accum: List<Int>, i: Int -> accum.plus(i) }))
             //        System.out.println("Done testing separate drop.");
             assertEquals(listOf(7, 70, 700, 9, 90, 900),
-                         td.filter { i -> i!! % 2 == 0 }
-                                 .map { i -> i!! + 1 }
+                         td.allowWhere { i -> i % 2 == 0 }
+                                 .map { i -> i + 1 }
                                  .drop(2)
-                                 .flatMap { i -> vec(i, i!! * 10, i * 100) }
+                                 .flatMap { i -> vec(i, i * 10, i * 100) }
                                  .fold(listOf(), { accum: List<Int>, i: Int -> accum.plus(i) }))
             assertEquals(listOf(500, 7, 70, 700, 9, 90, 900),
-                         td.filter { i -> i!! % 2 == 0 }
-                                 .map { i -> i!! + 1 }
-                                 .flatMap { i -> vec(i, i!! * 10, i * 100) }
+                         td.allowWhere { i -> i % 2 == 0 }
+                                 .map { i -> i + 1 }
+                                 .flatMap { i -> vec(i, i * 10, i * 100) }
                                  .drop(5)
                                  .fold(listOf(), { accum: List<Int>, i: Int -> accum.plus(i) }))
             assertEquals(listOf(500, 7, 70, 700, 9, 90),
-                         td.filter { i -> i!! % 2 == 0 }
-                                 .map { i -> i!! + 1 }
-                                 .flatMap { i -> vec(i, i!! * 10, i * 100) }
+                         td.allowWhere { i -> i % 2 == 0 }
+                                 .map { i -> i + 1 }
+                                 .flatMap { i -> vec(i, i * 10, i * 100) }
                                  .drop(5)
                                  .take(6)
                                  .fold(listOf(), { accum: List<Int>, i: Int -> accum.plus(i) }))
             assertEquals(listOf(500, 7, 70, 700, 9, 90, 91, 92, 93),
-                         td.filter { i -> i!! % 2 == 0 }
-                                 .map { i -> i!! + 1 }
-                                 .flatMap { i -> vec(i, i!! * 10, i * 100) }
+                         td.allowWhere { i -> i % 2 == 0 }
+                                 .map { i -> i + 1 }
+                                 .flatMap { i -> vec(i, i * 10, i * 100) }
                                  .drop(5)
                                  .take(6)
                                  .concat(listOf(91, 92, 93))

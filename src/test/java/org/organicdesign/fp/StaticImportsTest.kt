@@ -24,6 +24,7 @@ import org.organicdesign.fp.collections.PersistentHashSet
 import org.organicdesign.fp.collections.PersistentTreeMap
 import org.organicdesign.fp.collections.PersistentTreeSet
 import org.organicdesign.fp.collections.PersistentVector
+import org.organicdesign.fp.function.Fn0
 import org.organicdesign.fp.tuple.Tuple2
 import org.organicdesign.fp.tuple.Tuple3
 import org.organicdesign.fp.xform.Xform
@@ -202,4 +203,38 @@ class StaticImportsTest {
     fun testXformChars() {
         assertEquals(vec('H', 'e', 'l', 'l', 'o'), xformChars("Hello").toImList())
     }
+
+
+    companion object {
+        open class A {
+            open fun foo(): String {
+                return "A"
+            }
+        }
+
+        open class B : A() {
+            override fun foo(): String {
+                return "B"
+            }
+        }
+
+        @JvmStatic
+        fun getAFromF(f: () -> A): A {
+            return f.invoke()
+        }
+    }
+
+//    @Test
+//    fun testBasics() {
+//        assertEquals("A", getAFromF({ A() }).foo())
+//        assertEquals("A", getAFromF({ () -> A() }).foo())
+//        assertEquals("B", getAFromF(Fn0<B> { B() }).foo())
+//        assertEquals("C", getAFromF(object : Fn0<B> {
+//            @Throws(Exception::class)
+//            override fun invokeEx(): B? {
+//                return null
+//            }
+//        }).foo())
+//    }
+
 }

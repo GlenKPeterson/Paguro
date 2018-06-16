@@ -14,16 +14,16 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.organicdesign.fp.FunctionUtils.ordinal;
 import static org.organicdesign.fp.StaticImportsKt.vec;
-import static org.organicdesign.fp.function.Fn1.ConstObjObj.IDENTITY;
-import static org.organicdesign.fp.function.Fn1.ConstObjBool.ACCEPT;
-import static org.organicdesign.fp.function.Fn1.ConstObjBool.REJECT;
+import static org.organicdesign.fp.function.Fn1.Companion.ConstObjObj.IDENTITY;
+import static org.organicdesign.fp.function.Fn1.Companion.ConstObjBool.ACCEPT;
+import static org.organicdesign.fp.function.Fn1.Companion.ConstObjBool.REJECT;
 
 @RunWith(JUnit4.class)
 public class Fn1Test {
     @Test(expected = RuntimeException.class)
     public void applyIOException() {
         new Fn1<Integer,Integer>() {
-            @Override public Integer applyEx(Integer o) throws Exception {
+            @Override public Integer invokeEx(Integer o) throws Exception {
                 if (o < 10) {
                     throw new IOException("test exception");
                 }
@@ -35,7 +35,7 @@ public class Fn1Test {
     @Test(expected = IllegalStateException.class)
     public void applyIllegalStateException() {
         new Fn1<Integer,Integer>() {
-            @Override public Integer applyEx(Integer o) throws Exception {
+            @Override public Integer invokeEx(Integer o) throws Exception {
                 if (o < 10) {
                     throw new IllegalStateException("test exception");
                 }
@@ -49,85 +49,85 @@ public class Fn1Test {
     };
 
     @Test public void composePredicatesWithAnd() {
-        assertEquals(ACCEPT, Fn1.and(null));
-        assertEquals(ACCEPT, Fn1.and(vec()));
-        assertEquals(ACCEPT, Fn1.and(Collections.emptyList()));
+        assertEquals(ACCEPT, Fn1.Companion.and(null));
+        assertEquals(ACCEPT, Fn1.Companion.and(vec()));
+        assertEquals(ACCEPT, Fn1.Companion.and(Collections.emptyList()));
 
         assertEquals(REJECT,
-                     Fn1.and(vec(Fn1.reject(),
+                     Fn1.Companion.and(vec(Fn1.Companion.reject(),
                                  NOT_PROCESSED)));
 
         assertEquals(REJECT,
-                     Fn1.and(vec(null, null, null, Fn1.reject(),
+                     Fn1.Companion.and(vec(null, null, null, Fn1.Companion.reject(),
                                  NOT_PROCESSED)));
 
         assertEquals(REJECT,
-                     Fn1.and(Arrays.asList(null, null, null, Fn1.reject(),
+                     Fn1.Companion.and(Arrays.asList(null, null, null, Fn1.Companion.reject(),
+                                                     NOT_PROCESSED)));
+
+        assertEquals(REJECT,
+                     Fn1.Companion.and(vec(Fn1.Companion.accept(),
+                                           Fn1.Companion.accept(),
+                                           Fn1.Companion.accept(),
+                                           Fn1.Companion.reject(),
                                            NOT_PROCESSED)));
 
         assertEquals(REJECT,
-                     Fn1.and(vec(Fn1.accept(),
-                                 Fn1.accept(),
-                                 Fn1.accept(),
-                                 Fn1.reject(),
-                                 NOT_PROCESSED)));
-
-        assertEquals(REJECT,
-                     Fn1.and(vec(Fn1.reject(),
-                                 Fn1.accept(),
-                                 Fn1.accept(),
-                                 Fn1.accept())));
+                     Fn1.Companion.and(vec(Fn1.Companion.reject(),
+                                 Fn1.Companion.accept(),
+                                 Fn1.Companion.accept(),
+                                 Fn1.Companion.accept())));
 
         assertEquals(ACCEPT,
-                     Fn1.and(vec(Fn1.accept())));
+                     Fn1.Companion.and(vec(Fn1.Companion.accept())));
     }
 
     @Test public void composePredicatesWithOr() {
-        assertEquals(REJECT, Fn1.or(null));
+        assertEquals(REJECT, Fn1.Companion.or(null));
 
         assertEquals(ACCEPT,
-                     Fn1.or(vec(Fn1.accept(),
+                     Fn1.Companion.or(vec(Fn1.Companion.accept(),
                                 NOT_PROCESSED)));
 
         assertEquals(ACCEPT,
-                     Fn1.or(vec(null, null, null, Fn1.accept(),
+                     Fn1.Companion.or(vec(null, null, null, Fn1.Companion.accept(),
                                 NOT_PROCESSED)));
 
         assertEquals(ACCEPT,
-                     Fn1.or(Arrays.asList(null, null, null, Fn1.accept(),
+                     Fn1.Companion.or(Arrays.asList(null, null, null, Fn1.Companion.accept(),
                                           NOT_PROCESSED)));
 
         assertEquals(ACCEPT,
-                     Fn1.or(vec(Fn1.reject(),
-                                Fn1.reject(),
-                                Fn1.reject(),
-                                Fn1.accept(),
+                     Fn1.Companion.or(vec(Fn1.Companion.reject(),
+                                Fn1.Companion.reject(),
+                                Fn1.Companion.reject(),
+                                Fn1.Companion.accept(),
                                 NOT_PROCESSED)));
 
         assertEquals(ACCEPT,
-                     Fn1.or(vec(Fn1.accept(),
-                                Fn1.reject(),
-                                Fn1.reject(),
-                                Fn1.reject())));
+                     Fn1.Companion.or(vec(Fn1.Companion.accept(),
+                                Fn1.Companion.reject(),
+                                Fn1.Companion.reject(),
+                                Fn1.Companion.reject())));
 
         assertEquals(REJECT,
-                     Fn1.or(vec(Fn1.reject())));
+                     Fn1.Companion.or(vec(Fn1.Companion.reject())));
     }
 
     @Test public void compose() {
         assertEquals(IDENTITY,
-                     Fn1.compose((Iterable<Fn1<String,String>>) null));
+                     Fn1.Companion.compose((Iterable<Fn1<String,String>>) null));
 
-        assertEquals(IDENTITY, Fn1.compose(vec(null, null, null)));
+        assertEquals(IDENTITY, Fn1.Companion.compose(vec(null, null, null)));
 
-        assertEquals(IDENTITY, Fn1.compose(vec(null, Fn1.identity(), null)));
+        assertEquals(IDENTITY, Fn1.Companion.compose(vec(null, Fn1.Companion.identity(), null)));
 
-        assertEquals(ACCEPT, Fn1.compose(vec(null, Fn1.identity(), null,
-                                             Fn1.accept())));
+        assertEquals(ACCEPT, Fn1.Companion.compose(vec(null, Fn1.Companion.identity(), null,
+                                             Fn1.Companion.accept())));
 
         Fn1<Integer,String> intToStr = new Fn1<Integer, String>() {
             @Override
-            public String applyEx(Integer i) throws Exception {
+            public String invokeEx(Integer i) throws Exception {
                 return (i == 0) ? "zero" :
                        (i == 1) ? "one" :
                        (i == 2) ? "two" : "unknown";
@@ -135,7 +135,7 @@ public class Fn1Test {
         };
         Fn1<String,String> wordToOrdinal = new Fn1<String, String>() {
             @Override
-            public String applyEx(String s) throws Exception {
+            public String invokeEx(String s) throws Exception {
                 return ("one".equals(s)) ? "first" :
                        ("two".equals(s)) ? "second" : s;
             }
@@ -147,21 +147,21 @@ public class Fn1Test {
         assertEquals("second", f.apply(2));
         assertEquals("unknown", f.apply(3));
 
-        Fn1<Integer,String> g = intToStr.compose(Fn1.identity());
+        Fn1<Integer,String> g = intToStr.compose(Fn1.Companion.identity());
         assertEquals("unknown", g.apply(-1));
         assertEquals("zero", g.apply(0));
         assertEquals("one", g.apply(1));
         assertEquals("two", g.apply(2));
         assertEquals("unknown", g.apply(3));
 
-        Fn1<Integer,String> h = Fn1.<String>identity().compose(intToStr);
+        Fn1<Integer,String> h = Fn1.Companion.<String>identity().compose(intToStr);
         assertEquals("unknown", h.apply(-1));
         assertEquals("zero", h.apply(0));
         assertEquals("one", h.apply(1));
         assertEquals("two", h.apply(2));
         assertEquals("unknown", h.apply(3));
 
-        Fn1<String,String> i = Fn1.compose(vec((Fn1<String, String>) s -> s.substring(0, s.indexOf(" hundred")),
+        Fn1<String,String> i = Fn1.Companion.compose(vec((Fn1<String, String>) s -> s.substring(0, s.indexOf(" hundred")),
                                                wordToOrdinal));
         assertEquals("zillion", i.apply("zillion hundred"));
         assertEquals("zero", i.apply("zero hundred"));
@@ -175,93 +175,93 @@ public class Fn1Test {
         Integer[] oneToNineArray = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         ImList<Integer> oneToNine = vec(oneToNineArray);
 
-        assertEquals(ACCEPT, Fn1.or(Fn1.accept(), (Integer i) -> i < 6));
-        assertEquals(ACCEPT, Fn1.or((Integer i) -> i < 6, Fn1.accept()));
+        assertEquals(ACCEPT, Fn1.Companion.or(Fn1.Companion.accept(), (Integer i) -> i < 6));
+        assertEquals(ACCEPT, Fn1.Companion.or((Integer i) -> i < 6, Fn1.Companion.accept()));
 
         assertArrayEquals(oneToNineArray,
-                          oneToNine.filter(Fn1.or(i -> i < 3,
-                                                  Fn1.accept()))
+                          oneToNine.allowWhere(Fn1.Companion.or(i -> i < 3,
+                                                  Fn1.Companion.accept()))
                                    .toMutList()
                                    .toArray());
 
         assertArrayEquals(oneToNineArray,
-                          oneToNine.filter(Fn1.or(Fn1.accept(),
+                          oneToNine.allowWhere(Fn1.Companion.or(Fn1.Companion.accept(),
                                                         i -> i > 5))
                                    .toMutList()
                                    .toArray());
 
 
         assertArrayEquals(new Integer[]{6, 7, 8, 9},
-                          oneToNine.filter(Fn1.or(Fn1.reject(),
+                          oneToNine.allowWhere(Fn1.Companion.or(Fn1.Companion.reject(),
                                                         i -> i > 5))
                                    .toMutList()
                                    .toArray());
 
         assertArrayEquals(new Integer[]{1, 2},
-                          oneToNine.filter(Fn1.or(i -> i < 3,
-                                                  Fn1.reject()))
+                          oneToNine.allowWhere(Fn1.Companion.or(i -> i < 3,
+                                                  Fn1.Companion.reject()))
                                    .toMutList()
                                    .toArray());
 
         assertArrayEquals(new Integer[]{1, 2, 6, 7, 8, 9},
-                          oneToNine.filter(Fn1.or(i -> i < 3,
+                          oneToNine.allowWhere(Fn1.Companion.or(i -> i < 3,
                                                         i -> i > 5))
                                    .toMutList()
                                    .toArray());
 
         assertArrayEquals(new Integer[]{1, 2, 4, 6, 7, 8, 9},
-                          oneToNine.filter(Fn1.or(vec((Fn1<Integer,Boolean>) i -> i < 3,
+                          oneToNine.allowWhere(Fn1.Companion.or(vec((Fn1<Integer,Boolean>) i -> i < 3,
                                                       (Fn1<Integer,Boolean>) i -> i == 4,
                                                       (Fn1<Integer,Boolean>) i -> i > 5)))
                                    .toMutList()
                                    .toArray());
 
         // and(a, b)
-        assertEquals(REJECT, Fn1.and(Fn1.reject(), (Integer i) -> i < 6));
-        assertEquals(REJECT, Fn1.and((Integer i) -> i < 6, Fn1.reject()));
+        assertEquals(REJECT, Fn1.Companion.and(Fn1.Companion.reject(), (Integer i) -> i < 6));
+        assertEquals(REJECT, Fn1.Companion.and((Integer i) -> i < 6, Fn1.Companion.reject()));
 
         assertArrayEquals(new Integer[]{},
-                          oneToNine.filter(Fn1.and((i) -> i > 2,
-                                                   Fn1.reject()))
+                          oneToNine.allowWhere(Fn1.Companion.and((i) -> i > 2,
+                                                   Fn1.Companion.reject()))
                                    .toMutList()
                                    .toArray());
 
         assertArrayEquals(new Integer[]{},
-                          oneToNine.filter(Fn1.and(Fn1.reject(),
+                          oneToNine.allowWhere(Fn1.Companion.and(Fn1.Companion.reject(),
                                                    (i) -> i > 2))
                                    .toMutList()
                                    .toArray());
 
         assertArrayEquals(new Integer[]{3, 4, 5, 6, 7, 8, 9},
-                          oneToNine.filter(Fn1.and((i) -> i > 2,
-                                                   Fn1.accept()))
+                          oneToNine.allowWhere(Fn1.Companion.and((i) -> i > 2,
+                                                   Fn1.Companion.accept()))
                                    .toMutList()
                                    .toArray());
 
         assertArrayEquals(new Integer[]{1, 2, 3, 4, 5},
-                          oneToNine.filter(Fn1.and(Fn1.accept(),
+                          oneToNine.allowWhere(Fn1.Companion.and(Fn1.Companion.accept(),
                                                    (i) -> i < 6))
                                    .toMutList()
                                    .toArray());
 
         assertArrayEquals(new Integer[]{3, 4, 5},
-                          oneToNine.filter(Fn1.and((i) -> i > 2,
+                          oneToNine.allowWhere(Fn1.Companion.and((i) -> i > 2,
                                                    (i) -> i < 6))
                                    .toMutList()
                                    .toArray());
 
         assertArrayEquals(new Integer[]{4, 5},
-                          oneToNine.filter(Fn1.and(vec((Fn1<Integer,Boolean>) i -> i > 2,
+                          oneToNine.allowWhere(Fn1.Companion.and(vec((Fn1<Integer,Boolean>) i -> i > 2,
                                                        (Fn1<Integer,Boolean>) i -> i > 3,
                                                        (Fn1<Integer,Boolean>) i -> i < 6)))
                                    .toMutList()
                                    .toArray());
 
-        assertEquals(REJECT, Fn1.negate(Fn1.accept()));
-        assertEquals(ACCEPT, Fn1.negate(Fn1.reject()));
+        assertEquals(REJECT, Fn1.Companion.negate(Fn1.Companion.accept()));
+        assertEquals(ACCEPT, Fn1.Companion.negate(Fn1.Companion.reject()));
 
         assertArrayEquals(new Integer[]{1, 2},
-                          oneToNine.filter(Fn1.negate(i -> i > 2))
+                          oneToNine.allowWhere(Fn1.Companion.negate(i -> i > 2))
                                    .toMutList()
                                    .toArray());
     }
@@ -269,7 +269,7 @@ public class Fn1Test {
     @Test public void testMemoize() {
         final int MAX_INT = 1000;
         AtomicInteger counter = new AtomicInteger(0);
-        Fn1<Integer,String> f = Fn1.memoize(i -> {
+        Fn1<Integer,String> f = Fn1.Companion.memoize(i -> {
             counter.getAndIncrement();
             return ordinal(i);
         });

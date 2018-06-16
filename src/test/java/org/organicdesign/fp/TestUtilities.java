@@ -100,7 +100,7 @@ public class TestUtilities {
     public static <T extends Throwable> void assertEx(Fn0<?> f, String beforeText,
                                                       Class<T> exType) {
         try {
-            f.apply();
+            f.invoke();
         } catch (Throwable t) {
             if (!exType.isInstance(t)) {
                 fail("Expected " + beforeText + " to throw " + exType.getSimpleName() +

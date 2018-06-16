@@ -31,10 +31,10 @@ public interface BaseList<E> extends UnmodList<E> {
     /**
      Efficiently adds items to the end of this ImList.
 
-     @param es the values to insert
+     @param iterable the values to insert
      @return a new ImList with the additional items at the end.
      */
-    @Override BaseList<E> concat(Iterable<? extends E> es);
+    @Override BaseList<E> concat(Iterable<? extends E> iterable);
 
     // I don't know if this is a good idea or not and I don't want to have to support it if not.
 //    /**

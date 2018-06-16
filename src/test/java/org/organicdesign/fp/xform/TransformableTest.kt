@@ -28,6 +28,7 @@ import org.organicdesign.fp.tuple.Tuple2
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.organicdesign.fp.FunctionUtils.ordinal
+import kotlin.Comparator
 import kotlin.collections.Map.Entry
 
 class TransformableTest {
@@ -56,14 +57,14 @@ class TransformableTest {
             control.put(i, ordinal(i))
         }
         val trans = Xform.of<Entry<Int, String>>(control.entries)
-        assertEquals(control, trans.toMutMap<Int, String> { x -> x })
+        assertEquals(control, trans.toMutMap{ x -> x })
     }
 
     @Test
     @Throws(Exception::class)
     fun testToMutableSortedMap() {
         val items:List<Int> = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)
-        val comp = Integer::compare
+        val comp = Comparator(Integer::compare)
         val control = TreeMap<Int, String>(comp)
         for (i in items) {
             control.put(i, ordinal(i))
@@ -88,7 +89,7 @@ class TransformableTest {
     @Throws(Exception::class)
     fun testToImSortedMap() {
         val items = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)
-        val comp = Integer::compare
+        val comp = Comparator(Integer::compare)
         var control: ImSortedMap<Int, String> = PersistentTreeMap.empty(comp)
         for (i in items) {
             control = control.assoc(i, ordinal(i))
@@ -103,7 +104,8 @@ class TransformableTest {
         val control = TreeSet(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
         val trans = Xform.of(control)
         assertTrue(UnmodSortedIterable.equal(UnmodSortedIterable.castFromSortedSet(control),
-                                             UnmodSortedIterable.castFromSortedSet(trans.toMutSortedSet { a, b -> a!! - b!! })))
+                                             UnmodSortedIterable.castFromSortedSet(trans.toMutSortedSet(
+                                                     Comparator(Integer::compare)))))
     }
 
     @Test
@@ -119,7 +121,7 @@ class TransformableTest {
     @Throws(Exception::class)
     fun testToImSortedSet() {
         val items = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)
-        val comp = Integer::compare
+        val comp = Comparator(Integer::compare)
         val control = TreeSet<Int>(comp)
         control.addAll(items)
         val trans = Xform.of(items)

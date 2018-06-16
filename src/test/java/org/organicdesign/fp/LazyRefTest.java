@@ -29,9 +29,9 @@ public class LazyRefTest {
     public void testLazyRef() {
         AtomicInteger intRef = new AtomicInteger(3);
         Fn0<Integer> f = () -> intRef.incrementAndGet();
-        assertEquals(new Integer(4), f.apply());
-        assertEquals(new Integer(5), f.apply());
-        assertEquals(new Integer(6), f.apply());
+        assertEquals(new Integer(4), f.invoke());
+        assertEquals(new Integer(5), f.invoke());
+        assertEquals(new Integer(6), f.invoke());
 
         LazyRef<Integer> lr = LazyRef.of(f);
 
@@ -41,7 +41,7 @@ public class LazyRefTest {
 
         assertEquals("LazyRef(7)", lr.toString());
 
-        assertEquals(new Integer(8), f.apply());
+        assertEquals(new Integer(8), f.invoke());
         intRef.set(-1);
 
         assertEquals(new Integer(7), lr.get());
@@ -58,14 +58,14 @@ public class LazyRefTest {
 //    public void testLazyInt() {
 //        Mutable.IntRef intRef = Mutable.IntRef.of(3);
 //        Fn0<Integer> f = () -> intRef.increment().value();
-//        assertEquals(f.apply(), new Integer(4));
-//        assertEquals(f.apply(), new Integer(5));
-//        assertEquals(f.apply(), new Integer(6));
+//        assertEquals(f.invoke(), new Integer(4));
+//        assertEquals(f.invoke(), new Integer(5));
+//        assertEquals(f.invoke(), new Integer(6));
 //
 //        Lazy.Int lr = Lazy.Int.of(f);
 //        assertEquals(lr.get(), 7);
 //
-//        assertEquals(f.apply(), new Integer(8));
+//        assertEquals(f.invoke(), new Integer(8));
 //        intRef.set(-1);
 //
 //        assertEquals(lr.get(), 7);

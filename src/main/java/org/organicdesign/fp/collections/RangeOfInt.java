@@ -46,7 +46,7 @@ public class RangeOfInt implements UnmodList<Integer>, Serializable {
              a range.
              */
             @Override public int hash(List<Integer> integers) {
-                return UnmodIterable.hash(integers);
+                return UnmodIterable.Companion.hash(integers);
             }
 
             @Override

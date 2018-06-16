@@ -14,14 +14,14 @@
 package org.organicdesign.fp.oneOf;
 
 import org.junit.Test;
-import org.organicdesign.fp.oneOf.Or;
+import org.organicdesign.fp.oneOf.Or.*;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class OrTest {
-    @Test public void bad() {
-        Or<Integer,String> or = Or.bad("Hello");
+    @Test public void testBad() {
+        Or<Integer,String> or = Or.Companion.bad("Hello");
         assertTrue(or.isBad());
         assertFalse(or.isGood());
         assertEquals("Hello", or.bad());
@@ -30,8 +30,8 @@ public class OrTest {
                             (b) -> "Hello".equals(b)));
     }
 
-    @Test public void good() {
-        Or<String,Integer> or = Or.good("Hello");
+    @Test public void testGood() {
+        Or<String,Integer> or = Or.Companion.good("Hello");
         assertFalse(or.isBad());
         assertTrue(or.isGood());
         assertEquals("Hello", or.good());
@@ -43,35 +43,35 @@ public class OrTest {
     @SuppressWarnings("deprecation")
     @Test (expected = IllegalStateException.class)
     public void badEx() {
-        Or.bad("Hello").good();
+        Or.Companion.bad("Hello").good();
     }
 
     @SuppressWarnings("deprecation")
     @Test (expected = IllegalStateException.class)
     public void goodEx() {
-        Or.good("Hello").bad();
+        Or.Companion.good("Hello").bad();
     }
 
     @Test public void equalsHashCodeToStr() {
-        equalsDistinctHashCode(Or.bad("Hello"),
-                               Or.bad("Hello"),
-                               Or.bad("Hello"),
-                               Or.good("Hello"));
+        equalsDistinctHashCode(Or.Companion.bad("Hello"),
+                               Or.Companion.bad("Hello"),
+                               Or.Companion.bad("Hello"),
+                               Or.Companion.good("Hello"));
 
-        equalsDistinctHashCode(Or.good("Hello"),
-                               Or.good("Hello"),
-                               Or.good("Hello"),
-                               Or.bad("Hello"));
+        equalsDistinctHashCode(Or.Companion.good("Hello"),
+                               Or.Companion.good("Hello"),
+                               Or.Companion.good("Hello"),
+                               Or.Companion.bad("Hello"));
 
-        Or<Integer,String> b = Or.bad("Hello");
+        Or<Integer,String> b = Or.Companion.bad("Hello");
 //        System.out.println("b:" + b.toString());
-        assertEquals(b.hashCode(), Or.bad("Hello").hashCode());
-        assertTrue(b.equals(Or.bad("Hello")));
+        assertEquals(b.hashCode(), Or.Companion.bad("Hello").hashCode());
+        assertTrue(b.equals(Or.Companion.bad("Hello")));
 
-        Or<String,Integer> g = Or.good("Hello");
+        Or<String,Integer> g = Or.Companion.good("Hello");
 //        System.out.println("g:" + g);
-        assertEquals(g.hashCode(), Or.good("Hello").hashCode());
-        assertTrue(g.equals(Or.good("Hello")));
+        assertEquals(g.hashCode(), Or.Companion.good("Hello").hashCode());
+        assertTrue(g.equals(Or.Companion.good("Hello")));
 
         assertNotEquals(b.hashCode(), g.hashCode());
         assertNotEquals(b, g);

@@ -20,7 +20,8 @@ import org.organicdesign.fp.function.Fn1;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.organicdesign.fp.StaticImportsKt.vec;
-import static org.organicdesign.fp.function.Fn1.ConstObjBool.*;
+import static org.organicdesign.fp.function.Fn1.Companion.*;
+import static org.organicdesign.fp.function.Fn1.Companion.ConstObjBool.*;
 
 @RunWith(JUnit4.class)
 public class BooleanCombinerTest {
@@ -29,25 +30,25 @@ public class BooleanCombinerTest {
     @SuppressWarnings("unchecked")
     public void combineAnd() {
 //        assertTrue(Fn1.BooleanCombiner.AND.combineArray() == ACCEPT);
-        assertTrue(Fn1.BooleanCombiner.AND.combine(null) == ACCEPT);
+//        assertTrue(BooleanCombiner.AND.combine(null) == ACCEPT);
 
 //        assertTrue(Fn1.BooleanCombiner.AND.combineArray(accept()) == ACCEPT);
-        assertTrue(Fn1.BooleanCombiner.AND.combine(vec(Fn1.accept())) == ACCEPT);
+        assertTrue(BooleanCombiner.AND.combine(vec(Fn1.Companion.accept())) == ACCEPT);
 
 //        assertTrue(Fn1.BooleanCombiner.AND.combineArray(reject()) == REJECT);
-        assertTrue(Fn1.BooleanCombiner.AND.combine(vec(Fn1.reject())) == REJECT);
+        assertTrue(BooleanCombiner.AND.combine(vec(Fn1.Companion.reject())) == REJECT);
     }
 
     @Test
     @SuppressWarnings("unchecked")
     public void combineOr() {
 //        assertTrue(Fn1.BooleanCombiner.OR.combineArray() == REJECT);
-        assertTrue(Fn1.BooleanCombiner.OR.combine(null) == REJECT);
+//        assertTrue(BooleanCombiner.OR.combine(null) == REJECT);
 
 //        assertTrue(Fn1.BooleanCombiner.OR.combineArray(accept()) == ACCEPT);
-        assertTrue(Fn1.BooleanCombiner.OR.combine(vec(Fn1.accept())) == ACCEPT);
+        assertTrue(BooleanCombiner.OR.combine(vec(Fn1.Companion.accept())) == ACCEPT);
 
 //        assertTrue(Fn1.BooleanCombiner.OR.combineArray(reject()) == REJECT);
-        assertTrue(Fn1.BooleanCombiner.OR.combine(vec(Fn1.reject())) == REJECT);
+        assertTrue(BooleanCombiner.OR.combine(vec(Fn1.Companion.reject())) == REJECT);
     }
 }

@@ -1050,7 +1050,7 @@ public class PersistentHashMapTest {
         Option<String> item = seq.head();
         while (item.isSome()) {
             // System.out.println("item.get(): " + item.get());
-            // u = fun.apply(u, item.get());
+            // u = fun.invoke(u, item.get());
             u = u.put(item.get());
             // System.out.println("u: " + u);
             // repeat with next element
@@ -1263,14 +1263,14 @@ public class PersistentHashMapTest {
         FunctionUtilsTest.mapHelperOdd(vec(tup(1, "One"), null, tup(3, "Three"),
                                            null, tup(5, "Five"), null,
                                            tup(7, "Seven"), null, tup(9, "Nine"), null)
-                                               .filter(t -> t != null)
-                                               .toImMap(Fn1.identity()),
+                                               .allowWhere(t -> t != null)
+                                               .toImMap(Fn1.Companion.identity()),
                                        max);
         FunctionUtilsTest.mapHelperEven(
                 vec(null, tup(2, "Two"), null, tup(4, "Four"), null,
                     tup(6, "Six"), null, tup(8, "Eight"), null, tup(10, "Ten"))
-                        .filter(t -> t != null)
-                        .toImMap(Fn1.identity()), max);
+                        .allowWhere(t -> t != null)
+                        .toImMap(Fn1.Companion.identity()), max);
     }
 
     @Test public void testImMap3() {
@@ -1295,12 +1295,12 @@ public class PersistentHashMapTest {
         assertEquals(a.hashCode(), b.hashCode());
         assertEquals(a.hashCode(), c.hashCode());
         FunctionUtilsTest.mapHelperOdd(vec(tup(1, "One"), null, tup(3, "Three"))
-                                               .filter(t -> t != null)
-                                               .toImMap(Fn1.identity()),
+                                               .allowWhere(t -> t != null)
+                                               .toImMap(Fn1.Companion.identity()),
                                        max);
         FunctionUtilsTest.mapHelperEven(vec(null, tup(2, "Two"), null)
-                                                .filter(t -> t != null)
-                                                .toImMap(Fn1.identity()),
+                                                .allowWhere(t -> t != null)
+                                                .toImMap(Fn1.Companion.identity()),
                                         max);
     }
 
@@ -1322,8 +1322,8 @@ public class PersistentHashMapTest {
         assertEquals(a.hashCode(), c.hashCode());
         FunctionUtilsTest.mapHelperOdd(map(tup(1, "One")), max);
         FunctionUtilsTest.mapHelperEven(vec((Map.Entry<Integer,String>) null)
-                                                .filter(t -> t != null)
-                                                .toImMap(Fn1.identity()),
+                                                .allowWhere(t -> t != null)
+                                                .toImMap(Fn1.Companion.identity()),
                                         max);
     }
 
@@ -1390,19 +1390,19 @@ public class PersistentHashMapTest {
 
         verify(result, vec(tup(1, "one"), null, tup(2, "two"), null,
                            tup(3, "three"), null, tup(4, "four"))
-                .filter(t -> t != null)
-                .toImMap(Fn1.identity()));
+                .allowWhere(Objects::nonNull)
+                .toImMap(Fn1.Companion.identity()));
 
         verify(result, vec(null, tup(1, "one"), null, tup(2, "two"),
                            null, tup(3, "three"), null, tup(4, "four"), null)
-                .filter(t -> t != null)
-                .toImMap(Fn1.identity()));
+                .allowWhere(t -> t != null)
+                .toImMap(Fn1.Companion.identity()));
 
         verify(result, PersistentHashMap.ofEq(
                 Equator.defaultEquator(),
                 vec(null, tup(1, "one"), null, tup(2, "two"), null,
                     tup(3, "three"), null, tup(4, "four"), null)
-                        .filter(t -> t != null)
+                        .allowWhere(t -> t != null)
                         .map(t -> (Map.Entry<Integer,String>) t)
                         .toImList()));
 
@@ -1410,7 +1410,7 @@ public class PersistentHashMapTest {
                 Equator.defaultEquator(),
                 vec(tup(1, "one"), null, tup(2, "two"), null,
                     tup(3, "three"), null, tup(4, "four"))
-                        .filter(t -> t != null)
+                        .allowWhere(t -> t != null)
                         .map(t -> (Map.Entry<Integer,String>) t)
                         .toImList()));
     }

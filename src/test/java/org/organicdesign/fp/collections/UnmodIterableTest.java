@@ -57,7 +57,7 @@ public class UnmodIterableTest {
                                            }).bad());
 
         assertEquals(Arrays.asList("How", "now", "cow"),
-                     testIterable.filter((String s) -> s.endsWith("w")).toMutList());
+                     testIterable.allowWhere((String s) -> s.endsWith("w")).toMutList());
 
         assertEquals(Arrays.asList("How", "are", "you", "now", "are", "you", "brown", "are", "you",
                                    "cow", "are", "you"),
@@ -100,10 +100,10 @@ public class UnmodIterableTest {
             @Override public Integer next() { return intern.next(); }
         };
 
-        assertEquals(UnmodIterable.hash(a), UnmodIterable.hash(a));
-        assertEquals(UnmodIterable.hash(a), UnmodIterable.hash(b));
-        assertNotEquals(UnmodIterable.hash(a), UnmodIterable.hash(c));
-        assertNotEquals(UnmodIterable.hash(b), UnmodIterable.hash(d));
+        assertEquals(UnmodIterable.Companion.hash(a), UnmodIterable.Companion.hash(a));
+        assertEquals(UnmodIterable.Companion.hash(a), UnmodIterable.Companion.hash(b));
+        assertNotEquals(UnmodIterable.Companion.hash(a), UnmodIterable.Companion.hash(c));
+        assertNotEquals(UnmodIterable.Companion.hash(b), UnmodIterable.Companion.hash(d));
 
         assertTrue(UnmodSortedIterable.equal(a, a));
         assertTrue(UnmodSortedIterable.equal(a, b));
@@ -116,15 +116,15 @@ public class UnmodIterableTest {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Test (expected = IllegalArgumentException.class)
-    public void testEx01() { UnmodIterable.hash(null); }
+    public void testEx01() { UnmodIterable.Companion.hash(null); }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Test (expected = IllegalArgumentException.class)
-    public void testEx02() { UnmodIterable.toString(null, Arrays.asList(1,2,3)); }
+    public void testEx02() { UnmodIterable.Companion.toString(null, Arrays.asList(1,2,3)); }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Test (expected = IllegalArgumentException.class)
-    public void testEx03() { UnmodIterable.toString("Oops", null); }
+    public void testEx03() { UnmodIterable.Companion.toString("Oops", null); }
 
 //    @Test public void compareHelper() {
 //        UnmodIterable<Integer> a = () -> new UnmodIterator<Integer>() {

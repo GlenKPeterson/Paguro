@@ -107,8 +107,8 @@ abstract class RrbTree<E> : BaseList<E>, Indented {
         }
 
         /** {@inheritDoc}  */
-        override fun concat(es: Iterable<E>): MutRrbt<E> {
-            return super.concat(es) as MutRrbt<E>
+        override fun concat(iterable: Iterable<E>): MutRrbt<E> {
+            return super.concat(iterable) as MutRrbt<E>
         }
 
         override fun debugValidate() {
@@ -570,8 +570,8 @@ abstract class RrbTree<E> : BaseList<E>, Indented {
         }
 
         /** {@inheritDoc}  */
-        override fun concat(es: Iterable<E>): ImRrbt<E> {
-            return this.mutable().concat(es).immutable()
+        override fun concat(iterable: Iterable<E>): ImRrbt<E> {
+            return this.mutable().concat(iterable).immutable()
         }
 
         override fun debugValidate() {

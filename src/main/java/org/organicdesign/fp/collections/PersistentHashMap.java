@@ -45,7 +45,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
 //    static private <K, V, R> R doKvreduce(Object[] array, Fn3<R,K,V,R> f, R init) {
 //        for (int i = 0; i < array.length; i += 2) {
 //            if (array[i] != null) {
-//                init = f.apply(init, k(array, i), v(array, i + 1));
+//                init = f.invoke(init, k(array, i), v(array, i + 1));
 //            } else {
 //                INode<K,V> node = iNode(array, i + 1);
 //                if (node != null)
@@ -301,7 +301,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
     }
 
 //    public <R> R kvreduce(Fn3<R,K,V,R> f, R init) {
-//        init = hasNull ? f.apply(init, null, nullValue) : init;
+//        init = hasNull ? f.invoke(init, null, nullValue) : init;
 //        if(RT.isReduced(init))
 //            return ((IDeref)init).deref();
 //        if(root != null){
@@ -319,14 +319,14 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
 //                      final Fn1<R,Object> fjfork, final Fn1<Object,R> fjjoin){
 //        //we are ignoring n for now
 //        Fn0<R> top = () -> {
-//            R ret = combinef.apply(null,null);
+//            R ret = combinef.invoke(null,null);
 //            if(root != null)
-//                ret = combinef.apply(ret, root.fold(combinef, reducef, fjtask, fjfork, fjjoin));
-//            return hasNull ? combinef.apply(ret, reducef.apply(combinef.apply(null,null), null,
+//                ret = combinef.invoke(ret, root.fold(combinef, reducef, fjtask, fjfork, fjjoin));
+//            return hasNull ? combinef.invoke(ret, reducef.invoke(combinef.invoke(null,null), null,
 //                                            nullValue))
 //                           : ret;
 //        };
-//        return fjinvoke.apply(top);
+//        return fjinvoke.invoke(top);
 //    }
 
 //    @SuppressWarnings("unchecked")
@@ -596,7 +596,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
 //                                       final Fn1<Object,R> fjjoin) {
 //
 //            if(tasks.isEmpty())
-//                return combinef.apply(null,null);
+//                return combinef.invoke(null,null);
 //
 //            if(tasks.size() == 1){
 //                try {
@@ -611,11 +611,11 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
 //            List<Callable<R>> t1 = tasks.subList(0,tasks.size()/2);
 //            final List<Callable<R>> t2 = tasks.subList(tasks.size()/2, tasks.size());
 //
-//            Object forked = fjfork.apply(fjtask.apply(() -> foldTasks(t2, combinef, fjtask,
+//            Object forked = fjfork.invoke(fjtask.invoke(() -> foldTasks(t2, combinef, fjtask,
 //                                         fjfork, fjjoin)));
 //
-//            return combinef.apply(foldTasks(t1, combinef, fjtask, fjfork, fjjoin),
-//                                  fjjoin.apply(forked));
+//            return combinef.invoke(foldTasks(t1, combinef, fjtask, fjfork, fjjoin),
+//                                  fjjoin.invoke(forked));
 //        }
 
 
@@ -691,7 +691,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
         }
 
         @Override public String toString() {
-            return UnmodIterable.toString("ArrayNode", this);
+            return UnmodIterable.Companion.toString("ArrayNode", this);
         }
 
         private static class Iter<K,V> implements UnmodIterator<UnEntry<K,V>> {
@@ -890,7 +890,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
 //                                    final Fn1<Fn0,R> fjtask,
 //                                    final Fn1<R,Object> fjfork,
 //                                    final Fn1<Object,R> fjjoin){
-//            return doKvreduce(array, reducef, combinef.apply(null, null));
+//            return doKvreduce(array, reducef, combinef.invoke(null, null));
 //        }
 
         private BitmapIndexedNode<K,V> ensureEditable(AtomicReference<Thread> edit){
@@ -1101,7 +1101,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
 //                                    final Fn1<Fn0,R> fjtask,
 //                                    final Fn1<R,Object> fjfork,
 //                                    final Fn1<Object,R> fjjoin){
-//            return doKvreduce(array, reducef, combinef.apply(null, null));
+//            return doKvreduce(array, reducef, combinef.invoke(null, null));
 //        }
 
         private int findIndex(K key){

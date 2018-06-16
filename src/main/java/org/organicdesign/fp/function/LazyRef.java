@@ -6,6 +6,7 @@ package org.organicdesign.fp.function;
  Subsequent calls to get() cheaply return the previously initialized value.  This class is thread-safe if the producer
  function and the value it produces are free from side effects.
  */
+// TODO: Must override invoke method (not invokeEx)!
 public class LazyRef<T> implements Fn0<T> {
     private Fn0<T> producer;
     private T value;
@@ -34,11 +35,11 @@ public class LazyRef<T> implements Fn0<T> {
      @return the same value every time it is called.
      */
     // This whole method is synchronized on the advice of Goetz2006 p. 347
-    public synchronized T applyEx() {
+    public synchronized T invokeEx() {
         // Have we produced our value yet?
         if (producer != null) {
             // produce our value.
-            value = producer.apply();
+            value = producer.invoke();
             // Delete the producer to 1. mark the work done and 2. free resources.
             producer = null;
         }

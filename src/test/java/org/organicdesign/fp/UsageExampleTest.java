@@ -208,7 +208,7 @@ public class UsageExampleTest {
         ImMap<String,Person> peopleByEmail =
                 people.flatMap(person -> person.emailAddrs()
                                                .map(mail -> tup(mail.address(), person)))
-                      .toImMap(Fn1.identity());
+                      .toImMap(Fn1.Companion.identity());
 
         assertEquals("PersistentHashMap(" +
                      "Tuple2(\"d@e.f\",Person(\"Fred\",\"Tase\",PersistentVector(Email(HOME,\"c@d.e\")," +
@@ -266,7 +266,7 @@ public class UsageExampleTest {
 
         assertEquals(vec(1, 2, 3, 4, 5, 6, 7, 8, 9), u2.toImList());
 
-        u2 = u2.filter(i -> i > 4);
+        u2 = u2.allowWhere(i -> i > 4);
 
         assertEquals(vec(5,6,7,8,9), u2.toImList());
 
@@ -289,7 +289,7 @@ public class UsageExampleTest {
                      vec(4, 5)                        //          4, 5
                              .precat(vec(1, 2, 3))    // 1, 2, 3, 4, 5
                              .concat(vec(6, 7, 8, 9)) // 1, 2, 3, 4, 5, 6, 7, 8, 9
-                             .filter(i -> i > 4)      //             5, 6, 7, 8, 9
+                             .allowWhere(i -> i > 4)  //             5, 6, 7, 8, 9
                              .map(i -> i - 2)         //       3, 4, 5, 6, 7
                              .take(4)                 //       3, 4, 5, 6
                              .drop(2)                 //             5, 6

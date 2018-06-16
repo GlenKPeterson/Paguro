@@ -51,9 +51,9 @@ class XformTakenWhileTest {
                           seq.takeWhile { i -> i > 10 }.toMutList().toTypedArray())
     }
 
-    @Test(expected = IllegalArgumentException::class)
-    fun exception1() {
-        Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).takeWhile(null)
-    }
+//    @Test(expected = IllegalArgumentException::class)
+//    fun exception1() {
+//        Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).takeWhile(null)
+//    }
 
 }
