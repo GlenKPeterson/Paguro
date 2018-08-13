@@ -275,7 +275,7 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
             @Override public boolean contains(Object o) { return parent.containsKey(o); }
 
             @Override public UnmodIterator<K> iterator() {
-                return new UnEntry.UnmodKeyIter<>(parent.iterator());
+                return parent.keyIterator();
             }
             @Override public int size() { return parent.size(); }
 
@@ -284,6 +284,14 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
             }
         }
         return new KeySet(this);
+    }
+
+    default UnmodIterator<K> keyIterator() {
+        return new UnEntry.UnmodKeyIter<>(this.iterator());
+    }
+
+    default UnmodIterator<V> valIterator() {
+        return new UnEntry.UnmodValIter<>(this.iterator());
     }
 
     /** Not allowed - this is supposed to be unmodifiable */
@@ -375,7 +383,7 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
             @SuppressWarnings("SuspiciousMethodCalls")
             @Override public boolean contains(Object o) { return parent.containsValue(o); }
             @Override public UnmodIterator<V> iterator() {
-                return new UnEntry.UnmodValIter<>(parent.iterator());
+                return parent.valIterator();
             }
             @Override public int size() { return parent.size(); }
 

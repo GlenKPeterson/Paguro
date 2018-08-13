@@ -20,9 +20,9 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Queue;
-import java.util.SortedMap;
 import java.util.Stack;
 
+import org.organicdesign.fp.function.Fn1;
 import org.organicdesign.fp.oneOf.Option;
 import org.organicdesign.fp.tuple.Tuple2;
 
@@ -600,7 +600,15 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
 
     /** {@inheritDoc} */
     @Override
-    public UnmodSortedIterator<UnEntry<K,V>> iterator() { return new NodeIterator<>(tree, true); }
+    public UnmodSortedIterator<UnEntry<K,V>> iterator() { return iterator(Tuple2::of); }
+
+    @Override
+    public UnmodSortedIterator<K> keyIterator() { return iterator(Node::getKey); }
+
+    @Override
+    public UnmodSortedIterator<V> valIterator() { return iterator(Node::getValue); }
+
+    public <R> UnmodSortedIterator<R> iterator(Fn1<Node<K,V>,R> aFn) { return new NodeIterator<>(tree, true, aFn); }
 
 //    public NodeIterator<K,V> reverseIterator() { return new NodeIterator<>(tree, false); }
 
@@ -1088,16 +1096,18 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
      They are not serializable and should not be made so.  I can alter this to return nice,
      neat, Tuple2 objects which are serializable, but we've made it this far without so...
      */
-    private static class NodeIterator<K, V> implements UnmodSortedIterator<UnEntry<K,V>> {
+    private static class NodeIterator<K,V,R> implements UnmodSortedIterator<R> {
         //, Serializable {
         // For serializable.  Make sure to change whenever internal data format changes.
         // private static final long serialVersionUID = 20160827174100L;
 
         private Stack<Node<K,V>> stack = new Stack<>();
         private final boolean asc;
+        private Fn1<Node<K, V>, R> aFn;
 
-        NodeIterator(Node<K,V> t, boolean asc) {
+        NodeIterator(Node<K,V> t, boolean asc, Fn1<Node<K,V>,R> aFn) {
             this.asc = asc;
+            this.aFn = aFn;
             push(t);
         }
 
@@ -1113,11 +1123,11 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
         }
 
         @SuppressWarnings("unchecked")
-        @Override public UnmodMap.UnEntry<K,V> next() {
+        @Override public R next() {
             Node<K,V> t = stack.pop();
             push(asc ? t.right() : t.left());
 
-            return Tuple2.of(t);
+            return aFn.apply(t);
         }
     }
 
