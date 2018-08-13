@@ -5,6 +5,9 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
+# Release 3.1.0: Map.keyIterator() and .valIterator()
+ - [Nate Austin](https://github.com/navision)'s memory-efficient iteration of just keys or just values from maps.  Thank you Nate!
+
 # Release 3.0.19: RRB Tree Split Bounds
  - Fixed split() to handle splitIndex = 0 and splitIndex = size() thanks to a bug report from [Jonathan Cornaz](https://github.com/jcornaz) (curator of [collekt](https://github.com/jcornaz/collekt))
 
