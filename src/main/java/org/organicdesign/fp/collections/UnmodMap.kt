@@ -35,7 +35,7 @@ interface UnmodMap<K,V> : Map<K,V>, UnmodIterable<UnmodMap.UnEntry<K,V>>, Sized 
      *
      * @see UnmodMap#entries
      */
-    interface UnEntry<K,V> : Entry<K,V> {
+    interface UnEntry<K,V> : Map.Entry<K,V>, MutableMap.MutableEntry<K,V> {
         open class EntryToUnEntryIter<K,V>(private val innerIter:Iterator<Entry<K,V>>) : UnmodIterator<UnEntry<K,V>> {
             //, Serializable {
             // For serializable.  Make sure to change whenever internal data format changes.
@@ -86,9 +86,11 @@ interface UnmodMap<K,V> : Map<K,V>, UnmodIterable<UnmodMap.UnEntry<K,V>>, Sized 
         }
 
         companion object {
+            @JvmStatic
             fun <K,V> entryIterToUnEntryUnIter(innerIter: Iterator<Entry<K,V>>):UnmodIterator<UnEntry<K,V>> =
                     EntryToUnEntryIter(innerIter)
 
+            @JvmStatic
             fun <K,V> entryIterToUnEntrySortedUnIter(innerIter: Iterator<Entry<K,V>>): UnmodSortedIterator<UnEntry<K,V>> =
                     EntryToUnEntrySortedIter(innerIter)
 
@@ -112,7 +114,7 @@ interface UnmodMap<K,V> : Map<K,V>, UnmodIterable<UnmodMap.UnEntry<K,V>>, Sized 
          */
         @Deprecated("Not allowed - this is supposed to be unmodifiable")
         @JvmDefault
-        fun setValue(value: V):V = throw UnsupportedOperationException("Modification attempted")
+        override fun setValue(newValue: V):V = throw UnsupportedOperationException("Modification attempted")
     }
 
     // ========================================= Instance =========================================

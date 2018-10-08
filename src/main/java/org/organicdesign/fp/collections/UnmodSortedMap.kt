@@ -148,6 +148,11 @@ interface UnmodSortedMap<K, V> : UnmodMap<K, V>, SortedMap<K, V>, UnmodSortedIte
     /** Not allowed - this is supposed to be unmodifiable */
     @JvmDefault
     @Deprecated("Modification not allowed", ReplaceWith("Use java.util.SortedMap instead"))
+    override fun remove(key: K): V? = throw UnsupportedOperationException("Modification attempted")
+
+    /** Not allowed - this is supposed to be unmodifiable */
+    @JvmDefault
+    @Deprecated("Modification not allowed", ReplaceWith("Use java.util.SortedMap instead"))
     override fun remove(key: K, value: V): Boolean = throw UnsupportedOperationException("Modification attempted")
 
     override fun subMap(fromKey: K, toKey: K): UnmodSortedMap<K, V>

@@ -181,7 +181,7 @@ fun <K, V> sortedMap(comp: Comparator<in K>, kvPairs: Iterable<Entry<K, V>>): Im
  * @return a new PersistentTreeMap of the specified comparator and the given key/value pairs which
  * uses the default comparator defined on the element type.
  */
-fun <K : Comparable<K>, V> sortedMap(kvPairs: Iterable<Entry<K, V>>): ImSortedMap<K, V> =
+fun <K : Comparable<K>, V> sortedMap(kvPairs: Iterable<Map.Entry<K, V>>): ImSortedMap<K, V> =
         PersistentTreeMap.of(kvPairs)
 
 /**

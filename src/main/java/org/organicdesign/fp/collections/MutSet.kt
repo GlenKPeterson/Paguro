@@ -15,7 +15,31 @@
 package org.organicdesign.fp.collections
 
 /** Interface for mutable (unordered/hash) set builder. */
-interface MutSet<E> : BaseSet<E> {
+interface MutSet<E> : BaseSet<E>, MutableSet<E> {
+
+    // ======================================= Mutators =======================================
+    @JvmDefault
+    override fun add(element: E): Boolean
+
+    @JvmDefault
+    override fun addAll(elements: Collection<E>): Boolean
+
+    @JvmDefault
+    override fun clear()
+
+    @JvmDefault
+    override fun contains(element: E): Boolean
+
+    @JvmDefault
+    override fun remove(element: E): Boolean
+
+    @JvmDefault
+    override fun removeAll(elements: Collection<E>): Boolean
+
+    @JvmDefault
+    override fun retainAll(elements: Collection<E>): Boolean
+
+    // ======================================= Immutable Methods =======================================
 
     /** Returns an immutable version of this immutable set.  */
     fun immutable(): ImSet<E>
