@@ -5,21 +5,9 @@ Photo by [Rushen](https://www.flickr.com/photos/rushen/12171498934/in/photostrea
 
 Paguro is short for the Latin "Paguroidea" - the name of the Hermit Crab superfamily in Biology.  These collections grow by adding a new shell, leaving the insides the same, much the way [Hermit Crabs trade up to a new shell when they grow](https://www.youtube.com/watch?v=f1dnocPQXDQ).
 
-# News
-### RRB Tree Released!
+### Paguro 4.0, "Kotlin Compatibility" STILL INCOMPLETE
 
-An [RRB Tree](https://glenkpeterson.github.io/Paguro/apidocs/index.html?org/organicdesign/fp/collections/RrbTree.html) is an immutable List (like Clojure's PersistentVector) that also supports random inserts, deletes, and can be split and joined back together in logarithmic time.  Details: https://github.com/GlenKPeterson/Paguro/releases/tag/3.0.16
-
-### Other new features
-[Union types](https://glenkpeterson.github.io/Paguro/apidocs/index.html?org/organicdesign/fp/oneOf/package-summary.html) for Java!  Well, an approximation of them anyway.
-
-### Next Major Release will be Paguro 4.0, "Kotlin Compatibility"
-
-This announcement is making some people nervous even as it makes others happy.  The primary curator (Glen) will still continue using Paguro in both Java and Kotlin for at least a year, maybe forever.  Kotlin is nearly 100% backward-compatible with Java 8.  I've met several people who know Paguro but not Kotlin, but I have yet to meet the person who knows both and likes Paguro but not Kotlin.
-
-You are probably interested in Paguro because you like Immutability, Functional Programming (maybe as pure as Haskell, maybe not), and Types.  Kotlin is a briefer Java that assumes immutability, makes Functional Programming easier, and plugs 3/4 of the quirks in Java's generic type system.  If you're concerned about the future of Paguro, I think the best way to put your worries to rest is to try Kotlin.  It's pretty great!
-
-Check back for more details as the 4.x release progresses.
+This does not even compile yet.  I'm just checking in so I don't lose my work.
 
 # Features
 

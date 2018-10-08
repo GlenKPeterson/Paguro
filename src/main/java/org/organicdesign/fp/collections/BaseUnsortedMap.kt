@@ -11,13 +11,16 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package org.organicdesign.fp.collections;
+package org.organicdesign.fp.collections
 
 /**
- Adds {@link #equator()} to {@link BaseMap} which is an unsorted-only operation.
- Lowest common ancestor of {@link MutMap} and {@link ImMap}.
+ * Adds [.equator] to [BaseMap] which is an unsorted-only operation.
+ * Lowest common ancestor of [MutMap] and [ImMap].
  */
-public interface BaseUnsortedMap<K,V> extends BaseMap<K,V> {
-    /** Returns the Equator used by this map for equals comparisons and hashCodes */
-    Equator<K> equator();
+interface BaseUnsortedMap<K, V> : BaseMap<K, V> {
+    /** Returns the Equator used by this map for equals comparisons and hashCodes  */
+    fun equator(): Equator<K>
+
+    @JvmDefault
+    override val size: kotlin.Int
 }

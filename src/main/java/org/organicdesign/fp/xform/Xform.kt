@@ -14,6 +14,7 @@
 
 package org.organicdesign.fp.xform
 
+import org.organicdesign.fp.collections.MutList
 import org.organicdesign.fp.collections.UnmodIterable
 import org.organicdesign.fp.collections.UnmodIterator
 import org.organicdesign.fp.oneOf.Or
@@ -197,8 +198,8 @@ abstract class Xform<A>(internal val prevOp: Xform<Any>?) : UnmodIterable<A> {
                                     })
 
                 return object : Iterator<Any> {
-                    internal var innerIter: Iterator<Any> = prevSrc.iterator()
-                    internal var usingPrevSrc = true
+                    var innerIter: Iterator<Any> = prevSrc.iterator()
+                    var usingPrevSrc = true
                     /** {@inheritDoc}  */
                     override operator fun hasNext(): Boolean {
                         if (innerIter.hasNext()) {
@@ -602,7 +603,7 @@ abstract class Xform<A>(internal val prevOp: Xform<Any>?) : UnmodIterable<A> {
         // return from the recursion, it may have too many elements already.
         // In XformTest.java, there's something marked "Early termination test" that illustrates
         // this exact problem.
-        val items:MutableList<A> = this.toMutList()
+        val items: MutList<A> = this.toMutList()
         for (item:A in items) {
             val term: B? = terminator(g, item)
             if (term != null) {

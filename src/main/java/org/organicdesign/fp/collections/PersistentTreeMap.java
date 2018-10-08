@@ -482,7 +482,7 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
      Fn2.DEFAULT_COMPARATOR (for compatibility with java.util.SortedMap).
      */
     @Override public Comparator<? super K> comparator() {
-        return (comp == Equator.Comp.DEFAULT) ? null : comp;
+        return (comp == Equator.Companion.defaultComparator()) ? null : comp;
     }
 
 //    /** Returns true if the map contains the given key. */

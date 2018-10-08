@@ -11,16 +11,15 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package org.organicdesign.fp.collections;
+package org.organicdesign.fp.collections
 
-import org.organicdesign.fp.oneOf.Option;
-
-import java.util.Map;
+import org.organicdesign.fp.collections.UnmodMap.UnEntry
+import org.organicdesign.fp.oneOf.Option
 
 /** An immutable sorted map. */
-public interface ImSortedMap<K,V> extends UnmodSortedMap<K,V>, BaseMap<K,V> {
+interface ImSortedMap<K,V> : UnmodSortedMap<K,V>, BaseMap<K,V> {
 
-    Option<UnmodMap.UnEntry<K,V>> entry(K key);
+    override fun entry(key: K): Option<UnEntry<K,V>>
 
 //    /**
 //     Returns a view of the mappings contained in this map.  The set should actually contain
@@ -31,48 +30,64 @@ public interface ImSortedMap<K,V> extends UnmodSortedMap<K,V>, BaseMap<K,V> {
 
 // public  K	firstKey()
 
-    @SuppressWarnings("unchecked")
-    @Override default boolean containsKey(Object key) { return entry((K) key).isSome(); }
+    @JvmDefault
+    override fun containsKey(key: K): Boolean = entry(key).isSome
 
-    /** {@inheritDoc} */
-    @Override ImSortedSet<Entry<K,V>> entrySet();
+    @JvmDefault
+    override val entries: MutableSet<MutableMap.MutableEntry<K, V>>
+        get() = super<UnmodSortedMap>.entries
+//    override fun entrySet(): ImSortedSet<Entry<K,V>>
 
-    @SuppressWarnings("unchecked")
-    @Override default V get(Object key) {
-        Option<UnEntry<K,V>> entry = entry((K) key);
-        return entry.isSome() ? entry.get().getValue() : null;
+    @JvmDefault
+    override fun get(key: K): V? {
+        val entry:Option<UnEntry<K, V>> = entry(key)
+        return if (entry.isSome) entry.get().value else null
+//        return entry.match({ item: UnmodMap.UnEntry<K, V> -> item.value }, { null })
     }
 
-    default V getOrElse(K key, V notFound) {
-        Option<UnEntry<K,V>> entry = entry(key);
-        return entry.isSome() ? entry.get().getValue() : notFound;
+//    @SuppressWarnings("unchecked")
+//    @Override default V get(Object key) {
+//        Option<UnEntry<K,V>> entry = entry((K) key);
+//        return entry.isSome() ? entry.get().getValue() : null;
+//    }
+
+    @JvmDefault
+    override fun getOrDefault(key: K, defaultValue: V): V {
+        val entry:Option<UnEntry<K, V>> = entry(key)
+        return if (entry.isSome) entry.get().value else defaultValue
     }
 
     /** Return the elements in this map up (but excluding) to the given element */
-    @Override default ImSortedMap<K,V> headMap(K toKey) { return subMap(firstKey(), toKey); }
+    @JvmDefault
+    override fun headMap(toKey: K): ImSortedMap<K, V> = subMap(firstKey(), toKey)
 
     /**
-     Returns an iterator over the UnEntries of this map in order.
-     @return an Iterator.
+    Returns an iterator over the UnEntries of this map in order.
+    @return an Iterator.
      */
-    @Override
-    UnmodSortedIterator<UnEntry<K, V>> iterator();
+    @JvmDefault
+    override fun iterator(): UnmodSortedIterator<UnEntry<K, V>>
 
     /** Returns a view of the keys contained in this map. */
-    @Override default ImSortedSet<K> keySet() { return PersistentTreeSet.ofMap(this); }
+    @JvmDefault
+    override val keys: ImSortedSet<K>
+        get() = PersistentTreeSet.ofMap(this)
 
 // public  K	lastKey()
+
+    // Overrides kotlin.collections.Collection.size
+    override val size: kotlin.Int
 
     /**
      Return the elements in this map from the start element (inclusive) to the end element
      (exclusive)
      */
-    @Override
-    ImSortedMap<K,V> subMap(K fromKey, K toKey);
+    @JvmDefault
+    override fun subMap(fromKey: K, toKey: K): ImSortedMap<K, V>
 
     /** Return the elements in this from the given element to the end */
-    @Override
-    ImSortedMap<K,V> tailMap(K fromKey);
+    @JvmDefault
+    override fun tailMap(fromKey: K): ImSortedMap<K,V>
 
 //    /** {@inheritDoc} */
 //    @Override default UnmodSortedCollection<V> values() {
@@ -106,6 +121,8 @@ public interface ImSortedMap<K,V> extends UnmodSortedMap<K,V>, BaseMap<K,V> {
 //            }
 //        };
 //    }
+    // TODO: Java to Kotlin conversion didn't work here.  Keep converting manually.
+
 
     /**
      Returns a new map with the given key/value added.  If the key exists in this map, the new value
@@ -121,13 +138,12 @@ public interface ImSortedMap<K,V> extends UnmodSortedMap<K,V>, BaseMap<K,V> {
      @return a new PersistentTreeMap of the specified comparator and the given key/value pairs
 
      */
-    ImSortedMap<K,V> assoc(K key, V val);
+    override fun assoc(key: K, value: V): ImSortedMap<K, V>
 
     /** Returns a new map with an immutable copy of the given entry added */
-    default ImSortedMap<K,V> assoc(Map.Entry<K,V> entry) {
-        return assoc(entry.getKey(), entry.getValue());
-    }
+    @JvmDefault
+    override fun assoc(entry: kotlin.collections.Map.Entry<K,V>): ImSortedMap<K,V> = assoc(entry.key, entry.value)
 
     /** Returns a new map with the given key/value removed */
-    ImSortedMap<K,V> without(K key);
+    override fun without(key: K): ImSortedMap<K, V>
 }

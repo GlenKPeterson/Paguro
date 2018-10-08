@@ -12,26 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.organicdesign.fp.collections;
+package org.organicdesign.fp.collections
 
-/**
- Interface for mutable (hash) set builder.
- */
-public interface MutSet<E> extends BaseSet<E> {
+/** Interface for mutable (unordered/hash) set builder. */
+interface MutSet<E> : BaseSet<E> {
 
-    /** Returns an immutable version of this immutable set. */
-    ImSet<E> immutable();
+    /** Returns an immutable version of this immutable set.  */
+    fun immutable(): ImSet<E>
 
-    /** {@inheritDoc} */
-    @Override
-    MutSet<E> put(E val);
+    override fun put(item: E): MutSet<E>
 
-    /** {@inheritDoc} */
-    @Override default MutSet<E> union(Iterable<? extends E> iter) {
-        return concat(iter).toMutSet();
-    }
+    @JvmDefault
+    override val size: kotlin.Int
 
-    /** {@inheritDoc} */
-    @Override
-    MutSet<E> without(E key);
+    @JvmDefault
+    override fun union(iter: Iterable<E>?): MutSet<E> = concat(iter!!).toMutSet()
+
+    override fun without(key: E): MutSet<E>
 }

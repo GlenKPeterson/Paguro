@@ -29,11 +29,11 @@ import static org.junit.Assert.*;
 public class UnmodListTest {
     @Test public void permutationsTest() {
         Set<Tuple2<Integer,Integer>> answerSet = new HashSet<>();
-        UnmodList.permutations(Arrays.asList(1,2,3,4),
-                               (a, b) -> {
-                                   answerSet.add(new Tuple2<>(a, b));
-                                   return answerSet;
-                               });
+        UnmodList.Companion.permutations(Arrays.asList(1,2,3,4),
+                                         (a, b) -> {
+                                             answerSet.add(new Tuple2<>(a, b));
+                                             return answerSet;
+                                         });
         assertEquals(6, answerSet.size());
         assertTrue(answerSet.contains(new Tuple2<>(1, 2)));
         assertTrue(answerSet.contains(new Tuple2<>(1, 3)));
@@ -49,7 +49,7 @@ public class UnmodListTest {
 
     // Test implementation of UnmodList.
     private static final UnmodList<String> unList = new UnmodList<String>() {
-        @Override public int size() { return sticksAndStones.length; }
+        @Override public int getSize() { return sticksAndStones.length; }
 
         @Override public String get(int index) { return sticksAndStones[index]; }
     };

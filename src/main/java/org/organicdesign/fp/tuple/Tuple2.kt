@@ -48,7 +48,7 @@ open class Tuple2<A,B>(val _1:A, val _2:B) : Entry<A,B>, UnmodMap.UnEntry<A,B>, 
      * instead because it returns a new map.
      */
     @Deprecated("Mutation not allowed")
-    override fun setValue(newValue: B): B {
+    override fun setValue(value: B): B {
         throw UnsupportedOperationException("Modification attempted")
     }
 

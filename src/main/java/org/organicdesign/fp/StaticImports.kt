@@ -239,11 +239,11 @@ fun <T> xformArray(vararg items: T): UnmodIterable<T> = Xform.of(Arrays.asList(*
 //    }
 //
 /** Wrap a String (or CharSequence) to perform a Character-by-Character transformation on it.  */
-fun xformChars(seq: CharSequence): UnmodIterable<Char> {
+fun xformChars(seq: CharSequence): UnmodIterable<Char?> {
 
-    return object : UnmodIterable<Char> {
-        override fun iterator(): UnmodIterator<Char> {
-            return object : UnmodIterator<Char> {
+    return object : UnmodIterable<Char?> {
+        override fun iterator(): UnmodIterator<Char?> {
+            return object : UnmodIterator<Char?> {
                 private var idx = 0
                 override fun hasNext(): Boolean {
                     return idx < seq.length

@@ -337,7 +337,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
 //    }
 
     /** {@inheritDoc} */
-    @Override public int size() { return size; }
+    @Override public int getSize() { return size; }
 
     @SuppressWarnings("unchecked")
     @Override public PersistentHashMap<K,V> without(K key){
@@ -461,7 +461,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
             return new PersistentHashMap<>(equator, count, root, hasNull, nullValue);
         }
 
-        @Override public final int size() {
+        @Override public final int getSize() {
             ensureEditable();
             return count;
         }

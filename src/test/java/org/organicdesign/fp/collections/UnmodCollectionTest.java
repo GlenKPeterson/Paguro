@@ -35,7 +35,7 @@ public class UnmodCollectionTest {
 //        TestColl(Collection<T> is) { items = new HashSet<>(is); }
         TestColl(T[] is) { items = new HashSet<>(Arrays.asList(is)); }
 
-        @Override public int size() { return items.size(); }
+        @Override public int getSize() { return items.size(); }
 
         @Override public boolean contains(Object o) {
             for (Object item : items) {

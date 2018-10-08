@@ -5,8 +5,10 @@ import org.organicdesign.fp.oneOf.Option
 import org.organicdesign.fp.oneOf.Or
 import org.organicdesign.fp.xform.Transformable
 import org.organicdesign.fp.xform.Xform
+import java.util.Arrays
 
 /** An unmodifiable Iterable, without any guarantee about order.  */
+@PurelyImplements("java.util.Iterable")
 interface UnmodIterable<T> : Iterable<T>, Transformable<T> {
     // ========================================== Static ==========================================
 
@@ -25,6 +27,7 @@ interface UnmodIterable<T> : Iterable<T>, Transformable<T> {
      * iterators so this is the lowest common denominator of collection iteration, even though
      * iterators are inherently mutable.
      */
+    @JvmDefault
     override fun iterator(): UnmodIterator<T>
 
     // =============================== Inherited from Transformable ===============================
@@ -204,6 +207,43 @@ interface UnmodIterable<T> : Iterable<T>, Transformable<T> {
             //        }
             return sB.append(")").toString()
         }
+
+        /**
+         * This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for backwards
+         * compatibility.  If you need to create an array then the best way to use this method is:
+         *
+         * `MyThing[] things = toArray(collection, new MyThing[coll.size()], size);`
+         *
+         * Calling this method any other way causes unnecessary work to be done - an extra memory allocation and
+         * potential garbage collection if the passed array is too small, extra effort to fill the end of the array
+         * with nulls if it is too large.
+         */
+        fun <T> toArray(iterable:Iterable<T>, elements: Array<T>, size:Int): Array<out T> {
+            var elems:Array<T> = elements
+            if (elems.size < size) {
+                // This produced a class cast exception when the return was put into a
+                // variable of type non-Object[] (like String[] or Integer[]).  To see the problem
+                // you must.
+                // 1. pass a smaller array so that an Object[] is created
+                // 2. Force the return type to be a String[] (or other not-exactly Object)
+                // Merely running Arrays.AsList() on it is not enough to get the exception.
+
+                // Bad: watch for this in the future!
+                //            as = (T[]) new Object[size()];
+                @Suppress("UNCHECKED_CAST")
+                elems = java.lang.reflect.Array.newInstance(elems.javaClass.componentType as Class<T>, size) as Array<T>
+//            elems = arrayOfNulls(size)
+            }
+            val iter = iterable.iterator()
+            for (i in 0 until size) {
+                elems[i] = iter.next()
+            }
+            if (size < elems.size) {
+                Arrays.fill(elems, size, elems.size, null)
+            }
+            return elems
+        }
+
     }
 
     //    /**

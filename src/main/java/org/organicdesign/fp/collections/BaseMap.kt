@@ -11,55 +11,55 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package org.organicdesign.fp.collections;
+package org.organicdesign.fp.collections
 
-import java.util.Map;
-
-import org.organicdesign.fp.oneOf.Option;
+import org.organicdesign.fp.oneOf.Option
 
 /**
  Adds copy-on-write, "fluent interface" methods to {@link UnmodMap}.
  Lowest common ancestor of {@link BaseUnsortedMap}, and {@link ImSortedMap}.
  */
-public interface BaseMap<K,V> extends UnmodMap<K,V> {
+interface BaseMap<K,V>: UnmodMap<K,V> {
     /** Returns an option of the key/value pair associated with this key */
-    Option<UnEntry<K,V>> entry(K key);
+    fun entry(key: K): Option<UnmodMap.UnEntry<K, V>>
 
     /** Returns a new map with the given key/value added */
-    BaseMap<K,V> assoc(K key, V val);
+    fun assoc(key: K, value: V): BaseMap<K,V>
+
+    // Overrides kotlin.collections.Collection.size
+    override val size: kotlin.Int
+
+    @JvmDefault
+    override fun size(): Int = size
 
     /** Returns a new map with an immutable copy of the given entry added */
-    default BaseMap<K,V> assoc(Map.Entry<K,V> entry) {
-        return assoc(entry.getKey(), entry.getValue());
-    }
+    @JvmDefault
+    fun assoc(entry: Map.Entry<K,V>):  BaseMap<K,V> =
+            assoc(entry.key, entry.value)
 
     /** Returns a new map with the given key/value removed */
-    BaseMap<K,V> without(K key);
+    fun without(key: K): BaseMap<K,V>
 
-    /**
-     Returns a view of the mappings contained in this map.  The set should actually contain
-     UnmodMap.Entry items, but that return signature is illegal in Java, so you'll just have to
-     remember.
-     */
-    @Override BaseSet<Entry<K,V>> entrySet();
+    @JvmDefault
+    override val entries: MutableSet<MutableMap.MutableEntry<K, V>>
+        get() = super.entries
 //        return map(e -> (Map.Entry<K,V>) e)
 //                .toImSet();
 //    }
 
     /** Returns a view of the keys contained in this map. */
-    @Override BaseSet<K> keySet();
+    @JvmDefault
+    override val keys: BaseSet<K>
 
-    @SuppressWarnings("unchecked")
-    @Override default boolean containsKey(Object key) { return entry((K) key).isSome(); }
+    @JvmDefault
+    override fun containsKey(key: K): Boolean = entry(key).isSome
 
-    @SuppressWarnings("unchecked")
-    @Override default V get(Object key) {
-        Option<UnEntry<K,V>> entry = entry((K) key);
-        return entry.isSome() ? entry.get().getValue() : null;
-    }
+    @JvmDefault
+    override fun get(key: K): V? = getOrDefault(key, null)
 
-    default V getOrElse(K key, V notFound) {
-        Option<UnEntry<K,V>> entry = entry(key);
-        return entry.isSome() ? entry.get().getValue() : notFound;
+    @JvmDefault
+    override fun getOrDefault(key: K, defaultValue: V): V {
+        val entry:Option<UnmodMap.UnEntry<K,V>> = entry(key)
+        return if (entry.isSome) { entry.get().value } else { defaultValue }
     }
 }

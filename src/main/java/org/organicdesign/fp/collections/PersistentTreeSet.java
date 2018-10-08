@@ -250,7 +250,7 @@ public class PersistentTreeSet<E> extends AbstractUnmodSet<E>
     }
 
     /** The size of this set. */
-    @Override public int size() { return impl.size(); }
+    @Override public int getSize() { return impl.size(); }
 
     /** {@inheritDoc} */
     @Override public ImSortedSet<E> subSet(E fromElement, E toElement) {

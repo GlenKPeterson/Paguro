@@ -81,7 +81,7 @@ abstract class RrbTree<E> : BaseList<E>, Indented {
                                           override var size: Int) : RrbTree<E>(), MutList<E> {
 
         /** {@inheritDoc}  */
-        override fun append(item: E?): MutRrbt<E> {
+        override fun append(item: E): MutRrbt<E> {
             // If our focus isn't set up for appends or if it's full, insert it into the data structure
             // where it belongs.  Then make a new focus
             if (focusLength >= STRICT_NODE_LENGTH || focusLength > 0 && focusStartIndex < size - focusLength) {
@@ -133,7 +133,7 @@ abstract class RrbTree<E> : BaseList<E>, Indented {
         }
 
         /** {@inheritDoc}  */
-        override fun get(index: Int): E? {
+        override fun get(index: Int): E {
             var i = index
             if (i < 0 || i > size) {
                 throw IndexOutOfBoundsException("Index: $i size: $size")
@@ -148,11 +148,11 @@ abstract class RrbTree<E> : BaseList<E>, Indented {
             if (i >= focusStartIndex) {
                 val focusOffset = i - focusStartIndex
                 if (focusOffset < focusLength) {
-                    return focus[focusOffset]
+                    return focus[focusOffset]!!
                 }
                 i -= focusLength
             }
-            return root[i]
+            return root[i]!!
         }
 
         /** {@inheritDoc}  */
@@ -173,7 +173,7 @@ abstract class RrbTree<E> : BaseList<E>, Indented {
         }
 
         /** {@inheritDoc}  */
-        override fun insert(idx: Int, element: E?): MutRrbt<E> {
+        override fun insert(idx: Int, element: E): MutRrbt<E> {
             // If the focus is full, push it into the tree and make a new one with the new element.
             if (focusLength >= STRICT_NODE_LENGTH) {
                 root = root.pushFocus(focusStartIndex,
@@ -437,7 +437,7 @@ abstract class RrbTree<E> : BaseList<E>, Indented {
         }
 
         /** {@inheritDoc}  */
-        override fun replace(index: Int, item: E?): MutRrbt<E> {
+        override fun replace(index: Int, item: E): MutRrbt<E> {
             @Suppress("NAME_SHADOWING")
             var index = index
             if (index < 0 || index > size) {
@@ -556,7 +556,7 @@ abstract class RrbTree<E> : BaseList<E>, Indented {
         // =================================== Instance Methods ===================================
 
         /** {@inheritDoc}  */
-        override fun append(item: E?): ImRrbt<E> {
+        override fun append(item: E): ImRrbt<E> {
             // If our focus isn't set up for appends or if it's full, insert it into the data
             // structure where it belongs.  Then make a new focus
             if (focus.size >= STRICT_NODE_LENGTH || focus.isNotEmpty() && focusStartIndex < size - focus.size) {
@@ -596,7 +596,7 @@ abstract class RrbTree<E> : BaseList<E>, Indented {
         }
 
         /** {@inheritDoc}  */
-        override fun get(index: Int): E? {
+        override fun get(index: Int): E {
             var i = index
             if (i < 0 || i > size) {
                 throw IndexOutOfBoundsException("Index: $i size: $size")
@@ -611,15 +611,15 @@ abstract class RrbTree<E> : BaseList<E>, Indented {
             if (i >= focusStartIndex) {
                 val focusOffset = i - focusStartIndex
                 if (focusOffset < focus.size) {
-                    return focus[focusOffset]
+                    return focus[focusOffset]!!
                 }
                 i -= focus.size
             }
-            return root[i]
+            return root[i]!!
         }
 
         /** {@inheritDoc}  */
-        override fun insert(idx: Int, element: E?): ImRrbt<E> {
+        override fun insert(idx: Int, element: E): ImRrbt<E> {
             // If the focus is full, push it into the tree and make a new one with the new element.
             if (focus.size >= STRICT_NODE_LENGTH) {
                 val newRoot = root.pushFocus(focusStartIndex, focus)
@@ -844,7 +844,7 @@ abstract class RrbTree<E> : BaseList<E>, Indented {
         }
 
         /** {@inheritDoc}  */
-        override fun replace(index: Int, item: E?): ImRrbt<E> {
+        override fun replace(index: Int, item: E): ImRrbt<E> {
             @Suppress("NAME_SHADOWING")
             var index = index
             if (index < 0 || index > size) {
@@ -943,13 +943,13 @@ abstract class RrbTree<E> : BaseList<E>, Indented {
     // ===================================== Instance Methods =====================================
 
     /** {@inheritDoc}  */
-    abstract override fun append(item: E?): RrbTree<E>
+    abstract override fun append(item: E): RrbTree<E>
 
     /** Internal validation method for testing.  */
     internal abstract fun debugValidate()
 
     /** {@inheritDoc}  */
-    abstract override fun get(index: Int): E?
+    abstract override fun get(index: Int): E
 
     /**
      * Inserts an item in the RRB tree pushing the current element at that index and all subsequent
@@ -959,7 +959,7 @@ abstract class RrbTree<E> : BaseList<E>, Indented {
      * @return a new RRB-Tree with the item inserted.
      */
     //    @SuppressWarnings("WeakerAccess")
-    abstract fun insert(idx: Int, element: E?): RrbTree<E>
+    abstract fun insert(idx: Int, element: E): RrbTree<E>
 
     /** {@inheritDoc}  */
     abstract override fun iterator(): UnmodSortedIterator<E>
@@ -1008,11 +1008,11 @@ involves changing more nodes than maybe necessary.
     internal abstract fun pushFocus(): Node<E>
 
     /** {@inheritDoc}  */
-    abstract override fun replace(index: Int, item: E?): RrbTree<E>
+    abstract override fun replace(index: Int, item: E): RrbTree<E>
 
     // TODO: HERE!!!
 //    /** {@inheritDoc}  */
-//    abstract override fun size(): Int
+    abstract override val size: Int
 
     /**
      * Divides this RRB-Tree such that every index less-than the given index ends up in the left-hand
@@ -1044,15 +1044,10 @@ involves changing more nodes than maybe necessary.
     // ================================== Standard Object Methods ==================================
 
     /** {@inheritDoc}  */
-    override fun equals(other: Any?): Boolean {
-        if (this === other) {
-            return true
-        }
-        if (other !is List<*>) {
-            return false
-        }
-        return this.size == other.size && UnmodSortedIterable.equal(this, UnmodSortedIterable.castFromList(other))
-    }
+    override fun equals(other: Any?): Boolean =
+            (other is List<*>) &&
+            (this.size == other.size) &&
+            UnmodSortedIterable.equal(this, UnmodSortedIterable.castFromList(other))
 
     /** This implementation is correct and compatible with java.util.AbstractList, but O(n).  */
     override fun hashCode(): Int {
@@ -2470,14 +2465,14 @@ involves changing more nodes than maybe necessary.
             return leafArray.isNotEmpty()
         }
 
-        override fun next(): E? {
+        override fun next(): E {
             // If there's no more in this leaf array, get the next one
             if (leafArrayIdx >= leafArray.size) {
                 leafArray = nextLeafArray()
                 leafArrayIdx = 0
             }
             // Return the next item in the leaf array and increment index
-            return leafArray[leafArrayIdx++]
+            return leafArray[leafArrayIdx++]!! // Very unsure about nullability here!
         }
     }
 
@@ -2487,7 +2482,7 @@ involves changing more nodes than maybe necessary.
         private val nodeClassVal = Node::class.java
 
         @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-        inline internal fun <T> nodeClass() = nodeClassVal as java.lang.Class<Node<T>>
+        internal inline fun <T> nodeClass() = nodeClassVal as java.lang.Class<Node<T>>
 
         /** Returns the empty, immutable RRB-Tree (there is only one)  */
         @Suppress("UNCHECKED_CAST")
@@ -2529,19 +2524,19 @@ involves changing more nodes than maybe necessary.
 
         // There's bit shifting going on here because it's a very fast operation.
         // Shifting right by 5 is eons faster than dividing by 32.
-        private val NODE_LENGTH_POW_2 = 5 // 2 for testing, 5 for real
+        private const val NODE_LENGTH_POW_2 = 5 // 2 for testing, 5 for real
 
         // 0b00000000000000000000000000100000 = 0x20 = 32
-        internal val STRICT_NODE_LENGTH = 1 shl NODE_LENGTH_POW_2
+        internal const val STRICT_NODE_LENGTH = 1 shl NODE_LENGTH_POW_2
 
-        private val HALF_STRICT_NODE_LENGTH = STRICT_NODE_LENGTH shr 1
+        private const val HALF_STRICT_NODE_LENGTH = STRICT_NODE_LENGTH shr 1
 
         // (MIN_NODE_LENGTH + MAX_NODE_LENGTH) / 2 should equal STRICT_NODE_LENGTH so that they have the
         // same average node size to make the index interpolation easier.
-        private val MIN_NODE_LENGTH = (STRICT_NODE_LENGTH + 1) * 2 / 3
+        private const val MIN_NODE_LENGTH = (STRICT_NODE_LENGTH + 1) * 2 / 3
         // Always check if less-than this.  Never less-than-or-equal.  Cormen adds a -1 here and tests
         // for <= (I think!).
-        private val MAX_NODE_LENGTH = (STRICT_NODE_LENGTH + 1) * 4 / 3
+        private const val MAX_NODE_LENGTH = (STRICT_NODE_LENGTH + 1) * 4 / 3
 
         private val EMPTY_LEAF = Leaf(EMPTY_ARRAY)
         @Suppress("UNCHECKED_CAST")

@@ -180,27 +180,29 @@ http://mvnrepository.com/artifact/org.organicdesign/Paguro
 						[WARNING] Following manually enabled features will force generation of pre-release binaries:
 						JvmStaticInInterface
 						-->
-						<!--<arg>-XXLanguage:+JvmStaticInInterface</arg>-->
+						<arg>-XXLanguage:+JvmStaticInInterface</arg>
 					</args>
 				</configuration>
 				<version>${kotlin.version}</version>
 				<executions>
 					<execution>
 						<id>compile</id>
-						<goals> <goal>compile</goal> </goals>
+						<goals>
+							<goal>compile</goal>
+						</goals>
 						<configuration>
 							<sourceDirs>
-								<!--<sourceDir>${project.basedir}/src/main/kotlin</sourceDir>-->
 								<sourceDir>${project.basedir}/src/main/java</sourceDir>
 							</sourceDirs>
 						</configuration>
 					</execution>
 					<execution>
 						<id>test-compile</id>
-						<goals> <goal>test-compile</goal> </goals>
+						<goals>
+							<goal>test-compile</goal>
+						</goals>
 						<configuration>
 							<sourceDirs>
-								<!--<sourceDir>${project.basedir}/src/test/kotlin</sourceDir>-->
 								<sourceDir>${project.basedir}/src/test/java</sourceDir>
 							</sourceDirs>
 						</configuration>
@@ -210,7 +212,7 @@ http://mvnrepository.com/artifact/org.organicdesign/Paguro
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.5.1</version>
+				<version>3.8.0</version>
 				<configuration>
 					<!--
                     I'm favoring the maven.compiler properties over this for now...
@@ -221,7 +223,9 @@ http://mvnrepository.com/artifact/org.organicdesign/Paguro
 					<compilerArgs>
 						<arg>-profile</arg>
 						<arg>compact1</arg>
-						<arg>-Xlint</arg>
+						<compilerArgument>-Xlint:all</compilerArgument>
+						<showWarnings>true</showWarnings>
+						<showDeprecation>true</showDeprecation>
 					</compilerArgs>
 				</configuration>
 				<executions>
@@ -294,6 +298,6 @@ http://mvnrepository.com/artifact/org.organicdesign/Paguro
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-		<kotlin.version>1.2.50</kotlin.version>
+		<kotlin.version>1.2.71</kotlin.version>
 	</properties>
 </project>
