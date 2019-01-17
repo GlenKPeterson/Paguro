@@ -9,6 +9,13 @@ import org.organicdesign.fp.tuple.Tuple2;
  Cowry is short for Copy On Write aRraY and contains utilities for doing this quickly and correctly.
  While a key goal of Paguro is to get away from working with arrays, you still need to do it sometimes and
  shouldn't have to re-implement common copy-on-write modifictions.
+
+ Never, ever, ever do this:
+ (Class&lt;T>) items[0].getClass()
+
+ If you are using an array of Numbers and the first item is an Integer and the second a Double,
+ You'll get an array of Integers which will blow up when you try to add a Double.
+
  This class is final and cannot be instantiated.
  Created by gpeterso on 5/21/2017.
  */

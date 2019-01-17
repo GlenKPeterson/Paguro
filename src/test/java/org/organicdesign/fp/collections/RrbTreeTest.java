@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.junit.Test;
+import org.organicdesign.fp.StaticImports;
 import org.organicdesign.fp.TestUtilities;
 import org.organicdesign.fp.collections.RrbTree.ImRrbt;
 import org.organicdesign.fp.collections.RrbTree.MutableRrbt;
@@ -930,4 +931,25 @@ public class RrbTreeTest {
         }
 //        }
     }
+
+    /**
+     Thanks to fcurts for finding this!
+     */
+    @Test
+    public void heterogeneousTest() {
+        RrbTree<Object> rrb =
+                // first tree needs to contain at least 32 elements for the bug to surface
+                StaticImports.<Object>rrb(1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2)
+                        .concat(StaticImports.<Object>rrb("a"));
+
+        List<Object> list = Arrays.asList(1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,"a");
+
+        int i = 0;
+        // iterating throws ArrayStoreException
+        for (Object elem : rrb) {
+            assertEquals(list.get(i), elem);
+            i++;
+        }
+    }
+
 }

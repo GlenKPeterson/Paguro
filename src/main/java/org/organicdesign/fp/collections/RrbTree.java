@@ -1374,7 +1374,8 @@ involves changing more nodes than maybe necessary.
         private Leaf<T>[] spliceAndSplit(T[] oldFocus, int splitIndex) {
             // Consider optimizing:
             T[] newItems = spliceIntoArrayAt(oldFocus, items, splitIndex,
-                                             (Class<T>) items[0].getClass());
+                                             null);
+//                                             (Class<T>) items[0].getClass());
 
             // Shift right one is divide-by 2.
             Tuple2<T[],T[]> split = splitArray(newItems, newItems.length >> 1);
@@ -1415,7 +1416,8 @@ involves changing more nodes than maybe necessary.
 
             if ((items.length + oldFocus.length) < MAX_NODE_LENGTH) {
                 return new Leaf<>(spliceIntoArrayAt(oldFocus, items, index,
-                                                    (Class<T>) items[0].getClass()));
+                                                    null));
+//                                                    (Class<T>) items[0].getClass()));
             }
 
             // We should only get here when the root node is a leaf.
@@ -1763,6 +1765,10 @@ involves changing more nodes than maybe necessary.
                     }
 
                     if ((nodes.length < STRICT_NODE_LENGTH)) {
+                        // This will fail at runtime if we use an array of Objects instead of Nodes.
+                        // To do that, we'd have to convert all this to Objects and cast each item as
+                        // it comes off.
+                        //
                         // Add a node to the existing array
                         Node<T>[] newNodes =
                                 insertIntoArrayAt(newNode, nodes, subNodeIndex, Node.class);
