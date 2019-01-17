@@ -7,22 +7,29 @@ import org.organicdesign.fp.tuple.Tuple2;
 
 /**
  Cowry is short for Copy On Write aRraY and contains utilities for doing this quickly and correctly.
- It's package-private for now, final, and cannot be instantiated.
- Created by gpeterso on 5/21/17.
+ While a key goal of Paguro is to get away from working with arrays, you still need to do it sometimes and
+ shouldn't have to re-implement common copy-on-write modifictions.
+ This class is final and cannot be instantiated.
+ Created by gpeterso on 5/21/2017.
  */
-final class Cowry {
+public final class Cowry {
     private Cowry() {
         throw new UnsupportedOperationException("Do not instantiate");
     }
 
-    // We only one empty array and it makes the code simpler than pointing to null all the time.
-    // Have to time the difference between using this and null.  The only difference I can imagine
-    // is that this has an address in memory and null does not, so it could save a memory lookup
-    // in some places.
+    /**
+     * We only one empty array and it makes the code simpler than pointing to null all the time.
+     * Have to time the difference between using this and null.  The only difference I can imagine
+     * is that this has an address in memory and null does not, so it could save a memory lookup
+     * in some places.
+     *
+     * Since no objects are ever added to or removed from an empty array, it is effectively immutable
+     * and there only ever needs to be one.  It also turns out that the type doesn't matter.
+     */
     static final Object[] EMPTY_ARRAY = new Object[0];
 
     // =================================== Array Helper Functions ==================================
-    // Helper function to avoid type warnings.
+    // Helper function to return the empty array of whatever type you need.
     @SuppressWarnings("unchecked")
     static <T> T[] emptyArray() { return (T[]) EMPTY_ARRAY; }
 
@@ -40,11 +47,19 @@ final class Cowry {
 //        return c;
 //    }
 
-    // Helper function to avoid type warnings.
+    /**
+     * Helper function to avoid type warnings.
+     * @return an Object[1] containing the single element.
+     */
     @SuppressWarnings("unchecked")
     static <T> T[] singleElementArray(T elem) { return (T[]) new Object[] { elem }; }
 
-    // Helper function to avoid type warnings.
+    /**
+     * Helper function to avoid type warnings.
+     * @param elem the item to put in the array.
+     * @param tClass the class of the array.
+     * @return an array of the appropriate class containing the single element.
+     */
     @SuppressWarnings("unchecked")
     static <T> T[] singleElementArray(T elem, Class<T> tClass) {
         if (tClass == null) {
@@ -56,15 +71,21 @@ final class Cowry {
         return newItems;
     }
 
+    /**
+     * Returns a new array one longer than the given one, witht the specified item inserted at the specified index.
+     * @param item The item to insert
+     * @param items The original array (will not be modified)
+     * @param idx the index to insert the item at.
+     * @param tClass The runtime class to store in the new array (or null for an Object array).
+     * @return A copy of the given array with the additional item at the appropriate index
+     *         (will be one longer than the original array).
+     */
     static <T> T[] insertIntoArrayAt(T item, T[] items, int idx, Class<T> tClass) {
         // Make an array that's one bigger.  It's too bad that the JVM bothers to
         // initialize this with nulls.
-
         @SuppressWarnings("unchecked")
-        // Make an array that big enough.  It's too bad that the JVM bothers to
-                // initialize this with nulls.
-                T[] newItems = (T[]) ((tClass == null) ? new Object[items.length + 1]
-                                                       : Array.newInstance(tClass, items.length + 1) );
+        T[] newItems = (T[]) ((tClass == null) ? new Object[items.length + 1]
+                                               : Array.newInstance(tClass, items.length + 1) );
 
         // If we aren't inserting at the first item, array-copy the items before the insert
         // point.
@@ -84,13 +105,27 @@ final class Cowry {
         return newItems;
     }
 
+    /**
+     * Returns a new array containing the first n items of the given array.
+     *
+     * @param items the items to copy
+     * @param length the maximum length of the new array
+     * @param tClass the class of the items in the array (null for Object)
+     * @return a copy of the original array with the given length
+     */
     static <T> T[] arrayCopy(T[] items, int length, Class<T> tClass) {
+        // Make an array of the appropriate size.  It's too bad that the JVM bothers to
+        // initialize this with nulls.
         @SuppressWarnings("unchecked")
         T[] newItems = (T[]) ((tClass == null) ? new Object[length]
                                                : Array.newInstance(tClass, length) );
-        System.arraycopy(items, 0, newItems, 0,
-                         items.length < length ? items.length
-                                               : length);
+
+        // array-copy the items up to the new length.
+        if (length > 0) {
+            System.arraycopy(items, 0, newItems, 0,
+                             items.length < length ? items.length
+                                                   : length);
+        }
         return newItems;
     }
 
