@@ -128,7 +128,7 @@ It started with a Software Engineering Stack Exchange question: [Why doesn't Jav
 
 ### Q: Why Java instead of another/better JVM language?
 
-[Why Java?](https://github.com/GlenKPeterson/Paguro/wiki/Why-is-UncleJim-written-in-Java%3F)
+[Why Java?](https://github.com/GlenKPeterson/Paguro/wiki/Why-is-Paguro-written-in-Java%3F)
 That said, this could become a Kotlin-based project.
 
 # Future Development Ideas (as of 2017-09-10)
