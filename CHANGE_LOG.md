@@ -5,8 +5,9 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
-# Release 3.1.1: (unnamed)
-
+# Release 3.1.1: Heterogeneous RrbTree Fix
+ - Fixed a bug (reported by fcurts - with unit test!) where Heterogeneous RrbTrees of more than 32 items
+ would throw an exception at Runtime.  I had done something that in retrospect is obviously dumb.
  - Documented Cowry (Copy-On Write aRraY) better.
   These are type-safe utility methods for dealing with arrays.
  This project still aims to keep you from needing to deal with arrays, but sometimes you do, and it's handy to have copy-on-write routines for doing it.
