@@ -5,7 +5,9 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
-### Release 3.1.1: Kotlin compatibility
+### Release 3.5.1: Kotlin compatibility
+ - Renamed artifact to Paguro-KF for "Kotlin-Friendly"
+ - This was originally 3.1.1, but the master branch ended up using that number, so now this branch is 3.5.x
  - Added Transform.any(Fn1<Boolean>) which returns true if anything matches the given predicate.
 
 # Release 3.1.0: Kotlin compatibility

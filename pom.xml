@@ -37,12 +37,12 @@ They say that the Maven search site can take up to 2 hours to update:
 http://mvnrepository.com/artifact/org.organicdesign/Paguro
 	-->
 	<groupId>org.organicdesign</groupId>
-	<artifactId>Paguro</artifactId>
-	<version>3.1.1</version>
+	<artifactId>Paguro-KF</artifactId>
+	<version>3.5.1</version>
 	<packaging>jar</packaging>
 
-	<name>Paguro</name>
-	<description>Immutable Clojure collections and a Transformation abstraction for Java 8+, immutably, type-safely, and with good performance.</description>
+	<name>Paguro: Kotlin-Friendly</name>
+	<description>Immutable Clojure collections with transformations for Java 8+.  Classes renamed to not conflict with Kotlin.</description>
 	<url>https://github.com/GlenKPeterson/Paguro</url>
 
 	<licenses>

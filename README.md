@@ -1,9 +1,16 @@
 Type-safe versions of Clojure's immutable/persistent collections, an immutable alternative to Java 8 Streams, and other tools to make functional programming in Java easier.
 
+# Kotlin-Friendly Branch
+This branch of Paguro (3.5.x) has some classes renamed to not conflict with Kotlin.
+They do not extend Kotlin's collections yet (that's the 4.0 branch).
+
 ![Hermit Crab](https://c7.staticflickr.com/8/7413/12171498934_2934c7ef28_n.jpg)
 Photo by [Rushen](https://www.flickr.com/photos/rushen/12171498934/in/photostream/)
 
-Paguro is short for the Latin "Paguroidea" - the name of the Hermit Crab superfamily in Biology.  These collections grow by adding a new shell, leaving the insides the same, much the way [Hermit Crabs trade up to a new shell when they grow](https://www.youtube.com/watch?v=f1dnocPQXDQ).  This project used to be called UncleJim. 
+# Overview
+Paguro is short for the Latin "Paguroidea" - the name of the Hermit Crab superfamily in Biology.
+These collections grow by adding a new shell, leaving the insides the same, much the way [Hermit Crabs trade up to a new shell when they grow](https://www.youtube.com/watch?v=f1dnocPQXDQ).
+This project used to be called UncleJim.
 
 # News
 ### RRB Tree Released!
@@ -73,8 +80,8 @@ If you're new to Paguro, consider starting with the streamlined
  -->
 <dependency>
         <groupId>org.organicdesign</groupId>
-        <artifactId>Paguro</artifactId>
-        <version>3.1.1</version>
+        <artifactId>Paguro-KF</artifactId>
+        <version>3.5.1</version>
 </dependency>
 ```
 
