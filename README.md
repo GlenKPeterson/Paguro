@@ -1,5 +1,10 @@
 Type-safe versions of Clojure's immutable/persistent collections, an immutable alternative to Java 8 Streams, and other tools to make functional programming in Java easier.
 
+# Classic
+You are on the Paguro Classic, or main branch of this project.
+If you work with a mix of Java and Kotlin files, you may wish to try Paguro-KF 3.5.x in the `2017-09-17b_KotlinFootWetting` branch.
+If you want to live dangerously, try the all-Kotlin version in the 4.0 branch when it becomes available.
+
 ![Hermit Crab](https://c7.staticflickr.com/8/7413/12171498934_2934c7ef28_n.jpg)
 Photo by [Rushen](https://www.flickr.com/photos/rushen/12171498934/in/photostream/)
 
@@ -49,13 +54,13 @@ Paguro takes advantage of Java's type inferencing.  It eschews void return types
 Available from the [Maven Repository](http://mvnrepository.com/artifact/org.organicdesign/Paguro) as:
 ```xml
 <!--
-If you're using Kotlin and Java, you want the 3.1 version in the KotlinFootWetting branch.
-Java-only users want 3.0 from the main branch.
+If you're using Kotlin and Java, you want the 3.5 version in the KotlinFootWetting branch.
+Java-only users want 3.x from the main branch.
  -->
 <dependency>
         <groupId>org.organicdesign</groupId>
         <artifactId>Paguro</artifactId>
-        <version>3.1.1</version>
+        <version>3.1.2</version>
 </dependency>
 ```
 
