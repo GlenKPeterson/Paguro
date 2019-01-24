@@ -47,7 +47,7 @@ If a rewrite in Kotlin sounds good to you, consider voting for [this issue](http
 
 Check back for more details as the 4.x release progresses.
 
-Check the [CHANGE_LOG.md] for details of recent changes.
+Check the [Change Log](CHANGE_LOG.md) for details of recent changes.
 
 # Features
 
