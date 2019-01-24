@@ -7,7 +7,7 @@ tells you what to use instead.  Once we delete the deprecated methods, that docu
 
 # Release 3.1.2: Heterogeneous RrbTree Fix
  - Fixed a bug (reported by [fcurts](https://github.com/fcurts) - with unit test!) where Heterogeneous RrbTrees of more than 32 items
- would throw an exception at Runtime.  I had done something that in retrospect is obviously dumb.
+ would throw an exception at Runtime.  I had done something that in retrospect is obviously dumb.  Thank you fcurts!
  - Documented Cowry (Copy-On Write aRraY) better.
   These are type-safe utility methods for dealing with arrays.
  This project still aims to keep you from needing to deal with arrays, but sometimes you do, and it's handy to have copy-on-write routines for doing it.
