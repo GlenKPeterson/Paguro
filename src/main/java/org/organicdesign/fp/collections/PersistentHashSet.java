@@ -20,6 +20,8 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  A wrapper that turns a PersistentTreeMap into a set.
 
@@ -145,12 +147,14 @@ public class PersistentHashSet<E> extends AbstractUnmodSet<E>
     /** Returns the Equator used by this set for equals comparisons and hashCodes */
     public Equator<E> equator() { return impl.equator(); }
 
+    @NotNull
     @Override public PersistentHashSet<E> without(E key) {
         if (contains(key))
             return new PersistentHashSet<>(impl.without(key));
         return this;
     }
 
+    @NotNull
     @Override public PersistentHashSet<E> put(E o) {
         if (contains(o))
             return this;
@@ -159,6 +163,7 @@ public class PersistentHashSet<E> extends AbstractUnmodSet<E>
 
 //    @Override public Sequence<E> seq() { return impl.seq().map(e -> e.getKey()); }
 
+    @NotNull
     @Override public UnmodIterator<E> iterator() { return impl.keyIterator(); }
 
     @Override public int size() { return impl.size(); }
@@ -176,12 +181,14 @@ public class PersistentHashSet<E> extends AbstractUnmodSet<E>
 
         @Override public int size() { return impl.size(); }
 
+        @NotNull
         @Override public MutHashSet<E> put(E val) {
             MutMap<E,E> m = impl.assoc(val, val);
             if (m != impl) this.impl = m;
             return this;
         }
 
+        @NotNull
         @Override
         public UnmodIterator<E> iterator() { return impl.keyIterator(); }
 
@@ -190,6 +197,7 @@ public class PersistentHashSet<E> extends AbstractUnmodSet<E>
             return impl.entry((E) key).isSome();
         }
 
+        @NotNull
         @Override public MutHashSet<E> without(E key) {
             MutMap<E,E> m = impl.without(key);
             if (m != impl) this.impl = m;

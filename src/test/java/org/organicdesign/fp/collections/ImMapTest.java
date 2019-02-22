@@ -1,5 +1,6 @@
 package org.organicdesign.fp.collections;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.organicdesign.fp.oneOf.Option;
 import org.organicdesign.fp.tuple.Tuple2;
@@ -25,11 +26,13 @@ public class ImMapTest {
 
         private TestMap(Map<K,V> m) { inner = m; }
 
+        @NotNull
         @Override public Option<UnEntry<K, V>> entry(K key) {
             return inner.containsKey(key) ? Option.some(Tuple2.of(key, inner.get(key)))
                                           : Option.none();
         }
 
+        @NotNull
         @Override public ImMap<K, V> assoc(K key, V val) {
             Map<K,V> m = copyMap(inner);
             m.put(key, val);
@@ -40,10 +43,12 @@ public class ImMapTest {
             throw new UnsupportedOperationException("not implemented");
         }
 
+        @NotNull
         @Override public MutMap<K,V> mutable() {
             throw new UnsupportedOperationException("not implemented");
         }
 
+        @NotNull
         @Override public ImMap<K, V> without(K key) {
             Map<K,V> m = copyMap(inner);
             m.remove(key);
@@ -52,10 +57,12 @@ public class ImMapTest {
 
         @Override public int size() { return inner.size(); }
 
+        @NotNull
         @Override public ImSet<K> keySet() {
             return new ImSetTest.TestSet<>(inner.keySet());
         }
 
+        @NotNull
         @Override public UnmodIterator<UnEntry<K, V>> iterator() {
             return UnmodMap.UnEntry.entryIterToUnEntryUnIter(inner.entrySet().iterator());
         }

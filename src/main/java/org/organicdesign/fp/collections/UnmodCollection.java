@@ -20,6 +20,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.function.Predicate;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  Don't implement this interface directly if you don't have to. A collection is an
  {@link java.lang.Iterable} with a size (a size() method) and unfortunately a contains() method
@@ -96,7 +98,7 @@ public interface UnmodCollection<E> extends Collection<E>, UnmodIterable<E>, Siz
     }
 
     /** Not allowed - this is supposed to be unmodifiable */
-    @Override @Deprecated default boolean addAll(Collection<? extends E> c) {
+    @Override @Deprecated default boolean addAll(@NotNull Collection<? extends E> c) {
         throw new UnsupportedOperationException("Modification attempted");
     }
 
@@ -126,15 +128,18 @@ public interface UnmodCollection<E> extends Collection<E>, UnmodIterable<E>, Siz
 
      {@inheritDoc}
      */
-    @Override default boolean containsAll(Collection<?> c) {
+    @Override default boolean containsAll(@NotNull Collection<?> c) {
         // Faster to create a HashSet and call containsAll on that because it's
         // O(this size PLUS that size), whereas looping through both would be
         // O(this size TIMES that size).
-        return  ( (c == null) || (c.size() < 1) ) ? true :
-                (size() < 1) ? false :
-//                (ts instanceof Set) ? ((Set) ts).containsAll(c) :
-//                (ts instanceof Map) ? ((Map) ts).entrySet().containsAll(c) :
-                new HashSet<>(this).containsAll(c);
+
+        // We're also going to check for simple cases before constructing a new HashSet...
+        if (c.size() < 1) {
+            return true;
+        } else {
+            return (size() >= 1) &&
+                   new HashSet<>(this).containsAll(c);
+        }
     }
 
     // You can't implement equals correctly for a Collection due to duplicates, ordering, and
@@ -147,6 +152,7 @@ public interface UnmodCollection<E> extends Collection<E>, UnmodIterable<E>, Siz
     @Override default boolean isEmpty() { return size() == 0; }
 
     /** An unmodifiable iterator {@inheritDoc} */
+    @NotNull
     @Override
     UnmodIterator<E> iterator();
 
@@ -158,7 +164,7 @@ public interface UnmodCollection<E> extends Collection<E>, UnmodIterable<E>, Siz
     }
 
     /** Not allowed - this is supposed to be unmodifiable */
-    @Override @Deprecated default boolean removeAll(Collection<?> c) {
+    @Override @Deprecated default boolean removeAll(@NotNull Collection<?> c) {
         throw new UnsupportedOperationException("Modification attempted");
     }
 
@@ -168,7 +174,7 @@ public interface UnmodCollection<E> extends Collection<E>, UnmodIterable<E>, Siz
     }
 
     /** Not allowed - this is supposed to be unmodifiable */
-    @Override @Deprecated default boolean retainAll(Collection<?> c) {
+    @Override @Deprecated default boolean retainAll(@NotNull Collection<?> c) {
         throw new UnsupportedOperationException("Modification attempted");
     }
 
@@ -183,7 +189,7 @@ public interface UnmodCollection<E> extends Collection<E>, UnmodIterable<E>, Siz
      *
      * {@inheritDoc}
      */
-    @Override default Object[] toArray() {
+    @Override default @NotNull Object[] toArray() {
         return this.toArray(new Object[size()]);
     }
 
@@ -201,7 +207,7 @@ public interface UnmodCollection<E> extends Collection<E>, UnmodIterable<E>, Siz
      * {@inheritDoc}
      */
     @SuppressWarnings("unchecked")
-    @Override default <T> T[] toArray(T[] as) {
+    @Override default @NotNull <T> T[] toArray(@NotNull T[] as) {
         if (as.length < size()) {
             // This produced a class cast exception when the return was put into a
             // variable of type non-Object[] (like String[] or Integer[]).  To see the problem

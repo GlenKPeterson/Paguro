@@ -5,6 +5,9 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
+## Release 3.5.3: NotNull
+ - Added org.jetbrains.annotations dependency and marked many methods with Nullable and NotNull.
+
 ## Release 3.5.2: Fixes from Master
  - Made most Cowry methods public
  - Fixed a bug (reported by [fcurts](https://github.com/fcurts) - with unit test!) where Heterogeneous RrbTrees of more than 32 items

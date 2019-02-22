@@ -19,6 +19,8 @@ import java.io.Serializable;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  This started out as Rich Hickey's PersistentVector class from Clojure in late 2014.  Glen added
  generic types, tried to make it a little more pure-Java friendly, and removed dependencies on other
@@ -289,6 +291,7 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
      @param items the values to insert
      @return a new PersistentVector with the additional items at the end.
      */
+    @NotNull
     @Override public PersistentVector<E> concat(Iterable<? extends E> items) {
         return (PersistentVector<E>) ImList.super.concat(items);
     }
@@ -314,6 +317,7 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
     }
 
     /** {@inheritDoc} */
+    @NotNull
     @Override public UnmodListIterator<E> listIterator(int index) {
         if( (index < 0) || (index > size) ) {
             // To match ArrayList and other java.util.List expectations

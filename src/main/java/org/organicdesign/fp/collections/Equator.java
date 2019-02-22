@@ -17,6 +17,8 @@ package org.organicdesign.fp.collections;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import org.jetbrains.annotations.Nullable;
+
 /**
  An Equator represents an equality context in a way that is analgous to the java.util.Comparator
  interface.
@@ -48,11 +50,11 @@ public interface Equator<T> {
          you want.
          */
         DEFAULT {
-            @Override public int hash(Object o) {
+            @Override public int hash(@Nullable Object o) {
                 return (o == null) ? 0 : o.hashCode();
             }
 
-            @Override public boolean eq(Object o1, Object o2) {
+            @Override public boolean eq(@Nullable Object o1, @Nullable Object o2) {
                 if (o1 == null) { return (o2 == null); }
                 return o1.equals(o2);
             }

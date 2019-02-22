@@ -20,6 +20,8 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  An efficient (in both time and memory) implementation of List.  If you want to compare a RangeOfInt
  to generic List&lt;Integer&gt;, use RangeOfInt.LIST_EQUATOR so that the hashCodes will be
@@ -70,10 +72,7 @@ public class RangeOfInt implements UnmodList<Integer>, Serializable {
 //        return new RangeOfInt(s, e);
 //    }
 
-    public static RangeOfInt of(Number s, Number e) {
-        if ((s == null) || (e == null)) {
-            throw new IllegalArgumentException("Nulls not allowed");
-        }
+    public static @NotNull RangeOfInt of(@NotNull Number s, @NotNull Number e) {
         if (e.longValue() < s.longValue()) {
             throw new IllegalArgumentException("end of range must be >= start of range");
         }
@@ -81,10 +80,7 @@ public class RangeOfInt implements UnmodList<Integer>, Serializable {
     }
 
     //
-    public static RangeOfInt of(Number e) {
-        if (e == null) {
-            throw new IllegalArgumentException("Nulls not allowed");
-        }
+    public static @NotNull RangeOfInt of(@NotNull Number e) {
         if (e.longValue() < 0) {
             throw new IllegalArgumentException("Single argument factory can't accept a negative" +
                                                " endpoint (it assumes start is zero and positive" +
@@ -260,6 +256,7 @@ public class RangeOfInt implements UnmodList<Integer>, Serializable {
      I'm not sure this is a good idea, but Python, Clojure, Scala, and just about everything in
      Java expects similar behavior.
      */
+    @NotNull
     @Override public UnmodListIterator<Integer> listIterator(final int startIdx) {
         if( (startIdx < 0) || (startIdx > size) ) {
             // To match ArrayList and other java.util.List expectations
@@ -291,6 +288,7 @@ public class RangeOfInt implements UnmodList<Integer>, Serializable {
     }
 
     /** {@inheritDoc} */
+    @NotNull
     @Override public RangeOfInt subList(int fromIndex, int toIndex) {
         if ( (fromIndex == 0) && (toIndex == size) ) {
             return this;

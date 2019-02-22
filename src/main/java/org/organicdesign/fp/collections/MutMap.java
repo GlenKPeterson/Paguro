@@ -16,25 +16,31 @@ package org.organicdesign.fp.collections;
 
 import java.util.Map;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  Interface for mutable (hash) map builder.
  */
 public interface MutMap<K,V> extends BaseUnsortedMap<K,V> {
     /** {@inheritDoc} */
+    @NotNull
     @Override
     MutMap<K,V> assoc(K key, V val);
 
     /** {@inheritDoc} */
-    @Override default MutMap<K,V> assoc(Map.Entry<K,V> entry) {
+    @NotNull
+    @Override default MutMap<K,V> assoc(@NotNull Map.Entry<K,V> entry) {
         return assoc(entry.getKey(), entry.getValue());
     }
 
 
+    @NotNull
     @Override default MutSet<Entry<K,V>> entrySet() {
         return map(e -> (Map.Entry<K,V>) e).toMutSet();
     }
 
     /** Returns a mutable view of the keys contained in this map. */
+    @NotNull
     @Override default MutSet<K> keySet() {
         return map(e -> ((Map.Entry<K,V>) e).getKey()).toMutSet();
     }
@@ -43,6 +49,7 @@ public interface MutMap<K,V> extends BaseUnsortedMap<K,V> {
     ImMap<K,V> immutable();
 
     /** {@inheritDoc} */
+    @NotNull
     @Override
     MutMap<K,V> without(K key);
 }

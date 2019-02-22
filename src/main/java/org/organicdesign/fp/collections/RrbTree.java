@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jetbrains.annotations.NotNull;
 import org.organicdesign.fp.indent.Indented;
 import org.organicdesign.fp.tuple.Tuple2;
 import org.organicdesign.fp.tuple.Tuple4;
@@ -117,6 +118,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         }
 
         /** {@inheritDoc} */
+        @NotNull
         @Override public MutRrbt<E> concat(Iterable<? extends E> es) {
             return (MutRrbt<E>) MutList.super.concat(es);
         }
@@ -247,6 +249,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         }
 
         /** {@inheritDoc} */
+        @NotNull
         @Override public UnmodSortedIterator<E> iterator() {
             return new Iter(pushFocus());
         }
@@ -598,6 +601,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         }
 
         /** {@inheritDoc} */
+        @NotNull
         @Override public ImRrbt<E> concat(Iterable<? extends E> es) {
             return this.mutable().concat(es).immutable();
         }
@@ -682,6 +686,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         }
 
         /** {@inheritDoc} */
+        @NotNull
         @Override public UnmodSortedIterator<E> iterator() {
             return new Iter(pushFocus());
         }
@@ -1001,6 +1006,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
     public abstract RrbTree<E> insert(int idx, E element);
 
     /** {@inheritDoc} */
+    @NotNull
     @Override abstract public UnmodSortedIterator<E> iterator();
 
 /*

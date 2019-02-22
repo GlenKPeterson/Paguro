@@ -17,6 +17,9 @@ package org.organicdesign.fp.collections;
 import java.util.Comparator;
 import java.util.Iterator;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 /**
  <p>Represents a context for comparison because sometimes you order the same things differently.
  For instance, a class of students might be sorted by height for the yearbook picture (shortest in
@@ -75,10 +78,9 @@ public interface ComparisonContext<T> extends Equator<T>, Comparator<T> {
      Returns the minimum (as defined by this Comparison Context).  Nulls are skipped.  If there are
      duplicate minimum values, the first one is returned.
      */
-    default T min(Iterable<T> is) {
+    default @Nullable T min(@NotNull Iterable<T> items) {
         // Note: following code is identical to max() except for lt() vs. gt()
-        if (is == null) { throw new IllegalArgumentException("null argument"); }
-        Iterator<T> iter = is.iterator();
+        Iterator<T> iter = items.iterator();
         T ret = null;
         while ( (ret == null) && iter.hasNext() ) {
             ret = iter.next();
@@ -96,10 +98,9 @@ public interface ComparisonContext<T> extends Equator<T>, Comparator<T> {
      Returns the maximum (as defined by this Comparison Context).  Nulls are skipped.  If there are
      duplicate maximum values, the first one is returned.
      */
-    default T max(Iterable<T> is) {
+    default @Nullable T max(@NotNull Iterable<T> items) {
         // Note: following code is identical to min() except for lt() vs. gt()
-        if (is == null) { throw new IllegalArgumentException("null argument"); }
-        Iterator<T> iter = is.iterator();
+        Iterator<T> iter = items.iterator();
         T ret = null;
         while ( (ret == null) && iter.hasNext() ) {
             ret = iter.next();
@@ -121,9 +122,8 @@ public interface ComparisonContext<T> extends Equator<T>, Comparator<T> {
     enum CompCtx implements ComparisonContext<Comparable<Object>> {
         DEFAULT {
             @Override
-            public int hash(Comparable<Object> o) { return (o == null) ? 0 : o.hashCode(); }
+            public int hash(@Nullable Comparable<Object> o) { return (o == null) ? 0 : o.hashCode(); }
 
-            @SuppressWarnings("ConstantConditions")
             @Override public int compare(Comparable<Object> o1, Comparable<Object> o2) {
                 return Equator.doCompare(o1, o2);
             }

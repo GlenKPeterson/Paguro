@@ -13,6 +13,9 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 /** An immutable set with no guarantees about its ordering */
 public interface ImSet<E> extends BaseSet<E> {
 
@@ -28,10 +31,10 @@ public interface ImSet<E> extends BaseSet<E> {
      @param e the element to add to this set
      @return a new set with the element added (see note above about adding duplicate elements).
      */
+    @NotNull
     @Override ImSet<E> put(E e);
 
-    /** {@inheritDoc} */
-    default ImSet<E> union(Iterable<? extends E> iter) {
+    default @NotNull ImSet<E> union(@Nullable Iterable<? extends E> iter) {
         if (iter == null) { return this; }
         ImSet<E> ret = this;
         for (E e : iter) { ret = ret.put(e); }
@@ -39,5 +42,6 @@ public interface ImSet<E> extends BaseSet<E> {
     }
 
     /** {@inheritDoc} */
+    @NotNull
     @Override ImSet<E> without(E key);
 }

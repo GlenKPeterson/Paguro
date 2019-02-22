@@ -2,18 +2,23 @@ package org.organicdesign.fp.collections;
 
 import java.util.Map;
 
+import org.jetbrains.annotations.NotNull;
+
 /** An immutable map with no guarantees about its ordering. */
 public interface ImMap<K,V> extends BaseUnsortedMap<K,V> {
 
     /** Returns a new map with the given key/value added */
+    @NotNull
     @Override ImMap<K,V> assoc(K key, V val);
 
     /** Returns a new map with an immutable copy of the given entry added */
-    @Override default ImMap<K,V> assoc(Map.Entry<K,V> entry) {
+    @NotNull
+    @Override default ImMap<K,V> assoc(@NotNull Map.Entry<K,V> entry) {
         return assoc(entry.getKey(), entry.getValue());
     }
 
     /** Returns a new map with the given key/value removed */
+    @NotNull
     @Override ImMap<K,V> without(K key);
 
     /**
@@ -21,17 +26,18 @@ public interface ImMap<K,V> extends BaseUnsortedMap<K,V> {
      UnmodMap.Entry items, but that return signature is illegal in Java, so you'll just have to
      remember.
      */
+    @NotNull
     @Override default ImSet<Map.Entry<K,V>> entrySet() {
         return map(e -> (Map.Entry<K,V>) e)
                 .toImSet();
     }
 
     /** Returns an immutable view of the keys contained in this map. */
-    @Override default ImSet<K> keySet() {
+    @Override default @NotNull ImSet<K> keySet() {
         return mutable().keySet().immutable();
     }
 
     /** Returns a mutable version of this mutable map. */
-    MutMap<K,V> mutable();
+    @NotNull MutMap<K,V> mutable();
 
 }

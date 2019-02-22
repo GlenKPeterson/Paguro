@@ -15,7 +15,7 @@ These collections grow by adding a new shell, leaving the insides the same, much
 
 # Maven Artifact
 
-Available from the [Maven Repository](http://mvnrepository.com/artifact/org.organicdesign/Paguro) as:
+Available from the [Maven Repository](http://mvnrepository.com/artifact/org.organicdesign/Paguro-KF) as:
 ```xml
 <!--
 If you're using Kotlin and Java, you want the 3.5 version in the KotlinFootWetting branch.
@@ -23,8 +23,8 @@ Java-only users want 3.x from the main branch.
  -->
 <dependency>
         <groupId>org.organicdesign</groupId>
-        <artifactId>Paguro</artifactId>
-        <version>3.5.2</version>
+        <artifactId>Paguro-KF</artifactId>
+        <version>3.5.3</version>
 </dependency>
 ```
 

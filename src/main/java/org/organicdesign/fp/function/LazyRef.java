@@ -1,6 +1,9 @@
 package org.organicdesign.fp.function;
 
 // Should this bee an inner class of Fn0?
+
+import org.jetbrains.annotations.NotNull;
+
 /**
  Lazily initialize a value (and free the initialization resources) on the first call to get().
  Subsequent calls to get() cheaply return the previously initialized value.  This class is thread-safe if the producer
@@ -19,10 +22,7 @@ public class LazyRef<T> implements Fn0<T> {
 
      @return a LazyRef with the given producer.
      */
-    public static <T> LazyRef<T> of(Fn0<T> producer) {
-        if (producer == null) {
-            throw new IllegalArgumentException("The producer function cannot be null (the value it returns can)");
-        }
+    public static <T> @NotNull LazyRef<T> of(@NotNull Fn0<T> producer) {
         return new LazyRef<>(producer);
     }
 

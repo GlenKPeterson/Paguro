@@ -22,6 +22,7 @@ import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.Stack;
 
+import org.jetbrains.annotations.NotNull;
 import org.organicdesign.fp.function.Fn1;
 import org.organicdesign.fp.oneOf.Option;
 import org.organicdesign.fp.tuple.Tuple2;
@@ -154,10 +155,7 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
     private final int size;
 
     // ======================================== Constructor ========================================
-    private PersistentTreeMap(Comparator<? super K> c, Node<K,V> t, int n) {
-        if (c == null) {
-            throw new IllegalArgumentException("Comparator can't be null.");
-        }
+    private PersistentTreeMap(@NotNull Comparator<? super K> c, Node<K,V> t, int n) {
         comp = c; tree = t; size = n;
     }
 
@@ -293,6 +291,7 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
      UnmodMap.UnEntry items, but that return signature is illegal in Java, so you'll just have to
      remember.
      */
+    @NotNull
     @Override public ImSortedSet<Entry<K,V>> entrySet() {
         // This is the pretty way to do it.
         return this.fold(PersistentTreeSet.ofComp(new KeyComparator<>(comp)),
@@ -318,6 +317,7 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
 //    @Override public ImSet<K> keySet() { return PersistentTreeSet.ofMap(this); }
 
     /** {@inheritDoc} */
+    @NotNull
     @Override public ImSortedMap<K,V> subMap(K fromKey, K toKey) {
         int diff = comp.compare(fromKey, toKey);
 
@@ -395,6 +395,7 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
 //    }
 
     /** {@inheritDoc} */
+    @NotNull
     @Override public Option<UnEntry<K,V>> head() {
         Node<K,V> t = tree;
         if (t != null) {
@@ -406,6 +407,7 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
     }
 
     /** {@inheritDoc} */
+    @NotNull
     @Override public ImSortedMap<K,V> tailMap(K fromKey) {
         UnEntry<K,V> last = last();
         K lastKey = last.getKey();
@@ -505,6 +507,7 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
 // Inherits default implementation of assocEx from IPersistentMap
 
     /** {@inheritDoc} */
+    @NotNull
     @Override public PersistentTreeMap<K,V> assoc(K key, V val) {
         Box<Node<K,V>> found = new Box<>(null);
         Node<K,V> t = add(tree, key, val, found);
@@ -522,6 +525,7 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
     }
 
     /** {@inheritDoc} */
+    @NotNull
     @Override public PersistentTreeMap<K,V> without(K key) {
         Box<Node<K,V>> found = new Box<>(null);
         Node<K,V> t = remove(tree, key, found);
@@ -599,12 +603,15 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
 //    }
 
     /** {@inheritDoc} */
+    @NotNull
     @Override
     public UnmodSortedIterator<UnEntry<K,V>> iterator() { return iterator(Tuple2::of); }
 
+    @NotNull
     @Override
     public UnmodSortedIterator<K> keyIterator() { return iterator(Node::getKey); }
 
+    @NotNull
     @Override
     public UnmodSortedIterator<V> valIterator() { return iterator(Node::getValue); }
 
@@ -657,6 +664,7 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
      Returns an Option of the key/value pair matching the given key, or Option.none() if the key is
      not found.
      */
+    @NotNull
     @Override public Option<UnmodMap.UnEntry<K,V>> entry(K key) {
         Node<K,V> t = tree;
         while (t != null) {

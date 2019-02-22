@@ -13,6 +13,8 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
+import org.jetbrains.annotations.NotNull;
+
 /** Immutable copy-on-write list */
 public interface ImList<E> extends BaseList<E> {
 // Inherited correctly - there is no ImIterator.
@@ -29,6 +31,7 @@ public interface ImList<E> extends BaseList<E> {
     @Override ImList<E> append(E e);
 
     /** {@inheritDoc} */
+    @NotNull
     @Override default ImList<E> concat(Iterable<? extends E> es) {
         return mutable().concat(es).immutable();
     }

@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 
+import org.jetbrains.annotations.NotNull;
 import org.organicdesign.fp.tuple.Tuple2;
 
 /** An unmodifiable SortedMap. */
@@ -35,6 +36,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>,
      UnmodMap.Entry items, but that return signature is illegal in Java, so you'll just have to
      remember.
      */
+    @NotNull
     @Override default UnmodSortedSet<Entry<K,V>> entrySet() {
         class Implementation implements UnmodSortedSet<Entry<K,V>>, Serializable {
             // For serializable.  Make sure to change whenever internal data format changes.
@@ -50,6 +52,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>,
                 return (o instanceof Entry) && containsKey(((Entry<K, V>) o).getKey());
             }
 
+            @NotNull
             @SuppressWarnings("unchecked")
             @Override public UnmodSortedIterator<Entry<K,V>> iterator() {
                 // Converting from
@@ -81,12 +84,12 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>,
                 return (o1, o2) -> parentMap.comparator().compare(o1.getKey(), o2.getKey());
             }
 
-            @Override public UnmodSortedSet<Entry<K,V>> subSet(Entry<K,V> fromElement,
-                                                                 Entry<K,V> toElement) {
+            @Override public @NotNull UnmodSortedSet<Entry<K,V>> subSet(Entry<K,V> fromElement,
+                                                                        Entry<K,V> toElement) {
                 return parentMap.subMap(fromElement.getKey(), toElement.getKey()).entrySet();
             }
 
-            @Override public UnmodSortedSet<Entry<K,V>> tailSet(Entry<K,V> fromElement) {
+            @Override public @NotNull UnmodSortedSet<Entry<K,V>> tailSet(Entry<K,V> fromElement) {
                 return parentMap.tailMap(fromElement.getKey()).entrySet();
             }
 
@@ -152,22 +155,25 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>,
 // public  K	firstKey()
 
     /** {@inheritDoc} */
-    @Override default UnmodSortedMap<K,V> headMap(K toKey) { return subMap(firstKey(), toKey); }
+    @Override default @NotNull UnmodSortedMap<K,V> headMap(K toKey) { return subMap(firstKey(), toKey); }
 
 //    /** {@inheritDoc} */
 //    @Override default UnmodSortedIterator<UnEntry<K,V>> iterator() {
 //        return UnmodMap.UnEntry.unSortIterEntToUnSortIterUnEnt(entrySet().iterator());
 //    }
 
+    @NotNull
     @Override default UnmodSortedIterator<K> keyIterator() {
         return new UnEntry.UnmodSortedKeyIter<>(iterator());
     }
 
+    @NotNull
     @Override default UnmodSortedIterator<V> valIterator() {
         return new UnEntry.UnmodSortedValIter<>(iterator());
     }
 
     /** Returns a view of the keys contained in this map. */
+    @NotNull
     @Override default UnmodSortedSet<K> keySet() {
         class KeySet implements UnmodSortedSet<K>, Serializable {
             // For serializable.  Make sure to change whenever internal data format changes.
@@ -179,17 +185,18 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>,
             @SuppressWarnings("SuspiciousMethodCalls")
             @Override public boolean contains(Object o) { return parentMap.containsKey(o); }
 
+            @NotNull
             @Override public UnmodSortedIterator<K> iterator() {
                 return parentMap.keyIterator();
             }
 
             @Override public int size() { return parentMap.size(); }
 
-            @Override public UnmodSortedSet<K> subSet(K fromElement, K toElement) {
+            @Override public @NotNull UnmodSortedSet<K> subSet(K fromElement, K toElement) {
                 return parentMap.subMap(fromElement, toElement).keySet();
             }
 
-            @Override public UnmodSortedSet<K> tailSet(K fromElement) {
+            @Override public @NotNull UnmodSortedSet<K> tailSet(K fromElement) {
                 return parentMap.tailMap(fromElement).keySet();
             }
 
@@ -265,10 +272,10 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>,
 // public  K	lastKey()
 
     /** {@inheritDoc} */
-    @Override UnmodSortedMap<K,V> subMap(K fromKey, K toKey);
+    @Override @NotNull UnmodSortedMap<K,V> subMap(K fromKey, K toKey);
 
     /** {@inheritDoc} */
-    @Override UnmodSortedMap<K,V> tailMap(K fromKey);
+    @Override @NotNull UnmodSortedMap<K,V> tailMap(K fromKey);
 
     /**
      This method is deprecated on UnmodMap because equals() and hashCode() cannot be implemented
@@ -281,6 +288,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>,
 
      {@inheritDoc}
      */
+    @NotNull
     @SuppressWarnings("deprecation")
     @Override default UnmodSortedCollection<V> values() {
 //        return map((UnEntry<K,V> entry) -> entry.getValue())
@@ -294,6 +302,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>,
 
             @SuppressWarnings("SuspiciousMethodCalls")
             @Override public boolean contains(Object o) { return parent.containsValue(o); }
+            @NotNull
             @Override public UnmodSortedIterator<V> iterator() { return parent.valIterator(); }
             @Override public int size() { return parent.size(); }
 

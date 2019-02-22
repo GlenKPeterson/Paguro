@@ -1,5 +1,6 @@
 package org.organicdesign.fp.type;
 
+import org.jetbrains.annotations.NotNull;
 import org.organicdesign.fp.collections.ImList;
 
 import java.util.HashMap;
@@ -40,10 +41,7 @@ public final class RuntimeTypes {
      Use this to prevent duplicate runtime types.
      @param cs an immutable vector of classes to register
      */
-    public static ImList<Class> registerClasses(Class... cs) {
-        if (cs == null) {
-            throw new IllegalArgumentException("Can't register a null type array");
-        }
+    public static ImList<Class> registerClasses(@NotNull Class... cs) {
         if (cs.length == 0) {
             throw new IllegalArgumentException("Can't register a zero-length type array");
         }

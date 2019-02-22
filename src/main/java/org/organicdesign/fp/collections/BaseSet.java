@@ -13,6 +13,8 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  Adds copy-on-write, "fluent interface" methods to {@link UnmodSet}.
  Lowest common ancestor of {@link MutSet}, {@link ImSet}, and {@link ImSortedSet}.
@@ -27,14 +29,14 @@ public interface BaseSet<E> extends UnmodSet<E> {
      @param e the element to add to this set
      @return a new set with the element added (see note above about adding duplicate elements).
      */
-    BaseSet<E> put(E e);
+    @NotNull BaseSet<E> put(E e);
 
     /** Returns a new set containing all the items. */
-    BaseSet<E> union(Iterable<? extends E> iter);
+    @NotNull BaseSet<E> union(Iterable<? extends E> iter);
 //    {
 //        return concat(iter).toImSet();
 //    }
 
     /** Removes this key from the set */
-    BaseSet<E> without(E key);
+    @NotNull BaseSet<E> without(E key);
 }

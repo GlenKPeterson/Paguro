@@ -1,5 +1,6 @@
 package org.organicdesign.fp.collections;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -33,6 +34,7 @@ public class UnmodSortedSetTest {
 
         @Override public boolean contains(Object o) { return inner.contains(o); }
 
+        @NotNull
         @Override public UnmodSortedIterator<E> iterator() {
             return new UnmodSortedIterator<E>() {
                 Iterator<E> iter = inner.iterator();
@@ -43,11 +45,13 @@ public class UnmodSortedSetTest {
 
         @Override public Comparator<? super E> comparator() { return inner.comparator(); }
 
+        @NotNull
         @Override public UnmodSortedSet<E> subSet(E fromElement, E toElement) {
             SortedSet<E> next = dup(inner);
             return new TestSortSet<>(next.subSet(fromElement, toElement), inner.comparator());
         }
 
+        @NotNull
         @Override public UnmodSortedSet<E> tailSet(E fromElement) {
             SortedSet<E> next = dup(inner);
             return new TestSortSet<>(next.tailSet(fromElement), inner.comparator());

@@ -21,6 +21,7 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
+import org.jetbrains.annotations.NotNull;
 import org.organicdesign.fp.function.Fn2;
 
 /**
@@ -87,12 +88,12 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
 
     /** Not allowed - this is supposed to be unmodifiable */
     @SuppressWarnings("deprecation")
-    @Override @Deprecated default boolean addAll(Collection<? extends E> c) {
+    @Override @Deprecated default boolean addAll(@NotNull Collection<? extends E> c) {
         throw new UnsupportedOperationException("Modification attempted");
     }
 
     /** Not allowed - this is supposed to be unmodifiable */
-    @Override @Deprecated default boolean addAll(int index, Collection<? extends E> c) {
+    @Override @Deprecated default boolean addAll(int index, @NotNull Collection<? extends E> c) {
         throw new UnsupportedOperationException("Modification attempted");
     }
 
@@ -125,7 +126,7 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
      So even though contains() is impossible to implement efficiently for Lists, containsAll()
      has a decent implementation (brute force would be O(this.size() * that.size()) or O(n^2) ).
      */
-    @Override default boolean containsAll(Collection<?> c) {
+    @Override default boolean containsAll(@NotNull Collection<?> c) {
         return UnmodSortedCollection.super.containsAll(c);
     }
 
@@ -150,6 +151,7 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
     @Override default boolean isEmpty() { return size() == 0; }
 
     /** A convenience method to get a listIterator. */
+    @NotNull
     @Override default UnmodSortedIterator<E> iterator() { return listIterator(0); }
 
     /** The default implementation of this method has O(this.size()) performance. */
@@ -163,10 +165,10 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
     }
 
     /** {@inheritDoc} */
-    @Override default UnmodListIterator<E> listIterator() { return listIterator(0); }
+    @Override default @NotNull UnmodListIterator<E> listIterator() { return listIterator(0); }
 
     /** {@inheritDoc}  Subclasses should override this when they can do so more efficiently. */
-    @Override default UnmodListIterator<E> listIterator(int index) {
+    @Override default @NotNull UnmodListIterator<E> listIterator(int index) {
         if ( (index < 0) || (index > size()) ) {
             throw new IndexOutOfBoundsException("Expected an index between 0 and " + size() +
                                                 " but found: " + index);
@@ -229,7 +231,7 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
 
     /** Not allowed - this is supposed to be unmodifiable */
     @SuppressWarnings("deprecation")
-    @Override @Deprecated default boolean removeAll(Collection<?> c) {
+    @Override @Deprecated default boolean removeAll(@NotNull Collection<?> c) {
         throw new UnsupportedOperationException("Modification attempted");
     }
 
@@ -240,7 +242,7 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
 
     /** Not allowed - this is supposed to be unmodifiable */
     @SuppressWarnings("deprecation")
-    @Override @Deprecated default boolean retainAll(Collection<?> c) {
+    @Override @Deprecated default boolean retainAll(@NotNull Collection<?> c) {
         throw new UnsupportedOperationException("Modification attempted");
     }
 
@@ -259,7 +261,7 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
 //default Spliterator<E> spliterator()
 
     /** {@inheritDoc} */
-    @Override default UnmodList<E> subList(int fromIndex, int toIndex) {
+    @Override default @NotNull UnmodList<E> subList(int fromIndex, int toIndex) {
         if ( (fromIndex == 0) && (toIndex == size()) ) {
             return this;
         }
@@ -291,6 +293,7 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
 
      {@inheritDoc}
      */
+    @NotNull
     @Override default Object[] toArray() { return UnmodSortedCollection.super.toArray(); }
 
     /**
@@ -306,8 +309,9 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
 
      {@inheritDoc}
      */
+    @NotNull
     @SuppressWarnings("SuspiciousToArrayCall")
-    @Override default <T> T[] toArray(T[] as) { return UnmodSortedCollection.super.toArray(as); }
+    @Override default <T> T[] toArray(@NotNull T[] as) { return UnmodSortedCollection.super.toArray(as); }
 
 //Methods inherited from interface java.util.Collection
 //parallelStream, removeIf, stream

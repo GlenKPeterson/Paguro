@@ -1,5 +1,7 @@
 package org.organicdesign.fp.collections;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.organicdesign.fp.function.Fn1;
 import org.organicdesign.fp.function.Fn2;
 import org.organicdesign.fp.oneOf.Option;
@@ -17,13 +19,14 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
 
     enum UnIterable implements UnmodIterable {
         EMPTY {
+            @NotNull
             @Override public UnmodIterator iterator() { return UnmodIterator.emptyUnmodIterator(); }
         }
     }
 
     /** We only ever need one empty iterable in memory. */
     @SuppressWarnings("unchecked")
-    static <T> UnmodIterable<T> emptyUnmodIterable() {
+    static <T> @NotNull UnmodIterable<T> emptyUnmodIterable() {
         return (UnmodIterable<T>) UnIterable.EMPTY;
     }
 
@@ -100,8 +103,7 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
      This is correct, but O(n).  It also works regardless of the order of the items because
      a + b = b + a, even when an overflow occurs.
      */
-    static int hash(Iterable is) {
-        if (is == null) { throw new IllegalArgumentException("Can't have a null iteratable."); }
+    static int hash(@NotNull Iterable is) {
 //        System.out.println("hashCode for: " + is);
         int ret = 0;
         for (Object t : is) {
@@ -114,11 +116,7 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
     }
 
     /** Computes a reasonable to-string. */
-    static String toString(String name, Iterable iterable) {
-        if (name == null) { throw new IllegalArgumentException("Can't have a null name."); }
-        if (iterable == null) {
-            throw new IllegalArgumentException("Can't have a null iteratable.");
-        }
+    static @NotNull String toString(@NotNull String name, @NotNull Iterable iterable) {
         StringBuilder sB = new StringBuilder();
         sB.append(name).append("(");
         int i = 0;
@@ -143,27 +141,27 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
      iterators so this is the lowest common denominator of collection iteration, even though
      iterators are inherently mutable.
      */
-    @Override UnmodIterator<T> iterator();
+    @Override @NotNull UnmodIterator<T> iterator();
 
     // =============================== Inherited from Transformable ===============================
 
     /** {@inheritDoc} */
-    @Override default UnmodIterable<T> concat(Iterable<? extends T> list) {
+    @Override default @NotNull UnmodIterable<T> concat(Iterable<? extends T> list) {
         return Xform.of(this).concat(list);
     }
 
     /** {@inheritDoc} */
-    @Override default UnmodIterable<T> precat(Iterable<? extends T> list) {
+    @Override default @NotNull UnmodIterable<T> precat(Iterable<? extends T> list) {
         return Xform.of(this).precat(list);
     }
 
     /** {@inheritDoc} */
-    @Override default UnmodIterable<T> drop(long n) {
+    @Override default @NotNull UnmodIterable<T> drop(long n) {
         return Xform.of(this).drop(n);
     }
 
     /** {@inheritDoc} */
-    @Override default UnmodIterable<T> dropWhile(Fn1<? super T,Boolean> predicate) {
+    @Override default @NotNull UnmodIterable<T> dropWhile(Fn1<? super T,Boolean> predicate) {
         return Xform.of(this).dropWhile(predicate);
     }
 
@@ -173,39 +171,42 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
     }
 
     /** {@inheritDoc} */
-    @Override default <G,B> Or<G,B> foldUntil(G accum,
-                                              Fn2<? super G,? super T,B> terminator,
-                                              Fn2<? super G,? super T,G> reducer) {
+    @Override default <G,B> @NotNull Or<G,B> foldUntil(
+            G accum,
+            @Nullable Fn2<? super G,? super T,B> terminator,
+            @NotNull Fn2<? super G,? super T,G> reducer
+    ) {
 
         return Xform.of(this).foldUntil(accum, terminator, reducer);
     }
 
     /** {@inheritDoc} */
-    @Override default UnmodIterable<T> filter(Fn1<? super T,Boolean> f) {
+    @Override default @NotNull UnmodIterable<T> filter(@NotNull Fn1<? super T,Boolean> f) {
         return Xform.of(this).filter(f);
     }
 
     /** {@inheritDoc} */
-    @Override default <B> UnmodIterable<B> flatMap(Fn1<? super T,Iterable<B>> f) {
+    @Override default <B> @NotNull UnmodIterable<B> flatMap(@NotNull Fn1<? super T,Iterable<B>> f) {
         return Xform.of(this).flatMap(f);
     }
 
     /** {@inheritDoc} */
-    @Override default <B> UnmodIterable<B> map(Fn1<? super T, ? extends B> f) {
+    @Override default <B> @NotNull UnmodIterable<B> map(@NotNull Fn1<? super T, ? extends B> f) {
         return Xform.of(this).map(f);
     }
 
     /** {@inheritDoc} */
-    @Override default UnmodIterable<T> take(long numItems) {
+    @Override default @NotNull UnmodIterable<T> take(long numItems) {
         return Xform.of(this).take(numItems);
     }
 
     /** {@inheritDoc} */
-    @Override default UnmodIterable<T> takeWhile(Fn1<? super T,Boolean> f) {
+    @Override default @NotNull UnmodIterable<T> takeWhile(@NotNull Fn1<? super T,Boolean> f) {
         return Xform.of(this).takeWhile(f);
     }
 
     /** The first item in this iterable. */
+    @NotNull
     @Override default Option<T> head() {
         Iterator<T> iter = iterator();
         return iter.hasNext() ? Option.some(iter.next())

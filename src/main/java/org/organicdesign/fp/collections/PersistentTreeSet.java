@@ -19,6 +19,7 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.SortedSet;
 
+import org.jetbrains.annotations.NotNull;
 import org.organicdesign.fp.oneOf.Option;
 
 import static org.organicdesign.fp.collections.Equator.defaultComparator;
@@ -183,12 +184,14 @@ public class PersistentTreeSet<E> extends AbstractUnmodSet<E>
     @Override public boolean contains(Object o) { return impl.containsKey(o); }
 
     /** {@inheritDoc} */
+    @NotNull
     @Override public PersistentTreeSet<E> without(E key) {
         return (impl.containsKey(key)) ? new PersistentTreeSet<>(impl.without(key))
                                        : this;
     }
 
     /** {@inheritDoc} */
+    @NotNull
     @Override
     public UnmodSortedIterator<E> iterator() {
         return new UnmodSortedIterator<E>() {
@@ -230,6 +233,7 @@ public class PersistentTreeSet<E> extends AbstractUnmodSet<E>
     @Override public E first() { return impl.firstKey(); }
 
     /** {@inheritDoc} */
+    @NotNull
     @Override public Option<E> head() {
         return size() > 0 ? Option.some(impl.firstKey()) : Option.none();
     }
@@ -244,6 +248,7 @@ public class PersistentTreeSet<E> extends AbstractUnmodSet<E>
     @Override public E last() { return impl.lastKey(); }
 
     /** {@inheritDoc} */
+    @NotNull
     @Override public PersistentTreeSet<E> put(E e) {
         return (impl.containsKey(e)) ? this
                                      : new PersistentTreeSet<>(impl.assoc(e, null));
@@ -253,11 +258,13 @@ public class PersistentTreeSet<E> extends AbstractUnmodSet<E>
     @Override public int size() { return impl.size(); }
 
     /** {@inheritDoc} */
+    @NotNull
     @Override public ImSortedSet<E> subSet(E fromElement, E toElement) {
         return PersistentTreeSet.ofMap(impl.subMap(fromElement, toElement));
     }
 
     /** {@inheritDoc} */
+    @NotNull
     @Override public ImSortedSet<E> tailSet(E fromElement) {
         return PersistentTreeSet.ofMap(impl.tailMap(fromElement));
     }

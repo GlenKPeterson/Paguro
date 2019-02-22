@@ -14,6 +14,8 @@
 
 package org.organicdesign.fp;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.ImMap;
 import org.organicdesign.fp.collections.ImSet;
@@ -93,7 +95,7 @@ public final class StaticImports {
      @return a new PersistentHashMap of the given key/value pairs
      */
     @SafeVarargs
-    public static <K,V> ImMap<K,V> map(Map.Entry<K,V>... kvPairs) {
+    public static <K,V> @NotNull ImMap<K,V> map(@Nullable Map.Entry<K,V>... kvPairs) {
         if ( (kvPairs == null) || (kvPairs.length < 1) ) { return PersistentHashMap.empty(); }
         return PersistentHashMap.of(Arrays.asList(kvPairs));
     }
@@ -111,7 +113,7 @@ public final class StaticImports {
      @return a new MutMap of the given key/value pairs
      */
     @SafeVarargs
-    public static <K,V> MutMap<K,V> mutableMap(Map.Entry<K,V>... kvPairs) {
+    public static <K,V> @NotNull MutMap<K,V> mutableMap(@Nullable Map.Entry<K,V>... kvPairs) {
         MutMap<K,V> ret = PersistentHashMap.emptyMutable();
         if (kvPairs == null) { return ret; }
         for (Map.Entry<K,V> me : kvPairs) {
@@ -130,7 +132,7 @@ public final class StaticImports {
      This data definition method is one of the few methods in this project that support varargs.
      */
     @SafeVarargs
-    static public <T> MutRrbt<T> mutableRrb(T... items) {
+    public static <T> @NotNull MutRrbt<T> mutableRrb(@Nullable T... items) {
         if ( (items == null) || (items.length < 1) ) { return RrbTree.emptyMutable(); }
         return RrbTree.<T>emptyMutable()
                 .concat(Arrays.asList(items));
@@ -142,7 +144,7 @@ public final class StaticImports {
      values overwrite earlier ones.
      */
     @SafeVarargs
-    public static <T> MutSet<T> mutableSet(T... items) {
+    public static <T> @NotNull MutSet<T> mutableSet(@Nullable T... items) {
         MutSet<T> ret = PersistentHashSet.emptyMutable();
         if (items == null) { return ret; }
         for (T t : items) {
@@ -156,7 +158,7 @@ public final class StaticImports {
      few methods in this project that support varargs.
      */
     @SafeVarargs
-    public static <T> MutList<T> mutableVec(T... items) {
+    public static <T> @NotNull MutList<T> mutableVec(@Nullable T... items) {
         MutList<T> ret = PersistentVector.emptyMutable();
         if (items == null) { return ret; }
         for (T t : items) {
@@ -175,7 +177,7 @@ public final class StaticImports {
      This data definition method is one of the few methods in this project that support varargs.
      */
     @SafeVarargs
-    static public <T> ImRrbt<T> rrb(T... items) {
+    static public <T> @NotNull ImRrbt<T> rrb(@Nullable T... items) {
         if ( (items == null) || (items.length < 1) ) { return RrbTree.empty(); }
         return mutableRrb(items).immutable();
     }
@@ -186,7 +188,7 @@ public final class StaticImports {
      values overwrite earlier ones.
      */
     @SafeVarargs
-    public static <T> ImSet<T> set(T... items) {
+    public static <T> @NotNull ImSet<T> set(@Nullable T... items) {
         if ( (items == null) || (items.length < 1) ) { return PersistentHashSet.empty(); }
         return PersistentHashSet.of(Arrays.asList(items));
     }
@@ -207,7 +209,7 @@ public final class StaticImports {
 
      @return a new PersistentTreeMap of the specified comparator and the given key/value pairs
      */
-    public static <K,V> ImSortedMap<K,V>
+    public static <K,V> @NotNull ImSortedMap<K,V>
     sortedMap(Comparator<? super K> comp, Iterable<Map.Entry<K,V>> kvPairs) {
         return PersistentTreeMap.ofComp(comp, kvPairs);
     }
@@ -222,7 +224,7 @@ public final class StaticImports {
      @return a new PersistentTreeMap of the specified comparator and the given key/value pairs which
      uses the default comparator defined on the element type.
      */
-    public static <K extends Comparable<K>,V> ImSortedMap<K,V>
+    public static <K extends Comparable<K>,V> @NotNull ImSortedMap<K,V>
     sortedMap(Iterable<Map.Entry<K,V>> kvPairs) { return PersistentTreeMap.of(kvPairs); }
 
     /**
@@ -234,27 +236,27 @@ public final class StaticImports {
      earlier ones.
      @return a new PersistentTreeSet of the specified comparator and the given elements
      */
-    public static <T> ImSortedSet<T> sortedSet(Comparator<? super T> comp, Iterable<T> elements) {
+    public static <T> @NotNull ImSortedSet<T> sortedSet(Comparator<? super T> comp, Iterable<T> elements) {
         return Xform.of(elements).toImSortedSet(comp);
     }
 
     /** Returns a new PersistentTreeSet of the given comparable items. */
-    public static <T extends Comparable<T>> ImSortedSet<T> sortedSet(Iterable<T> items) {
+    public static <T extends Comparable<T>> @NotNull ImSortedSet<T> sortedSet(Iterable<T> items) {
         return PersistentTreeSet.of(items);
     }
 
     /** Returns a new Tuple2 of the given items. */
-    public static <T,U> Tuple2<T,U> tup(T t, U u) { return Tuple2.of(t, u); }
+    public static <T,U> @NotNull Tuple2<T,U> tup(T t, U u) { return Tuple2.of(t, u); }
 
     /** Returns a new Tuple3 of the given items. */
-    public static <T,U,V> Tuple3<T,U,V> tup(T t, U u, V v) { return Tuple3.of(t, u, v); }
+    public static <T,U,V> @NotNull Tuple3<T,U,V> tup(T t, U u, V v) { return Tuple3.of(t, u, v); }
 
     /**
      Returns a new PersistentVector of the given items.  This data definition method is one of the
      few methods in this project that support varargs.
      */
     @SafeVarargs
-    static public <T> ImList<T> vec(T... items) {
+    static public <T> @NotNull ImList<T> vec(@Nullable T... items) {
         if ( (items == null) || (items.length < 1) ) { return PersistentVector.empty(); }
         return mutableVec(items).immutable();
     }
@@ -263,14 +265,16 @@ public final class StaticImports {
      If you need to wrap a regular Java collection or other iterable outside this project to perform
      a transformation on it, this method is the most convenient, efficient way to do so.
      */
-    public static <T> UnmodIterable<T> xform(Iterable<T> iterable) { return Xform.of(iterable); }
+    public static <T> @NotNull UnmodIterable<T> xform(
+            @Nullable Iterable<T> iterable
+    ) { return Xform.of(iterable); }
 
     /**
      If you need to wrap a regular Java array outside this project to perform
      a transformation on it, this method is the most convenient, efficient way to do so.
      */
     @SafeVarargs
-    public static <T> UnmodIterable<T> xformArray(T... items) {
+    public static <T> @NotNull UnmodIterable<T> xformArray(T... items) {
         return Xform.of(Arrays.asList(items));
     }
 
@@ -281,9 +285,10 @@ public final class StaticImports {
 //    }
 //
     /** Wrap a String (or CharSequence) to perform a Character-by-Character transformation on it. */
-    public static UnmodIterable<Character> xformChars(CharSequence seq) {
+    public static @NotNull UnmodIterable<Character> xformChars(CharSequence seq) {
         //noinspection Convert2Lambda
         return new UnmodIterable<Character>() {
+            @NotNull
             @Override public UnmodIterator<Character> iterator() {
                 return new UnmodIterator<Character>() {
                     private int idx = 0;

@@ -15,6 +15,7 @@ package org.organicdesign.fp.collections;
 
 import java.util.Map;
 
+import org.jetbrains.annotations.NotNull;
 import org.organicdesign.fp.oneOf.Option;
 
 /**
@@ -23,30 +24,31 @@ import org.organicdesign.fp.oneOf.Option;
  */
 public interface BaseMap<K,V> extends UnmodMap<K,V> {
     /** Returns an option of the key/value pair associated with this key */
-    Option<UnEntry<K,V>> entry(K key);
+    @NotNull Option<UnEntry<K,V>> entry(K key);
 
     /** Returns a new map with the given key/value added */
-    BaseMap<K,V> assoc(K key, V val);
+    @NotNull BaseMap<K,V> assoc(K key, V val);
 
     /** Returns a new map with an immutable copy of the given entry added */
-    default BaseMap<K,V> assoc(Map.Entry<K,V> entry) {
+    default @NotNull BaseMap<K,V> assoc(@NotNull Map.Entry<K,V> entry) {
         return assoc(entry.getKey(), entry.getValue());
     }
 
     /** Returns a new map with the given key/value removed */
-    BaseMap<K,V> without(K key);
+    @NotNull BaseMap<K,V> without(K key);
 
     /**
      Returns a view of the mappings contained in this map.  The set should actually contain
      UnmodMap.Entry items, but that return signature is illegal in Java, so you'll just have to
      remember.
      */
-    @Override BaseSet<Entry<K,V>> entrySet();
+    @Override @NotNull BaseSet<Entry<K,V>> entrySet();
 //        return map(e -> (Map.Entry<K,V>) e)
 //                .toImSet();
 //    }
 
     /** Returns a view of the keys contained in this map. */
+    @NotNull
     @Override BaseSet<K> keySet();
 
     @SuppressWarnings("unchecked")

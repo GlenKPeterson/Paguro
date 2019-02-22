@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.organicdesign.fp.collections.PersistentTreeMap.Box;
 import org.organicdesign.fp.function.Fn2;
 import org.organicdesign.fp.oneOf.Option;
@@ -118,24 +120,23 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
 
 //    interface IFn {}
 
-    final public static PersistentHashMap<Object,Object> EMPTY =
+    final public static @NotNull PersistentHashMap<Object,Object> EMPTY =
             new PersistentHashMap<>(null, 0, null, false, null);
 
     @SuppressWarnings("unchecked")
-    public static <K,V> PersistentHashMap<K,V> empty() { return (PersistentHashMap<K,V>) EMPTY; }
+    public static <K,V> @NotNull PersistentHashMap<K,V> empty() { return (PersistentHashMap<K,V>) EMPTY; }
 
     /** Works around some type inference limitations of Java 8. */
-    public static <K,V> MutHashMap<K,V> emptyMutable() {
+    public static <K,V> @NotNull MutHashMap<K,V> emptyMutable() {
         return PersistentHashMap.<K,V>empty().mutable();
     }
 
-    @SuppressWarnings("unchecked")
-    public static <K,V> PersistentHashMap<K,V> empty(Equator<K> e) {
+    public static <K,V> @NotNull PersistentHashMap<K,V> empty(Equator<K> e) {
         return new PersistentHashMap<>(e, 0, null, false, null);
     }
 
     /** Works around some type inference limitations of Java 8. */
-    public static <K,V> MutHashMap<K,V> emptyMutable(Equator<K> e) {
+    public static <K,V> @NotNull MutHashMap<K,V> emptyMutable(Equator<K> e) {
         return PersistentHashMap.<K,V>empty(e).mutable();
     }
 
@@ -152,7 +153,9 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
      Entries.
      */
     @SuppressWarnings("WeakerAccess")
-    public static <K,V> PersistentHashMap<K,V> ofEq(Equator<K> eq, Iterable<Map.Entry<K,V>> es) {
+    public static <K,V> @NotNull PersistentHashMap<K,V> ofEq(
+            Equator<K> eq,
+            @Nullable Iterable<Map.Entry<K,V>> es) {
         if (es == null) { return empty(eq); }
         MutHashMap<K,V> map = emptyMutable(eq);
         for (Map.Entry<K,V> entry : es) {
@@ -188,15 +191,20 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
     }
 
     // ==================================== Instance Variables ====================================
-    private final Equator<K> equator;
+    private final @NotNull Equator<K> equator;
     private final int size;
-    private transient final INode<K,V> root;
+    private transient final @Nullable INode<K,V> root;
     private final boolean hasNull;
     private final V nullValue;
 
     // ======================================== Constructor ========================================
-    private PersistentHashMap(Equator<K> eq, int sz, INode<K,V> root, boolean hasNull,
-                              V nullValue) {
+    private PersistentHashMap(
+            @Nullable Equator<K> eq,
+            int sz,
+            @Nullable INode<K,V> root,
+            boolean hasNull,
+            V nullValue
+    ) {
         this.equator = (eq == null) ? Equator.defaultEquator() : eq;
         this.size = sz;
         this.root = root;
@@ -263,6 +271,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
     /** {@inheritDoc} */
     @Override public Equator<K> equator() { return equator; }
 
+    @NotNull
     @Override public PersistentHashMap<K,V> assoc(K key, V val) {
         if(key == null) {
             if (hasNull && (val == nullValue)) { return this; }
@@ -278,10 +287,12 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
                                        hasNull, nullValue);
     }
 
+    @NotNull
     @Override public MutHashMap<K,V> mutable() {
         return new MutHashMap<>(this);
     }
 
+    @NotNull
     @Override public Option<UnmodMap.UnEntry<K,V>> entry(K key) {
         if (key == null) {
             return hasNull ? Option.some(Tuple2.of(null, nullValue)) : Option.none();
@@ -294,21 +305,24 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
     }
 
     // The iterator methods are identical to the Mutable version of this class below.
+    @NotNull
     @Override public UnmodIterator<UnEntry<K,V>> iterator() {
         return iterator(Tuple2::of);
     }
 
+    @NotNull
     @SuppressWarnings("unchecked")
     @Override public UnmodIterator<K> keyIterator() {
         return iterator(Fn2.Singletons.FIRST);
     }
 
+    @NotNull
     @SuppressWarnings("unchecked")
     @Override public UnmodIterator<V> valIterator() {
         return iterator(Fn2.Singletons.SECOND);
     }
 
-    private <R> UnmodIterator<R> iterator(Fn2<K, V, R> aFn) {
+    private <R> @NotNull UnmodIterator<R> iterator(Fn2<K, V, R> aFn) {
         final UnmodIterator<R> rootIter = (root == null) ? emptyUnmodIterator()
                                                          : root.iterator(aFn);
         return (hasNull) ? new Iter<>(rootIter, aFn, nullValue)
@@ -354,7 +368,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
     /** {@inheritDoc} */
     @Override public int size() { return size; }
 
-    @SuppressWarnings("unchecked")
+    @NotNull
     @Override public PersistentHashMap<K,V> without(K key){
         if(key == null)
             return hasNull ? new PersistentHashMap<>(equator, size - 1, root, false, null) : this;
@@ -403,6 +417,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
 
         @Override public Equator<K> equator() { return equator; }
 
+        @NotNull
         @Override public MutHashMap<K,V> assoc(K key, V val) {
             ensureEditable();
             if (key == null) {
@@ -424,6 +439,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
             return this;
         }
 
+        @NotNull
         @Override public Option<UnEntry<K,V>> entry(K key) {
             ensureEditable();
             if (key == null) {
@@ -444,15 +460,18 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
 //        }
 
         // The iterator methods are a duplicate of the same methods in the Persistent version of this class above.
+        @NotNull
         @Override public UnmodIterator<UnEntry<K,V>> iterator() {
             return iterator(Tuple2::of);
         }
 
+        @NotNull
         @SuppressWarnings("unchecked")
         @Override public UnmodIterator<K> keyIterator() {
             return iterator(Fn2.Singletons.FIRST);
         }
 
+        @NotNull
         @SuppressWarnings("unchecked")
         @Override public UnmodIterator<V> valIterator() {
             return iterator(Fn2.Singletons.SECOND);
@@ -465,6 +484,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
                              : rootIter;
         }
 
+        @NotNull
         @Override public final MutHashMap<K,V> without(K key) {
             ensureEditable();
             if (key == null) {
@@ -591,6 +611,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
 
 //        @Override public Sequence<UnmodMap.UnEntry<K,V>> nodeSeq(){ return Seq.create(array); }
 
+        @NotNull
         @Override public UnmodIterator<UnEntry<K,V>> iterator() {
             return iterator(Tuple2::of);
         }

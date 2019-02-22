@@ -14,6 +14,9 @@
 
 package org.organicdesign.fp;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 /**
  A dumping ground for utility functions that aren't useful enough to belong in
  {@link StaticImports}.
@@ -25,7 +28,7 @@ public class FunctionUtils {
         throw new UnsupportedOperationException("No instantiation");
     }
 
-    public static String stringify(Object o) {
+    public static @NotNull String stringify(@Nullable Object o) {
         if (o == null) { return "null"; }
         if (o instanceof String) { return "\"" + o + "\""; }
         return o.toString();
@@ -168,7 +171,7 @@ public class FunctionUtils {
 //        return sB.toString();
 //    }
 
-    public static String ordinal(final int origI) {
+    public static @NotNull String ordinal(final int origI) {
         final int i = (origI < 0) ? -origI : origI;
         final int modTen = i % 10;
         if ( (modTen < 4) && (modTen > 0)) {

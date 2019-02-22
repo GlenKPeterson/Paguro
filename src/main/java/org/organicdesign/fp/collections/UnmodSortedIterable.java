@@ -7,6 +7,8 @@ import java.util.Objects;
 import java.util.SortedMap;
 import java.util.SortedSet;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  An unmodifiable Iterable, with guaranteed order.  The signature of this interface is nearly
  identical to UnmodIterable, but implementing this interface represents a contract to always return
@@ -50,6 +52,7 @@ public interface UnmodSortedIterable<T> extends UnmodIterable<T> {
             private Implementation(SortedSet<S> s) { ss = s; }
 
             /** Returns items in a guaranteed order. */
+            @NotNull
             @Override
             public UnmodSortedIterator<S> iterator() {
                 return new UnmodSortedIterator.Wrapper<>(ss.iterator());
@@ -75,6 +78,7 @@ public interface UnmodSortedIterable<T> extends UnmodIterable<T> {
             private Implementation(List<S> s) { ss = s; }
 
             /** Returns items in a guaranteed order. */
+            @NotNull
             @Override
             public UnmodSortedIterator<S> iterator() {
                 return new UnmodSortedIterator.Wrapper<>(ss.iterator());
@@ -119,6 +123,7 @@ public interface UnmodSortedIterable<T> extends UnmodIterable<T> {
             private Implementation(SortedMap<K1,V1> s) { m = s; }
 
             /** Returns items in a guaranteed order. */
+            @NotNull
             @Override public UnmodSortedIterator<UnmodMap.UnEntry<K1,V1>> iterator() {
                 return new UnmodMap.UnEntry.EntryToUnEntrySortedIter<>(m.entrySet().iterator());
             }
@@ -128,6 +133,7 @@ public interface UnmodSortedIterable<T> extends UnmodIterable<T> {
 
     // ========================================= Instance =========================================
     /** Returns items in a guaranteed order. */
+    @NotNull
     @Override
     UnmodSortedIterator<T> iterator();
 }

@@ -13,6 +13,8 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  A mutate-in-place interface using the same copy-on-write methods as {@link BaseList} and
  {@link ImList} so that you can treat mutable and immutable lists the same.
@@ -41,6 +43,7 @@ public interface MutList<E> extends BaseList<E> {
     ImList<E> immutable();
 
     /** {@inheritDoc} */
+    @NotNull
     @Override default MutList<E> concat(Iterable<? extends E> es) {
         for (E e : es) {
             this.append(e);

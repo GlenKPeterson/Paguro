@@ -13,15 +13,20 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
+import org.jetbrains.annotations.NotNull;
+
 /** An immutable sorted set interface */
 public interface ImSortedSet<E> extends BaseSet<E>, UnmodSortedSet<E> {
     /** {@inheritDoc} */
+    @NotNull
     @Override ImSortedSet<E> put(E e);
 
     /** {@inheritDoc} */
+    @NotNull
     @Override ImSortedSet<E> without(E key);
 
     /** {@inheritDoc} */
+    @NotNull
     @SuppressWarnings("unchecked")
     @Override default ImSortedSet<E> headSet(E toElement) {
         return (ImSortedSet<E>) UnmodSortedSet.super.headSet(toElement);
@@ -30,20 +35,24 @@ public interface ImSortedSet<E> extends BaseSet<E>, UnmodSortedSet<E> {
     /**
      Iterates over contents in a guaranteed order. {@inheritDoc}
      */
+    @NotNull
     @Override UnmodSortedIterator<E> iterator();
 
     /**
      Return the elements in this set from the start element (inclusive) to the end element
      (exclusive)
      */
+    @NotNull
     @Override ImSortedSet<E> subSet(E fromElement, E toElement);
 
     /** {@inheritDoc} */
     // Note: there is no simple default implementation because subSet() is exclusive of the given
     // end element and there is no way to reliably find an element exactly larger than last().
     // Otherwise we could just return subSet(fromElement, last());
+    @NotNull
     @Override ImSortedSet<E> tailSet(E fromElement);
 
+    @NotNull
     @Override default ImSortedSet<E> union(Iterable<? extends E> iter) {
         ImSortedSet<E> ret = this;
         for (E e : iter) {

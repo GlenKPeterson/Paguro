@@ -1,5 +1,6 @@
 package org.organicdesign.fp.collections;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -17,6 +18,7 @@ public class UnmodSetTest {
             return false;
         }
 
+        @NotNull
         @Override public UnmodIterator<String> iterator() {
             return new UnmodIterator<String>() {
                 int i = 0;

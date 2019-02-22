@@ -1,5 +1,6 @@
 package org.organicdesign.fp.collections;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.HashSet;
@@ -22,11 +23,13 @@ public class MutSetTest {
             return new ImUnsortedSetTest.TestSet<>(inner);
         }
 
+        @NotNull
         @Override public MutSet<E> put(E val) {
             inner.add(val);
             return this;
         }
 
+        @NotNull
         @Override public MutSet<E> without(E key) {
             inner.remove(key);
             return this;
@@ -36,6 +39,7 @@ public class MutSetTest {
 
         @Override public boolean contains(Object o) { return inner.contains(o); }
 
+        @NotNull
         @Override public UnmodIterator<E> iterator() {
             return new UnmodIterator<E>() {
                 private final Iterator<E> iter = inner.iterator();

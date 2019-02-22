@@ -14,6 +14,8 @@
 
 package org.organicdesign.fp.collections;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  Interface for mutable (hash) set builder.
  */
@@ -23,15 +25,18 @@ public interface MutSet<E> extends BaseSet<E> {
     ImSet<E> immutable();
 
     /** {@inheritDoc} */
+    @NotNull
     @Override
     MutSet<E> put(E val);
 
     /** {@inheritDoc} */
+    @NotNull
     @Override default MutSet<E> union(Iterable<? extends E> iter) {
         return concat(iter).toMutSet();
     }
 
     /** {@inheritDoc} */
+    @NotNull
     @Override
     MutSet<E> without(E key);
 }

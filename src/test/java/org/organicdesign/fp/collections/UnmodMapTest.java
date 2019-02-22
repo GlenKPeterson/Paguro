@@ -23,6 +23,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.TestUtilities;
@@ -44,6 +45,7 @@ public class UnmodMapTest {
             }
         }
 
+        @NotNull
         @Override public UnmodIterator<UnEntry<K,V>> iterator() {
             return UnmodMap.UnEntry.entryIterToUnEntryUnIter(inner.entrySet().iterator());
         }
@@ -234,9 +236,9 @@ public class UnmodMapTest {
     @Test (expected = UnsupportedOperationException.class)
     public void unsupportedOpPut() { unMap.put(null, null); }
 
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpPutAll() { unMap.putAll(null); }
+//    @SuppressWarnings("deprecation")
+//    @Test (expected = UnsupportedOperationException.class)
+//    public void unsupportedOpPutAll() { unMap.putAll(null); }
 
     @SuppressWarnings("deprecation")
     @Test (expected = UnsupportedOperationException.class)

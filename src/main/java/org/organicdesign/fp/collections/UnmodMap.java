@@ -13,6 +13,7 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
+import org.jetbrains.annotations.NotNull;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import java.io.Serializable;
@@ -128,7 +129,6 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
          {@link ImMap#assoc(Object, Object)}
          instead because it returns a new map.
          */
-        @SuppressWarnings("deprecation")
         @Override @Deprecated default V setValue(V value) {
             throw new UnsupportedOperationException("Modification attempted");
         }
@@ -168,7 +168,6 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
      */
     // This is the place to define this slow operation so that it can be used in
     // values().contains(), UnmodSortedMap.containsValue() and UnmodSortedMap.values().contains().
-    @SuppressWarnings("SuspiciousMethodCalls")
     @Override default boolean containsValue(Object value) {
         for (UnEntry<K,V> item : this) {
             if (Objects.equals(item.getValue(), value)) { return true; }
@@ -183,7 +182,7 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
 
      {@inheritDoc}
      */
-    @Override default UnmodSet<Entry<K,V>> entrySet() {
+    @Override default @NotNull UnmodSet<Entry<K,V>> entrySet() {
         class EntrySet extends AbstractUnmodSet<Entry<K,V>>
                 implements Serializable {
             // For serializable.  Make sure to change whenever internal data format changes.
@@ -201,6 +200,7 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
                 return Objects.equals(entry.getValue(), value);
             }
 
+            @NotNull
             @SuppressWarnings("unchecked")
             @Override public UnmodIterator<Entry<K,V>> iterator() {
                 // Converting from
@@ -263,7 +263,7 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
 
      {@inheritDoc}
      */
-    @Override default UnmodSet<K> keySet() {
+    @Override default @NotNull UnmodSet<K> keySet() {
         class KeySet extends AbstractUnmodSet<K> implements Serializable {
             // For serializable.  Make sure to change whenever internal data format changes.
             private static final long serialVersionUID = 20160903104400L;
@@ -274,6 +274,7 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
             @SuppressWarnings("SuspiciousMethodCalls")
             @Override public boolean contains(Object o) { return parent.containsKey(o); }
 
+            @NotNull
             @Override public UnmodIterator<K> iterator() {
                 return parent.keyIterator();
             }
@@ -286,11 +287,11 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
         return new KeySet(this);
     }
 
-    default UnmodIterator<K> keyIterator() {
+    default @NotNull UnmodIterator<K> keyIterator() {
         return new UnEntry.UnmodKeyIter<>(this.iterator());
     }
 
-    default UnmodIterator<V> valIterator() {
+    default @NotNull UnmodIterator<V> valIterator() {
         return new UnEntry.UnmodValIter<>(this.iterator());
     }
 
@@ -309,7 +310,7 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
         throw new UnsupportedOperationException("Modification attempted");
     }
     /** Not allowed - this is supposed to be unmodifiable */
-    @Override @Deprecated default void putAll(Map<? extends K, ? extends V> m) {
+    @Override @Deprecated default void putAll(@NotNull Map<? extends K, ? extends V> m) {
         throw new UnsupportedOperationException("Modification attempted");
     }
     /** Not allowed - this is supposed to be unmodifiable */
@@ -372,7 +373,7 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
 
      {@inheritDoc}
      */
-    @Override @Deprecated default UnmodCollection<V> values() {
+    @Override @Deprecated default @NotNull UnmodCollection<V> values() {
         class Impl implements UnmodCollection<V>, Serializable {
             // For serializable.  Make sure to change whenever internal data format changes.
             private static final long serialVersionUID = 20160903104400L;
@@ -382,6 +383,7 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
 
             @SuppressWarnings("SuspiciousMethodCalls")
             @Override public boolean contains(Object o) { return parent.containsValue(o); }
+            @NotNull
             @Override public UnmodIterator<V> iterator() {
                 return parent.valIterator();
             }

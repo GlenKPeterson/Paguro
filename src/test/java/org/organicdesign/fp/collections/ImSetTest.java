@@ -1,5 +1,6 @@
 package org.organicdesign.fp.collections;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -30,12 +31,14 @@ public class ImSetTest {
             return new MutSetTest.TestSet<>(inner);
         }
 
+        @NotNull
         @Override public ImSet<E> put(E e) {
             Set<E> next = dup(inner);
             next.add(e);
             return new TestSet<>(next);
         }
 
+        @NotNull
         @Override public ImSet<E> without(E key) {
             Set<E> next = dup(inner);
             next.remove(key);
@@ -46,6 +49,7 @@ public class ImSetTest {
 
         @Override public boolean contains(Object o) { return inner.contains(o); }
 
+        @NotNull
         @Override public UnmodIterator<E> iterator() {
             return new UnmodIterator<E>() {
                 Iterator<E> iter = inner.iterator();

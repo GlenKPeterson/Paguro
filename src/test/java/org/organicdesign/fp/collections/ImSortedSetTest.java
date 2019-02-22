@@ -1,5 +1,6 @@
 package org.organicdesign.fp.collections;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -27,18 +28,21 @@ public class ImSortedSetTest {
                     : new TreeSet<>(comp);
             inner.addAll(items);
         }
+        @NotNull
         @Override public ImSortedSet<T> put(T s) {
             SortedSet<T> next = dup(inner);
             next.add(s);
             return new TestSortSet<>(next, inner.comparator());
         }
 
+        @NotNull
         @Override public ImSortedSet<T> without(T key) {
             SortedSet<T> next = dup(inner);
             next.remove(key);
             return new TestSortSet<>(next, inner.comparator());
         }
 
+        @NotNull
         @Override public UnmodSortedIterator<T> iterator() {
             return new UnmodSortedIterator<T>() {
                 Iterator<T> iter = inner.iterator();
@@ -47,11 +51,13 @@ public class ImSortedSetTest {
             };
         }
 
+        @NotNull
         @Override public ImSortedSet<T> subSet(T fromElement, T toElement) {
             SortedSet<T> next = dup(inner);
             return new TestSortSet<>(next.subSet(fromElement, toElement), inner.comparator());
         }
 
+        @NotNull
         @Override public ImSortedSet<T> tailSet(T fromElement) {
             SortedSet<T> next = dup(inner);
             return new TestSortSet<>(next.tailSet(fromElement), inner.comparator());

@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.organicdesign.fp.TestUtilities;
 
@@ -49,11 +50,13 @@ public class UnmodSortedMapTest {
         @Override
         public Comparator<? super K> comparator() { return inner.comparator(); }
 
+        @NotNull
         @Override
         public UnmodSortedMap<K,V> subMap(K fromKey, K toKey) {
             return new TestMap<>(inner.subMap(fromKey, toKey), inner.comparator());
         }
 
+        @NotNull
         @Override
         public UnmodSortedMap<K,V> tailMap(K fromKey) {
             return new TestMap<>(inner.tailMap(fromKey), inner.comparator());
@@ -65,6 +68,7 @@ public class UnmodSortedMapTest {
         @Override
         public K lastKey() { return inner.lastKey(); }
 
+        @NotNull
         @Override public UnmodSortedIterator<UnEntry<K,V>> iterator() {
             return UnmodSortedIterable.castFromSortedMap(inner).iterator();
         }

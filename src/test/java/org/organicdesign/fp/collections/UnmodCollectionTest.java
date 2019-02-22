@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -44,6 +45,7 @@ public class UnmodCollectionTest {
             return false;
         }
 
+        @NotNull
         @Override public UnmodIterator<T> iterator() {
             Iterator<T> iter = items.iterator();
             return new UnmodIterator<T>() {
@@ -113,7 +115,7 @@ public class UnmodCollectionTest {
         // sets have no duplicates and may or may not be ordered.
         assertTrue(Arrays.asList(sticksMay).containsAll(unColl));
 
-        assertTrue(unColl.containsAll(null));
+//        assertTrue(unColl.containsAll(null));
         assertTrue(unColl.containsAll(Collections.unmodifiableCollection(Collections.emptySet())));
         assertFalse(Collections.emptySet().containsAll(unColl));
     }

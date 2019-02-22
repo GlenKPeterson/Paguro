@@ -13,6 +13,7 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
+import org.jetbrains.annotations.NotNull;
 import org.organicdesign.fp.oneOf.Option;
 
 /**
@@ -34,6 +35,7 @@ public interface BaseList<E> extends UnmodList<E> {
      @param es the values to insert
      @return a new ImList with the additional items at the end.
      */
+    @NotNull
     @Override BaseList<E> concat(Iterable<? extends E> es);
 
     // I don't know if this is a good idea or not and I don't want to have to support it if not.
@@ -57,6 +59,7 @@ public interface BaseList<E> extends UnmodList<E> {
     }
 
     /** {@inheritDoc} */
+    @NotNull
     @Override default Option<E> head() {
         return size() > 0 ? Option.some(get(0)) : Option.none();
     }

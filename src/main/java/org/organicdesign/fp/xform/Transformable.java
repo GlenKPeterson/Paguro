@@ -21,6 +21,8 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.ImMap;
 import org.organicdesign.fp.collections.ImSet;
@@ -65,7 +67,7 @@ public interface Transformable<T> {
      @param list the items to add
      @return a new Transformable with the items added.
      */
-    Transformable<T> concat(Iterable<? extends T> list);
+    @NotNull Transformable<T> concat(Iterable<? extends T> list);
 
     /**
      Ignore the first n items and return only those that come after.
@@ -75,21 +77,21 @@ public interface Transformable<T> {
      @param numItems the number of items at the beginning of this Transformable to ignore
      @return a Transformable with the specified number of items ignored.
      */
-    Transformable<T> drop(long numItems);
+    @NotNull Transformable<T> drop(long numItems);
 
     /**
      Ignore leading items until the given predicate returns false.
      @param predicate the predicate (test function)
      @return a Transformable with the matching leading items ignored.
      */
-    Transformable<T> dropWhile(Fn1<? super T,Boolean> predicate);
+    @NotNull Transformable<T> dropWhile(Fn1<? super T,Boolean> predicate);
 
     /**
      Return only the items for which the given predicate returns true.
      @return a Transformable of only the filtered items.
      @param predicate a function that returns true for items to keep, false for items to drop
      */
-    Transformable<T> filter(Fn1<? super T,Boolean> predicate);
+    @NotNull Transformable<T> filter(Fn1<? super T,Boolean> predicate);
 
     /**
      Returns the first item produced by this transform.  If the source is unordered, there is no guarantee about which
@@ -102,7 +104,7 @@ public interface Transformable<T> {
 
      @return an eagerly evaluated result which is a single item.
      */
-    default Option<T> head() {
+    default @NotNull Option<T> head() {
         return foldUntil(Option.none(),
                          (accum, item) -> Option.someOrNullNoneOf(item),
                          Fn2.first())
@@ -119,7 +121,7 @@ public interface Transformable<T> {
      return is smaller, use filter followed by map if possible, or vice versa if not.
      @param f yields a Transformable of 0 or more results for each input item.
      */
-    <U> Transformable<U> flatMap(Fn1<? super T,Iterable<U>> f);
+    <U> @NotNull Transformable<U> flatMap(Fn1<? super T,Iterable<U>> f);
 
     /**
      Apply the function to each item, accumulating the result in u.  Other transformations can be
@@ -163,9 +165,9 @@ public interface Transformable<T> {
      @return an {@link Or} where the {@link Or#good()} is an eagerly evaluated result and
      {@link Or#bad()} is whatever terminateWhen returned.
      */
-    <G,B> Or<G,B> foldUntil(G accum,
-                            Fn2<? super G,? super T,B> terminator,
-                            Fn2<? super G,? super T,G> reducer);
+    <G,B> @NotNull Or<G,B> foldUntil(G accum,
+                            @Nullable Fn2<? super G,? super T,B> terminator,
+                            @NotNull Fn2<? super G,? super T,G> reducer);
 
     /**
      Transform each item into exactly one new item using the given function.
@@ -173,21 +175,21 @@ public interface Transformable<T> {
      @return a Transformable of the same size as the input (may contain duplicates) containing the
      return values of the given function in the same order as the input values.
      */
-    <U> Transformable<U> map(Fn1<? super T,? extends U> func);
+    <U> @NotNull Transformable<U> map(Fn1<? super T,? extends U> func);
 
     /**
      Add items to the beginning of this Transformable ("precat" is a PREpending version of conCAT).
      @param list the items to add
      @return a new Transformable with the items added.
      */
-    Transformable<T> precat(Iterable<? extends T> list);
+    @NotNull Transformable<T> precat(Iterable<? extends T> list);
 
     /**
      Return only the first n items.
      @param numItems the maximum number of items in the returned view.
      @return a Transformable containing no more than the specified number of items.
      */
-    Transformable<T> take(long numItems);
+    @NotNull Transformable<T> take(long numItems);
 
     /**
      Return items from the beginning until the given predicate returns false.
@@ -196,7 +198,7 @@ public interface Transformable<T> {
      beginning of the transformable, that satisfy the given predicate.  This could be 0 items to
      the entire transformable.
      */
-    Transformable<T> takeWhile(Fn1<? super T,Boolean> predicate);
+    @NotNull Transformable<T> takeWhile(Fn1<? super T,Boolean> predicate);
 
 //    /**
 //     Returns an Object[] for backward compatibility
@@ -210,12 +212,12 @@ public interface Transformable<T> {
     /**
      Realize a thread-safe immutable list to access items quickly O(log32 n) by index.
      */
-    default ImList<T> toImList() { return toMutList().immutable(); }
+    default @NotNull ImList<T> toImList() { return toMutList().immutable(); }
 
     /**
      Realize a thread-safe immutable RRB-Tree to access items quickly O(log32 n) by index.
      */
-    default ImRrbt<T> toImRrbt() { return toMutRrbt().immutable(); }
+    default @NotNull ImRrbt<T> toImRrbt() { return toMutRrbt().immutable(); }
 
     /**
      Realize an unordered immutable hash map to very quickly O(1) look up values by key, but don't
@@ -229,7 +231,7 @@ public interface Transformable<T> {
 
      @return An immutable map
      */
-    default <K,V> ImMap<K,V> toImMap(Fn1<? super T,Entry<K,V>> f1) {
+    default <K,V> @NotNull ImMap<K,V> toImMap(Fn1<? super T,Entry<K,V>> f1) {
         return toMutMap(f1).immutable();
     }
 
@@ -240,7 +242,7 @@ public interface Transformable<T> {
 
      @return An immutable set (with duplicates removed)
      */
-    default ImSet<T> toImSet() { return toMutSet().immutable(); }
+    default @NotNull ImSet<T> toImSet() { return toMutSet().immutable(); }
 
     /**
      Realize an immutable, ordered (tree) map to quickly O(log2 n) look up values by key, but still
@@ -259,7 +261,7 @@ public interface Transformable<T> {
 
      @return a new PersistentTreeMap of the specified comparator and the given key/value pairs
      */
-    default <K,V> ImSortedMap<K,V> toImSortedMap(Comparator<? super K> comp,
+    default <K,V> @NotNull ImSortedMap<K,V> toImSortedMap(Comparator<? super K> comp,
                                                  Fn1<? super T,Entry<K,V>> f1) {
         return fold((ImSortedMap<K, V>) PersistentTreeMap.<K, V>empty(comp),
                     (ts, t) -> ts.assoc(f1.apply(t)));
@@ -273,18 +275,18 @@ public interface Transformable<T> {
                        Fn2.defaultComparator() here.
      @return An immutable set (with duplicates removed).  Null elements are not allowed.
      */
-    default ImSortedSet<T> toImSortedSet(Comparator<? super T> comparator) {
+    default @NotNull ImSortedSet<T> toImSortedSet(Comparator<? super T> comparator) {
         return fold(PersistentTreeSet.ofComp(comparator), PersistentTreeSet::put);
     }
 
     /** Realize a mutable list.  Use toImList unless you need to modify the list in-place. */
-    default MutList<T> toMutList() {
+    default @NotNull MutList<T> toMutList() {
         return fold(PersistentVector.emptyMutable(),
                     MutList<T>::append);
     }
 
     /** Realize a mutable RRB-Tree.  Use toImRrbt unless you need to modify the list in-place. */
-    default MutRrbt<T> toMutRrbt() {
+    default @NotNull MutRrbt<T> toMutRrbt() {
         return fold(RrbTree.emptyMutable(),
                     MutRrbt<T>::append);
     }
@@ -297,7 +299,9 @@ public interface Transformable<T> {
 
      @return A map with the keys from the given set, mapped to values using the given function.
      */
-    default <K,V> MutMap<K,V> toMutMap(final Fn1<? super T,Entry<K,V>> f1) {
+    default <K,V> @NotNull MutMap<K,V> toMutMap(
+            @NotNull Fn1<? super T,Entry<K,V>> f1
+    ) {
         return fold(PersistentHashMap.emptyMutable(),
                     (MutMap<K,V> ts, T t) -> ts.assoc(f1.apply(t)));
     }
@@ -312,8 +316,9 @@ public interface Transformable<T> {
 
      @return A map with the keys from the given set, mapped to values using the given function.
      */
-    default <K,V> SortedMap<K,V>
-    toMutSortedMap(Comparator<? super K> comp, final Fn1<? super T,Entry<K,V>> f1) {
+    default <K,V> @NotNull SortedMap<K,V> toMutSortedMap(
+            @Nullable Comparator<? super K> comp,
+            @NotNull Fn1<? super T,Entry<K,V>> f1) {
         return fold(new TreeMap<>(comp), (ts, t) -> {
             Entry<K,V> entry = f1.apply(t);
             ts.put(entry.getKey(), entry.getValue());
@@ -326,7 +331,7 @@ public interface Transformable<T> {
 
      @return A mutable set (with duplicates removed)
      */
-    default MutSet<T> toMutSet() {
+    default @NotNull MutSet<T> toMutSet() {
         return fold(PersistentHashSet.emptyMutable(),
                     PersistentHashSet.MutHashSet::put);
     }
@@ -338,7 +343,7 @@ public interface Transformable<T> {
                        Fn2.defaultComparator() here.
      @return A mutable sorted set
      */
-    default SortedSet<T> toMutSortedSet(Comparator<? super T> comparator) {
+    default @NotNull SortedSet<T> toMutSortedSet(@Nullable Comparator<? super T> comparator) {
         return fold(new TreeSet<>(comparator), (ts, t) -> {
             ts.add(t);
             return ts;

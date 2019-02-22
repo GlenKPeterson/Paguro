@@ -17,6 +17,8 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import org.jetbrains.annotations.NotNull;
+
 /** An unmodifiable set */
 public interface UnmodSet<E> extends UnmodCollection<E>, Set<E> {
 
@@ -29,7 +31,7 @@ public interface UnmodSet<E> extends UnmodCollection<E>, Set<E> {
     }
     /** Not allowed - this is supposed to be unmodifiable */
     @SuppressWarnings("deprecation")
-    @Override @Deprecated default boolean addAll(Collection<? extends E> c) {
+    @Override @Deprecated default boolean addAll(@NotNull Collection<? extends E> c) {
         throw new UnsupportedOperationException("Modification attempted");
     }
     /** Not allowed - this is supposed to be unmodifiable */
@@ -46,7 +48,7 @@ public interface UnmodSet<E> extends UnmodCollection<E>, Set<E> {
     @Override boolean contains(Object o);
 
     /** {@inheritDoc} */
-    @Override default boolean containsAll(Collection<?> items) {
+    @Override default boolean containsAll(@NotNull Collection<?> items) {
         for (Object item : items) {
             if (!this.contains(item)) { return false; }
         }
@@ -65,6 +67,7 @@ public interface UnmodSet<E> extends UnmodCollection<E>, Set<E> {
      Iterates over contents with no guarantees about their ordering.
      {@inheritDoc}
      */
+    @NotNull
     @Override
     UnmodIterator<E> iterator();
 
@@ -75,12 +78,12 @@ public interface UnmodSet<E> extends UnmodCollection<E>, Set<E> {
     }
     /** Not allowed - this is supposed to be unmodifiable */
     @SuppressWarnings("deprecation")
-    @Override @Deprecated default boolean removeAll(Collection<?> c) {
+    @Override @Deprecated default boolean removeAll(@NotNull Collection<?> c) {
         throw new UnsupportedOperationException("Modification attempted");
     }
     /** Not allowed - this is supposed to be unmodifiable */
     @SuppressWarnings("deprecation")
-    @Override @Deprecated default boolean retainAll(Collection<?> c) {
+    @Override @Deprecated default boolean retainAll(@NotNull Collection<?> c) {
         throw new UnsupportedOperationException("Modification attempted");
     }
 
@@ -95,6 +98,7 @@ public interface UnmodSet<E> extends UnmodCollection<E>, Set<E> {
 
      {@inheritDoc}
      */
+    @NotNull
     @Override default Object[] toArray() { return UnmodCollection.super.toArray(); }
 
     /**
@@ -110,8 +114,9 @@ public interface UnmodSet<E> extends UnmodCollection<E>, Set<E> {
 
      {@inheritDoc}
      */
+    @NotNull
     @SuppressWarnings("SuspiciousToArrayCall")
-    @Override default <T> T[] toArray(T[] as) { return UnmodCollection.super.toArray(as); }
+    @Override default <T> T[] toArray(@NotNull T[] as) { return UnmodCollection.super.toArray(as); }
 
 // Methods inherited from interface java.util.Collection
 // parallelStream, removeIf, stream

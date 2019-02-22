@@ -14,6 +14,8 @@
 
 package org.organicdesign.fp.xform;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.organicdesign.fp.collections.UnmodIterable;
 import org.organicdesign.fp.collections.UnmodIterator;
 import org.organicdesign.fp.function.Fn1;
@@ -188,9 +190,9 @@ public abstract class Xform<A> implements UnmodIterable<A> {
         }
 
         Operation[] opArray() {
-            return list.toArray(new Operation[list.size()]);
+            return list.toArray(new Operation[0]);
         }
-        @Override public Iterator iterator() { return source.iterator(); }
+        @Override public @NotNull Iterator iterator() { return source.iterator(); }
     }
 
     /**
@@ -202,18 +204,18 @@ public abstract class Xform<A> implements UnmodIterable<A> {
     private static class AppendOp extends RunList {
         private AppendOp(RunList prv, Iterable src) { super(prv, src); }
 
+        @NotNull
         @Override public Iterator iterator() {
             @SuppressWarnings("Convert2Lambda")
             ArrayList prevSrc = _fold(prev, prev.opArray(), 0, new ArrayList(),
                                       new Fn2<ArrayList,Object,ArrayList>() {
                                           @SuppressWarnings("unchecked")
                                           @Override
-                                          public ArrayList applyEx(ArrayList res, Object item) throws Exception {
+                                          public ArrayList applyEx(ArrayList res, Object item) {
                                               res.add(item);
                                               return res;
                                           }
                                       });
-            //noinspection unchecked
             return new Iterator() {
                 Iterator innerIter = prevSrc.iterator();
                 boolean usingPrevSrc = true;
@@ -241,7 +243,6 @@ public abstract class Xform<A> implements UnmodIterable<A> {
 
         AppendIterDesc(Xform<T> prev, Xform<T> s) { super(prev); src = s; }
 
-        @SuppressWarnings("unchecked")
         @Override protected RunList toRunList() {
             return new AppendOp(prevOp.toRunList(), src);
         }
@@ -263,7 +264,6 @@ public abstract class Xform<A> implements UnmodIterable<A> {
         private final long dropAmt;
         DropDesc(Xform<T> prev, long d) { super(prev); dropAmt = d; }
 
-        @SuppressWarnings("unchecked")
         @Override protected RunList toRunList() {
 //                System.out.println("in toRunList() for drop");
             RunList ret = prevOp.toRunList();
@@ -315,7 +315,7 @@ public abstract class Xform<A> implements UnmodIterable<A> {
                 // function always returns true.
                 // There are probably more efficient ways to do this, but I'm going for correct first.
                 private boolean active = true;
-                @Override public Boolean applyEx(Object o) throws Exception {
+                @Override public Boolean applyEx(Object o) {
                     if (!active) {
                         return true;
                     }
@@ -348,7 +348,6 @@ public abstract class Xform<A> implements UnmodIterable<A> {
 
         MapDesc(Xform<T> prev, Fn1<? super T,? extends U> func) { super(prev);f = func; }
 
-        @SuppressWarnings("unchecked")
         @Override protected RunList toRunList() {
             RunList ret = prevOp.toRunList();
             ret.list.add(new Operation.MapOp(f));
@@ -382,7 +381,6 @@ public abstract class Xform<A> implements UnmodIterable<A> {
         private final long take;
         TakeDesc(Xform<T> prev, long t) { super(prev); take = t; }
 
-        @SuppressWarnings("unchecked")
         @Override protected RunList toRunList() {
 //                System.out.println("in toRunList() for take");
             RunList ret = prevOp.toRunList();
@@ -439,10 +437,10 @@ public abstract class Xform<A> implements UnmodIterable<A> {
     public static final Xform EMPTY = new SourceProviderIterableDesc<>(Collections.emptyList());
 
     @SuppressWarnings("unchecked")
-    public static <T> Xform<T> empty() { return (Xform<T>) EMPTY; }
+    public static <T> @NotNull Xform<T> empty() { return (Xform<T>) EMPTY; }
 
     /** Static factory methods */
-    public static <T> Xform<T> of(Iterable<? extends T> list) {
+    public static <T> @NotNull Xform<T> of(@Nullable Iterable<? extends T> list) {
         if (list == null) { return empty(); }
         return new SourceProviderIterableDesc<>(list);
     }
@@ -507,6 +505,7 @@ public abstract class Xform<A> implements UnmodIterable<A> {
         return (H) ret;
     } // end _fold();
 
+    @NotNull
     @Override public UnmodIterator<A> iterator() {
         // TODO: I had a really fast array-list implementation that I could probably hack into this for performance (assuming it actually works).
         return toMutList().iterator();
@@ -520,8 +519,7 @@ public abstract class Xform<A> implements UnmodIterable<A> {
 //        return concat(list);
 //    }
 
-    @Override public Xform<A> concat(Iterable<? extends A> list) {
-        if (list == null) { throw new IllegalArgumentException("Can't concat a null iterable"); }
+    @Override public @NotNull Xform<A> concat(@NotNull Iterable<? extends A> list) {
         return new AppendIterDesc<>(this, new SourceProviderIterableDesc<>(list));
     }
 
@@ -536,8 +534,8 @@ public abstract class Xform<A> implements UnmodIterable<A> {
 //        return precat(list);
 //    }
 
-    @Override public Xform<A> precat(Iterable<? extends A> list) {
-        if (list == null) { throw new IllegalArgumentException("Can't precat a null iterable"); }
+    @NotNull
+    @Override public Xform<A> precat(@NotNull Iterable<? extends A> list) {
         return new AppendIterDesc<>(of(list), this);
     }
 
@@ -548,22 +546,21 @@ public abstract class Xform<A> implements UnmodIterable<A> {
 //    }
 
     /** The number of items to drop from the beginning of the output. */
+    @NotNull
     @Override public Xform<A> drop(long n) {
         if (n < 0) { throw new IllegalArgumentException("Can't drop less than zero items."); }
         return new DropDesc<>(this, n);
     }
 
     /** The number of items to drop from the beginning of the output. */
-    @Override public Xform<A> dropWhile(Fn1<? super A,Boolean> predicate) {
-        if (predicate == null) { throw new IllegalArgumentException("Can't dropWhile without a function."); }
+    @NotNull
+    @Override public Xform<A> dropWhile(@NotNull Fn1<? super A,Boolean> predicate) {
         return new DropWhileDesc<>(this, predicate);
     }
 
     /** Provides a way to collect the results of the transformation. */
-    @Override public <B> B fold(B ident, Fn2<? super B,? super A,B> reducer) {
-        if (reducer == null) {
-            throw new IllegalArgumentException("Can't fold with a null reduction function.");
-        }
+    @Override public <B> B fold(B ident,
+                                @NotNull Fn2<? super B,? super A,B> reducer) {
 
         // Construct an optimized array of OpRuns (mutable operations for this run)
         RunList runList = toRunList();
@@ -582,14 +579,11 @@ public abstract class Xform<A> implements UnmodIterable<A> {
 
      {@inheritDoc}
      */
-    @Override public <G,B> Or<G,B> foldUntil(G accum,
-                                             Fn2<? super G,? super A,B> terminator,
-                                             Fn2<? super G,? super A,G> reducer) {
+    @Override public <G,B> @NotNull Or<G,B> foldUntil(G accum,
+                                                      @Nullable Fn2<? super G,? super A,B> terminator,
+                                                      @NotNull Fn2<? super G,? super A,G> reducer) {
         if (terminator == null) {
             return Or.good(fold(accum, reducer));
-        }
-        if (reducer == null) {
-            throw new IllegalArgumentException("Can't fold with a null reduction function.");
         }
 
         // Yes, this is a cheap plastic imitation of what you'd hope for if you really need this
@@ -611,32 +605,29 @@ public abstract class Xform<A> implements UnmodIterable<A> {
         return Or.good(accum);
     }
 
-    @Override public Xform<A> filter(Fn1<? super A,Boolean> f) {
-        if (f == null) { throw new IllegalArgumentException("Can't filter with a null function."); }
+    @NotNull
+    @Override public Xform<A> filter(@NotNull Fn1<? super A,Boolean> f) {
         return new FilterDesc<>(this, f);
     }
 
-    @Override public <B> Xform<B> flatMap(Fn1<? super A,Iterable<B>> f) {
-        if (f == null) { throw new IllegalArgumentException("Can't flatmap with a null function."); }
+    @Override public <B> @NotNull Xform<B> flatMap(@NotNull Fn1<? super A,Iterable<B>> f) {
         return new FlatMapDesc<>(this, f);
     }
 
-    @Override public <B> Xform<B> map(Fn1<? super A, ? extends B> f) {
-        if (f == null) { throw new IllegalArgumentException("Can't map with a null function."); }
+    @Override public <B> @NotNull Xform<B> map(@NotNull Fn1<? super A, ? extends B> f) {
         return new MapDesc<>(this, f);
     }
 
     protected abstract RunList toRunList();
 
+    @NotNull
     @Override public Xform<A> take(long numItems) {
         if (numItems < 0) { throw new IllegalArgumentException("Num items must be >= 0"); }
         return new TakeDesc<>(this, numItems);
     }
 
-    @Override public Xform<A> takeWhile(Fn1<? super A,Boolean> f) {
-        if (f == null) {
-            throw new IllegalArgumentException("Can't takeWhile with a null function.");
-        }
+    @NotNull
+    @Override public Xform<A> takeWhile(@NotNull Fn1<? super A,Boolean> f) {
         // I'm coding this as a map operation that either returns the source, or a TERMINATE
         // sentinel value.
         return new MapDesc<>(this, a -> f.apply(a) ? a : terminate());

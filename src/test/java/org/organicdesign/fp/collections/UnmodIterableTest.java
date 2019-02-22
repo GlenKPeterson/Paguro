@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -18,6 +19,7 @@ public class UnmodIterableTest {
     class TestIterable<T> implements UnmodIterable<T> {
         private final Iterable<T> inner;
         TestIterable(Iterable<T> i) { inner = i; }
+        @NotNull
         @Override public UnmodIterator<T> iterator() {
             Iterator<T> iter = inner.iterator();
             return new UnmodIterator<T>() {

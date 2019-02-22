@@ -9,6 +9,7 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.organicdesign.fp.TestUtilities;
 
@@ -21,6 +22,7 @@ public class UnmodSortedIterableTest {
             private final List<T> ts;
             private Usi(List<T> l) { ts = l; }
             /** Returns items in a guaranteed order. */
+            @NotNull
             @Override
             public UnmodSortedIterator<T> iterator() {
                 return new UnmodSortedIterator.Wrapper<>(ts.iterator());

@@ -13,6 +13,7 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
+import org.jetbrains.annotations.NotNull;
 import org.organicdesign.fp.oneOf.Option;
 
 import java.util.Map;
@@ -20,7 +21,7 @@ import java.util.Map;
 /** An immutable sorted map. */
 public interface ImSortedMap<K,V> extends UnmodSortedMap<K,V>, BaseMap<K,V> {
 
-    Option<UnmodMap.UnEntry<K,V>> entry(K key);
+    @NotNull Option<UnmodMap.UnEntry<K,V>> entry(K key);
 
 //    /**
 //     Returns a view of the mappings contained in this map.  The set should actually contain
@@ -35,6 +36,7 @@ public interface ImSortedMap<K,V> extends UnmodSortedMap<K,V>, BaseMap<K,V> {
     @Override default boolean containsKey(Object key) { return entry((K) key).isSome(); }
 
     /** {@inheritDoc} */
+    @NotNull
     @Override ImSortedSet<Entry<K,V>> entrySet();
 
     @SuppressWarnings("unchecked")
@@ -49,16 +51,18 @@ public interface ImSortedMap<K,V> extends UnmodSortedMap<K,V>, BaseMap<K,V> {
     }
 
     /** Return the elements in this map up (but excluding) to the given element */
-    @Override default ImSortedMap<K,V> headMap(K toKey) { return subMap(firstKey(), toKey); }
+    @Override default @NotNull ImSortedMap<K,V> headMap(K toKey) { return subMap(firstKey(), toKey); }
 
     /**
      Returns an iterator over the UnEntries of this map in order.
      @return an Iterator.
      */
+    @NotNull
     @Override
     UnmodSortedIterator<UnEntry<K, V>> iterator();
 
     /** Returns a view of the keys contained in this map. */
+    @NotNull
     @Override default ImSortedSet<K> keySet() { return PersistentTreeSet.ofMap(this); }
 
 // public  K	lastKey()
@@ -67,10 +71,12 @@ public interface ImSortedMap<K,V> extends UnmodSortedMap<K,V>, BaseMap<K,V> {
      Return the elements in this map from the start element (inclusive) to the end element
      (exclusive)
      */
+    @NotNull
     @Override
     ImSortedMap<K,V> subMap(K fromKey, K toKey);
 
     /** Return the elements in this from the given element to the end */
+    @NotNull
     @Override
     ImSortedMap<K,V> tailMap(K fromKey);
 
@@ -121,13 +127,14 @@ public interface ImSortedMap<K,V> extends UnmodSortedMap<K,V>, BaseMap<K,V> {
      @return a new PersistentTreeMap of the specified comparator and the given key/value pairs
 
      */
-    ImSortedMap<K,V> assoc(K key, V val);
+    @NotNull ImSortedMap<K,V> assoc(K key, V val);
 
     /** Returns a new map with an immutable copy of the given entry added */
-    default ImSortedMap<K,V> assoc(Map.Entry<K,V> entry) {
+    @NotNull
+    default ImSortedMap<K,V> assoc(@NotNull Map.Entry<K,V> entry) {
         return assoc(entry.getKey(), entry.getValue());
     }
 
     /** Returns a new map with the given key/value removed */
-    ImSortedMap<K,V> without(K key);
+    @NotNull ImSortedMap<K,V> without(K key);
 }

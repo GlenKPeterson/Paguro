@@ -3,6 +3,7 @@ package org.organicdesign.fp.collections;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 
+import org.jetbrains.annotations.Nullable;
 import org.organicdesign.fp.tuple.Tuple2;
 
 /**
@@ -69,7 +70,7 @@ public final class Cowry {
      * @return an array of the appropriate class containing the single element.
      */
     @SuppressWarnings("unchecked")
-    public static <T> T[] singleElementArray(T elem, Class<T> tClass) {
+    public static <T> T[] singleElementArray(T elem, @Nullable Class<T> tClass) {
         if (tClass == null) {
             return (T[]) new Object[] { elem };
         }
@@ -88,7 +89,11 @@ public final class Cowry {
      * @return A copy of the given array with the additional item at the appropriate index
      *         (will be one longer than the original array).
      */
-    public static <T> T[] insertIntoArrayAt(T item, T[] items, int idx, Class<T> tClass) {
+    public static <T> T[] insertIntoArrayAt(
+            T item,
+            T[] items,
+            int idx,
+            @Nullable Class<T> tClass) {
         // Make an array that's one bigger.  It's too bad that the JVM bothers to
         // initialize this with nulls.
         @SuppressWarnings("unchecked")
@@ -121,7 +126,11 @@ public final class Cowry {
      * @param tClass the class of the items in the array (null for Object)
      * @return a copy of the original array with the given length
      */
-    public static <T> T[] arrayCopy(T[] items, int length, Class<T> tClass) {
+    public static <T> T[] arrayCopy(
+            T[] items,
+            int length,
+            @Nullable Class<T> tClass
+    ) {
         // Make an array of the appropriate size.  It's too bad that the JVM bothers to
         // initialize this with nulls.
         @SuppressWarnings("unchecked")
@@ -150,7 +159,7 @@ public final class Cowry {
      @return a new array with the new items inserted at the proper position of the old array.
      */
     public static <A> A[] spliceIntoArrayAt(A[] insertedItems, A[] origItems, int idx,
-                                            Class<A> tClass) {
+                                            @Nullable Class<A> tClass) {
         // Make an array that big enough.  It's too bad that the JVM bothers to
         // initialize this with nulls.
         @SuppressWarnings("unchecked")
@@ -187,7 +196,7 @@ public final class Cowry {
 //    }
 
     public static <T> T[] replaceInArrayAt(T replacedItem, T[] origItems, int idx,
-                                           Class<T> tClass) {
+                                           @Nullable Class<T> tClass) {
         // Make an array that big enough.  It's too bad that the JVM bothers to
         // initialize this with nulls.
         @SuppressWarnings("unchecked")

@@ -16,11 +16,13 @@ package org.organicdesign.fp.collections;
 import java.util.Comparator;
 import java.util.SortedSet;
 
+import org.jetbrains.annotations.NotNull;
+
 /** An unmodifiable SortedSet. */
 public interface UnmodSortedSet<E> extends UnmodSet<E>, SortedSet<E>, UnmodSortedCollection<E> {
     /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
-    @Override default UnmodSortedSet<E> headSet(E toElement) {
+    @Override default @NotNull UnmodSortedSet<E> headSet(E toElement) {
         // This is tricky because of the case where toElement > last()
         Comparator<? super E> comparator = comparator();
         if (comparator == null) {
@@ -42,16 +44,17 @@ public interface UnmodSortedSet<E> extends UnmodSet<E>, SortedSet<E>, UnmodSorte
      Iterates over contents in a guaranteed order.
      {@inheritDoc}
      */
+    @NotNull
     @Override
     UnmodSortedIterator<E> iterator();
 
     /** {@inheritDoc} */
     @Override
-    UnmodSortedSet<E> subSet(E fromElement, E toElement);
+    @NotNull UnmodSortedSet<E> subSet(E fromElement, E toElement);
 
     /** {@inheritDoc} */
     // Note: there is no simple default implementation because subSet() is exclusive of the given
     // end element and there is no way to reliably find an element exactly larger than last().
     // Otherwise we could just return subSet(fromElement, last());
-    @Override UnmodSortedSet<E> tailSet(E fromElement);
+    @Override @NotNull UnmodSortedSet<E> tailSet(E fromElement);
 }
