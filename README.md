@@ -10,44 +10,42 @@ Photo by [Rushen](https://www.flickr.com/photos/rushen/12171498934/in/photostrea
 # Overview
 Paguro is short for the Latin "Paguroidea" - the name of the Hermit Crab superfamily in Biology.
 These collections grow by adding a new shell, leaving the insides the same, much the way [Hermit Crabs trade up to a new shell when they grow](https://www.youtube.com/watch?v=f1dnocPQXDQ).
-This project used to be called UncleJim.
+
+[![Join the chat at https://gitter.im/GlenKPeterson/Paguro](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/GlenKPeterson/Paguro?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+# Maven Artifact
+
+Available from the [Maven Repository](http://mvnrepository.com/artifact/org.organicdesign/Paguro) as:
+```xml
+<!--
+If you're using Kotlin and Java, you want the 3.5 version in the KotlinFootWetting branch.
+Java-only users want 3.x from the main branch.
+ -->
+<dependency>
+        <groupId>org.organicdesign</groupId>
+        <artifactId>Paguro</artifactId>
+        <version>3.5.2</version>
+</dependency>
+```
+
+The Maven artifact is the easiest way to use Paguro, but you can [build from source](#build-from-source) if you want to.
 
 # News
 ### RRB Tree Released!
-An [RRB Tree](https://glenkpeterson.github.io/Paguro/apidocs/index.html?org/organicdesign/fp/collections/RrbTree.html) is an immutable List (like Clojure's PersistentVector) that also supports random inserts, deletes, and can be split and joined back together in logarithmic time.
-There's been one for Scala for a while (Bagwell/Rompf who wrote the paper were Scala people), and a native Clojure one, but neither is super helpful for Java programmers.
-This is an entirely new Apache 2.0 Java implementation.
 
-It's easy to use:
-```java
-import org.organicdesign.fp.collections.RrbTree.ImRrbt;
-import static org.organicdesign.fp.StaticImports.rrb;
-
-class Foo {
-    public static void main(String[] args) {
-        ImRrbt<String> rrb = rrb("This", "is", "a", "list");
-        rrb = rrb.insert(0, "Hello!");
-        System.out.println("rrb: " + rrb);
-    }
-}
-```
-
-### How to update
-An upgrade script is in the [Change Log](CHANGE_LOG.md#30-upgrade) along with a description of the 3.0 changes (there were may!).
-
-### Other new features
-[Union types](https://glenkpeterson.github.io/Paguro/apidocs/index.html?org/organicdesign/fp/oneOf/package-summary.html) for Java!  Well, an approximation of them anyway.
+An [RRB Tree](https://glenkpeterson.github.io/Paguro/apidocs/index.html?org/organicdesign/fp/collections/RrbTree.html) is an immutable List (like Clojure's PersistentVector) that also supports random inserts, deletes, and can be split and joined back together in logarithmic time.  Details: https://github.com/GlenKPeterson/Paguro/releases/tag/3.0.16
 
 ### Next Major Release will be Paguro 4.0, "Kotlin Compatibility"
 
-Some things will have to be renamed in order to fit better with the Kotlin standard library.
-Notably MutableList, MutableMap, and MutableSet conflict with the same-named classes in Kotlin.
+This announcement is making some people nervous even as it makes others happy.  The primary curator (Glen) will still continue using Paguro in both Java and Kotlin for at least a year, maybe forever.  Kotlin is nearly 100% backward-compatible with Java 8.  I've met several people who know Paguro but not Kotlin, but I have yet to meet the person who knows both and likes Paguro but not Kotlin.
 
-The primary programmer on this project is now writing more Kotlin than Java.
-If you like Paguro, you'll probably prefer Kotlin too.
-Kotlin seems nearly 100% compatible with Java, meaning when you call Kotlin from Java, you could think you're calling native Java.
-So even if this becomes an all Kotlin project, Java programmers should have no trouble using it.
-If Java-only programmers object for some reason, we can make a Java-only branch.
+You are probably interested in Paguro because you like Immutability, Functional Programming (maybe as pure as Haskell, maybe not), and Types.  Kotlin is a briefer Java that assumes immutability, makes Functional Programming easier, and plugs 3/4 of the quirks in Java's generic type system.  If you're concerned about the future of Paguro, I think the best way to put your worries to rest is to try Kotlin.  It's pretty great!
+
+If a rewrite in Kotlin sounds good to you, consider voting for [this issue](https://youtrack.jetbrains.com/issue/KT-4779) because without it, I'll have to maintain separate Java and Kotlin code.
+
+Check back for more details as the 4.x release progresses.
+
+Check the [Change Log](CHANGE_LOG.md) for details of recent changes.
 
 # Features
 
@@ -60,30 +58,13 @@ If Java-only programmers object for some reason, we can make a Java-only branch.
   * `map(tup(1, "single"), tup(2, "double"), tup(3, "triple"))` - an immutable map that uses integers to look up appropriate strings.
 * **Extensible, immutable tuples** [api](https://glenkpeterson.github.io/Paguro/apidocs/index.html?org/organicdesign/fp/tuple/package-summary.html)/[src](src/main/java/org/organicdesign/fp/tuple) - use them for rapid prototyping, then later extend them to make your own lightweight, immutable Java classes with correct `equals()`, `hashCode()`, and `toString()` implementations.
 * **Lazy initialization** [api](https://glenkpeterson.github.io/Paguro/apidocs/index.html?org/organicdesign/fp/function/LazyRef.html)/[src](src/main/java/org/organicdesign/fp/function/LazyRef.java) - LazyRef thread-safely performs initialization and frees initialization resources on first use.  Subsequent uses get the now-constant initialized value.  Use this instead of static initializers to avoid initialization loops.  Cache results of expensive operations for reuse.
+* **Union types** [api](https://glenkpeterson.github.io/Paguro/apidocs/index.html?org/organicdesign/fp/oneOf/package-summary.html)/[src](src/main/java/org/organicdesign/fp/oneOf) - Not as nice as being built into the language, but they extend type safety outside the object hierarchy.
 * **Memoization** [api](https://glenkpeterson.github.io/Paguro/apidocs/org/organicdesign/fp/function/Fn3.html#memoize-org.organicdesign.fp.function.Fn3-)/[src](src/main/java/org/organicdesign/fp/function/Fn3.java#L42) - Turns function calls into hashtable lookups to speed up slow functions over a limited range of inputs.
 * **Tiny** with no dependencies - The entire project fits in a 270K jar file that is compiled in the compact1 profile.
 
 [API Docs](https://glenkpeterson.github.io/Paguro/apidocs/index.html)
 
 Paguro takes advantage of Java's type inferencing.  It eschews void return types, arrays, primatives, and checked exceptions in lambdas.  It can decrease the amount of code you need to write by a factor of at 2x-3x.  Using functional transfomrations instead of loops focuses you on choosing the right collections which leads to more readable code AND better Big O complexity/scalability.
-
-[![Build Status](https://travis-ci.org/GlenKPeterson/Paguro.svg?branch=master)](https://travis-ci.org/GlenKPeterson/Paguro)
-[![Code Coverage](http://codecov.io/github/GlenKPeterson/Paguro/coverage.svg?branch=master)](http://codecov.io/github/GlenKPeterson/Paguro?branch=master)
-
-[![Join the chat at https://gitter.im/GlenKPeterson/Paguro](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/GlenKPeterson/Paguro?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-Available from the [Maven Repository](http://mvnrepository.com/artifact/org.organicdesign/Paguro) as:
-```xml
-<!--
-If you're new to Paguro, consider starting with the streamlined
-3.0 Alpha version instead (on the 2016-05-22_RRB-Tree branch)
- -->
-<dependency>
-        <groupId>org.organicdesign</groupId>
-        <artifactId>Paguro-KF</artifactId>
-        <version>3.5.1</version>
-</dependency>
-```
 
 # Details
 
@@ -152,7 +133,7 @@ It started with a Software Engineering Stack Exchange question: [Why doesn't Jav
 
 ### Q: Why Java instead of another/better JVM language?
 
-[Why Java?](https://github.com/GlenKPeterson/Paguro/wiki/Why-is-UncleJim-written-in-Java%3F)
+[Why Java?](https://github.com/GlenKPeterson/Paguro/wiki/Why-is-Paguro-written-in-Java%3F)
 That said, this could become a Kotlin-based project.
 
 # Future Development Ideas (as of 2017-09-10)
@@ -179,6 +160,55 @@ These files are still derivative works under the EPL.
 Unless otherwise stated, the rest of this work is licensed under the Apache 2.0 license.
 New contributions should be made under the Apache 2.0 license whenever practical.
 I believe it is more popular, clearer, and has been better tested in courts of law.
+
+# Build from Source
+
+The [pre-built maven artifact](#maven-artifact) is the easiest way to use Paguro.
+Mose users do not need to build Paguro from source.
+
+#### Prerequisites
+Paguro should build on Ubuntu 16.04 and later with `openjdk-8-jdk`, `git`, and `maven` installed from the official repositories.  A compiler bug in javac 1.8.0_31 prevents building Paguro, but OpenJDK 1.8.0.91 and later (or Oracle) should work on Windows or Mac.
+
+##### Environment Variables
+Depending on how you installed Java and Maven, you may need to set some of the following in your `~/.profile` file and reboot (or source that file like `. ~/.profile` from the command line you will use for the build).  Or do whatever Windows does.  If your tools are installed in different directories, you will have to fix the following:
+```bash
+export JDK_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export JAVA_HOME=$JDK_HOME/jre
+export M2_HOME=$TOOLS/apache-maven-3.3.9/
+export M2="$M2_HOME"bin
+export PATH=$PATH:$M2
+```
+
+##### Build
+```bash
+# Start in an appropriate directory
+
+# You need TestUtils for Paguro's equality testing.
+# The first time you build, get a local copy of that and Paguro
+git clone https://github.com/GlenKPeterson/TestUtils.git
+git clone https://github.com/GlenKPeterson/Paguro.git
+
+# Build TestUtils:
+cd TestUtils
+git pull
+mvn clean install
+cd ..
+
+# Build Paguro:
+cd Paguro
+git pull
+mvn clean install
+cd ..
+```
+
+# Contributing
+
+If you submit a patch, please:
+ - Keep the changes minimal (don't let your IDE reformat whole files).
+ - Try to match the code style as best you can.
+ - Clearly document your changes.
+ - Update the unit tests to clearly and simply prove that your code works.
+ - It's a good idea to discuss proposed changes by opening an issue on github before you spend time coding.
 
 # More
 Additional information is in: [README2.md](README2.md).

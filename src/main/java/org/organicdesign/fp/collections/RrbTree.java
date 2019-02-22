@@ -21,12 +21,13 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
+import org.organicdesign.fp.indent.Indented;
 import org.organicdesign.fp.tuple.Tuple2;
 import org.organicdesign.fp.tuple.Tuple4;
 
 import static org.organicdesign.fp.collections.Cowry.*;
-import static org.organicdesign.fp.collections.Indented.arrayString;
-import static org.organicdesign.fp.collections.Indented.indentSpace;
+import static org.organicdesign.fp.indent.IndentUtils.arrayString;
+import static org.organicdesign.fp.indent.IndentUtils.indentSpace;
 
 /**
  <p>An RRB Tree is an immutable List (like Clojure's PersistentVector) that also supports random inserts, deletes,
@@ -478,9 +479,20 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
          this.size() one tree will be empty (but never null).
          */
         public Tuple2<MutRrbt<E>,MutRrbt<E>> split(int splitIndex) {
-            if ( (splitIndex < 1) || (splitIndex > size) ) {
-                throw new IndexOutOfBoundsException(
-                        "Constraint violation failed: 1 <= splitIndex <= size");
+            if (splitIndex < 1) {
+                if (splitIndex == 0) {
+                    return Tuple2.of(emptyMutable(), this);
+                } else {
+                    throw new IndexOutOfBoundsException(
+                            "Constraint violation failed: 1 <= splitIndex <= size");
+                }
+            } else if (splitIndex >= size) {
+                if (splitIndex == size) {
+                    return Tuple2.of(this, emptyMutable());
+                } else {
+                    throw new IndexOutOfBoundsException(
+                            "Constraint violation failed: 1 <= splitIndex <= size");
+                }
             }
             // Push the focus before splitting.
             Node<E> newRoot = pushFocus();
@@ -512,7 +524,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
     public static class ImRrbt<E> extends RrbTree<E> implements ImList<E>, Serializable {
         private final E[] focus;
         private final int focusStartIndex;
-        private final Node<E> root;
+        private transient final Node<E> root;
         private final int size;
 
         ImRrbt(E[] f, int fi, Node<E> r, int s) {
@@ -896,9 +908,20 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
          one tree will be empty (but never null).
          */
         public Tuple2<ImRrbt<E>,ImRrbt<E>> split(int splitIndex) {
-            if ( (splitIndex < 1) || (splitIndex > size) ) {
-                throw new IndexOutOfBoundsException(
-                        "Constraint violation failed: 1 <= splitIndex <= size");
+            if (splitIndex < 1) {
+                if (splitIndex == 0) {
+                    return Tuple2.of(empty(), this);
+                } else {
+                    throw new IndexOutOfBoundsException(
+                            "Constraint violation failed: 1 <= splitIndex <= size");
+                }
+            } else if (splitIndex >= size) {
+                if (splitIndex == size) {
+                    return Tuple2.of(this, empty());
+                } else {
+                    throw new IndexOutOfBoundsException(
+                            "Constraint violation failed: 1 <= splitIndex <= size");
+                }
             }
             // Push the focus before splitting.
             Node<E> newRoot = pushFocus();
@@ -1351,7 +1374,8 @@ involves changing more nodes than maybe necessary.
         private Leaf<T>[] spliceAndSplit(T[] oldFocus, int splitIndex) {
             // Consider optimizing:
             T[] newItems = spliceIntoArrayAt(oldFocus, items, splitIndex,
-                                             (Class<T>) items[0].getClass());
+                                             null);
+//                                             (Class<T>) items[0].getClass());
 
             // Shift right one is divide-by 2.
             Tuple2<T[],T[]> split = splitArray(newItems, newItems.length >> 1);
@@ -1392,7 +1416,8 @@ involves changing more nodes than maybe necessary.
 
             if ((items.length + oldFocus.length) < MAX_NODE_LENGTH) {
                 return new Leaf<>(spliceIntoArrayAt(oldFocus, items, index,
-                                                    (Class<T>) items[0].getClass()));
+                                                    null));
+//                                                    (Class<T>) items[0].getClass()));
             }
 
             // We should only get here when the root node is a leaf.
@@ -1740,6 +1765,10 @@ involves changing more nodes than maybe necessary.
                     }
 
                     if ((nodes.length < STRICT_NODE_LENGTH)) {
+                        // This will fail at runtime if we use an array of Objects instead of Nodes.
+                        // To do that, we'd have to convert all this to Objects and cast each item as
+                        // it comes off.
+                        //
                         // Add a node to the existing array
                         Node<T>[] newNodes =
                                 insertIntoArrayAt(newNode, nodes, subNodeIndex, Node.class);

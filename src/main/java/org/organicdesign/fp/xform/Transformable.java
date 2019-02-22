@@ -21,8 +21,22 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.organicdesign.fp.collections.*;
+import org.organicdesign.fp.collections.ImList;
+import org.organicdesign.fp.collections.ImMap;
+import org.organicdesign.fp.collections.ImSet;
+import org.organicdesign.fp.collections.ImSortedMap;
+import org.organicdesign.fp.collections.ImSortedSet;
 import org.organicdesign.fp.collections.MutList;
+import org.organicdesign.fp.collections.MutMap;
+import org.organicdesign.fp.collections.MutSet;
+import org.organicdesign.fp.collections.PersistentHashMap;
+import org.organicdesign.fp.collections.PersistentHashSet;
+import org.organicdesign.fp.collections.PersistentTreeMap;
+import org.organicdesign.fp.collections.PersistentTreeSet;
+import org.organicdesign.fp.collections.PersistentVector;
+import org.organicdesign.fp.collections.RrbTree;
+import org.organicdesign.fp.collections.RrbTree.ImRrbt;
+import org.organicdesign.fp.collections.RrbTree.MutRrbt;
 import org.organicdesign.fp.function.Fn1;
 import org.organicdesign.fp.function.Fn2;
 import org.organicdesign.fp.oneOf.Option;
@@ -199,6 +213,11 @@ public interface Transformable<T> {
     default ImList<T> toImList() { return toMutList().immutable(); }
 
     /**
+     Realize a thread-safe immutable RRB-Tree to access items quickly O(log32 n) by index.
+     */
+    default ImRrbt<T> toImRrbt() { return toMutRrbt().immutable(); }
+
+    /**
      Realize an unordered immutable hash map to very quickly O(1) look up values by key, but don't
      care about ordering.  In the case of a duplicate key, later values from this transform will
      overwrite the earlier ones. The resulting map can contain zero or one null key and any number
@@ -262,6 +281,12 @@ public interface Transformable<T> {
     default MutList<T> toMutList() {
         return fold(PersistentVector.emptyMutable(),
                     MutList<T>::append);
+    }
+
+    /** Realize a mutable RRB-Tree.  Use toImRrbt unless you need to modify the list in-place. */
+    default MutRrbt<T> toMutRrbt() {
+        return fold(RrbTree.emptyMutable(),
+                    MutRrbt<T>::append);
     }
 
     /**

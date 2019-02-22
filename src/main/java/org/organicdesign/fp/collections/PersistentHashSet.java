@@ -159,7 +159,7 @@ public class PersistentHashSet<E> extends AbstractUnmodSet<E>
 
 //    @Override public Sequence<E> seq() { return impl.seq().map(e -> e.getKey()); }
 
-    @Override public UnmodIterator<E> iterator() { return impl.map(e -> e.getKey()).iterator(); }
+    @Override public UnmodIterator<E> iterator() { return impl.keyIterator(); }
 
     @Override public int size() { return impl.size(); }
 
@@ -183,7 +183,7 @@ public class PersistentHashSet<E> extends AbstractUnmodSet<E>
         }
 
         @Override
-        public UnmodIterator<E> iterator() { return impl.map(e -> e.getKey()).iterator(); }
+        public UnmodIterator<E> iterator() { return impl.keyIterator(); }
 
         @SuppressWarnings("unchecked")
         @Override public boolean contains(Object key) {

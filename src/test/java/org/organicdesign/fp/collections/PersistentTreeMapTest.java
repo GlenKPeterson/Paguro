@@ -127,27 +127,35 @@ public class PersistentTreeMapTest {
 
 
         {
-            UnmodIterator<Integer> iter = PersistentTreeMap.of(vec(tup("b", 2)))
-                                                           .assoc("c", 1)
-                                                           .assoc("a", 3)
-                                                           .map(e -> e.getValue()).iterator();
+            PersistentTreeMap<String, Integer> m2 = PersistentTreeMap.of(vec(tup("b", 2)))
+                    .assoc("c", 1)
+                    .assoc("a", 3);
+            UnmodIterator<Integer> iter = m2.map(e -> e.getValue()).iterator();
+            UnmodIterator<Integer> iter2 = m2.valIterator();
 
             assertTrue(iter.hasNext());
             assertEquals(Integer.valueOf(3), iter.next());
+            assertTrue(iter2.hasNext());
+            assertEquals(Integer.valueOf(3), iter2.next());
 
             assertTrue(iter.hasNext());
             assertEquals(Integer.valueOf(2), iter.next());
+            assertTrue(iter2.hasNext());
+            assertEquals(Integer.valueOf(2), iter2.next());
 
             assertTrue(iter.hasNext());
             assertEquals(Integer.valueOf(1), iter.next());
+            assertTrue(iter2.hasNext());
+            assertEquals(Integer.valueOf(1), iter2.next());
 
             assertFalse(iter.hasNext());
+            assertFalse(iter2.hasNext());
         }
 
-        PersistentTreeMap<String,Integer> m2 = PersistentTreeMap.of(vec(tup("c", 3)))
+        PersistentTreeMap<String,Integer> m3 = PersistentTreeMap.of(vec(tup("c", 3)))
                                                                 .assoc("b", 2)
                                                                 .assoc("a", 1);
-        UnmodIterator<UnmodMap.UnEntry<String,Integer>> iter = m2.iterator();
+        UnmodIterator<UnmodMap.UnEntry<String,Integer>> iter = m3.iterator();
         UnmodMap.UnEntry<String,Integer> next = iter.next();
         assertEquals("a", next.getKey());
         assertEquals(Integer.valueOf(1), next.getValue());
@@ -160,30 +168,38 @@ public class PersistentTreeMapTest {
         assertEquals("c", next.getKey());
         assertEquals(Integer.valueOf(3), next.getValue());
 
-        assertNull(m2.comparator());
-        assertNotEquals(String.CASE_INSENSITIVE_ORDER.reversed(), m2.comparator());
+        assertNull(m3.comparator());
+        assertNotEquals(String.CASE_INSENSITIVE_ORDER.reversed(), m3.comparator());
 
-        PersistentTreeMap<String,Integer> m3 =
+        PersistentTreeMap<String,Integer> m4 =
                 PersistentTreeMap.ofComp(String.CASE_INSENSITIVE_ORDER.reversed(),
                                          vec(tup("a", 1),
                                              tup("b", 2),
                                              tup("c", 3)));
-        UnmodIterator<UnmodMap.UnEntry<String,Integer>> iter2 = m3.iterator();
+        UnmodIterator<UnmodMap.UnEntry<String,Integer>> iter2 = m4.iterator();
+        UnmodIterator<String> iter3 = m4.keyIterator();
+        UnmodIterator<Integer> iter4 = m4.valIterator();
 
         next = iter2.next();
         assertEquals("c", next.getKey());
         assertEquals(Integer.valueOf(3), next.getValue());
+        assertEquals("c", iter3.next());
+        assertEquals(Integer.valueOf(3), iter4.next());
 
         next = iter2.next();
         assertEquals("b", next.getKey());
         assertEquals(Integer.valueOf(2), next.getValue());
+        assertEquals("b", iter3.next());
+        assertEquals(Integer.valueOf(2), iter4.next());
 
         next = iter2.next();
         assertEquals("a", next.getKey());
         assertEquals(Integer.valueOf(1), next.getValue());
+        assertEquals("a", iter3.next());
+        assertEquals(Integer.valueOf(1), iter4.next());
 
-        assertEquals(String.CASE_INSENSITIVE_ORDER.reversed(), m3.comparator());
-        assertNotEquals(Equator.defaultComparator(), m3.comparator());
+        assertEquals(String.CASE_INSENSITIVE_ORDER.reversed(), m4.comparator());
+        assertNotEquals(Equator.defaultComparator(), m4.comparator());
     }
 
     @Test public void hashCodeAndEquals() {
@@ -211,6 +227,8 @@ public class PersistentTreeMapTest {
         assertEquals(control.hashCode(), serializeDeserialize(test).hashCode());
 
         compareIterators(control.entrySet().iterator(), test.iterator());
+        compareIterators(control.keySet().iterator(), test.keyIterator());
+        compareIterators(control.values().iterator(), test.valIterator());
 
         assertTrue(test.equals(control));
         assertTrue(control.equals(test));
@@ -327,6 +345,12 @@ public class PersistentTreeMapTest {
         compareIterators(control.entrySet().iterator(), test.iterator());
         compareIterators(control.entrySet().iterator(), ser.iterator());
 
+        compareIterators(control.keySet().iterator(), test.keyIterator());
+        compareIterators(control.keySet().iterator(), ser.keyIterator());
+
+        compareIterators(control.values().iterator(), test.valIterator());
+        compareIterators(control.values().iterator(), ser.valIterator());
+
         compareEntryIterSer(control.entrySet().iterator(), test.iterator());
 
         HashMap<String,Integer> hash = new HashMap<>();
@@ -385,6 +409,12 @@ public class PersistentTreeMapTest {
 
         compareIterators(control.entrySet().iterator(), test.iterator());
         compareIterators(control.entrySet().iterator(), ser.iterator());
+
+        compareIterators(control.keySet().iterator(), test.keyIterator());
+        compareIterators(control.keySet().iterator(), ser.keyIterator());
+
+        compareIterators(control.values().iterator(), test.valIterator());
+        compareIterators(control.values().iterator(), ser.valIterator());
 
         compareEntryIterSer(control.entrySet().iterator(), test.iterator());
 

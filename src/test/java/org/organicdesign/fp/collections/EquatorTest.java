@@ -97,8 +97,8 @@ public class EquatorTest {
 
         assertEquals(new ComparableToNull<>(3).compareTo(null),
                      defaultComparator().compare(new ComparableToNull<>(3), null));
-        assertEquals(- new ComparableToNull<>(3).compareTo(null),
-                     defaultComparator().compare(null, new ComparableToNull<>(3)));
+        assertEquals(- Integer.signum(new ComparableToNull<>(3).compareTo(null)),
+                     Integer.signum(defaultComparator().compare(null, new ComparableToNull<>(3))));
     }
 
     @SuppressWarnings({"StringBufferReplaceableByString", "RedundantStringConstructorCall"})
@@ -148,8 +148,8 @@ public class EquatorTest {
 
         assertEquals(new ComparableToNull<>(3).compareTo(null),
                      defCompCtx().compare(new ComparableToNull<>(3), null));
-        assertEquals(- new ComparableToNull<>(3).compareTo(null),
-                     defCompCtx().compare(null, new ComparableToNull<>(3)));
+        assertEquals(- Integer.signum(new ComparableToNull<>(3).compareTo(null)),
+                     Integer.signum(defCompCtx().compare(null, new ComparableToNull<>(3))));
 
         assertTrue(defCompCtx().lt(2, 3));
         assertFalse(defCompCtx().lt(3, 3));

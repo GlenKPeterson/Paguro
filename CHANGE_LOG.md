@@ -5,6 +5,25 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
+## Release 3.5.2: Fixes from Master
+ - Made most Cowry methods public
+ - Fixed a bug (reported by [fcurts](https://github.com/fcurts) - with unit test!) where Heterogeneous RrbTrees of more than 32 items
+ would throw an exception at Runtime.  I had done something that in retrospect is obviously dumb.
+ - Documented Cowry (Copy-On Write aRraY) better.
+  These are type-safe utility methods for dealing with arrays.
+ This project still aims to keep you from needing to deal with arrays, but sometimes you do, and it's handy to have copy-on-write routines for doing it.
+ More of these methods could be made public if they are needed.
+ - [Nate Austin](https://github.com/navision)'s memory-efficient iteration of just keys or just values from maps.  Thank you Nate!
+ - Fixed split() to handle splitIndex = 0 and splitIndex = size() thanks to a bug report from [Jonathan Cornaz](https://github.com/jcornaz) (curator of [collekt](https://github.com/jcornaz/collekt))
+ - Added Transformable.toImRrbt() and .toMutableRrbt() to make it convenient to transform things into RRB-Trees.
+ - Fixed bugs found using FindBugs - thanks to @cprice404.  There are still some reported bugs, but
+ I think they are rare corner cases that lack clear solutions.  This was the low-hanging fruit.
+    - Option.NONE is removed to avoid possible circular instantiation.  Use None.NONE instead.
+    - Moved Indented to new indent package.
+    - Moved static methods from the Indented interface to a new IndentedUtils class.
+    - STRINGS array constant from Indented interface is now private to the IndentedUtils class.
+    - UnmodMap.UnEntry.EntryToUnEntryIter.next() now returns a Tuple2 instead of some other one-off class. 
+
 ### Release 3.5.1: Kotlin compatibility
  - Renamed artifact to Paguro-KF for "Kotlin-Friendly"
  - This was originally 3.1.1, but the master branch ended up using that number, so now this branch is 3.5.x

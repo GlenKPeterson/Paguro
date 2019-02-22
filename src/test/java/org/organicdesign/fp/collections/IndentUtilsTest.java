@@ -3,12 +3,12 @@ package org.organicdesign.fp.collections;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
-import static org.organicdesign.fp.collections.Indented.indentSpace;
+import static org.organicdesign.fp.indent.IndentUtils.indentSpace;
 
 /**
  Created by gpeterso on 5/21/17.
  */
-public class IndentedTest {
+public class IndentUtilsTest {
     @Test public void testIndentSpace() {
         assertEquals("", indentSpace(Integer.MIN_VALUE).toString());
         assertEquals("", indentSpace(-1).toString());

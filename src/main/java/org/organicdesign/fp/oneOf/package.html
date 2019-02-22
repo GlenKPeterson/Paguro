@@ -1,23 +1,159 @@
 <html>
 <body>
-<p>This approximates union types for Java - for when something (like a return type) can be
-    exactly one of a few different things.  This is NOT variance or inheritance
-    (Cars and Trucks are Vehicles), this is one un-related thing or another (a set of things that
-    are either Trucks, Happiness, or Timestamps).</p>
+<p>This package contains Option which has Some() and None() which is useful for indicating "Not-Found"
+    or "End-of-stream/file".  It also has Or which has Good() and Bad() for functional error
+    handling.  A third option is to roll-your own union-type wrappers.</p>
 
-<p>Java has specifically avoided union types in favor of defining a super-type and making those
-    other two types extend the new parent.  But sometimes you don't have control of the two types to
-    make them inherit from a common ancestor (like Trucks and Happiness).  Sometimes, one hierarchy
-    makes sense in one context and another hierarchy makes sense in another.</p>
+<p>The OneOf classes in this package approximates union types for Java - for when an object can be exactly one of a few different types.
+    Java has specifically avoided union types in favor of defining a super-type and making all interchangeable types
+    implement it.  That's still the easiest way to go when practical.
+    But sometimes you don't have control of the two types to make them inherit from a common ancestor.
+    Maybe one hierarchy makes sense in one context and another hierarchy makes sense in another?
+    Should you write code like this?</p>
 
-<p>Really, we want to move to a type system where types are sets.  ML had this in 1990.
-    Haskell took it from there.  Then Object Oriented programming took the world by storm and types
-    without Objects waned. In retrospect, we may have missed something.</p>
+<pre><code>
+// Ugly, hard to read, and awkward to use.
+// Plus, coding mistakes are caught at runtime.
+String showThing(String s, Integer i) {
+    if (s == null) {
+        if (i == null) {
+            throw new IllegalArgumentException("Exactly one argument should not be null, but both were");
+        } else {
+            return "an int: " + i;
+        }
+    } else if (i != null) {
+        throw new IllegalArgumentException("Exactly one argument should be null, but neither were");
+    }
+    return "a string: " + s;
+}</code></pre>
+
+<p>How much work is it to read that code?  What if there were more than 2 types?  This is a problem.
+    Union types are the answer.</p>
+
+<p>If your return value can be a User or a Group, you no longer have to code it as Object and make the client
+    cast to one or the other.  What if the client forgets that your method can return a Group and only codes for User?
+    What if one day, you can return a User, or a Group, or a Company?
+    Union types force the client to deal with all these possibilities before their code can compile.
+    If you add or remove a type, all client code will show compile-time errors until updated to deal with the change.
+
+<p>Really, we want to move to a type system where types are sets.
+    ML had this in 1990.
+    Then Object Oriented programming took the world by storm and types without Objects waned.
+    In retrospect, we may have missed something.</p>
+
+<p>Here's an example using OneOf2.
+    This forces all client code to handle both types: type safety, outside the class hierarchy.</p>
+
+<pre><code>
+// You need to subclass a OneOf class with your own class like this:
+static class Str_Int extends OneOf2&lt;String,Integer&gt; {
+    // Constructor
+    private Str_Int(Object o, int n) { super(o, String.class, Integer.class, n); }
+
+    // Static Factory Methods:
+    // Make sure to use consecutive integers starting from zero
+    // for the second constructor argument.  These ints represent
+    // indices that select the classes you passed to the call to
+    // super() above.  So String uses index 0:
+    static Str_Int ofStr(String o) { return new Str_Int(o, 0); }
+
+    // Integer uses index 1:
+    static Str_Int ofInt(Integer o) { return new Str_Int(o, 1); }
+}
+
+// Now create a new instance with your factory
+Str_Int soi = Str_Int.ofInt(57);
+
+// Finally, use your new instance.  Notice that this forces you
+// to account for all cases of what the union type could contain.
+// The return types of the match() function is the same as the return
+// type of the lambdas you pass to it (they all have to match).  In this
+// case, that type is String.
+return "This is " + soi.match(str -> "a string: " + str,
+                              i   -> "an integer: " + i));</code></pre>
+
+<p>Another great example is iText.
+    What if you just want to add a child item to whatever kind of parent you have?
+    You know there can only be 4 parents, but they are unrelated classes: Document, Paragraph, Li, and Cell.
+    You could petition iText to make them implement a common interface, but that could take time.
+    If you use "if" statements everywhere in your code, you might forget one case.
+    The following example casts objects inside every "if" and does unnecessary "instanceof" checks at runtime</p>
+
+<pre><code>
+// Ugly, hard to read, and coding mistakes are caught at runtime.
+if (parent instanceof Document) {
+    Document doc = (Document) parent;
+    // Add a new paragraph
+    doc.add(new Paragraph(textRenderable));
+} else if (parent instanceof Paragraph) {
+    Paragraph para = (Paragraph) parent;
+    // Just add text to existing paragraph
+    para.add(textRenderable);
+} else if (parent instanceof Cell) {
+    Cell cell = (Cell) parent;
+    // Add a new paragraph
+    cell.add(new Paragraph(textRenderable));
+} else {
+    // Defensive coding.  This may not be eligible for test coverage.
+    throw new IllegalStateException("Coded for parent to be a Document, Paragraph, or Cell but found: " +
+                                    (parent == null) ? "null" : parent.getClass().getCanonicalName());
+}
+</code></pre>
+
+<p>What if you don't use Cells any more?  Dead code.
+    What if you forget to code for some type?  Runtime Bugs.
+    What if parent can be some additional type in the future, like a Table?  Runtime Bugs.</p>
+
+<p>There's a better way.</p>
+
+<pre><code>
+public static class Doc_Para_Li_Cell
+        extends OneOf3&lt;Document,Paragraph,Cell&gt; {
+
+    // Constructor
+    protected Doc_Para_Li_Cell(Object o, int s) {
+        super(o, Document.class, Paragraph.class, Cell.class, s);
+    }
+
+    // Static factory methods
+    public static Doc_Para_Li_Cell ofDoc(Document document) {
+        return new Doc_Para_Li_Cell(document, 0);
+    }
+    public static Doc_Para_Li_Cell ofPara(Paragraph p) { return new Doc_Para_Li_Cell(p, 1); }
+    public static Doc_Para_Li_Cell ofCell(Cell c) { return new Doc_Para_Li_Cell(c, 2); }
+}</code></pre>
+
+<p>Now in your code, when you want to add a bunch of text, you can do it the right way for each.  No casts,
+    no instanceOf, no fuss:</p>
+
+<pre><code>
+parent.match(doc -> { doc.add(new Paragraph(textRenderable)); return null; },
+             para -> { para.add(textRenderable); return null; },
+             cell -> { cell.add(new Paragraph(textRenderable)); return null; });</code></pre>
+
+<p>In this example, you have to have the same return type for each.
+    Since we don't care about a return value, we return null in each function.
+    What happens if some combination is sometimes invalid?
+    Throw an exception (catching the illegal state at runtime is better than ignoring it,
+    and it's only one runtime issue, instead of the many in previous examples):</p>
+
+<pre><code>
+parent.match(doc -> { doc.add(table); return null; },
+             para -> { throw new IllegalStateException("Can't add a table to a paragraph."); },
+             cell -> { cell.add(table); return null; });</code></pre>
+
+<p>Now if you decide not to use Cells any more, you switch Doc_Para_Li_Cell to extend OneOf2, rename it to Doc_Para_Li
+    and fix all the compile-time errors.  To add a Table type, extend OneOf4.
+    No dead code.  No bugs.
+    Union types extend type safety outside the object hierarchy.
+    I'd love to see this added to Java or Kotlin someday.
+    Well, Kotlin already has it for nulls, just not in the general case.</p>
 
 <p>If you like Paguro and are interested in a new JVM and maybe compile-to-JavaScript language
     with Union and Intersection types instead of Object Oriented hierarchies, take a look at the
     evolving spec for the
     <a href="https://github.com/GlenKPeterson/Cymling" target="_blank">Cymling</a> programming
     language.  It may need some help to become reality.</p>
+
 </body>
 </html>

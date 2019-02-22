@@ -16,12 +16,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.organicdesign.fp.collections.PersistentTreeMap.Box;
+import org.organicdesign.fp.function.Fn2;
 import org.organicdesign.fp.oneOf.Option;
 import org.organicdesign.fp.tuple.Tuple2;
 
@@ -58,15 +58,16 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
 //        return init;
 //    }
 
-    private static class Iter<K,V> implements UnmodIterator<UnEntry<K,V>> {
+    private static class Iter<K,V,R> implements UnmodIterator<R> {
 //        , Serializable {
 //        // For serializable.  Make sure to change whenever internal data format changes.
 //        private static final long serialVersionUID = 20160903192900L;
 
         private boolean seen = false;
-        private final UnmodIterator<UnEntry<K,V>> rootIter;
+        private final UnmodIterator<R> rootIter;
+        private final Fn2<K, V, R> aFn;
         private final V nullValue;
-        private Iter(UnmodIterator<UnEntry<K,V>> ri, V nv) { rootIter = ri; nullValue = nv; }
+        private Iter(UnmodIterator<R> ri, Fn2<K,V,R> aFn, V nv) { rootIter = ri; this.aFn = aFn; nullValue = nv; }
 
         @Override public boolean hasNext() {
             //noinspection SimplifiableIfStatement
@@ -77,10 +78,10 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
             }
         }
 
-        @Override public UnEntry<K,V> next(){
+        @Override public R next(){
             if (!seen) {
                 seen = true;
-                return Tuple2.of(null, nullValue);
+                return aFn.apply(null, nullValue);
             } else {
                 return rootIter.next();
             }
@@ -292,11 +293,25 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
         return Option.someOrNullNoneOf(entry);
     }
 
-    // This identical to the Mutable version of this class below.
+    // The iterator methods are identical to the Mutable version of this class below.
     @Override public UnmodIterator<UnEntry<K,V>> iterator() {
-        final UnmodIterator<UnEntry<K,V>> rootIter = (root == null) ? emptyUnmodIterator()
-                                                                    : root.iterator();
-        return (hasNull) ? new Iter<>(rootIter, nullValue)
+        return iterator(Tuple2::of);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override public UnmodIterator<K> keyIterator() {
+        return iterator(Fn2.Singletons.FIRST);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override public UnmodIterator<V> valIterator() {
+        return iterator(Fn2.Singletons.SECOND);
+    }
+
+    private <R> UnmodIterator<R> iterator(Fn2<K, V, R> aFn) {
+        final UnmodIterator<R> rootIter = (root == null) ? emptyUnmodIterator()
+                                                         : root.iterator(aFn);
+        return (hasNull) ? new Iter<>(rootIter, aFn, nullValue)
                          : rootIter;
     }
 
@@ -428,11 +443,25 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
 //            return hasNull ? s.prepend((UnEntry<K,V>) Tuple2.of((K) null, nullValue)) : s;
 //        }
 
-        // This is a duplicate of the same method in the Persistent version of this class above.
+        // The iterator methods are a duplicate of the same methods in the Persistent version of this class above.
         @Override public UnmodIterator<UnEntry<K,V>> iterator() {
-            final UnmodIterator<UnEntry<K,V>> rootIter = (root == null) ? emptyUnmodIterator()
-                                                                        : root.iterator();
-            return (hasNull) ? new Iter<>(rootIter, nullValue)
+            return iterator(Tuple2::of);
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override public UnmodIterator<K> keyIterator() {
+            return iterator(Fn2.Singletons.FIRST);
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override public UnmodIterator<V> valIterator() {
+            return iterator(Fn2.Singletons.SECOND);
+        }
+
+        private <R> UnmodIterator<R> iterator(Fn2<K, V, R> aFn) {
+            final UnmodIterator<R> rootIter = (root == null) ? emptyUnmodIterator()
+                                                             : root.iterator(aFn);
+            return (hasNull) ? new Iter<>(rootIter, aFn, nullValue)
                              : rootIter;
         }
 
@@ -495,7 +524,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
 //                   final Fn1<Fn0,R> fjtask,
 //                   final Fn1<R,Object> fjfork, final Fn1<Object,R> fjjoin);
 
-        UnmodIterator<UnEntry<K,V>> iterator();
+        <R> UnmodIterator<R> iterator(Fn2<K, V, R> aFn);
     }
 
     private final static class ArrayNode<K,V> implements INode<K,V>, UnmodIterable<UnEntry<K,V>> {
@@ -563,7 +592,11 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
 //        @Override public Sequence<UnmodMap.UnEntry<K,V>> nodeSeq(){ return Seq.create(array); }
 
         @Override public UnmodIterator<UnEntry<K,V>> iterator() {
-            return new Iter<>(array);
+            return iterator(Tuple2::of);
+        }
+
+        @Override public <R> UnmodIterator<R> iterator(Fn2<K, V, R> aFn) {
+            return new Iter<>(array, aFn);
         }
 
 //        @Override public <R> R kvreduce(Fn3<R,K,V,R> f, R init){
@@ -694,17 +727,19 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
             return UnmodIterable.toString("ArrayNode", this);
         }
 
-        private static class Iter<K,V> implements UnmodIterator<UnEntry<K,V>> {
+        private static class Iter<K,V,R> implements UnmodIterator<R> {
 //            , Serializable {
 //            // For serializable.  Make sure to change whenever internal data format changes.
 //            private static final long serialVersionUID = 20160903192900L;
 
             private final INode<K,V>[] array;
+            private Fn2<K, V, R> aFn;
             private int i = 0;
-            private UnmodIterator<UnEntry<K,V>> nestedIter;
+            private UnmodIterator<R> nestedIter;
 
-            private Iter(INode<K,V>[] array){
+            private Iter(INode<K,V>[] array, Fn2<K,V,R> aFn){
                 this.array = array;
+                this.aFn = aFn;
             }
 
             @Override public boolean hasNext(){
@@ -719,7 +754,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
                     if (i < array.length) {
                         INode<K,V> node = array[i++];
                         if (node != null) {
-                            nestedIter = node.iterator();
+                            nestedIter = node.iterator(aFn);
                         }
                     } else {
                         return false;
@@ -727,7 +762,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
                 }
             }
 
-            @Override public UnEntry<K,V> next(){
+            @Override public R next(){
                 if (hasNext()) {
                     return nestedIter.next();
                 } else {
@@ -878,8 +913,8 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
 
 //        @Override public Sequence<UnEntry<K,V>> nodeSeq() { return NodeSeq.create(array); }
 
-        @Override public UnmodIterator<UnEntry<K,V>> iterator(){
-            return new NodeIter<>(array);
+        @Override public <R> UnmodIterator<R> iterator(Fn2<K, V, R> aFn){
+            return new NodeIter<>(array, aFn);
         }
 
 //        @Override public <R> R kvreduce(Fn3<R,K,V,R> f, R init){
@@ -1091,7 +1126,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
 
 //        @Override public Sequence<UnEntry<K,V>> nodeSeq() { return NodeSeq.create(array); }
 
-        @Override public UnmodIterator<UnEntry<K,V>> iterator() { return new NodeIter<>(array); }
+        @Override public <R> UnmodIterator<R> iterator(Fn2<K, V, R> aFn) { return new NodeIter<>(array, aFn); }
 
 //        @Override public <R> R kvreduce(Fn3<R,K,V,R> f, R init){
 //            return doKvreduce(array, f, init);
@@ -1333,31 +1368,20 @@ public static void main(String[] args){
         return 1 << mask(hash, shift);
     }
 
-    private static final class NodeIter<K,V> implements UnmodIterator<UnEntry<K,V>> {
+    private static final class NodeIter<K,V,R> implements UnmodIterator<R> {
 //        , Serializable {
 //        // For serializable.  Make sure to change whenever internal data format changes.
 //        private static final long serialVersionUID = 20160903192900L;
-
-        enum Absent implements UnEntry {
-            ENTRY {
-                @Override public Object getKey() {
-                    throw new UnsupportedOperationException("Should be Unreachable.");
-                }
-                @Override public Object getValue() {
-                    throw new UnsupportedOperationException("Should be Unreachable.");
-                }
-            }
-        }
-        @SuppressWarnings("unchecked")
-        private static <K,V> UnEntry<K,V> absence() { return (UnEntry<K,V>) Absent.ENTRY; }
-
         final Object[] array;
+        private Fn2<K, V, R> aFn;
         private int mutableIndex = 0;
-        private UnEntry<K,V> nextEntry = absence();
-        private Iterator<UnEntry<K,V>> nextIter;
+        private R nextEntry = null;
+        private boolean absent = true;
+        private UnmodIterator<R> nextIter;
 
-        NodeIter(Object[] array){
+        NodeIter(Object[] array, Fn2<K,V,R> aFn){
             this.array = array;
+            this.aFn = aFn;
         }
 
         private boolean advance(){
@@ -1380,12 +1404,13 @@ public static void main(String[] args){
                 int i = mutableIndex;
                 mutableIndex = i + 2;
                 if (array[i] != null) {
-                    nextEntry = Tuple2.of(k(array, i), v(array, i + 1));
+                    nextEntry = aFn.apply(k(array, i), v(array, i + 1));
+                    absent = false;
                     return true;
                 } else {
                     INode<K,V> node = iNode(array, i + 1);
                     if (node != null) {
-                        Iterator<UnEntry<K,V>> iter = node.iterator();
+                        UnmodIterator<R> iter = node.iterator(aFn);
                         if (iter != null && iter.hasNext()) {
                             nextIter = iter;
                             return true;
@@ -1398,16 +1423,17 @@ public static void main(String[] args){
 
         @Override public boolean hasNext(){
             //noinspection SimplifiableIfStatement
-            if (nextEntry != Absent.ENTRY || nextIter != null) {
+            if (!absent || nextIter != null) {
                 return true;
             }
             return advance();
         }
 
-        @Override public UnEntry<K,V> next(){
-            UnEntry<K,V> ret = nextEntry;
-            if(ret != Absent.ENTRY) {
-                nextEntry = absence();
+        @Override public R next(){
+            R ret = nextEntry;
+            if(!absent) {
+                nextEntry = null;
+                absent = true;
                 return ret;
             } else if(nextIter != null) {
                 ret = nextIter.next();

@@ -20,9 +20,9 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Queue;
-import java.util.SortedMap;
 import java.util.Stack;
 
+import org.organicdesign.fp.function.Fn1;
 import org.organicdesign.fp.oneOf.Option;
 import org.organicdesign.fp.tuple.Tuple2;
 
@@ -314,63 +314,6 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
 //        }
 //    };
 
-    /**
-     When comparing against a SortedMap, this is correct and O(n) fast, but BEWARE! It is also
-     compatible with java.util.Map which unfortunately means equality as defined by this method
-     (and java.util.AbstractMap) is not commutative when comparing ordered and unordered maps (it is
-     also O(n log n) slow).  The Equator defined by this class prevents comparison with unordered
-     Maps.
-     */
-    @Override public boolean equals(Object other) {
-        if (this == other) { return true; }
-        // Note: It does not make sense to compare an ordered map with an unordered map.
-        // This is a bug, but it's the *same* bug that java.util.AbstractMap has.
-        // there is a javaBug unit test.  When that fails, we can fix this to be correct instead of
-        // what it currently is (most politely called "compatible with existing API's").
-        if ( !(other instanceof Map) ) { return false; }
-
-        Map<?,?> that = (Map) other;
-
-        if (size != that.size()) { return false; }
-
-        // Yay, this makes sense, and we can compare these with O(n) efficiency while still
-        // maintaining compatibility with java.util.Map.
-        if (other instanceof UnmodSortedMap) {
-            return UnmodSortedIterable.equal(this, (UnmodSortedMap<?,?>) other);
-        }
-        if (other instanceof SortedMap) {
-            return UnmodSortedIterable.equal(this,
-                                             UnmodSortedIterable.castFromSortedMap(
-                                                     (SortedMap<?,?>) other));
-        }
-
-        // This makes no sense and takes O(n log n) or something.
-        // It's here to be compatible with java.util.AbstractMap.
-        // java.util.TreeMap doesn't involve the comparator, and its effect plays out in the order
-        // of the values.  I'm uncomfortable with this, but for now I'm aiming for
-        // Compatibility with TreeMap.
-        try {
-            for (Entry<K,V> e : this) {
-                K key = e.getKey();
-                V value = e.getValue();
-                Object thatValue = that.get(key);
-                if (value == null) {
-                    if ( (thatValue != null) || !that.containsKey(key) )
-                        return false;
-                } else {
-                    if ( !value.equals(thatValue) )
-                        return false;
-                }
-            }
-        } catch (ClassCastException ignore) {
-            return false;
-        } catch (NullPointerException ignore) {
-            return false;
-        }
-
-        return true;
-    }
-
 //    /** Returns a view of the keys contained in this map. */
 //    @Override public ImSet<K> keySet() { return PersistentTreeSet.ofMap(this); }
 
@@ -657,7 +600,15 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
 
     /** {@inheritDoc} */
     @Override
-    public UnmodSortedIterator<UnEntry<K,V>> iterator() { return new NodeIterator<>(tree, true); }
+    public UnmodSortedIterator<UnEntry<K,V>> iterator() { return iterator(Tuple2::of); }
+
+    @Override
+    public UnmodSortedIterator<K> keyIterator() { return iterator(Node::getKey); }
+
+    @Override
+    public UnmodSortedIterator<V> valIterator() { return iterator(Node::getValue); }
+
+    public <R> UnmodSortedIterator<R> iterator(Fn1<Node<K,V>,R> aFn) { return new NodeIterator<>(tree, true, aFn); }
 
 //    public NodeIterator<K,V> reverseIterator() { return new NodeIterator<>(tree, false); }
 
@@ -1145,16 +1096,18 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
      They are not serializable and should not be made so.  I can alter this to return nice,
      neat, Tuple2 objects which are serializable, but we've made it this far without so...
      */
-    private static class NodeIterator<K, V> implements UnmodSortedIterator<UnEntry<K,V>> {
+    private static class NodeIterator<K,V,R> implements UnmodSortedIterator<R> {
         //, Serializable {
         // For serializable.  Make sure to change whenever internal data format changes.
         // private static final long serialVersionUID = 20160827174100L;
 
         private Stack<Node<K,V>> stack = new Stack<>();
         private final boolean asc;
+        private Fn1<Node<K, V>, R> aFn;
 
-        NodeIterator(Node<K,V> t, boolean asc) {
+        NodeIterator(Node<K,V> t, boolean asc, Fn1<Node<K,V>,R> aFn) {
             this.asc = asc;
+            this.aFn = aFn;
             push(t);
         }
 
@@ -1170,11 +1123,11 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
         }
 
         @SuppressWarnings("unchecked")
-        @Override public UnmodMap.UnEntry<K,V> next() {
+        @Override public R next() {
             Node<K,V> t = stack.pop();
             push(asc ? t.right() : t.left());
 
-            return Tuple2.of(t);
+            return aFn.apply(t);
         }
     }
 

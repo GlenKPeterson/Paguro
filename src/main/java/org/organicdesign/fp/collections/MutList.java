@@ -25,6 +25,18 @@ public interface MutList<E> extends BaseList<E> {
     @Override
     MutList<E> append(E val);
 
+    // TODO: Is this a good idea?  Kotlin does this...
+//    /**
+//     Ensures that this collection contains the specified element (optional operation).
+//     Returns true if this collection changed as a result of the call.
+//     */
+//    @SuppressWarnings("deprecation")
+//    @Override default boolean add(E val) {
+//        int origSize = size();
+//        append(val);
+//        return origSize != size();
+//    }
+
     /** Returns a immutable version of this mutable list. */
     ImList<E> immutable();
 

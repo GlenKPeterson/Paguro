@@ -159,6 +159,14 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>,
 //        return UnmodMap.UnEntry.unSortIterEntToUnSortIterUnEnt(entrySet().iterator());
 //    }
 
+    @Override default UnmodSortedIterator<K> keyIterator() {
+        return new UnEntry.UnmodSortedKeyIter<>(iterator());
+    }
+
+    @Override default UnmodSortedIterator<V> valIterator() {
+        return new UnEntry.UnmodSortedValIter<>(iterator());
+    }
+
     /** Returns a view of the keys contained in this map. */
     @Override default UnmodSortedSet<K> keySet() {
         class KeySet implements UnmodSortedSet<K>, Serializable {
@@ -172,7 +180,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>,
             @Override public boolean contains(Object o) { return parentMap.containsKey(o); }
 
             @Override public UnmodSortedIterator<K> iterator() {
-                return new UnEntry.UnmodSortedKeyIter<>(parentMap.iterator());
+                return parentMap.keyIterator();
             }
 
             @Override public int size() { return parentMap.size(); }
@@ -281,14 +289,12 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>,
             // For serializable.  Make sure to change whenever internal data format changes.
             private static final long serialVersionUID = 20160903104400L;
 
-            private final UnmodMap<K,V> parent;
-            private Impl(UnmodMap<K,V> p) { parent = p; }
+            private final UnmodSortedMap<K,V> parent;
+            private Impl(UnmodSortedMap<K,V> p) { parent = p; }
 
             @SuppressWarnings("SuspiciousMethodCalls")
             @Override public boolean contains(Object o) { return parent.containsValue(o); }
-            @Override public UnmodSortedIterator<V> iterator() {
-                return new UnEntry.UnmodSortedValIter<>(parent.iterator());
-            }
+            @Override public UnmodSortedIterator<V> iterator() { return parent.valIterator(); }
             @Override public int size() { return parent.size(); }
 
             @Override public int hashCode() {

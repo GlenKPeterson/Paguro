@@ -81,17 +81,36 @@ public interface Equator<T> {
         DEFAULT {
             @Override
             public int compare(Comparable<Object> o1, Comparable<Object> o2) {
-                if (o1 == o2) { return 0; }
-                if (o1 == null) {
-                    return - (o2.compareTo(o1));
-                }
-                return o1.compareTo(o2);
+                return doCompare(o1, o2);
             }
         }
     }
 
     @SuppressWarnings("unchecked")
     static <T> Comparator<T> defaultComparator() { return (Comparator<T>) Comp.DEFAULT; }
+
+    /** This is the guts of building a comparator from Comparables. */
+    static int doCompare(Comparable<Object> o1, Comparable<Object> o2) {
+        if (o1 == o2) { return 0; }
+        if (o1 == null) {
+            // FindBugs Hates this for at least the following reasons:
+            // 1. Method call passes null for known non-null value.
+            // 2. Load of known null value
+            // 3. Negating the result of compareTo()/compare()
+            // Negating Integer.MIN_VALUE won't negate the sign of the result.
+            //
+            // Generally, you shouldn't be comparing something to null.
+            // But if your Comparable class is defined for comparing against null, and if you pass a null,
+            // this should work.  We're trying to be compatible with anything you do that even might make sense.
+            //
+            // I'd love to have someone explain to me why this can never work.  I'm unable to prove to myself that
+            // this could never be useful.  In fact, I think I rely on it to sort some lists of stuff that can
+            // contain nulls somewhere, like a list of selectOptions including the null option to display to the user.
+            // The selectOption is defined so that compareTo(null) always returns 1.
+            return - Integer.signum(o2.compareTo(o1));
+        }
+        return o1.compareTo(o2);
+    }
 
     // ========================================= Instance =========================================
     /**
