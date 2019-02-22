@@ -5,6 +5,9 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
+# Release 3.1.3: Cowry (Copy-On Write aRraY)
+ - Made most Cowry methods public
+
 # Release 3.1.2: Heterogeneous RrbTree Fix
  - Fixed a bug (reported by [fcurts](https://github.com/fcurts) - with unit test!) where Heterogeneous RrbTrees of more than 32 items
  would throw an exception at Runtime.  I had done something that in retrospect is obviously dumb.

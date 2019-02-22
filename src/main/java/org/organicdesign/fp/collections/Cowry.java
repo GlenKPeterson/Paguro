@@ -19,6 +19,7 @@ import org.organicdesign.fp.tuple.Tuple2;
  This class is final and cannot be instantiated.
  Created by gpeterso on 5/21/2017.
  */
+@SuppressWarnings("WeakerAccess")
 public final class Cowry {
     private Cowry() {
         throw new UnsupportedOperationException("Do not instantiate");
@@ -38,7 +39,7 @@ public final class Cowry {
     // =================================== Array Helper Functions ==================================
     // Helper function to return the empty array of whatever type you need.
     @SuppressWarnings("unchecked")
-    static <T> T[] emptyArray() { return (T[]) EMPTY_ARRAY; }
+    public static <T> T[] emptyArray() { return (T[]) EMPTY_ARRAY; }
 
 //    // Thank you jeannicolas
 //    // http://stackoverflow.com/questions/80476/how-can-i-concatenate-two-arrays-in-java
@@ -68,7 +69,7 @@ public final class Cowry {
      * @return an array of the appropriate class containing the single element.
      */
     @SuppressWarnings("unchecked")
-    static <T> T[] singleElementArray(T elem, Class<T> tClass) {
+    public static <T> T[] singleElementArray(T elem, Class<T> tClass) {
         if (tClass == null) {
             return (T[]) new Object[] { elem };
         }
@@ -79,7 +80,7 @@ public final class Cowry {
     }
 
     /**
-     * Returns a new array one longer than the given one, witht the specified item inserted at the specified index.
+     * Returns a new array one longer than the given one, with the specified item inserted at the specified index.
      * @param item The item to insert
      * @param items The original array (will not be modified)
      * @param idx the index to insert the item at.
@@ -87,7 +88,7 @@ public final class Cowry {
      * @return A copy of the given array with the additional item at the appropriate index
      *         (will be one longer than the original array).
      */
-    static <T> T[] insertIntoArrayAt(T item, T[] items, int idx, Class<T> tClass) {
+    public static <T> T[] insertIntoArrayAt(T item, T[] items, int idx, Class<T> tClass) {
         // Make an array that's one bigger.  It's too bad that the JVM bothers to
         // initialize this with nulls.
         @SuppressWarnings("unchecked")
@@ -120,7 +121,7 @@ public final class Cowry {
      * @param tClass the class of the items in the array (null for Object)
      * @return a copy of the original array with the given length
      */
-    static <T> T[] arrayCopy(T[] items, int length, Class<T> tClass) {
+    public static <T> T[] arrayCopy(T[] items, int length, Class<T> tClass) {
         // Make an array of the appropriate size.  It's too bad that the JVM bothers to
         // initialize this with nulls.
         @SuppressWarnings("unchecked")
@@ -148,8 +149,8 @@ public final class Cowry {
      @param tClass the class of the resulting new array
      @return a new array with the new items inserted at the proper position of the old array.
      */
-    static <A> A[] spliceIntoArrayAt(A[] insertedItems, A[] origItems, int idx,
-                                             Class<A> tClass) {
+    public static <A> A[] spliceIntoArrayAt(A[] insertedItems, A[] origItems, int idx,
+                                            Class<A> tClass) {
         // Make an array that big enough.  It's too bad that the JVM bothers to
         // initialize this with nulls.
         @SuppressWarnings("unchecked")
@@ -185,11 +186,11 @@ public final class Cowry {
 //        return newItems;
 //    }
 
-    @SuppressWarnings("unchecked")
-    static <T> T[] replaceInArrayAt(T replacedItem, T[] origItems, int idx,
-                                            Class<T> tClass) {
+    public static <T> T[] replaceInArrayAt(T replacedItem, T[] origItems, int idx,
+                                           Class<T> tClass) {
         // Make an array that big enough.  It's too bad that the JVM bothers to
         // initialize this with nulls.
+        @SuppressWarnings("unchecked")
         T[] newItems = (T[]) ( (tClass == null) ? new Object[origItems.length]
                                                 : Array.newInstance(tClass, origItems.length) );
         System.arraycopy(origItems, 0, newItems, 0, origItems.length);
@@ -203,7 +204,7 @@ public final class Cowry {
      @param splitIndex items less than this index go in the left, equal or greater in the right.
      @return a 2D array of leftItems then rightItems
      */
-    static <T> Tuple2<T[],T[]> splitArray(T[] orig, int splitIndex) { //, Class<T> tClass) {
+    public static <T> Tuple2<T[],T[]> splitArray(T[] orig, int splitIndex) { //, Class<T> tClass) {
 //        if (splitIndex < 1) {
 //            throw new IllegalArgumentException("Called split when splitIndex < 1");
 //        }
@@ -238,7 +239,7 @@ public final class Cowry {
      @param splitIndex items less than this index go in the left, equal or greater in the right.
      @return a 2D array of leftItems then rightItems
      */
-    static int[][] splitArray(int[] orig, int splitIndex) {
+    public static int[][] splitArray(int[] orig, int splitIndex) {
         // This function started an exact duplicate of the one above, but for ints.
 //        if (splitIndex < 1) {
 //            throw new IllegalArgumentException("Called split when splitIndex < 1");
