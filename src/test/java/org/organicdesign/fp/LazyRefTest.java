@@ -49,10 +49,10 @@ public class LazyRefTest {
         assertEquals(new Integer(7), lr.get());
     }
 
-    @Test (expected = IllegalArgumentException.class)
-    public void ofEx() {
-        LazyRef.of(null);
-    }
+//    @Test (expected = IllegalArgumentException.class)
+//    public void ofEx() {
+//        LazyRef.of(null);
+//    }
 
 //    @Test
 //    public void testLazyInt() {

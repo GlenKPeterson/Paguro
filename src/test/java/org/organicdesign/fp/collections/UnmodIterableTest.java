@@ -121,17 +121,17 @@ public class UnmodIterableTest {
         assertFalse(UnmodSortedIterable.equal(d, b));
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    @Test (expected = IllegalArgumentException.class)
-    public void testEx01() { UnmodIterable.hash(null); }
-
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    @Test (expected = IllegalArgumentException.class)
-    public void testEx02() { UnmodIterable.toString(null, Arrays.asList(1,2,3)); }
-
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    @Test (expected = IllegalArgumentException.class)
-    public void testEx03() { UnmodIterable.toString("Oops", null); }
+//    @SuppressWarnings("ResultOfMethodCallIgnored")
+//    @Test (expected = IllegalArgumentException.class)
+//    public void testEx01() { UnmodIterable.hash(null); }
+//
+//    @SuppressWarnings("ResultOfMethodCallIgnored")
+//    @Test (expected = IllegalArgumentException.class)
+//    public void testEx02() { UnmodIterable.toString(null, Arrays.asList(1,2,3)); }
+//
+//    @SuppressWarnings("ResultOfMethodCallIgnored")
+//    @Test (expected = IllegalArgumentException.class)
+//    public void testEx03() { UnmodIterable.toString("Oops", null); }
 
 //    @Test public void compareHelper() {
 //        UnmodIterable<Integer> a = () -> new UnmodIterator<Integer>() {

@@ -14,26 +14,26 @@ import static org.junit.Assert.*;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 
 public class RangeOfIntTest {
-    @Test(expected = IllegalArgumentException.class)
-    public void factory1() {
-        RangeOfInt.of(null, Integer.valueOf(1));
-    }
+//    @Test(expected = IllegalArgumentException.class)
+//    public void factory1() {
+//        RangeOfInt.of(null, Integer.valueOf(1));
+//    }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void factory2() {
-        RangeOfInt.of(Integer.valueOf(1), null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void factory3() {
-        RangeOfInt.of(1, 0);
-    }
+//    @Test(expected = IllegalArgumentException.class)
+//    public void factory2() {
+//        RangeOfInt.of(Integer.valueOf(1), null);
+//    }
+//
+//    @Test(expected = IllegalArgumentException.class)
+//    public void factory3() {
+//        RangeOfInt.of(1, 0);
+//    }
 
     @Test public void basics() {
         RangeOfInt ir1 = RangeOfInt.of(0, 1);
-        assertEquals(ir1.contains(0), true);
-        assertEquals(ir1.contains(1), false);
-        assertEquals(ir1.contains(-1), false);
+        assertTrue(ir1.contains(0));
+        assertFalse(ir1.contains(1));
+        assertFalse(ir1.contains(-1));
         assertEquals(ir1.size(), 1);
 
         List<Integer> a = Collections.singletonList(99);
@@ -289,8 +289,8 @@ public class RangeOfIntTest {
         assertEquals(sla.size(), slb.size());
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void factoryEx1() { RangeOfInt.of(null); }
+//    @Test(expected = IllegalArgumentException.class)
+//    public void factoryEx1() { RangeOfInt.of(null); }
 
     @Test(expected = IllegalArgumentException.class)
     public void factoryEx2() { RangeOfInt.of(-1); }
