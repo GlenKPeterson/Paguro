@@ -28,7 +28,6 @@ import org.organicdesign.fp.collections.PersistentVector;
 import org.organicdesign.fp.tuple.Tuple2;
 import org.organicdesign.fp.tuple.Tuple3;
 import org.organicdesign.fp.xform.Xform;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -38,6 +37,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Random;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -45,7 +46,7 @@ import static org.organicdesign.fp.StaticImports.*;
 
 public class StaticImportsTest {
 
-    @Test public void mutableMapTest() throws Exception {
+    @Test public void mutableMapTest() {
         assertEquals(Collections.emptyMap(), mutableMap());
         assertEquals(Collections.singletonMap(35, "Thirty Five"),
                      mutableMap(tup(35, "Thirty Five")));
@@ -60,7 +61,7 @@ public class StaticImportsTest {
                                 tup("three", 3)));
     }
 
-    @Test public void mutableSetTest() throws Exception {
+    @Test public void mutableSetTest() {
         assertEquals(Collections.emptySet(), mutableSet());
         assertEquals(Collections.singleton("Thirty Five"),
                      mutableSet("Thirty Five"));
@@ -73,7 +74,7 @@ public class StaticImportsTest {
                      mutableSet(1, 2, 3));
     }
 
-    @Test public void mutableVecTest() throws Exception {
+    @Test public void mutableVecTest() {
         assertEquals(Collections.emptyList(), mutableVec());
         assertEquals(Collections.singletonList("Thirty Five"),
                      mutableVec("Thirty Five"));
@@ -101,7 +102,7 @@ public class StaticImportsTest {
     }
 
     @SuppressWarnings({"NullArgumentToVariableArgMethod", "RedundantArrayCreation", "unchecked"})
-    @Test public void testMap() throws Exception {
+    @Test public void testMap() {
         assertEquals(PersistentHashMap.EMPTY, map());
         assertEquals(PersistentHashMap.EMPTY, map((Map.Entry[]) null));
         assertEquals(PersistentHashMap.EMPTY, map(new Map.Entry[0]));
@@ -111,7 +112,7 @@ public class StaticImportsTest {
     }
 
     @SuppressWarnings({"NullArgumentToVariableArgMethod", "RedundantArrayCreation"})
-    @Test public void testSet() throws Exception {
+    @Test public void testSet() {
         assertEquals(PersistentHashSet.EMPTY, set());
         assertEquals(PersistentHashSet.EMPTY, set((Map.Entry[]) null));
         assertEquals(PersistentHashSet.EMPTY, set(new Object[0]));
@@ -120,7 +121,7 @@ public class StaticImportsTest {
         assertEquals(phm, set("Hi"));
     }
 
-    @Test public void testSortedMap() throws Exception {
+    @Test public void testSortedMap() {
         ImList<Map.Entry<String,Integer>> ls = PersistentVector.empty();
         ls = ls.append(tup("Hi", 1))
                .append(Tuple2.of("Bye", -99))
@@ -144,7 +145,7 @@ public class StaticImportsTest {
         assertEquals(refMap.comparator(), testMap.comparator());
     }
 
-    @Test public void testSortedSet() throws Exception {
+    @Test public void testSortedSet() {
         ImList<String> ls = PersistentVector.empty();
         ls = ls.append("Hi")
                .append("Bye")
@@ -168,26 +169,36 @@ public class StaticImportsTest {
         assertEquals(refSet.comparator(), testSet.comparator());
     }
 
-    @Test public void testTup() throws Exception {
+    @Test public void testTup() {
         assertEquals(Tuple2.of("Hello", -32), tup("Hello", -32));
         assertEquals(Tuple3.of("Hello", -32, 9.5), tup("Hello", -32, 9.5));
     }
 
     @SuppressWarnings({"NullArgumentToVariableArgMethod", "RedundantArrayCreation"})
-    @Test public void testVec() throws Exception {
+    @Test public void testVec() {
         assertEquals(PersistentVector.EMPTY, vec());
         assertEquals(PersistentVector.EMPTY, vec((Map.Entry[]) null));
         assertEquals(PersistentVector.EMPTY, vec(new Map.Entry[0]));
         ImList<String> ls = PersistentVector.<String>empty()
                 .append("Hi");
         assertEquals(ls, vec("Hi"));
+
+        Random r = new Random();
+        boolean showEditable = r.nextBoolean();
+        boolean showDeleted = r.nextBoolean();
+
+        // This just shows whether Objects::nonNull generates a warning in your editor.
+        vec(showEditable ? tup("showEditable", "1") : null,
+            showDeleted ? tup("showDeleted", "1") : null)
+                .filter(Objects::nonNull)
+                .toImList();
     }
 
-    @Test public void testXform() throws Exception {
+    @Test public void testXform() {
         assertEquals(Xform.of(Arrays.asList(1,2,3)), xform(Arrays.asList(1,2,3)));
     }
 
-    @Test public void xformArrayTest() throws Exception {
+    @Test public void xformArrayTest() {
         assertEquals(Collections.emptyList(), xformArray().toImList());
         assertEquals(Collections.singletonList("Thirty Five"),
                      xformArray("Thirty Five").toImList());

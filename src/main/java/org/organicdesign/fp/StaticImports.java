@@ -77,7 +77,7 @@ map(tup("a", 1),
  file in your classpath, or if a method is ever removed from this file.  Java needs a data
  definition language so badly that I think it is worth this small risk.</p>
  */
-@SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "WeakerAccess"})
 public final class StaticImports {
     // Prevent instantiation
     private StaticImports() { throw new UnsupportedOperationException("No instantiation"); }
@@ -117,7 +117,9 @@ public final class StaticImports {
         MutMap<K,V> ret = PersistentHashMap.emptyMutable();
         if (kvPairs == null) { return ret; }
         for (Map.Entry<K,V> me : kvPairs) {
-            ret.assoc(me);
+            if (me != null) {
+                ret.assoc(me);
+            }
         }
         return ret;
     }
@@ -132,9 +134,9 @@ public final class StaticImports {
      This data definition method is one of the few methods in this project that support varargs.
      */
     @SafeVarargs
-    public static <T> @NotNull MutRrbt<T> mutableRrb(@Nullable T... items) {
+    public static <T> @NotNull MutRrbt<@Nullable T> mutableRrb(@Nullable T... items) {
         if ( (items == null) || (items.length < 1) ) { return RrbTree.emptyMutable(); }
-        return RrbTree.<T>emptyMutable()
+        return RrbTree.<@Nullable T>emptyMutable()
                 .concat(Arrays.asList(items));
     }
 
@@ -144,10 +146,10 @@ public final class StaticImports {
      values overwrite earlier ones.
      */
     @SafeVarargs
-    public static <T> @NotNull MutSet<T> mutableSet(@Nullable T... items) {
-        MutSet<T> ret = PersistentHashSet.emptyMutable();
+    public static <T> @NotNull MutSet<@Nullable T> mutableSet(@Nullable T... items) {
+        MutSet<@Nullable T> ret = PersistentHashSet.emptyMutable();
         if (items == null) { return ret; }
-        for (T t : items) {
+        for (@Nullable T t : items) {
             ret.put(t);
         }
         return ret;
@@ -158,10 +160,10 @@ public final class StaticImports {
      few methods in this project that support varargs.
      */
     @SafeVarargs
-    public static <T> @NotNull MutList<T> mutableVec(@Nullable T... items) {
-        MutList<T> ret = PersistentVector.emptyMutable();
+    public static <T> @NotNull MutList<@Nullable T> mutableVec(@Nullable T... items) {
+        MutList<@Nullable T> ret = PersistentVector.emptyMutable();
         if (items == null) { return ret; }
-        for (T t : items) {
+        for (@Nullable T t : items) {
             ret.append(t);
         }
         return ret;
@@ -177,7 +179,7 @@ public final class StaticImports {
      This data definition method is one of the few methods in this project that support varargs.
      */
     @SafeVarargs
-    static public <T> @NotNull ImRrbt<T> rrb(@Nullable T... items) {
+    static public <T> @NotNull ImRrbt<@Nullable T> rrb(@Nullable T... items) {
         if ( (items == null) || (items.length < 1) ) { return RrbTree.empty(); }
         return mutableRrb(items).immutable();
     }
@@ -188,7 +190,7 @@ public final class StaticImports {
      values overwrite earlier ones.
      */
     @SafeVarargs
-    public static <T> @NotNull ImSet<T> set(@Nullable T... items) {
+    public static <T> @NotNull ImSet<@Nullable T> set(@Nullable T... items) {
         if ( (items == null) || (items.length < 1) ) { return PersistentHashSet.empty(); }
         return PersistentHashSet.of(Arrays.asList(items));
     }
@@ -256,7 +258,7 @@ public final class StaticImports {
      few methods in this project that support varargs.
      */
     @SafeVarargs
-    static public <T> @NotNull ImList<T> vec(@Nullable T... items) {
+    static public <T> @NotNull ImList<@Nullable T> vec(@Nullable T... items) {
         if ( (items == null) || (items.length < 1) ) { return PersistentVector.empty(); }
         return mutableVec(items).immutable();
     }
