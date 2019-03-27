@@ -78,7 +78,7 @@ public interface ComparisonContext<T> extends Equator<T>, Comparator<T> {
      Returns the minimum (as defined by this Comparison Context).  Nulls are skipped.  If there are
      duplicate minimum values, the first one is returned.
      */
-    default @Nullable T min(@NotNull Iterable<T> items) {
+    default T min(@NotNull Iterable<T> items) {
         // Note: following code is identical to max() except for lt() vs. gt()
         Iterator<T> iter = items.iterator();
         T ret = null;
@@ -98,7 +98,7 @@ public interface ComparisonContext<T> extends Equator<T>, Comparator<T> {
      Returns the maximum (as defined by this Comparison Context).  Nulls are skipped.  If there are
      duplicate maximum values, the first one is returned.
      */
-    default @Nullable T max(@NotNull Iterable<T> items) {
+    default T max(@NotNull Iterable<T> items) {
         // Note: following code is identical to min() except for lt() vs. gt()
         Iterator<T> iter = items.iterator();
         T ret = null;

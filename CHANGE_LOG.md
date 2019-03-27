@@ -5,7 +5,10 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
-## Release 3.5.4: Nullability details
+## Release 3.5.5: More nullability details
+ - Fixed more nullability issues
+
+### Release 3.5.4: Nullability details
  - Fixed some nullability issues with the few varargs methods in this project.
 
 ### Release 3.5.3: NotNull
