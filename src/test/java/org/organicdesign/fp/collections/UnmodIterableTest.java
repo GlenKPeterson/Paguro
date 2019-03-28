@@ -63,6 +63,18 @@ public class UnmodIterableTest {
         assertEquals(Arrays.asList("How", "now", "cow"),
                      testIterable.filter((String s) -> s.endsWith("w")).toMutList());
 
+        assertEquals(Arrays.asList("Holy", "cow!"),
+                     new TestIterable<>(Arrays.asList("Holy", null, "cow!"))
+                             .whereNonNull()
+                             .toMutList());
+
+        assertEquals(Arrays.asList("Holy", "cow!"),
+                     new TestIterable<>(Arrays.asList(null, null, null,
+                                                      "Holy", null, null, null, null, "cow!",
+                                                      null, null))
+                             .whereNonNull()
+                             .toMutList());
+
         assertEquals(Arrays.asList("How", "are", "you", "now", "are", "you", "brown", "are", "you",
                                    "cow", "are", "you"),
                      testIterable.flatMap((String s) ->

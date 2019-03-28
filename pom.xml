@@ -41,7 +41,7 @@ http://mvnrepository.com/artifact/org.organicdesign/Paguro
 	-->
 	<groupId>org.organicdesign</groupId>
 	<artifactId>Paguro-KF</artifactId>
-	<version>3.5.5</version>
+	<version>3.5.6</version>
 	<packaging>jar</packaging>
 
 	<name>Paguro: Kotlin-Friendly</name>

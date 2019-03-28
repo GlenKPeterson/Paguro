@@ -417,7 +417,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
 //                throw new IllegalStateException("Expected trees of equal height");
 //            }
 
-                @SuppressWarnings("unchecked")
+                @SuppressWarnings({"rawtypes", "unchecked"}) // Need raw types here.
                 Node<E>[] newRootArray = new Node[] {leftRoot, rightRoot};
                 int leftSize = leftRoot.size();
                 Node<E> newRoot =
@@ -848,7 +848,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
 //                throw new IllegalStateException("Expected trees of equal height");
 //            }
 
-                @SuppressWarnings("unchecked")
+                @SuppressWarnings({"rawtypes", "unchecked"}) // Need raw types here.
                 Node<E>[] newRootArray = new Node[] {leftRoot, rightRoot};
                 int leftSize = leftRoot.size();
                 Node<E> newRoot =

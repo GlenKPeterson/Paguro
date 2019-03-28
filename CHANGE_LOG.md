@@ -5,6 +5,10 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
+### Release 3.5.6: Transformable.whereNonNull()
+ - Instead of .filter(Objects::nonNull) because sometimes IntelliJ
+ gets confused about whether objects can be null in this case or not.
+
 ## Release 3.5.5: More nullability details
  - Fixed more nullability issues
 

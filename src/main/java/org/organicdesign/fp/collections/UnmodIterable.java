@@ -10,6 +10,7 @@ import org.organicdesign.fp.xform.Transformable;
 import org.organicdesign.fp.xform.Xform;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 import static org.organicdesign.fp.FunctionUtils.stringify;
 
@@ -17,6 +18,7 @@ import static org.organicdesign.fp.FunctionUtils.stringify;
 public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
     // ========================================== Static ==========================================
 
+    @SuppressWarnings("rawtypes") // Need raw types here.
     enum UnIterable implements UnmodIterable {
         EMPTY {
             @NotNull
@@ -103,6 +105,7 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
      This is correct, but O(n).  It also works regardless of the order of the items because
      a + b = b + a, even when an overflow occurs.
      */
+    @SuppressWarnings("rawtypes") // Need raw types here.
     static int hash(@NotNull Iterable is) {
 //        System.out.println("hashCode for: " + is);
         int ret = 0;
@@ -183,6 +186,11 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
     /** {@inheritDoc} */
     @Override default @NotNull UnmodIterable<T> filter(@NotNull Fn1<? super T,Boolean> f) {
         return Xform.of(this).filter(f);
+    }
+
+    /** {@inheritDoc} */
+    @Override default @NotNull UnmodIterable<T> whereNonNull() {
+        return Xform.of(this).filter(Objects::nonNull);
     }
 
     /** {@inheritDoc} */

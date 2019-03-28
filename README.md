@@ -24,7 +24,7 @@ Java-only users want 3.x from the main branch.
 <dependency>
         <groupId>org.organicdesign</groupId>
         <artifactId>Paguro-KF</artifactId>
-        <version>3.5.5</version>
+        <version>3.5.6</version>
 </dependency>
 ```
 

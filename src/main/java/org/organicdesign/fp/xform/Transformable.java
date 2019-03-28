@@ -94,6 +94,12 @@ public interface Transformable<T> {
     @NotNull Transformable<T> filter(Fn1<? super T,Boolean> predicate);
 
     /**
+     Return only the items which are non-null
+     @return a Transformable of only the non-null items.
+     */
+    @NotNull Transformable<T> whereNonNull();
+
+    /**
      Returns the first item produced by this transform.  If the source is unordered, there is no guarantee about which
      item will make it through the transform first.
 
