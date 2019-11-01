@@ -92,11 +92,15 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         @SuppressWarnings("unchecked")
         @Override public MutableRrbt<E> append(E val) {
             // If our focus isn't set up for appends or if it's full, insert it into the data structure
-            // where it belongs.  Then make a new focus
-            if ( (focusLength >= STRICT_NODE_LENGTH) ||
+            // structure where it belongs.  If focus is empty, no need to insert it into the
+            // data structure.  Then make a new focus
+            if ( (focusLength == 0) ||
+                 (focusLength >= STRICT_NODE_LENGTH) ||
                  ((focusLength > 0) &&
                   (focusStartIndex < (size - focusLength))) ) {
-                root = root.pushFocus(focusStartIndex, arrayCopy(focus, focusLength, null));
+                if (focusLength != 0) {
+                    root = root.pushFocus(focusStartIndex, arrayCopy(focus, focusLength, null));
+                }
                 focus = (E[]) new Object[STRICT_NODE_LENGTH];
                 focus[0] = val;
                 focusStartIndex = size;
@@ -584,11 +588,16 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         /** {@inheritDoc} */
         @Override public ImRrbt<E> append(E val) {
             // If our focus isn't set up for appends or if it's full, insert it into the data
-            // structure where it belongs.  Then make a new focus
-            if ( (focus.length >= STRICT_NODE_LENGTH) ||
+            // structure where it belongs.  If focus is empty, no need to insert it into the
+            // data structure.  Then make a new focus
+            if ( (focus.length == 0) ||
+                 (focus.length >= STRICT_NODE_LENGTH) ||
                  ((focus.length > 0) &&
                   (focusStartIndex < (size - focus.length))) ) {
-                Node<E> newRoot = root.pushFocus(focusStartIndex, focus);
+                Node<E> newRoot = root;
+                if (focus.length != 0) {
+                    newRoot = root.pushFocus(focusStartIndex, focus);
+                }
                 return new ImRrbt<>(singleElementArray(val), size, newRoot,
                                     size + 1);
             }
