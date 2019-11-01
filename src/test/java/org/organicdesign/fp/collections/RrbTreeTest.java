@@ -952,4 +952,47 @@ public class RrbTreeTest {
         }
     }
 
+    private static ImRrbt<Integer> immutableAppendRange(ImRrbt<Integer> rrb, int min, int max) {
+	for (int i = min; i <= max; i++) {
+	    rrb = rrb.append(i);
+	}
+	return rrb;
+    }
+
+    @Test
+    public void immutableAppendAfterConcat() {
+	ImRrbt<Integer> is1 = immutableAppendRange(ImRrbt.empty(), 0, 43);
+	ImRrbt<Integer> is2 = immutableAppendRange(ImRrbt.empty(), 44, 88);
+	ImRrbt<Integer> is3 = (ImRrbt<Integer>) is1.join(is2);
+	ImRrbt<Integer> is4 = immutableAppendRange(is3, 89, 89);
+
+	ArrayList<Integer> control = new ArrayList<>();
+	for (int i = 0; i <= 89; i++) {
+	    control.add(i);
+	}
+	assertEquals(control, is4);
+    }
+
+    private static void mutableAppendRange(MutableRrbt<Integer> rrb, int min, int max) {
+	for (int i = min; i <= max; i++) {
+	    rrb.append(i);
+	}
+    }
+
+    @Test
+    public void mutableAppendAfterConcat() {
+	MutableRrbt<Integer> is1 = RrbTree.emptyMutable();
+	mutableAppendRange(is1, 0, 43);
+	MutableRrbt<Integer> is2 = RrbTree.emptyMutable();
+	mutableAppendRange(is2, 44, 88);
+	MutableRrbt<Integer> is3 = (MutableRrbt<Integer>) is1.join(is2);
+	mutableAppendRange(is3, 89, 89);
+
+	ArrayList<Integer> control = new ArrayList<>();
+	for (int i = 0; i <= 89; i++) {
+	    control.add(i);
+	}
+	assertEquals(control, is3);
+    }
+
 }
