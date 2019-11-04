@@ -813,8 +813,9 @@ public class RrbTreeTest {
             r3.debugValidate();
         }
 
-	for (int i = 32; i < (32*32 + 2*32); i += 32) {
-	    for (int j = 32; j < (4*32); j += 32) {
+	int b = STRICT_NODE_LENGTH;
+	for (int i = b; i < (b*b + 2*b); i += b) {
+	    for (int j = b; j < (4*b); j += b) {
 		r1 = RrbTree.empty();
 		r2 = RrbTree.empty();
 		for (int k = 0; k < i; k++) {
@@ -902,8 +903,9 @@ public class RrbTreeTest {
             r3.debugValidate();
         }
 
-	for (int i = 32; i < (32*32 + 2*32); i += 32) {
-	    for (int j = 32; j < (4*32); j += 32) {
+	int b = STRICT_NODE_LENGTH;
+	for (int i = b; i < (b*b + 2*b); i += b) {
+	    for (int j = b; j < (4*b); j += b) {
 		r1 = RrbTree.emptyMutable();
 		r2 = RrbTree.emptyMutable();
 		for (int k = 0; k < i; k++) {
