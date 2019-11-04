@@ -813,6 +813,29 @@ public class RrbTreeTest {
             r3.debugValidate();
         }
 
+	for (int i = 32; i < (32*32 + 2*32); i += 32) {
+	    for (int j = 32; j < (4*32); j += 32) {
+		r1 = RrbTree.empty();
+		r2 = RrbTree.empty();
+		for (int k = 0; k < i; k++) {
+		    r1 = r1.append(k);
+		}
+		for (int k = 0; k < j; k++) {
+		    r2 = r2.append(i+k);
+		}
+		r3 = r1.join(r2);
+		control = new ArrayList<>();
+		for (int k = 0; k < (i+j); k++) {
+		    control.add(k);
+		}
+		assertEquals(control, r3);
+		for (int k = 0; k < (i+j); k++) {
+		    assertEquals(control.get(k), r3.get(k));
+		}
+		r3.debugValidate();
+	    }
+	}
+
 //        r1 = rrb(1, 2, 3, 4, 5, 6);
 //        r2 = rrb(7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26);
 //
@@ -878,6 +901,29 @@ public class RrbTreeTest {
             assertEquals(control, r3);
             r3.debugValidate();
         }
+
+	for (int i = 32; i < (32*32 + 2*32); i += 32) {
+	    for (int j = 32; j < (4*32); j += 32) {
+		r1 = RrbTree.emptyMutable();
+		r2 = RrbTree.emptyMutable();
+		for (int k = 0; k < i; k++) {
+		    r1 = r1.append(k);
+		}
+		for (int k = 0; k < j; k++) {
+		    r2 = r2.append(i+k);
+		}
+		r3 = r1.join(r2);
+		control = new ArrayList<>();
+		for (int k = 0; k < (i+j); k++) {
+		    control.add(k);
+		}
+		assertEquals(control, r3);
+		for (int k = 0; k < (i+j); k++) {
+		    assertEquals(control.get(k), r3.get(k));
+		}
+		r3.debugValidate();
+	    }
+	}
     }
 
     @Test public void testBiggerJoin() {
