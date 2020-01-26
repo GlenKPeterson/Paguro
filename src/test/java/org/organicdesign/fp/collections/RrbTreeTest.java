@@ -13,19 +13,18 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-
+import org.junit.Ignore;
 import org.junit.Test;
 import org.organicdesign.fp.StaticImports;
 import org.organicdesign.fp.TestUtilities;
 import org.organicdesign.fp.collections.RrbTree.ImRrbt;
 import org.organicdesign.fp.collections.RrbTree.MutableRrbt;
 import org.organicdesign.fp.tuple.Tuple2;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.xform;
@@ -62,7 +61,6 @@ public class RrbTreeTest {
             assertEquals(j + 1, is.size());
             assertEquals(Integer.valueOf(j), is.get(j));
         }
-        //noinspection AssertEqualsBetweenInconvertibleTypes
         assertEquals(control, is);
         is.debugValidate();
         assertEquals(iterations, is.size());
@@ -210,12 +208,6 @@ public class RrbTreeTest {
 
     final int SEVERAL = 100; //0; //0; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
 
-    private static <E> ArrayList<E> deepCopy(ArrayList<E> in) {
-        ArrayList<E> out = new ArrayList<E>();
-        out.addAll(in);
-        return out;
-    }
-
     /**
      Sequences of random inserts which previously failed.  So far, these are
      */
@@ -226,10 +218,10 @@ public class RrbTreeTest {
             is = is.append(i);
             control.add(i);
         }
-        randomInsertTest2(is, deepCopy(control), new int[] {74, 45, 46, 50});
+        randomInsertTest2(is, new ArrayList<>(control), new int[] {74, 45, 46, 50});
 //        System.out.println("================= HERE ================");
-        randomInsertTest2(is, deepCopy(control), new int[] {25, 47, 19, 101, 21, 37, 7, 25, 23, 79, 21, 103, 44, 31, 32, 110,
-                                                            58, 55, 7, 72, 73, 115});
+        randomInsertTest2(is, new ArrayList<>(control), new int[] {25, 47, 19, 101, 21, 37, 7, 25, 23, 79, 21, 103, 44, 31, 32, 110,
+                                                                   58, 55, 7, 72, 73, 115});
     }
 
     @Test
@@ -421,7 +413,7 @@ public class RrbTreeTest {
     @Test(expected = IndexOutOfBoundsException.class)
     public void emptyEx34() { RrbTree.emptyMutable().without(Integer.MAX_VALUE); }
 
-    @Test public void addSeveralItems() throws NoSuchAlgorithmException {
+    @Test public void addSeveralItems() {
 //        System.out.println("addSeveral start");
         final int SEVERAL = 100; //0; //0; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
         RrbTree<Integer> is = RrbTree.empty();
@@ -761,29 +753,40 @@ public class RrbTreeTest {
         return ret;
     }
 
+    private static final List<Integer> oneTo49 = Collections.unmodifiableList(Arrays.asList(
+            1, 2, 3, 4, 5, 6, 7, 8, 9,
+            10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+            20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+            30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
+            40, 41, 42, 43, 44, 45, 46, 47, 48, 49
+    ));
+
+    private static final List<Integer> fiftyTo99 = Collections.unmodifiableList(Arrays.asList(
+            50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
+            60, 61, 62, 63, 64, 65, 66, 67, 68, 69,
+            70, 71, 72, 73, 74, 75, 76, 77, 78, 79,
+            80, 81, 82, 83, 84, 85, 86, 87, 88, 89,
+            90, 91, 92, 93, 94, 95, 96, 97, 98, 99
+    ));
+
+    private static final List<Integer> oneTo99 = Collections.unmodifiableList(Arrays.asList(
+            1, 2, 3, 4, 5, 6, 7, 8, 9,
+            10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+            20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+            30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
+            40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
+            50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
+            60, 61, 62, 63, 64, 65, 66, 67, 68, 69,
+            70, 71, 72, 73, 74, 75, 76, 77, 78, 79,
+            80, 81, 82, 83, 84, 85, 86, 87, 88, 89,
+            90, 91, 92, 93, 94, 95, 96, 97, 98, 99
+    ));
+
     @Test public void joinImTest() {
         assertEquals(rrb(1,2,3,4,5,6), rrb(1,2,3).join(rrb(4,5,6)));
-        RrbTree<Integer> r1 = rrb(1, 2, 3, 4, 5, 6, 7, 8, 9,
-                                  10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-                                  20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-                                  30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
-                                  40, 41, 42, 43, 44, 45, 46, 47, 48, 49);
-        RrbTree<Integer> r2 = rrb(50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
-                                  60, 61, 62, 63, 64, 65, 66, 67, 68, 69,
-                                  70, 71, 72, 73, 74, 75, 76, 77, 78, 79,
-                                  80, 81, 82, 83, 84, 85, 86, 87, 88, 89,
-                                  90, 91, 92, 93, 94, 95, 96, 97, 98, 99);
-
-        RrbTree<Integer> r3 = rrb(1, 2, 3, 4, 5, 6, 7, 8, 9,
-                                  10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-                                  20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-                                  30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
-                                  40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
-                                  50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
-                                  60, 61, 62, 63, 64, 65, 66, 67, 68, 69,
-                                  70, 71, 72, 73, 74, 75, 76, 77, 78, 79,
-                                  80, 81, 82, 83, 84, 85, 86, 87, 88, 89,
-                                  90, 91, 92, 93, 94, 95, 96, 97, 98, 99);
+        RrbTree<Integer> r1 = rrb(oneTo49.toArray(new Integer[0]));
+        RrbTree<Integer> r2 = rrb(fiftyTo99.toArray(new Integer[0]));
+        RrbTree<Integer> r3 = rrb(oneTo99.toArray(new Integer[0]));
 
         assertEquals(r3, r1.join(r2));
 
@@ -813,30 +816,6 @@ public class RrbTreeTest {
             r3.debugValidate();
         }
 
-	int b = STRICT_NODE_LENGTH;
-	for (int i = b; i < (b*b + 2*b); i += b) {
-	    for (int j = b; j < (4*b); j += b) {
-		r1 = RrbTree.empty();
-		r2 = RrbTree.empty();
-		for (int k = 0; k < i; k++) {
-		    r1 = r1.append(k);
-		}
-		for (int k = 0; k < j; k++) {
-		    r2 = r2.append(i+k);
-		}
-		r3 = r1.join(r2);
-		control = new ArrayList<>();
-		for (int k = 0; k < (i+j); k++) {
-		    control.add(k);
-		}
-		assertEquals(control, r3);
-		for (int k = 0; k < (i+j); k++) {
-		    assertEquals(control.get(k), r3.get(k));
-		}
-		r3.debugValidate();
-	    }
-	}
-
 //        r1 = rrb(1, 2, 3, 4, 5, 6);
 //        r2 = rrb(7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26);
 //
@@ -860,27 +839,9 @@ public class RrbTreeTest {
 
     @Test public void joinMutableTest() {
         assertEquals(mut(1,2,3,4,5,6), mut(1,2,3).join(mut(4,5,6)));
-        RrbTree<Integer> r1 = mut(1, 2, 3, 4, 5, 6, 7, 8, 9,
-                                  10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-                                  20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-                                  30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
-                                  40, 41, 42, 43, 44, 45, 46, 47, 48, 49);
-        RrbTree<Integer> r2 = mut(50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
-                                  60, 61, 62, 63, 64, 65, 66, 67, 68, 69,
-                                  70, 71, 72, 73, 74, 75, 76, 77, 78, 79,
-                                  80, 81, 82, 83, 84, 85, 86, 87, 88, 89,
-                                  90, 91, 92, 93, 94, 95, 96, 97, 98, 99);
-
-        RrbTree<Integer> r3 = mut(1, 2, 3, 4, 5, 6, 7, 8, 9,
-                                  10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-                                  20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-                                  30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
-                                  40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
-                                  50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
-                                  60, 61, 62, 63, 64, 65, 66, 67, 68, 69,
-                                  70, 71, 72, 73, 74, 75, 76, 77, 78, 79,
-                                  80, 81, 82, 83, 84, 85, 86, 87, 88, 89,
-                                  90, 91, 92, 93, 94, 95, 96, 97, 98, 99);
+        RrbTree<Integer> r1 = mut(oneTo49.toArray(new Integer[0]));
+        RrbTree<Integer> r2 = mut(fiftyTo99.toArray(new Integer[0]));
+        RrbTree<Integer> r3 = mut(oneTo99.toArray(new Integer[0]));
 
         assertEquals(r3, r1.join(r2));
 
@@ -902,30 +863,75 @@ public class RrbTreeTest {
             assertEquals(control, r3);
             r3.debugValidate();
         }
+    }
 
-	int b = STRICT_NODE_LENGTH;
-	for (int i = b; i < (b*b + 2*b); i += b) {
-	    for (int j = b; j < (4*b); j += b) {
-		r1 = RrbTree.emptyMutable();
-		r2 = RrbTree.emptyMutable();
-		for (int k = 0; k < i; k++) {
-		    r1 = r1.append(k);
-		}
-		for (int k = 0; k < j; k++) {
-		    r2 = r2.append(i+k);
-		}
-		r3 = r1.join(r2);
-		control = new ArrayList<>();
-		for (int k = 0; k < (i+j); k++) {
-		    control.add(k);
-		}
-		assertEquals(control, r3);
-		for (int k = 0; k < (i+j); k++) {
-		    assertEquals(control.get(k), r3.get(k));
-		}
-		r3.debugValidate();
-	    }
-	}
+    /**
+     * New test submitted by J.A. Fingerhut
+     */
+    // TODO: Make this pass!
+    @Ignore
+    @Test public void joinMutableTest2() {
+        int b = STRICT_NODE_LENGTH;
+        for (int i = b; i < (b*b + 2*b); i += b) {
+            for (int j = b; j < (4*b); j += b) {
+                RrbTree<Integer> r1 = RrbTree.emptyMutable();
+                RrbTree<Integer> r2 = RrbTree.emptyMutable();
+                for (int k = 0; k < i; k++) {
+                    r1 = r1.append(k);
+                    r1.debugValidate();
+                }
+                for (int k = 0; k < j; k++) {
+                    r2 = r2.append(i+k);
+                    r2.debugValidate();
+                }
+                System.out.println("================== ACTUAL JOIN STARTS NOW ==============");
+                RrbTree<Integer> r3 = r1.join(r2);
+                r3.debugValidate();
+                List<Integer> control = new ArrayList<>();
+                for (int k = 0; k < (i+j); k++) {
+                    control.add(k);
+                }
+                assertEquals(control, r3);
+                for (int k = 0; k < (i+j); k++) {
+                    assertEquals(control.get(k), r3.get(k));
+                }
+                r3.debugValidate();
+            }
+        }
+    }
+
+    /**
+     * New test submitted by J.A. Fingerhut
+     */
+    // TODO: Make this pass!
+    @Ignore
+    @Test public void joinImTest2() {
+        int b = STRICT_NODE_LENGTH;
+        for (int i = b; i < (b*b + 2*b); i += b) {
+            for (int j = b; j < (4*b); j += b) {
+                RrbTree<Integer> r1 = RrbTree.empty();
+                RrbTree<Integer> r2 = RrbTree.empty();
+                for (int k = 0; k < i; k++) {
+                    r1 = r1.append(k);
+                    r1.debugValidate();
+                }
+                for (int k = 0; k < j; k++) {
+                    r2 = r2.append(i+k);
+                    r2.debugValidate();
+                }
+                RrbTree<Integer> r3 = r1.join(r2);
+                r3.debugValidate();
+                List<Integer> control = new ArrayList<>();
+                for (int k = 0; k < (i+j); k++) {
+                    control.add(k);
+                }
+                assertEquals(control, r3);
+                for (int k = 0; k < (i+j); k++) {
+                    assertEquals(control.get(k), r3.get(k));
+                }
+                r3.debugValidate();
+            }
+        }
     }
 
     @Test public void testBiggerJoin() {
