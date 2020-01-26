@@ -275,10 +275,10 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
             // Also, it leaves the tree cleaner to just smash leaves onto the bigger tree.
             // Ultimately, we might want to see if we can grab the tail and stick it where it belongs
             // but for now, this should be alright.
-            if (that.size() < MAX_NODE_LENGTH) {
+            if (that.size() <= MAX_NODE_LENGTH) {
                 return concat(that);
             }
-            if (this.size < MAX_NODE_LENGTH) {
+            if (this.size <= MAX_NODE_LENGTH) {
                 for (int i = 0; i < size; i++) {
                     that = that.insert(i, this.get(i));
                 }
@@ -355,19 +355,21 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
                 // Adding kids of shorter to proper level of taller...
                 Node<E>[] kids;
                 if (shorter instanceof Strict) {
-                    kids = ((Strict) shorter).nodes;
+                    kids = ((Strict<E>) shorter).nodes;
                 } else if (shorter instanceof Relaxed) {
-                    kids = ((Relaxed) shorter).nodes;
+                    kids = ((Relaxed<E>) shorter).nodes;
                 } else {
                     throw new IllegalStateException("Expected a strict or relaxed, but found " +
                                                     shorter.getClass());
                 }
                 n = n.addEndChildren(leftIntoRight, kids);
+//                System.out.println("n0=" + n.indentedStr(3));
             }
 
             if (i >= 0) {
                 // Go back up one after lowest check.
                 n = ancestors[i];
+//                System.out.println("n1=" + n.indentedStr(3));
                 i--;
 //            if (n.height() != shorter.height() + 1) {
 //                throw new IllegalStateException("Didn't go back up enough");
@@ -407,7 +409,8 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
                 // Shorter one level below n and there's room
                 // Trees are not equal height and there's room somewhere.
                 n = n.addEndChild(leftIntoRight, shorter);
-//            n.debugValidate();
+//                System.out.println("n2=" + n.indentedStr(3));
+//                n.debugValidate();
             } else if (i < 0) {
                 // 2 trees of equal height so we make a new parent
 //            if (shorter.height() != n.height()) {
@@ -434,7 +437,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
                 // leaf nodes, but I could be wrong.
                 // I also think we should get rid of relaxed nodes and everything will be much
                 // easier.
-                Relaxed<E> rel = (anc instanceof Strict) ? ((Strict) anc).relax()
+                Relaxed<E> rel = (anc instanceof Strict) ? ((Strict<E>) anc).relax()
                                                          : (Relaxed<E>) anc;
 
                 int repIdx = leftIntoRight ? 0 : rel.numChildren() - 1;
@@ -704,10 +707,10 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
             // Also, it leaves the tree cleaner to just smash leaves onto the bigger tree.
             // Ultimately, we might want to see if we can grab the tail and stick it where it
             // belongs but for now, this should be alright.
-            if (that.size() < MAX_NODE_LENGTH) {
+            if (that.size() <= MAX_NODE_LENGTH) {
                 return concat(that);
             }
-            if (this.size < MAX_NODE_LENGTH) {
+            if (this.size <= MAX_NODE_LENGTH) {
                 for (int i = 0; i < size; i++) {
                     that = that.insert(i, this.get(i));
                 }
@@ -784,9 +787,9 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
                 // Adding kids of shorter to proper level of taller...
                 Node<E>[] kids;
                 if (shorter instanceof Strict) {
-                    kids = ((Strict) shorter).nodes;
+                    kids = ((Strict<E>) shorter).nodes;
                 } else if (shorter instanceof Relaxed) {
-                    kids = ((Relaxed) shorter).nodes;
+                    kids = ((Relaxed<E>) shorter).nodes;
                 } else {
                     throw new IllegalStateException("Expected a strict or relaxed, but found " +
                                                     shorter.getClass());
@@ -863,7 +866,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
                 // leaf nodes, but I could be wrong.
                 // I also think we should get rid of relaxed nodes and everything will be much
                 // easier.
-                Relaxed<E> rel = (anc instanceof Strict) ? ((Strict) anc).relax()
+                Relaxed<E> rel = (anc instanceof Strict) ? ((Strict<E>) anc).relax()
                                                          : (Relaxed<E>) anc;
 
                 int repIdx = leftIntoRight ? 0 : rel.numChildren() - 1;
@@ -1094,7 +1097,7 @@ involves changing more nodes than maybe necessary.
                  (n.size() == STRICT_NODE_LENGTH) ) ? new Strict<>(NODE_LENGTH_POW_2,
                                                                    n.size(),
                                                                    (Node<E>[]) new Node[]{n}) :
-               (n instanceof Strict) ? new Strict<>(((Strict) n).shift + NODE_LENGTH_POW_2,
+               (n instanceof Strict) ? new Strict<>(((Strict<E>) n).shift + NODE_LENGTH_POW_2,
                                                     n.size(),
                                                     (Node<E>[]) new Node[]{n}) :
                new Relaxed<>(new int[] { n.size() },
@@ -1493,7 +1496,7 @@ involves changing more nodes than maybe necessary.
                     throw new IllegalStateException("Unequal height!  My height = " + height() + "\n" + this.indentedStr(0));
                 }
                 if ( (n instanceof Strict) &&
-                     ((Strict) n).shift != sh ) {
+                     ((Strict<T>) n).shift != sh ) {
                     throw new IllegalStateException(
                             "Unexpected shift difference between levels!\n" + this.indentedStr(0));
                 }
@@ -1645,7 +1648,7 @@ involves changing more nodes than maybe necessary.
             final Node<T> left;
             final Node<T> splitLeft = split.left();
             if (subNodeIndex == 0) {
-                left = new Strict<>(shift, splitLeft.size(), new Node[] {splitLeft});
+                left = new Strict<T>(shift, splitLeft.size(), new Node[] {splitLeft});
             } else {
                 boolean haveLeft = (splitLeft.size() > 0);
                 int numLeftItems = subNodeIndex + (haveLeft ? 1 : 0);
@@ -1660,7 +1663,7 @@ involves changing more nodes than maybe necessary.
                     leftNodes[numLeftItems - 1] = splitLeft;
                 }
                 int newSize = 0;
-                for (Node n : leftNodes) {
+                for (Node<T> n : leftNodes) {
                     newSize += n.size();
                 }
                 left = new Strict<>(shift, newSize, leftNodes);
@@ -1776,9 +1779,9 @@ involves changing more nodes than maybe necessary.
                         return new Strict<>(shift, size + oldFocus.length, newNodes);
                     } else {
                         // Add a level to the Strict tree
-                        return new Strict(shift + NODE_LENGTH_POW_2,
-                                          size + oldFocus.length,
-                                          new Node[]{this, newNode});
+                        return new Strict<T>(shift + NODE_LENGTH_POW_2,
+                                             size + oldFocus.length,
+                                             new Node[]{this, newNode});
                     }
                 } else if ( (shift == NODE_LENGTH_POW_2) &&
                             (lowBits(index) == 0) &&
@@ -1929,6 +1932,25 @@ involves changing more nodes than maybe necessary.
                                                        : nodes.length, Node.class);
             // TODO: Figure out which side we inserted on and do the math to adjust counts instead
             // of looking them up.
+
+//            System.out.println("nz=" + Arrays.toString(res));
+//            // Make a strict node if we can.
+//            if (res.length == STRICT_NODE_LENGTH) {
+//                boolean canBeStrict = true;
+//                int totalSize = 0;
+//                for (Node<T> node : nodes) {
+//                    if ( !(node instanceof Strict) ) {
+//                        canBeStrict = false;
+//                        break;
+//                    } else {
+//                        totalSize += ((Strict<T>) node).size;
+//                    }
+//                }
+//                if (canBeStrict) {
+//                    return new Strict<>( ((Strict<T>) nodes[0]).shift + NODE_LENGTH_POW_2,
+//                                         totalSize, res);
+//                }
+//            }
             return new Relaxed<>(makeSizeArray(res), res);
         }
 
@@ -2309,7 +2331,7 @@ involves changing more nodes than maybe necessary.
                 // end if subNode instanceof Leaf
             } else if (subNode instanceof Strict) {
                 // Convert Strict to Relaxed
-                Relaxed<T> relaxed = ((Strict) subNode).relax();
+                Relaxed<T> relaxed = ((Strict<T>) subNode).relax();
                 Node<T> newNode = relaxed.pushFocus(subNodeAdjustedIndex, oldFocus);
                 return replaceInRelaxedAt(cumulativeSizes, nodes, newNode, subNodeIndex,
                                           oldFocus.length);
@@ -2488,7 +2510,7 @@ involves changing more nodes than maybe necessary.
             Node<T> right;
             if (subNodeIndex == (origNodes.length - 1)) {
 //                right = splitRight;
-                right = new Relaxed<>(new int[] { splitRight.size() }, new Node[]{ splitRight });
+                right = new Relaxed<T>(new int[] { splitRight.size() }, new Node[]{ splitRight });
             } else {
                 boolean haveRightSubNode = splitRight.size() > 0;
                 // If we have a rightSubNode, it's going to need a space in our new node array.
@@ -2547,7 +2569,7 @@ involves changing more nodes than maybe necessary.
         private final IdxNode<E>[] stack;
         private int stackMaxIdx = -1;
 
-        private E[] leafArray = emptyArray();
+        private E[] leafArray;
         private int leafArrayIdx;
 
         // Focus must be pre-pushed so we don't have to ever check the index.

@@ -88,7 +88,7 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
      This is correct, but O(n).  It also works regardless of the order of the items because
      a + b = b + a, even when an overflow occurs.
      */
-    static int hash(Iterable is) {
+    static int hash(Iterable<?> is) {
         if (is == null) { throw new IllegalArgumentException("Can't have a null iteratable."); }
 //        System.out.println("hashCode for: " + is);
         int ret = 0;
@@ -102,7 +102,7 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
     }
 
     /** Computes a reasonable to-string. */
-    static String toString(String name, Iterable iterable) {
+    static String toString(String name, Iterable<?> iterable) {
         if (name == null) { throw new IllegalArgumentException("Can't have a null name."); }
         if (iterable == null) {
             throw new IllegalArgumentException("Can't have a null iteratable.");
@@ -110,7 +110,7 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
         StringBuilder sB = new StringBuilder();
         sB.append(name).append("(");
         int i = 0;
-        Iterator iter = iterable.iterator();
+        Iterator<?> iter = iterable.iterator();
         while (iter.hasNext()) {
             if (i > 0) { sB.append(","); }
 //            if (i > 4) { break; }
