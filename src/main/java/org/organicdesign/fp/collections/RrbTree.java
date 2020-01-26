@@ -1146,7 +1146,7 @@ involves changing more nodes than maybe necessary.
 
     // There's bit shifting going on here because it's a very fast operation.
     // Shifting right by 5 is eons faster than dividing by 32.
-    private static final int NODE_LENGTH_POW_2 = 2; //5; // 2 for testing, 5 for real
+    private static final int NODE_LENGTH_POW_2 = 5; // 2 for testing, 5 for real
 
     // 0b00000000000000000000000000100000 = 0x20 = 32
     static final int STRICT_NODE_LENGTH = 1 << NODE_LENGTH_POW_2;
