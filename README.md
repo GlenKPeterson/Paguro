@@ -33,7 +33,14 @@ Java-only users want 3.x from the main branch.
 The Maven artifact is the easiest way to use Paguro, but you can [build from source](#build-from-source) if you want to.
 
 # News
-### RRB Tree Released!
+## Don't use RrbTree.join()!
+@jafingerhut has found bugs in the RRB Tree join implementation.
+See [issue 31](https://github.com/GlenKPeterson/Paguro/issues/31) and [36](https://github.com/GlenKPeterson/Paguro/issues/36).
+I normally try to fix bugs promptly, but the issue here is that I don't know how to fix it!
+I understood a new chunk of the problem last night 2020-02-01 and am working with jafingerhut on an algorithm for a solution.
+If anyone knows of a paper with a working algorithm for merging two n-ary BTrees, let us know!
+
+#### RRB Tree Released!
 
 An [RRB Tree](https://glenkpeterson.github.io/Paguro/apidocs/index.html?org/organicdesign/fp/collections/RrbTree.html) is an immutable List (like Clojure's PersistentVector) that also supports random inserts, deletes, and can be split and joined back together in logarithmic time.  Details: https://github.com/GlenKPeterson/Paguro/releases/tag/3.0.16
 
