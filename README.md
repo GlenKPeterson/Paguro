@@ -37,7 +37,7 @@ The Maven artifact is the easiest way to use Paguro, but you can [build from sou
 @jafingerhut has found bugs in the RRB Tree join implementation.
 See [issue 31](https://github.com/GlenKPeterson/Paguro/issues/31) and [36](https://github.com/GlenKPeterson/Paguro/issues/36).
 I normally try to fix bugs promptly, but the issue here is that I don't know how to fix it!
-I understood a new chunk of the problem last night 2020-02-01 and am working with jafingerhut on an algorithm for a solution.
+I understood a new chunk of the problem last night 2020-02-01 and am probably going to use jafingerhut's algorithm for a solution.
 If anyone knows of a paper with a working algorithm for merging two n-ary BTrees, let us know!
 
 #### RRB Tree Released!
