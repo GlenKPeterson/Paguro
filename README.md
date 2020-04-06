@@ -10,6 +10,7 @@ Photo by [Rushen](https://www.flickr.com/photos/rushen/12171498934/in/photostrea
 
 Paguro is short for the Latin "Paguroidea" - the name of the Hermit Crab superfamily in Biology.  These collections grow by adding a new shell, leaving the insides the same, much the way [Hermit Crabs trade up to a new shell when they grow](https://www.youtube.com/watch?v=f1dnocPQXDQ).
 
+[![javadoc](https://javadoc.io/badge2/org.organicdesign/Paguro/javadoc.svg)](https://javadoc.io/doc/org.organicdesign/Paguro)
 [![Build Status](https://travis-ci.org/GlenKPeterson/Paguro.svg?branch=master)](https://travis-ci.org/GlenKPeterson/Paguro)
 [![Code Coverage](http://codecov.io/github/GlenKPeterson/Paguro/coverage.svg?branch=master)](http://codecov.io/github/GlenKPeterson/Paguro?branch=master)
 
