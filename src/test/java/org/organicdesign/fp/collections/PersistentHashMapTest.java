@@ -543,7 +543,7 @@ public class PersistentHashMapTest {
         assertEquals(0, t.size());
     }
 
-    @Test (expected = IllegalAccessError.class)
+    @Test (expected = IllegalStateException.class)
     public void mutableHashEx1() {
         PersistentHashMap<String,Integer> m = PersistentHashMap.empty();
         PersistentHashMap.MutableHashMap<String,Integer> t = m.mutable();

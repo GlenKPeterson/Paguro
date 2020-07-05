@@ -497,7 +497,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
 
         private void ensureEditable() {
             if(edit.get() == null)
-                throw new IllegalAccessError("Mutable used after immutable! call");
+                throw new IllegalStateException("Mutable used after immutable! call");
         }
     }
 
