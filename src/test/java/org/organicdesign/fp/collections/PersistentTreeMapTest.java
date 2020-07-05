@@ -60,7 +60,7 @@ public class PersistentTreeMapTest {
 
     @Test public void assocAndGet() {
         PersistentTreeMap<String,Integer> m1 = empty();
-        PersistentTreeMap<String,Integer> m2 = m1.assoc("one", 1);
+        PersistentTreeMap<String,Integer> m2 = m1.assoc("one", 1000);
 
         // Prove m1 unchanged
         assertEquals(0, m1.size());
@@ -68,10 +68,10 @@ public class PersistentTreeMapTest {
 
         // Show m2 correct.
         assertEquals(1, m2.size());
-        assertEquals(Integer.valueOf(1), m2.get("one"));
+        assertEquals(Integer.valueOf(1000), m2.get("one"));
         assertNull(m1.get("two"));
 
-        Integer twoInt = Integer.valueOf(2);
+        Integer twoInt = Integer.valueOf(2000);
         PersistentTreeMap<String,Integer> m3 = m2.assoc("two", twoInt);
 
         // Prove m1 unchanged
@@ -80,12 +80,12 @@ public class PersistentTreeMapTest {
 
         // Show m2 unchanged
         assertEquals(1, m2.size());
-        assertEquals(Integer.valueOf(1), m2.get("one"));
+        assertEquals(Integer.valueOf(1000), m2.get("one"));
 
         // Show m3 correct
         assertEquals(2, m3.size());
-        assertEquals(Integer.valueOf(1), m3.get("one"));
-        assertEquals(Integer.valueOf(2), m3.get("two"));
+        assertEquals(Integer.valueOf(1000), m3.get("one"));
+        assertEquals(Integer.valueOf(2000), m3.get("two"));
         assertNull(m3.get("three"));
 
 //        System.out.println("m3: " + m3);
@@ -96,7 +96,7 @@ public class PersistentTreeMapTest {
         assertTrue(m3 == m3.assoc("two", twoInt));
 
         // Check that it uses the == test and not the .equals() test.
-        assertFalse(m3 == m3.assoc("two", new Integer(2)));
+        assertFalse(m3 == m3.assoc("two", Integer.valueOf(2000)));
     }
 
     @Test public void order() {

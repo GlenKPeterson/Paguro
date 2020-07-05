@@ -69,8 +69,8 @@ Str_Int soi = Str_Int.ofInt(57);
 // The return types of the match() function is the same as the return
 // type of the lambdas you pass to it (they all have to match).  In this
 // case, that type is String.
-return "This is " + soi.match(str -> "a string: " + str,
-                              i   -> "an integer: " + i));</code></pre>
+return "This is " + soi.match(str -&gt; "a string: " + str,
+                              i   -&gt; "an integer: " + i));</code></pre>
 
 <p>Another great example is iText.
     What if you just want to add a child item to whatever kind of parent you have?
@@ -127,9 +127,9 @@ public static class Doc_Para_Li_Cell
     no instanceOf, no fuss:</p>
 
 <pre><code>
-parent.match(doc -> { doc.add(new Paragraph(textRenderable)); return null; },
-             para -> { para.add(textRenderable); return null; },
-             cell -> { cell.add(new Paragraph(textRenderable)); return null; });</code></pre>
+parent.match(doc  -&gt; { doc.add(new Paragraph(textRenderable)); return null; },
+             para -&gt; { para.add(textRenderable); return null; },
+             cell -&gt; { cell.add(new Paragraph(textRenderable)); return null; });</code></pre>
 
 <p>In this example, you have to have the same return type for each.
     Since we don't care about a return value, we return null in each function.
@@ -138,9 +138,9 @@ parent.match(doc -> { doc.add(new Paragraph(textRenderable)); return null; },
     and it's only one runtime issue, instead of the many in previous examples):</p>
 
 <pre><code>
-parent.match(doc -> { doc.add(table); return null; },
-             para -> { throw new IllegalStateException("Can't add a table to a paragraph."); },
-             cell -> { cell.add(table); return null; });</code></pre>
+parent.match(doc  -&gt; { doc.add(table); return null; },
+             para -&gt; { throw new IllegalStateException("Can't add a table to a paragraph."); },
+             cell -&gt; { cell.add(table); return null; });</code></pre>
 
 <p>Now if you decide not to use Cells any more, you switch Doc_Para_Li_Cell to extend OneOf2, rename it to Doc_Para_Li
     and fix all the compile-time errors.  To add a Table type, extend OneOf4.

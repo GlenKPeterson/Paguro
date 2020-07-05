@@ -11,7 +11,10 @@ import org.organicdesign.fp.tuple.Tuple2;
  shouldn't have to re-implement common copy-on-write modifictions.
 
  Never, ever, ever do this:
- (Class&lt;T>) items[0].getClass()
+ <pre>{@code
+// Evil, bad, and wrong!
+(Class<T>) items[0].getClass()
+}</pre>
 
  If you are using an array of Numbers and the first item is an Integer and the second a Double,
  You'll get an array of Integers which will blow up when you try to add a Double.

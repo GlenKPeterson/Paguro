@@ -41,7 +41,7 @@ import static org.organicdesign.fp.indent.IndentUtils.indentSpace;
  small trees which just get concatenated).</li>
  </ul>
 
- <p>Details were filled in from the Cormen, Leiserson, Rivest & Stein Algorithms book entry
+ <p>Details were filled in from the Cormen, Leiserson, Rivest &amp; Stein Algorithms book entry
  on B-Trees.  Also with an awareness of the Clojure PersistentVector by Rich Hickey.  All errors
  are by Glen Peterson.</p>
 

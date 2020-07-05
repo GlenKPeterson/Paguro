@@ -18,8 +18,8 @@ public class OptionTest {
 
         Option<Integer> z = Option.some(null);
         assertTrue(z.isSome());
-        assertEquals(null, z.get());
-        assertEquals(null, z.getOrElse(2));
+        assertNull(z.get());
+        assertNull(z.getOrElse(2));
         assertEquals("One", z.match(s -> "One",
                                     () -> "Two"));
 
@@ -43,8 +43,9 @@ public class OptionTest {
                                                    () -> 2));
         assertEquals(None.NONE, Option.someOrNullNoneOf(None.NONE));
 
-        //noinspection EqualsWithItself
+        //noinspection SimplifiableJUnitAssertion,EqualsWithItself
         assertTrue(None.NONE.equals(None.NONE));
+        //noinspection SimplifiableJUnitAssertion
         assertTrue(None.NONE.equals(Option.someOrNullNoneOf(null)));
     }
 
@@ -80,7 +81,7 @@ public class OptionTest {
 
     @Test public void equalsHash() {
         Option<Integer> o1a = Option.some(1);
-        @SuppressWarnings("UnnecessaryBoxing") Option<Integer> o1b = Option.some(new Integer(2 - 1));
+        @SuppressWarnings("UnnecessaryBoxing") Option<Integer> o1b = Option.some(Integer.valueOf(2 - 1));
         Option<Integer> o1c = Option.some(Integer.valueOf("1"));
 
         equalsDistinctHashCode(o1a, o1b, o1c, Option.some(0));

@@ -29,24 +29,24 @@ public class LazyRefTest {
     public void testLazyRef() {
         AtomicInteger intRef = new AtomicInteger(3);
         Fn0<Integer> f = () -> intRef.incrementAndGet();
-        assertEquals(new Integer(4), f.apply());
-        assertEquals(new Integer(5), f.apply());
-        assertEquals(new Integer(6), f.apply());
+        assertEquals(Integer.valueOf(4), f.apply());
+        assertEquals(Integer.valueOf(5), f.apply());
+        assertEquals(Integer.valueOf(6), f.apply());
 
         LazyRef<Integer> lr = LazyRef.of(f);
 
         assertEquals("LazyRef(*not-computed-yet*)", lr.toString());
 
-        assertEquals(new Integer(7), lr.get());
+        assertEquals(Integer.valueOf(7), lr.get());
 
         assertEquals("LazyRef(7)", lr.toString());
 
-        assertEquals(new Integer(8), f.apply());
+        assertEquals(Integer.valueOf(8), f.apply());
         intRef.set(-1);
 
-        assertEquals(new Integer(7), lr.get());
-        assertEquals(new Integer(7), lr.get());
-        assertEquals(new Integer(7), lr.get());
+        assertEquals(Integer.valueOf(7), lr.get());
+        assertEquals(Integer.valueOf(7), lr.get());
+        assertEquals(Integer.valueOf(7), lr.get());
     }
 
     @Test (expected = IllegalArgumentException.class)
@@ -58,14 +58,14 @@ public class LazyRefTest {
 //    public void testLazyInt() {
 //        Mutable.IntRef intRef = Mutable.IntRef.of(3);
 //        Fn0<Integer> f = () -> intRef.increment().value();
-//        assertEquals(f.apply(), new Integer(4));
-//        assertEquals(f.apply(), new Integer(5));
-//        assertEquals(f.apply(), new Integer(6));
+//        assertEquals(f.apply(), Integer.valueOf(4));
+//        assertEquals(f.apply(), Integer.valueOf(5));
+//        assertEquals(f.apply(), Integer.valueOf(6));
 //
 //        Lazy.Int lr = Lazy.Int.of(f);
 //        assertEquals(lr.get(), 7);
 //
-//        assertEquals(f.apply(), new Integer(8));
+//        assertEquals(f.apply(), Integer.valueOf(8));
 //        intRef.set(-1);
 //
 //        assertEquals(lr.get(), 7);
