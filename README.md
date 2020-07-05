@@ -12,7 +12,7 @@ Paguro is short for the Latin "Paguroidea" - the name of the Hermit Crab superfa
 
 [![javadoc](https://javadoc.io/badge2/org.organicdesign/Paguro/javadoc.svg)](https://javadoc.io/doc/org.organicdesign/Paguro)
 [![Build Status](https://travis-ci.org/GlenKPeterson/Paguro.svg?branch=master)](https://travis-ci.org/GlenKPeterson/Paguro)
-[![Code Coverage](http://codecov.io/github/GlenKPeterson/Paguro/coverage.svg?branch=master)](http://codecov.io/github/GlenKPeterson/Paguro?branch=master)
+[![codecov](https://codecov.io/gh/GlenKPeterson/Paguro/branch/master/graph/badge.svg)](https://codecov.io/gh/GlenKPeterson/Paguro)
 
 [![Join the chat at https://gitter.im/GlenKPeterson/Paguro](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/GlenKPeterson/Paguro?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
