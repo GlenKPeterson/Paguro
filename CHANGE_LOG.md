@@ -5,12 +5,12 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
-# Release 3.1.4: IllegalStateException
+# Release 3.2.0: IllegalStateException
  - Merged [kmark's](https://github.com/kmark) changes to ues IllegalStateException (extends RuntimeException) instead of IllegalAccessError (extends Error) in PersistentHashMap.
    IllegalAccessError was a holdover from the original Clojure source code and may have made sense in an earlier Java version, but IllegalStateException is a better choice today.
    Thank you, Kevin!
  - Updated test and plugin dependencies
- - Compiled with Java 11.
+ - Compiled with Java 11 (hence updating middle version number).
  - Fixed warnings
 
 # Release 3.1.3: Cowry (Copy-On Write aRraY)
