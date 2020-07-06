@@ -1,33 +1,40 @@
+![Hermit Crab](https://c7.staticflickr.com/8/7413/12171498934_2934c7ef28_n.jpg)
+Photo by [Rushen](https://www.flickr.com/photos/rushen/12171498934/in/photostream/)
+[![Maven Central](https://img.shields.io/maven-central/v/org.organicdesign/Paguro.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.organicdesign%22%20AND%20a:%22Paguro%22)
+[![javadoc](https://javadoc.io/badge2/org.organicdesign/Paguro/javadoc.svg)](https://javadoc.io/doc/org.organicdesign/Paguro)
+[![Build Status](https://travis-ci.org/GlenKPeterson/Paguro.svg?branch=master)](https://travis-ci.org/GlenKPeterson/Paguro)
+[![codecov](https://codecov.io/gh/GlenKPeterson/Paguro/branch/master/graph/badge.svg)](https://codecov.io/gh/GlenKPeterson/Paguro)
+
 # Why Use Paguro?
 
-Paguro is designed to decrease the number of things you need to think about when coding.
+Paguro is designed for two goals:
+ 1. Make Functional Programming simpler AND easier in Java.
+ 2. Decrease the number of things you need to think about when coding.
+
 If you spend your mental energies on distractions, that's less energy for creativity and problem-solving.
 Paguro lets you forget about:
 
  * Potential modifications to shared collections (immutable collections are safe to share)
  * The cost of adding items to an unmodifiable collection (immutable collections support extremely lightweight modified copies)
  * Which collections are modifiable (your compiler knows)
- * Arrays vs. collections (use `xform(myArray)` to encapsulate arrays)
+ * Arrays vs. collections (use `xformArray(myArray)` to encapsulate arrays)
  * Primitives vs. boxed objects (Don't use primitives - generics can't handle them anyway)
  * Checked exceptions in lambdas (Paguro accepts them without complaint)
 
-Kotlin fixes almost all these issues too, but if you're stuck in Java, Paguro is the answer.
+Kotlin fixes almost all these issues too, but if you're stuck in Java, Paguro is a great solution.
 
 # What's in Paguro?
 Type-safe versions of Clojure's immutable/persistent collections, an immutable alternative to Java 8 Streams that handles checked exceptions in lambdas, and other tools to make functional programming in Java easier.
 
 # Why is it called Paguro?
 
-![Hermit Crab](https://c7.staticflickr.com/8/7413/12171498934_2934c7ef28_n.jpg)
-Photo by [Rushen](https://www.flickr.com/photos/rushen/12171498934/in/photostream/)
-
 Paguro is short for the Latin "Paguroidea" - the name of the Hermit Crab superfamily in Biology.  These collections grow by adding a new shell, leaving the insides the same, much the way [Hermit Crabs trade up to a new shell when they grow](https://www.youtube.com/watch?v=f1dnocPQXDQ).
 
 # Specific Features
 
 * **Immutable collections** [api](https://javadoc.io/doc/org.organicdesign/Paguro/latest/org/organicdesign/fp/collections/package-summary.html) / [src](src/main/java/org/organicdesign/fp/collections) - type-safe generic Java versions of Clojure's immutable (HAMT = 'Hash Array Mapped Trie') collections - arguably the best immutable collections on the JVM.  Plus an RRB Tree!
-* **Functional transformations** [api](https://javadoc.io/doc/org.organicdesign/Paguro/latest/org/organicdesign/fp/xform/package-summary.html) / [src](src/main/java/org/organicdesign/fp/xform/Transformable.java#L42) are like a type-safe version of Clojure's Transducers, or a simplified immutable alternative to Java 8 Streams, wrapping checked exceptions and avoiding primitives (you can still use Java 8 streams if you want to).
-* **Brief collection constructors** [api](https://javadoc.io/doc/org.organicdesign/Paguro/latest/org/organicdesign/fp/StaticImports.html) / [src](src/main/java/org/organicdesign/fp/StaticImports.java#L36) are like a tiny, type-safe data definition language (a little like JSON for Java):
+* **Functional transformations** [api](https://javadoc.io/doc/org.organicdesign/Paguro/latest/org/organicdesign/fp/xform/package-summary.html) / [src](src/main/java/org/organicdesign/fp/xform/Transformable.java) are like a type-safe version of Clojure's Transducers, or a simplified immutable alternative to Java 8 Streams, wrapping checked exceptions and avoiding primitives (you can still use Java 8 streams if you want to).
+* **Brief collection constructors** [api](https://javadoc.io/doc/org.organicdesign/Paguro/latest/org/organicdesign/fp/StaticImports.html) / [src](src/main/java/org/organicdesign/fp/StaticImports.java) are like a tiny, type-safe data definition language (a little like JSON for Java):
   * `vec("one", "two", "three")` - an immutable vector/list of three strings
   * `set(3, 5, 7)` - an immutable set of three integers
   * `tup("Alice", 11, 3.14)` - an immutable 3-field tuple or record
@@ -35,7 +42,7 @@ Paguro is short for the Latin "Paguroidea" - the name of the Hermit Crab superfa
 * **Extensible, immutable tuples** [api](https://javadoc.io/doc/org.organicdesign/Paguro/latest/org/organicdesign/fp/tuple/package-summary.html) / [src](src/main/java/org/organicdesign/fp/tuple) - use them for rapid, yet type-safe prototyping, then later extend them to make your own lightweight, immutable Java classes with correct `equals()`, `hashCode()`, and `toString()` implementations.
 * **Lazy initialization** [api](https://javadoc.io/doc/org.organicdesign/Paguro/latest/org/organicdesign/fp/function/LazyRef.html) / [src](src/main/java/org/organicdesign/fp/function/LazyRef.java) - LazyRef thread-safely performs initialization and frees initialization resources on first use.  Subsequent uses get the now-constant initialized value.  Use this instead of static initializers to avoid initialization loops.  Cache results of expensive operations for reuse.
 * **Union types** [api](https://javadoc.io/doc/org.organicdesign/Paguro/latest/org/organicdesign/fp/oneOf/package-summary.html) / [src](src/main/java/org/organicdesign/fp/oneOf) - Not as nice as being built into the language, but they extend type safety outside the object hierarchy.
-* **Memoization** [api](https://glenkpeterson.github.io/Paguro/apidocs/org/organicdesign/fp/function/Fn3.html#memoize-org.organicdesign.fp.function.Fn3-) / [src](src/main/java/org/organicdesign/fp/function/Fn3.java#L42) - Turns function calls into hashtable lookups to speed up slow functions over a limited range of inputs.
+* **Memoization** [api](https://javadoc.io/doc/org.organicdesign/Paguro/latest/org/organicdesign/fp/function/Fn3.html) / [src](src/main/java/org/organicdesign/fp/function/Fn3.java) - Turns function calls into hashtable lookups to speed up slow functions over a limited range of inputs.
 * **Tiny** with no dependencies - The entire project fits in a 270K jar file.
 
 # Examples
@@ -48,30 +55,7 @@ Paguro is short for the Latin "Paguroidea" - the name of the Hermit Crab superfa
 * [Class/Interface Hierarchy](inheritanceHierarchy.pdf) (PDF)
 * [API Docs](https://javadoc.io/doc/org.organicdesign/Paguro/latest/index.html)
 * Get started now by following the [Usage Tips](https://github.com/GlenKPeterson/Paguro/wiki/Usage-Tips)
-* [Comparison with Traditional Java and Java 8 Streams](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java#L22)
-
-
-# Maven Artifact
-
-[![javadoc](https://javadoc.io/badge2/org.organicdesign/Paguro/javadoc.svg)](https://javadoc.io/doc/org.organicdesign/Paguro)
-[![Build Status](https://travis-ci.org/GlenKPeterson/Paguro.svg?branch=master)](https://travis-ci.org/GlenKPeterson/Paguro)
-[![codecov](https://codecov.io/gh/GlenKPeterson/Paguro/branch/master/graph/badge.svg)](https://codecov.io/gh/GlenKPeterson/Paguro)
-
-
-Available from the [Maven Repository](http://mvnrepository.com/artifact/org.organicdesign/Paguro) as:
-```xml
-<!--
-If you're using Kotlin and Java, you want the 3.5 version in the KotlinFootWetting branch.
-Java-only users want 3.x from the main branch.
- -->
-<dependency>
-        <groupId>org.organicdesign</groupId>
-        <artifactId>Paguro</artifactId>
-        <version>3.2.0</version>
-</dependency>
-```
-
-The Maven artifact is the easiest way to use Paguro, but you can [build from source](#build-from-source) if you want to.
+* [Comparison with Traditional Java and Java 8 Streams](src/test/java/org/organicdesign/fp/TradJavaStreamComparisonTest.java)
 
 # Classic
 You are on the Paguro Classic, or main branch of this project.
@@ -126,15 +110,28 @@ Unless otherwise stated, the rest of this work is licensed under the Apache 2.0 
 New contributions should be made under the Apache 2.0 license whenever practical.
 I believe it is more popular, clearer, and has been better tested in courts of law.
 
-# Build from Source
+# Contributing
 
-The [pre-built maven artifact](#maven-artifact) is the easiest way to use Paguro.  Mose users do not need to build Paguro from source.
+If you submit a patch, please:
+ - Keep the changes minimal (don't let your IDE reformat whole files).
+ - Try to match the code style as best you can.
+ - Clearly document your changes.
+ - Update the unit tests to clearly and simply prove that your code works.
+ - It's a good idea to discuss proposed changes by opening an issue on github before you spend time coding.
+
+### Build from Source
+
+The [pre-built jar file](https://search.maven.org/search?q=g:%22org.organicdesign%22%20AND%20a:%22Paguro%22) is the easiest way to use Paguro.
+Users typically only build Paguro from source to make a contribution, or to experiment with the source code.
 
 #### Prerequisites
 Paguro is usually built on Ubuntu 18.04 and later with `openjdk-11`, `git`, and `maven` installed from the official repositories.
+Being Java it should theoretically build with JDK 11+ on any system.
 
 ##### Environment Variables
-Depending on how you installed Java and Maven, you may need to set some of the following in your `~/.profile` file and reboot (or source that file like `. ~/.profile` from the command line you will use for the build).  Or do whatever Windows does.  If your tools are installed in different directories, you will have to fix the following:
+Depending on how you installed Java and Maven, you may need to set some of the following in your `~/.profile` file and reboot (or source that file like `. ~/.profile` from the command line you will use for the build).
+Or do whatever Windows does.
+If your tools are installed in different directories, you will have to fix the following:
 ```bash
 export JDK_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 export JAVA_HOME=$JDK_HOME/jre
@@ -156,15 +153,6 @@ cd Paguro
 git pull
 mvn clean install
 ```
-
-# Contributing
-
-If you submit a patch, please:
- - Keep the changes minimal (don't let your IDE reformat whole files).
- - Try to match the code style as best you can.
- - Clearly document your changes.
- - Update the unit tests to clearly and simply prove that your code works.
- - It's a good idea to discuss proposed changes by opening an issue on github before you spend time coding.
 
 # More
 Additional information is in: [README2.md](README2.md).
