@@ -1,5 +1,6 @@
 ![Hermit Crab](https://c7.staticflickr.com/8/7413/12171498934_2934c7ef28_n.jpg)
 Photo by [Rushen](https://www.flickr.com/photos/rushen/12171498934/in/photostream/)
+
 [![Maven Central](https://img.shields.io/maven-central/v/org.organicdesign/Paguro.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.organicdesign%22%20AND%20a:%22Paguro%22)
 [![javadoc](https://javadoc.io/badge2/org.organicdesign/Paguro/javadoc.svg)](https://javadoc.io/doc/org.organicdesign/Paguro)
 [![Build Status](https://travis-ci.org/GlenKPeterson/Paguro.svg?branch=master)](https://travis-ci.org/GlenKPeterson/Paguro)
