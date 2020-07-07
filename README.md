@@ -1,18 +1,18 @@
-![Hermit Crab](https://c7.staticflickr.com/8/7413/12171498934_2934c7ef28_n.jpg)
-Photo by [Rushen](https://www.flickr.com/photos/rushen/12171498934/in/photostream/)
+![Hermit Crab](HermitCrabByRushen.jpg)
 
 [![Maven Central](https://img.shields.io/maven-central/v/org.organicdesign/Paguro.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.organicdesign%22%20AND%20a:%22Paguro%22)
 [![javadoc](https://javadoc.io/badge2/org.organicdesign/Paguro/javadoc.svg)](https://javadoc.io/doc/org.organicdesign/Paguro)
 [![Build Status](https://travis-ci.org/GlenKPeterson/Paguro.svg?branch=master)](https://travis-ci.org/GlenKPeterson/Paguro)
 [![codecov](https://codecov.io/gh/GlenKPeterson/Paguro/branch/master/graph/badge.svg)](https://codecov.io/gh/GlenKPeterson/Paguro)
+[![Google group : Email List](https://img.shields.io/badge/Google%20Group-Email%20List-blue.svg)](https://groups.google.com/d/forum/paguro)
 
 # Why Use Paguro?
 
-Paguro is designed for two goals:
- 1. Make Functional Programming simpler AND easier in Java.
+Paguro is designed to:
+ 1. Make Functional Programming simpler and easier in Java.
  2. Decrease the number of things you need to think about when coding.
 
-If you spend your mental energies on distractions, that's less energy for creativity and problem-solving.
+Removing distractions leaves you more energy for creativity and problem-solving.
 Paguro lets you forget about:
 
  * Potential modifications to shared collections (immutable collections are safe to share)
@@ -111,14 +111,19 @@ Unless otherwise stated, the rest of this work is licensed under the Apache 2.0 
 New contributions should be made under the Apache 2.0 license whenever practical.
 I believe it is more popular, clearer, and has been better tested in courts of law.
 
+Hermit Crab Photo by [Rushen](https://www.flickr.com/photos/rushen/12171498934/in/photostream/)
+
 # Contributing
+
+Questions?  Ideas?  Feedback?  Use the [Google Group Email List](https://groups.google.com/d/forum/paguro).
+Clear bugs or simple pull requests can be made on Github without discussing them first on the email list.
 
 If you submit a patch, please:
  - Keep the changes minimal (don't let your IDE reformat whole files).
  - Try to match the code style as best you can.
  - Clearly document your changes.
  - Update the unit tests to clearly and simply prove that your code works.
- - It's a good idea to discuss proposed changes by opening an issue on github before you spend time coding.
+ - It's a good idea to discuss proposed changes on the email list before you spend time coding.
 
 ### Build from Source
 
