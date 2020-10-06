@@ -5,11 +5,12 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
-### Release 3.5.7
+## Release 3.5.8 2020-10-06
  - Renamed all mutable collections from Mutable___ to Mut___ so they no longer conflict with Kotlin's StdLib.
  See script below to help you upgrade.
+ - Deprecated RRB-Tree join() and remove() methods until the bugs in them can be fixed.
  - Added jetbrains `@NotNull` and `@Nullable` annotations which  increased the size of the jar file by less than 3%.
- - Merged Kotlin-Friendly changes to master branch.  I have one less branch to keep patched.
+ - Merged Kotlin-Friendly changes to master branch and deleted that branch.
  - Use filterNonNull() Instead of .filter(Objects::nonNull) because sometimes IntelliJ
  gets confused about whether objects can be null in this case or not.
  - Fixed some nullability issues with the few varargs methods in this project.
@@ -53,7 +54,7 @@ After the above, you probably want to check out any Kotlin files.  Sorry.
 If you use MutableMap/MutableList/etc. inside a Kotlin file, you have to fix it manually.  Sorry.
 
 
-# Release 3.2.0: IllegalStateException
+## Release 3.2.0: IllegalStateException
  - Merged [kmark's](https://github.com/kmark) changes to ues IllegalStateException (extends RuntimeException) instead of IllegalAccessError (extends Error) in PersistentHashMap.
    IllegalAccessError was a holdover from the original Clojure source code and may have made sense in an earlier Java version, but IllegalStateException is a better choice today.
    Thank you, Kevin!
@@ -61,10 +62,10 @@ If you use MutableMap/MutableList/etc. inside a Kotlin file, you have to fix it 
  - Compiled with Java 11 (hence updating middle version number).
  - Fixed warnings
 
-# Release 3.1.3: Cowry (Copy-On Write aRraY)
+## Release 3.1.3: Cowry (Copy-On Write aRraY)
  - Made most Cowry methods public
 
-# Release 3.1.2: Heterogeneous RrbTree Fix
+## Release 3.1.2: Heterogeneous RrbTree Fix
  - Fixed a bug (reported by [fcurts](https://github.com/fcurts) - with unit test!) where Heterogeneous RrbTrees of more than 32 items
  would throw an exception at Runtime.  I had done something that in retrospect is obviously dumb.
  - Documented Cowry (Copy-On Write aRraY) better.

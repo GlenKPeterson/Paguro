@@ -268,9 +268,11 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         }
 
         /**
-         Joins the given tree to the right side of this tree (or this to the left side of that one) in
-         something like O(log n) time.
+         * THIS METHOD HAS BEEN SHOWN TO HAVE BUGS AND IS DEPRECATED UNTIL WE CAN FIX
+         * Joins the given tree to the right side of this tree (or this to the left side of that one) in
+         * something like O(log n) time.
          */
+        @Deprecated
         @SuppressWarnings("unchecked")
         public RrbTree<E> join(RrbTree<E> that) {
 
@@ -420,7 +422,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
 //                throw new IllegalStateException("Expected trees of equal height");
 //            }
 
-                @SuppressWarnings({"rawtypes", "unchecked"}) // Need raw types here.
+                @SuppressWarnings("unchecked") // Need raw types here.
                 Node<E>[] newRootArray = new Node[] {leftRoot, rightRoot};
                 int leftSize = leftRoot.size();
                 Node<E> newRoot =
@@ -472,6 +474,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         }
 
         /** {@inheritDoc} */
+        @SuppressWarnings("deprecation")
         public MutRrbt<E> without(int index) { return (MutRrbt<E>) super.without(index); }
 
         @Override public int size() { return size; }
@@ -702,9 +705,11 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         }
 
         /**
-         Joins the given tree to the right side of this tree (or this to the left side of that one)
-         in something like O(log n) time.
+         * THIS METHOD HAS BEEN SHOWN TO HAVE BUGS AND IS DEPRECATED UNTIL WE CAN FIX
+         * Joins the given tree to the right side of this tree (or this to the left side of that one) in
+         * something like O(log n) time.
          */
+        @Deprecated
         @SuppressWarnings("unchecked")
         public RrbTree<E> join(RrbTree<E> that) {
 
@@ -851,7 +856,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
 //                throw new IllegalStateException("Expected trees of equal height");
 //            }
 
-                @SuppressWarnings({"rawtypes", "unchecked"}) // Need raw types here.
+                @SuppressWarnings({"unchecked"}) // Need raw types here.
                 Node<E>[] newRootArray = new Node[] {leftRoot, rightRoot};
                 int leftSize = leftRoot.size();
                 Node<E> newRoot =
@@ -903,6 +908,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
 
 
         /** {@inheritDoc} */
+        @SuppressWarnings("deprecation")
         public ImRrbt<E> without(int index) { return (ImRrbt<E>) super.without(index); }
 
         @Override public int size() { return size; }
@@ -1047,9 +1053,11 @@ involves changing more nodes than maybe necessary.
   [1]: https://infoscience.epfl.ch/record/169879/files/RMTrees.pdf
 */
     /**
-     Joins the given tree to the right side of this tree (or this to the left side of that one) in
-     something like O(log n) time.
+     * THIS METHOD HAS BEEN SHOWN TO HAVE BUGS AND IS DEPRECATED UNTIL WE CAN FIX
+     * Joins the given tree to the right side of this tree (or this to the left side of that one) in
+     * something like O(log n) time.
      */
+    @Deprecated
     public abstract RrbTree<E> join(RrbTree<E> that);
 
     /** Internal method - do not use. */
@@ -1072,9 +1080,11 @@ involves changing more nodes than maybe necessary.
     abstract public Tuple2<? extends RrbTree<E>,? extends RrbTree<E>> split(int splitIndex);
 
     /**
-     Returns a new RrbTree minus the given item (all items to the right are shifted left one)
-     This is O(log n).
+     * THIS METHOD HAS BEEN SHOWN TO HAVE BUGS AND IS DEPRECATED UNTIL WE CAN FIX
+     * Returns a new RrbTree minus the given item (all items to the right are shifted left one)
+     * This is O(log n).
      */
+    @Deprecated
     public RrbTree<E> without(int index) {
         if ( (index > 0) && (index < size() - 1) ) {
             Tuple2<? extends RrbTree<E>,? extends RrbTree<E>> s1 = split(index);

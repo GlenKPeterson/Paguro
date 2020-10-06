@@ -38,11 +38,11 @@ http://mvnrepository.com/artifact/org.organicdesign/Paguro
 	-->
 	<groupId>org.organicdesign</groupId>
 	<artifactId>Paguro</artifactId>
-	<version>3.5.7</version>
+	<version>3.5.8</version>
 	<packaging>jar</packaging>
 
-	<name>Paguro: Kotlin-Friendly</name>
-	<description>Immutable Clojure collections with transformations for Java 8+.  Classes renamed to not conflict with Kotlin.</description>
+	<name>Paguro</name>
+	<description>Immutable Clojure collections and a Transformation abstraction for Java 8+, immutably, type-safely, and with good performance.</description>
 	<url>https://github.com/GlenKPeterson/Paguro</url>
 
 	<licenses>
