@@ -21,11 +21,12 @@ Paguro lets you forget about:
  * Arrays vs. collections (use `xformArray(myArray)` to encapsulate arrays)
  * Primitives vs. boxed objects (Don't use primitives - generics can't handle them anyway)
  * Checked exceptions in lambdas (Paguro accepts them without complaint)
+ * Null pointer exceptions
 
 Kotlin fixes almost all these issues too, but if you're stuck in Java, Paguro is a great solution.
 
 # What's in Paguro?
-Type-safe versions of Clojure's immutable/persistent collections, an immutable alternative to Java 8 Streams that handles checked exceptions in lambdas, and other tools to make functional programming in Java easier.
+Type-safe, null-safe versions of Clojure's immutable/persistent collections, an immutable alternative to Java 8 Streams that handles checked exceptions in lambdas, and other tools to make functional programming in Java easier.
 
 # Why is it called Paguro?
 
