@@ -14,27 +14,22 @@
 
 package org.organicdesign.fp.tuple;
 
+import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class Tuple2Test {
-    @Rule
-    public ExpectedException thrown= ExpectedException.none();
 
     public void constructionAndAccess() {
         Tuple2<Integer,String> a = new Tuple2<>(7, "Hello");
 
-        assertEquals(new Integer(7), a._1());
-        assertEquals(new Integer(7), a.getKey());
+        assertEquals(Integer.valueOf(7), a._1());
+        assertEquals(Integer.valueOf(7), a.getKey());
 
         assertEquals("Hello", a._2());
         assertEquals("Hello", a.getValue());
@@ -44,8 +39,8 @@ public class Tuple2Test {
 
         Tuple2<Integer,String> b = Tuple2.of(5, "hello");
 
-        assertEquals(new Integer(5), b._1());
-        assertEquals(new Integer(5), b.getKey());
+        assertEquals(Integer.valueOf(5), b._1());
+        assertEquals(Integer.valueOf(5), b.getKey());
 
         assertEquals("hello", b._2());
         assertEquals("hello", b.getValue());
@@ -59,8 +54,8 @@ public class Tuple2Test {
 
         Tuple2<Integer,String> c = new Tuple2<>(7, null);
 
-        assertEquals(new Integer(7), c._1());
-        assertEquals(new Integer(7), c.getKey());
+        assertEquals(Integer.valueOf(7), c._1());
+        assertEquals(Integer.valueOf(7), c.getKey());
 
         assertEquals(null, c._2());
         assertEquals(null, c.getValue());
@@ -144,10 +139,9 @@ public class Tuple2Test {
     }
 
     @SuppressWarnings("deprecation")
-    @Test
+    @Test(expected = UnsupportedOperationException.class)
     public void modification() {
         Tuple2<Integer,String> t = Tuple2.of(19, "World");
-        thrown.expect(UnsupportedOperationException.class);
         t.setValue("Boom!");
     }
 }

@@ -281,9 +281,10 @@ public class PersistentHashMapTest {
         }
     }
 
+    @SuppressWarnings("UnnecessaryBoxing")
     @Test public void assocAndGet() {
         PersistentHashMap<String,Integer> m1 = PersistentHashMap.empty();
-        PersistentHashMap<String,Integer> m2 = m1.assoc("one", 1);
+        PersistentHashMap<String,Integer> m2 = m1.assoc("one", 1000);
 
         // Prove m1 unchanged
         assertEquals(0, m1.size());
@@ -291,10 +292,10 @@ public class PersistentHashMapTest {
 
         // Show m2 correct.
         assertEquals(1, m2.size());
-        assertEquals(Integer.valueOf(1), m2.get("one"));
+        assertEquals(Integer.valueOf(1000), m2.get("one"));
         assertNull(m1.get("two"));
 
-        Integer twoInt = Integer.valueOf(2);
+        Integer twoInt = Integer.valueOf(2000);
         PersistentHashMap<String,Integer> m3 = m2.assoc("two", twoInt);
 
         // Prove m1 unchanged
@@ -303,85 +304,84 @@ public class PersistentHashMapTest {
 
         // Show m2 unchanged
         assertEquals(1, m2.size());
-        assertEquals(Integer.valueOf(1), m2.get("one"));
+        assertEquals(Integer.valueOf(1000), m2.get("one"));
 
         // Show m3 correct
         assertEquals(2, m3.size());
-        assertEquals(Integer.valueOf(1), m3.get("one"));
-        assertEquals(Integer.valueOf(2), m3.get("two"));
+        assertEquals(Integer.valueOf(1000), m3.get("one"));
+        assertEquals(Integer.valueOf(2000), m3.get("two"));
         assertNull(m3.get("three"));
         assertTrue(m3.containsKey("one"));
         assertTrue(m3.containsKey("two"));
         assertFalse(m3.containsKey("three"));
-        assertTrue(m3.containsValue(Integer.valueOf(1)));
-        assertTrue(m3.containsValue(Integer.valueOf(2)));
-        assertFalse(m3.containsValue(Integer.valueOf(3)));
+        assertTrue(m3.containsValue(Integer.valueOf(1000)));
+        assertTrue(m3.containsValue(Integer.valueOf(2000)));
+        assertFalse(m3.containsValue(Integer.valueOf(3000)));
 
 //        System.out.println("m3: " + m3);
 //        PersistentHashMap<String,Integer> m4 = m3.assoc("two", twoInt);
 //        System.out.println("m4: " + m4);
 
         // Check that inserting the same key/value pair returns the same collection.
-        assertTrue(m3 == m3.assoc("two", twoInt));
+        assertSame(m3, m3.assoc("two", twoInt));
 
         // Check that it uses the == test and not the .equals() test.
-        assertFalse(m3 == m3.assoc("two", new Integer(2)));
+        assertNotSame(m3, m3.assoc("two", Integer.valueOf(2000)));
 
         // Check without().
         PersistentHashMap<String,Integer> m3a = m3.without("one");
         assertEquals(1, m3a.size());
         assertNull(m3a.get("one"));
-        assertEquals(Integer.valueOf(2), m3a.get("two"));
+        assertEquals(Integer.valueOf(2000), m3a.get("two"));
         assertNull(m3a.get("three"));
         assertFalse(m3a.containsKey("one"));
         assertTrue(m3a.containsKey("two"));
         assertFalse(m3a.containsKey("three"));
-        assertFalse(m3a.containsValue(Integer.valueOf(1)));
-        assertTrue(m3a.containsValue(Integer.valueOf(2)));
-        assertFalse(m3a.containsValue(Integer.valueOf(3)));
+        assertFalse(m3a.containsValue(Integer.valueOf(1000)));
+        assertTrue(m3a.containsValue(Integer.valueOf(2000)));
+        assertFalse(m3a.containsValue(Integer.valueOf(3000)));
 
         // Test what happens when the hashcodes collide but objects are different.
         PersistentHashMap<HashCollision,Integer> m4 = PersistentHashMap.empty();
-        m4 = m4.assoc(new HashCollision("one"), 1)
-               .assoc(new HashCollision("two"), 2)
-               .assoc(new HashCollision("three"), 3);
+        m4 = m4.assoc(new HashCollision("one"), 1000)
+               .assoc(new HashCollision("two"), twoInt)
+               .assoc(new HashCollision("three"), 3000);
 
         assertEquals(3, m4.size());
-        assertEquals(Integer.valueOf(1), m4.get(new HashCollision("one")));
-        assertEquals(Integer.valueOf(2), m4.get(new HashCollision("two")));
-        assertEquals(Integer.valueOf(3), m4.get(new HashCollision("three")));
+        assertEquals(Integer.valueOf(1000), m4.get(new HashCollision("one")));
+        assertEquals(Integer.valueOf(2000), m4.get(new HashCollision("two")));
+        assertEquals(Integer.valueOf(3000), m4.get(new HashCollision("three")));
         assertNull(m4.get(new HashCollision("four")));
         assertTrue(m4.containsKey(new HashCollision("one")));
         assertTrue(m4.containsKey(new HashCollision("two")));
         assertTrue(m4.containsKey(new HashCollision("three")));
         assertFalse(m4.containsKey(new HashCollision("four")));
-        assertTrue(m4.containsValue(Integer.valueOf(1)));
-        assertTrue(m4.containsValue(Integer.valueOf(2)));
-        assertTrue(m4.containsValue(Integer.valueOf(3)));
-        assertFalse(m4.containsValue(Integer.valueOf(4)));
+        assertTrue(m4.containsValue(Integer.valueOf(1000)));
+        assertTrue(m4.containsValue(Integer.valueOf(2000)));
+        assertTrue(m4.containsValue(Integer.valueOf(3000)));
+        assertFalse(m4.containsValue(Integer.valueOf(4000)));
 
         // Check that inserting the same key/value pair returns the same collection.
-        assertTrue(m4 == m4.assoc(new HashCollision("two"), twoInt));
+        assertSame(m4, m4.assoc(new HashCollision("two"), twoInt));
 
         // Check that it uses the == test and not the .equals() test.
-        assertFalse(m4 == m4.assoc(new HashCollision("two"), new Integer(2)));
+        assertNotSame(m4, m4.assoc(new HashCollision("two"), Integer.valueOf(2000)));
 
         // Check without().
         PersistentHashMap<HashCollision,Integer> m5 = m4.without(new HashCollision("two"));
         assertEquals(2, m5.size());
-        assertEquals(Integer.valueOf(1), m5.get(new HashCollision("one")));
+        assertEquals(Integer.valueOf(1000), m5.get(new HashCollision("one")));
         assertNull(m5.get(new HashCollision("two")));
-        assertEquals(Integer.valueOf(3), m5.get(new HashCollision("three")));
+        assertEquals(Integer.valueOf(3000), m5.get(new HashCollision("three")));
         assertNull(m5.get(new HashCollision("four")));
         assertTrue(m5.containsKey(new HashCollision("one")));
         assertFalse(m5.containsKey(new HashCollision("two")));
         assertTrue(m5.containsKey(new HashCollision("three")));
         assertFalse(m5.containsKey(new HashCollision("four")));
-        assertTrue(m5.containsValue(Integer.valueOf(1)));
-        assertFalse(m5.containsValue(Integer.valueOf(2)));
-        assertTrue(m5.containsValue(Integer.valueOf(3)));
-        assertFalse(m5.containsValue(Integer.valueOf(4)));
-
+        assertTrue(m5.containsValue(Integer.valueOf(1000)));
+        assertFalse(m5.containsValue(Integer.valueOf(2000)));
+        assertTrue(m5.containsValue(Integer.valueOf(3000)));
+        assertFalse(m5.containsValue(Integer.valueOf(4000)));
     }
 
     @Test public void biggerHashMaps() {
@@ -542,7 +542,7 @@ public class PersistentHashMapTest {
         assertEquals(0, t.size());
     }
 
-    @Test (expected = IllegalAccessError.class)
+    @Test (expected = IllegalStateException.class)
     public void mutableHashEx1() {
         PersistentHashMap<String,Integer> m = PersistentHashMap.empty();
         PersistentHashMap.MutHashMap<String,Integer> t = m.mutable();

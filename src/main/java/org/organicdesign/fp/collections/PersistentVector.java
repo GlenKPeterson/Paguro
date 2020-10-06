@@ -533,7 +533,7 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
 
         private void ensureEditable() {
             if (root.edit.get() == null) {
-                throw new IllegalAccessError("Mutable used after immutable! call");
+                throw new IllegalStateException("Mutable used after immutable! call");
             }
             //		root = editableRoot(root);
             //		tail = editableTail(tail);
@@ -550,7 +550,7 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
             //		Thread owner = root.edit.get();
             //		if(owner != null && owner != Thread.currentThread())
             //			{
-            //			throw new IllegalAccessError("Mutation release by non-owner thread");
+            //			throw new IllegalStateException("Mutation release by non-owner thread");
             //			}
             root.edit.set(null);
             F[] trimmedTail = (F[]) new Object[size - tailoff()];

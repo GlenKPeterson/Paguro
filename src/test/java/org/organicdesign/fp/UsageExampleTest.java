@@ -41,7 +41,8 @@ public class UsageExampleTest {
         // name of the person we find with the subsequent code.
         assertEquals("Jane",
                      // Define some people with lists of email addresses on the fly.
-                     // vec() makes a Vector/List, tup() makes a Tuple
+                     // vec() makes a Vector/List
+                     // tup() makes a type-safe, anonymous Tuple (pair, triple, etc.)
                      vec(tup("Jane", "Smith", vec("a@b.c", "b@c.d")),
                          tup("Fred", "Tase", vec("c@d.e", "d@e.f", "e@f.g")))
 

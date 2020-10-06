@@ -1,9 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<prerequisites>
-		<maven>3.6.0</maven>
-	</prerequisites>
 
 	<!--
 To build javadoc:
@@ -40,8 +37,8 @@ They say that the Maven search site can take up to 2 hours to update:
 http://mvnrepository.com/artifact/org.organicdesign/Paguro
 	-->
 	<groupId>org.organicdesign</groupId>
-	<artifactId>PaguroKf</artifactId>
-	<version>3.5.6</version>
+	<artifactId>Paguro</artifactId>
+	<version>3.5.7</version>
 	<packaging>jar</packaging>
 
 	<name>Paguro: Kotlin-Friendly</name>
@@ -78,24 +75,26 @@ http://mvnrepository.com/artifact/org.organicdesign/Paguro
 	<build>
 		<defaultGoal>compile</defaultGoal>
 		<plugins>
-<!--			<plugin>-->
-<!--				<groupId>org.apache.maven.plugins</groupId>-->
-<!--				<artifactId>maven-compiler-plugin</artifactId>-->
-<!--				<version>3.8.0</version>-->
-<!--				<configuration>-->
-<!--					&lt;!&ndash;-->
-<!--                    I'm favoring the maven.compiler properties over this for now...-->
-<!--					<compilerVersion>1.8</compilerVersion>-->
-<!--					<source>1.8</source>-->
-<!--					<target>1.8</target>-->
-<!--					 &ndash;&gt;-->
-<!--					<compilerArgs>-->
-<!--						<arg>-profile</arg>-->
-<!--						<arg>compact1</arg>-->
-<!--						<arg>-Xlint</arg>-->
-<!--					</compilerArgs>-->
-<!--				</configuration>-->
-<!--			</plugin>-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>3.0.0-M3</version>
+				<executions>
+					<execution>
+						<id>enforce-maven</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<requireMavenVersion>
+									<version>[3.6.0,)</version>
+								</requireMavenVersion>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-gpg-plugin</artifactId>
@@ -117,7 +116,7 @@ http://mvnrepository.com/artifact/org.organicdesign/Paguro
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>3.0.1</version>
+				<version>3.2.1</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -131,10 +130,9 @@ http://mvnrepository.com/artifact/org.organicdesign/Paguro
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<!-- JavaDoc wasn't providing the right links to the Java APIs with the default version of the plugin on my machine. -->
-				<version>3.0.1</version>
+				<version>3.2.0</version>
 				<configuration>
-					<doclint>none</doclint>
-					<!--<additionalparam>-Xdoclint:none</additionalparam>-->
+					<additionalOptions>-Xdoclint:none</additionalOptions>
 				</configuration>
 				<executions>
 					<execution>
@@ -148,7 +146,7 @@ http://mvnrepository.com/artifact/org.organicdesign/Paguro
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.3</version>
+				<version>0.8.6</version>
 				<executions>
 					<execution>
 						<goals>
@@ -187,10 +185,10 @@ http://mvnrepository.com/artifact/org.organicdesign/Paguro
 		<dependency>
 			<groupId>org.jetbrains</groupId>
 			<artifactId>annotations</artifactId>
-			<version>17.0.0</version>
+			<version>20.1.0</version>
 		</dependency>
 		<dependency>
-			<groupId>org.organicdesign.testUtils</groupId>
+			<groupId>org.organicdesign</groupId>
 			<artifactId>TestUtils</artifactId>
 			<version>0.0.19</version>
 			<scope>test</scope>
@@ -211,5 +209,8 @@ http://mvnrepository.com/artifact/org.organicdesign/Paguro
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>
+		<maven.compiler.arg>-profile</maven.compiler.arg>
+		<maven.compiler.arg>compact1</maven.compiler.arg>
+		<maven.compiler.arg>-Xlint</maven.compiler.arg>
 	</properties>
 </project>

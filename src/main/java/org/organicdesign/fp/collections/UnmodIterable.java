@@ -105,8 +105,7 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
      This is correct, but O(n).  It also works regardless of the order of the items because
      a + b = b + a, even when an overflow occurs.
      */
-    @SuppressWarnings("rawtypes") // Need raw types here.
-    static int hash(@NotNull Iterable is) {
+    static int hash(@NotNull Iterable<?> is) {
 //        System.out.println("hashCode for: " + is);
         int ret = 0;
         for (Object t : is) {
@@ -119,11 +118,11 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
     }
 
     /** Computes a reasonable to-string. */
-    static @NotNull String toString(@NotNull String name, @NotNull Iterable iterable) {
+    static @NotNull String toString(@NotNull String name, @NotNull Iterable<?> iterable) {
         StringBuilder sB = new StringBuilder();
         sB.append(name).append("(");
         int i = 0;
-        Iterator iter = iterable.iterator();
+        Iterator<?> iter = iterable.iterator();
         while (iter.hasNext()) {
             if (i > 0) { sB.append(","); }
 //            if (i > 4) { break; }

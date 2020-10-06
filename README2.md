@@ -2,6 +2,24 @@
 Read [README.md](README.md) before this file as that is the official introduction to Paguro.
 This file contains additional information for contributors, or maybe people who are considering opening an issue.
 
+# Manifesto
+
+* Immutability promotes correct code as much as type safety does.
+* Better to focus on picking the appropriate collections and transformations than on looping details.
+* Write functions before defining classes, yet still take advantage of type safety.
+* On-the fly data definition should be simple and easy.  Naming/formalizing those data structures should be too.
+* Minimal, easy-to-understand interface covering the most critical building blocks for higher functionality.
+
+# Future Development Ideas (as of 2017-09-10)
+1. Make all collections sub-classes of Kotlin's collections
+2. Add a fast ListIterator to RRB implementation.
+I have made some strides toward this, but it's slow work, PersistentVector never got this feature, and Kotlin compatibility is a higher priority. 
+3. All methods of Xform can be implemented in terms of foldUntil().  Try doing that instead of _fold.
+4. Ensure everything is as friendly as possible to Monadic and Reactive thinking.
+5. Consider a Fn1v subclass of Fn1 (and similar for Fn0, Fn2, etc.) that returns void because sometimes you need one of those for backward compatibility and you don't want it to choke on checked exceptions.
+6. Consider insertion-order maps and sets
+
+
 # Additional features:
 * Simplified [functional interfaces](src/main/java/org/organicdesign/fp/function) that wrap checked exceptions
 * An [Equator](src/main/java/org/organicdesign/fp/collections/Equator.java) and [ComparisonContext](src/main/java/org/organicdesign/fp/collections/Equator.java#L45) which work like `java.util.Comparator`, but for hash-based collections.

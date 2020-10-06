@@ -34,21 +34,21 @@ import static org.organicdesign.fp.type.RuntimeTypes.union2Str;
  handle each type you could possibly receive.
 
  Usage:
- <pre><code>
-thingy.match(fst -&gt; fst.doOneThing(),
-                 sec -&gt; sec.doSomethingElse());
- </code></pre>
+ <pre>{@code
+thingy.match(fst -> fst.doOneThing(),
+             sec -> sec.doSomethingElse());
+}</pre>
 
  Sometimes it's a programming error to pass one type or another and you may want to throw an
  exception.
- <pre><code>
-oneOf.match(fst -&gt; fst.doOneThing(),
-                sec -&gt; { throw new IllegalStateException("Asked for a 2nd; only had a 1st."); });
- </code></pre>
+ <pre>{@code
+oneOf.match(fst -> fst.doOneThing(),
+            sec -> { throw new IllegalStateException("Asked for a 2nd; only had a 1st."); });
+}</pre>
 
  For the shortest syntax and best names, define your own subclass.  This is similar to sub-classing Tuples.
- <pre><code>
-static class String_Integer extends OneOf2&lt;String,Integer&gt; {
+ <pre>{@code
+static class String_Integer extends OneOf2<String,Integer> {
 
     // Private Constructor because the o parameter is not type safe.
     private String_Integer(Object o, int n) { super(o, String.class, Integer.class, n); }
@@ -56,23 +56,23 @@ static class String_Integer extends OneOf2&lt;String,Integer&gt; {
     // Static factory methods ensure type-safe construction.
     public static String_Integer ofStr(String o) { return new String_Integer(o, 0); }
     public static String_Integer ofInt(Integer o) { return new String_Integer(o, 1); }
-}</code></pre>
+}
+}</pre>
 
  equals(), hashcode(), and toString() are all taken care of for you.
 
  Now you use descriptive and extremely brief syntax:
- <pre><code>
+ <pre>{@code
 // Type-safe switching - always works at runtime.
 x.match(s -> (s == null) ? null : s.lowerCase(),
-n -> "This is the number " + n);
+        n -> "This is the number " + n);
 
 // If not a String at runtime throws "Expected a(n) String but found a(n) Integer"
 x.str().contains("goody!");
 
- // If not an Integer at runtime throws "Expected a(n) Integer but found a(n) String"
+// If not an Integer at runtime throws "Expected a(n) Integer but found a(n) String"
 3 + x.integer();
-
- </code></pre>
+}</pre>
  */
 // TODO: Should this implement javax.lang.model.type.UnionType somehow?
 public class OneOf2<A,B> {

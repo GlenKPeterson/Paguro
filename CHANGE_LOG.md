@@ -5,47 +5,18 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
-### Release 3.5.6: Transformable.whereNonNull()
- - Instead of .filter(Objects::nonNull) because sometimes IntelliJ
+### Release 3.5.7
+ - Renamed all mutable collections from Mutable___ to Mut___ so they no longer conflict with Kotlin's StdLib.
+ See script below to help you upgrade.
+ - Added jetbrains `@NotNull` and `@Nullable` annotations which  increased the size of the jar file by less than 3%.
+ - Merged Kotlin-Friendly changes to master branch.  I have one less branch to keep patched.
+ - Use filterNonNull() Instead of .filter(Objects::nonNull) because sometimes IntelliJ
  gets confused about whether objects can be null in this case or not.
-
-## Release 3.5.5: More nullability details
- - Fixed more nullability issues
-
-### Release 3.5.4: Nullability details
  - Fixed some nullability issues with the few varargs methods in this project.
-
-### Release 3.5.3: NotNull
  - Added org.jetbrains.annotations dependency and marked many methods with Nullable and NotNull.
-
-## Release 3.5.2: Fixes from Master
- - Made most Cowry methods public
- - Fixed a bug (reported by [fcurts](https://github.com/fcurts) - with unit test!) where Heterogeneous RrbTrees of more than 32 items
- would throw an exception at Runtime.  I had done something that in retrospect is obviously dumb.
- - Documented Cowry (Copy-On Write aRraY) better.
-  These are type-safe utility methods for dealing with arrays.
- This project still aims to keep you from needing to deal with arrays, but sometimes you do, and it's handy to have copy-on-write routines for doing it.
- More of these methods could be made public if they are needed.
- - [Nate Austin](https://github.com/navision)'s memory-efficient iteration of just keys or just values from maps.  Thank you Nate!
- - Fixed split() to handle splitIndex = 0 and splitIndex = size() thanks to a bug report from [Jonathan Cornaz](https://github.com/jcornaz) (curator of [collekt](https://github.com/jcornaz/collekt))
- - Added Transformable.toImRrbt() and .toMutableRrbt() to make it convenient to transform things into RRB-Trees.
- - Fixed bugs found using FindBugs - thanks to @cprice404.  There are still some reported bugs, but
- I think they are rare corner cases that lack clear solutions.  This was the low-hanging fruit.
-    - Option.NONE is removed to avoid possible circular instantiation.  Use None.NONE instead.
-    - Moved Indented to new indent package.
-    - Moved static methods from the Indented interface to a new IndentedUtils class.
-    - STRINGS array constant from Indented interface is now private to the IndentedUtils class.
-    - UnmodMap.UnEntry.EntryToUnEntryIter.next() now returns a Tuple2 instead of some other one-off class. 
-
-### Release 3.5.1: Kotlin compatibility
- - Renamed artifact to Paguro-KF for "Kotlin-Friendly"
- - This was originally 3.1.1, but the master branch ended up using that number, so now this branch is 3.5.x
  - Added Transform.any(Fn1<Boolean>) which returns true if anything matches the given predicate.
 
-# Release 3.1.0: Kotlin compatibility
- - Renamed all mutable collections from Mutable___ to Mut___.
-
-Here is a script to ease your upgrade from 3.0 to 3.1 (INCOMPLETE work in progress)
+Here is a script to ease your upgrade from 3.0 or 3.2 to 3.5
 ```bash
 # USE CAUTION AND HAVE A BACKUP OF YOUR SOURCE CODE (VERSION CONTROL) - NO GUARANTEES
 
@@ -81,7 +52,49 @@ sed -i -e "s/$oldString/$newString/g" $(fgrep --exclude-dir='.svn' --exclude-dir
 After the above, you probably want to check out any Kotlin files.  Sorry.
 If you use MutableMap/MutableList/etc. inside a Kotlin file, you have to fix it manually.  Sorry.
 
-# Release 3.0.16: RRB Tree
+
+# Release 3.2.0: IllegalStateException
+ - Merged [kmark's](https://github.com/kmark) changes to ues IllegalStateException (extends RuntimeException) instead of IllegalAccessError (extends Error) in PersistentHashMap.
+   IllegalAccessError was a holdover from the original Clojure source code and may have made sense in an earlier Java version, but IllegalStateException is a better choice today.
+   Thank you, Kevin!
+ - Updated test and plugin dependencies
+ - Compiled with Java 11 (hence updating middle version number).
+ - Fixed warnings
+
+# Release 3.1.3: Cowry (Copy-On Write aRraY)
+ - Made most Cowry methods public
+
+# Release 3.1.2: Heterogeneous RrbTree Fix
+ - Fixed a bug (reported by [fcurts](https://github.com/fcurts) - with unit test!) where Heterogeneous RrbTrees of more than 32 items
+ would throw an exception at Runtime.  I had done something that in retrospect is obviously dumb.
+ - Documented Cowry (Copy-On Write aRraY) better.
+  These are type-safe utility methods for dealing with arrays.
+ This project still aims to keep you from needing to deal with arrays, but sometimes you do, and it's handy to have copy-on-write routines for doing it.
+ More of these methods could be made public if they are needed.
+
+##### Release 3.1.1: SKIPPED
+ - This was an accidental release number where the Kotlin-Friendly branch ended up having the same release
+ number as the Master branch.  Kotlin-Friendly Paguro is now called Paguro-KF and starts with version 3.5.x.
+
+## Release 3.1.0: Map.keyIterator() and .valIterator()
+ - [Nate Austin](https://github.com/navision)'s memory-efficient iteration of just keys or just values from maps.  Thank you Nate!
+
+# Release 3.0.19: RRB Tree Split Bounds
+ - Fixed split() to handle splitIndex = 0 and splitIndex = size() thanks to a bug report from [Jonathan Cornaz](https://github.com/jcornaz) (curator of [collekt](https://github.com/jcornaz/collekt))
+
+## Release 3.0.18: RRB Tree
+ - Added Transformable.toImRrbt() and .toMutableRrbt() to make it convenient to transform things into RRB-Trees.
+
+### Release 3.0.17: RRB Tree
+Fixed bugs found using FindBugs - thanks to @cprice404.  There are still some reported bugs, but
+I think they are rare corner cases that lack clear solutions.  This was the low-hanging fruit.
+ - Option.NONE is removed to avoid possible circular instantiation.  Use None.NONE instead.
+ - Moved Indented to new indent package.
+ - Moved static methods from the Indented interface to a new IndentedUtils class.
+ - STRINGS array constant from Indented interface is now private to the IndentedUtils class.
+ - UnmodMap.UnEntry.EntryToUnEntryIter.next() now returns a Tuple2 instead of some other one-off class. 
+
+#### Release 3.0.16: RRB Tree
  - Added Option.Some.toString() and unit test for same.
 
 See [3.0 Upgrade](#30-upgrade) notes below if upgrading from 2.x
