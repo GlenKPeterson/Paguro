@@ -14,19 +14,16 @@
 
 package org.organicdesign.fp.collections;
 
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.organicdesign.fp.TestUtilities;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.vec;
@@ -36,6 +33,7 @@ import static org.organicdesign.fp.collections.PersistentVector.emptyMutable;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 @RunWith(JUnit4.class)
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class PersistentVectorTest {
     @Test
     public void basics() {
@@ -168,31 +166,21 @@ public class PersistentVectorTest {
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void oneEx20() {
-        List<Integer> oneList = new ArrayList<>();
-        oneList.add(1);
-        PersistentVector.ofIter(Collections.unmodifiableList(oneList)).get(Integer.MIN_VALUE); }
+        PersistentVector.ofIter(List.of(1)).get(Integer.MIN_VALUE); }
     @Test(expected = IndexOutOfBoundsException.class)
     public void oneEx21() {
-        List<Integer> oneList = new ArrayList<>();
-        oneList.add(1);
-        PersistentVector.ofIter(Collections.unmodifiableList(oneList)).get(-1); }
+        PersistentVector.ofIter(List.of(1)).get(-1); }
     @Test
     public void oneIsOne3() {
-        List<Integer> oneList = new ArrayList<>();
-        oneList.add(1);
-        assertEquals(Integer.valueOf(1), PersistentVector.ofIter(Collections.unmodifiableList(oneList)).get(0)); }
+        assertEquals(Integer.valueOf(1), PersistentVector.ofIter(List.of(1)).get(0)); }
     @Test(expected = IndexOutOfBoundsException.class)
     public void oneEx23() {
-        List<Integer> oneList = new ArrayList<>();
-        oneList.add(1);
-        PersistentVector.ofIter(Collections.unmodifiableList(oneList)).get(1); }
+        PersistentVector.ofIter(List.of(1)).get(1); }
     @Test(expected = IndexOutOfBoundsException.class)
     public void oneEx24() {
-        List<Integer> oneList = new ArrayList<>();
-        oneList.add(1);
-        PersistentVector.ofIter(Collections.unmodifiableList(oneList)).get(Integer.MAX_VALUE); }
+        PersistentVector.ofIter(List.of(1)).get(Integer.MAX_VALUE); }
 
-    @Test public void addSeveralItems() throws NoSuchAlgorithmException {
+    @Test public void addSeveralItems() {
 //        System.out.println("addSeveral start");
         final int SEVERAL = 100; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
         PersistentVector<Integer> is = PersistentVector.empty();
@@ -205,7 +193,7 @@ public class PersistentVectorTest {
         }
     }
 
-    @Test public void serializationTest() throws Exception {
+    @Test public void serializationTest() {
         ImList<Integer> empty1 = serializeDeserialize(PersistentVector.empty());
         ImList<Integer> empty2 = PersistentVector.ofIter(Collections.emptyList());
         ImList<Integer> empty3 = PersistentVector.ofIter(new ArrayList<>());
@@ -246,7 +234,7 @@ public class PersistentVectorTest {
     // Time ImVectorImplementation vs. java.util.ArrayList to prove that performance does not degrade
     // if changes are made.
     @Ignore
-    @Test public void speedTest() throws NoSuchAlgorithmException, InterruptedException {
+    @Test public void speedTest() throws InterruptedException {
         final int maxItems = 1000000;
 
         System.out.println("Speed tests take time.  The more accurate, the more time.\n" +
@@ -254,18 +242,15 @@ public class PersistentVectorTest {
                                    "Better that, than set the limit too high and miss a performance drop.");
 
         // These are worst-case timings, indexed by number of items inserted in the test.
-        final Map<Integer,Double> benchmarkRatios;
-        {
-            Map<Integer,Double> mm = new HashMap<>();
-            mm.put(1, 1.4);
-            mm.put(10, 2.7);
-            mm.put(100, 6.5);
-            mm.put(1000, 9.0);
-            mm.put(10000, 18.0);
-            mm.put(100000, 13.9);
-            mm.put(1000000, 7.8);
-            benchmarkRatios = Collections.unmodifiableMap(mm);
-        }
+        final Map<Integer,Double> benchmarkRatios = Map.of(
+                1, 1.4,
+                10, 2.7,
+                100, 6.5,
+                1000, 9.0,
+                10000, 18.0,
+                100000, 13.9,
+                1000000, 7.8
+        );
 
         // Remember the results of each insertion test to average them later.
         List<Double> ratios = new ArrayList<>();
@@ -396,7 +381,7 @@ public class PersistentVectorTest {
         TestUtilities.listIteratorTest(control, serTest);
     }
 
-    @Test public void testConcat() throws Exception {
+    @Test public void testConcat() {
         PersistentVector<String> pv = PersistentVector.ofIter(Arrays.asList("1st", "2nd", "3rd"));
         pv = pv.concat(Arrays.asList("4th", "5th", "6th"));
         assertEquals(6, pv.size());

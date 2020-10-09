@@ -18,7 +18,7 @@ import static org.junit.Assert.assertTrue;
 import static org.organicdesign.fp.FunctionUtils.ordinal;
 
 public class TransformableTest {
-    static final List<Integer> controlList = Collections.unmodifiableList(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9));
+    static final List<Integer> controlList = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9);
 
     @Test public void testAny() {
         assertTrue(Xform.of(controlList)

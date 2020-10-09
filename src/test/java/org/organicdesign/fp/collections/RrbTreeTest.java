@@ -33,6 +33,7 @@ import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 import static org.organicdesign.fp.collections.RrbTree.STRICT_NODE_LENGTH;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class RrbTreeTest {
 
     // Ensures that we've got at least height=1 + a full focus.
@@ -41,7 +42,7 @@ public class RrbTreeTest {
     private static final int TWO_LEVEL_SZ =
             STRICT_NODE_LENGTH * STRICT_NODE_LENGTH * (STRICT_NODE_LENGTH + 2);
 
-    private static Random rand = new java.security.SecureRandom();
+    private static final Random rand = new java.security.SecureRandom();
 
     @SuppressWarnings("unchecked")
     private static <T extends RrbTree<Integer>> T generateRelaxed(int size, T rs) {
@@ -753,23 +754,23 @@ public class RrbTreeTest {
         return ret;
     }
 
-    private static final List<Integer> oneTo49 = Collections.unmodifiableList(Arrays.asList(
+    private static final List<Integer> oneTo49 = List.of(
             1, 2, 3, 4, 5, 6, 7, 8, 9,
             10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
             20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
             30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
             40, 41, 42, 43, 44, 45, 46, 47, 48, 49
-    ));
+    );
 
-    private static final List<Integer> fiftyTo99 = Collections.unmodifiableList(Arrays.asList(
+    private static final List<Integer> fiftyTo99 = List.of(
             50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
             60, 61, 62, 63, 64, 65, 66, 67, 68, 69,
             70, 71, 72, 73, 74, 75, 76, 77, 78, 79,
             80, 81, 82, 83, 84, 85, 86, 87, 88, 89,
             90, 91, 92, 93, 94, 95, 96, 97, 98, 99
-    ));
+    );
 
-    private static final List<Integer> oneTo99 = Collections.unmodifiableList(Arrays.asList(
+    private static final List<Integer> oneTo99 = List.of(
             1, 2, 3, 4, 5, 6, 7, 8, 9,
             10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
             20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
@@ -780,8 +781,9 @@ public class RrbTreeTest {
             70, 71, 72, 73, 74, 75, 76, 77, 78, 79,
             80, 81, 82, 83, 84, 85, 86, 87, 88, 89,
             90, 91, 92, 93, 94, 95, 96, 97, 98, 99
-    ));
+    );
 
+    @SuppressWarnings("deprecation")
     @Test public void joinImTest() {
         assertEquals(rrb(1,2,3,4,5,6), rrb(1,2,3).join(rrb(4,5,6)));
         RrbTree<Integer> r1 = rrb(oneTo49.toArray(new Integer[0]));
@@ -837,6 +839,7 @@ public class RrbTreeTest {
         return ret;
     }
 
+    @SuppressWarnings("deprecation")
     @Test public void joinMutableTest() {
         assertEquals(mut(1,2,3,4,5,6), mut(1,2,3).join(mut(4,5,6)));
         RrbTree<Integer> r1 = mut(oneTo49.toArray(new Integer[0]));
@@ -870,6 +873,7 @@ public class RrbTreeTest {
      */
     // TODO: Make this pass!
     @Ignore
+    @SuppressWarnings("deprecation")
     @Test public void joinMutableTest2() {
         int b = STRICT_NODE_LENGTH;
         for (int i = b; i < (b*b + 2*b); i += b) {
@@ -904,6 +908,7 @@ public class RrbTreeTest {
      * New test submitted by J.A. Fingerhut
      */
     // TODO: Make this pass!
+    @SuppressWarnings("deprecation")
     @Ignore
     @Test public void joinImTest2() {
         int b = STRICT_NODE_LENGTH;
@@ -934,6 +939,7 @@ public class RrbTreeTest {
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Test public void testBiggerJoin() {
         ImRrbt<Integer> is = RrbTree.empty();
         MutRrbt<Integer> ms = RrbTree.emptyMutable();
@@ -953,6 +959,7 @@ public class RrbTreeTest {
     }
 
 
+    @SuppressWarnings("deprecation")
     @Test public void testWithout() {
         assertEquals(rrb(1,2,3,5,6), rrb(1,2,3,4,5,6).without(3));
         assertEquals(mut(1,2,3,5,6), mut(1,2,3,4,5,6).without(3));
