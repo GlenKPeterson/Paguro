@@ -190,7 +190,7 @@ http://mvnrepository.com/artifact/org.organicdesign/Paguro
 		<dependency>
 			<groupId>org.organicdesign</groupId>
 			<artifactId>TestUtils</artifactId>
-			<version>1.0.0</version>
+			<version>1.0.1</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
