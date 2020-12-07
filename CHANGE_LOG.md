@@ -5,6 +5,9 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
+## Release 3.5.9 2020-12-07
+ - Fixed some nullability annotations in StaticImports to work with Kotlin 1.4.21.
+
 ## Release 3.5.8 2020-10-06
  - Renamed all mutable collections from Mutable___ to Mut___ so they no longer conflict with Kotlin's StdLib.
  See script below to help you upgrade.

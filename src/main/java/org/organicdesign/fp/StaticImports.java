@@ -134,9 +134,9 @@ public final class StaticImports {
      This data definition method is one of the few methods in this project that support varargs.
      */
     @SafeVarargs
-    public static <T> @NotNull MutRrbt<@Nullable T> mutableRrb(@Nullable T... items) {
+    public static <T> @NotNull MutRrbt<T> mutableRrb(T... items) {
         if ( (items == null) || (items.length < 1) ) { return RrbTree.emptyMutable(); }
-        return RrbTree.<@Nullable T>emptyMutable()
+        return RrbTree.<T>emptyMutable()
                 .concat(Arrays.asList(items));
     }
 
@@ -146,10 +146,10 @@ public final class StaticImports {
      values overwrite earlier ones.
      */
     @SafeVarargs
-    public static <T> @NotNull MutSet<@Nullable T> mutableSet(@Nullable T... items) {
-        MutSet<@Nullable T> ret = PersistentHashSet.emptyMutable();
+    public static <T> @NotNull MutSet<T> mutableSet(T... items) {
+        MutSet<T> ret = PersistentHashSet.emptyMutable();
         if (items == null) { return ret; }
-        for (@Nullable T t : items) {
+        for (T t : items) {
             ret.put(t);
         }
         return ret;
@@ -160,10 +160,10 @@ public final class StaticImports {
      few methods in this project that support varargs.
      */
     @SafeVarargs
-    public static <T> @NotNull MutList<@Nullable T> mutableVec(@Nullable T... items) {
-        MutList<@Nullable T> ret = PersistentVector.emptyMutable();
+    public static <T> @NotNull MutList<T> mutableVec(T... items) {
+        MutList<T> ret = PersistentVector.emptyMutable();
         if (items == null) { return ret; }
-        for (@Nullable T t : items) {
+        for (T t : items) {
             ret.append(t);
         }
         return ret;
@@ -179,7 +179,7 @@ public final class StaticImports {
      This data definition method is one of the few methods in this project that support varargs.
      */
     @SafeVarargs
-    static public <T> @NotNull ImRrbt<@Nullable T> rrb(@Nullable T... items) {
+    static public <T> @NotNull ImRrbt<T> rrb(T... items) {
         if ( (items == null) || (items.length < 1) ) { return RrbTree.empty(); }
         return mutableRrb(items).immutable();
     }
@@ -190,7 +190,7 @@ public final class StaticImports {
      values overwrite earlier ones.
      */
     @SafeVarargs
-    public static <T> @NotNull ImSet<@Nullable T> set(@Nullable T... items) {
+    public static <T> @NotNull ImSet<T> set(T... items) {
         if ( (items == null) || (items.length < 1) ) { return PersistentHashSet.empty(); }
         return PersistentHashSet.of(Arrays.asList(items));
     }
@@ -258,7 +258,7 @@ public final class StaticImports {
      few methods in this project that support varargs.
      */
     @SafeVarargs
-    static public <T> @NotNull ImList<@Nullable T> vec(@Nullable T... items) {
+    static public <T> @NotNull ImList<T> vec(T... items) {
         if ( (items == null) || (items.length < 1) ) { return PersistentVector.empty(); }
         return mutableVec(items).immutable();
     }
@@ -289,14 +289,18 @@ public final class StaticImports {
     /** Wrap a String (or CharSequence) to perform a Character-by-Character transformation on it. */
     public static @NotNull UnmodIterable<Character> xformChars(CharSequence seq) {
         //noinspection Convert2Lambda
-        return new UnmodIterable<Character>() {
+        return new UnmodIterable<>() {
             @NotNull
-            @Override public UnmodIterator<Character> iterator() {
-                return new UnmodIterator<Character>() {
+            @Override
+            public UnmodIterator<Character> iterator() {
+                return new UnmodIterator<>() {
                     private int idx = 0;
-                    @Override public boolean hasNext() { return idx < seq.length(); }
 
-                    @Override public Character next() {
+                    @Override
+                    public boolean hasNext() { return idx < seq.length(); }
+
+                    @Override
+                    public Character next() {
                         int nextIdx = idx + 1;
                         Character c = seq.charAt(idx);
                         idx = nextIdx;
