@@ -2,6 +2,13 @@
 Read [README.md](README.md) before this file as that is the official introduction to Paguro.
 This file contains additional information for contributors, or maybe people who are considering opening an issue.
 
+# History
+
+* DECEMBER 1995: Ropes: an Alternative to Strings: hans-j. boehm, russ atkinson and michael plass
+* September 1996: Purely Functional Data Structures: Chris Okasaki. 
+* Clojure collections - Rich Hickey
+* RRB-Tree paper: Phil Bagwell
+
 # Manifesto
 
 * Immutability promotes correct code as much as type safety does.
@@ -119,6 +126,24 @@ interface Sequence2<T> {
 ```
 
 Ultimately, Transformable took the place of a sequence abstraction in Paguro.  It's safe, easy to use, and about 98% as fast as native Java iteration.  If you really need to pretend you have a Sequence1, Transformable has `take(1)` and `drop(1)` that you can use like `first()` and `rest()` in a pinch.  That said, everything you could do with Sequence1 you can do faster and just as clearly with Transformable.  Presumably, this is why Clojure now has Transducers.
+
+### Make map creation less verbose #42
+
+This was more complexity than value.
+
+1. How many overloads do you want to make for this function?  Without many, it's not so useful.  With many, it used to slow down the type inference for the IDE and I think for the compile.
+2. In general, I don't like syntax that works one way sometimes and another way other times.  It makes source control diffs messy when you go from your 6-item map syntax to a 7-item map syntax and every line of the map creation has to change.
+3. Many overloads for this function also increased the size of Paguro.  This is a really small project.  People have said they use it in Android projects where space is very tight.
+4. It was more to unit test.
+
+It was also a little unsafe if you had a map with the same type for keys and values.  Like a Map<String,String>, there was no visual indicator what were keys and what were values.  The "tup()" shows the pairs unambiguously.
+
+If you need this, it's not that hard to write your own functions:
+```java
+public static Map<K,V> map(K k1, V v1) { return map(tup(k1, v1)); }
+public static Map<K,V> map(K k1, V v1, K k2, V v2) { return map(tup(k1, v1), tup(k2, v2)); }
+```
+If you like brevity, you can even call them m() instead of map().
 
 # Motivation
 
