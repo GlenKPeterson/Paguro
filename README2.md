@@ -4,6 +4,7 @@ This file contains additional information for contributors, or maybe people who 
 
 # History
 
+* 1970: B-Tree:	Rudolf Bayer, Edward M. McCreight
 * DECEMBER 1995: Ropes: an Alternative to Strings: hans-j. boehm, russ atkinson and michael plass
 * September 1996: Purely Functional Data Structures: Chris Okasaki. 
 * Clojure collections - Rich Hickey
