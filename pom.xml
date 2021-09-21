@@ -38,7 +38,7 @@ http://mvnrepository.com/artifact/org.organicdesign/Paguro
 	-->
 	<groupId>org.organicdesign</groupId>
 	<artifactId>Paguro</artifactId>
-	<version>3.5.9</version>
+	<version>3.5.10</version>
 	<packaging>jar</packaging>
 
 	<name>Paguro</name>
@@ -48,13 +48,12 @@ http://mvnrepository.com/artifact/org.organicdesign/Paguro
 	<licenses>
 		<license>
 			<name>The Apache License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-			<comments>The license for most of the files in this
-				project.</comments>
+			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<comments>The license for most of the files in this project.</comments>
 		</license>
 		<license>
 			<name>Eclipse Public License - v 1.0</name>
-			<url>http://www.eclipse.org/legal/epl-v10.html</url>
+			<url>https://www.eclipse.org/legal/epl-v10.html</url>
 			<comments>For the persistent collections in the
 				collections/ folder. These files are derivative
 				works based on the Clojure source code.</comments>
@@ -78,7 +77,7 @@ http://mvnrepository.com/artifact/org.organicdesign/Paguro
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>3.0.0-M3</version>
+				<version>3.0.0</version>
 				<executions>
 					<execution>
 						<id>enforce-maven</id>
@@ -98,7 +97,7 @@ http://mvnrepository.com/artifact/org.organicdesign/Paguro
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-gpg-plugin</artifactId>
-				<version>1.6</version>
+				<version>3.0.1</version>
 				<executions>
 					<execution>
 						<id>sign-artifacts</id>
@@ -130,7 +129,7 @@ http://mvnrepository.com/artifact/org.organicdesign/Paguro
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<!-- JavaDoc wasn't providing the right links to the Java APIs with the default version of the plugin on my machine. -->
-				<version>3.2.0</version>
+				<version>3.3.1</version>
 				<configuration>
 					<additionalOptions>-Xdoclint:none</additionalOptions>
 				</configuration>
@@ -146,7 +145,7 @@ http://mvnrepository.com/artifact/org.organicdesign/Paguro
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.6</version>
+				<version>0.8.7</version>
 				<executions>
 					<execution>
 						<goals>
@@ -179,18 +178,18 @@ http://mvnrepository.com/artifact/org.organicdesign/Paguro
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.13.1</version>
+			<version>4.13.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.jetbrains</groupId>
 			<artifactId>annotations</artifactId>
-			<version>20.1.0</version>
+			<version>22.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.organicdesign</groupId>
 			<artifactId>TestUtils</artifactId>
-			<version>1.0.1</version>
+			<version>1.0.5</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
