@@ -38,7 +38,7 @@ http://mvnrepository.com/artifact/org.organicdesign/Paguro
 	-->
 	<groupId>org.organicdesign</groupId>
 	<artifactId>Paguro</artifactId>
-	<version>3.5.10</version>
+	<version>3.6.0</version>
 	<packaging>jar</packaging>
 
 	<name>Paguro</name>
@@ -47,22 +47,22 @@ http://mvnrepository.com/artifact/org.organicdesign/Paguro
 
 	<licenses>
 		<license>
-			<name>The Apache License, Version 2.0</name>
-			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
-			<comments>The license for most of the files in this project.</comments>
-		</license>
-		<license>
 			<name>Eclipse Public License - v 1.0</name>
 			<url>https://www.eclipse.org/legal/epl-v10.html</url>
 			<comments>For the persistent collections in the
 				collections/ folder. These files are derivative
 				works based on the Clojure source code.</comments>
 		</license>
+		<license>
+			<name>The Apache License, Version 2.0</name>
+			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<comments>This is an optional license (user can choose it) for the files in this project that were never part of Clojure.</comments>
+		</license>
 	</licenses>
 	<developers>
 		<developer>
 			<name>Glen K. Peterson</name>
-			<email>glen@organicdesign.org</email>
+			<email>glen.k.peterson@gmail.com</email>
 			<organization>PlanBase Inc.</organization>
 		</developer>
 	</developers>

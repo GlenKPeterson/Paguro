@@ -5,6 +5,11 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
+### Release 3.6.0 2021-09-21
+- Added back .add() and .addAll() methods to MutList.
+  This is sort of an experiment to see if this is more helpful than dangerous.
+  It's probably helpful, but I can't do this with all the appropriate methods/interfaces right now.
+
 ## Release 3.5.10 2021-09-21
 - Bumped dependencies
 

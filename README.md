@@ -108,9 +108,10 @@ The Clojure collections are licensed under the Eclipse Public License.
 Versions of them have been included in this project and modified to add type safety and implement different interfaces.
 These files are still derivative works under the EPL.
 
-Unless otherwise stated, the rest of this work is licensed under the Apache 2.0 license.
-New contributions should be made under the Apache 2.0 license whenever practical.
-I believe it is more popular, clearer, and has been better tested in courts of law.
+Unless otherwise stated, the rest of this work may be licensed under EITHER the Eclipse 1.0 or the Apache 2.0.
+You get to choose!
+New contributions should be made under both licenses whenever practical.
+I believe Apache is more popular, clearer, and has been better tested in courts of law.
 
 Hermit Crab Photo by [Rushen](https://www.flickr.com/photos/rushen/12171498934/in/photostream/)
 

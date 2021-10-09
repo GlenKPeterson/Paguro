@@ -15,6 +15,8 @@ package org.organicdesign.fp.collections;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
+
 /**
  A mutate-in-place interface using the same copy-on-write methods as {@link BaseList} and
  {@link ImList} so that you can treat mutable and immutable lists the same.
@@ -28,16 +30,30 @@ public interface MutList<E> extends BaseList<E> {
     MutList<E> append(E val);
 
     // TODO: Is this a good idea?  Kotlin does this...
-//    /**
-//     Ensures that this collection contains the specified element (optional operation).
-//     Returns true if this collection changed as a result of the call.
-//     */
-//    @SuppressWarnings("deprecation")
-//    @Override default boolean add(E val) {
-//        int origSize = size();
-//        append(val);
-//        return origSize != size();
-//    }
+    // I'm concerned that we cannot provide good implementations for all these methods.
+    // Will implementing some be a benefit?
+    // Or just a temptation to use other deprecated methods?
+    // I'm going to try this with a few easy methods to see how it goes.
+    // These are all technically "optional" operations anyway.
+    /**
+     Ensures that this collection contains the specified element (optional operation).
+     Returns true if this collection changed as a result of the call.
+     */
+    @SuppressWarnings("deprecation")
+    @Override default boolean add(E val) {
+        append(val);
+        return true;
+    }
+
+    /**
+     * Appends all the elements in the specified collection to the end of this list,
+     * in the order that they are returned by the specified collection's iterator.
+     */
+    @SuppressWarnings("deprecation")
+    @Override default boolean addAll(@NotNull Collection<? extends E> c) {
+        concat(c);
+        return true;
+    }
 
     /** Returns a immutable version of this mutable list. */
     ImList<E> immutable();

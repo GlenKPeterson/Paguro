@@ -56,4 +56,25 @@ public class MutListTest {
         assertEquals(control.size(), test.size());
         assertEquals(control, test);
     }
+
+    @Test public void testOriginalMethods() {
+        List<String> control = new ArrayList<>();
+        MutList<String> test = new TestList<>(new ArrayList<>());
+
+        for (int i = 0; i < 32; i++) {
+            String ord = ordinal(i);
+            assertTrue(control.add(ord));
+            assertTrue(test.add(ord));
+            assertEquals(control.size(), test.size());
+            assertEquals(control, test);
+        }
+
+        List<String> moreStuff = Arrays.asList("this", "is", "more", "stuff");
+        assertTrue(control.addAll(moreStuff));
+        assertTrue(test.addAll(moreStuff));
+
+        assertEquals(control.size(), test.size());
+        assertEquals(control, test);
+    }
+
 }
