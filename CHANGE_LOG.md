@@ -9,6 +9,9 @@ tells you what to use instead.  Once we delete the deprecated methods, that docu
 - Added back .add() and .addAll() methods to MutList.
   This is sort of an experiment to see if this is more helpful than dangerous.
   It's probably helpful, but I can't do this with all the appropriate methods/interfaces right now.
+- Made project Eclipse 1.0 by default, some files available Apache 2.0 if you want.
+  This is not a big change from what it was before and probably only affects forks,
+  or people just using a few files or code snippets.
 
 ## Release 3.5.10 2021-09-21
 - Bumped dependencies
