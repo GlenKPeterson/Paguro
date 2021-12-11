@@ -359,14 +359,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
             if (n.thisNodeHasRelaxedCapacity(shorter.numChildren())) {
                 // Adding kids of shorter to proper level of taller...
                 Node<E>[] kids;
-                if (shorter instanceof Strict) {
-                    kids = ((Strict<E>) shorter).nodes;
-                } else if (shorter instanceof Relaxed) {
-                    kids = ((Relaxed<E>) shorter).nodes;
-                } else {
-                    throw new IllegalStateException("Expected a strict or relaxed, but found " +
-                                                    shorter.getClass());
-                }
+                kids = ((Relaxed<E>) shorter).nodes;
                 n = n.addEndChildren(leftIntoRight, kids);
 //                System.out.println("n0=" + n.indentedStr(3));
             }
@@ -442,8 +435,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
                 // leaf nodes, but I could be wrong.
                 // I also think we should get rid of relaxed nodes and everything will be much
                 // easier.
-                Relaxed<E> rel = (anc instanceof Strict) ? ((Strict<E>) anc).relax()
-                                                         : (Relaxed<E>) anc;
+                Relaxed<E> rel = (Relaxed<E>) anc;
 
                 int repIdx = leftIntoRight ? 0 : rel.numChildren() - 1;
                 n = Relaxed.replaceInRelaxedAt(rel.cumulativeSizes, rel.nodes, n, repIdx,
@@ -796,14 +788,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
             if (n.thisNodeHasRelaxedCapacity(shorter.numChildren())) {
                 // Adding kids of shorter to proper level of taller...
                 Node<E>[] kids;
-                if (shorter instanceof Strict) {
-                    kids = ((Strict<E>) shorter).nodes;
-                } else if (shorter instanceof Relaxed) {
-                    kids = ((Relaxed<E>) shorter).nodes;
-                } else {
-                    throw new IllegalStateException("Expected a strict or relaxed, but found " +
-                                                    shorter.getClass());
-                }
+                kids = ((Relaxed<E>) shorter).nodes;
                 n = n.addEndChildren(leftIntoRight, kids);
             }
 
@@ -876,8 +861,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
                 // leaf nodes, but I could be wrong.
                 // I also think we should get rid of relaxed nodes and everything will be much
                 // easier.
-                Relaxed<E> rel = (anc instanceof Strict) ? ((Strict<E>) anc).relax()
-                                                         : (Relaxed<E>) anc;
+                Relaxed<E> rel = (Relaxed<E>) anc;
 
                 int repIdx = leftIntoRight ? 0 : rel.numChildren() - 1;
                 n = Relaxed.replaceInRelaxedAt(rel.cumulativeSizes, rel.nodes, n, repIdx,
@@ -1109,14 +1093,7 @@ involves changing more nodes than maybe necessary.
 
     @SuppressWarnings("unchecked")
     private static <E> Node<E> addAncestor(Node<E> n) {
-        return ( (n instanceof Leaf) &&
-                 (n.size() == STRICT_NODE_LENGTH) ) ? new Strict<>(NODE_LENGTH_POW_2,
-                                                                   n.size(),
-                                                                   (Node<E>[]) new Node[]{n}) :
-               (n instanceof Strict) ? new Strict<>(((Strict<E>) n).shift + NODE_LENGTH_POW_2,
-                                                    n.size(),
-                                                    (Node<E>[]) new Node[]{n}) :
-               new Relaxed<>(new int[] { n.size() },
+        return new Relaxed<>(new int[] { n.size() },
                              (Node<E>[]) new Node[]{n});
     }
 
@@ -1199,9 +1176,6 @@ involves changing more nodes than maybe necessary.
 
         /** Return the item at the given index */
         T get(int i);
-
-        /** Returns true if this strict-Radix tree can take another 32 items. */
-        boolean hasStrictCapacity();
 
         /** Returns the maximum depth below this node.  Leaf nodes are height 1. */
         int height();
@@ -1346,8 +1320,6 @@ involves changing more nodes than maybe necessary.
         // relaxed tree.
 //        public boolean thisNodeHasCapacity() { return items.length < MAX_NODE_LENGTH; }
 
-        @Override public boolean hasStrictCapacity() { return false; }
-
         @Override public boolean hasRelaxedCapacity(int index, int size) {
             // Appends and prepends need to be a good size, but random inserts do not.
 //            if ( (size < 1) || (size >= MAX_NODE_LENGTH) ) {
@@ -1420,18 +1392,18 @@ involves changing more nodes than maybe necessary.
             // Try first to yield a Strict node.  For a leaf like this, that means both this node
             // and the pushed focus are STRICT_NODE_LENGTH.  It also means the old focus is being
             // pushed at either the beginning or the end of this node (not anywhere in-between).
-            if ( (items.length == STRICT_NODE_LENGTH) &&
-                 (oldFocus.length == STRICT_NODE_LENGTH) &&
-                 ((index == STRICT_NODE_LENGTH) || (index == 0)) ) {
-
-                Leaf<T>[] newNodes = (index == STRICT_NODE_LENGTH)
-                                     ? new Leaf[] { this,
-                                                    new Leaf<>(oldFocus)}
-                                     : new Leaf[] { new Leaf<>(oldFocus),
-                                                    this };
-                // Size is twice STRICT_NODE_LENGTH, so shift left 1 to double.
-                return new Strict<>(NODE_LENGTH_POW_2, STRICT_NODE_LENGTH << 1, newNodes);
-            }
+//            if ( (items.length == STRICT_NODE_LENGTH) &&
+//                 (oldFocus.length == STRICT_NODE_LENGTH) &&
+//                 ((index == STRICT_NODE_LENGTH) || (index == 0)) ) {
+//
+//                Leaf<T>[] newNodes = (index == STRICT_NODE_LENGTH)
+//                                     ? new Leaf[] { this,
+//                                                    new Leaf<>(oldFocus)}
+//                                     : new Leaf[] { new Leaf<>(oldFocus),
+//                                                    this };
+//                // Size is twice STRICT_NODE_LENGTH, so shift left 1 to double.
+//                return new Strict<>(NODE_LENGTH_POW_2, STRICT_NODE_LENGTH << 1, newNodes);
+//            }
 
             if ((items.length + oldFocus.length) < MAX_NODE_LENGTH) {
                 return new Leaf<>(spliceIntoArrayAt(oldFocus, items, index,
@@ -1475,386 +1447,6 @@ involves changing more nodes than maybe necessary.
             return arrayString(items);
         }
     } // end class Leaf
-
-    // Contains a left-packed tree of exactly 32-item nodes.
-    private static class Strict<T> implements Node<T> {
-        // This is the number of levels below this node (height) times NODE_LENGTH
-        // For speed, we calculate it as height << NODE_LENGTH_POW_2
-        // TODO: Can we store shift at the top-level Strict only?
-        final int shift;
-        final int size;
-        // These are the child nodes
-        final Node<T>[] nodes;
-        // Constructor
-        Strict(int sh, int sz, Node<T>[] ns) {
-            shift = sh; size = sz; nodes = ns;
-        }
-
-        @Override public Node<T> child(int childIdx) { return nodes[childIdx]; }
-
-        @Override public int debugValidate() {
-            if (nodes.length > STRICT_NODE_LENGTH) {
-                throw new IllegalStateException("Too many child nodes!\n" +
-                                                this.indentedStr(0));
-            }
-            int sz = 0;
-            int height = height() - 1;
-            int sh = shift - NODE_LENGTH_POW_2;
-            for (int i = 0; i < nodes.length; i++) {
-                Node<T> n = nodes[i];
-                if ( !(n instanceof Strict) &&
-                     !(n instanceof Leaf) ) {
-                    throw new IllegalStateException(
-                            "Strict nodes can only have strict or leaf children!\n" +
-                            this.indentedStr(0));
-                }
-                if (n.height() != height) {
-                    throw new IllegalStateException("Unequal height!  My height = " + height() + "\n" + this.indentedStr(0));
-                }
-                if ( (n instanceof Strict) &&
-                     ((Strict<T>) n).shift != sh ) {
-                    throw new IllegalStateException(
-                            "Unexpected shift difference between levels!\n" + this.indentedStr(0));
-                }
-                if (i < nodes.length - 1) {
-                    if (n.hasStrictCapacity())  {
-                        throw new IllegalStateException("Non-last strict node is not full!\n" +
-                                                        this.indentedStr(0));
-                    }
-                    if ((n.size() % STRICT_NODE_LENGTH) != 0){
-                        throw new IllegalStateException("Non-last strict node has a weird size!\n" +
-                                                        this.indentedStr(0));
-                    }
-                }
-                if (n instanceof Strict) {
-                    n.debugValidate();
-                }
-                sz += n.size();
-            }
-            return sz;
-        }
-
-        /** Returns the leftMost (first) or right-most (last) child */
-        @Override public Node<T> endChild(boolean leftMost) {
-            return nodes[leftMost ? 0 : nodes.length - 1];
-        }
-
-        /** Adds a node as the first/leftmost or last/rightmost child */
-        @SuppressWarnings("unchecked")
-        @Override public Node<T> addEndChild(boolean leftMost, Node<T> shorter) {
-            if (leftMost || !(shorter instanceof Strict)) {
-                return relax().addEndChild(leftMost, shorter);
-            }
-            return new Strict<>(shift, size + shorter.size(),
-                                insertIntoArrayAt(shorter, nodes, nodes.length, Node.class));
-        }
-
-        /** Adds kids as leftmost or rightmost of current children */
-        @Override public Node<T> addEndChildren(boolean leftMost, Node<T>[] newKids) {
-//            if (!thisNodeHasRelaxedCapacity(newKids.length)) {
-//                throw new IllegalStateException("Can't add enough kids");
-//            }
-            return relax().addEndChildren(leftMost, newKids);
-        }
-
-        @Override public int height() {
-            return (shift / NODE_LENGTH_POW_2) + 1;
-        }
-
-        /**
-         Returns the highest bits which we use to index into our array - the index of the immediate
-         child of this node.  This is the simplicity (and
-         speed) of Strict indexing.  When everything works, this can be inlined for performance.
-         This could maybe yield a good guess for Relaxed nodes?
-
-         Shifting right by a number is equivalent to dividing by: 2 raised to the power of that
-         number.
-         i >> n is equivalent to i / (2^n)
-         */
-        private int highBits(int i) { return i >> shift; }
-
-        /**
-         Returns the low bits of the index (the part Strict sub-nodes need to know about).  This
-         only works because the leaf nodes are all the same size and that size is a power of 2
-         (the radix).  All branch must have the same radix (branching factor or number of immediate
-         sub-nodes).
-
-         Bit shifting is faster than addition or multiplication, but perhaps more importantly, it
-         means we don't have to store the sizes of the nodes which means we don't have to fetch
-         those sizes from memory or use up cache space.  All of this helps make this data structure
-         simple and fast.
-
-         When everything works, this function can be inlined for performance (if that even helps).
-         Contrast this with how Relaxed nodes work: they use subtraction instead!
-         */
-        private int lowBits(int i) {
-            // Little trick: -1 in binary is all ones: 0b11111111111111111111111111111111
-            // We shift it left, filling the right-most bits with zeros and creating a bit-mask
-            // with ones on the left and zeros on the right
-            int shifter = -1 << shift;
-
-            // Now we take the inverse so our bit-mask has zeros on the left and ones on the right
-            int invShifter = ~shifter;
-
-            // Finally, we bitwise-and the mask with the index to leave only the low bits.
-            return  i & invShifter;
-        }
-
-        @Override public T get(int i) {
-            // Find the node indexed by the high bits (for this height).
-            // Send the low bits on to our sub-nodes.
-            return nodes[highBits(i)].get(lowBits(i));
-        }
-
-        @Override public int size() { return size; }
-
-//        private boolean thisNodeHasCapacity() { return nodes.length < STRICT_NODE_LENGTH; }
-
-        @Override public boolean hasStrictCapacity() {
-//            boolean ret = thisNodeHasCapacity() || nodes[nodes.length - 1].hasStrictCapacity();
-//            boolean ret2 = highBits(size) != STRICT_NODE_LENGTH;
-//            if (ret != ret2) {
-//                System.out.println("size: " + size);
-//                System.out.println("hasStrict: " + ret);
-//                System.out.println("highBits(size)" + highBits(size));
-//                System.out.println("lowBits(size)" + lowBits(size));
-//                throw new IllegalStateException("Won't work!");
-//            }
-
-            // This works because when a strict node is not full, it's highest child index is
-            // STRICT_NODE_LENGTH - 1 (which is what highBits(size) will return.
-            // This used to then walk down the right hand side of the tree checking for room.
-            // But it turns out that the highest index would have lowBits() equals all ones.
-            // size is the maxIndex + 1, so that flips the lowest bit of highBits() and makes
-            // all lowBits() zeros so that the following line works:
-            return highBits(size) != STRICT_NODE_LENGTH;
-        }
-
-        @Override public boolean hasRelaxedCapacity(int index, int size) {
-//            if ( (size < 1) || (size >= MAX_NODE_LENGTH) ) {
-//                throw new IllegalArgumentException("Bad size: " + size);
-//            }
-            // It has relaxed capacity because a Relaxed node could have up to MAX_NODE_LENGTH nodes
-            // and by definition this Strict node has exactly STRICT_NODE_LENGTH items.
-            return size < MAX_NODE_LENGTH - STRICT_NODE_LENGTH;
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        public SplitNode<T> splitAt(int splitIndex) {
-//            int size = size();
-//            if ( (splitIndex < 0) || (splitIndex > size) ) {
-//                throw new IllegalArgumentException("Bad splitIndex: " + splitIndex);
-//            }
-            if (splitIndex == 0) {
-                return new SplitNode<>(emptyLeaf(), emptyArray(), this, emptyArray());
-            }
-            if (splitIndex == size) {
-                return new SplitNode<>(this, emptyArray(), emptyLeaf(), emptyArray());
-            }
-
-            // Not split on a child boundary, so find which child to split and pass it the
-            // appropriate index.
-            int subNodeIndex = highBits(splitIndex);
-            Node<T> subNode = nodes[subNodeIndex];
-            int subNodeAdjustedIndex = lowBits(splitIndex);
-
-            SplitNode<T> split = subNode.splitAt(subNodeAdjustedIndex);
-
-            final Node<T> left;
-            final Node<T> splitLeft = split.left();
-            if (subNodeIndex == 0) {
-                left = new Strict<T>(shift, splitLeft.size(), new Node[] {splitLeft});
-            } else {
-                boolean haveLeft = (splitLeft.size() > 0);
-                int numLeftItems = subNodeIndex + (haveLeft ? 1 : 0);
-                Node<T>[] leftNodes = genericNodeArray(numLeftItems);
-                // Copy one less item if we are going to add the split one in a moment.
-                // I could have written:
-                //     haveLeft ? numLeftItems - 1
-                //              : numLeftItems
-                // but that's always equal to subNodeIndex.
-                System.arraycopy(nodes, 0, leftNodes, 0, subNodeIndex);
-                if (haveLeft) {
-                    leftNodes[numLeftItems - 1] = splitLeft;
-                }
-                int newSize = 0;
-                for (Node<T> n : leftNodes) {
-                    newSize += n.size();
-                }
-                left = new Strict<>(shift, newSize, leftNodes);
-            }
-
-//            left.debugValidate();
-//            split.right().debugValidate();
-
-//            if ( (split.right().size() > 0) &&
-//                 (nodes[0].height() != split.right().height()) ) {
-//                throw new IllegalStateException(
-//                        "Have a right node of a different height!" +
-//                        "nodes:" + showSubNodes(new StringBuilder(), nodes, 6) +
-//                        "\nright:" + split.right().indentedStr(6));
-//            }
-            final Node<T> right = Relaxed.fixRight(nodes, split.right(), subNodeIndex);
-
-//            right.debugValidate();
-
-//            if ( (left.size() > 0) &&
-//                 (right.size() > 0) &&
-//                 (left.height() != right.height()) ) {
-//                throw new IllegalStateException("Unequal heights of split!\n" +
-//                "left: " + left.indentedStr(6) +
-//                "\nright:" + right.indentedStr(6));
-//            }
-
-//            if (this.size() != ret.size()) {
-//                throw new IllegalStateException(
-//                        "Split on " + this.size() + " items returned " + ret.size() + " items");
-//            }
-
-            return new SplitNode<>(left, split.leftFocus(),
-                                   right, split.rightFocus());
-        }
-
-        Relaxed<T> relax() {
-            int[] newCumSizes = new int[nodes.length];
-            int cumulativeSize = 0;
-            // We know all sub-nodes (except the last) have the same size because they are
-            // packed-left.
-            int subNodeSize = nodes[0].size();
-            for (int i = 0; i < nodes.length - 1; i++) {
-                cumulativeSize += subNodeSize;
-                newCumSizes[i] = cumulativeSize;
-            }
-
-            // Final node may not be packed, so it could have a different size
-            cumulativeSize += nodes[nodes.length - 1].size();
-            newCumSizes[newCumSizes.length - 1] = cumulativeSize;
-
-            return new Relaxed<>(newCumSizes, nodes);
-        }
-
-        @Override public int numChildren() { return nodes.length; }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        public Node<T> pushFocus(int index, T[] oldFocus) {
-            // If the proper sub-node can take the additional array, let it!
-            int subNodeIndex = highBits(index);
-
-            // It's a strict-compatible addition if the focus being pushed is of
-            // STRICT_NODE_LENGTH and the index it's pushed to falls on the final leaf-node boundary
-            // and the children of this node are leaves and this node is not full.
-            if (oldFocus.length == STRICT_NODE_LENGTH) {
-
-                if (index == size()) {
-                    Node<T> lastNode = nodes[nodes.length - 1];
-                    if (lastNode.hasStrictCapacity()) {
-                        // Pushing focus down to lower-level node with capacity.
-                        // TODO: This line appears to be the slowest part.
-
-                        // This variable is my attempt to prevent dynamic dispatch on the call
-                        // to pushFocus()
-                        Strict<T> strict = (Strict<T>) lastNode;
-                        Node<T> newNode = strict.pushFocus(lowBits(index), oldFocus);
-                        Node<T>[] newNodes = replaceInArrayAt(newNode, nodes, nodes.length - 1,
-                                                              Node.class);
-                        return new Strict<>(shift, size + oldFocus.length, newNodes);
-                    }
-                    // Regardless of what else happens, we're going to add a new node.
-                    Node<T> newNode = new Leaf<>(oldFocus);
-
-                    // Make a skinny branch of a tree by walking up from the leaf node until our
-                    // new branch is at the same level as the old one.  We have to build evenly
-                    // (like hotels in Monopoly) in order to keep the tree balanced.  Even height,
-                    // but left-packed (the lower indices must all be filled before adding new
-                    // nodes to the right).
-                    int newShift = NODE_LENGTH_POW_2;
-
-                    // If we've got space in our array, we just have to add skinny-branch nodes up
-                    // to the level below ours.  But if we don't have space, we have to add a
-                    // single-element strict node at the same level as ours here too.
-                    int maxShift = (nodes.length < STRICT_NODE_LENGTH) ? shift : shift + 1;
-
-                    // Make the skinny-branch of single-element strict nodes:
-                    while (newShift < maxShift) {
-                        // Add a skinny branch node
-                        newNode = new Strict<>(newShift, oldFocus.length, singleElementArray(newNode, Node.class));
-                        newShift += NODE_LENGTH_POW_2;
-                    }
-
-                    if ((nodes.length < STRICT_NODE_LENGTH)) {
-                        // This will fail at runtime if we use an array of Objects instead of Nodes.
-                        // To do that, we'd have to convert all this to Objects and cast each item as
-                        // it comes off.
-                        //
-                        // Add a node to the existing array
-                        Node<T>[] newNodes =
-                                insertIntoArrayAt(newNode, nodes, subNodeIndex, Node.class);
-                        // This could allow cheap strict inserts on any leaf-node boundary...
-                        return new Strict<>(shift, size + oldFocus.length, newNodes);
-                    } else {
-                        // Add a level to the Strict tree
-                        return new Strict<T>(shift + NODE_LENGTH_POW_2,
-                                             size + oldFocus.length,
-                                             new Node[]{this, newNode});
-                    }
-                } else if ( (shift == NODE_LENGTH_POW_2) &&
-                            (lowBits(index) == 0) &&
-                            (nodes.length < STRICT_NODE_LENGTH) ) {
-                    // Here we are:
-                    //    Pushing a STRICT_NODE_LENGTH focus
-                    //    At the level above the leaf nodes
-                    //    Inserting *between* existing leaf nodes (or before or after)
-                    //    Have room for at least one more leaf child
-                    // That makes it free and legal to insert a new STRICT_NODE_LENGTH leaf node and
-                    // still yield a Strict (as opposed to Relaxed).
-
-                    // Regardless of what else happens, we're going to add a new node.
-                    Node<T> newNode = new Leaf<>(oldFocus);
-
-                    Node<T>[] newNodes =
-                            insertIntoArrayAt(newNode, nodes, subNodeIndex, Node.class);
-                    // This allows cheap strict inserts on any leaf-node boundary...
-                    return new Strict<>(shift, size + oldFocus.length, newNodes);
-                }
-            } // end if oldFocus.length == STRICT_NODE_LENGTH
-
-            // Here we're going to yield a Relaxed Radix node, so punt to that (slower) logic.
-            return relax().pushFocus(index, oldFocus);
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        public Node<T> replace(int idx, T t) {
-            // Find the node indexed by the high bits (for this height).
-            // Send the low bits on to our sub-nodes.
-            int thisNodeIdx = highBits(idx);
-            Node<T> newNode = nodes[thisNodeIdx].replace(lowBits(idx), t);
-            return new Strict<>(shift, size,
-                                replaceInArrayAt(newNode, nodes, thisNodeIdx, Node.class));
-        }
-
-        @Override public boolean thisNodeHasRelaxedCapacity(int numNodes) {
-            return nodes.length + numNodes < MAX_NODE_LENGTH;
-        }
-
-        @Override public String toString() {
-//            return "Strict(nodes.length="+ nodes.length + ", shift=" + shift + ")";
-            return "Strict" + shift + arrayString(nodes);
-        }
-
-        @Override public String indentedStr(int indent) {
-            StringBuilder sB = new StringBuilder() // indentSpace(indent)
-                    .append("Strict").append(shift).append("(");
-            int len = sB.length();
-            sB.append("size=").append(size).append("\n");
-            sB.append(indentSpace(len + indent));
-            return showSubNodes(sB, nodes, indent + len)
-                    .append(")")
-                    .toString();
-        }
-    }
 
     // Contains a relaxed tree of nodes that average around 32 items each.
     private static class Relaxed<T> implements Node<T> {
@@ -2093,12 +1685,6 @@ involves changing more nodes than maybe necessary.
 
         @Override public boolean thisNodeHasRelaxedCapacity(int numNodes) {
             return nodes.length + numNodes < MAX_NODE_LENGTH;
-        }
-
-        // I don't think this should ever be called.  Should this throw an exception instead?
-        @Override public boolean hasStrictCapacity() {
-            throw new UnsupportedOperationException("I don't think this should ever be called.");
-//            return false;
         }
 
         @Override public boolean hasRelaxedCapacity(int index, int size) {
@@ -2345,12 +1931,6 @@ involves changing more nodes than maybe necessary.
 
                 return new Relaxed<>(newCumSizes, newNodes);
                 // end if subNode instanceof Leaf
-            } else if (subNode instanceof Strict) {
-                // Convert Strict to Relaxed
-                Relaxed<T> relaxed = ((Strict<T>) subNode).relax();
-                Node<T> newNode = relaxed.pushFocus(subNodeAdjustedIndex, oldFocus);
-                return replaceInRelaxedAt(cumulativeSizes, nodes, newNode, subNodeIndex,
-                                          oldFocus.length);
             }
 
             // Here we have capacity and the full sub-node is not a leaf or strict, so we have to

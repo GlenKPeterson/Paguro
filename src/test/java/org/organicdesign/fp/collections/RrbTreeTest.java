@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Random;
 
 import static org.junit.Assert.*;
+import static org.organicdesign.fp.StaticImports.vec;
 import static org.organicdesign.fp.StaticImports.xform;
 import static org.organicdesign.fp.TestUtilities.compareIterators;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
@@ -739,10 +740,10 @@ public class RrbTreeTest {
             mu.append(j);
         }
         assertTrue(im.indentedStr(7).startsWith("RrbTree(size=99 fsi=96 focus="));
-        assertTrue(im.indentedStr(7).contains("               root=Strict"));
+        assertTrue(im.indentedStr(7).contains("               root=Relaxed"));
 
         assertTrue(mu.indentedStr(7).startsWith("RrbTree(size=99 fsi=96 focus="));
-        assertTrue(mu.indentedStr(7).contains("               root=Strict"));
+        assertTrue(mu.indentedStr(7).contains("               root=Relaxed"));
     }
 
     @SafeVarargs
@@ -1012,5 +1013,4 @@ public class RrbTreeTest {
             i++;
         }
     }
-
 }

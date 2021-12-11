@@ -408,6 +408,7 @@ public class PersistentVectorTest {
             control.set(i, i + 10);
             test.replace(i, i + 10);
             assertEquals(control.size(), test.size());
+//            assertEquals(control, test);
         }
 
         for (int i = 0; i < SEVERAL; i++) {
