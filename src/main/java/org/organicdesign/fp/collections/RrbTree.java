@@ -309,6 +309,9 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
 
         @Override public int size() { return size; }
 
+        @Override
+        protected @NotNull MutRrbt<E> mt() { return emptyMutable(); }
+
         /**
          Divides this RRB-Tree such that every index less-than the given index ends up in the
          left-hand tree and the indexed item and all subsequent ones end up in the right-hand tree.
@@ -317,45 +320,10 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
          @return two new sub-trees as determined by the split point.  If the point is 0 or
          this.size() one tree will be empty (but never null).
          */
+        @SuppressWarnings("unchecked")
+        @Override
         public @NotNull Tuple2<MutRrbt<E>,MutRrbt<E>> split(int splitIndex) {
-            if (splitIndex < 1) {
-                if (splitIndex == 0) {
-                    return Tuple2.of(emptyMutable(), this);
-                } else {
-                    throw new IndexOutOfBoundsException(
-                            "Constraint violation failed: 1 <= splitIndex <= size");
-                }
-            } else if (splitIndex >= size) {
-                if (splitIndex == size) {
-                    return Tuple2.of(this, emptyMutable());
-                } else {
-                    throw new IndexOutOfBoundsException(
-                            "Constraint violation failed: 1 <= splitIndex <= size");
-                }
-            }
-            // Push the focus before splitting.
-            Node<E> newRoot = pushFocus();
-
-            // If a leaf-node is split, the fragments become the new focus for each side of the split.
-            // Otherwise, the focus can be left empty, or the last node of each side can be made into
-            // the focus.
-
-            SplitNode<E> split = newRoot.splitAt(splitIndex);
-
-//        split.left().debugValidate();
-//        split.right().debugValidate();
-
-            E[] lFocus = split.leftFocus();
-            Node<E> left = eliminateUnnecessaryAncestors(split.left());
-
-            E[] rFocus = split.rightFocus();
-            Node<E> right = eliminateUnnecessaryAncestors(split.right());
-
-            // These branches are identical, just different classes.
-            return Tuple2.of(new MutRrbt<>(lFocus, left.size(), lFocus.length,
-                                           left, left.size() + lFocus.length),
-                             new MutRrbt<>(rFocus, 0, rFocus.length,
-                                           right, right.size() + rFocus.length));
+            return (Tuple2<MutRrbt<E>,MutRrbt<E>>) super.split(splitIndex);
         }
     }
 
@@ -575,6 +543,9 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
 
         @Override public int size() { return size; }
 
+        @Override
+        protected @NotNull MutRrbt<E> mt() { return emptyMutable(); }
+
         /**
          Divides this RRB-Tree such that every index less-than the given index ends up in the left-hand
          tree and the indexed item and all subsequent ones end up in the right-hand tree.
@@ -583,45 +554,10 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
          @return two new sub-trees as determined by the split point.  If the point is 0 or this.size()
          one tree will be empty (but never null).
          */
+        @SuppressWarnings("unchecked")
+        @Override
         public @NotNull Tuple2<ImRrbt<E>,ImRrbt<E>> split(int splitIndex) {
-            if (splitIndex < 1) {
-                if (splitIndex == 0) {
-                    return Tuple2.of(empty(), this);
-                } else {
-                    throw new IndexOutOfBoundsException(
-                            "Constraint violation failed: 1 <= splitIndex <= size");
-                }
-            } else if (splitIndex >= size) {
-                if (splitIndex == size) {
-                    return Tuple2.of(this, empty());
-                } else {
-                    throw new IndexOutOfBoundsException(
-                            "Constraint violation failed: 1 <= splitIndex <= size");
-                }
-            }
-            // Push the focus before splitting.
-            Node<E> newRoot = pushFocus();
-
-            // If a leaf-node is split, the fragments become the new focus for each side of the split.
-            // Otherwise, the focus can be left empty, or the last node of each side can be made into
-            // the focus.
-
-            SplitNode<E> split = newRoot.splitAt(splitIndex);
-
-//        split.left().debugValidate();
-//        split.right().debugValidate();
-
-            E[] lFocus = split.leftFocus();
-            Node<E> left = eliminateUnnecessaryAncestors(split.left());
-
-            E[] rFocus = split.rightFocus();
-            Node<E> right = eliminateUnnecessaryAncestors(split.right());
-
-            // These branches are identical, just different classes.
-            return Tuple2.of(new ImRrbt<>(lFocus, left.size(),
-                                          left, left.size() + lFocus.length),
-                             new ImRrbt<>(rFocus, 0,
-                                          right, right.size() + rFocus.length));
+            return (Tuple2<ImRrbt<E>,ImRrbt<E>>) super.split(splitIndex);
         }
 
         /** {@inheritDoc} */
@@ -689,22 +625,18 @@ I'm implementing something like the [Bagwell/Rompf RRB-Tree][1] and I'm a little
 the details of the join/merge algorithm.  I wonder if there's a standard way to do this that they
 assume that I know (I don't), or if someone has come up with a better way to do this.
 
-I'm thinking the signature is something like:
-
-    public RrbTree<E> join(RrbTree<? extends E> that)
-
 My basic approach was to fit the shorter tree into the left-most or right-most leg of the taller
 tree at the correct height.  For `a.join(b)`, if `b` is taller, fit `a` into `b`'s left-most leg at
 the right height, otherwise fit `b` into `a`'s right-most leg at the right height
 
 Overview:
 
-1. Push the focus of both trees so we don't have to worry about it.
+1. Push the focus of both trees, so we don't have to worry about it.
 
 2. Find the height of each tree.
 
 3. Stick the shorter tree into the proper level of the larger tree (on the left or right as
-appropriate).  If the leftmost/rightmost node at the proper level level of the larger tree is full,
+appropriate).  If the leftmost/rightmost node at the proper level of the larger tree is full,
 add a "skinny leg" (a new root with a single child) to the short tree and stick it on the left or
 right one level up in the large one.  If the large tree is packed, several skinny-leg insertion
 attempts may be required, or even a new root added to the large tree with 2 children: the old
@@ -718,11 +650,6 @@ involves changing more nodes than maybe necessary.
 
   [1]: https://infoscience.epfl.ch/record/169879/files/RMTrees.pdf
 */
-
-    /**
-     * Allows removing duplicated code by letting super-class produce new members of subclass types.
-     */
-    protected abstract @NotNull RrbTree<E> makeNew(@NotNull E[] f, int fi, int fl, @NotNull Node<E> r, int s);
 
     /**
      * Joins the given tree to the right side of this tree (or this to the left side of that one) in
@@ -863,7 +790,7 @@ involves changing more nodes than maybe necessary.
 //                System.out.println("n2=" + n.indentedStr(3));
 //            n.debugValidate();
         } else if (i < 0) {
-            // 2 trees of equal height so we make a new parent
+            // 2 trees of equal height: make a new parent
 //            if (shorter.height() != n.height()) {
 //                throw new IllegalStateException("Expected trees of equal height");
 //            }
@@ -900,6 +827,13 @@ involves changing more nodes than maybe necessary.
         return makeNew(emptyArray(), 0, 0, n, n.size());
     }
 
+    /**
+     * Allows removing duplicated code by letting super-class produce new members of subclass types.
+     */
+    protected abstract @NotNull RrbTree<E> makeNew(@NotNull E[] f, int fi, int fl, @NotNull Node<E> r, int s);
+
+    protected abstract @NotNull RrbTree<E> mt();
+
     /** Internal method - do not use. */
     abstract @NotNull Node<E> pushFocus();
 
@@ -918,7 +852,46 @@ involves changing more nodes than maybe necessary.
      @return two new sub-trees as determined by the split point.  If the point is 0 or this.size()
      one tree will be empty (but never null).
      */
-    abstract public @NotNull Tuple2<? extends RrbTree<E>,? extends RrbTree<E>> split(int splitIndex);
+    public @NotNull Tuple2<? extends RrbTree<E>,? extends RrbTree<E>> split(int splitIndex) {
+        if (splitIndex < 1) {
+            if (splitIndex == 0) {
+                return Tuple2.of(mt(), this);
+            } else {
+                throw new IndexOutOfBoundsException(
+                        "Constraint violation failed: 1 <= splitIndex <= size");
+            }
+        } else if (splitIndex >= size()) {
+            if (splitIndex == size()) {
+                return Tuple2.of(this, mt());
+            } else {
+                throw new IndexOutOfBoundsException(
+                        "Constraint violation failed: 1 <= splitIndex <= size");
+            }
+        }
+        // Push the focus before splitting.
+        Node<E> newRoot = pushFocus();
+
+        // If a leaf-node is split, the fragments become the new focus for each side of the split.
+        // Otherwise, the focus can be left empty, or the last node of each side can be made into
+        // the focus.
+
+        SplitNode<E> split = newRoot.splitAt(splitIndex);
+
+//        split.left().debugValidate();
+//        split.right().debugValidate();
+
+        E[] lFocus = split.leftFocus();
+        Node<E> left = eliminateUnnecessaryAncestors(split.left());
+
+        E[] rFocus = split.rightFocus();
+        Node<E> right = eliminateUnnecessaryAncestors(split.right());
+
+        // These branches are identical, just different classes.
+        return Tuple2.of(makeNew(lFocus, left.size(), lFocus.length,
+                        left, left.size() + lFocus.length),
+                makeNew(rFocus, 0, rFocus.length,
+                        right, right.size() + rFocus.length));
+    }
 
     /**
      * Returns a new RrbTree minus the given item (all items to the right are shifted left one)
@@ -984,7 +957,7 @@ involves changing more nodes than maybe necessary.
 
     // Definitions:
     // Relaxed: short for "Relaxed Radix."   Relaxed nodes are of somewhat varying sizes, ranging
-    //          from MIN_NODE_LENGTH (Cormen et al calls this "Minimum Degree") to MAX_NODE_LENGTH.
+    //          from MIN_NODE_LENGTH (Cormen et al. calls this "Minimum Degree") to MAX_NODE_LENGTH.
     //          This requires linear interpolation, a bit of searching, and subtraction to find an
     //          index into a sub-node, but supports inserts, split, and combine (with another
     //          RrbTree)
@@ -1001,7 +974,7 @@ involves changing more nodes than maybe necessary.
     // (MIN_NODE_LENGTH + MAX_NODE_LENGTH) / 2 should equal STRICT_NODE_LENGTH so that they have the
     // same average node size to make the index interpolation easier.
     private static final int MIN_NODE_LENGTH = (STRICT_NODE_LENGTH+1) * 2 / 3;
-    // Always check if less-than this.  Never less-than-or-equal.  Cormen adds a -1 here and tests
+    // Always check if less-than this.  Never if less-than-or-equal.  Cormen adds a -1 here and tests
     // for <= (I think!).
     private static final int MAX_NODE_LENGTH = ( (STRICT_NODE_LENGTH+1) * 4 / 3);
 
@@ -1238,7 +1211,7 @@ involves changing more nodes than maybe necessary.
 //            if (oldFocus.length == 0) {
 //                throw new IllegalStateException("Never call this with an empty focus!");
 //            }
-            // We put the empty Leaf as the root of the empty vector and it stays there
+            // We put the empty Leaf as the root of the empty vector.  It stays there
             // until the first call to this method, at which point, the oldFocus becomes the
             // new root.
             if (items.length == 0) {
@@ -1252,7 +1225,7 @@ involves changing more nodes than maybe necessary.
             }
 
             // We should only get here when the root node is a leaf.
-            // Maybe we should be more circumspect with our array creation, but for now, just jam
+            // Maybe we should be more circumspect with our array creation, but for now, just
             // jam it into one big array, then split it up for simplicity
             Leaf<T>[] res = spliceAndSplit(oldFocus, index);
             Leaf<T> leftLeaf = res[0];
@@ -1292,7 +1265,7 @@ involves changing more nodes than maybe necessary.
     private static class Relaxed<T> implements Node<T> {
 
         // Holds the size of each sub-node and plus all nodes to its left.  You could think of this
-        // as maxIndex + 1. This is a separate array so it can be retrieved in a single memory
+        // as maxIndex + 1. This is a separate array so that it can be retrieved in a single memory
         // fetch.  Note that this is a 1-based count, not a zero-based index.
         final int[] cumulativeSizes;
         // The sub nodes
@@ -1323,7 +1296,7 @@ involves changing more nodes than maybe necessary.
 //                    throw new IllegalArgumentException(
 //                            "nodes[" + i + "].size() was " +
 //                            nodes[i].size() +
-//                            " which is not compatable with cumulativeSizes[" +
+//                            " which is not compatible with cumulativeSizes[" +
 //                            i + "] which was " + cumulativeSizes[i] +
 //                            "\n\tcumulativeSizes=" + arrayString(cumulativeSizes) +
 //                            "\n\tnodes=" + arrayString(nodes));
