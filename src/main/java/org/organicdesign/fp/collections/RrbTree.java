@@ -79,19 +79,20 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
 
     /** Mutable version of an {@link RrbTree}.  Timing information is available there. */
     public static class MutRrbt<E> extends RrbTree<E> implements MutList<E> {
-        private E[] focus;
+        private @NotNull E[] focus;
         private int focusStartIndex;
         private int focusLength;
-        private Node<E> root;
+        private @NotNull Node<E> root;
         private int size;
 
-        MutRrbt(E[] f, int fi, int fl, Node<E> r, int s) {
+        MutRrbt(@NotNull E[] f, int fi, int fl, @NotNull Node<E> r, int s) {
             focus = f; focusStartIndex = fi; focusLength = fl; root = r; size = s;
         }
 
         /** {@inheritDoc} */
         @SuppressWarnings("unchecked")
-        @Override public MutRrbt<E> append(E val) {
+        @Override
+        public @NotNull MutRrbt<E> append(E val) {
             // If our focus isn't set up for appends or if it's full, insert it into the data structure
             // where it belongs.  Then make a new focus
             if ( (focusLength >= STRICT_NODE_LENGTH) ||
@@ -169,24 +170,27 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         }
 
         /** {@inheritDoc} */
-        @Override public ImRrbt<E> immutable() {
+        @Override
+        public @NotNull ImRrbt<E> immutable() {
             return new ImRrbt<>(arrayCopy(focus, focusLength, null),
                                 focusStartIndex,
                                 root, size);
         }
 
         /** {@inheritDoc} */
-        @Override public String indentedStr(int indent) {
+        @Override
+        public @NotNull String indentedStr(int indent) {
             return "RrbTree(size=" + size +
                    " fsi=" + focusStartIndex +
                    " focus=" + arrayString(focus) + "\n" +
                    indentSpace(indent + 8) + "root=" +
-                   (root == null ? "null" : root.indentedStr(indent + 13)) +
+                   root.indentedStr(indent + 13) +
                    ")";
         }
 
         /** {@inheritDoc} */
-        @Override public MutRrbt<E> insert(int idx, E element)  {
+        @Override
+        public @NotNull MutRrbt<E> insert(int idx, E element)  {
             // If the focus is full, push it into the tree and make a new one with the new element.
             if (focusLength >= STRICT_NODE_LENGTH) {
                 root = root.pushFocus(focusStartIndex,
@@ -255,7 +259,8 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         }
 
         /** {@inheritDoc} */
-        @Override Node<E> pushFocus() {
+        @Override
+        @NotNull Node<E> pushFocus() {
             return (focusLength == 0)
                    ? root
                    : root.pushFocus(focusStartIndex,
@@ -268,13 +273,11 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         }
 
         /**
-         * THIS METHOD HAS BEEN SHOWN TO HAVE BUGS AND IS DEPRECATED UNTIL WE CAN FIX
          * Joins the given tree to the right side of this tree (or this to the left side of that one) in
          * something like O(log n) time.
          */
-        @Deprecated
         @SuppressWarnings("unchecked")
-        public RrbTree<E> join(RrbTree<E> that) {
+        public @NotNull RrbTree<E> join(@NotNull RrbTree<E> that) {
 
             // We don't want to wonder below if we're inserting leaves or branch-nodes.
             // Also, it leaves the tree cleaner to just smash leaves onto the bigger tree.
@@ -448,7 +451,8 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         }
 
         /** {@inheritDoc} */
-        @Override public MutRrbt<E> replace(int index, E item) {
+        @Override
+        public @NotNull MutRrbt<E> replace(int index, E item) {
             if ( (index < 0) || (index > size) ) {
                 throw new IndexOutOfBoundsException("Index: " + index + " size: " + size);
             }
@@ -466,8 +470,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         }
 
         /** {@inheritDoc} */
-        @SuppressWarnings("deprecation")
-        public MutRrbt<E> without(int index) { return (MutRrbt<E>) super.without(index); }
+        public @NotNull MutRrbt<E> without(int index) { return (MutRrbt<E>) super.without(index); }
 
         @Override public int size() { return size; }
 
@@ -479,7 +482,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
          @return two new sub-trees as determined by the split point.  If the point is 0 or
          this.size() one tree will be empty (but never null).
          */
-        public Tuple2<MutRrbt<E>,MutRrbt<E>> split(int splitIndex) {
+        public @NotNull Tuple2<MutRrbt<E>,MutRrbt<E>> split(int splitIndex) {
             if (splitIndex < 1) {
                 if (splitIndex == 0) {
                     return Tuple2.of(emptyMutable(), this);
@@ -523,12 +526,12 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
 
     /** Immutable version of an {@link RrbTree}.  Timing information is available there. */
     public static class ImRrbt<E> extends RrbTree<E> implements ImList<E>, Serializable {
-        private final E[] focus;
+        private final @NotNull E[] focus;
         private final int focusStartIndex;
-        private transient final Node<E> root;
+        private transient final @NotNull Node<E> root;
         private final int size;
 
-        ImRrbt(E[] f, int fi, Node<E> r, int s) {
+        ImRrbt(@NotNull E[] f, int fi, @NotNull Node<E> r, int s) {
             focus = f; focusStartIndex = fi; root = r; size = s;
         }
 
@@ -583,7 +586,8 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         // =================================== Instance Methods ===================================
 
         /** {@inheritDoc} */
-        @Override public ImRrbt<E> append(E val) {
+        @Override
+        public @NotNull ImRrbt<E> append(E val) {
             // If our focus isn't set up for appends or if it's full, insert it into the data
             // structure where it belongs.  Then make a new focus
             if ( (focus.length >= STRICT_NODE_LENGTH) ||
@@ -650,7 +654,8 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         }
 
         /** {@inheritDoc} */
-        @Override public ImRrbt<E> insert(int idx, E element) {
+        @Override
+        public @NotNull ImRrbt<E> insert(int idx, E element) {
             // If the focus is full, push it into the tree and make a new one with the new element.
             if (focus.length >= STRICT_NODE_LENGTH) {
                 Node<E> newRoot = root.pushFocus(focusStartIndex, focus);
@@ -676,7 +681,8 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         }
 
         /** {@inheritDoc} */
-        @Override public MutRrbt<E> mutable() {
+        @Override
+        public @NotNull MutRrbt<E> mutable() {
             // TODO: Should we defensively copy the root as well?
             return new MutRrbt<>(arrayCopy(focus, focus.length, null),
                                  focusStartIndex, focus.length,
@@ -684,26 +690,25 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         }
 
         /** {@inheritDoc} */
-        @NotNull
-        @Override public UnmodSortedIterator<E> iterator() {
+        @Override
+        public @NotNull UnmodSortedIterator<E> iterator() {
             return new Iter(pushFocus());
         }
 
         /** {@inheritDoc} */
-        @Override Node<E> pushFocus() {
+        @Override
+        @NotNull Node<E> pushFocus() {
             return (focus.length == 0)
                    ? root
                    : root.pushFocus(focusStartIndex, focus);
         }
 
         /**
-         * THIS METHOD HAS BEEN SHOWN TO HAVE BUGS AND IS DEPRECATED UNTIL WE CAN FIX
          * Joins the given tree to the right side of this tree (or this to the left side of that one) in
          * something like O(log n) time.
          */
-        @Deprecated
         @SuppressWarnings("unchecked")
-        public RrbTree<E> join(RrbTree<E> that) {
+        public @NotNull RrbTree<E> join(@NotNull RrbTree<E> that) {
 
             // We don't want to wonder below if we're inserting leaves or branch-nodes.
             // Also, it leaves the tree cleaner to just smash leaves onto the bigger tree.
@@ -874,7 +879,8 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         }
 
         /** {@inheritDoc} */
-        @Override public ImRrbt<E> replace(int index, E item) {
+        @Override
+        public @NotNull ImRrbt<E> replace(int index, E item) {
             if ( (index < 0) || (index > size) ) {
                 throw new IndexOutOfBoundsException("Index: " + index + " size: " + size);
             }
@@ -892,8 +898,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
 
 
         /** {@inheritDoc} */
-        @SuppressWarnings("deprecation")
-        public ImRrbt<E> without(int index) { return (ImRrbt<E>) super.without(index); }
+        public @NotNull ImRrbt<E> without(int index) { return (ImRrbt<E>) super.without(index); }
 
         @Override public int size() { return size; }
 
@@ -905,7 +910,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
          @return two new sub-trees as determined by the split point.  If the point is 0 or this.size()
          one tree will be empty (but never null).
          */
-        public Tuple2<ImRrbt<E>,ImRrbt<E>> split(int splitIndex) {
+        public @NotNull Tuple2<ImRrbt<E>,ImRrbt<E>> split(int splitIndex) {
             if (splitIndex < 1) {
                 if (splitIndex == 0) {
                     return Tuple2.of(empty(), this);
@@ -947,18 +952,20 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         }
 
         /** {@inheritDoc} */
-        @Override public String indentedStr(int indent) {
+        @Override
+        public @NotNull String indentedStr(int indent) {
             return "RrbTree(size=" + size +
                    " fsi=" + focusStartIndex +
                    " focus=" + arrayString(focus) + "\n" +
                    indentSpace(indent + 8) + "root=" +
-                   (root == null ? "null" : root.indentedStr(indent + 13)) +
+                   root.indentedStr(indent + 13) +
                    ")";
         }
 
 
         /** {@inheritDoc} */
-        @Override public String toString() {
+        @Override
+        public @NotNull String toString() {
             return UnmodIterable.toString("ImRrbt", this);
         }
 
@@ -968,11 +975,11 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
 
     /** Returns the empty, immutable RRB-Tree (there is only one) */
     @SuppressWarnings("unchecked")
-    public static <T> ImRrbt<T> empty() { return (ImRrbt<T>) ImRrbt.EMPTY_IM_RRBT; }
+    public static <T> @NotNull ImRrbt<T> empty() { return (ImRrbt<T>) ImRrbt.EMPTY_IM_RRBT; }
 
     /** Returns the empty, mutable RRB-Tree (there is only one) */
     @SuppressWarnings("unchecked")
-    public static <T> MutRrbt<T> emptyMutable() {
+    public static <T> @NotNull MutRrbt<T> emptyMutable() {
         return (MutRrbt<T>) empty().mutable();
     }
 
@@ -980,7 +987,8 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
     // ===================================== Instance Methods =====================================
 
     /** {@inheritDoc} */
-    @Override abstract public RrbTree<E> append(E t);
+    @Override
+    abstract public @NotNull RrbTree<E> append(E t);
 
     /** Internal validation method for testing. */
     abstract void debugValidate();
@@ -996,11 +1004,11 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
      @return a new RRB-Tree with the item inserted.
      */
     @SuppressWarnings("WeakerAccess")
-    public abstract RrbTree<E> insert(int idx, E element);
+    public abstract @NotNull RrbTree<E> insert(int idx, E element);
 
     /** {@inheritDoc} */
-    @NotNull
-    @Override abstract public UnmodSortedIterator<E> iterator();
+    @Override
+    abstract public @NotNull UnmodSortedIterator<E> iterator();
 
 /*
 I'm implementing something like the [Bagwell/Rompf RRB-Tree][1] and I'm a little unsatisfied with
@@ -1037,18 +1045,17 @@ involves changing more nodes than maybe necessary.
   [1]: https://infoscience.epfl.ch/record/169879/files/RMTrees.pdf
 */
     /**
-     * THIS METHOD HAS BEEN SHOWN TO HAVE BUGS AND IS DEPRECATED UNTIL WE CAN FIX
      * Joins the given tree to the right side of this tree (or this to the left side of that one) in
      * something like O(log n) time.
      */
-    @Deprecated
-    public abstract RrbTree<E> join(RrbTree<E> that);
+    public abstract @NotNull RrbTree<E> join(@NotNull RrbTree<E> that);
 
     /** Internal method - do not use. */
-    abstract Node<E> pushFocus();
+    abstract @NotNull Node<E> pushFocus();
 
     /** {@inheritDoc} */
-    @Override abstract public RrbTree<E> replace(int index, E item);
+    @Override
+    abstract public @NotNull RrbTree<E> replace(int index, E item);
 
     /** {@inheritDoc} */
     @Override abstract public int size();
@@ -1061,15 +1068,13 @@ involves changing more nodes than maybe necessary.
      @return two new sub-trees as determined by the split point.  If the point is 0 or this.size()
      one tree will be empty (but never null).
      */
-    abstract public Tuple2<? extends RrbTree<E>,? extends RrbTree<E>> split(int splitIndex);
+    abstract public @NotNull Tuple2<? extends RrbTree<E>,? extends RrbTree<E>> split(int splitIndex);
 
     /**
-     * THIS METHOD HAS BEEN SHOWN TO HAVE BUGS AND IS DEPRECATED UNTIL WE CAN FIX
      * Returns a new RrbTree minus the given item (all items to the right are shifted left one)
      * This is O(log n).
      */
-    @Deprecated
-    public RrbTree<E> without(int index) {
+    public @NotNull RrbTree<E> without(int index) {
         if ( (index > 0) && (index < size() - 1) ) {
             Tuple2<? extends RrbTree<E>,? extends RrbTree<E>> s1 = split(index);
             Tuple2<? extends RrbTree<E>,? extends RrbTree<E>> s2 = s1._2().split(1);
@@ -1083,7 +1088,7 @@ involves changing more nodes than maybe necessary.
         }
     }
 
-    private static <E> Node<E> eliminateUnnecessaryAncestors(Node<E> n) {
+    private static <E> @NotNull Node<E> eliminateUnnecessaryAncestors(Node<E> n) {
         while ( !(n instanceof Leaf) &&
                 (n.numChildren() == 1) ) {
             n = n.child(0);
@@ -1092,7 +1097,7 @@ involves changing more nodes than maybe necessary.
     }
 
     @SuppressWarnings("unchecked")
-    private static <E> Node<E> addAncestor(Node<E> n) {
+    private static <E> @NotNull Node<E> addAncestor(@NotNull Node<E> n) {
         return new Relaxed<>(new int[] { n.size() },
                              (Node<E>[]) new Node[]{n});
     }
@@ -1122,15 +1127,12 @@ involves changing more nodes than maybe necessary.
     }
 
     /** {@inheritDoc} */
-    @Override abstract public String indentedStr(int indent);
+    @Override
+    abstract public @NotNull String indentedStr(int indent);
 
     // ================================== Implementation Details ==================================
 
     // Definitions:
-    // Strict: Short for "Strict Radix."  Strict nodes have leaf widths of exactly
-    //         STRICT_NODE_LENGTH and are left-filled and packed up to the last full node.  This
-    //         lets us use a power of 2 to take advantage of bit shifting to exactly index which
-    //         sub-node an item is found in.  Does not support inserts (only appends).
     // Relaxed: short for "Relaxed Radix."   Relaxed nodes are of somewhat varying sizes, ranging
     //          from MIN_NODE_LENGTH (Cormen et al calls this "Minimum Degree") to MAX_NODE_LENGTH.
     //          This requires linear interpolation, a bit of searching, and subtraction to find an
@@ -1153,26 +1155,26 @@ involves changing more nodes than maybe necessary.
     // for <= (I think!).
     private static final int MAX_NODE_LENGTH = ( (STRICT_NODE_LENGTH+1) * 4 / 3);
 
-    private static final Leaf EMPTY_LEAF = new Leaf<>(EMPTY_ARRAY);
+    private static final @NotNull Leaf EMPTY_LEAF = new Leaf<>(EMPTY_ARRAY);
     @SuppressWarnings("unchecked")
-    private static <T> Leaf<T> emptyLeaf() { return (Leaf<T>) EMPTY_LEAF; }
+    private static <T> @NotNull Leaf<T> emptyLeaf() { return (Leaf<T>) EMPTY_LEAF; }
 
     // ================================ Node private inner classes ================================
 
     private interface Node<T> extends Indented {
         /** Returns the immediate child node at the given index. */
-        Node<T> child(int childIdx);
+        @NotNull Node<T> child(int childIdx);
 
         int debugValidate();
 
         /** Returns the leftMost (first) or right-most (last) child */
-        Node<T> endChild(boolean leftMost);
+        @NotNull Node<T> endChild(boolean leftMost);
 
         /** Adds a node as the first/leftmost or last/rightmost child */
-        Node<T> addEndChild(boolean leftMost, Node<T> shorter);
+        @NotNull Node<T> addEndChild(boolean leftMost, @NotNull Node<T> shorter);
 
         /** Adds kids as leftmost or rightmost of current children */
-        Node<T> addEndChildren(boolean leftMost, Node<T>[] newKids);
+        @NotNull Node<T> addEndChildren(boolean leftMost, @NotNull Node<T>[] newKids);
 
         /** Return the item at the given index */
         T get(int i);
@@ -1210,11 +1212,11 @@ involves changing more nodes than maybe necessary.
         // Because we want to append/insert into the focus as much as possible, we will treat
         // the insert or append of a single item as a degenerate case.  Instead, the primary way
         // to add to the internal data structure will be to push the entire focus array into it
-        Node<T> pushFocus(int index, T[] oldFocus);
+        @NotNull Node<T> pushFocus(int index, @NotNull T[] oldFocus);
 
-        Node<T> replace(int idx, T t);
+        @NotNull Node<T> replace(int idx, T t);
 
-        SplitNode<T> splitAt(int splitIndex);
+        @NotNull SplitNode<T> splitAt(int splitIndex);
     }
 
 //    private interface BranchNode<T> extends Node<T> {
@@ -1238,7 +1240,7 @@ involves changing more nodes than maybe necessary.
          @param rn Right-hand whole-node
          @param rf Right-focus (leftover items from right node)
          */
-        SplitNode(Node<T> ln, T[] lf, Node<T> rn, T[] rf) {
+        SplitNode(@NotNull Node<T> ln, @NotNull T[] lf, @NotNull Node<T> rn, @NotNull T[] rf) {
             super(ln, lf, rn, rf);
 //            if (lf.length > STRICT_NODE_LENGTH) {
 //                throw new IllegalStateException("Left focus too long: " + arrayString(lf));
@@ -1247,13 +1249,14 @@ involves changing more nodes than maybe necessary.
 //                throw new IllegalStateException("Right focus too long: " + arrayString(rf));
 //            }
         }
-        public Node<T> left() { return _1; }
-        public T[] leftFocus() { return _2; }
-        public Node<T> right() { return _3; }
-        public T[] rightFocus() { return _4; }
+        public @NotNull Node<T> left() { return _1; }
+        public @NotNull T[] leftFocus() { return _2; }
+        public @NotNull Node<T> right() { return _3; }
+        public @NotNull T[] rightFocus() { return _4; }
         public int size() { return _1.size() + _2.length + _3.size() + _4.length; }
 
-        @Override public String indentedStr(int indent) {
+        @Override
+        public @NotNull String indentedStr(int indent) {
             StringBuilder sB = new StringBuilder() // indentSpace(indent)
                     .append("SplitNode(");
             int nextIndent = indent + sB.length();
@@ -1273,12 +1276,11 @@ involves changing more nodes than maybe necessary.
 
     private static class Leaf<T> implements Node<T> {
         final T[] items;
-        // It can only be Strict if items.length == STRICT_NODE_LENGTH and if its parents
-        // are strict.
-//        boolean isStrict;
+
         Leaf(T[] ts) { items = ts; }
 
-        @Override public Node<T> child(int childIdx) {
+        @Override
+        public @NotNull Node<T> child(int childIdx) {
             throw new UnsupportedOperationException("Don't call this on a leaf");
         }
 
@@ -1297,17 +1299,20 @@ involves changing more nodes than maybe necessary.
         }
 
         /** Returns the leftMost (first) or right-most (last) child */
-        @Override public Node<T> endChild(boolean leftMost) {
+        @Override
+        public @NotNull Node<T> endChild(boolean leftMost) {
             throw new UnsupportedOperationException("Don't call this on a leaf");
         }
 
         /** Adds a node as the first/leftmost or last/rightmost child */
-        @Override public Node<T> addEndChild(boolean leftMost, Node<T> shorter) {
+        @Override
+        public @NotNull Node<T> addEndChild(boolean leftMost, @NotNull Node<T> shorter) {
             throw new UnsupportedOperationException("Don't call this on a leaf");
         }
 
         /** Adds kids as leftmost or rightmost of current children */
-        @Override public Node<T> addEndChildren(boolean leftMost, Node<T>[] newKids) {
+        @Override
+        public @NotNull Node<T> addEndChildren(boolean leftMost, @NotNull Node<T>[] newKids) {
             throw new UnsupportedOperationException("Don't call this on a leaf");
         }
 
@@ -1330,7 +1335,7 @@ involves changing more nodes than maybe necessary.
         }
 
         @Override
-        public SplitNode<T> splitAt(int splitIndex) {
+        public @NotNull SplitNode<T> splitAt(int splitIndex) {
 //            if (splitIndex < 0) {
 //                throw new IllegalArgumentException("Called splitAt when splitIndex < 0");
 //            }
@@ -1377,8 +1382,8 @@ involves changing more nodes than maybe necessary.
         @Override public int numChildren() { return size(); }
 
         // I think this can only be called when the root node is a leaf.
-        @SuppressWarnings("unchecked")
-        @Override public Node<T> pushFocus(int index, T[] oldFocus) {
+        @Override
+        public @NotNull Node<T> pushFocus(int index, @NotNull T[] oldFocus) {
 //            if (oldFocus.length == 0) {
 //                throw new IllegalStateException("Never call this with an empty focus!");
 //            }
@@ -1388,22 +1393,6 @@ involves changing more nodes than maybe necessary.
             if (items.length == 0) {
                 return new Leaf<>(oldFocus);
             }
-
-            // Try first to yield a Strict node.  For a leaf like this, that means both this node
-            // and the pushed focus are STRICT_NODE_LENGTH.  It also means the old focus is being
-            // pushed at either the beginning or the end of this node (not anywhere in-between).
-//            if ( (items.length == STRICT_NODE_LENGTH) &&
-//                 (oldFocus.length == STRICT_NODE_LENGTH) &&
-//                 ((index == STRICT_NODE_LENGTH) || (index == 0)) ) {
-//
-//                Leaf<T>[] newNodes = (index == STRICT_NODE_LENGTH)
-//                                     ? new Leaf[] { this,
-//                                                    new Leaf<>(oldFocus)}
-//                                     : new Leaf[] { new Leaf<>(oldFocus),
-//                                                    this };
-//                // Size is twice STRICT_NODE_LENGTH, so shift left 1 to double.
-//                return new Strict<>(NODE_LENGTH_POW_2, STRICT_NODE_LENGTH << 1, newNodes);
-//            }
 
             if ((items.length + oldFocus.length) < MAX_NODE_LENGTH) {
                 return new Leaf<>(spliceIntoArrayAt(oldFocus, items, index,
@@ -1424,7 +1413,7 @@ involves changing more nodes than maybe necessary.
         }
 
         @Override
-        public Node<T> replace(int idx, T t) {
+        public @NotNull Node<T> replace(int idx, T t) {
 //            if (idx >= size()) {
 //                throw new IllegalArgumentException("Invalid index " + idx + " >= " + size());
 //            }
@@ -1491,7 +1480,8 @@ involves changing more nodes than maybe necessary.
 //            }
         }
 
-        @Override public Node<T> child(int childIdx) { return nodes[childIdx]; }
+        @Override
+        public @NotNull Node<T> child(int childIdx) { return nodes[childIdx]; }
 
         @Override public int debugValidate() {
             int sz = 0;
@@ -1516,18 +1506,27 @@ involves changing more nodes than maybe necessary.
         }
 
         /** Returns the leftMost (first) or right-most (last) child */
-        @Override public Node<T> endChild(boolean leftMost) {
+        @Override
+        public @NotNull Node<T> endChild(boolean leftMost) {
             return nodes[leftMost ? 0 : nodes.length - 1];
         }
 
         /** Adds a node as the first/leftmost or last/rightmost child */
-        @Override public Node<T> addEndChild(boolean leftMost, Node<T> shorter) {
+        @Override
+        public @NotNull Node<T> addEndChild(
+                boolean leftMost,
+                @NotNull Node<T> shorter
+        ) {
             return insertInRelaxedAt(cumulativeSizes, nodes, shorter,
                                      leftMost ? 0 : nodes.length);
         }
 
         /** Adds kids as leftmost or rightmost of current children */
-        @Override public Node<T> addEndChildren(boolean leftMost, Node<T>[] newKids) {
+        @Override
+        public @NotNull Node<T> addEndChildren(
+                boolean leftMost,
+                @NotNull Node<T>[] newKids
+        ) {
 //            if (!thisNodeHasRelaxedCapacity(newKids.length)) {
 //                throw new IllegalStateException("Can't add enough kids");
 //            }
@@ -1540,25 +1539,6 @@ involves changing more nodes than maybe necessary.
                                                        : nodes.length, Node.class);
             // TODO: Figure out which side we inserted on and do the math to adjust counts instead
             // of looking them up.
-
-//            System.out.println("nz=" + Arrays.toString(res));
-//            // Make a strict node if we can.
-//            if (res.length == STRICT_NODE_LENGTH) {
-//                boolean canBeStrict = true;
-//                int totalSize = 0;
-//                for (Node<T> node : nodes) {
-//                    if ( !(node instanceof Strict) ) {
-//                        canBeStrict = false;
-//                        break;
-//                    } else {
-//                        totalSize += ((Strict<T>) node).size;
-//                    }
-//                }
-//                if (canBeStrict) {
-//                    return new Strict<>( ((Strict<T>) nodes[0]).shift + NODE_LENGTH_POW_2,
-//                                         totalSize, res);
-//                }
-//            }
             return new Relaxed<>(makeSizeArray(res), res);
         }
 
@@ -1716,7 +1696,7 @@ involves changing more nodes than maybe necessary.
         }
 
         @Override
-        public SplitNode<T> splitAt(int splitIndex) {
+        public @NotNull SplitNode<T> splitAt(int splitIndex) {
             int size = size();
 //            if ( (splitIndex < 0) || (splitIndex > size) ) {
 //                throw new IllegalArgumentException("Bad splitIndex: " + splitIndex);
@@ -1818,7 +1798,8 @@ involves changing more nodes than maybe necessary.
         @Override public int numChildren() { return nodes.length; }
 
         @SuppressWarnings("unchecked")
-        @Override public Node<T> pushFocus(int index, T[] oldFocus) {
+        @Override
+        public @NotNull Node<T> pushFocus(int index, @NotNull T[] oldFocus) {
             // TODO: Review this entire method.
             int subNodeIndex = subNodeIndex(index);
             Node<T> subNode = nodes[subNodeIndex];
@@ -1981,7 +1962,8 @@ involves changing more nodes than maybe necessary.
         }
 
         @SuppressWarnings("unchecked")
-        @Override public Node<T> replace(int index, T t) {
+        @Override
+        public @NotNull Node<T> replace(int index, T t) {
             int subNodeIndex = subNodeIndex(index);
             Node<T> alteredNode =
                     nodes[subNodeIndex].replace(subNodeAdjustedIndex(index, subNodeIndex), t);
@@ -2012,7 +1994,7 @@ involves changing more nodes than maybe necessary.
          @param newNodes the nodes to take sizes from.
          @return An array of cumulative sizes of each node in the passed array.
          */
-        private static int[] makeSizeArray(Node[] newNodes) {
+        private static int[] makeSizeArray(@NotNull Node[] newNodes) {
             int[] newCumSizes = new int[newNodes.length];
             int cumulativeSize = 0;
             for (int i = 0; i < newCumSizes.length; i++) {
@@ -2152,8 +2134,8 @@ involves changing more nodes than maybe necessary.
     /** Holds a node and the index of the child node we are currently iterating in. */
     private static final class IdxNode<E> {
         int idx = 0;
-        final Node<E> node;
-        IdxNode(Node<E> n) { node = n; }
+        final @NotNull Node<E> node;
+        IdxNode(@NotNull Node<E> n) { node = n; }
         public boolean hasNext() { return idx < node.numChildren(); }
         public Node<E> next() { return node.child(idx++); }
 //        public String toString() { return "IdxNode(" + idx + " " + node + ")"; }
@@ -2162,21 +2144,21 @@ involves changing more nodes than maybe necessary.
     final class Iter implements UnmodSortedIterator<E> {
 
         // We want this iterator to walk the node tree.
-        private final IdxNode<E>[] stack;
+        private final @NotNull IdxNode<E>[] stack;
         private int stackMaxIdx = -1;
 
-        private E[] leafArray;
+        private @NotNull E[] leafArray;
         private int leafArrayIdx;
 
         // Focus must be pre-pushed so we don't have to ever check the index.
         @SuppressWarnings("unchecked")
-        private Iter(Node<E> root) {
+        private Iter(@NotNull Node<E> root) {
             stack = (IdxNode<E>[]) new IdxNode<?>[root.height()];
             leafArray = findLeaf(root);
         }
 
         // Descent to the leftmost unused leaf node.
-        private E[] findLeaf(Node<E> node) {
+        private @NotNull E[] findLeaf(@NotNull Node<E> node) {
             // Descent to left-most bottom node.
             while (!(node instanceof Leaf)) {
                 IdxNode<E> in = new IdxNode<>(node);
@@ -2187,7 +2169,7 @@ involves changing more nodes than maybe necessary.
             return ((Leaf<E>) node).items;
         }
 
-        private E[] nextLeafArray() {
+        private @NotNull E[] nextLeafArray() {
             // While nodes are used up, get next node from node one level up.
             while ( (stackMaxIdx > -1) && !stack[stackMaxIdx].hasNext() ) {
                 stackMaxIdx--;
@@ -2224,13 +2206,17 @@ involves changing more nodes than maybe necessary.
     // Helper function to avoid type warnings.
 
     @SuppressWarnings("unchecked")
-    private static <T> Node<T>[] genericNodeArray(int size) {
+    private static <T> @NotNull Node<T>[] genericNodeArray(int size) {
         return (Node<T>[]) new Node<?>[size];
     }
 
     // =============================== Debugging and pretty-printing ===============================
 
-    private static StringBuilder showSubNodes(StringBuilder sB, Object[] items, int nextIndent) {
+    private static @NotNull StringBuilder showSubNodes(
+            @NotNull StringBuilder sB,
+            @NotNull Object[] items,
+            int nextIndent
+    ) {
         boolean isFirst = true;
         for (Object n : items) {
             if (isFirst) {

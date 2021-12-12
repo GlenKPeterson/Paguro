@@ -13,21 +13,16 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.organicdesign.fp.StaticImports;
 import org.organicdesign.fp.TestUtilities;
 import org.organicdesign.fp.collections.RrbTree.ImRrbt;
 import org.organicdesign.fp.collections.RrbTree.MutRrbt;
 import org.organicdesign.fp.tuple.Tuple2;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+
+import java.util.*;
 
 import static org.junit.Assert.*;
-import static org.organicdesign.fp.StaticImports.vec;
 import static org.organicdesign.fp.StaticImports.xform;
 import static org.organicdesign.fp.TestUtilities.compareIterators;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
@@ -872,9 +867,6 @@ public class RrbTreeTest {
     /**
      * New test submitted by J.A. Fingerhut
      */
-    // TODO: Make this pass!
-    @Ignore
-    @SuppressWarnings("deprecation")
     @Test public void joinMutableTest2() {
         int b = STRICT_NODE_LENGTH;
         for (int i = b; i < (b*b + 2*b); i += b) {
@@ -889,7 +881,7 @@ public class RrbTreeTest {
                     r2 = r2.append(i+k);
                     r2.debugValidate();
                 }
-                System.out.println("================== ACTUAL JOIN STARTS NOW ==============");
+//                System.out.println("================== ACTUAL JOIN STARTS NOW ==============");
                 RrbTree<Integer> r3 = r1.join(r2);
                 r3.debugValidate();
                 List<Integer> control = new ArrayList<>();
@@ -908,9 +900,6 @@ public class RrbTreeTest {
     /**
      * New test submitted by J.A. Fingerhut
      */
-    // TODO: Make this pass!
-    @SuppressWarnings("deprecation")
-    @Ignore
     @Test public void joinImTest2() {
         int b = STRICT_NODE_LENGTH;
         for (int i = b; i < (b*b + 2*b); i += b) {
