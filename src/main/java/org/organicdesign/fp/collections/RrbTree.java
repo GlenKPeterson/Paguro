@@ -89,6 +89,11 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
             focus = f; focusStartIndex = fi; focusLength = fl; root = r; size = s;
         }
 
+        @Override
+        protected @NotNull MutRrbt<E> makeNew(@NotNull E[] f, int fi, int fl, @NotNull Node<E> r, int s) {
+            return new MutRrbt<>(f, fi, fl, r, s);
+        }
+
         /** {@inheritDoc} */
         @SuppressWarnings("unchecked")
         @Override
@@ -276,178 +281,8 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
          * Joins the given tree to the right side of this tree (or this to the left side of that one) in
          * something like O(log n) time.
          */
-        @SuppressWarnings("unchecked")
-        public @NotNull RrbTree<E> join(@NotNull RrbTree<E> that) {
-
-            // We don't want to wonder below if we're inserting leaves or branch-nodes.
-            // Also, it leaves the tree cleaner to just smash leaves onto the bigger tree.
-            // Ultimately, we might want to see if we can grab the tail and stick it where it belongs
-            // but for now, this should be alright.
-            if (that.size() <= MAX_NODE_LENGTH) {
-                return concat(that);
-            }
-            if (this.size <= MAX_NODE_LENGTH) {
-                for (int i = 0; i < size; i++) {
-                    that = that.insert(i, this.get(i));
-                }
-                return that;
-            }
-
-            // OK, here we've eliminated the case of merging a leaf into a tree.  We only have to
-            // deal with tree-into-tree merges below.
-            //
-            // Note that if the right-hand tree is bigger, we'll effectively add this tree to the
-            // left-hand side of that one.  It's logically the same as adding that tree to the right
-            // of this, but the mechanism by which it happens is a little different.
-            Node<E> leftRoot = pushFocus();
-            Node<E> rightRoot = that.pushFocus();
-
-//        if (leftRoot != eliminateUnnecessaryAncestors(leftRoot)) {
-//            throw new IllegalStateException("Left had unnecessary ancestors!");
-//        }
-
-//        if (rightRoot != eliminateUnnecessaryAncestors(rightRoot)) {
-//            throw new IllegalStateException("Right had unnecessary ancestors!");
-//        }
-
-            // Whether to add the right tree to the left one (true) or vice-versa (false).
-            // True also means left is taller, false: right is taller.
-            boolean leftIntoRight = leftRoot.height() < rightRoot.height();
-            Node<E> taller = leftIntoRight ? rightRoot : leftRoot;
-            Node<E> shorter = leftIntoRight ? leftRoot : rightRoot;
-
-            // Most compact: Descend the taller tree to shorter.height and find room for all
-            //     shorter children as children of that node.
-            //
-            // Next: add the shorter node, unchanged, as a child to the taller tree at
-            //       shorter.height + 1
-            //
-            // If that level of the taller tree is full, add an ancestor to the shorter node and try to
-            // fit at the next level up in the taller tree.
-            //
-            // If this brings us to the top of the taller tree (both trees are the same height), add a
-            // new parent node with leftRoot and rightRoot as children
-
-            // Walk down the taller tree to one below the shorter, remembering ancestors.
-            Node<E> n = taller;
-
-            // This is the maximum we can descend into the taller tree (before running out of tree)
-//        int maxDescent = taller.height() - 1;
-
-            // Actual amount we're going to descend.
-            int descentDepth = taller.height() - shorter.height();
-//        if ( (descentDepth < 0) || (descentDepth >= taller.height()) ) {
-//            throw new IllegalStateException("Illegal descent depth: " + descentDepth);
-//        }
-            Node<E>[] ancestors =  genericNodeArray(descentDepth);
-            int i = 0;
-            for (; i < ancestors.length; i++) {
-                // Add an ancestor to array
-                ancestors[i] = n;
-//            if (n instanceof Leaf) {
-//                throw new IllegalStateException("Somehow found a leaf node");
-//            }
-                n = n.endChild(leftIntoRight);
-            }
-            // i is incremented before leaving the loop, so decrement it here to make it point
-            // to ancestors.length - 1;
-            i--;
-
-//        if (n.height() != shorter.height()) {
-//            throw new IllegalStateException("Didn't get to proper height");
-//        }
-
-            // Most compact: Descend the taller tree to shorter.height and find room for all
-            //     shorter children as children of that node.
-            if (n.thisNodeHasRelaxedCapacity(shorter.numChildren())) {
-                // Adding kids of shorter to proper level of taller...
-                Node<E>[] kids;
-                kids = ((Relaxed<E>) shorter).nodes;
-                n = n.addEndChildren(leftIntoRight, kids);
-//                System.out.println("n0=" + n.indentedStr(3));
-            }
-
-            if (i >= 0) {
-                // Go back up one after lowest check.
-                n = ancestors[i];
-//                System.out.println("n1=" + n.indentedStr(3));
-                i--;
-//            if (n.height() != shorter.height() + 1) {
-//                throw new IllegalStateException("Didn't go back up enough");
-//            }
-            }
-
-            // TODO: Is this used?
-            // While nodes in the taller are full, add a parent to the shorter and try the next level
-            // up.
-            while (!n.thisNodeHasRelaxedCapacity(1) &&
-                   (i >= 0) ) {
-
-                // no room for short at this level (n has too many kids)
-                n = ancestors[i];
-                i--;
-
-                shorter = addAncestor(shorter);
-//            shorter.debugValidate();
-
-                // Sometimes we care about which is shorter and sometimes about left and right.
-                // Since we fixed the shorter tree, we have to update the left/right
-                // pointer to point to the new shorter.
-                if (leftIntoRight) {
-                    leftRoot = shorter;
-                } else {
-                    rightRoot = shorter;
-                }
-            }
-
-            // Here we either have 2 trees of equal height, or
-            // we have room in n for the shorter as a child.
-
-            if (shorter.height() == (n.height() - 1)) {
-//            if (!n.thisNodeHasRelaxedCapacity(1)) {
-//                throw new IllegalStateException("somehow got here without relaxed capacity...");
-//            }
-                // Shorter one level below n and there's room
-                // Trees are not equal height and there's room somewhere.
-                n = n.addEndChild(leftIntoRight, shorter);
-//                System.out.println("n2=" + n.indentedStr(3));
-//                n.debugValidate();
-            } else if (i < 0) {
-                // 2 trees of equal height so we make a new parent
-//            if (shorter.height() != n.height()) {
-//                throw new IllegalStateException("Expected trees of equal height");
-//            }
-
-                @SuppressWarnings("unchecked") // Need raw types here.
-                Node<E>[] newRootArray = new Node[] {leftRoot, rightRoot};
-                int leftSize = leftRoot.size();
-                Node<E> newRoot =
-                        new Relaxed<>(new int[] {leftSize, leftSize + rightRoot.size()}, newRootArray);
-//            newRoot.debugValidate();
-                return new MutRrbt<>(emptyArray(), 0, 0, newRoot, newRoot.size());
-            } else {
-                throw new IllegalStateException("How did we get here?");
-            }
-
-            // We've merged the nodes.  Now see if we need to create new parents
-            // to hold the changed sub-nodes...
-            while (i >= 0) {
-                Node<E> anc = ancestors[i];
-                // By definition, I think that if we need a new root node, then we aren't dealing with
-
-                // leaf nodes, but I could be wrong.
-                // I also think we should get rid of relaxed nodes and everything will be much
-                // easier.
-                Relaxed<E> rel = (Relaxed<E>) anc;
-
-                int repIdx = leftIntoRight ? 0 : rel.numChildren() - 1;
-                n = Relaxed.replaceInRelaxedAt(rel.cumulativeSizes, rel.nodes, n, repIdx,
-                                               n.size() - rel.nodes[repIdx].size());
-                i--;
-            }
-
-//        n.debugValidate();
-            return new MutRrbt<>(emptyArray(), 0, 0, n, n.size());
+        public @NotNull MutRrbt<E> join(@NotNull RrbTree<E> that) {
+            return (MutRrbt<E>) super.join(that);
         }
 
         /** {@inheritDoc} */
@@ -533,6 +368,11 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
 
         ImRrbt(@NotNull E[] f, int fi, @NotNull Node<E> r, int s) {
             focus = f; focusStartIndex = fi; root = r; size = s;
+        }
+
+        @Override
+        protected @NotNull ImRrbt<E> makeNew(@NotNull E[] f, int fi, int fl, @NotNull Node<E> r, int s) {
+            return new ImRrbt<>(f, fi, r, s);
         }
 
         // ===================================== Serialization =====================================
@@ -707,175 +547,8 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
          * Joins the given tree to the right side of this tree (or this to the left side of that one) in
          * something like O(log n) time.
          */
-        @SuppressWarnings("unchecked")
-        public @NotNull RrbTree<E> join(@NotNull RrbTree<E> that) {
-
-            // We don't want to wonder below if we're inserting leaves or branch-nodes.
-            // Also, it leaves the tree cleaner to just smash leaves onto the bigger tree.
-            // Ultimately, we might want to see if we can grab the tail and stick it where it
-            // belongs but for now, this should be alright.
-            if (that.size() <= MAX_NODE_LENGTH) {
-                return concat(that);
-            }
-            if (this.size <= MAX_NODE_LENGTH) {
-                for (int i = 0; i < size; i++) {
-                    that = that.insert(i, this.get(i));
-                }
-                return that;
-            }
-
-            // OK, here we've eliminated the case of merging a leaf into a tree.  We only have to
-            // deal with tree-into-tree merges below.
-            //
-            // Note that if the right-hand tree is bigger, we'll effectively add this tree to the
-            // left-hand side of that one.  It's logically the same as adding that tree to the right
-            // of this, but the mechanism by which it happens is a little different.
-            Node<E> leftRoot = pushFocus();
-            Node<E> rightRoot = that.pushFocus();
-
-//        if (leftRoot != eliminateUnnecessaryAncestors(leftRoot)) {
-//            throw new IllegalStateException("Left had unnecessary ancestors!");
-//        }
-
-//        if (rightRoot != eliminateUnnecessaryAncestors(rightRoot)) {
-//            throw new IllegalStateException("Right had unnecessary ancestors!");
-//        }
-
-            // Whether to add the right tree to the left one (true) or vice-versa (false).
-            // True also means left is taller, false: right is taller.
-            boolean leftIntoRight = leftRoot.height() < rightRoot.height();
-            Node<E> taller = leftIntoRight ? rightRoot : leftRoot;
-            Node<E> shorter = leftIntoRight ? leftRoot : rightRoot;
-
-            // Most compact: Descend the taller tree to shorter.height and find room for all
-            //     shorter children as children of that node.
-            //
-            // Next: add the shorter node, unchanged, as a child to the taller tree at
-            //       shorter.height + 1
-            //
-            // If that level of the taller tree is full, add an ancestor to the shorter node and try to
-            // fit at the next level up in the taller tree.
-            //
-            // If this brings us to the top of the taller tree (both trees are the same height), add a
-            // new parent node with leftRoot and rightRoot as children
-
-            // Walk down the taller tree to one below the shorter, remembering ancestors.
-            Node<E> n = taller;
-
-            // This is the maximum we can descend into the taller tree (before running out of tree)
-//        int maxDescent = taller.height() - 1;
-
-            // Actual amount we're going to descend.
-            int descentDepth = taller.height() - shorter.height();
-//        if ( (descentDepth < 0) || (descentDepth >= taller.height()) ) {
-//            throw new IllegalStateException("Illegal descent depth: " + descentDepth);
-//        }
-            Node<E>[] ancestors =  genericNodeArray(descentDepth);
-            int i = 0;
-            for (; i < ancestors.length; i++) {
-                // Add an ancestor to array
-                ancestors[i] = n;
-//            if (n instanceof Leaf) {
-//                throw new IllegalStateException("Somehow found a leaf node");
-//            }
-                n = n.endChild(leftIntoRight);
-            }
-            // i is incremented before leaving the loop, so decrement it here to make it point
-            // to ancestors.length - 1;
-            i--;
-
-//        if (n.height() != shorter.height()) {
-//            throw new IllegalStateException("Didn't get to proper height");
-//        }
-
-            // Most compact: Descend the taller tree to shorter.height and find room for all
-            //     shorter children as children of that node.
-            if (n.thisNodeHasRelaxedCapacity(shorter.numChildren())) {
-                // Adding kids of shorter to proper level of taller...
-                Node<E>[] kids;
-                kids = ((Relaxed<E>) shorter).nodes;
-                n = n.addEndChildren(leftIntoRight, kids);
-            }
-
-            if (i >= 0) {
-                // Go back up one after lowest check.
-                n = ancestors[i];
-                i--;
-//            if (n.height() != shorter.height() + 1) {
-//                throw new IllegalStateException("Didn't go back up enough");
-//            }
-            }
-
-            // TODO: Is this used?
-            // While nodes in the taller are full, add a parent to the shorter and try the next level
-            // up.
-            while (!n.thisNodeHasRelaxedCapacity(1) &&
-                   (i >= 0) ) {
-
-                // no room for short at this level (n has too many kids)
-                n = ancestors[i];
-                i--;
-
-                shorter = addAncestor(shorter);
-//            shorter.debugValidate();
-
-                // Sometimes we care about which is shorter and sometimes about left and right.
-                // Since we fixed the shorter tree, we have to update the left/right
-                // pointer to point to the new shorter.
-                if (leftIntoRight) {
-                    leftRoot = shorter;
-                } else {
-                    rightRoot = shorter;
-                }
-            }
-
-            // Here we either have 2 trees of equal height, or
-            // we have room in n for the shorter as a child.
-
-            if (shorter.height() == (n.height() - 1)) {
-//            if (!n.thisNodeHasRelaxedCapacity(1)) {
-//                throw new IllegalStateException("somehow got here without relaxed capacity...");
-//            }
-                // Shorter one level below n and there's room
-                // Trees are not equal height and there's room somewhere.
-                n = n.addEndChild(leftIntoRight, shorter);
-//            n.debugValidate();
-            } else if (i < 0) {
-                // 2 trees of equal height so we make a new parent
-//            if (shorter.height() != n.height()) {
-//                throw new IllegalStateException("Expected trees of equal height");
-//            }
-
-                @SuppressWarnings({"unchecked"}) // Need raw types here.
-                Node<E>[] newRootArray = new Node[] {leftRoot, rightRoot};
-                int leftSize = leftRoot.size();
-                Node<E> newRoot =
-                        new Relaxed<>(new int[] {leftSize, leftSize + rightRoot.size()}, newRootArray);
-//            newRoot.debugValidate();
-                return new ImRrbt<>(emptyArray(), 0, newRoot, newRoot.size());
-            } else {
-                throw new IllegalStateException("How did we get here?");
-            }
-
-            // We've merged the nodes.  Now see if we need to create new parents
-            // to hold the changed sub-nodes...
-            while (i >= 0) {
-                Node<E> anc = ancestors[i];
-                // By definition, I think that if we need a new root node, then we aren't dealing with
-
-                // leaf nodes, but I could be wrong.
-                // I also think we should get rid of relaxed nodes and everything will be much
-                // easier.
-                Relaxed<E> rel = (Relaxed<E>) anc;
-
-                int repIdx = leftIntoRight ? 0 : rel.numChildren() - 1;
-                n = Relaxed.replaceInRelaxedAt(rel.cumulativeSizes, rel.nodes, n, repIdx,
-                                               n.size() - rel.nodes[repIdx].size());
-                i--;
-            }
-
-//        n.debugValidate();
-            return new ImRrbt<>(emptyArray(), 0, n, n.size());
+        public @NotNull ImRrbt<E> join(@NotNull RrbTree<E> that) {
+            return (ImRrbt<E>) super.join(that);
         }
 
         /** {@inheritDoc} */
@@ -1045,11 +718,187 @@ involves changing more nodes than maybe necessary.
 
   [1]: https://infoscience.epfl.ch/record/169879/files/RMTrees.pdf
 */
+
+    /**
+     * Allows removing duplicated code by letting super-class produce new members of subclass types.
+     */
+    protected abstract @NotNull RrbTree<E> makeNew(@NotNull E[] f, int fi, int fl, @NotNull Node<E> r, int s);
+
     /**
      * Joins the given tree to the right side of this tree (or this to the left side of that one) in
      * something like O(log n) time.
      */
-    public abstract @NotNull RrbTree<E> join(@NotNull RrbTree<E> that);
+    public @NotNull RrbTree<E> join(@NotNull RrbTree<E> that) {
+        // We don't want to wonder below if we're inserting leaves or branch-nodes.
+        // Also, it leaves the tree cleaner to just smash leaves onto the bigger tree.
+        // Ultimately, we might want to see if we can grab the tail and stick it where it
+        // belongs but for now, this should be alright.
+        if (that.size() <= MAX_NODE_LENGTH) {
+            return (RrbTree<E>) concat(that);
+        }
+        if (this.size() <= MAX_NODE_LENGTH) {
+            for (int i = 0; i < size(); i++) {
+                that = that.insert(i, this.get(i));
+            }
+            return that;
+        }
+
+        // OK, here we've eliminated the case of merging a leaf into a tree.  We only have to
+        // deal with tree-into-tree merges below.
+        //
+        // Note that if the right-hand tree is bigger, we'll effectively add this tree to the
+        // left-hand side of that one.  It's logically the same as adding that tree to the right
+        // of this, but the mechanism by which it happens is a little different.
+        Node<E> leftRoot = pushFocus();
+        Node<E> rightRoot = that.pushFocus();
+
+//        if (leftRoot != eliminateUnnecessaryAncestors(leftRoot)) {
+//            throw new IllegalStateException("Left had unnecessary ancestors!");
+//        }
+
+//        if (rightRoot != eliminateUnnecessaryAncestors(rightRoot)) {
+//            throw new IllegalStateException("Right had unnecessary ancestors!");
+//        }
+
+        // Whether to add the right tree to the left one (true) or vice-versa (false).
+        // True also means left is taller, false: right is taller.
+        boolean leftIntoRight = leftRoot.height() < rightRoot.height();
+        Node<E> taller = leftIntoRight ? rightRoot : leftRoot;
+        Node<E> shorter = leftIntoRight ? leftRoot : rightRoot;
+
+        // Most compact: Descend the taller tree to shorter.height and find room for all
+        //     shorter children as children of that node.
+        //
+        // Next: add the shorter node, unchanged, as a child to the taller tree at
+        //       shorter.height + 1
+        //
+        // If that level of the taller tree is full, add an ancestor to the shorter node and try to
+        // fit at the next level up in the taller tree.
+        //
+        // If this brings us to the top of the taller tree (both trees are the same height), add a
+        // new parent node with leftRoot and rightRoot as children
+
+        // Walk down the taller tree to one below the shorter, remembering ancestors.
+        Node<E> n = taller;
+
+        // This is the maximum we can descend into the taller tree (before running out of tree)
+//        int maxDescent = taller.height() - 1;
+
+        // Actual amount we're going to descend.
+        int descentDepth = taller.height() - shorter.height();
+//        if ( (descentDepth < 0) || (descentDepth >= taller.height()) ) {
+//            throw new IllegalStateException("Illegal descent depth: " + descentDepth);
+//        }
+        Node<E>[] ancestors =  genericNodeArray(descentDepth);
+        int i = 0;
+        for (; i < ancestors.length; i++) {
+            // Add an ancestor to array
+            ancestors[i] = n;
+//            if (n instanceof Leaf) {
+//                throw new IllegalStateException("Somehow found a leaf node");
+//            }
+            n = n.endChild(leftIntoRight);
+        }
+        // i is incremented before leaving the loop, so decrement it here to make it point
+        // to ancestors.length - 1;
+        i--;
+
+//        if (n.height() != shorter.height()) {
+//            throw new IllegalStateException("Didn't get to proper height");
+//        }
+
+        // Most compact: Descend the taller tree to shorter.height and find room for all
+        //     shorter children as children of that node.
+        if (n.thisNodeHasRelaxedCapacity(shorter.numChildren())) {
+            // Adding kids of shorter to proper level of taller...
+            Node<E>[] kids;
+            kids = ((Relaxed<E>) shorter).nodes;
+            n = n.addEndChildren(leftIntoRight, kids);
+//                System.out.println("n0=" + n.indentedStr(3));
+        }
+
+        if (i >= 0) {
+            // Go back up one after lowest check.
+            n = ancestors[i];
+//                System.out.println("n1=" + n.indentedStr(3));
+            i--;
+//            if (n.height() != shorter.height() + 1) {
+//                throw new IllegalStateException("Didn't go back up enough");
+//            }
+        }
+
+        // TODO: Is this used?
+        // While nodes in the taller are full, add a parent to the shorter and try the next level
+        // up.
+        while (!n.thisNodeHasRelaxedCapacity(1) &&
+                (i >= 0) ) {
+
+            // no room for short at this level (n has too many kids)
+            n = ancestors[i];
+            i--;
+
+            shorter = addAncestor(shorter);
+//            shorter.debugValidate();
+
+            // Sometimes we care about which is shorter and sometimes about left and right.
+            // Since we fixed the shorter tree, we have to update the left/right
+            // pointer to point to the new shorter.
+            if (leftIntoRight) {
+                leftRoot = shorter;
+            } else {
+                rightRoot = shorter;
+            }
+        }
+
+        // Here we either have 2 trees of equal height, or
+        // we have room in n for the shorter as a child.
+
+        if (shorter.height() == (n.height() - 1)) {
+//            if (!n.thisNodeHasRelaxedCapacity(1)) {
+//                throw new IllegalStateException("somehow got here without relaxed capacity...");
+//            }
+            // Shorter one level below n and there's room
+            // Trees are not equal height and there's room somewhere.
+            n = n.addEndChild(leftIntoRight, shorter);
+//                System.out.println("n2=" + n.indentedStr(3));
+//            n.debugValidate();
+        } else if (i < 0) {
+            // 2 trees of equal height so we make a new parent
+//            if (shorter.height() != n.height()) {
+//                throw new IllegalStateException("Expected trees of equal height");
+//            }
+
+            @SuppressWarnings("unchecked") // Need raw types here.
+            Node<E>[] newRootArray = new Node[] {leftRoot, rightRoot};
+            int leftSize = leftRoot.size();
+            Node<E> newRoot =
+                    new Relaxed<>(new int[] {leftSize, leftSize + rightRoot.size()}, newRootArray);
+//            newRoot.debugValidate();
+            return makeNew(emptyArray(), 0, 0, newRoot, newRoot.size());
+        } else {
+            throw new IllegalStateException("How did we get here?");
+        }
+
+        // We've merged the nodes.  Now see if we need to create new parents
+        // to hold the changed sub-nodes...
+        while (i >= 0) {
+            Node<E> anc = ancestors[i];
+            // By definition, I think that if we need a new root node, then we aren't dealing with
+
+            // leaf nodes, but I could be wrong.
+            // I also think we should get rid of relaxed nodes and everything will be much
+            // easier.
+            Relaxed<E> rel = (Relaxed<E>) anc;
+
+            int repIdx = leftIntoRight ? 0 : rel.numChildren() - 1;
+            n = Relaxed.replaceInRelaxedAt(rel.cumulativeSizes, rel.nodes, n, repIdx,
+                    n.size() - rel.nodes[repIdx].size());
+            i--;
+        }
+
+//        n.debugValidate();
+        return makeNew(emptyArray(), 0, 0, n, n.size());
+    }
 
     /** Internal method - do not use. */
     abstract @NotNull Node<E> pushFocus();
