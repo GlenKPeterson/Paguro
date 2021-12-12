@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.organicdesign.fp.TestUtilities;
 
@@ -63,13 +64,13 @@ public class ImListTest {
 
 //        TestList() { inner = new ArrayList<>(); }
 
-        @Override public ImList<T> append(T t) {
+        @Override public @NotNull ImList<T> append(T t) {
             List<T> next = dup(inner);
             next.add(t);
             return new TestList<>(next);
         }
 
-        @Override public ImList<T> replace(int idx, T t) {
+        @Override public @NotNull ImList<T> replace(int idx, T t) {
             List<T> next = dup(inner);
             next.set(idx, t);
             return new TestList<>(next);
@@ -79,7 +80,7 @@ public class ImListTest {
 
         @Override public T get(int index) { return inner.get(index); }
 
-        @Override public MutList<T> mutable() {
+        @Override public @NotNull MutList<T> mutable() {
             return new MutList<T>() {
                 private final List<T> mutable = dup(inner);
 
@@ -87,13 +88,13 @@ public class ImListTest {
 
                 @Override public T get(int i) { return mutable.get(i); }
 
-                @Override public MutList<T> append(T val) { mutable.add(val); return this; }
+                @Override public @NotNull MutList<T> append(T val) { mutable.add(val); return this; }
 
                 @Override public ImList<T> immutable() {
                     return new TestList<>(dup(mutable));
                 }
 
-                @Override public MutList<T> replace(int idx, T t) {
+                @Override public @NotNull MutList<T> replace(int idx, T t) {
                     mutable.set(idx, t); return this;
                 }
             };

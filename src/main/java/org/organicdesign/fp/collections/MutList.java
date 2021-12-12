@@ -14,6 +14,7 @@
 package org.organicdesign.fp.collections;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
@@ -27,7 +28,7 @@ import java.util.Collection;
 public interface MutList<E> extends BaseList<E> {
     /** {@inheritDoc} */
     @Override
-    MutList<E> append(E val);
+    @NotNull MutList<E> append(E val);
 
     // TODO: Is this a good idea?  Kotlin does this...
     // I'm concerned that we cannot provide good implementations for all these methods.
@@ -59,20 +60,23 @@ public interface MutList<E> extends BaseList<E> {
     ImList<E> immutable();
 
     /** {@inheritDoc} */
-    @NotNull
-    @Override default MutList<E> concat(Iterable<? extends E> es) {
-        for (E e : es) {
-            this.append(e);
+    @Override
+    default @NotNull MutList<E> concat(@Nullable Iterable<? extends E> es) {
+        if (es != null) {
+            for (E e : es) {
+                this.append(e);
+            }
         }
         return this;
     }
 
     /** {@inheritDoc} */
     @Override
-    MutList<E> replace(int idx, E e);
+    @NotNull MutList<E> replace(int idx, E e);
 
     /** {@inheritDoc} */
-    @Override default MutList<E> reverse() {
+    @Override
+    default @NotNull MutList<E> reverse() {
         MutList<E> ret = PersistentVector.emptyMutable();
         UnmodListIterator<E> iter = listIterator(size());
         while (iter.hasPrevious()) {

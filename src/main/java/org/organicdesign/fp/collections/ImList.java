@@ -14,6 +14,7 @@
 package org.organicdesign.fp.collections;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /** Immutable copy-on-write list */
 public interface ImList<E> extends BaseList<E> {
@@ -28,22 +29,23 @@ public interface ImList<E> extends BaseList<E> {
 // E get(int index) {
 
     /** {@inheritDoc} */
-    @Override ImList<E> append(E e);
+    @Override
+    @NotNull ImList<E> append(E e);
 
     /** {@inheritDoc} */
-    @NotNull
-    @Override default ImList<E> concat(Iterable<? extends E> es) {
+    @Override
+    default @NotNull ImList<E> concat(@Nullable Iterable<? extends E> es) {
         return mutable().concat(es).immutable();
     }
 
     /** Returns a mutable list (builder) */
-    MutList<E> mutable();
+    @NotNull MutList<E> mutable();
 
     /** {@inheritDoc} */
-    ImList<E> replace(int idx, E e);
+    @NotNull ImList<E> replace(int idx, E e);
 
     /** {@inheritDoc} */
-    default ImList<E> reverse() {
+    default @NotNull ImList<E> reverse() {
         return mutable().reverse().immutable();
     }
 }

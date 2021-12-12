@@ -58,7 +58,7 @@ public interface Transformable<T> {
      @return a Transformable of only the filtered items.
      @param predicate a function that returns true for items to keep, false for items to drop
      */
-    default boolean any(Fn1<? super T,Boolean> predicate) {
+    default boolean any(@NotNull Fn1<? super T,Boolean> predicate) {
         return filter(predicate).head().isSome();
     }
 
@@ -67,7 +67,7 @@ public interface Transformable<T> {
      @param list the items to add
      @return a new Transformable with the items added.
      */
-    @NotNull Transformable<T> concat(Iterable<? extends T> list);
+    @NotNull Transformable<T> concat(@Nullable Iterable<? extends T> list);
 
     /**
      Ignore the first n items and return only those that come after.
@@ -84,14 +84,14 @@ public interface Transformable<T> {
      @param predicate the predicate (test function)
      @return a Transformable with the matching leading items ignored.
      */
-    @NotNull Transformable<T> dropWhile(Fn1<? super T,Boolean> predicate);
+    @NotNull Transformable<T> dropWhile(@NotNull Fn1<? super T,Boolean> predicate);
 
     /**
      Return only the items for which the given predicate returns true.
      @return a Transformable of only the filtered items.
      @param predicate a function that returns true for items to keep, false for items to drop
      */
-    @NotNull Transformable<T> filter(Fn1<? super T,Boolean> predicate);
+    @NotNull Transformable<T> filter(@NotNull Fn1<? super T,Boolean> predicate);
 
     /**
      Return only the items which are non-null
@@ -127,7 +127,7 @@ public interface Transformable<T> {
      return is smaller, use filter followed by map if possible, or vice versa if not.
      @param f yields a Transformable of 0 or more results for each input item.
      */
-    <U> @NotNull Transformable<U> flatMap(Fn1<? super T,Iterable<U>> f);
+    <U> @NotNull Transformable<U> flatMap(@NotNull Fn1<? super T, Iterable<U>> f);
 
     /**
      Apply the function to each item, accumulating the result in u.  Other transformations can be
@@ -148,7 +148,7 @@ public interface Transformable<T> {
      @param reducer combines each value in the list with the result so far.  The initial result is u.
      @return an eagerly evaluated result which could be a single value like a sum, or a collection.
      */
-    <U> U fold(U accum, Fn2<? super U,? super T,U> reducer);
+    <U> U fold(U accum, @NotNull Fn2<? super U,? super T,U> reducer);
 
     /**
      Normally you want to terminate by doing a take(), drop(), or takeWhile() before you get to the
@@ -181,14 +181,14 @@ public interface Transformable<T> {
      @return a Transformable of the same size as the input (may contain duplicates) containing the
      return values of the given function in the same order as the input values.
      */
-    <U> @NotNull Transformable<U> map(Fn1<? super T,? extends U> func);
+    <U> @NotNull Transformable<U> map(@NotNull Fn1<? super T,? extends U> func);
 
     /**
      Add items to the beginning of this Transformable ("precat" is a PREpending version of conCAT).
      @param list the items to add
      @return a new Transformable with the items added.
      */
-    @NotNull Transformable<T> precat(Iterable<? extends T> list);
+    @NotNull Transformable<T> precat(@Nullable Iterable<? extends T> list);
 
     /**
      Return only the first n items.
@@ -204,7 +204,7 @@ public interface Transformable<T> {
      beginning of the transformable, that satisfy the given predicate.  This could be 0 items to
      the entire transformable.
      */
-    @NotNull Transformable<T> takeWhile(Fn1<? super T,Boolean> predicate);
+    @NotNull Transformable<T> takeWhile(@NotNull Fn1<? super T,Boolean> predicate);
 
 //    /**
 //     Returns an Object[] for backward compatibility
@@ -237,7 +237,7 @@ public interface Transformable<T> {
 
      @return An immutable map
      */
-    default <K,V> @NotNull ImMap<K,V> toImMap(Fn1<? super T,Entry<K,V>> f1) {
+    default <K,V> @NotNull ImMap<K,V> toImMap(@NotNull Fn1<? super T,Entry<K,V>> f1) {
         return toMutMap(f1).immutable();
     }
 
@@ -268,7 +268,7 @@ public interface Transformable<T> {
      @return a new PersistentTreeMap of the specified comparator and the given key/value pairs
      */
     default <K,V> @NotNull ImSortedMap<K,V> toImSortedMap(Comparator<? super K> comp,
-                                                 Fn1<? super T,Entry<K,V>> f1) {
+                                                          @NotNull Fn1<? super T,Entry<K,V>> f1) {
         return fold((ImSortedMap<K, V>) PersistentTreeMap.<K, V>empty(comp),
                     (ts, t) -> ts.assoc(f1.apply(t)));
     }
@@ -324,7 +324,8 @@ public interface Transformable<T> {
      */
     default <K,V> @NotNull SortedMap<K,V> toMutSortedMap(
             @Nullable Comparator<? super K> comp,
-            @NotNull Fn1<? super T,Entry<K,V>> f1) {
+            @NotNull Fn1<? super T,Entry<K,V>> f1
+    ) {
         return fold(new TreeMap<>(comp), (ts, t) -> {
             Entry<K,V> entry = f1.apply(t);
             ts.put(entry.getKey(), entry.getValue());

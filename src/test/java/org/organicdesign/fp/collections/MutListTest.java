@@ -1,5 +1,6 @@
 package org.organicdesign.fp.collections;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ public class MutListTest {
 
         TestList(List<E> ls) { inner = ls; }
 
-        @Override public MutList<E> append(E val) {
+        @Override public @NotNull MutList<E> append(E val) {
             inner.add(val);
             return this;
         }
@@ -27,7 +28,7 @@ public class MutListTest {
             return PersistentVector.ofIter(inner);
         }
 
-        @Override public MutList<E> replace(int idx, E e) {
+        @Override public @NotNull MutList<E> replace(int idx, E e) {
             inner.set(idx, e);
             return this;
         }

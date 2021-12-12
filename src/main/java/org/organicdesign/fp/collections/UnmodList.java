@@ -151,8 +151,8 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
     @Override default boolean isEmpty() { return size() == 0; }
 
     /** A convenience method to get a listIterator. */
-    @NotNull
-    @Override default UnmodSortedIterator<E> iterator() { return listIterator(0); }
+    @Override
+    default @NotNull UnmodSortedIterator<E> iterator() { return listIterator(0); }
 
     /** The default implementation of this method has O(this.size()) performance. */
     @Override default int lastIndexOf(Object o) {

@@ -148,32 +148,38 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
     // =============================== Inherited from Transformable ===============================
 
     /** {@inheritDoc} */
-    @Override default @NotNull UnmodIterable<T> concat(Iterable<? extends T> list) {
+    @Override
+    default @NotNull UnmodIterable<T> concat(@Nullable Iterable<? extends T> list) {
         return Xform.of(this).concat(list);
     }
 
     /** {@inheritDoc} */
-    @Override default @NotNull UnmodIterable<T> precat(Iterable<? extends T> list) {
+    @Override
+    default @NotNull UnmodIterable<T> precat(@Nullable Iterable<? extends T> list) {
         return Xform.of(this).precat(list);
     }
 
     /** {@inheritDoc} */
-    @Override default @NotNull UnmodIterable<T> drop(long n) {
+    @Override
+    default @NotNull UnmodIterable<T> drop(long n) {
         return Xform.of(this).drop(n);
     }
 
     /** {@inheritDoc} */
-    @Override default @NotNull UnmodIterable<T> dropWhile(Fn1<? super T,Boolean> predicate) {
+    @Override
+    default @NotNull UnmodIterable<T> dropWhile(@NotNull Fn1<? super T,Boolean> predicate) {
         return Xform.of(this).dropWhile(predicate);
     }
 
     /** {@inheritDoc} */
-    @Override default <B> B fold(B ident, Fn2<? super B,? super T,B> reducer) {
+    @Override
+    default <B> B fold(B ident, @NotNull Fn2<? super B,? super T,B> reducer) {
         return Xform.of(this).fold(ident, reducer);
     }
 
     /** {@inheritDoc} */
-    @Override default <G,B> @NotNull Or<G,B> foldUntil(
+    @Override
+    default <G,B> @NotNull Or<G,B> foldUntil(
             G accum,
             @Nullable Fn2<? super G,? super T,B> terminator,
             @NotNull Fn2<? super G,? super T,G> reducer
@@ -213,8 +219,8 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
     }
 
     /** The first item in this iterable. */
-    @NotNull
-    @Override default Option<T> head() {
+    @Override
+    default @NotNull Option<T> head() {
         Iterator<T> iter = iterator();
         return iter.hasNext() ? Option.some(iter.next())
                               : Option.none();

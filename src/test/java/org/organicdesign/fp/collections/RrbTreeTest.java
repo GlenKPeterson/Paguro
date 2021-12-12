@@ -189,7 +189,7 @@ public class RrbTreeTest {
 //            System.out.println("===test:" + is);
             for (int k = 0; k <= j; k++) {
                 assertEquals("Wrong item at " + k + ", but still correct size (" + is.size() + ")\n" +
-                        "control:\n" + control.toString() + "\n" +
+                        "control:\n" + control + "\n" +
                         "test:\n" + is.indentedStr(0),
                              control.get(k), is.get(k));
 //                System.out.println("control[" + k + "]:" + control.get(k) + " test[" + k + "]:" + is.get(k));
@@ -238,6 +238,42 @@ public class RrbTreeTest {
                 control.add(idx, j);
                 assertEquals(control.size(), is.size());
                 assertEquals(Integer.valueOf(j), is.get(idx));
+            }
+            assertEquals(control.size(), is.size());
+            for (int j = 0; j < is.size(); j++) {
+                assertEquals(control.get(j), is.get(j));
+            }
+            is.debugValidate();
+        } catch (Exception e) {
+            System.out.println("rands:" + rands); // print before blowing up...
+            // OK, now we can continue throwing exception.
+            throw e;
+        }
+    }
+
+    // heterogeneous list.
+    private static final Object[] heteroVals = { "Hello", null, 37, 21.3, 'x' };
+    private static Object heteroVal(int i) {
+        return heteroVals[i % heteroVals.length];
+    }
+
+    @Test
+    public void buildHetero() {
+        RrbTree<Object> is = RrbTree.empty();
+        ArrayList<Object> control = new ArrayList<>();
+        ArrayList<Object> rands = new ArrayList<>();
+        for (int i = 0; i < SEVERAL; i++) {
+            is = is.append(heteroVal(i));
+            control.add(heteroVal(i));
+        }
+        try {
+            for (int j = 0; j < 100000; j++) {
+                int idx = rand.nextInt(is.size() + 1);
+                rands.add(idx);
+                is = is.insert(idx, heteroVal(j));
+                control.add(idx, heteroVal(j));
+                assertEquals(control.size(), is.size());
+                assertEquals(heteroVal(j), is.get(idx));
             }
             assertEquals(control.size(), is.size());
             for (int j = 0; j < is.size(); j++) {
@@ -779,7 +815,6 @@ public class RrbTreeTest {
             90, 91, 92, 93, 94, 95, 96, 97, 98, 99
     );
 
-    @SuppressWarnings("deprecation")
     @Test public void joinImTest() {
         assertEquals(rrb(1,2,3,4,5,6), rrb(1,2,3).join(rrb(4,5,6)));
         RrbTree<Integer> r1 = rrb(oneTo49.toArray(new Integer[0]));
@@ -835,7 +870,6 @@ public class RrbTreeTest {
         return ret;
     }
 
-    @SuppressWarnings("deprecation")
     @Test public void joinMutableTest() {
         assertEquals(mut(1,2,3,4,5,6), mut(1,2,3).join(mut(4,5,6)));
         RrbTree<Integer> r1 = mut(oneTo49.toArray(new Integer[0]));

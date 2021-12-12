@@ -519,7 +519,8 @@ public abstract class Xform<A> implements UnmodIterable<A> {
 //        return concat(list);
 //    }
 
-    @Override public @NotNull Xform<A> concat(@NotNull Iterable<? extends A> list) {
+    @Override
+    public @NotNull Xform<A> concat(@Nullable Iterable<? extends A> list) {
         return new AppendIterDesc<>(this, new SourceProviderIterableDesc<>(list));
     }
 
@@ -534,8 +535,8 @@ public abstract class Xform<A> implements UnmodIterable<A> {
 //        return precat(list);
 //    }
 
-    @NotNull
-    @Override public Xform<A> precat(@NotNull Iterable<? extends A> list) {
+    @Override
+    public @NotNull Xform<A> precat(@Nullable Iterable<? extends A> list) {
         return new AppendIterDesc<>(of(list), this);
     }
 

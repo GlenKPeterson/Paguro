@@ -14,6 +14,7 @@
 package org.organicdesign.fp.collections;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.organicdesign.fp.oneOf.Option;
 
 /**
@@ -27,7 +28,7 @@ public interface BaseList<E> extends UnmodList<E> {
      @param e the value to insert
      @return a new ImList with the additional item at the end.
      */
-    BaseList<E> append(E e);
+    @NotNull BaseList<E> append(E e);
 
     /**
      Efficiently adds items to the end of this ImList.
@@ -35,8 +36,8 @@ public interface BaseList<E> extends UnmodList<E> {
      @param es the values to insert
      @return a new ImList with the additional items at the end.
      */
-    @NotNull
-    @Override BaseList<E> concat(Iterable<? extends E> es);
+    @Override
+    @NotNull BaseList<E> concat(@Nullable Iterable<? extends E> es);
 
     // I don't know if this is a good idea or not and I don't want to have to support it if not.
 //    /**
@@ -73,8 +74,8 @@ public interface BaseList<E> extends UnmodList<E> {
      @return a new ImList with the replaced item
      */
     // TODO: Don't make i.replace(i.size(), o) equivalent to i.concat(o)
-    BaseList<E> replace(int idx, E e);
+    @NotNull BaseList<E> replace(int idx, E e);
 
     /** Returns a reversed copy of this list. */
-    BaseList<E> reverse();
+    @NotNull BaseList<E> reverse();
 }

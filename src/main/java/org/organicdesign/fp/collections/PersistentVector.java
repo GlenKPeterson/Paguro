@@ -20,6 +20,7 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  This started out as Rich Hickey's PersistentVector class from Clojure in late 2014.  Glen added
@@ -190,7 +191,8 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
     // not MutVector<E> as this originally returned.
 //    @Override
     // We could make this public some day, maybe.
-    @Override public MutVector<E> mutable() { return new MutVector<>(this); }
+    @Override
+    public @NotNull MutVector<E> mutable() { return new MutVector<>(this); }
 
     // Returns the high (gt 5) bits of the index of the last item.
     // I think this is the index of the start of the last array in the tree.
@@ -234,7 +236,8 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
 
     /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
-    @Override public PersistentVector<E> replace(int i, E val) {
+    @Override
+    public @NotNull PersistentVector<E> replace(int i, E val) {
         if (i >= 0 && i < size) {
             if (i >= tailoff()) {
                 Object[] newTail = new Object[tail.length];
@@ -261,7 +264,8 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
      * @return a new Vecsicle with the additional item.
      */
     @SuppressWarnings("unchecked")
-    @Override public PersistentVector<E> append(E val) {
+    @Override
+    public @NotNull PersistentVector<E> append(E val) {
         //room in tail?
         //	if(tail.length < MAX_NODE_LENGTH)
         if (size - tailoff() < MAX_NODE_LENGTH) {
@@ -291,8 +295,8 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
      @param items the values to insert
      @return a new PersistentVector with the additional items at the end.
      */
-    @NotNull
-    @Override public PersistentVector<E> concat(Iterable<? extends E> items) {
+    @Override
+    public @NotNull PersistentVector<E> concat(@Nullable Iterable<? extends E> items) {
         return (PersistentVector<E>) ImList.super.concat(items);
     }
 
@@ -559,7 +563,8 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
         }
 
         @SuppressWarnings("unchecked")
-        @Override  public MutList<F> append(F val) {
+        @Override
+        public @NotNull MutList<F> append(F val) {
             ensureEditable();
             int i = size;
             //room in tail?
@@ -658,7 +663,8 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
             return node[i & LOW_BITS];
         }
 
-        @Override public MutList<F> replace(int idx, F e) {
+        @Override
+        public @NotNull MutList<F> replace(int idx, F e) {
             ensureEditable();
             F[] node = editableArrayFor(idx);
             node[idx & LOW_BITS] = e;

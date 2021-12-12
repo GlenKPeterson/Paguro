@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.organicdesign.fp.indent.Indented;
 import org.organicdesign.fp.tuple.Tuple2;
 import org.organicdesign.fp.tuple.Tuple4;
@@ -124,8 +125,8 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         }
 
         /** {@inheritDoc} */
-        @NotNull
-        @Override public MutRrbt<E> concat(Iterable<? extends E> es) {
+        @Override
+        public @NotNull MutRrbt<E> concat(@Nullable Iterable<? extends E> es) {
             return (MutRrbt<E>) MutList.super.concat(es);
         }
 
@@ -273,7 +274,8 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         }
 
         /** {@inheritDoc} */
-        @Override public String toString() {
+        @Override
+        public @NotNull String toString() {
             return UnmodIterable.toString("MutRrbt", this);
         }
 
@@ -357,13 +359,13 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
 
             private final int size;
             private transient RrbTree<E> rrbTree;
-            SerializationProxy(RrbTree<E> v) {
+            SerializationProxy(@NotNull RrbTree<E> v) {
                 size = v.size();
                 rrbTree = v;
             }
 
             // Taken from Josh Bloch Item 75, p. 298
-            private void writeObject(ObjectOutputStream s) throws IOException {
+            private void writeObject(@NotNull ObjectOutputStream s) throws IOException {
                 s.defaultWriteObject();
                 // Write out all elements in the proper order
                 for (E entry : rrbTree) {
@@ -372,7 +374,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
             }
 
             @SuppressWarnings("unchecked")
-            private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
+            private void readObject(@NotNull ObjectInputStream s) throws IOException, ClassNotFoundException {
                 s.defaultReadObject();
                 MutRrbt<E> temp = emptyMutable();
                 for (int i = 0; i < size; i++) {
@@ -384,7 +386,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
             private Object readResolve() { return rrbTree; }
         }
 
-        private Object writeReplace() { return new SerializationProxy<>(this); }
+        private @NotNull Object writeReplace() { return new SerializationProxy<>(this); }
 
         private void readObject(java.io.ObjectInputStream in) throws IOException,
                                                                      ClassNotFoundException {
@@ -411,8 +413,8 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         }
 
         /** {@inheritDoc} */
-        @NotNull
-        @Override public ImRrbt<E> concat(Iterable<? extends E> es) {
+        @Override
+        public @NotNull ImRrbt<E> concat(@Nullable Iterable<? extends E> es) {
             return this.mutable().concat(es).immutable();
         }
 
@@ -1095,7 +1097,7 @@ involves changing more nodes than maybe necessary.
                      .toString();
         }
 
-        @Override public String toString() { return indentedStr(0); }
+        @Override public @NotNull String toString() { return indentedStr(0); }
     }
 
     private static class Leaf<T> implements Node<T> {
@@ -1191,7 +1193,7 @@ involves changing more nodes than maybe necessary.
         }
 
         @SuppressWarnings("unchecked")
-        private Leaf<T>[] spliceAndSplit(T[] oldFocus, int splitIndex) {
+        private @NotNull Leaf<T>[] spliceAndSplit(T[] oldFocus, int splitIndex) {
             // Consider optimizing:
             T[] newItems = spliceIntoArrayAt(oldFocus, items, splitIndex,
                                              null);
@@ -1251,12 +1253,14 @@ involves changing more nodes than maybe necessary.
             return items.length + numItems < MAX_NODE_LENGTH;
         }
 
-        @Override public String toString() {
+        @Override
+        public @NotNull String toString() {
 //            return "Leaf("+ arrayString(items) + ")";
             return arrayString(items);
         }
 
-        @Override public String indentedStr(int indent) {
+        @Override
+        public @NotNull String indentedStr(int indent) {
             return arrayString(items);
         }
     } // end class Leaf
@@ -1504,7 +1508,7 @@ involves changing more nodes than maybe necessary.
         }
 
         @SuppressWarnings("unchecked")
-        Relaxed<T>[] split() {
+        @NotNull Relaxed<T>[] split() {
             int midpoint = nodes.length >> 1; // Shift-right one is the same as dividing by 2.
             Relaxed<T> left = new Relaxed<>(Arrays.copyOf(cumulativeSizes, midpoint),
                                                     Arrays.copyOf(nodes, midpoint));
@@ -1795,7 +1799,8 @@ involves changing more nodes than maybe necessary.
             return new Relaxed<>(cumulativeSizes, newNodes);
         }
 
-        @Override public String indentedStr(int indent) {
+        @Override
+        public @NotNull String indentedStr(int indent) {
             StringBuilder sB = new StringBuilder() // indentSpace(indent)
                     .append("Relaxed(");
             int nextIndent = indent + sB.length();
@@ -1807,7 +1812,8 @@ involves changing more nodes than maybe necessary.
                     .toString();
         }
 
-        @Override public String toString() { return indentedStr(0); }
+        @Override
+        public @NotNull String toString() { return indentedStr(0); }
 
         /**
          This asks each node what size it is, then puts the cumulative sizes into a new array.
@@ -1841,8 +1847,13 @@ involves changing more nodes than maybe necessary.
          @param insertSize the difference in size between the original node and the new node.
          @return a new immutable Relaxed node with the immediate child node replaced.
          */
-        static <T> Relaxed<T> replaceInRelaxedAt(int[] is, Node<T>[] ns, Node<T> newNode,
-                                                 int subNodeIndex, int insertSize) {
+        static <T> @NotNull Relaxed<T> replaceInRelaxedAt(
+                int[] is,
+                @NotNull Node<T>[] ns,
+                @NotNull Node<T> newNode,
+                int subNodeIndex,
+                int insertSize
+        ) {
             @SuppressWarnings("unchecked")
             Node<T>[] newNodes = replaceInArrayAt(newNode, ns, subNodeIndex, Node.class);
             // Increment newCumSizes for the changed item and all items to the right.
@@ -1865,8 +1876,12 @@ involves changing more nodes than maybe necessary.
          @param subNodeIndex index to insert in this node's immediate children
          @return a new immutable Relaxed node with the immediate child node inserted.
          */
-        static <T> Relaxed<T> insertInRelaxedAt(int[] oldCumSizes, Node<T>[] ns, Node<T> newNode,
-                                                int subNodeIndex) {
+        static <T> @NotNull Relaxed<T> insertInRelaxedAt(
+                int[] oldCumSizes,
+                @NotNull Node<T>[] ns,
+                @NotNull Node<T> newNode,
+                int subNodeIndex
+        ) {
             @SuppressWarnings("unchecked")
             Node<T>[] newNodes = insertIntoArrayAt(newNode, ns, subNodeIndex, Node.class);
 
@@ -1904,8 +1919,11 @@ involves changing more nodes than maybe necessary.
          @return a copy of this node with only the right-hand side of the split.
          */
         @SuppressWarnings("unchecked")
-        public static <T> Node<T> fixRight(Node<T>[] origNodes, Node<T> splitRight,
-                                           int subNodeIndex) {
+        public static <T> @NotNull Node<T> fixRight(
+                @NotNull Node<T>[] origNodes,
+                @NotNull Node<T> splitRight,
+                int subNodeIndex
+        ) {
 //            if ( (splitRight.size() > 0) &&
 //                 (origNodes[0].height() != splitRight.height()) ) {
 //                throw new IllegalStateException("Passed a splitRight node of a different height" +
@@ -1963,7 +1981,7 @@ involves changing more nodes than maybe necessary.
         final @NotNull Node<E> node;
         IdxNode(@NotNull Node<E> n) { node = n; }
         public boolean hasNext() { return idx < node.numChildren(); }
-        public Node<E> next() { return node.child(idx++); }
+        public @NotNull Node<E> next() { return node.child(idx++); }
 //        public String toString() { return "IdxNode(" + idx + " " + node + ")"; }
     }
 
