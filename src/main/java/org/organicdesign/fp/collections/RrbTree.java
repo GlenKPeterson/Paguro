@@ -969,6 +969,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
             return UnmodIterable.toString("ImRrbt", this);
         }
 
+        @SuppressWarnings("rawtypes")
         private static final ImRrbt EMPTY_IM_RRBT =
                 new ImRrbt<>(emptyArray(), 0, emptyLeaf(), 0);
     }
@@ -1155,6 +1156,7 @@ involves changing more nodes than maybe necessary.
     // for <= (I think!).
     private static final int MAX_NODE_LENGTH = ( (STRICT_NODE_LENGTH+1) * 4 / 3);
 
+    @SuppressWarnings("rawtypes")
     private static final @NotNull Leaf EMPTY_LEAF = new Leaf<>(EMPTY_ARRAY);
     @SuppressWarnings("unchecked")
     private static <T> @NotNull Leaf<T> emptyLeaf() { return (Leaf<T>) EMPTY_LEAF; }
@@ -1994,7 +1996,9 @@ involves changing more nodes than maybe necessary.
          @param newNodes the nodes to take sizes from.
          @return An array of cumulative sizes of each node in the passed array.
          */
-        private static int[] makeSizeArray(@NotNull Node[] newNodes) {
+        private static int[] makeSizeArray(
+                @SuppressWarnings("rawtypes") @NotNull Node[] newNodes
+        ) {
             int[] newCumSizes = new int[newNodes.length];
             int cumulativeSize = 0;
             for (int i = 0; i < newCumSizes.length; i++) {
@@ -2229,6 +2233,7 @@ involves changing more nodes than maybe necessary.
                     sB.append("\n").append(indentSpace(nextIndent));
                 }
             }
+            //noinspection rawtypes
             sB.append(((Node) n).indentedStr(nextIndent));
         }
         return sB;
