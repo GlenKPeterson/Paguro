@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.organicdesign.fp.collections.PersistentTreeMap.Box;
@@ -178,7 +179,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
 
      @return a new PersistentHashMap of the given key/value pairs
       */
-    public static <K,V> PersistentHashMap<K,V> of(Iterable<Map.Entry<K,V>> kvPairs) {
+    public static <K,V> @NotNull PersistentHashMap<K,V> of(@Nullable Iterable<Map.Entry<K,V>> kvPairs) {
         if (kvPairs == null) { return empty(); }
         PersistentHashMap<K,V> m = empty();
         MutHashMap<K,V> map = m.mutable();
@@ -257,7 +258,8 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
         private Object readResolve() { return theMap; }
     }
 
-    private Object writeReplace() { return new SerializationProxy<>(this); }
+    @Contract(value = " -> new", pure = true)
+    private @NotNull Object writeReplace() { return new SerializationProxy<>(this); }
 
     private void readObject(java.io.ObjectInputStream in) throws IOException,
             ClassNotFoundException {
@@ -269,10 +271,11 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
 //    boolean hasNull() { return hasNull; }
 
     /** {@inheritDoc} */
-    @Override public Equator<K> equator() { return equator; }
+    @Override
+    public @NotNull Equator<K> equator() { return equator; }
 
-    @NotNull
-    @Override public PersistentHashMap<K,V> assoc(K key, V val) {
+    @Override
+    public @NotNull PersistentHashMap<K,V> assoc(K key, V val) {
         if(key == null) {
             if (hasNull && (val == nullValue)) { return this; }
             return new PersistentHashMap<>(equator, hasNull ? size : size + 1, root, true, val);
@@ -368,8 +371,8 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
     /** {@inheritDoc} */
     @Override public int size() { return size; }
 
-    @NotNull
-    @Override public PersistentHashMap<K,V> without(K key){
+    @Override
+    public @NotNull PersistentHashMap<K,V> without(K key){
         if(key == null)
             return hasNull ? new PersistentHashMap<>(equator, size - 1, root, false, null) : this;
         if(root == null)
@@ -1340,34 +1343,41 @@ public static void main(String[] args){
 }
 */
 
-    private static <K,V> INode<K,V>[] cloneAndSet(INode<K,V>[] array, int i, INode<K,V> a) {
+    private static <K,V> INode<K,V> @NotNull [] cloneAndSet(INode<K,V> @NotNull [] array, int i, INode<K,V> a) {
         INode<K,V>[] clone = array.clone();
         clone[i] = a;
         return clone;
     }
 
-    private static Object[] cloneAndSet(Object[] array, int i, Object a) {
+    private static Object @NotNull [] cloneAndSet(Object @NotNull [] array, int i, Object a) {
         Object[] clone = array.clone();
         clone[i] = a;
         return clone;
     }
 
-    private static Object[] cloneAndSet(Object[] array, int i, int j, Object b) {
+    private static Object @NotNull [] cloneAndSet(Object @NotNull [] array, int i, int j, Object b) {
         Object[] clone = array.clone();
         clone[i] = null;
         clone[j] = b;
         return clone;
     }
 
-    private static Object[] removePair(Object[] array, int i) {
+    private static Object @NotNull [] removePair(Object @NotNull [] array, int i) {
         Object[] newArray = new Object[array.length - 2];
         System.arraycopy(array, 0, newArray, 0, 2*i);
         System.arraycopy(array, 2*(i+1), newArray, 2*i, newArray.length - 2*i);
         return newArray;
     }
 
-    private static <K,V> INode<K,V> createNode(Equator<K> equator, int shift, K key1, V val1,
-                                               int key2hash, K key2, V val2) {
+    private static <K,V> INode<K,V> createNode(
+            @NotNull Equator<K> equator,
+            int shift,
+            K key1,
+            V val1,
+            int key2hash,
+            K key2,
+            V val2
+    ) {
         int key1hash = equator.hash(key1);
         if(key1hash == key2hash)
             return new HashCollisionNode<>(equator, null, key1hash, 2,
@@ -1379,9 +1389,12 @@ public static void main(String[] args){
                 .assoc(edit, shift, key2hash, key2, val2, addedLeaf);
     }
 
-    private static <K,V> INode<K,V> createNode(Equator<K> equator, AtomicReference<Thread> edit,
-                                               int shift, K key1, V val1, int key2hash,
-                                               K key2, V val2) {
+    private static <K,V> INode<K,V> createNode(
+            @NotNull Equator<K> equator,
+            AtomicReference<Thread> edit,
+            int shift, K key1, V val1, int key2hash,
+            K key2, V val2
+    ) {
         int key1hash = equator.hash(key1);
         if(key1hash == key2hash)
             return new HashCollisionNode<>(equator, null, key1hash, 2,
