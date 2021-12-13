@@ -1824,7 +1824,7 @@ involves changing more nodes than maybe necessary.
          @param newNodes the nodes to take sizes from.
          @return An array of cumulative sizes of each node in the passed array.
          */
-        private static int[] makeSizeArray(
+        private static int @NotNull [] makeSizeArray(
                 @SuppressWarnings("rawtypes") @NotNull Node @NotNull [] newNodes
         ) {
             int[] newCumSizes = new int[newNodes.length];
@@ -1877,7 +1877,7 @@ involves changing more nodes than maybe necessary.
          @return a new immutable Relaxed node with the immediate child node inserted.
          */
         static <T> @NotNull Relaxed<T> insertInRelaxedAt(
-                int[] oldCumSizes,
+                int @NotNull [] oldCumSizes,
                 @NotNull Node<T> @NotNull [] ns,
                 @NotNull Node<T> newNode,
                 int subNodeIndex
