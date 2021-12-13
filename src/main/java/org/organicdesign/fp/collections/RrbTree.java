@@ -80,18 +80,18 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
 
     /** Mutable version of an {@link RrbTree}.  Timing information is available there. */
     public static class MutRrbt<E> extends RrbTree<E> implements MutList<E> {
-        private @NotNull E[] focus;
+        private E @NotNull [] focus;
         private int focusStartIndex;
         private int focusLength;
         private @NotNull Node<E> root;
         private int size;
 
-        MutRrbt(@NotNull E[] f, int fi, int fl, @NotNull Node<E> r, int s) {
+        MutRrbt(E @NotNull [] f, int fi, int fl, @NotNull Node<E> r, int s) {
             focus = f; focusStartIndex = fi; focusLength = fl; root = r; size = s;
         }
 
         @Override
-        protected @NotNull MutRrbt<E> makeNew(@NotNull E[] f, int fi, int fl, @NotNull Node<E> r, int s) {
+        protected @NotNull MutRrbt<E> makeNew(E @NotNull [] f, int fi, int fl, @NotNull Node<E> r, int s) {
             return new MutRrbt<>(f, fi, fl, r, s);
         }
 
@@ -331,17 +331,17 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
 
     /** Immutable version of an {@link RrbTree}.  Timing information is available there. */
     public static class ImRrbt<E> extends RrbTree<E> implements ImList<E>, Serializable {
-        private final @NotNull E[] focus;
+        private final E @NotNull [] focus;
         private final int focusStartIndex;
         private transient final @NotNull Node<E> root;
         private final int size;
 
-        ImRrbt(@NotNull E[] f, int fi, @NotNull Node<E> r, int s) {
+        ImRrbt(E @NotNull [] f, int fi, @NotNull Node<E> r, int s) {
             focus = f; focusStartIndex = fi; root = r; size = s;
         }
 
         @Override
-        protected @NotNull ImRrbt<E> makeNew(@NotNull E[] f, int fi, int fl, @NotNull Node<E> r, int s) {
+        protected @NotNull ImRrbt<E> makeNew(E @NotNull [] f, int fi, int fl, @NotNull Node<E> r, int s) {
             return new ImRrbt<>(f, fi, r, s);
         }
 
@@ -832,7 +832,7 @@ involves changing more nodes than maybe necessary.
     /**
      * Allows removing duplicated code by letting super-class produce new members of subclass types.
      */
-    protected abstract @NotNull RrbTree<E> makeNew(@NotNull E[] f, int fi, int fl, @NotNull Node<E> r, int s);
+    protected abstract @NotNull RrbTree<E> makeNew(E @NotNull [] f, int fi, int fl, @NotNull Node<E> r, int s);
 
     protected abstract @NotNull RrbTree<E> mt();
 
@@ -1000,7 +1000,7 @@ involves changing more nodes than maybe necessary.
         @NotNull Node<T> addEndChild(boolean leftMost, @NotNull Node<T> shorter);
 
         /** Adds kids as leftmost or rightmost of current children */
-        @NotNull Node<T> addEndChildren(boolean leftMost, @NotNull Node<T>[] newKids);
+        @NotNull Node<T> addEndChildren(boolean leftMost, Node<T> @NotNull [] newKids);
 
         /** Return the item at the given index */
         T get(int i);
@@ -1038,7 +1038,7 @@ involves changing more nodes than maybe necessary.
         // Because we want to append/insert into the focus as much as possible, we will treat
         // the insert or append of a single item as a degenerate case.  Instead, the primary way
         // to add to the internal data structure will be to push the entire focus array into it
-        @NotNull Node<T> pushFocus(int index, @NotNull T[] oldFocus);
+        @NotNull Node<T> pushFocus(int index, T @NotNull [] oldFocus);
 
         @NotNull Node<T> replace(int idx, T t);
 
@@ -1066,7 +1066,7 @@ involves changing more nodes than maybe necessary.
          @param rn Right-hand whole-node
          @param rf Right-focus (leftover items from right node)
          */
-        SplitNode(@NotNull Node<T> ln, @NotNull T[] lf, @NotNull Node<T> rn, @NotNull T[] rf) {
+        SplitNode(@NotNull Node<T> ln, T @NotNull [] lf, @NotNull Node<T> rn, T @NotNull [] rf) {
             super(ln, lf, rn, rf);
 //            if (lf.length > STRICT_NODE_LENGTH) {
 //                throw new IllegalStateException("Left focus too long: " + arrayString(lf));
@@ -1076,9 +1076,9 @@ involves changing more nodes than maybe necessary.
 //            }
         }
         public @NotNull Node<T> left() { return _1; }
-        public @NotNull T[] leftFocus() { return _2; }
+        public T @NotNull [] leftFocus() { return _2; }
         public @NotNull Node<T> right() { return _3; }
-        public @NotNull T[] rightFocus() { return _4; }
+        public T @NotNull [] rightFocus() { return _4; }
         public int size() { return _1.size() + _2.length + _3.size() + _4.length; }
 
         @Override
@@ -1138,7 +1138,7 @@ involves changing more nodes than maybe necessary.
 
         /** Adds kids as leftmost or rightmost of current children */
         @Override
-        public @NotNull Node<T> addEndChildren(boolean leftMost, @NotNull Node<T>[] newKids) {
+        public @NotNull Node<T> addEndChildren(boolean leftMost, Node<T> @NotNull [] newKids) {
             throw new UnsupportedOperationException("Don't call this on a leaf");
         }
 
@@ -1193,7 +1193,7 @@ involves changing more nodes than maybe necessary.
         }
 
         @SuppressWarnings("unchecked")
-        private @NotNull Leaf<T>[] spliceAndSplit(T[] oldFocus, int splitIndex) {
+        private @NotNull Leaf<T> @NotNull [] spliceAndSplit(T @NotNull [] oldFocus, int splitIndex) {
             // Consider optimizing:
             T[] newItems = spliceIntoArrayAt(oldFocus, items, splitIndex,
                                              null);
@@ -1209,7 +1209,7 @@ involves changing more nodes than maybe necessary.
 
         // I think this can only be called when the root node is a leaf.
         @Override
-        public @NotNull Node<T> pushFocus(int index, @NotNull T[] oldFocus) {
+        public @NotNull Node<T> pushFocus(int index, T @NotNull [] oldFocus) {
 //            if (oldFocus.length == 0) {
 //                throw new IllegalStateException("Never call this with an empty focus!");
 //            }
@@ -1353,7 +1353,7 @@ involves changing more nodes than maybe necessary.
         @Override
         public @NotNull Node<T> addEndChildren(
                 boolean leftMost,
-                @NotNull Node<T>[] newKids
+                Node<T> @NotNull [] newKids
         ) {
 //            if (!thisNodeHasRelaxedCapacity(newKids.length)) {
 //                throw new IllegalStateException("Can't add enough kids");
@@ -1508,7 +1508,7 @@ involves changing more nodes than maybe necessary.
         }
 
         @SuppressWarnings("unchecked")
-        @NotNull Relaxed<T>[] split() {
+        @NotNull Relaxed<T> @NotNull [] split() {
             int midpoint = nodes.length >> 1; // Shift-right one is the same as dividing by 2.
             Relaxed<T> left = new Relaxed<>(Arrays.copyOf(cumulativeSizes, midpoint),
                                                     Arrays.copyOf(nodes, midpoint));
@@ -1627,7 +1627,7 @@ involves changing more nodes than maybe necessary.
 
         @SuppressWarnings("unchecked")
         @Override
-        public @NotNull Node<T> pushFocus(int index, @NotNull T[] oldFocus) {
+        public @NotNull Node<T> pushFocus(int index, T @NotNull [] oldFocus) {
             // TODO: Review this entire method.
             int subNodeIndex = subNodeIndex(index);
             Node<T> subNode = nodes[subNodeIndex];
@@ -1825,7 +1825,7 @@ involves changing more nodes than maybe necessary.
          @return An array of cumulative sizes of each node in the passed array.
          */
         private static int[] makeSizeArray(
-                @SuppressWarnings("rawtypes") @NotNull Node[] newNodes
+                @SuppressWarnings("rawtypes") @NotNull Node @NotNull [] newNodes
         ) {
             int[] newCumSizes = new int[newNodes.length];
             int cumulativeSize = 0;
@@ -1848,8 +1848,8 @@ involves changing more nodes than maybe necessary.
          @return a new immutable Relaxed node with the immediate child node replaced.
          */
         static <T> @NotNull Relaxed<T> replaceInRelaxedAt(
-                int[] is,
-                @NotNull Node<T>[] ns,
+                int @NotNull [] is,
+                @NotNull Node<T> @NotNull [] ns,
                 @NotNull Node<T> newNode,
                 int subNodeIndex,
                 int insertSize
@@ -1878,7 +1878,7 @@ involves changing more nodes than maybe necessary.
          */
         static <T> @NotNull Relaxed<T> insertInRelaxedAt(
                 int[] oldCumSizes,
-                @NotNull Node<T>[] ns,
+                @NotNull Node<T> @NotNull [] ns,
                 @NotNull Node<T> newNode,
                 int subNodeIndex
         ) {
@@ -1920,7 +1920,7 @@ involves changing more nodes than maybe necessary.
          */
         @SuppressWarnings("unchecked")
         public static <T> @NotNull Node<T> fixRight(
-                @NotNull Node<T>[] origNodes,
+                @NotNull Node<T> @NotNull [] origNodes,
                 @NotNull Node<T> splitRight,
                 int subNodeIndex
         ) {
@@ -1988,10 +1988,10 @@ involves changing more nodes than maybe necessary.
     final class Iter implements UnmodSortedIterator<E> {
 
         // We want this iterator to walk the node tree.
-        private final @NotNull IdxNode<E>[] stack;
+        private final IdxNode<E> @NotNull [] stack;
         private int stackMaxIdx = -1;
 
-        private @NotNull E[] leafArray;
+        private E @NotNull [] leafArray;
         private int leafArrayIdx;
 
         // Focus must be pre-pushed so we don't have to ever check the index.
@@ -2002,7 +2002,7 @@ involves changing more nodes than maybe necessary.
         }
 
         // Descent to the leftmost unused leaf node.
-        private @NotNull E[] findLeaf(@NotNull Node<E> node) {
+        private E @NotNull [] findLeaf(@NotNull Node<E> node) {
             // Descent to left-most bottom node.
             while (!(node instanceof Leaf)) {
                 IdxNode<E> in = new IdxNode<>(node);
@@ -2013,7 +2013,7 @@ involves changing more nodes than maybe necessary.
             return ((Leaf<E>) node).items;
         }
 
-        private @NotNull E[] nextLeafArray() {
+        private E @NotNull [] nextLeafArray() {
             // While nodes are used up, get next node from node one level up.
             while ( (stackMaxIdx > -1) && !stack[stackMaxIdx].hasNext() ) {
                 stackMaxIdx--;
@@ -2050,7 +2050,7 @@ involves changing more nodes than maybe necessary.
     // Helper function to avoid type warnings.
 
     @SuppressWarnings("unchecked")
-    private static <T> @NotNull Node<T>[] genericNodeArray(int size) {
+    private static <T> Node<T> @NotNull [] genericNodeArray(int size) {
         return (Node<T>[]) new Node<?>[size];
     }
 
@@ -2058,7 +2058,7 @@ involves changing more nodes than maybe necessary.
 
     private static @NotNull StringBuilder showSubNodes(
             @NotNull StringBuilder sB,
-            @NotNull Object[] items,
+            Object @NotNull[] items,
             int nextIndent
     ) {
         boolean isFirst = true;

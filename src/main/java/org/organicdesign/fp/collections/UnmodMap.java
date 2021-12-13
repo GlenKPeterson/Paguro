@@ -145,18 +145,18 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
 
     /** Not allowed - this is supposed to be unmodifiable */
     @Override @Deprecated
-    default V compute(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
+    default V compute(K key, @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
         throw new UnsupportedOperationException("Modification attempted");
     }
     /** Not allowed - this is supposed to be unmodifiable */
     @Override @Deprecated
-    default V computeIfAbsent(K key, Function<? super K, ? extends V> mappingFunction) {
+    default V computeIfAbsent(K key, @NotNull Function<? super K, ? extends V> mappingFunction) {
         throw new UnsupportedOperationException("Modification attempted");
     }
     /** Not allowed - this is supposed to be unmodifiable */
     @Override @Deprecated
     default V computeIfPresent(K key,
-                               BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
+                               @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
         throw new UnsupportedOperationException("Modification attempted");
     }
 // boolean	containsKey(Object key)
@@ -297,8 +297,11 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
 
     /** Not allowed - this is supposed to be unmodifiable */
     @Override @Deprecated
-    default V merge(K key, V value,
-                    BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
+    default V merge(
+            K key,
+            @NotNull V value,
+            @NotNull BiFunction<? super V, ? super V, ? extends V> remappingFunction
+    ) {
         throw new UnsupportedOperationException("Modification attempted");
     }
     /**

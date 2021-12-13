@@ -189,7 +189,7 @@ public interface UnmodCollection<E> extends Collection<E>, UnmodIterable<E>, Siz
      *
      * {@inheritDoc}
      */
-    @Override default @NotNull Object[] toArray() {
+    @Override default Object @NotNull [] toArray() {
         return this.toArray(new Object[size()]);
     }
 
@@ -207,7 +207,8 @@ public interface UnmodCollection<E> extends Collection<E>, UnmodIterable<E>, Siz
      * {@inheritDoc}
      */
     @SuppressWarnings("unchecked")
-    @Override default @NotNull <T> T[] toArray(@NotNull T[] as) {
+    @Override
+    default <T> T @NotNull [] toArray(T @NotNull [] as) {
         if (as.length < size()) {
             // This produced a class cast exception when the return was put into a
             // variable of type non-Object[] (like String[] or Integer[]).  To see the problem

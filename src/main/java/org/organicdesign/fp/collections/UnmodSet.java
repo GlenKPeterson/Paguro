@@ -98,8 +98,8 @@ public interface UnmodSet<E> extends UnmodCollection<E>, Set<E> {
 
      {@inheritDoc}
      */
-    @NotNull
-    @Override default Object[] toArray() { return UnmodCollection.super.toArray(); }
+    @Override
+    default Object @NotNull [] toArray() { return UnmodCollection.super.toArray(); }
 
     /**
      This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for
@@ -116,7 +116,7 @@ public interface UnmodSet<E> extends UnmodCollection<E>, Set<E> {
      */
     @NotNull
     @SuppressWarnings("SuspiciousToArrayCall")
-    @Override default <T> T[] toArray(@NotNull T[] as) { return UnmodCollection.super.toArray(as); }
+    @Override default <T> T @NotNull [] toArray(T @NotNull [] as) { return UnmodCollection.super.toArray(as); }
 
 // Methods inherited from interface java.util.Collection
 // parallelStream, removeIf, stream

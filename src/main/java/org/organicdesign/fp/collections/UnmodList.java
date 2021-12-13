@@ -293,8 +293,8 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
 
      {@inheritDoc}
      */
-    @NotNull
-    @Override default Object[] toArray() { return UnmodSortedCollection.super.toArray(); }
+    @Override
+    default Object @NotNull [] toArray() { return UnmodSortedCollection.super.toArray(); }
 
     /**
      This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for
@@ -309,9 +309,9 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
 
      {@inheritDoc}
      */
-    @NotNull
     @SuppressWarnings("SuspiciousToArrayCall")
-    @Override default <T> T[] toArray(@NotNull T[] as) { return UnmodSortedCollection.super.toArray(as); }
+    @Override
+    default <T> T @NotNull [] toArray(T @NotNull [] as) { return UnmodSortedCollection.super.toArray(as); }
 
 //Methods inherited from interface java.util.Collection
 //parallelStream, removeIf, stream

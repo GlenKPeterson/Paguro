@@ -3,6 +3,7 @@ package org.organicdesign.fp.collections;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.organicdesign.fp.tuple.Tuple2;
 
@@ -38,12 +39,12 @@ public final class Cowry {
      * Since no objects are ever added to or removed from an empty array, it is effectively immutable
      * and there only ever needs to be one.  It also turns out that the type doesn't matter.
      */
-    static final Object[] EMPTY_ARRAY = new Object[0];
+    static final Object @NotNull [] EMPTY_ARRAY = new Object[0];
 
     // =================================== Array Helper Functions ==================================
     // Helper function to return the empty array of whatever type you need.
     @SuppressWarnings("unchecked")
-    public static <T> T[] emptyArray() { return (T[]) EMPTY_ARRAY; }
+    public static <T> T @NotNull [] emptyArray() { return (T[]) EMPTY_ARRAY; }
 
 //    // Thank you jeannicolas
 //    // http://stackoverflow.com/questions/80476/how-can-i-concatenate-two-arrays-in-java
@@ -64,7 +65,7 @@ public final class Cowry {
      * @return an Object[1] containing the single element.
      */
     @SuppressWarnings("unchecked")
-    static <T> T[] singleElementArray(T elem) { return (T[]) new Object[] { elem }; }
+    static <T> T @NotNull [] singleElementArray(T elem) { return (T[]) new Object[] { elem }; }
 
     /**
      * Helper function to avoid type warnings.
@@ -73,12 +74,12 @@ public final class Cowry {
      * @return an array of the appropriate class containing the single element.
      */
     @SuppressWarnings("unchecked")
-    public static <T> T[] singleElementArray(T elem, @Nullable Class<T> tClass) {
+    public static <T> T @NotNull [] singleElementArray(T elem, @Nullable Class<T> tClass) {
         if (tClass == null) {
             return (T[]) new Object[] { elem };
         }
 
-        T[] newItems = (T[]) Array.newInstance(tClass, 1);
+        T @NotNull [] newItems = (T[]) Array.newInstance(tClass, 1);
         newItems[0] = elem;
         return newItems;
     }
@@ -92,9 +93,9 @@ public final class Cowry {
      * @return A copy of the given array with the additional item at the appropriate index
      *         (will be one longer than the original array).
      */
-    public static <T> T[] insertIntoArrayAt(
+    public static <T> T @NotNull [] insertIntoArrayAt(
             T item,
-            T[] items,
+            T @NotNull [] items,
             int idx,
             @Nullable Class<T> tClass
     ) {
@@ -130,8 +131,8 @@ public final class Cowry {
      * @param tClass the class of the items in the array (null for Object)
      * @return a copy of the original array with the given length
      */
-    public static <T> T[] arrayCopy(
-            T[] items,
+    public static <T> T @NotNull [] arrayCopy(
+            T @NotNull [] items,
             int length,
             @Nullable Class<T> tClass
     ) {
@@ -144,8 +145,7 @@ public final class Cowry {
         // array-copy the items up to the new length.
         if (length > 0) {
             System.arraycopy(items, 0, newItems, 0,
-                             items.length < length ? items.length
-                                                   : length);
+                    Math.min(items.length, length));
         }
         return newItems;
     }
@@ -162,8 +162,12 @@ public final class Cowry {
      @param tClass the class of the resulting new array
      @return a new array with the new items inserted at the proper position of the old array.
      */
-    public static <A> A[] spliceIntoArrayAt(A[] insertedItems, A[] origItems, int idx,
-                                            @Nullable Class<A> tClass) {
+    public static <A> A @NotNull [] spliceIntoArrayAt(
+            A @NotNull [] insertedItems,
+            A @NotNull [] origItems,
+            int idx,
+            @Nullable Class<A> tClass
+    ) {
         // Make an array that big enough.  It's too bad that the JVM bothers to
         // initialize this with nulls.
         @SuppressWarnings("unchecked")
@@ -199,8 +203,12 @@ public final class Cowry {
 //        return newItems;
 //    }
 
-    public static <T> T[] replaceInArrayAt(T replacedItem, T[] origItems, int idx,
-                                           @Nullable Class<T> tClass) {
+    public static <T> T @NotNull [] replaceInArrayAt(
+            T replacedItem,
+            T @NotNull [] origItems,
+            int idx,
+            @Nullable Class<T> tClass
+    ) {
         // Make an array that big enough.  It's too bad that the JVM bothers to
         // initialize this with nulls.
         @SuppressWarnings("unchecked")
@@ -215,9 +223,12 @@ public final class Cowry {
      Only call this if the array actually needs to be split (0 &lt; splitPoint &lt; orig.length).
      @param orig array to split
      @param splitIndex items less than this index go in the left, equal or greater in the right.
-     @return a 2D array of leftItems then rightItems
+     @return a pair of leftItems and rightItems
      */
-    public static <T> Tuple2<T[],T[]> splitArray(T[] orig, int splitIndex) { //, Class<T> tClass) {
+    public static <T> @NotNull Tuple2<T @NotNull [],T @NotNull []> splitArray(
+            T @NotNull [] orig,
+            int splitIndex
+    ) { //, Class<T> tClass) {
 //        if (splitIndex < 1) {
 //            throw new IllegalArgumentException("Called split when splitIndex < 1");
 //        }
@@ -252,7 +263,10 @@ public final class Cowry {
      @param splitIndex items less than this index go in the left, equal or greater in the right.
      @return a 2D array of leftItems then rightItems
      */
-    public static int[][] splitArray(int[] orig, int splitIndex) {
+    public static int @NotNull [] @NotNull [] splitArray(
+            int @NotNull [] orig,
+            int splitIndex
+    ) {
         // This function started an exact duplicate of the one above, but for ints.
 //        if (splitIndex < 1) {
 //            throw new IllegalArgumentException("Called split when splitIndex < 1");

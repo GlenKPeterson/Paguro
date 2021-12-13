@@ -107,15 +107,15 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
 
     // A method call is slow, but it keeps the cast localized.
     @SuppressWarnings("unchecked")
-    private static <K> K k(Object[] array, int i) { return (K) array[i]; }
+    private static <K> K k(Object @NotNull [] array, int i) { return (K) array[i]; }
 
     // A method call is slow, but it keeps the cast localized.
     @SuppressWarnings("unchecked")
-    private static <V> V v(Object[] array, int i) { return (V) array[i]; }
+    private static <V> V v(Object @NotNull [] array, int i) { return (V) array[i]; }
 
     // A method call is slow, but it keeps the cast localized.
     @SuppressWarnings("unchecked")
-    private static <K,V> INode<K,V> iNode(Object[] array, int i) { return (INode<K,V>) array[i]; }
+    private static <K,V> INode<K,V> iNode(Object @NotNull [] array, int i) { return (INode<K,V>) array[i]; }
 
 
 //    interface IFn {}
@@ -131,7 +131,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
         return PersistentHashMap.<K,V>empty().mutable();
     }
 
-    public static <K,V> @NotNull PersistentHashMap<K,V> empty(Equator<K> e) {
+    public static <K,V> @NotNull PersistentHashMap<K,V> empty(@Nullable Equator<K> e) {
         return new PersistentHashMap<>(e, 0, null, false, null);
     }
 
@@ -292,8 +292,8 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
         return new MutHashMap<>(this);
     }
 
-    @NotNull
-    @Override public Option<UnmodMap.UnEntry<K,V>> entry(K key) {
+    @Override
+    public @NotNull Option<UnmodMap.UnEntry<K,V>> entry(K key) {
         if (key == null) {
             return hasNull ? Option.some(Tuple2.of(null, nullValue)) : Option.none();
         }
@@ -383,7 +383,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
     public static final class MutHashMap<K,V> extends AbstractUnmodMap<K,V>
             implements MutMap<K,V> {
 
-        private AtomicReference<Thread> edit;
+        private final AtomicReference<Thread> edit;
         private final Equator<K> equator;
         private INode<K,V> root;
         private int count;
@@ -484,8 +484,8 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
                              : rootIter;
         }
 
-        @NotNull
-        @Override public final MutHashMap<K,V> without(K key) {
+        @Override
+        public @NotNull MutHashMap<K,V> without(K key) {
             ensureEditable();
             if (key == null) {
                 if (!hasNull) return this;
@@ -504,13 +504,15 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
             return this;
         }
 
-        @Override public final PersistentHashMap<K,V> immutable() {
+        @Override
+        public @NotNull PersistentHashMap<K,V> immutable() {
             ensureEditable();
             edit.set(null);
             return new PersistentHashMap<>(equator, count, root, hasNull, nullValue);
         }
 
-        @Override public final int size() {
+        @Override
+        public int size() {
             ensureEditable();
             return count;
         }
@@ -550,10 +552,15 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
     private final static class ArrayNode<K,V> implements INode<K,V>, UnmodIterable<UnEntry<K,V>> {
         private final Equator<K> equator;
         int count;
-        final INode<K,V>[] array;
+        final INode<K,V> @NotNull [] array;
         final AtomicReference<Thread> edit;
 
-        ArrayNode(Equator<K> eq, AtomicReference<Thread> edit, int count, INode<K,V>[] array){
+        ArrayNode(
+                Equator<K> eq,
+                AtomicReference<Thread> edit,
+                int count,
+                INode<K,V> @NotNull [] array
+        ){
             this.equator = eq;
             this.array = array;
             this.edit = edit;
@@ -753,12 +760,12 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
 //            // For serializable.  Make sure to change whenever internal data format changes.
 //            private static final long serialVersionUID = 20160903192900L;
 
-            private final INode<K,V>[] array;
-            private Fn2<K, V, R> aFn;
+            private final INode<K,V> @NotNull [] array;
+            private final Fn2<K, V, R> aFn;
             private int i = 0;
             private UnmodIterator<R> nestedIter;
 
-            private Iter(INode<K,V>[] array, Fn2<K,V,R> aFn){
+            private Iter(INode<K,V> @NotNull [] array, Fn2<K,V,R> aFn){
                 this.array = array;
                 this.aFn = aFn;
             }
@@ -812,7 +819,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
                    edit + ")";
         }
 
-        final int index(int bit) { return Integer.bitCount(bitmap & (bit - 1)); }
+        int index(int bit) { return Integer.bitCount(bitmap & (bit - 1)); }
 
         BitmapIndexedNode(Equator<K> equator, AtomicReference<Thread> edit, int bitmap,
                           Object[] array) {
@@ -1394,7 +1401,7 @@ public static void main(String[] args){
 //        // For serializable.  Make sure to change whenever internal data format changes.
 //        private static final long serialVersionUID = 20160903192900L;
         final Object[] array;
-        private Fn2<K, V, R> aFn;
+        private final Fn2<K, V, R> aFn;
         private int mutableIndex = 0;
         private R nextEntry = null;
         private boolean absent = true;

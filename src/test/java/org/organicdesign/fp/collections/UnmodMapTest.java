@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.BiFunction;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -218,19 +219,19 @@ public class UnmodMapTest {
 
     @SuppressWarnings("deprecation")
     @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpCompute() { unMap.compute(null, null); }
+    public void unsupportedOpCompute() { unMap.compute(null, (s, i) -> i); }
 
     @SuppressWarnings("deprecation")
     @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpComputeIfAbsent() { unMap.computeIfAbsent(null, null); }
+    public void unsupportedOpComputeIfAbsent() { unMap.computeIfAbsent(null, s -> 1); }
 
     @SuppressWarnings("deprecation")
     @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpComputeIfPresent() { unMap.computeIfPresent(null, null); }
+    public void unsupportedOpComputeIfPresent() { unMap.computeIfPresent(null, (s, i) -> i); }
 
     @SuppressWarnings("deprecation")
     @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpMerge() { unMap.merge(null, null, null); }
+    public void unsupportedOpMerge() { unMap.merge(null, 99, (a, b) -> a); }
 
     @SuppressWarnings("deprecation")
     @Test (expected = UnsupportedOperationException.class)
