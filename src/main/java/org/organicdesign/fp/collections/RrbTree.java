@@ -973,7 +973,7 @@ involves changing more nodes than maybe necessary.
 
     private static final int HALF_STRICT_NODE_LENGTH = STRICT_NODE_LENGTH >> 1;
 
-    // (MIN_NODE_LENGTH + MAX_NODE_LENGTH) / 2 should equal STRICT_NODE_LENGTH so that they have the
+    // (MIN_NODE_LENGTH + MAX_NODE_LENGTH) / 2 should equal STRICT_NODE_LENGTH so that they have roughly the
     // same average node size to make the index interpolation easier.
     private static final int MIN_NODE_LENGTH = (STRICT_NODE_LENGTH+1) * 2 / 3;
     // Always check if less-than this.  Never if less-than-or-equal.  Cormen adds a -1 here and tests
