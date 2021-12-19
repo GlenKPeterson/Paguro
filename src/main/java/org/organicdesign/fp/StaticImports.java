@@ -85,8 +85,7 @@ public final class StaticImports {
     /**
      Returns a new PersistentHashMap of the given keys and their paired values.  Use the
      {@link StaticImports#tup(Object, Object)} method to define those key/value pairs briefly and
-     easily.  This data definition method is one of the few methods in this project that support
-     varargs.
+     easily.
 
      @param kvPairs Key/value pairs (to go into the map).  In the case of a duplicate key, later
      values in the input list overwrite the earlier ones.  The resulting map can contain zero or one
@@ -103,8 +102,7 @@ public final class StaticImports {
     /**
      Returns a new MutMap of the given keys and their paired values.  Use the
      {@link StaticImports#tup(Object, Object)} method to define those key/value pairs briefly and
-     easily.  This data definition method is one of the few methods in this project that support
-     varargs.
+     easily.
 
      @param kvPairs Key/value pairs (to go into the map).  In the case of a duplicate key, later
      values in the input list overwrite the earlier ones.  The resulting map can contain zero or one
@@ -126,12 +124,11 @@ public final class StaticImports {
 
     /**
      Returns a mutable RRB Tree {@link RrbTree} of the given items.
-     The RRB Tree is a list-type data structure that supports random inserts, split, and join
+     The RRB Tree is a list-type data structure that supports random inserts, split, join, and remove.
      (the PersistentVector does not).  The mutable RRB Tree append() method is only about half
-     as fast as the PersistentVector method of the same name.  If you build it entirely with random
-     inserts, then the RRB tree get() method may be about 5x slower.  Otherwise, performance
+     as fast as the PersistentVector method of the same name.
+     The RRB tree get() method may be about 5x slower.  Otherwise, performance
      is about the same.
-     This data definition method is one of the few methods in this project that support varargs.
      */
     @SafeVarargs
     public static <T> @NotNull MutRrbt<T> mutableRrb(T... items) {
@@ -141,9 +138,8 @@ public final class StaticImports {
     }
 
     /**
-     Returns a new MutSet of the values.  This data definition method is one of the few
-     methods in this project that support varargs.  If the input contains duplicate elements, later
-     values overwrite earlier ones.
+     * Returns a new MutSet of the values.  If the input contains duplicate elements, later
+     * values overwrite earlier ones.
      */
     @SafeVarargs
     public static <T> @NotNull MutSet<T> mutableSet(T... items) {
@@ -156,8 +152,8 @@ public final class StaticImports {
     }
 
     /**
-     Returns a MutVector of the given items.  This data definition method is one of the
-     few methods in this project that support varargs.
+     * Returns a MutVector of the given items.
+     * If you require inserts or join operations, use {@link #mutableRrb} instead.
      */
     @SafeVarargs
     public static <T> @NotNull MutList<T> mutableVec(T... items) {
@@ -171,12 +167,10 @@ public final class StaticImports {
 
     /**
      Returns a new immutable RRB Tree {@link ImRrbt} of the given items.  An RRB Tree
-     is an immutable list that supports random inserts, split, and join (the PersistentVector does
-     not).  If you build it entirely with random
-     inserts, then the RRB tree get() method may be about 5x slower.  Otherwise, performance
-     is about the same.
-
-     This data definition method is one of the few methods in this project that support varargs.
+     is an immutable vector (list) that supports random inserts, split, join, and remove
+     (the PersistentVector does not).
+     The RRB tree get() method may be about 5x slower.
+     Otherwise, performance is about the same.
      */
     @SafeVarargs
     static public <T> @NotNull ImRrbt<T> rrb(T... items) {
@@ -185,9 +179,8 @@ public final class StaticImports {
     }
 
     /**
-     Returns a new PersistentHashSet of the values.  This data definition method is one of the few
-     methods in this project that support varargs.  If the input contains duplicate elements, later
-     values overwrite earlier ones.
+     * Returns a new PersistentHashSet of the values.  If the input contains duplicate elements, later
+     * values overwrite earlier ones.
      */
     @SafeVarargs
     public static <T> @NotNull ImSet<T> set(T... items) {
@@ -254,8 +247,8 @@ public final class StaticImports {
     public static <T,U,V> @NotNull Tuple3<T,U,V> tup(T t, U u, V v) { return Tuple3.of(t, u, v); }
 
     /**
-     Returns a new PersistentVector of the given items.  This data definition method is one of the
-     few methods in this project that support varargs.
+     * Returns a new PersistentVector of the given items.
+     * If you require inserts or join operations, use {@link #rrb} instead.
      */
     @SafeVarargs
     static public <T> @NotNull ImList<T> vec(T... items) {

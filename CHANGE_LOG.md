@@ -5,6 +5,16 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
+### Release 3.7.0 2021-12-19
+ - RRB Tree .join() method appears to work after removing strict-node optimization.
+   Many thanks to hours of conversations with Andy Fingerhut @jafingerhut and for his
+   great unit tests and fixes.  Without his help, this would not have happened.
+   Choose wisely based on your write operations: If you're only doing appends, use PersistentVector as it's more efficient.
+   Inserts or joins, use RRB-Tree.
+ - PersistentVector.MutVector.replace() now works thanks to a bug report and unit test
+   from Axel Kramer @axkr.  The persistent version was unaffected by this issue.
+ - Added more @NotNull annotations, though there are still many more to add.
+
 ### Release 3.6.0 2021-09-21
 - Added back .add() and .addAll() methods to MutList.
   This is sort of an experiment to see if this is more helpful than dangerous.
