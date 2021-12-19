@@ -103,7 +103,6 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
      Returns a new mutable vector.  For some reason calling empty().mutable() sometimes requires
      an explicit type parameter in Java, so this convenience method works around that.
      */
-    @SuppressWarnings("unchecked")
     public static <T> MutVector<T> emptyMutable() {
         PersistentVector<T> e = empty();
         return e.mutable();
@@ -259,7 +258,7 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
     @Override public int size() { return size; }
 
     /**
-     * Inserts a new item at the end of the Vecsicle.
+     * Inserts a new item at the end of the vector
      * @param val the value to insert
      * @return a new Vecsicle with the additional item.
      */
@@ -327,7 +326,7 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
             // To match ArrayList and other java.util.List expectations
             throw new IndexOutOfBoundsException("Index: " + index);
         }
-        return new UnmodListIterator<E>() {
+        return new UnmodListIterator<>() {
             private int i = index;
             private int base = i - (i % MAX_NODE_LENGTH);
             private E[] array = (index < size()) ? leafNodeArrayFor(i) : null;
@@ -594,7 +593,6 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
         }
 
         // TODO: are these all node<F> or could this return a super-type of F?
-        @SuppressWarnings("unchecked")
         private Node pushTail(int level, Node parent, Node tailnode) {
             //if parent is leaf, insert node,
             // else does it map to an existing child? -> nodeToInsert = pushNode one more level
@@ -650,8 +648,11 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
                 if (i >= tailoff())
                     return tail;
                 Node node = root;
-                for (int level = shift; level > 0; level -= NODE_LENGTH_POW_2)
-                    node = ensureEditable((Node) node.array[(i >>> level) & LOW_BITS]);
+                for (int level = shift; level > 0; level -= NODE_LENGTH_POW_2) {
+                    int idx = (i >>> level) & LOW_BITS;
+                    node.array[idx] = ensureEditable((Node) node.array[idx]);
+                    node = (Node) node.array[idx];
+                }
                 return (F[]) node.array;
             }
             throw new IndexOutOfBoundsException();
