@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.organicdesign.fp.function.Fn0;
 
 /**
  This started out as Rich Hickey's PersistentVector class from Clojure in late 2014.  Glen added
@@ -287,6 +288,15 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
             newroot = pushTail(shift, root, tailnode);
         }
         return new PersistentVector<>(size + 1, newshift, newroot, (E[]) new Object[]{val});
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public @NotNull PersistentVector<E> appendWhen(
+            @NotNull Fn0<Boolean> test,
+            E e
+    ) {
+        return test.apply() ? append(e) : this;
     }
 
     /**
@@ -590,6 +600,15 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
             shift = newshift;
             ++size;
             return this;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public @NotNull MutList<F> appendWhen(
+                @NotNull Fn0<Boolean> test,
+                F e
+        ) {
+            return test.apply() ? append(e) : this;
         }
 
         // TODO: are these all node<F> or could this return a super-type of F?

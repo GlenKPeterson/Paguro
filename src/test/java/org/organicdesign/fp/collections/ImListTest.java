@@ -129,6 +129,15 @@ public class ImListTest {
         assertEquals(control.size(), test.size());
         assertEquals(control, test);
         TestUtilities.listIteratorTest(control, test);
+
+        test = test.appendWhen(() -> false, "hello");
+        assertEquals(control.size(), test.size());
+        assertEquals(control, test);
+
+        test = test.appendWhen(() -> true, "hello");
+        control.add("hello");
+        assertEquals(control.size(), test.size());
+        assertEquals(control, test);
     }
 
     @Test public void iteratorTest() {

@@ -15,6 +15,7 @@ package org.organicdesign.fp.collections;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.organicdesign.fp.function.Fn0;
 
 /** Immutable copy-on-write list */
 public interface ImList<E> extends BaseList<E> {
@@ -31,6 +32,15 @@ public interface ImList<E> extends BaseList<E> {
     /** {@inheritDoc} */
     @Override
     @NotNull ImList<E> append(E e);
+
+    /** {@inheritDoc} */
+    @Override
+    default @NotNull ImList<E> appendWhen(
+            @NotNull Fn0<Boolean> test,
+            E e
+    ) {
+        return test.apply() ? append(e) : this;
+    }
 
     /** {@inheritDoc} */
     @Override

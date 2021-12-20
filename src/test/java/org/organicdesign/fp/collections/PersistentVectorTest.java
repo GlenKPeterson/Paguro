@@ -379,6 +379,16 @@ public class PersistentVectorTest {
 
         TestUtilities.listIteratorTest(control, test);
         TestUtilities.listIteratorTest(control, serTest);
+
+
+        test = test.appendWhen(() -> false, -1);
+        assertEquals(control.size(), test.size());
+        assertEquals(control, test);
+
+        test = test.appendWhen(() -> true, -1);
+        control.add(-1);
+        assertEquals(control.size(), test.size());
+        assertEquals(control, test);
     }
 
     @Test public void testConcat() {

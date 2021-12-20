@@ -15,6 +15,7 @@ package org.organicdesign.fp.collections;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.organicdesign.fp.function.Fn0;
 
 import java.util.Collection;
 
@@ -29,6 +30,16 @@ public interface MutList<E> extends BaseList<E> {
     /** {@inheritDoc} */
     @Override
     @NotNull MutList<E> append(E val);
+
+
+    /** {@inheritDoc} */
+    @Override
+    default @NotNull MutList<E> appendWhen(
+            @NotNull Fn0<Boolean> test,
+            E e
+    ) {
+        return test.apply() ? append(e) : this;
+    }
 
     // TODO: Is this a good idea?  Kotlin does this...
     // I'm concerned that we cannot provide good implementations for all these methods.

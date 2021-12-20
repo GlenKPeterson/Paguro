@@ -56,6 +56,15 @@ public class MutListTest {
 
         assertEquals(control.size(), test.size());
         assertEquals(control, test);
+
+        test.appendWhen(() -> false, "hello");
+        assertEquals(control.size(), test.size());
+        assertEquals(control, test);
+
+        test.appendWhen(() -> true, "hello");
+        control.add("hello");
+        assertEquals(control.size(), test.size());
+        assertEquals(control, test);
     }
 
     @Test public void testOriginalMethods() {

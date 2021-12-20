@@ -13,19 +13,16 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
-import java.io.IOException;
-import java.io.InvalidObjectException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.organicdesign.fp.function.Fn0;
 import org.organicdesign.fp.indent.Indented;
 import org.organicdesign.fp.tuple.Tuple2;
 import org.organicdesign.fp.tuple.Tuple4;
+
+import java.io.*;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.organicdesign.fp.collections.Cowry.*;
 import static org.organicdesign.fp.indent.IndentUtils.arrayString;
@@ -122,6 +119,15 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
             focusLength++;
             size++;
             return this;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public @NotNull MutRrbt<E> appendWhen(
+                @NotNull Fn0<Boolean> test,
+                E e
+        ) {
+            return test.apply() ? append(e) : this;
         }
 
         /** {@inheritDoc} */
@@ -414,6 +420,15 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
 
         /** {@inheritDoc} */
         @Override
+        public @NotNull ImRrbt<E> appendWhen(
+                @NotNull Fn0<Boolean> test,
+                E e
+        ) {
+            return test.apply() ? append(e) : this;
+        }
+
+        /** {@inheritDoc} */
+        @Override
         public @NotNull ImRrbt<E> concat(@Nullable Iterable<? extends E> es) {
             return this.mutable().concat(es).immutable();
         }
@@ -601,6 +616,13 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
     /** {@inheritDoc} */
     @Override
     abstract public @NotNull RrbTree<E> append(E t);
+
+    /** {@inheritDoc} */
+    @Override
+    abstract public @NotNull RrbTree<E> appendWhen(
+            @NotNull Fn0<Boolean> test,
+            E e
+    );
 
     /** Internal validation method for testing. */
     abstract void debugValidate();

@@ -260,10 +260,12 @@ public class RrbTreeTest {
     @Test
     public void buildHetero() {
         RrbTree<Object> is = RrbTree.empty();
+        MutRrbt<Object> mut = MutRrbt.emptyMutable();
         ArrayList<Object> control = new ArrayList<>();
         ArrayList<Object> rands = new ArrayList<>();
         for (int i = 0; i < SEVERAL; i++) {
             is = is.append(heteroVal(i));
+            mut.append(heteroVal(i));
             control.add(heteroVal(i));
         }
         try {
@@ -271,20 +273,41 @@ public class RrbTreeTest {
                 int idx = rand.nextInt(is.size() + 1);
                 rands.add(idx);
                 is = is.insert(idx, heteroVal(j));
+                mut.insert(idx, heteroVal(j));
                 control.add(idx, heteroVal(j));
                 assertEquals(control.size(), is.size());
+                assertEquals(control.size(), mut.size());
                 assertEquals(heteroVal(j), is.get(idx));
+                assertEquals(heteroVal(j), mut.get(idx));
             }
             assertEquals(control.size(), is.size());
+            assertEquals(control.size(), mut.size());
             for (int j = 0; j < is.size(); j++) {
                 assertEquals(control.get(j), is.get(j));
+                assertEquals(control.get(j), mut.get(j));
             }
             is.debugValidate();
+            mut.debugValidate();
         } catch (Exception e) {
             System.out.println("rands:" + rands); // print before blowing up...
             // OK, now we can continue throwing exception.
             throw e;
         }
+
+        is = is.appendWhen(() -> false, "hello");
+        mut.appendWhen(() -> false, "hello");
+        assertEquals(control.size(), is.size());
+        assertEquals(control.size(), mut.size());
+        assertEquals(control, is);
+        assertEquals(control, mut);
+
+        is = is.appendWhen(() -> true, "hello");
+        mut = mut.appendWhen(() -> true, "hello");
+        control.add("hello");
+        assertEquals(control.size(), is.size());
+        assertEquals(control.size(), mut.size());
+        assertEquals(control, is);
+        assertEquals(control, mut);
     }
 
     @Test
@@ -316,6 +339,20 @@ public class RrbTreeTest {
         assertEquals(Integer.valueOf(4), rrb2.get(1));
         assertEquals(Integer.valueOf(4), rrb3.get(1));
         assertEquals(Integer.valueOf(3), rrb3.get(2));
+
+        rrb3 = rrb3.appendWhen(() -> false, 7);
+        assertEquals(0, rrb.size());
+        assertEquals(1, rrb1.size());
+        assertEquals(2, rrb2.size());
+        assertEquals(3, rrb3.size());
+
+        rrb3 = rrb3.appendWhen(() -> true, 7);
+        assertEquals(0, rrb.size());
+        assertEquals(1, rrb1.size());
+        assertEquals(2, rrb2.size());
+        assertEquals(4, rrb3.size());
+        assertEquals(Integer.valueOf(7), rrb3.get(3));
+
         rrb.debugValidate();
         rrb1.debugValidate();
         rrb2.debugValidate();

@@ -5,6 +5,9 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
+### Release 3.7.1 2021-12-20
+- Added BaseList.appendWhen() for fluent list building with optional additions.
+
 ### Release 3.7.0 2021-12-19
  - RRB Tree .join() method appears to work after removing strict-node optimization.
    Many thanks to hours of conversations with Andy Fingerhut @jafingerhut and for his

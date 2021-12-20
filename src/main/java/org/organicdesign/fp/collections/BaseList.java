@@ -15,6 +15,7 @@ package org.organicdesign.fp.collections;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.organicdesign.fp.function.Fn0;
 import org.organicdesign.fp.oneOf.Option;
 
 /**
@@ -29,6 +30,19 @@ public interface BaseList<E> extends UnmodList<E> {
      @return a new ImList with the additional item at the end.
      */
     @NotNull BaseList<E> append(E e);
+
+    /**
+     Adds one item to the end of the ImList.
+
+     @param e the value to insert
+     @return a new ImList with the additional item at the end.
+     */
+    default @NotNull BaseList<E> appendWhen(
+            @NotNull Fn0<Boolean> test,
+            E e
+    ) {
+        return test.apply() ? append(e) : this;
+    }
 
     /**
      Efficiently adds items to the end of this ImList.
