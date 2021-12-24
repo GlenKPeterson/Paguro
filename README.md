@@ -65,11 +65,8 @@ If you work with pure Java, or a mix of Java and Kotlin files, this is your bran
 If you want to live dangerously, try the all-Kotlin version in the 4.0 branch when it becomes available.
 
 # News
-## Don't use RrbTree.join()!
-@jafingerhut has found bugs in the RRB Tree join implementation.
-See [issue 31](https://github.com/GlenKPeterson/Paguro/issues/31) and [36](https://github.com/GlenKPeterson/Paguro/issues/36).
-I normally try to fix bugs promptly, this issue requires more thought!
-If anyone knows of a paper with a working algorithm for merging two n-ary BTrees, let us know!
+## RrbTree.join() seems to work now
+RrbTree is still a new class, but as of 3.7.2, there are no known bugs.  Fingers crossed!
 
 Check the [Change Log](CHANGE_LOG.md) for details of recent changes.
 

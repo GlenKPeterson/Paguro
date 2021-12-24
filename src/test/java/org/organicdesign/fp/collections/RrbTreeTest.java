@@ -13,6 +13,7 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.organicdesign.fp.StaticImports;
 import org.organicdesign.fp.TestUtilities;
@@ -516,7 +517,12 @@ public class RrbTreeTest {
 //        return true;
     }
 
-    private static <T> void testSplit(ArrayList<T> control, RrbTree<T> test, int splitIndex) {
+    private static <T> void testSplit(
+            @SuppressWarnings("rawtypes") @NotNull Class<? extends RrbTree> expectedClass,
+            @NotNull ArrayList<T> control,
+            @NotNull RrbTree<T> test,
+            int splitIndex
+    ) {
         if ( (splitIndex < 0) || (splitIndex > control.size()) ) {
             throw new IllegalArgumentException("Constraint violation failed: 1 <= splitIndex <= size");
         }
@@ -527,7 +533,15 @@ public class RrbTreeTest {
         List<T> leftControl = control.subList(0, splitIndex);
         List<T> rightControl = control.subList(splitIndex, control.size());
         RrbTree<T> leftSplit = split._1();
+        if (!expectedClass.isAssignableFrom(leftSplit.getClass())) {
+            fail("splitIndex " + splitIndex + " left " + leftSplit.getClass() +
+                    " not an instance of " + expectedClass);
+        }
         RrbTree<T> rightSplit = split._2();
+        if (!expectedClass.isAssignableFrom(rightSplit.getClass())) {
+            fail("splitIndex " + splitIndex + " right " + rightSplit.getClass() +
+                    " not an instance of " + expectedClass);
+        }
         if (isPrime(splitIndex)) {
             System.out.println("original=\n" + test.indentedStr(0));
             System.out.println("splitIndex=" + splitIndex);
@@ -550,7 +564,7 @@ public class RrbTreeTest {
             is = is.append(i);
             control.add(i);
         }
-        testSplit(control, is, 29);
+        testSplit(ImRrbt.class, control, is, 29);
     }
 
     @Test public void strictSplitTest() {
@@ -570,12 +584,12 @@ public class RrbTreeTest {
 //            int splitIndex = i; //rand.nextInt(is.size() + 1);
 //            System.out.println("splitIndex=" + splitIndex);
 //        System.out.println("empty=" + RrbTree.empty().indentedStr(6));
-                testSplit(control, is, splitIndex);
-                testSplit(control, ms, splitIndex);
+                testSplit(ImRrbt.class, control, is, splitIndex);
+                testSplit(MutRrbt.class, control, ms, splitIndex);
             }
             splitIndex = TWO_LEVEL_SZ;
-            testSplit(control, is, splitIndex);
-            testSplit(control, ms, splitIndex);
+            testSplit(ImRrbt.class, control, is, splitIndex);
+            testSplit(MutRrbt.class, control, ms, splitIndex);
         } catch (Exception e) {
             System.out.println("Bad splitIndex (im): " + splitIndex); // print before blowing up...
             System.out.println("before split (im): " + is.indentedStr(13)); // print before blowing up...
@@ -603,12 +617,12 @@ public class RrbTreeTest {
 //            System.out.println("is:" + is.indentedStr(3));
             for (int j = 0; j <= ONE_LEVEL_SZ; j+= ONE_LEVEL_SZ / 10) {
                 splitIndex = j; // So we have it when exception is thrown.
-                testSplit(control, is, splitIndex);
-                testSplit(control, ms, splitIndex);
+                testSplit(ImRrbt.class, control, is, splitIndex);
+                testSplit(MutRrbt.class, control, ms, splitIndex);
             }
             splitIndex = ONE_LEVEL_SZ;
-            testSplit(control, is, splitIndex);
-            testSplit(control, ms, splitIndex);
+            testSplit(ImRrbt.class, control, is, splitIndex);
+            testSplit(MutRrbt.class, control, ms, splitIndex);
         } catch (Exception e) {
             System.out.println("splitIndex:" + splitIndex + " rands:" + rands); // print before blowing up...
             // OK, now we can continue throwing exception.
@@ -936,7 +950,7 @@ public class RrbTreeTest {
     }
 
     /**
-     * New test submitted by J.A. Fingerhut
+     * Test submitted by J.A. Fingerhut
      */
     @Test public void joinMutableTest2() {
         int b = STRICT_NODE_LENGTH;
@@ -969,7 +983,7 @@ public class RrbTreeTest {
     }
 
     /**
-     * New test submitted by J.A. Fingerhut
+     * Test submitted by J.A. Fingerhut
      */
     @Test public void joinImTest2() {
         int b = STRICT_NODE_LENGTH;
@@ -1000,7 +1014,6 @@ public class RrbTreeTest {
         }
     }
 
-    @SuppressWarnings("deprecation")
     @Test public void testBiggerJoin() {
         ImRrbt<Integer> is = RrbTree.empty();
         MutRrbt<Integer> ms = RrbTree.emptyMutable();
@@ -1019,8 +1032,6 @@ public class RrbTreeTest {
         }
     }
 
-
-    @SuppressWarnings("deprecation")
     @Test public void testWithout() {
         assertEquals(rrb(1,2,3,5,6), rrb(1,2,3,4,5,6).without(3));
         assertEquals(mut(1,2,3,5,6), mut(1,2,3,4,5,6).without(3));

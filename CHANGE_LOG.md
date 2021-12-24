@@ -5,6 +5,10 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
+## Release 3.7.2 2021-12-20: Fix RrbTree.split()
+- Fixed Bug #47: "RrbTree.split() returns wrong type" and added test to prevent regressions.
+  Thank you, @fcurts, for reporting this!
+
 ### Release 3.7.1 2021-12-20
 - Added BaseList.appendWhen() for fluent list building with optional additions.
 

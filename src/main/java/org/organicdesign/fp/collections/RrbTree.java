@@ -561,7 +561,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         @Override public int size() { return size; }
 
         @Override
-        protected @NotNull MutRrbt<E> mt() { return emptyMutable(); }
+        protected @NotNull ImRrbt<E> mt() { return empty(); }
 
         /**
          Divides this RRB-Tree such that every index less-than the given index ends up in the left-hand
@@ -856,6 +856,7 @@ involves changing more nodes than maybe necessary.
      */
     protected abstract @NotNull RrbTree<E> makeNew(E @NotNull [] f, int fi, int fl, @NotNull Node<E> r, int s);
 
+    /** Creates a new empty ("M-T") tree of the appropriate (mutable/immutable) type. */
     protected abstract @NotNull RrbTree<E> mt();
 
     /** Internal method - do not use. */
