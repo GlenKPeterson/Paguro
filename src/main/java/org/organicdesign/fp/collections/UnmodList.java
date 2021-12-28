@@ -13,16 +13,12 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-
 import org.jetbrains.annotations.NotNull;
 import org.organicdesign.fp.function.Fn2;
+
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 
 /**
  Formalizes the return type of {@link java.util.Collections#unmodifiableList(List)}, deprecating
@@ -65,7 +61,10 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
      Apply the given function against all unique pairings of items in the list.  Does this belong on
      Fn2 instead of List?
      */
-    static <T> void permutations(List<T> items, Fn2<? super T,? super T,?> f) {
+    static <T> void permutations(
+            @NotNull List<T> items,
+            @NotNull Fn2<? super T,? super T,?> f
+    ) {
         for (int i = 0; i < items.size(); i++) {
             for (int j = i + 1; j < items.size(); j++) {
                 f.apply(items.get(i), items.get(j));
@@ -108,7 +107,7 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
      never go away because it's declared on java.util.Collection which List extends.  It still
      shouldn't be used.
 
-     If you need repeated or fast contains() tests, use a Set instead instead of a List.
+     If you need repeated or fast contains() tests, use a Set instead of a List.
      SortedSet.contains() has O(log2 n) performance.  HashSet.contains() has O(1) performance!
      If you truly need a one-shot contains test, iterate the list manually, or override the
      deprecation warning, but include a description of why you need to use a List instead of some
@@ -271,12 +270,12 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
             throw new IllegalArgumentException("fromIndex(" + fromIndex + ") > toIndex(" + toIndex +
                                                ")");
         }
-        // The text of this matches ArrayList
+        // This text matches ArrayList
         if (fromIndex < 0) { throw new IndexOutOfBoundsException("fromIndex = " + fromIndex); }
         if (toIndex > size()) { throw new IndexOutOfBoundsException("toIndex = " + toIndex); }
 
         final UnmodList<E> parent = this;
-        return new UnmodList<E>() {
+        return new UnmodList<>() {
             private final int size = toIndex - fromIndex;
 
             @Override public int size() { return size; }
@@ -297,17 +296,17 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
     default Object @NotNull [] toArray() { return UnmodSortedCollection.super.toArray(); }
 
     /**
-     This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for
-     backwards compatibility in some performance-critical situations.  If you need to create an
-     array (you almost always do) then the best way to use this method is:
-
-     <code>MyThing[] things = col.toArray(new MyThing[coll.size()]);</code>
-
-     Calling this method any other way causes unnecessary work to be done - an extra memory
-     allocation and potential garbage collection if the passed array is too small, extra effort to
-     fill the end of the array with nulls if it is too large.
-
-     {@inheritDoc}
+     * This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for
+     * backwards compatibility in some performance-critical situations.  If you need to create an
+     * array, the best way to use this method is:
+     *
+     * <code>MyThing[] things = col.toArray(new MyThing[coll.size()]);</code>
+     *
+     * Calling this method any other way causes unnecessary work to be done - memory
+     * allocation and potential garbage collection if the passed array is too small,
+     * the work of filling the end of the array with nulls if it is too large.
+     *
+     * {@inheritDoc}
      */
     @SuppressWarnings("SuspiciousToArrayCall")
     @Override

@@ -1,6 +1,8 @@
 package org.organicdesign.fp.collections;
 
-import java.util.Collections;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -21,14 +23,18 @@ public interface UnmodIterator<E> extends Iterator<E> {
 //E next()
 
     /** Not allowed - this is supposed to be unmodifiable */
-    @Override @Deprecated default void remove() {
+    @Override
+    @Deprecated
+    default void remove() {
         throw new UnsupportedOperationException("Modification attempted");
     }
 
     /** Instead of calling this directly, please use {@link #emptyUnmodIterator()} instead */
     enum UnIterator implements UnmodIterator<Object> {
         EMPTY {
-            @Override public boolean hasNext() { return false; }
+            @Override
+            @Contract(pure = true)
+            public boolean hasNext() { return false; }
             @Override public Object next() {
                 throw new NoSuchElementException("Can't call next() on an empty iterator");
             }
@@ -37,7 +43,7 @@ public interface UnmodIterator<E> extends Iterator<E> {
 
     /** Returns the empty unmodifiable iterator.*/
     @SuppressWarnings("unchecked")
-    static <T> UnmodIterator<T> emptyUnmodIterator() {
+    static <T> @NotNull UnmodIterator<T> emptyUnmodIterator() {
         return (UnmodIterator<T>) UnIterator.EMPTY;
     }
 }

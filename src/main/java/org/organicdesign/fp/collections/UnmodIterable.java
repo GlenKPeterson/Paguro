@@ -21,8 +21,8 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
     @SuppressWarnings("rawtypes") // Need raw types here.
     enum UnIterable implements UnmodIterable {
         EMPTY {
-            @NotNull
-            @Override public UnmodIterator iterator() { return UnmodIterator.emptyUnmodIterator(); }
+            @Override
+            public @NotNull UnmodIterator iterator() { return UnmodIterator.emptyUnmodIterator(); }
         }
     }
 
@@ -225,14 +225,4 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
         return iter.hasNext() ? Option.some(iter.next())
                               : Option.none();
     }
-
-//    /**
-//     The rest of this sequnce (all the items after its head).  This was originally called rest(),
-//     but when I renamed first() to head(), I renamed rest() to tail() so that it wouldn't mix
-//     metaphors.
-//     */
-//    @Deprecated
-//    default Transformable<T> tail() {
-//        return Xform.of(this).drop(1);
-//    }
 }
