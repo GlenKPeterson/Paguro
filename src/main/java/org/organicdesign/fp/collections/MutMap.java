@@ -14,42 +14,43 @@
 
 package org.organicdesign.fp.collections;
 
-import java.util.Map;
-
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Map;
 
 /**
  Interface for mutable (hash) map builder.
  */
 public interface MutMap<K,V> extends BaseUnsortedMap<K,V> {
     /** {@inheritDoc} */
-    @NotNull
     @Override
-    MutMap<K,V> assoc(K key, V val);
+    @Contract(mutates = "this")
+    @NotNull MutMap<K,V> assoc(K key, V val);
 
     /** {@inheritDoc} */
-    @NotNull
-    @Override default MutMap<K,V> assoc(@NotNull Map.Entry<K,V> entry) {
+    @Override
+    @Contract(mutates = "this")
+    default @NotNull MutMap<K,V> assoc(@NotNull Map.Entry<K,V> entry) {
         return assoc(entry.getKey(), entry.getValue());
     }
 
-
-    @NotNull
-    @Override default MutSet<Entry<K,V>> entrySet() {
+    @Override
+    default @NotNull MutSet<Entry<K,V>> entrySet() {
         return map(e -> (Map.Entry<K,V>) e).toMutSet();
     }
 
     /** Returns a mutable view of the keys contained in this map. */
-    @NotNull
-    @Override default MutSet<K> keySet() {
+    @Override
+    default @NotNull MutSet<K> keySet() {
         return map(e -> ((Map.Entry<K,V>) e).getKey()).toMutSet();
     }
 
     /** Returns an immutable version of this mutable map. */
-    ImMap<K,V> immutable();
+    @NotNull ImMap<K,V> immutable();
 
     /** {@inheritDoc} */
-    @NotNull
     @Override
-    MutMap<K,V> without(K key);
+    @Contract(mutates = "this")
+    @NotNull MutMap<K,V> without(K key);
 }

@@ -16,6 +16,7 @@ package org.organicdesign.fp.collections;
 import java.util.Map;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.organicdesign.fp.oneOf.Option;
 
 /**
@@ -55,7 +56,8 @@ public interface BaseMap<K,V> extends UnmodMap<K,V> {
     @Override default boolean containsKey(Object key) { return entry((K) key).isSome(); }
 
     @SuppressWarnings("unchecked")
-    @Override default V get(Object key) {
+    @Override
+    default @Nullable V get(Object key) {
         Option<UnEntry<K,V>> entry = entry((K) key);
         return entry.isSome() ? entry.get().getValue() : null;
     }

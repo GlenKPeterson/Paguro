@@ -94,7 +94,7 @@ public final class StaticImports {
      @return a new PersistentHashMap of the given key/value pairs
      */
     @SafeVarargs
-    public static <K,V> @NotNull ImMap<K,V> map(@Nullable Map.Entry<K,V>... kvPairs) {
+    public static <K,V> @NotNull ImMap<K,V> map(@Nullable Map.Entry<K,V> @Nullable ... kvPairs) {
         if ( (kvPairs == null) || (kvPairs.length < 1) ) { return PersistentHashMap.empty(); }
         return PersistentHashMap.of(Arrays.asList(kvPairs));
     }
@@ -111,7 +111,7 @@ public final class StaticImports {
      @return a new MutMap of the given key/value pairs
      */
     @SafeVarargs
-    public static <K,V> @NotNull MutMap<K,V> mutableMap(@Nullable Map.Entry<K,V>... kvPairs) {
+    public static <K,V> @NotNull MutMap<K,V> mutableMap(@Nullable Map.Entry<K,V> @Nullable ... kvPairs) {
         MutMap<K,V> ret = PersistentHashMap.emptyMutable();
         if (kvPairs == null) { return ret; }
         for (Map.Entry<K,V> me : kvPairs) {
@@ -131,7 +131,7 @@ public final class StaticImports {
      is about the same.
      */
     @SafeVarargs
-    public static <T> @NotNull MutRrbt<T> mutableRrb(T... items) {
+    public static <T> @NotNull MutRrbt<T> mutableRrb(T @Nullable ... items) {
         if ( (items == null) || (items.length < 1) ) { return RrbTree.emptyMutable(); }
         return RrbTree.<T>emptyMutable()
                 .concat(Arrays.asList(items));
@@ -142,7 +142,7 @@ public final class StaticImports {
      * values overwrite earlier ones.
      */
     @SafeVarargs
-    public static <T> @NotNull MutSet<T> mutableSet(T... items) {
+    public static <T> @NotNull MutSet<T> mutableSet(T @Nullable ... items) {
         MutSet<T> ret = PersistentHashSet.emptyMutable();
         if (items == null) { return ret; }
         for (T t : items) {
@@ -156,7 +156,7 @@ public final class StaticImports {
      * If you require inserts or join operations, use {@link #mutableRrb} instead.
      */
     @SafeVarargs
-    public static <T> @NotNull MutList<T> mutableVec(T... items) {
+    public static <T> @NotNull MutList<T> mutableVec(T @Nullable ... items) {
         MutList<T> ret = PersistentVector.emptyMutable();
         if (items == null) { return ret; }
         for (T t : items) {
@@ -173,7 +173,7 @@ public final class StaticImports {
      Otherwise, performance is about the same.
      */
     @SafeVarargs
-    static public <T> @NotNull ImRrbt<T> rrb(T... items) {
+    static public <T> @NotNull ImRrbt<T> rrb(T @Nullable ... items) {
         if ( (items == null) || (items.length < 1) ) { return RrbTree.empty(); }
         return mutableRrb(items).immutable();
     }
@@ -183,7 +183,7 @@ public final class StaticImports {
      * values overwrite earlier ones.
      */
     @SafeVarargs
-    public static <T> @NotNull ImSet<T> set(T... items) {
+    public static <T> @NotNull ImSet<T> set(T @Nullable ... items) {
         if ( (items == null) || (items.length < 1) ) { return PersistentHashSet.empty(); }
         return PersistentHashSet.of(Arrays.asList(items));
     }
@@ -251,7 +251,7 @@ public final class StaticImports {
      * If you require inserts or join operations, use {@link #rrb} instead.
      */
     @SafeVarargs
-    static public <T> @NotNull ImList<T> vec(T... items) {
+    static public <T> @NotNull ImList<T> vec(T @Nullable ... items) {
         if ( (items == null) || (items.length < 1) ) { return PersistentVector.empty(); }
         return mutableVec(items).immutable();
     }
@@ -280,9 +280,12 @@ public final class StaticImports {
 //    }
 //
     /** Wrap a String (or CharSequence) to perform a Character-by-Character transformation on it. */
-    public static @NotNull UnmodIterable<Character> xformChars(CharSequence seq) {
+    public static @NotNull UnmodIterable<Character> xformChars(@Nullable CharSequence seq) {
+
         //noinspection Convert2Lambda
-        return new UnmodIterable<>() {
+        return (seq == null)
+                ? UnmodIterable.emptyUnmodIterable()
+                : new UnmodIterable<>() {
             @NotNull
             @Override
             public UnmodIterator<Character> iterator() {
