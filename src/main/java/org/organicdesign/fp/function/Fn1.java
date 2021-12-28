@@ -14,18 +14,20 @@
 
 package org.organicdesign.fp.function;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.organicdesign.fp.collections.UnmodIterable;
+import org.organicdesign.fp.oneOf.Option;
+import org.organicdesign.fp.oneOf.Or;
+import org.organicdesign.fp.xform.Transformable;
+import org.organicdesign.fp.xform.Xform;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import org.organicdesign.fp.oneOf.Option;
-import org.organicdesign.fp.collections.UnmodIterable;
-import org.organicdesign.fp.oneOf.Or;
-import org.organicdesign.fp.xform.Transformable;
-import org.organicdesign.fp.xform.Xform;
 
 /**
  This is like Java 8's java.util.function.Function, but retrofitted to turn checked exceptions
@@ -46,7 +48,7 @@ public interface Fn1<T,U> extends Function<T,U>, Consumer<T> {
 
             @SuppressWarnings({"unchecked", "TypeParameterExplicitlyExtendsObject"})
             @Override
-            public <S> Fn1<S,Object> compose(Fn1<? super S,? extends Object> f) {
+            public <S> @NotNull Fn1<S,Object> compose(@NotNull Fn1<? super S,? extends Object> f) {
                 // Composing any function with the identity function has no effect on the original
                 // function (by definition of identity) - just return it.
                 return (Fn1<S,Object>) f;
@@ -61,7 +63,8 @@ public interface Fn1<T,U> extends Function<T,U>, Consumer<T> {
          this predicate.
          */
         ACCEPT {
-            @Override public Boolean applyEx (Object ignored) throws Exception {
+            @Override
+            public @NotNull Boolean applyEx(Object ignored) throws Exception {
                 return Boolean.TRUE;
             }
         },
@@ -71,16 +74,17 @@ public interface Fn1<T,U> extends Function<T,U>, Consumer<T> {
          this predicate.
          */
         REJECT {
-            @Override public Boolean applyEx (Object ignored) throws Exception {
+            @Override
+            public @NotNull Boolean applyEx(Object ignored) throws Exception {
                 return Boolean.FALSE;
             }
         }
     }
 
     @SuppressWarnings("unchecked")
-    static <V> Fn1<V,V> identity() { return (Fn1<V,V>) ConstObjObj.IDENTITY; }
+    static <V> @NotNull Fn1<V,V> identity() { return (Fn1<V,V>) ConstObjObj.IDENTITY; }
 
-    static <S> Fn1<S,Boolean> or(Fn1<S,Boolean> a, Fn1<S,Boolean> b) {
+    static <S> @NotNull Fn1<S,Boolean> or(@NotNull Fn1<S,Boolean> a, @NotNull Fn1<S,Boolean> b) {
         // Composition is not necessary in every case:
         return a == ConstObjBool.ACCEPT ? a : // If any are true, all are true.
                a == ConstObjBool.REJECT ? b : // return whatever b is.
@@ -89,7 +93,7 @@ public interface Fn1<T,U> extends Function<T,U>, Consumer<T> {
                (S s) -> (a.apply(s) == Boolean.TRUE) || (b.apply(s) == Boolean.TRUE); // compose
     }
 
-    static <S> Fn1<S,Boolean> and(Fn1<S,Boolean> a, Fn1<S,Boolean> b) {
+    static <S> @NotNull Fn1<S,Boolean> and(@NotNull Fn1<S,Boolean> a, @NotNull Fn1<S,Boolean> b) {
         // Composition is not necessary in every case:
         return a == ConstObjBool.ACCEPT ? b : // return whatever b is.
                a == ConstObjBool.REJECT ? a : // if any are false, all are false.
@@ -98,7 +102,7 @@ public interface Fn1<T,U> extends Function<T,U>, Consumer<T> {
                (S s) -> (a.apply(s) == Boolean.TRUE) && (b.apply(s) == Boolean.TRUE); // compose
     }
 
-    static <S> Fn1<S,Boolean> negate(Fn1<? super S,Boolean> a) {
+    static <S> @NotNull Fn1<S,Boolean> negate(@NotNull Fn1<? super S,Boolean> a) {
         return a == ConstObjBool.ACCEPT ? reject() :
                a == ConstObjBool.REJECT ? accept() :
                (S s) -> (a.apply(s) == Boolean.TRUE) ? Boolean.FALSE : Boolean.TRUE;
@@ -108,11 +112,11 @@ public interface Fn1<T,U> extends Function<T,U>, Consumer<T> {
      * Returns a type-safe version of the {@link ConstObjBool#ACCEPT} predicate.
      */
     @SuppressWarnings("unchecked")
-    static <T> Fn1<T,Boolean> accept() { return (Fn1<T,Boolean>) ConstObjBool.ACCEPT; }
+    static <T> @NotNull Fn1<T,Boolean> accept() { return (Fn1<T,Boolean>) ConstObjBool.ACCEPT; }
 
     /** Returns a type-safe version of the {@link ConstObjBool#REJECT} predicate. */
     @SuppressWarnings("unchecked")
-    static <T> Fn1<T,Boolean> reject() { return (Fn1<T,Boolean>) ConstObjBool.REJECT; }
+    static <T> @NotNull Fn1<T,Boolean> reject() { return (Fn1<T,Boolean>) ConstObjBool.REJECT; }
 
     /**
      Composes multiple functions into a single function to potentially minimize trips through
@@ -148,13 +152,13 @@ public interface Fn1<T,U> extends Function<T,U>, Consumer<T> {
      providing, along the lines of the and() helper function in Filter()
 
      @param in the functions to applyEx in order.  Nulls and IDENTITY functions are ignored.
-     No functions means IDENTITY.
+     No functions: returns IDENTITY.
 
      @param <V> the type of object to chain functions on
 
      @return a function which applies all the given functions in order.
      */
-    static <V> Fn1<V,V> compose(Iterable<Fn1<V,V>> in) {
+    static <V> @NotNull Fn1<V,V> compose(@Nullable Iterable<@Nullable Fn1<V,V>> in) {
         if (in == null) {
             return identity();
         }
@@ -166,7 +170,7 @@ public interface Fn1<T,U> extends Function<T,U>, Consumer<T> {
             out.add(f);
         }
         if (out.size() < 1) {
-            return identity(); // No functions means to return the original item
+            return identity(); // No functions: return the original item
         } else if (out.size() == 1) {
             return out.get(0);
         } else {
@@ -189,13 +193,13 @@ public interface Fn1<T,U> extends Function<T,U>, Consumer<T> {
 
      @param in the predicates to test in order.  Nulls and ACCEPT predicates are ignored.  Any
      REJECT predicate will cause this entire method to return a single REJECT predicate.  No
-     predicates means ACCEPT.
+     predicates: returns ACCEPT.
 
      @param <T> the type of object to predicate on.
 
      @return a predicate which returns true if all input predicates return true, false otherwise.
      */
-    static <T> Fn1<T,Boolean> and(Iterable<Fn1<T,Boolean>> in) {
+    static <T> @NotNull Fn1<T,Boolean> and(@Nullable Iterable<@Nullable Fn1<T,Boolean>> in) {
         if (in == null) { return accept(); }
 
         Transformable<Fn1<T,Boolean>> v =
@@ -221,14 +225,14 @@ public interface Fn1<T,U> extends Function<T,U>, Consumer<T> {
 
      @param in the predicates to test in order.  Nulls and REJECT predicates are ignored.  Any
      ACCEPT predicate will cause this entire method to return the ACCEPT predicate.
-     No predicates means REJECT.
+     No predicates: returns REJECT.
 
      @param <T> the type of object to predicate on.
 
      @return a predicate which returns true if any of the input predicates return true,
      false otherwise.
      */
-    static <T> Fn1<T,Boolean> or(Iterable<Fn1<T,Boolean>> in) {
+    static <T> @NotNull Fn1<T,Boolean> or(@Nullable Iterable<@Nullable Fn1<T,Boolean>> in) {
         if (in == null) { return reject(); }
 
         Transformable<Fn1<T,Boolean>> v =
@@ -267,7 +271,7 @@ public interface Fn1<T,U> extends Function<T,U>, Consumer<T> {
      will return identical output very quickly.  Please note that the return values from f need to
      implement equals() and hashCode() correctly for this to work correctly and quickly.
      */
-    static <A,B> Fn1<A,B> memoize(Fn1<A,B> f) {
+    static <A,B> @NotNull Fn1<A,B> memoize(@NotNull Fn1<A,B> f) {
         return new Fn1<>() {
             private final Map<A,Option<B>> memo = new HashMap<>();
             @Override
@@ -301,7 +305,7 @@ public interface Fn1<T,U> extends Function<T,U>, Consumer<T> {
     @Override default void accept(T t) { apply(t); }
 
     @SuppressWarnings("unchecked")
-    default <S> Fn1<S,U> compose(final Fn1<? super S, ? extends T> f) {
+    default <S> @NotNull Fn1<S,U> compose(final @NotNull Fn1<? super S, ? extends T> f) {
         if (f == ConstObjObj.IDENTITY) {
             // This violates type safety, but makes sense - composing any function with the
             // identity function should return the original function unchanged.  If you mess up the
