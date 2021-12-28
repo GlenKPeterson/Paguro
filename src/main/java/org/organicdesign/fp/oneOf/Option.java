@@ -13,6 +13,8 @@
 
 package org.organicdesign.fp.oneOf;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.function.Fn0;
 import org.organicdesign.fp.function.Fn1;
@@ -21,9 +23,12 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- Indicates presence or absence of a value (null is a valid, present value).  None often means "end of stream" or
- "none found". This is NOT a type-safe null (unless you want that, in which case use the
- {@link #someOrNullNoneOf(Object)} static factory method).  You can think of this class as OneOf1OrNone.
+ * Indicates presence or absence of a value (null is a valid, present value).
+ * None often means "end of stream" or "none found".
+ * This is NOT a type-safe null (unless you want that, in which case use the
+ * {@link #someOrNullNoneOf(Object)} static factory method).
+ * You can think of this class as OneOf1OrNone.
+ * Use {@link Or} instead of Option for chaining options or for returning an error.
  */
 public interface Option<T> extends Serializable { // extends UnmodSortedIterable<T> {
 
@@ -46,7 +51,7 @@ public interface Option<T> extends Serializable { // extends UnmodSortedIterable
     boolean isSome();
 
     /** Pass in a function to execute if its Some and another to execute if its None. */
-    <U> U match(Fn1<T,U> has, Fn0<U> hasNot);
+    <U> U match(@NotNull Fn1<T,U> has, @NotNull Fn0<U> hasNot);
 
     // ========================================== Static ==========================================
 
@@ -54,27 +59,13 @@ public interface Option<T> extends Serializable { // extends UnmodSortedIterable
     @SuppressWarnings("unchecked")
     static <T> Option<T> none() { return None.NONE; }
 
-    /**
-     Would {@link #some(Object)} be better for your purposes?  For some reason, this returns none
-     if you pass it a none.  This is like flatmapping Options.  Is this good for chaining or
-     is this just weird?  If the first, I'm going to rename it flatten() or flatmap() or something.
-     If the second, it should be deleted.  Remember, you also have {@link Or} for chaining or
-     returning an error which is probably a better choice than Option for that kind of thing.
-     */
-    @Deprecated static <T> Option<T> of(T t) {
-        if (None.NONE.equals(t)) {
-            return none();
-        }
-        return new Some<>(t);
-    }
-
     /** Public static factory method for constructing the Some Option. */
-    static <T> Option<T> some(T t) {
+    static <T> @NotNull Option<T> some(T t) {
         return new Some<>(t);
     }
 
     /** Construct an option, but if t is null, make it None instead of Some. */
-    static <T> Option<T> someOrNullNoneOf(T t) {
+    static <T> @NotNull Option<T> someOrNullNoneOf(@Nullable T t) {
         if ( (t == null) || None.NONE.equals(t) ) {
             return none();
         }
@@ -89,8 +80,6 @@ public interface Option<T> extends Serializable { // extends UnmodSortedIterable
         private final T item;
         private Some(T t) { item = t; }
 
-        //public static Some<T> of(T t) { return new Option(t); }
-
         /** {@inheritDoc} */
         @Override public T get() { return item; }
 
@@ -101,29 +90,21 @@ public interface Option<T> extends Serializable { // extends UnmodSortedIterable
         @Override public boolean isSome() { return true; }
 
         /** {@inheritDoc} */
-        @Override public String toString() { return "Some(" + FunctionUtils.stringify(item) + ")"; }
-//
-//        @Override public UnmodSortedIterator<T> iterator() {
-//            return new UnmodSortedIterator<T>() {
-//                private boolean hasNext = true;
-//                @Override public boolean hasNext() { return hasNext; }
-//                @Override public T next() {
-//                    if (hasNext) {
-//                        hasNext = false;
-//                        return item;
-//                    }
-//                    throw new NoSuchElementException();
-//                }
-//            };
-//        }
+        @Override
+        public @NotNull String toString() { return "Some(" + FunctionUtils.stringify(item) + ")"; }
 
         /** {@inheritDoc} */
-        @Override public <U> U match(Fn1<T,U> has, Fn0<U> hasNot) {
+        @Override
+        public <U> U match(
+                @NotNull Fn1<T,U> has,
+                @NotNull Fn0<U> hasNot
+        ) {
             return has.apply(item);
         }
 
         /** {@inheritDoc} */
-        @Override public <U> Option<U> then(Fn1<T,Option<U>> f) { return f.apply(item); }
+        @Override
+        public <U> Option<U> then(@NotNull Fn1<T,Option<U>> f) { return f.apply(item); }
 
         /** Valid, but deprecated because it's usually an error to call this in client code. */
         @Deprecated // Has no effect.  Darn!

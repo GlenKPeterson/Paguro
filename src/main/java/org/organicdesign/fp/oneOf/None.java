@@ -1,5 +1,6 @@
 package org.organicdesign.fp.oneOf;
 
+import org.jetbrains.annotations.NotNull;
 import org.organicdesign.fp.function.Fn0;
 import org.organicdesign.fp.function.Fn1;
 
@@ -14,26 +15,25 @@ public final class None<T> implements Option<T> {
 
     /** Generic version of the singleton instance. */
     @SuppressWarnings("unchecked")
-    public static <T> None<T> none() { return (None<T>) NONE; }
+    public static <T> @NotNull None<T> none() { return (None<T>) NONE; }
 
     /** Private constructor for singleton. */
     private None() {}
 
     /** {@inheritDoc} */
-    @Override public T get() { throw new IllegalStateException("Called get on None"); }
+    @Override public @NotNull T get() { throw new IllegalStateException("Called get on None"); }
 
     /** {@inheritDoc} */
     @Override public T getOrElse(T t) { return t; }
 
     /** {@inheritDoc} */
     @Override public boolean isSome() { return false; }
-//
-//        @Override public UnmodSortedIterator<T> iterator() {
-//            return UnmodSortedIterator.empty();
-//        }
 
     /** {@inheritDoc} */
-    @Override public <U> U match(Fn1<T,U> has, Fn0<U> hasNot) {
+    @Override public <U> U match(
+            @NotNull Fn1<T,U> has,
+            @NotNull Fn0<U> hasNot
+    ) {
         return hasNot.get();
     }
 
@@ -47,11 +47,12 @@ public final class None<T> implements Option<T> {
     /** Valid, but deprecated because it's usually an error to call this in client code. */
     @Deprecated // Has no effect.  Darn!
     @Override public boolean equals(Object other) {
-        return (this == other) || (other instanceof org.organicdesign.fp.oneOf.None);
+        return other instanceof org.organicdesign.fp.oneOf.None;
     }
 
     /** Defend our singleton property in the face of deserialization. */
-    private Object readResolve() { return NONE; }
+    private @NotNull Object readResolve() { return NONE; }
 
-    @Override public String toString() { return "None"; }
+    @Override
+    public @NotNull String toString() { return "None"; }
 }

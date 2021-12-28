@@ -94,7 +94,7 @@ public class OptionTest {
 
         equalsDistinctHashCode(o1a, o1b, o1c, Option.none());
 
-        @SuppressWarnings("deprecation") Option<Integer> weird = Option.of(1);
+        Option<Integer> weird = Option.some(1);
 
         equalsDistinctHashCode(o1a, o1b, weird, Option.none());
 
@@ -105,7 +105,7 @@ public class OptionTest {
         Option<Integer> z = Option.some(null);
         Option<Integer> n1 = Option.none();
         Option<Integer> n2 = Option.someOrNullNoneOf(null);
-        @SuppressWarnings("deprecation") Option n3 = Option.of(None.NONE);
+        Option n3 = Option.none();
 
         assertTrue(n1 == n2);
         assertTrue(n2 == n3);
