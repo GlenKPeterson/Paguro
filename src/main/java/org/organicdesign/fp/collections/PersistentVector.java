@@ -19,9 +19,11 @@ import java.io.Serializable;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.organicdesign.fp.function.Fn0;
+import org.organicdesign.fp.oneOf.Option;
 
 /**
  This started out as Rich Hickey's PersistentVector class from Clojure in late 2014.  Glen added
@@ -292,11 +294,13 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
 
     /** {@inheritDoc} */
     @Override
-    public @NotNull PersistentVector<E> appendWhen(
-            @NotNull Fn0<Boolean> test,
-            E e
+    public @NotNull PersistentVector<E> appendSome(
+            @NotNull Fn0<Option<E>> supplier
     ) {
-        return test.apply() ? append(e) : this;
+        return supplier.apply().match(
+                (it) -> append(it),
+                () -> this
+        );
     }
 
     /**
@@ -573,6 +577,7 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
 
         @SuppressWarnings("unchecked")
         @Override
+        @Contract(mutates = "this")
         public @NotNull MutList<F> append(F val) {
             ensureEditable();
             int i = size;
@@ -604,11 +609,14 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
 
         /** {@inheritDoc} */
         @Override
-        public @NotNull MutList<F> appendWhen(
-                @NotNull Fn0<Boolean> test,
-                F e
+        @Contract(mutates = "this")
+        public @NotNull MutList<F> appendSome(
+                @NotNull Fn0<@NotNull Option<F>> supplier
         ) {
-            return test.apply() ? append(e) : this;
+            return supplier.apply().match(
+                    (it) -> append(it),
+                    () -> this
+            );
         }
 
         // TODO: are these all node<F> or could this return a super-type of F?
@@ -684,6 +692,7 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
         }
 
         @Override
+        @Contract(mutates = "this")
         public @NotNull MutList<F> replace(int idx, F e) {
             ensureEditable();
             F[] node = editableArrayFor(idx);

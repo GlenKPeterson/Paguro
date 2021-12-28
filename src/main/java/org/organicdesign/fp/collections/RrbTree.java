@@ -13,10 +13,12 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.organicdesign.fp.function.Fn0;
 import org.organicdesign.fp.indent.Indented;
+import org.organicdesign.fp.oneOf.Option;
 import org.organicdesign.fp.tuple.Tuple2;
 import org.organicdesign.fp.tuple.Tuple4;
 
@@ -95,6 +97,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         /** {@inheritDoc} */
         @SuppressWarnings("unchecked")
         @Override
+        @Contract(mutates = "this")
         public @NotNull MutRrbt<E> append(E val) {
             // If our focus isn't set up for appends or if it's full, insert it into the data structure
             // where it belongs.  Then make a new focus
@@ -123,15 +126,19 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
 
         /** {@inheritDoc} */
         @Override
-        public @NotNull MutRrbt<E> appendWhen(
-                @NotNull Fn0<Boolean> test,
-                E e
+        @Contract(mutates = "this")
+        public @NotNull MutRrbt<E> appendSome(
+                @NotNull Fn0<Option<E>> supplier
         ) {
-            return test.apply() ? append(e) : this;
+            return supplier.apply().match(
+                    (it) -> append(it),
+                    () -> this
+            );
         }
 
         /** {@inheritDoc} */
         @Override
+        @Contract(mutates = "this")
         public @NotNull MutRrbt<E> concat(@Nullable Iterable<? extends E> es) {
             return (MutRrbt<E>) MutList.super.concat(es);
         }
@@ -202,6 +209,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
 
         /** {@inheritDoc} */
         @Override
+        @Contract(mutates = "this")
         public @NotNull MutRrbt<E> insert(int idx, E element)  {
             // If the focus is full, push it into the tree and make a new one with the new element.
             if (focusLength >= STRICT_NODE_LENGTH) {
@@ -295,6 +303,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
 
         /** {@inheritDoc} */
         @Override
+        @Contract(mutates = "this")
         public @NotNull MutRrbt<E> replace(int index, E item) {
             if ( (index < 0) || (index > size) ) {
                 throw new IndexOutOfBoundsException("Index: " + index + " size: " + size);
@@ -420,11 +429,13 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
 
         /** {@inheritDoc} */
         @Override
-        public @NotNull ImRrbt<E> appendWhen(
-                @NotNull Fn0<Boolean> test,
-                E e
+        public @NotNull ImRrbt<E> appendSome(
+                @NotNull Fn0<Option<E>> supplier
         ) {
-            return test.apply() ? append(e) : this;
+            return supplier.apply().match(
+                    (it) -> append(it),
+                    () -> this
+            );
         }
 
         /** {@inheritDoc} */
@@ -619,9 +630,8 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
 
     /** {@inheritDoc} */
     @Override
-    abstract public @NotNull RrbTree<E> appendWhen(
-            @NotNull Fn0<Boolean> test,
-            E e
+    abstract public @NotNull RrbTree<E> appendSome(
+            @NotNull Fn0<Option<E>> supplier
     );
 
     /** Internal validation method for testing. */

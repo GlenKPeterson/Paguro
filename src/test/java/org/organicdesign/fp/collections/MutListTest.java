@@ -9,15 +9,17 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.FunctionUtils.ordinal;
+import static org.organicdesign.fp.oneOf.None.none;
+import static org.organicdesign.fp.oneOf.Option.some;
 
 /**
  Created by gpeterso on 9/14/16.
  */
 public class MutListTest {
     static class TestList<E> implements MutList<E> {
-        private List<E> inner = new ArrayList<>();
+        private final @NotNull List<E> inner;
 
-        TestList(List<E> ls) { inner = ls; }
+        TestList(@NotNull List<E> ls) { inner = ls; }
 
         @Override public @NotNull MutList<E> append(E val) {
             inner.add(val);
@@ -57,11 +59,11 @@ public class MutListTest {
         assertEquals(control.size(), test.size());
         assertEquals(control, test);
 
-        test.appendWhen(() -> false, "hello");
+        test = test.appendSome(() -> none());
         assertEquals(control.size(), test.size());
         assertEquals(control, test);
 
-        test.appendWhen(() -> true, "hello");
+        test = test.appendSome(() -> some("hello"));
         control.add("hello");
         assertEquals(control.size(), test.size());
         assertEquals(control, test);

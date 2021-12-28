@@ -19,6 +19,7 @@ import org.organicdesign.fp.StaticImports;
 import org.organicdesign.fp.TestUtilities;
 import org.organicdesign.fp.collections.RrbTree.ImRrbt;
 import org.organicdesign.fp.collections.RrbTree.MutRrbt;
+import org.organicdesign.fp.oneOf.Option;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import java.util.*;
@@ -28,6 +29,8 @@ import static org.organicdesign.fp.StaticImports.xform;
 import static org.organicdesign.fp.TestUtilities.compareIterators;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 import static org.organicdesign.fp.collections.RrbTree.STRICT_NODE_LENGTH;
+import static org.organicdesign.fp.oneOf.Option.none;
+import static org.organicdesign.fp.oneOf.Option.some;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -295,15 +298,15 @@ public class RrbTreeTest {
             throw e;
         }
 
-        is = is.appendWhen(() -> false, "hello");
-        mut.appendWhen(() -> false, "hello");
+        is = is.appendSome(() -> none());
+        mut.appendSome(() -> none());
         assertEquals(control.size(), is.size());
         assertEquals(control.size(), mut.size());
         assertEquals(control, is);
         assertEquals(control, mut);
 
-        is = is.appendWhen(() -> true, "hello");
-        mut = mut.appendWhen(() -> true, "hello");
+        is = is.appendSome(() -> some("hello"));
+        mut = mut.appendSome(() -> some("hello"));
         control.add("hello");
         assertEquals(control.size(), is.size());
         assertEquals(control.size(), mut.size());
@@ -341,13 +344,13 @@ public class RrbTreeTest {
         assertEquals(Integer.valueOf(4), rrb3.get(1));
         assertEquals(Integer.valueOf(3), rrb3.get(2));
 
-        rrb3 = rrb3.appendWhen(() -> false, 7);
+        rrb3 = rrb3.appendSome(() -> none());
         assertEquals(0, rrb.size());
         assertEquals(1, rrb1.size());
         assertEquals(2, rrb2.size());
         assertEquals(3, rrb3.size());
 
-        rrb3 = rrb3.appendWhen(() -> true, 7);
+        rrb3 = rrb3.appendSome(() -> some(7));
         assertEquals(0, rrb.size());
         assertEquals(1, rrb1.size());
         assertEquals(2, rrb2.size());
@@ -750,10 +753,10 @@ public class RrbTreeTest {
     @Test public void equalsAndHashCode() {
         List<Integer> control = Arrays.asList(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
         ImRrbt<Integer> rrb1 =
-                xform(control).fold(RrbTree.<Integer>empty(),
+                xform(control).fold(RrbTree.empty(),
                                     (accum, item) -> accum.append(item));
         MutRrbt<Integer> rrb2 =
-                xform(control).fold(RrbTree.<Integer>emptyMutable(),
+                xform(control).fold(RrbTree.emptyMutable(),
                                     (accum, item) -> accum.append(item));
 
         List<Integer> other = Arrays.asList(1,3,2,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
@@ -766,10 +769,10 @@ public class RrbTreeTest {
         List<Integer> hasNull = Arrays.asList(1,2,3,4,5,6,null,8,9,10,11,12,13,14,15,16,17,18,19,20);
 
         ImRrbt<Integer> rrb3 =
-                xform(hasNull).fold(RrbTree.<Integer>empty(),
+                xform(hasNull).fold(RrbTree.empty(),
                                     (accum, item) -> accum.append(item));
         MutRrbt<Integer> rrb4 =
-                xform(hasNull).fold(RrbTree.<Integer>emptyMutable(),
+                xform(hasNull).fold(RrbTree.emptyMutable(),
                                     (accum, item) -> accum.append(item));
 
         equalsDistinctHashCode(rrb3, rrb4, hasNull, other);

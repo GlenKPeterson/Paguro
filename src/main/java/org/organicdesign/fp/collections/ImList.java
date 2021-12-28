@@ -16,6 +16,7 @@ package org.organicdesign.fp.collections;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.organicdesign.fp.function.Fn0;
+import org.organicdesign.fp.oneOf.Option;
 
 /** Immutable copy-on-write list */
 public interface ImList<E> extends BaseList<E> {
@@ -35,11 +36,13 @@ public interface ImList<E> extends BaseList<E> {
 
     /** {@inheritDoc} */
     @Override
-    default @NotNull ImList<E> appendWhen(
-            @NotNull Fn0<Boolean> test,
-            E e
+    default @NotNull ImList<E> appendSome(
+            @NotNull Fn0<Option<E>> supplier
     ) {
-        return test.apply() ? append(e) : this;
+        return supplier.apply().match(
+                (it) -> append(it),
+                () -> this
+        );
     }
 
     /** {@inheritDoc} */

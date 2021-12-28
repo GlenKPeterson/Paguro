@@ -19,17 +19,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.organicdesign.fp.TestUtilities;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.StaticImports.vec;
 import static org.organicdesign.fp.TestUtilities.compareIterators;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 import static org.organicdesign.fp.collections.PersistentVector.emptyMutable;
+import static org.organicdesign.fp.oneOf.Option.none;
+import static org.organicdesign.fp.oneOf.Option.some;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 @RunWith(JUnit4.class)
@@ -381,11 +380,11 @@ public class PersistentVectorTest {
         TestUtilities.listIteratorTest(control, serTest);
 
 
-        test = test.appendWhen(() -> false, -1);
+        test = test.appendSome(() -> none());
         assertEquals(control.size(), test.size());
         assertEquals(control, test);
 
-        test = test.appendWhen(() -> true, -1);
+        test = test.appendSome(() -> some(-1));
         control.add(-1);
         assertEquals(control.size(), test.size());
         assertEquals(control, test);

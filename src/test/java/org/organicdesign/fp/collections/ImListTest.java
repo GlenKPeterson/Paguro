@@ -14,17 +14,15 @@
 
 package org.organicdesign.fp.collections;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.organicdesign.fp.TestUtilities;
 
+import java.util.*;
+
 import static org.junit.Assert.assertEquals;
+import static org.organicdesign.fp.oneOf.None.none;
+import static org.organicdesign.fp.oneOf.Option.some;
 
 public class ImListTest {
 //    @Test public void insert() {
@@ -53,9 +51,7 @@ public class ImListTest {
 
     private static class TestList<T> implements ImList<T> {
         static <T> List<T> dup(Collection<T> in) {
-            List<T> out = new ArrayList<>();
-            out.addAll(in);
-            return out;
+            return new ArrayList<>(in);
         }
 
         private final List<T> inner;
@@ -81,7 +77,7 @@ public class ImListTest {
         @Override public T get(int index) { return inner.get(index); }
 
         @Override public @NotNull MutList<T> mutable() {
-            return new MutList<T>() {
+            return new MutList<>() {
                 private final List<T> mutable = dup(inner);
 
                 @Override public int size() { return mutable.size(); }
@@ -116,8 +112,7 @@ public class ImListTest {
     }
 
     @Test public void concatTest() {
-        List<String> control = new ArrayList<>();
-        control.addAll(Arrays.asList("a", "b", "c"));
+        List<String> control = new ArrayList<>(Arrays.asList("a", "b", "c"));
         ImList<String> test = new TestList<>(Arrays.asList("a", "b", "c"));
         assertEquals(control.size(), test.size());
         assertEquals(control, test);
@@ -130,11 +125,11 @@ public class ImListTest {
         assertEquals(control, test);
         TestUtilities.listIteratorTest(control, test);
 
-        test = test.appendWhen(() -> false, "hello");
+        test = test.appendSome(() -> none());
         assertEquals(control.size(), test.size());
         assertEquals(control, test);
 
-        test = test.appendWhen(() -> true, "hello");
+        test = test.appendSome(() -> some("hello"));
         control.add("hello");
         assertEquals(control.size(), test.size());
         assertEquals(control, test);

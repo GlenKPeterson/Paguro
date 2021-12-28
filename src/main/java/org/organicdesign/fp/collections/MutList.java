@@ -13,9 +13,11 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.organicdesign.fp.function.Fn0;
+import org.organicdesign.fp.oneOf.Option;
 
 import java.util.Collection;
 
@@ -27,18 +29,32 @@ import java.util.Collection;
  Being mutable, this is inherently NOT thread-safe.
  */
 public interface MutList<E> extends BaseList<E> {
-    /** {@inheritDoc} */
+    /**
+     * Adds the item to the end of this list (mutating it in place).
+     *
+     * @param e the value to append
+     */
     @Override
-    @NotNull MutList<E> append(E val);
+    @Contract(mutates = "this")
+    @NotNull MutList<E> append(E e);
 
 
-    /** {@inheritDoc} */
+    /**
+     * If supplier returns Some, append the additional item to the end of this MutList (modifying it in place).
+     * If None, just return this MutList unmodified.
+     *
+     * @param supplier return {@link org.organicdesign.fp.oneOf.Option.Some} to append,
+     *                 {@link org.organicdesign.fp.oneOf.None} for a no-op.
+     */
     @Override
-    default @NotNull MutList<E> appendWhen(
-            @NotNull Fn0<Boolean> test,
-            E e
+    @Contract(mutates = "this")
+    default @NotNull MutList<E> appendSome(
+            @NotNull Fn0<@NotNull Option<E>> supplier
     ) {
-        return test.apply() ? append(e) : this;
+        return supplier.apply().match(
+                (it) -> append(it),
+                () -> this
+        );
     }
 
     // TODO: Is this a good idea?  Kotlin does this...
@@ -48,11 +64,13 @@ public interface MutList<E> extends BaseList<E> {
     // I'm going to try this with a few easy methods to see how it goes.
     // These are all technically "optional" operations anyway.
     /**
-     Ensures that this collection contains the specified element (optional operation).
-     Returns true if this collection changed as a result of the call.
+     * Ensures that this collection contains the specified element (optional operation).
+     * Returns true if this collection changed as a result of the call.
      */
     @SuppressWarnings("deprecation")
-    @Override default boolean add(E val) {
+    @Override
+    @Contract(mutates = "this")
+    default boolean add(E val) {
         append(val);
         return true;
     }
@@ -62,16 +80,19 @@ public interface MutList<E> extends BaseList<E> {
      * in the order that they are returned by the specified collection's iterator.
      */
     @SuppressWarnings("deprecation")
-    @Override default boolean addAll(@NotNull Collection<? extends E> c) {
+    @Override
+    @Contract(mutates = "this")
+    default boolean addAll(@NotNull Collection<? extends E> c) {
         concat(c);
         return true;
     }
 
-    /** Returns a immutable version of this mutable list. */
+    /** Returns an immutable version of this mutable list. */
     ImList<E> immutable();
 
     /** {@inheritDoc} */
     @Override
+    @Contract(mutates = "this")
     default @NotNull MutList<E> concat(@Nullable Iterable<? extends E> es) {
         if (es != null) {
             for (E e : es) {
@@ -83,10 +104,12 @@ public interface MutList<E> extends BaseList<E> {
 
     /** {@inheritDoc} */
     @Override
+    @Contract(mutates = "this")
     @NotNull MutList<E> replace(int idx, E e);
 
     /** {@inheritDoc} */
     @Override
+    @Contract(mutates = "this")
     default @NotNull MutList<E> reverse() {
         MutList<E> ret = PersistentVector.emptyMutable();
         UnmodListIterator<E> iter = listIterator(size());

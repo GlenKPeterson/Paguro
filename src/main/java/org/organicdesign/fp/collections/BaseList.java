@@ -16,6 +16,7 @@ package org.organicdesign.fp.collections;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.organicdesign.fp.function.Fn0;
+import org.organicdesign.fp.function.Fn1;
 import org.organicdesign.fp.oneOf.Option;
 
 /**
@@ -24,24 +25,26 @@ import org.organicdesign.fp.oneOf.Option;
  */
 public interface BaseList<E> extends UnmodList<E> {
     /**
-     Adds one item to the end of the ImList.
-
-     @param e the value to insert
-     @return a new ImList with the additional item at the end.
+     * Returns a new BaseList with the additional item at the end.
+     *
+     * @param e the value to append
      */
     @NotNull BaseList<E> append(E e);
 
     /**
-     Adds one item to the end of the ImList.
-
-     @param e the value to insert
-     @return a new ImList with the additional item at the end.
+     * If supplier returns Some, return a new BaseList with the additional item at the end.
+     * If None, just return this BaseList unmodified.
+     *
+     * @param supplier return {@link org.organicdesign.fp.oneOf.Option.Some} to append,
+     *                 {@link org.organicdesign.fp.oneOf.None} for a no-op.
      */
-    default @NotNull BaseList<E> appendWhen(
-            @NotNull Fn0<Boolean> test,
-            E e
+    default @NotNull BaseList<E> appendSome(
+            @NotNull Fn0<@NotNull Option<E>> supplier
     ) {
-        return test.apply() ? append(e) : this;
+        return supplier.apply().match(
+                (it) -> append(it),
+                () -> this
+        );
     }
 
     /**
