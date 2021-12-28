@@ -10,6 +10,11 @@ tells you what to use instead.  Once we delete the deprecated methods, that docu
   This is a better design because it can do everything the first design does, but
   allows you to avoid constructing a new E unless you need it.
 - Added more nullability annotations.
+- Tuples now have a `private static final long serialVersionUID` field.
+  This was always intended to be there
+  (so you can serialize with one version of Paguro and deserialize with another)
+  but was generated as part of comment by accident.
+  This field will not change so long as tuples do not change in a way that affects their serialization.
 
 ### Release 3.7.2 2021-12-20: Fix RrbTree.split()
 - Fixed Bug #47: "RrbTree.split() returns wrong type" and added test to prevent regressions.
