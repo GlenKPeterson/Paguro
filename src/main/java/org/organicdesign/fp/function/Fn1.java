@@ -104,11 +104,13 @@ public interface Fn1<T,U> extends Function<T,U>, Consumer<T> {
                (S s) -> (a.apply(s) == Boolean.TRUE) ? Boolean.FALSE : Boolean.TRUE;
     }
 
-    /** Returns a type-safe version of the ConstObjBool.ACCEPT predicate. */
+    /**
+     * Returns a type-safe version of the {@link ConstObjBool#ACCEPT} predicate.
+     */
     @SuppressWarnings("unchecked")
     static <T> Fn1<T,Boolean> accept() { return (Fn1<T,Boolean>) ConstObjBool.ACCEPT; }
 
-    /** Returns a type-safe version of the ConstObjBool.REJECT predicate. */
+    /** Returns a type-safe version of the {@link ConstObjBool#REJECT} predicate. */
     @SuppressWarnings("unchecked")
     static <T> Fn1<T,Boolean> reject() { return (Fn1<T,Boolean>) ConstObjBool.REJECT; }
 
@@ -214,12 +216,12 @@ public interface Fn1<T,U> extends Function<T,U>, Consumer<T> {
      Composes multiple predicates into a single predicate to potentially minimize trips through
      the source data.  The resultant predicate will loop through the predicates for each item in
      the source, but for few predicates and many source items, that takes less memory.  Considers
-     no predicate to mean "reject all."  Use only accept()/ConstObjBool.ACCEPT and ConstObjBool.REJECT since
+     no predicate to mean "reject all."  Use only {@link #accept()} and {@link #reject()} since
      function comparison is done by reference.
 
-     @param in the predicates to test in order.  Nulls and ConstObjBool.REJECT predicates are ignored.  Any
+     @param in the predicates to test in order.  Nulls and REJECT predicates are ignored.  Any
      ACCEPT predicate will cause this entire method to return the ACCEPT predicate.
-     No predicates means ConstObjBool.REJECT.
+     No predicates means REJECT.
 
      @param <T> the type of object to predicate on.
 
@@ -266,13 +268,13 @@ public interface Fn1<T,U> extends Function<T,U>, Consumer<T> {
      implement equals() and hashCode() correctly for this to work correctly and quickly.
      */
     static <A,B> Fn1<A,B> memoize(Fn1<A,B> f) {
-        return new Fn1<A,B>() {
+        return new Fn1<>() {
             private final Map<A,Option<B>> memo = new HashMap<>();
             @Override
             public synchronized B applyEx(A a) throws Exception {
                 Option<B> val = memo.get(a);
                 if ( (val != null) && val.isSome() ) { return val.get(); }
-                B ret = f.apply(a);
+                B ret = f.applyEx(a);
                 memo.put(a, Option.some(ret));
                 return ret;
             }
@@ -281,7 +283,7 @@ public interface Fn1<T,U> extends Function<T,U>, Consumer<T> {
 
     // ========================================= Instance =========================================
 
-    /** Implement this one method and you don't have to worry about checked exceptions. */
+    /** Implement this one method, and you don't have to worry about checked exceptions. */
     U applyEx(T t) throws Exception;
 
     /** Call this convenience method so that you don't have to worry about checked exceptions. */

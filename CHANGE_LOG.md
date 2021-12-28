@@ -9,6 +9,7 @@ tells you what to use instead.  Once we delete the deprecated methods, that docu
 - Replaced BaseList.appendWhen(Fn0<Boolean> test, E item) with appendSome(Fn0<Option<E>>).
   This is a better design because it can do everything the first design does, but
   allows you to avoid constructing a new E unless you need it.
+- Added more nullability annotations.
 
 ### Release 3.7.2 2021-12-20: Fix RrbTree.split()
 - Fixed Bug #47: "RrbTree.split() returns wrong type" and added test to prevent regressions.

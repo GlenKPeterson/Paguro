@@ -16,6 +16,7 @@ package org.organicdesign.fp.function;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jetbrains.annotations.NotNull;
 import org.organicdesign.fp.oneOf.Option;
 import org.organicdesign.fp.tuple.Tuple3;
 
@@ -26,8 +27,8 @@ public interface Fn3<A,B,C,R> {
     R applyEx(A a, B b, C c) throws Exception;
 
     /**
-     The class that takes a consumer as an argument uses this convenience method so that it
-     doesn't have to worry about checked exceptions either.
+     * The class that takes a consumer as an argument uses this convenience method so that it
+     * doesn't have to worry about checked exceptions either.
      */
     default R apply(A a, B b, C c) {
         try {
@@ -40,21 +41,21 @@ public interface Fn3<A,B,C,R> {
     }
 
     /**
-     Use only on pure functions with no side effects.  Wrap an expensive function with this and for each input
-     value, the output will only be computed once.  Subsequent calls with the same input will return identical output
-     very quickly.  Please note that the parameters to f need to implement equals() and hashCode() correctly
-     for this to work correctly and quickly.  Also, make sure your domain is very small!  This function uses O(n^3)
-     memory.
+     * Use only on pure functions with no side effects.  Wrap an expensive function with this and for each input
+     * value, the output will only be computed once.  Subsequent calls with the same input will return identical output
+     * very quickly.  Please note that the parameters to f need to implement equals() and hashCode() correctly
+     * for this to work correctly and quickly.  Also, make sure your domain is very small!  This function uses O(n^3)
+     * memory.
      */
-    static <A,B,C,Z> Fn3<A,B,C,Z> memoize(Fn3<A,B,C,Z> f) {
-        return new Fn3<A,B,C,Z>() {
+    static <A,B,C,Z> @NotNull Fn3<A,B,C,Z> memoize(@NotNull Fn3<A,B,C,Z> f) {
+        return new Fn3<>() {
             private final Map<Tuple3<A,B,C>,Option<Z>> map = new HashMap<>();
             @Override
             public synchronized Z applyEx(A a, B b, C c) throws Exception {
                 Tuple3<A,B,C> t3 = Tuple3.of(a, b, c);
                 Option<Z> val = map.get(t3);
                 if (val != null) { return val.get(); }
-                Z ret = f.apply(a, b, c);
+                Z ret = f.applyEx(a, b, c);
                 map.put(t3, Option.some(ret));
                 return ret;
             }

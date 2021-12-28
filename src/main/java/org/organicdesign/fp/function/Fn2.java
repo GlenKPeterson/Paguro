@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
 
+import org.jetbrains.annotations.NotNull;
 import org.organicdesign.fp.oneOf.Option;
 import org.organicdesign.fp.tuple.Tuple2;
 
@@ -26,7 +27,7 @@ import org.organicdesign.fp.tuple.Tuple2;
  */
 @FunctionalInterface
 public interface Fn2<A,B,R> extends BiFunction<A,B,R> {
-    /** Implement this one method and you don't have to worry about checked exceptions. */
+    /** Implement this one method, and you don't have to worry about checked exceptions. */
     R applyEx(A a, B b) throws Exception;
 
     /**
@@ -43,27 +44,21 @@ public interface Fn2<A,B,R> extends BiFunction<A,B,R> {
         }
     }
 
-
-// Don't think this is necessary.  Is it?
-//    default BiFunction<A,B,R> asBiFunction() {
-//        return (A a, B b) -> apply(a, b);
-//    }
-
     /**
-     Use only on pure functions with no side effects.  Wrap an expensive function with this and for each input
-     value, the output will only be computed once.  Subsequent calls with the same input will return identical output
-     very quickly.  Please note that the parameters to f need to implement equals() and hashCode() correctly
-     for this to work correctly and quickly.
+     * Use only on pure functions with no side effects.  Wrap an expensive function with this and for each input
+     * value, the output will only be computed once.  Subsequent calls with the same input will return identical output
+     * very quickly.  Please note that the parameters to f need to implement equals() and hashCode() correctly
+     * for this to work correctly and quickly.
      */
-    static <A,B,Z> Fn2<A,B,Z> memoize(Fn2<A,B,Z> f) {
-        return new Fn2<A,B,Z>() {
+    static <A,B,Z> @NotNull Fn2<A,B,Z> memoize(@NotNull Fn2<A,B,Z> f) {
+        return new Fn2<>() {
             private final Map<Tuple2<A,B>,Option<Z>> map = new HashMap<>();
             @Override
             public synchronized Z applyEx(A a, B b) throws Exception {
                 Tuple2<A,B> t = Tuple2.of(a, b);
                 Option<Z> val = map.get(t);
                 if (val != null) { return val.get(); }
-                Z ret = f.apply(a, b);
+                Z ret = f.applyEx(a, b);
                 map.put(t, Option.some(ret));
                 return ret;
             }
@@ -73,7 +68,7 @@ public interface Fn2<A,B,R> extends BiFunction<A,B,R> {
     enum Singletons implements Fn2 {
         /**
          A static function that always returns the first argument it is given.
-         For type safety, please use {@link Fn2#first()} instead of accessing this dirctly.
+         For type safety, please use {@link Fn2#first()} instead of accessing this directly.
          */
         FIRST {
             @Override
@@ -83,7 +78,7 @@ public interface Fn2<A,B,R> extends BiFunction<A,B,R> {
         },
         /**
          A static function that always returns the second argument it is given.
-         For type safety, please use {@link Fn2#second()} instead of accessing this dirctly.
+         For type safety, please use {@link Fn2#second()} instead of accessing this directly.
          */
         SECOND {
             @Override
@@ -98,12 +93,12 @@ public interface Fn2<A,B,R> extends BiFunction<A,B,R> {
      @return the first argument, unmodified.
      */
     @SuppressWarnings("unchecked")
-    static <A1,B1> Fn2<A1,? super B1,A1> first() { return Singletons.FIRST; }
+    static <A1,B1> @NotNull Fn2<A1,? super B1,A1> first() { return Singletons.FIRST; }
 
     /**
      Returns a static function that always returns the second argument it is given.
      @return the second argument, unmodified.
      */
     @SuppressWarnings("unchecked")
-    static <A1,B1> Fn2<A1,? super B1,B1> second() { return Singletons.SECOND; }
+    static <A1,B1> @NotNull Fn2<A1,? super B1,B1> second() { return Singletons.SECOND; }
 }
