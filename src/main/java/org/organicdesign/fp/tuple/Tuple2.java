@@ -19,6 +19,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.organicdesign.fp.collections.UnmodMap;
 
 import static org.organicdesign.fp.FunctionUtils.stringify;
@@ -49,12 +51,12 @@ public class Tuple2<A,B> implements Entry<A,B>, UnmodMap.UnEntry<A,B>, Serializa
     }
 
     /** Public static factory method */
-    public static <A,B> Tuple2<A,B> of(A a, B b) {
+    public static <A,B> @NotNull Tuple2<A,B> of(A a, B b) {
         return new Tuple2<>(a, b);
     }
 
     /** Map.Entry factory method */
-    public static <K,V> Tuple2<K,V> of(Map.Entry<K,V> entry) {
+    public static <K,V> @NotNull Tuple2<K,V> of(Map.Entry<K,V> entry) {
         // Protect against multiple-instantiation
         if (entry instanceof Tuple2) {
             return (Tuple2<K,V>) entry;
@@ -95,14 +97,19 @@ public class Tuple2<A,B> implements Entry<A,B>, UnmodMap.UnEntry<A,B>, Serializa
 
     // Inherited from Map.Entry
     /** Returns the first field of the tuple.  To implement Map.Entry. */
+    @Contract(pure = true)
     @Override public A getKey() { return _1; }
 
     /** Returns the second field of the tuple.  To implement Map.Entry. */
-    @Override public B getValue() { return _2; }
+    @Override
+    @Contract(pure = true)
+    public B getValue() { return _2; }
 
     /** This method is required to implement Map.Entry, but calling it only issues an exception */
     @SuppressWarnings("deprecation")
-    @Override @Deprecated public B setValue(B value) {
+    @Override
+    @Deprecated
+    public B setValue(B value) {
         throw new UnsupportedOperationException("Tuple2 is immutable");
     }
 }
