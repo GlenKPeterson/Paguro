@@ -20,6 +20,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * This is a stand-alone project for generating Paguro's tuple classes of Tuple3 and greater.
+ *
+ * Usage:
+ * <pre><code>cd tupleGenerator/
+ *  javac TupleGenerator.java
+ *  java TupleGenerator</code></pre>
+ */
 public class TupleGenerator {
 
     public static String ordinal(final int origI) {
@@ -108,27 +116,29 @@ public class TupleGenerator {
         fr.write(copyright() +
                  "package org.organicdesign.fp.tuple;\n" +
                  "\n" +
+                 "import org.jetbrains.annotations.NotNull;\n" +
+                 "\n" +
                  "import java.io.Serializable;\n" +
                  "import java.util.Objects;\n" +
                  "\n" +
                  "import static org.organicdesign.fp.FunctionUtils.stringify;\n" +
                  generatedWarning() +
                  "/**\n" +
-                 " Holds " + i + " items of potentially different types.  Designed to let you easily create immutable\n" +
-                 " subclasses (to give your data structures meaningful names) with correct equals(), hashCode(), and\n" +
-                 " toString() methods.\n" +
+                 " * Holds " + i + " items of potentially different types.  Designed to let you easily create immutable\n" +
+                 " * subclasses (to give your data structures meaningful names) with correct equals(), hashCode(), and\n" +
+                 " * toString() methods.\n" +
                  " */\n" +
                  "public class Tuple" + i + "<");
         fr.write(types(i));
         fr.write("> implements Serializable {\n" +
                  "\n" +
                  "    // For serializable.  Make sure to change whenever internal data format changes.\n" +
-                 "    // Implemented because implementing serializable only on a sub-class of an\n" +
+                 "    // Implemented because implementing serializable only on a subclass of an\n" +
                  "    // immutable class requires a serialization proxy.  That's probably worse than\n" +
-                 "    // the conceptual burdeon of all tuples being Serializable." +
-                 "    private static final long serialVersionUID = 20160906065500L;\n" +
+                 "    // the conceptual burden of all tuples being Serializable.\n" +
+                 "    private static final long serialVersionUID = 20211228180200L;\n" +
                  "\n" +
-                 "    // Fields are protected so that sub-classes can make accessor methods with meaningful names.\n");
+                 "    // Fields are protected so that subclasses can make accessor methods with meaningful names.\n");
         for (int l = 1; l <= i; l++) {
             fr.write("    protected final ");
             fr.write(intToChar(l));
@@ -139,11 +149,11 @@ public class TupleGenerator {
 
         fr.write("\n" +
                  "    /**\n" +
-                 "     Constructor is protected (not public) for easy inheritance.  Josh Bloch's \"Item 1\" says public\n" +
-                 "     static factory methods are better than constructors because they have names, they can return\n" +
-                 "     an existing object instead of a new one, and they can return a sub-type.  Therefore, you\n" +
-                 "     have more flexibility with a static factory as part of your public API then with a public\n" +
-                 "     constructor.\n" +
+                 "     * Constructor is protected (not public) for easy inheritance.  Josh Bloch's \"Item 1\" says public\n" +
+                 "     * static factory methods are better than constructors because they have names, they can return\n" +
+                 "     * an existing object instead of a new one, and they can return a subtype.  Therefore, you\n" +
+                 "     * have more flexibility with a static factory as part of your public API then with a public\n" +
+                 "     * constructor.\n" +
                  "     */\n" +
                  "    protected Tuple" + i + "(");
         fr.write(factoryParams(i));
@@ -164,7 +174,7 @@ public class TupleGenerator {
                  "    /** Public static factory method */\n" +
                  "    public static <");
         fr.write(types(i));
-        fr.write("> Tuple" + i + "<");
+        fr.write("> @NotNull Tuple" + i + "<");
         fr.write(types(i));
         fr.write(">");
         if (i > 7) {
@@ -200,7 +210,7 @@ public class TupleGenerator {
 
         fr.write("\n" +
                  "    @Override\n" +
-                 "    public String toString() {\n" +
+                 "    public @NotNull String toString() {\n" +
                  "        return getClass().getSimpleName() + \"(\" +\n" +
                  "               stringify(_");
         isFirst = true;

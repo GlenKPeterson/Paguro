@@ -14,6 +14,8 @@
 
 package org.organicdesign.fp.tuple;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -24,18 +26,19 @@ import static org.organicdesign.fp.FunctionUtils.stringify;
 // ======================================================================================
 
 /**
- Holds 12 items of potentially different types.  Designed to let you easily create immutable
- subclasses (to give your data structures meaningful names) with correct equals(), hashCode(), and
- toString() methods.
+ * Holds 12 items of potentially different types.  Designed to let you easily create immutable
+ * subclasses (to give your data structures meaningful names) with correct equals(), hashCode(), and
+ * toString() methods.
  */
 public class Tuple12<A,B,C,D,E,F,G,H,I,J,K,L> implements Serializable {
 
     // For serializable.  Make sure to change whenever internal data format changes.
-    // Implemented because implementing serializable only on a sub-class of an
+    // Implemented because implementing serializable only on a subclass of an
     // immutable class requires a serialization proxy.  That's probably worse than
-    // the conceptual burdeon of all tuples being Serializable.    private static final long serialVersionUID = 20160906065500L;
+    // the conceptual burden of all tuples being Serializable.
+    private static final long serialVersionUID = 20211228180200L;
 
-    // Fields are protected so that sub-classes can make accessor methods with meaningful names.
+    // Fields are protected so that subclasses can make accessor methods with meaningful names.
     protected final A _1;
     protected final B _2;
     protected final C _3;
@@ -50,11 +53,11 @@ public class Tuple12<A,B,C,D,E,F,G,H,I,J,K,L> implements Serializable {
     protected final L _12;
 
     /**
-     Constructor is protected (not public) for easy inheritance.  Josh Bloch's "Item 1" says public
-     static factory methods are better than constructors because they have names, they can return
-     an existing object instead of a new one, and they can return a sub-type.  Therefore, you
-     have more flexibility with a static factory as part of your public API then with a public
-     constructor.
+     * Constructor is protected (not public) for easy inheritance.  Josh Bloch's "Item 1" says public
+     * static factory methods are better than constructors because they have names, they can return
+     * an existing object instead of a new one, and they can return a subtype.  Therefore, you
+     * have more flexibility with a static factory as part of your public API then with a public
+     * constructor.
      */
     protected Tuple12(A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k, L l) {
         _1 = a; _2 = b; _3 = c; _4 = d; _5 = e; _6 = f; _7 = g; _8 = h; _9 = i;
@@ -62,7 +65,7 @@ public class Tuple12<A,B,C,D,E,F,G,H,I,J,K,L> implements Serializable {
     }
 
     /** Public static factory method */
-    public static <A,B,C,D,E,F,G,H,I,J,K,L> Tuple12<A,B,C,D,E,F,G,H,I,J,K,L>
+    public static <A,B,C,D,E,F,G,H,I,J,K,L> @NotNull Tuple12<A,B,C,D,E,F,G,H,I,J,K,L>
     of(A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k, L l) {
         return new Tuple12<>(a, b, c, d, e, f, g, h, i, j, k, l);
     }
@@ -93,7 +96,7 @@ public class Tuple12<A,B,C,D,E,F,G,H,I,J,K,L> implements Serializable {
     public L _12() { return _12; }
 
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         return getClass().getSimpleName() + "(" +
                stringify(_1) + "," + stringify(_2) + "," +
                stringify(_3) + "," + stringify(_4) + "," + stringify(_5) + "," +
