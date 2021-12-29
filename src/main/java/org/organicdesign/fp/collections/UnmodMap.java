@@ -49,8 +49,10 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
             private final Iterator<Entry<K,V>> innerIter;
             EntryToUnEntryIter(Iterator<Entry<K,V>> i) { innerIter = i; }
 
-            @Override public boolean hasNext() { return innerIter.hasNext(); }
-            @Override public UnEntry<K, V> next() { return Tuple2.of(innerIter.next()); }
+            @Override
+            public boolean hasNext() { return innerIter.hasNext(); }
+            @Override
+            public @NotNull UnEntry<K, V> next() { return Tuple2.of(innerIter.next()); }
         }
 
         class EntryToUnEntrySortedIter<K,V> extends EntryToUnEntryIter<K,V>
@@ -103,12 +105,12 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
         }
 
         static <K,V>
-        UnmodIterator<UnEntry<K,V>> entryIterToUnEntryUnIter(Iterator<Entry<K,V>> innerIter) {
+        @NotNull UnmodIterator<UnEntry<K,V>> entryIterToUnEntryUnIter(Iterator<Entry<K,V>> innerIter) {
             return new EntryToUnEntryIter<>(innerIter);
         }
 
         static <K,V>
-        UnmodSortedIterator<UnEntry<K,V>>
+        @NotNull UnmodSortedIterator<UnEntry<K,V>>
         entryIterToUnEntrySortedUnIter(Iterator<Entry<K,V>> innerIter) {
             return new EntryToUnEntrySortedIter<>(innerIter);
         }
@@ -218,7 +220,8 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
 
             @Override public int size() { return parent.size(); }
 
-            @Override public String toString() {
+            @Override
+            public @NotNull String toString() {
                 return UnmodIterable.toString("UnmodMap.entrySet", this);
             }
         }
@@ -280,7 +283,8 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
             }
             @Override public int size() { return parent.size(); }
 
-            @Override public String toString() {
+            @Override
+            public @NotNull String toString() {
                 return UnmodIterable.toString("UnmodMap.keySet", this);
             }
         }
@@ -392,7 +396,8 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
             }
             @Override public int size() { return parent.size(); }
 
-            @Override public String toString() {
+            @Override
+            public @NotNull String toString() {
                 return UnmodIterable.toString("UnmodMap.values", this);
             }
         }

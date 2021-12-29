@@ -1,13 +1,9 @@
 package org.organicdesign.fp.collections;
 
-import java.io.Serializable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
-import java.util.SortedMap;
-import java.util.SortedSet;
-
 import org.jetbrains.annotations.NotNull;
+
+import java.io.Serializable;
+import java.util.*;
 
 /**
  An unmodifiable Iterable, with guaranteed order.  The signature of this interface is nearly
@@ -18,6 +14,7 @@ public interface UnmodSortedIterable<T> extends UnmodIterable<T> {
     // ========================================== Static ==========================================
 
     /** This is correct, but O(n).  This only works with an ordered iterable. */
+    @SuppressWarnings("rawtypes")
     static boolean equal(UnmodSortedIterable a, UnmodSortedIterable b) {
         // Cheapest operation first...
         if (a == b) { return true; }
@@ -43,7 +40,7 @@ public interface UnmodSortedIterable<T> extends UnmodIterable<T> {
 //        };
 //    }
 
-    static <E> UnmodSortedIterable<E> castFromSortedSet(final SortedSet<E> s) {
+    static <E> @NotNull UnmodSortedIterable<E> castFromSortedSet(final SortedSet<E> s) {
         class Implementation<S> implements UnmodSortedIterable<S>, Serializable {
             // For serializable.  Make sure to change whenever internal data format changes.
             private static final long serialVersionUID = 20160903174100L;
@@ -69,7 +66,7 @@ public interface UnmodSortedIterable<T> extends UnmodIterable<T> {
 //        };
 //    }
 
-    static <E> UnmodSortedIterable<E> castFromList(List<E> s) {
+    static <E> @NotNull UnmodSortedIterable<E> castFromList(List<E> s) {
         class Implementation<S> implements UnmodSortedIterable<S>, Serializable {
             // For serializable.  Make sure to change whenever internal data format changes.
             private static final long serialVersionUID = 20160903174100L;
@@ -111,7 +108,7 @@ public interface UnmodSortedIterable<T> extends UnmodIterable<T> {
 //        };
 //    }
 
-    static <K,V> UnmodSortedIterable<UnmodMap.UnEntry<K,V>> castFromSortedMap(SortedMap<K,V> sm) {
+    static <K,V> @NotNull UnmodSortedIterable<UnmodMap.UnEntry<K,V>> castFromSortedMap(SortedMap<K,V> sm) {
         if (sm instanceof UnmodSortedMap) { return (UnmodSortedMap<K,V>) sm; }
 
         class Implementation<K1,V1> implements UnmodSortedIterable<UnmodMap.UnEntry<K1,V1>>,

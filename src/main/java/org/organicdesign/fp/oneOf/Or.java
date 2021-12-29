@@ -13,6 +13,7 @@
 // limitations under the License.
 package org.organicdesign.fp.oneOf;
 
+import org.jetbrains.annotations.NotNull;
 import org.organicdesign.fp.function.Fn1;
 
 import java.util.Objects;
@@ -26,7 +27,7 @@ import static org.organicdesign.fp.FunctionUtils.stringify;
  <a href="https://www.youtube.com/watch?v=bCTZQi2dpl8" target="_blank">Bill Venners, Scalactic, SuperSafe, and
  Functional Error Handling talk at SF Scala 2015-02-24</a> convinced me that Or is friendlier than
  <a href="http://www.scala-lang.org/api/rc2/scala/Either.html" target="_blank">Either</a>.
- This class is based on Bill Venners' Or.  I did not make Every, One, and Many sub-classes, figuring that you can
+ This class is based on Bill Venners' Or.  I did not make Every, One, and Many subclasses, figuring that you can
  make an Or&lt;GoodType,ImList&lt;BadType&gt;&gt; if you expect that.
 
  Bill makes the point that there are still some reasons to throw exceptions, but he says to "Throw exceptions at
@@ -40,10 +41,10 @@ import static org.organicdesign.fp.FunctionUtils.stringify;
  */
 public interface Or<G,B> {
     /** Construct a new Good from the given object. */
-    static <G,B> Or<G,B> good(G good) { return new Good<>(good); }
+    static <G,B> @NotNull Or<G,B> good(G good) { return new Good<>(good); }
 
     /** Construct a new Bad from the given object. */
-    static <G,B> Or<G,B> bad(B bad) { return new Bad<>(bad); }
+    static <G,B> @NotNull Or<G,B> bad(B bad) { return new Bad<>(bad); }
 
     /** Returns true if this Or has a good value. */
     boolean isGood();
@@ -62,8 +63,8 @@ public interface Or<G,B> {
      @param fb the function to be executed if this OneOf stores the second type.
      @return the return value of whichever function is executed.
      */
-    <R> R match(Fn1<G, R> fg,
-                Fn1<B, R> fb);
+    <R> R match(@NotNull Fn1<G, R> fg,
+                @NotNull Fn1<B, R> fb);
 
 
     /** Represents the presence of a Good value (and absence of a Bad). */
@@ -84,7 +85,8 @@ public interface Or<G,B> {
         @Override public B bad() { throw new IllegalStateException("Cant call bad() on a Good."); }
 
         /** {@inheritDoc} */
-        @Override public <R> R match(Fn1<G, R> fg, Fn1<B, R> fb) { return fg.apply(g); }
+        @Override
+        public <R> R match(@NotNull Fn1<G, R> fg, @NotNull Fn1<B, R> fb) { return fg.apply(g); }
 
         /** {@inheritDoc} */
         @Override public int hashCode() { return g.hashCode(); }
@@ -98,7 +100,8 @@ public interface Or<G,B> {
         }
 
         /** {@inheritDoc} */
-        @Override public String toString() { return "Good(" + stringify(g) + ")"; }
+        @Override
+        public @NotNull String toString() { return "Good(" + stringify(g) + ")"; }
     }
 
     /** Represents the presence of a Bad value (and absence of a Good). */
@@ -119,8 +122,8 @@ public interface Or<G,B> {
         @Override public B bad() { return b; }
 
         /** {@inheritDoc} */
-        @Override public <R> R match(Fn1<G, R> fg, Fn1<B, R> fb) { return fb.apply(b); }
-
+        @Override
+        public <R> R match(@NotNull Fn1<G, R> fg, @NotNull Fn1<B, R> fb) { return fb.apply(b); }
 
         /** {@inheritDoc} */
         // Returns twos compliment of contained item.
@@ -135,6 +138,7 @@ public interface Or<G,B> {
         }
 
         /** {@inheritDoc} */
-        @Override public String toString() { return "Bad(" + stringify(b) + ")"; }
+        @Override
+        public @NotNull String toString() { return "Bad(" + stringify(b) + ")"; }
     }
 } // end interface Or

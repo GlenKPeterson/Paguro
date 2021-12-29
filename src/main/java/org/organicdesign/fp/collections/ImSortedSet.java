@@ -52,8 +52,8 @@ public interface ImSortedSet<E> extends BaseSet<E>, UnmodSortedSet<E> {
     @NotNull
     @Override ImSortedSet<E> tailSet(E fromElement);
 
-    @NotNull
-    @Override default ImSortedSet<E> union(Iterable<? extends E> iter) {
+    @Override
+    default @NotNull ImSortedSet<E> union(@NotNull Iterable<? extends E> iter) {
         ImSortedSet<E> ret = this;
         for (E e : iter) {
             if (!ret.contains(e)) { ret = ret.put(e); }

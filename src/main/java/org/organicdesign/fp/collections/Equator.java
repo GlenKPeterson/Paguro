@@ -14,10 +14,10 @@
 
 package org.organicdesign.fp.collections;
 
-import java.util.Arrays;
-import java.util.Comparator;
-
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Comparator;
 
 /**
  An Equator represents an equality context in a way that is analgous to the java.util.Comparator
@@ -75,10 +75,9 @@ public interface Equator<T> {
     }
 
     @SuppressWarnings("unchecked")
-    static <T> Equator<T> defaultEquator() { return (Equator<T>) Equat.DEFAULT; }
+    static <T> @NotNull Equator<T> defaultEquator() { return (Equator<T>) Equat.DEFAULT; }
 
-    // Enums are serializable and lambdas are not.  Therefore enums make better singletons.
-    @SuppressWarnings("ConstantConditions")
+    // Enums are serializable and lambdas are not.  Therefore, enums make better singletons.
     enum Comp implements Comparator<Comparable<Object>> {
         DEFAULT {
             @Override
@@ -89,7 +88,7 @@ public interface Equator<T> {
     }
 
     @SuppressWarnings("unchecked")
-    static <T> Comparator<T> defaultComparator() { return (Comparator<T>) Comp.DEFAULT; }
+    static <T> @NotNull Comparator<T> defaultComparator() { return (Comparator<T>) Comp.DEFAULT; }
 
     /** This is the guts of building a comparator from Comparables. */
     static int doCompare(Comparable<Object> o1, Comparable<Object> o2) {

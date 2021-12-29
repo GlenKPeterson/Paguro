@@ -3,6 +3,7 @@ package org.organicdesign.fp.function;
 // Should this bee an inner class of Fn0?
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  Lazily initialize a value (and free the initialization resources) on the first call to get().
@@ -10,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
  function and the value it produces are free from side effects.
  */
 public class LazyRef<T> implements Fn0<T> {
-    private Fn0<T> producer;
+    private @Nullable Fn0<T> producer;
     private T value;
 
     private LazyRef(Fn0<T> p) { producer = p; }
@@ -55,5 +56,5 @@ public class LazyRef<T> implements Fn0<T> {
      sometimes shows the value that was computed).
      @return a string describing this LazyRef and showing whether or not its value has been computed yet.
      */
-    public String toString() { return "LazyRef(" + ((producer == null) ? value : "*not-computed-yet*") + ")"; }
+    public @NotNull String toString() { return "LazyRef(" + ((producer == null) ? value : "*not-computed-yet*") + ")"; }
 }

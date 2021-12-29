@@ -1,5 +1,7 @@
 package org.organicdesign.fp.indent;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  Created by gpeterso on 5/21/17.
  */
@@ -10,5 +12,5 @@ public interface Indented {
      additional indent.
      @return a string with the given starting offset (in spaces) for every line.
      */
-    String indentedStr(int indent);
+    @NotNull String indentedStr(int indent);
 }

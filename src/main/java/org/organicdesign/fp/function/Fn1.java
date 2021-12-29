@@ -252,17 +252,17 @@ public interface Fn1<T,U> extends Function<T,U>, Consumer<T> {
     enum BooleanCombiner {
         AND {
             @Override
-            public <T> Fn1<T,Boolean> combine(Iterable<Fn1<T,Boolean>> in) {
+            public <T> @NotNull Fn1<T,Boolean> combine(Iterable<Fn1<T,Boolean>> in) {
                 return and(in);
             }
         },
         OR {
             @Override
-            public <T> Fn1<T,Boolean> combine(Iterable<Fn1<T,Boolean>> in) {
+            public <T> @NotNull Fn1<T,Boolean> combine(Iterable<Fn1<T,Boolean>> in) {
                 return or(in);
             }
         };
-        public abstract <T> Fn1<T,Boolean> combine(Iterable<Fn1<T,Boolean>> in);
+        public abstract <T> @NotNull Fn1<T,Boolean> combine(Iterable<Fn1<T,Boolean>> in);
     }
 
     /**

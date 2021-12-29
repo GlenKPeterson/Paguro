@@ -1,5 +1,7 @@
 package org.organicdesign.fp.indent;
 
+import org.jetbrains.annotations.NotNull;
+
 public class IndentUtils {
 
     private IndentUtils() {
@@ -68,7 +70,7 @@ public class IndentUtils {
      @param len the number of spaces
      @return a {@link StringBuilder} with the specificed number of initial spaces.
      */
-    public static StringBuilder indentSpace(int len) {
+    public static @NotNull StringBuilder indentSpace(int len) {
         StringBuilder sB = new StringBuilder();
         if (len < 1) { return sB; }
         while (len > SPACES_LENGTH_MINUS_ONE) {
@@ -81,7 +83,7 @@ public class IndentUtils {
     /**
      There is Arrays.toString, but this is intended to produce Cymling code some day.
      */
-    public static <T> String arrayString(T[] items) {
+    public static <T> @NotNull String arrayString(T @NotNull [] items) {
         StringBuilder sB = new StringBuilder("A[");
         boolean isFirst = true;
         for (T item : items) {
@@ -103,7 +105,7 @@ public class IndentUtils {
      There is Arrays.toString, but this is intended to produce Cymling code some day.
      */
     // TODO: We need one of these for each type of primitive for pretty-printing without commas.
-    public static String arrayString(int[] items) {
+    public static @NotNull String arrayString(int @NotNull [] items) {
         StringBuilder sB = new StringBuilder("i[");
         boolean isFirst = true;
         for (int item : items) {

@@ -57,7 +57,7 @@ public interface Option<T> extends Serializable { // extends UnmodSortedIterable
 
     /** Calling this instead of referring to NONE directly can make the type infrencer happy. */
     @SuppressWarnings("unchecked")
-    static <T> Option<T> none() { return None.NONE; }
+    static <T> @NotNull Option<T> none() { return None.NONE; }
 
     /** Public static factory method for constructing the Some Option. */
     static <T> @NotNull Option<T> some(T t) {
