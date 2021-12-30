@@ -13,6 +13,7 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.organicdesign.fp.function.Fn0;
@@ -36,8 +37,9 @@ public interface ImList<E> extends BaseList<E> {
 
     /** {@inheritDoc} */
     @Override
+    @Contract(pure = true)
     default @NotNull ImList<E> appendSome(
-            @NotNull Fn0<Option<E>> supplier
+            @NotNull Fn0<? extends @NotNull Option<E>> supplier
     ) {
         return supplier.apply().match(
                 (it) -> append(it),
@@ -47,6 +49,7 @@ public interface ImList<E> extends BaseList<E> {
 
     /** {@inheritDoc} */
     @Override
+    @Contract(pure = true)
     default @NotNull ImList<E> concat(@Nullable Iterable<? extends E> es) {
         return mutable().concat(es).immutable();
     }
@@ -55,6 +58,7 @@ public interface ImList<E> extends BaseList<E> {
     @NotNull MutList<E> mutable();
 
     /** {@inheritDoc} */
+    @Contract(pure = true)
     @NotNull ImList<E> replace(int idx, E e);
 
     /** {@inheritDoc} */

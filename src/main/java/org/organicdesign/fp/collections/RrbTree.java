@@ -128,7 +128,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
         @Override
         @Contract(mutates = "this")
         public @NotNull MutRrbt<E> appendSome(
-                @NotNull Fn0<Option<E>> supplier
+                @NotNull Fn0<? extends @NotNull Option<E>> supplier
         ) {
             return supplier.apply().match(
                     (it) -> append(it),
@@ -429,8 +429,9 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
 
         /** {@inheritDoc} */
         @Override
+        @Contract(pure = true)
         public @NotNull ImRrbt<E> appendSome(
-                @NotNull Fn0<Option<E>> supplier
+                @NotNull Fn0<? extends @NotNull Option<E>> supplier
         ) {
             return supplier.apply().match(
                     (it) -> append(it),
@@ -631,7 +632,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
     /** {@inheritDoc} */
     @Override
     abstract public @NotNull RrbTree<E> appendSome(
-            @NotNull Fn0<Option<E>> supplier
+            @NotNull Fn0<? extends @NotNull Option<E>> supplier
     );
 
     /** Internal validation method for testing. */

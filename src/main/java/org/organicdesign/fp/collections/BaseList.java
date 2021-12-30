@@ -39,7 +39,7 @@ public interface BaseList<E> extends UnmodList<E> {
      *                 {@link org.organicdesign.fp.oneOf.None} for a no-op.
      */
     default @NotNull BaseList<E> appendSome(
-            @NotNull Fn0<@NotNull Option<E>> supplier
+            @NotNull Fn0<? extends @NotNull Option<E>> supplier
     ) {
         return supplier.apply().match(
                 (it) -> append(it),

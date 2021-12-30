@@ -49,7 +49,7 @@ public interface MutList<E> extends BaseList<E> {
     @Override
     @Contract(mutates = "this")
     default @NotNull MutList<E> appendSome(
-            @NotNull Fn0<@NotNull Option<E>> supplier
+            @NotNull Fn0<? extends @NotNull Option<E>> supplier
     ) {
         return supplier.apply().match(
                 (it) -> append(it),

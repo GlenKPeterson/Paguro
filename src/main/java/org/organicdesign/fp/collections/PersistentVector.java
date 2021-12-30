@@ -295,7 +295,7 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
     /** {@inheritDoc} */
     @Override
     public @NotNull PersistentVector<E> appendSome(
-            @NotNull Fn0<Option<E>> supplier
+            @NotNull Fn0<? extends @NotNull Option<E>> supplier
     ) {
         return supplier.apply().match(
                 (it) -> append(it),
@@ -611,7 +611,7 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
         @Override
         @Contract(mutates = "this")
         public @NotNull MutList<F> appendSome(
-                @NotNull Fn0<@NotNull Option<F>> supplier
+                @NotNull Fn0<? extends @NotNull Option<F>> supplier
         ) {
             return supplier.apply().match(
                     (it) -> append(it),

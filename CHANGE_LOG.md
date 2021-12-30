@@ -9,6 +9,7 @@ tells you what to use instead.  Once we delete the deprecated methods, that docu
  - Use Option.none() instead.
    They are duplicate methods.
    You're almost certainly going to be importing Option.some() already, so it makes sense to use Option.none() as well.
+ - Fixed appendSome() to take a covariant parameter: `appendSome(@NotNull Fn0<? extends @NotNull Option<E>> supplier)`
  - Made RuntimeTypes store types in a Trie.  The previous storage made no sense.
  - More nullability annotations.
 
