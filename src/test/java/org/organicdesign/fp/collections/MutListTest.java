@@ -9,7 +9,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.fp.FunctionUtils.ordinal;
-import static org.organicdesign.fp.oneOf.None.none;
+import static org.organicdesign.fp.oneOf.Option.none;
 import static org.organicdesign.fp.oneOf.Option.some;
 
 /**

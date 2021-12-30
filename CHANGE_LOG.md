@@ -5,6 +5,13 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
+## Release 3.9.0 2021-12-30: Removed None.none()
+ - Use Option.none() instead.
+   They are duplicate methods.
+   You're almost certainly going to be importing Option.some() already, so it makes sense to use Option.none() as well.
+ - Made RuntimeTypes store types in a Trie.  The previous storage made no sense.
+ - More nullability annotations.
+
 ## Release 3.8.0 2021-12-28: BaseList.appendSome(() -> Option<E>)
 - Replaced BaseList.appendWhen(Fn0<Boolean> test, E item) with appendSome(Fn0<Option<E>>).
   This is a better design because it can do everything the first design does, but

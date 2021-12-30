@@ -14,6 +14,8 @@
 
 package org.organicdesign.fp.oneOf;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.function.Fn1;
 import org.organicdesign.fp.type.RuntimeTypes;
@@ -29,7 +31,7 @@ import static org.organicdesign.fp.type.RuntimeTypes.union2Str;
  Java has polymorphism to handle that more easily.  Before using a OneOf2, make sure you don't really need a
  {@link org.organicdesign.fp.tuple.Tuple2}.
 
- OneOf2 is designed to be sub-classed so you can add descriptive names.  The safest way
+ OneOf2 is designed to be subclassed to add descriptive names.  The safest way
  to use Union classes is to always call match() because it forces you to think about how to
  handle each type you could possibly receive.
 
@@ -39,7 +41,7 @@ thingy.match(fst -> fst.doOneThing(),
              sec -> sec.doSomethingElse());
 }</pre>
 
- Sometimes it's a programming error to pass one type or another and you may want to throw an
+ Sometimes it's a programming error to pass one type or another, and you may want to throw an
  exception.
  <pre>{@code
 oneOf.match(fst -> fst.doOneThing(),
@@ -77,9 +79,10 @@ x.str().contains("goody!");
 // TODO: Should this implement javax.lang.model.type.UnionType somehow?
 public class OneOf2<A,B> {
 
-    private final Object item;
+    private final @Nullable Object item;
     private final int sel;
-    private final ImList<Class> types;
+    @SuppressWarnings("rawtypes")
+    private final @NotNull ImList<Class> types;
 
     /**
      Protected constructor for subclassing.  A, B, and C parameters can be null, but if one is non-null, the index
@@ -90,7 +93,12 @@ public class OneOf2<A,B> {
      @param bClass class 1 (to have at runtime for descriptive error messages and toString()).
      @param index 0 means this represents an A, 1 represents a B, 2 represents a C, 3 means D
      */
-    protected OneOf2(Object o, Class<A> aClass, Class<B> bClass, int index) {
+    protected OneOf2(
+            @Nullable Object o,
+            @NotNull Class<A> aClass,
+            @NotNull Class<B> bClass,
+            int index
+    ) {
         types = RuntimeTypes.registerClasses(aClass, bClass);
         sel = index;
         item = o;
@@ -113,48 +121,34 @@ public class OneOf2<A,B> {
      @param fb the function to be executed if this OneOf stores the second type.
      @return the return value of whichever function is executed.
      */
-    // We only store one item and it's type is erased, so we have to cast it at runtime.
-    // If sel is managed correctly, it ensures that the cast is accurate.
+    // We only store one item and its type is erased, so we have to cast it at runtime.
+    // If sel is managed correctly, this ensures that cast is accurate.
     @SuppressWarnings("unchecked")
-    public <R> R match(Fn1<A, R> fa,
-                       Fn1<B, R> fb) {
+    public <R> R match(
+            @NotNull Fn1<A, R> fa,
+            @NotNull Fn1<B, R> fb
+    ) {
         if (sel == 0) {
             return fa.apply((A) item);
         }
         return fb.apply((B) item);
     }
 
-//    // The A parameter ensures that this is used in the proper branch of the guard
-//    // Not sure this is a good idea.  Using match() is probably better.
-//    @SuppressWarnings("UnusedParameters")
-//    protected <R> R throw1(A a) {
-//        throw new ClassCastException("Expected a(n) " +
-//                                     RuntimeTypes.name(types.get(0)) + " but found a(n) " +
-//                                     RuntimeTypes.name(types.get(1)));
-//    }
-//
-//    // The B parameter ensures that this is used in the proper branch of the guard
-//    @SuppressWarnings("UnusedParameters")
-//    protected <R> R throw2(B b){
-//        throw new ClassCastException("Expected a(n) " +
-//                                     RuntimeTypes.name(types.get(1)) + " but found a(n) " +
-//                                     RuntimeTypes.name(types.get(0)));
-//    }
-
     public int hashCode() {
         // Simplest way to make the two items different.
         return Objects.hashCode(item) + sel;
     }
 
-    @SuppressWarnings("unchecked")
     @Override public boolean equals(Object other) {
         if (this == other) { return true; }
         if (!(other instanceof OneOf2)) { return false; }
 
+        @SuppressWarnings("rawtypes")
         OneOf2 that = (OneOf2) other;
         return (sel == that.sel) &&
                Objects.equals(item, that.item);
     }
 
-    @Override public String toString() { return union2Str(item, types); }
+    @Override
+    public @NotNull String toString() { return union2Str(item, types); }
 }

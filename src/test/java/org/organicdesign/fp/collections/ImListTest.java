@@ -21,7 +21,7 @@ import org.organicdesign.fp.TestUtilities;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
-import static org.organicdesign.fp.oneOf.None.none;
+import static org.organicdesign.fp.oneOf.Option.none;
 import static org.organicdesign.fp.oneOf.Option.some;
 
 public class ImListTest {

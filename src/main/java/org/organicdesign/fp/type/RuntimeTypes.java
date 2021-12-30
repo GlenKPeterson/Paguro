@@ -1,28 +1,31 @@
 package org.organicdesign.fp.type;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.organicdesign.fp.collections.ImList;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import static org.organicdesign.fp.FunctionUtils.stringify;
 import static org.organicdesign.fp.StaticImports.vec;
 
 /**
- Stores the classes from the compile-time generic type parameters in a vector in the *same order* as the
- generics in the type signature of that class.
- Store them here using {@link #registerClasses(Class[])} to avoid duplication.  For example:
-
- <pre><code>private static final ImList<Class> CLASS_STRING_INTEGER =
-    RuntimeTypes.registerClasses(vec(String.class, Integer.class));</code></pre>
-
- Now you if you use CLASS_STRING_INTEGER, you are never creating a new vector.
- For a full example of how to use these RuntimeTypes, see {@link org.organicdesign.fp.oneOf.OneOf2}.
-
- This is an experiment in runtime types for Java.  Constructive criticism is appreciated!
- If you write a programming language, your compiler can manage these vectors so that humans don't have to
- ever think about them, except to query them when they want to.  I wanted to do this with arrays, but I didn't trust
- that they wouldn't be mutated, so I used ImList's.
+ * Stores the classes from the compile-time generic type parameters in a vector in the *same order* as the
+ * generics in the type signature of that class.
+ * Store them here using {@link #registerClasses(Class[])} to avoid duplication.  For example:
+ *
+ * <pre><code>private static final ImList<Class> CLASS_STRING_INTEGER =
+ *    RuntimeTypes.registerClasses(vec(String.class, Integer.class));</code></pre>
+ *
+ * Now you if you use CLASS_STRING_INTEGER, you are never creating a new vector.
+ * For a full example of how to use these RuntimeTypes, see {@link org.organicdesign.fp.oneOf.OneOf2}.
+ *
+ * This is an experiment in runtime types for Java.  Constructive criticism is appreciated!
+ * If you write a programming language, your compiler can manage these vectors so that humans don't have to
+ * ever think about them, except to query them when they want to.
+ *
+ * I believe this class is thread-safe.
  */
 public final class RuntimeTypes {
 
@@ -30,61 +33,57 @@ public final class RuntimeTypes {
     @Deprecated
     private RuntimeTypes() { throw new UnsupportedOperationException("No instantiation"); }
 
-    private enum Lock { INSTANCE }
+    // Keep a single copy of combinations of generic parameters at runtime.
+    // Thanks to martynas at https://stackoverflow.com/a/27378976/1128668 for the trie implementation!
+    private static final @NotNull ListAndMap root = new ListAndMap(vec());
 
-    // Keep a single copy of combinations of generic parameters at runtime. These are all arrays for size,
-    // cache-closeness, and speed.  But arrays can be modified, so this must be kept private to guard against
-    // modification.
-    private static final HashMap<ArrayHolder<Class>,ImList<Class>> typeMap = new HashMap<>();
+    // This is NOT thread-safe - for testing only!
+//    static int size = 0;
 
     /**
-     Use this to prevent duplicate runtime types.
-     @param cs an immutable vector of classes to register
+     * Use this to register runtime type signatures
+     * @param cs an array of types
+     * @return An immutable vector of those types.  Given the same types, always returns the same vector.
      */
-    public static ImList<Class> registerClasses(@NotNull Class... cs) {
-        if (cs.length == 0) {
-            throw new IllegalArgumentException("Can't register a zero-length type array");
-        }
-        for (Class c : cs) {
-            if (c == null) {
-                throw new IllegalArgumentException("There shouldn't be any null types in this array!");
-            }
-        }
+    @SuppressWarnings("rawtypes")
+    public static @NotNull ImList<Class> registerClasses(@NotNull Class @NotNull ... cs) {
 
-        ArrayHolder<Class> ah = new ArrayHolder<>(cs);
-        ImList<Class> registeredTypes;
-        synchronized (Lock.INSTANCE) {
-            registeredTypes = typeMap.get(ah);
-            if (registeredTypes == null) {
-                ImList<Class> vecCs = vec(cs);
-                typeMap.put(ah, vecCs);
-                registeredTypes = vecCs;
+        // Walk the trie to find the ImList corresponding to this array.
+        ListAndMap node = root;
+        for (Class currClass : cs) {
+            // Synchronize on the parent node to inspect it or add children.
+            // I'd love it if someone can confirm this is safe.
+            // I think all the items involved are immutable except the contents of the HashMap,
+            // which is why we need to access it in a synchronized block.
+            //noinspection SynchronizationOnLocalVariableOrMethodParameter
+            synchronized (node) {
+                if (node.map.containsKey(currClass)) {
+                    // Node becomes the next node down in the trie.  We aren't synchronized on it yet,
+                    // But we're neither querying nor modifying it.
+                    node = node.map.get(currClass);
+                } else {
+                    // Still synchronized on the same node to query and modify it.
+                    // NOT modifying node.list in place - this creates a lightweight modified copy.
+                    ListAndMap newNode = new ListAndMap(node.list.append(currClass));
+                    node.map.put(currClass, newNode);
+//                    size++;
+                    // Node becomes the next node down in the trie.  We aren't synchronized on it yet,
+                    // But we're neither querying nor modifying it.
+                    node = newNode;
+                }
             }
         }
-        // We are returning the original array.  If we returned our safe copy, it could be modified!
-        return registeredTypes;
+        return node.list;
     }
 
-    // The one time I thought I needed this I was confused.  I had a class Or which has types Good and Bad.
-    // I got confused and passed whatever the good and bad values were when I really wanted just the types Good and Bad.
-//    /**
-//     Use this to prevent duplicate runtime types.
-//     @param os an array of objects whose classes to register
-//     */
-//    public static ImList<Class> registerObjects(Object... os) {
-//        if (os == null) {
-//            throw new IllegalArgumentException("Can't register a null object array");
-//        }
-//        // We aren't doing extra work here because we have to return a different array from what we store
-//        // in the hash map.
-//        return registerClasses( vec(os).map(o -> o == null ? (Class) null
-//                                                           : o.getClass())
-//                                       .toImList() );
-//    }
+    @SuppressWarnings("rawtypes")
+    public static @NotNull String name(@Nullable Class c) { return (c == null) ? "null" : c.getSimpleName(); }
 
-    public static String name(Class c) { return (c == null) ? "null" : c.getSimpleName(); }
-
-    public static String union2Str(Object item, ImList<Class> types) {
+    @SuppressWarnings("rawtypes")
+    public static @NotNull String union2Str(
+            Object item,
+            @NotNull ImList<Class> types
+    ) {
             StringBuilder sB = new StringBuilder();
             sB.append(stringify(item)).append(":");
             boolean isFirst = true;
@@ -99,5 +98,10 @@ public final class RuntimeTypes {
             return sB.toString();
     }
 
-    static int size() { return typeMap.size(); }
+    @SuppressWarnings("rawtypes")
+    private static class ListAndMap {
+        public final @NotNull ImList<Class> list;
+        public final @NotNull Map<Class, ListAndMap> map = new HashMap<>();
+        public ListAndMap(@NotNull ImList<Class> l) { list = l; }
+    }
 }

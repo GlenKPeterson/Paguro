@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.organicdesign.testUtils.EqualsContract;
 
 import static org.junit.Assert.assertEquals;
+import static org.organicdesign.fp.oneOf.Option.none;
 import static org.organicdesign.testUtils.Serialization.serializeDeserialize;
 
 public class OneOf2OrNoneTest {
@@ -38,7 +39,7 @@ public class OneOf2OrNoneTest {
                                         () -> "right"));
         assertEquals("None:String|Integer|None", sin.toString());
 
-        assertEquals(None.NONE, serializeDeserialize(None.none()));
+        assertEquals(None.NONE, serializeDeserialize(none()));
     }
 
     @Test public void testEquality() {

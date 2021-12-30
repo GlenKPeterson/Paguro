@@ -1,5 +1,7 @@
 package org.organicdesign.fp.oneOf;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.function.Fn1;
 import org.organicdesign.fp.type.RuntimeTypes;
@@ -13,9 +15,10 @@ import static org.organicdesign.fp.type.RuntimeTypes.union2Str;
  want a tuple instead.
  */
 public class OneOf3<A,B,C> {
-    private final Object item;
+    private final @Nullable Object item;
     private final int sel;
-    private final ImList<Class> types;
+    @SuppressWarnings("rawtypes")
+    private final @NotNull ImList<Class> types;
 
     /**
      Protected constructor for subclassing.
@@ -26,7 +29,13 @@ public class OneOf3<A,B,C> {
      @param cClass class 2 (to have at runtime for descriptive error messages and toString()).
      @param index 0 means this represents an A, 1 represents a B, 2 represents a C, 3 means D
      */
-    protected OneOf3(Object o, Class<A> aClass, Class<B> bClass, Class<C> cClass, int index) {
+    protected OneOf3(
+            @Nullable Object o,
+            @NotNull Class<A> aClass,
+            @NotNull Class<B> bClass,
+            @NotNull Class<C> cClass,
+            int index
+    ) {
         types = RuntimeTypes.registerClasses(aClass, bClass, cClass);
         sel = index;
         item = o;
@@ -50,12 +59,14 @@ public class OneOf3<A,B,C> {
      @param fc the function to be executed if this OneOf stores the third type.
      @return the return value of whichever function is executed.
      */
-    // We only store one item and it's type is erased, so we have to cast it at runtime.
-    // If sel is managed correctly, it ensures that the cast is accurate.
+    // We only store one item and its type is erased, so we have to cast it at runtime.
+    // If sel is managed correctly, this ensures that cast is accurate.
     @SuppressWarnings("unchecked")
-    public <R> R match(Fn1<A, R> fa,
-                       Fn1<B, R> fb,
-                       Fn1<C, R> fc) {
+    public <R> R match(
+            @NotNull Fn1<A, R> fa,
+            @NotNull Fn1<B, R> fb,
+            @NotNull Fn1<C, R> fc
+    ) {
         if (sel == 0) {
             return fa.apply((A) item);
         } else if (sel == 1) {
@@ -70,15 +81,17 @@ public class OneOf3<A,B,C> {
         return Objects.hashCode(item) + sel;
     }
 
-    @SuppressWarnings("unchecked")
-    @Override public boolean equals(Object other) {
+    @Override
+    public boolean equals(Object other) {
         if (this == other) { return true; }
         if (!(other instanceof OneOf3)) { return false; }
 
+        @SuppressWarnings("rawtypes")
         OneOf3 that = (OneOf3) other;
         return (sel == that.sel) &&
                Objects.equals(item, that.item);
     }
 
-    @Override public String toString() { return union2Str(item, types); }
+    @Override
+    public @NotNull String toString() { return union2Str(item, types); }
 }

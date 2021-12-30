@@ -1,5 +1,7 @@
 package org.organicdesign.fp.oneOf;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.function.Fn0;
 import org.organicdesign.fp.function.Fn1;
@@ -15,9 +17,10 @@ import static org.organicdesign.fp.type.RuntimeTypes.union2Str;
  */
 public abstract class OneOf2OrNone<A,B> {
 
-    private final Object item;
+    private final @Nullable Object item;
     private final int sel;
-    private final ImList<Class> types;
+    @SuppressWarnings("rawtypes")
+    private final @NotNull ImList<Class> types;
 
     /**
      Protected constructor for subclassing.
@@ -27,7 +30,12 @@ public abstract class OneOf2OrNone<A,B> {
      @param bClass class 1 (to have at runtime for descriptive error messages and toString()).
      @param index 0 means this represents an A, 1 represents a B, 2 represents a None
      */
-    protected OneOf2OrNone(Object o, Class<A> aClass, Class<B> bClass, int index) {
+    protected OneOf2OrNone(
+            @Nullable Object o,
+            @NotNull Class<A> aClass,
+            @NotNull Class<B> bClass,
+            int index
+    ) {
         types = RuntimeTypes.registerClasses(aClass, bClass, None.class);
         sel = index;
         item = o;
@@ -54,12 +62,14 @@ public abstract class OneOf2OrNone<A,B> {
      @param fz the function to be executed if this OneOf stores a None.
      @return the return value of whichever function is executed.
      */
-    // We only store one item and it's type is erased, so we have to cast it at runtime.
-    // If sel is managed correctly, it ensures that the cast is accurate.
+    // We only store one item and its type is erased, so we have to cast it at runtime.
+    // If sel is managed correctly, this ensures that cast is accurate.
     @SuppressWarnings("unchecked")
-    public <R> R match(Fn1<A, R> fa,
-                       Fn1<B, R> fb,
-                       Fn0<R> fz) {
+    public <R> R match(
+            @NotNull Fn1<A, R> fa,
+            @NotNull Fn1<B, R> fb,
+            @NotNull Fn0<R> fz
+    ) {
         if (sel == 0) {
             return fa.apply((A) item);
         } else if (sel == 1) {
@@ -74,11 +84,11 @@ public abstract class OneOf2OrNone<A,B> {
         return Objects.hashCode(item) + sel;
     }
 
-    @SuppressWarnings("unchecked")
     @Override public boolean equals(Object other) {
         if (this == other) { return true; }
         if (!(other instanceof OneOf2OrNone)) { return false; }
 
+        @SuppressWarnings("rawtypes")
         OneOf2OrNone that = (OneOf2OrNone) other;
         return (sel == that.sel) &&
                Objects.equals(item, that.item);

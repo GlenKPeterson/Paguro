@@ -10,12 +10,13 @@ public final class None<T> implements Option<T> {
     private static final long serialVersionUID = 20170810211300L;
 
     // ========================================== Static ==========================================
-    /** None is a singleton and this is its only instance. */
+    /**
+     * None is a singleton and this is its only instance.
+     * In general, you want to use {@link Option#none()} instead of
+     * accessing this directly so that the generic types work out.
+     */
+    @SuppressWarnings("rawtypes")
     static final Option NONE = new None();
-
-    /** Generic version of the singleton instance. */
-    @SuppressWarnings("unchecked")
-    public static <T> @NotNull None<T> none() { return (None<T>) NONE; }
 
     /** Private constructor for singleton. */
     private None() {}

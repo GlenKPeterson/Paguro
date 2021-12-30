@@ -55,7 +55,9 @@ public interface Option<T> extends Serializable { // extends UnmodSortedIterable
 
     // ========================================== Static ==========================================
 
-    /** Calling this instead of referring to NONE directly can make the type infrencer happy. */
+    /**
+     * Call this instead of referring to {@link None#NONE} directly to make the generic types work out.
+     */
     @SuppressWarnings("unchecked")
     static <T> @NotNull Option<T> none() { return None.NONE; }
 
@@ -120,7 +122,8 @@ public interface Option<T> extends Serializable { // extends UnmodSortedIterable
             if (this == other) { return true; }
             if ( !(other instanceof Option) ) { return false; }
 
-            final Option that = (Option) other;
+            @SuppressWarnings("rawtypes")
+            Option that = (Option) other;
             return that.isSome() && Objects.equals(this.item, that.get());
         }
     }
