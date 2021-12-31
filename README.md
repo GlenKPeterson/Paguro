@@ -45,7 +45,7 @@ Paguro is short for the Latin "Paguroidea" - the name of the Hermit Crab superfa
 * **Lazy initialization** [api](https://javadoc.io/doc/org.organicdesign/Paguro/latest/org/organicdesign/fp/function/LazyRef.html) / [src](src/main/java/org/organicdesign/fp/function/LazyRef.java) - LazyRef thread-safely performs initialization and frees initialization resources on first use.  Subsequent uses get the now-constant initialized value.  Use this instead of static initializers to avoid initialization loops.  Cache results of expensive operations for reuse.
 * **Union types** [api](https://javadoc.io/doc/org.organicdesign/Paguro/latest/org/organicdesign/fp/oneOf/package-summary.html) / [src](src/main/java/org/organicdesign/fp/oneOf) - Not as nice as being built into the language, but they extend type safety outside the object hierarchy.
 * **Memoization** [api](https://javadoc.io/doc/org.organicdesign/Paguro/latest/org/organicdesign/fp/function/Fn3.html) / [src](src/main/java/org/organicdesign/fp/function/Fn3.java) - Turns function calls into hashtable lookups to speed up slow functions over a limited range of inputs.
-* **Tiny** with no dependencies - The entire project fits in a 270K jar file.
+* **Tiny** with no dependencies - The entire project fits in a ~270K jar file.
 
 # Examples
 
