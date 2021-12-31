@@ -57,16 +57,16 @@ public abstract class Xform<A> implements UnmodIterable<A> {
     private @NotNull A terminate() { return (A) TERMINATE; }
 
     /**
-     These are mutable operations that the transform carries out when it is run.  This is like the
-     compiled "op codes" in contrast to the Xform is like the immutable "source code" of the
-     transformation description.
+     * These are mutable operations that the transform carries out when it is run.  This is like the
+     * compiled "op codes" in contrast to the Xform is like the immutable "source code" of the
+     * transformation description.  Every operation can be carried out with these three functions.
      */
     static abstract class Operation {
         // Time using a linked list of ops instead of array, so that we can easily remove ops from
         // the list when they are used up.
-        Fn1<Object,Boolean> filter = null;
-        Fn1 map = null;
-        Fn1<Object,Iterable> flatMap = null;
+        @Nullable Fn1<Object,Boolean> filter = null;
+        @Nullable Fn1 map = null;
+        @Nullable Fn1<Object,Iterable> flatMap = null;
 
         /**
          Drops as many items as the source can handle.
