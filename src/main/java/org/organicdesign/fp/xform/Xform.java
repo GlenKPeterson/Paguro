@@ -16,17 +16,14 @@ package org.organicdesign.fp.xform;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.organicdesign.fp.StaticImports;
 import org.organicdesign.fp.collections.UnmodIterable;
 import org.organicdesign.fp.collections.UnmodIterator;
 import org.organicdesign.fp.function.Fn1;
 import org.organicdesign.fp.function.Fn2;
 import org.organicdesign.fp.oneOf.Or;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  An immutable description of operations to be performed (a transformation, transform, or x-form).
@@ -553,16 +550,16 @@ public abstract class Xform<A> implements UnmodIterable<A> {
     }
 
     /**
-     This implementation should be correct, but could be slow in the case where previous operations
-     are slow and the terminateWhen operation is fast and terminates early.  It actually renders
-     items to a mutable List, then runs through the list performing the requested reduction,
-     checking for early termination on the result.  If you can to a takeWhile() or take() earlier
-     in the transform chain instead of doing it here, always do that.  If you really need early
-     termination based on the *result* of a fold, and the operations are expensive or the input
-     is huge, try using a View instead.  If you don't care about those things, then this method is
-     perfect for you.
-
-     {@inheritDoc}
+     * This implementation should be correct, but could be slow in the case where previous operations
+     * are slow and the terminateWhen operation is fast and terminates early.  It actually renders
+     * items to a mutable List, then runs through the list performing the requested reduction,
+     * checking for early termination on the result.  If you can do a takeWhile() or take() earlier
+     * in the transform chain instead of doing it here, always do that.  If you really need early
+     * termination based on the *result* of a fold, and the operations are expensive or the input
+     * is huge, try using a View instead.  If you don't care about those things, then this method is
+     * perfect for you.
+     *
+     * {@inheritDoc}
      */
     @Override
     public <G,B> @NotNull Or<G,B> foldUntil(
