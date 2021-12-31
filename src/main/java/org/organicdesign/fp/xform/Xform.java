@@ -74,7 +74,7 @@ public abstract class Xform<A> implements UnmodIterable<A> {
          @return  whether the source can handle the take, or pass-through (ask-supplier), or can't
          do either.
          */
-        public Or<Long,OpStrategy> drop(long num) {
+        public @NotNull Or<Long,OpStrategy> drop(long num) {
             return (num < 1) ? Or.good(0L)
                              : Or.bad(OpStrategy.CANNOT_HANDLE);
         }
@@ -85,7 +85,7 @@ public abstract class Xform<A> implements UnmodIterable<A> {
          @return whether the source can handle the take, or pass-through (ask-supplier), or can't
          do either.
          */
-        public OpStrategy take(long num) { return OpStrategy.CANNOT_HANDLE; }
+        public @NotNull OpStrategy take(long num) { return OpStrategy.CANNOT_HANDLE; }
 
         /**
          We need to model this as a separate op for when the previous op is CANNOT_HANDLE.  It is
@@ -105,7 +105,8 @@ public abstract class Xform<A> implements UnmodIterable<A> {
                     return Boolean.TRUE;
                 };
             }
-            @Override public Or<Long,OpStrategy> drop(long num) {
+            @Override
+            public @NotNull Or<Long,OpStrategy> drop(long num) {
                 leftToDrop = leftToDrop + num;
                 return Or.good(num);
             }
@@ -117,10 +118,12 @@ public abstract class Xform<A> implements UnmodIterable<A> {
 
         private static final class MapOp extends Operation {
             MapOp(Fn1 func) { map = func; }
-            @Override public Or<Long,OpStrategy> drop(long num) {
+            @Override
+            public @NotNull Or<Long,OpStrategy> drop(long num) {
                 return Or.bad(OpStrategy.ASK_SUPPLIER);
             }
-            @Override public OpStrategy take(long num) { return OpStrategy.ASK_SUPPLIER; }
+            @Override
+            public @NotNull OpStrategy take(long num) { return OpStrategy.ASK_SUPPLIER; }
         }
 
         // TODO: FlatMap should drop and take internally using addition/subtraction on each output
@@ -151,7 +154,8 @@ public abstract class Xform<A> implements UnmodIterable<A> {
                 };
             }
 
-            @Override public OpStrategy take(long num) {
+            @Override
+            public @NotNull OpStrategy take(long num) {
                 // This data condition is prevented in Xform.take()
 //                if (num < 0) {
 //                    throw new IllegalArgumentException("Can't take less than 0 items.");
@@ -206,13 +210,13 @@ public abstract class Xform<A> implements UnmodIterable<A> {
                                       new Fn2<ArrayList,Object,ArrayList>() {
                                           @SuppressWarnings("unchecked")
                                           @Override
-                                          public ArrayList applyEx(ArrayList res, Object item) {
+                                          public @NotNull ArrayList applyEx(@NotNull ArrayList res, Object item) {
                                               res.add(item);
                                               return res;
                                           }
                                       });
             return new Iterator() {
-                Iterator innerIter = prevSrc.iterator();
+                @NotNull Iterator innerIter = prevSrc.iterator();
                 boolean usingPrevSrc = true;
                 /** {@inheritDoc} */
                 @Override public boolean hasNext() {
