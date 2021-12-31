@@ -6,12 +6,12 @@ release before upgrading to the next one.  The documentation next to each Deprec
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
 ## Release 3.9.0 2021-12-30: Removed None.none()
- - Use Option.none() instead.
+ - Use Option.none() instead of None.none().
    They are duplicate methods.
    You're almost certainly going to be importing Option.some() already, so it makes sense to use Option.none() as well.
  - Fixed appendSome() to take a covariant parameter: `appendSome(@NotNull Fn0<? extends @NotNull Option<E>> supplier)`
- - Made RuntimeTypes store types in a Trie.  The previous storage made no sense.
- - More nullability annotations.
+ - Made RuntimeTypes store types in a Trie with node-level synchronization.  The previous storage made no sense.
+ - Added more nullability annotations.
 
 ## Release 3.8.0 2021-12-28: BaseList.appendSome(() -> Option<E>)
 - Replaced BaseList.appendWhen(Fn0<Boolean> test, E item) with appendSome(Fn0<Option<E>>).

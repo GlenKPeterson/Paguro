@@ -33,8 +33,7 @@ public final class RuntimeTypes {
     @Deprecated
     private RuntimeTypes() { throw new UnsupportedOperationException("No instantiation"); }
 
-    // Keep a single copy of combinations of generic parameters at runtime.
-    // Thanks to martynas at https://stackoverflow.com/a/27378976/1128668 for the trie implementation!
+    // Keep a single copy of combinations of generic parameters at runtime in a trie.
     private static final @NotNull ListAndMap root = new ListAndMap(vec());
 
     // This is NOT thread-safe - for testing only!
@@ -47,31 +46,10 @@ public final class RuntimeTypes {
      */
     @SuppressWarnings("rawtypes")
     public static @NotNull ImList<Class> registerClasses(@NotNull Class @NotNull ... cs) {
-
         // Walk the trie to find the ImList corresponding to this array.
         ListAndMap node = root;
         for (Class currClass : cs) {
-            // Synchronize on the parent node to inspect it or add children.
-            // I'd love it if someone can confirm this is safe.
-            // I think all the items involved are immutable except the contents of the HashMap,
-            // which is why we need to access it in a synchronized block.
-            //noinspection SynchronizationOnLocalVariableOrMethodParameter
-            synchronized (node) {
-                if (node.map.containsKey(currClass)) {
-                    // Node becomes the next node down in the trie.  We aren't synchronized on it yet,
-                    // But we're neither querying nor modifying it.
-                    node = node.map.get(currClass);
-                } else {
-                    // Still synchronized on the same node to query and modify it.
-                    // NOT modifying node.list in place - this creates a lightweight modified copy.
-                    ListAndMap newNode = new ListAndMap(node.list.append(currClass));
-                    node.map.put(currClass, newNode);
-//                    size++;
-                    // Node becomes the next node down in the trie.  We aren't synchronized on it yet,
-                    // But we're neither querying nor modifying it.
-                    node = newNode;
-                }
-            }
+            node = node.next(currClass);
         }
         return node.list;
     }
@@ -98,10 +76,35 @@ public final class RuntimeTypes {
             return sB.toString();
     }
 
+    // Thanks to martynas on StackOverflow for the HashMap-based trie implementation!
+    // https://stackoverflow.com/a/27378976/1128668
     @SuppressWarnings("rawtypes")
     private static class ListAndMap {
         public final @NotNull ImList<Class> list;
-        public final @NotNull Map<Class, ListAndMap> map = new HashMap<>();
+        // Mutable field is private.
+        private final @NotNull Map<Class, ListAndMap> map = new HashMap<>();
         public ListAndMap(@NotNull ImList<Class> l) { list = l; }
+
+        // Synchronize on this node to inspect it or add children.
+        // This avoids contention with other threads accessing any other nodes in this trie.
+        // The list is immutable and threadsafe, the HashMap is neither.
+        // That's why we access the HashMap in a tiny, synchronized method.
+        // Everything from the start of the read to the end of the modification is therefore atomic.
+        public synchronized ListAndMap next(@NotNull Class currClass) {
+            ListAndMap next = map.get(currClass);
+            if (next == null) {
+                // next is null when there is a new class in an existing sequence, or an entirely new sequence.
+                // Make the next node in this sequence and return it.
+                //
+                // Thread-safety:
+                // list.append() creates a threadsafe, lightweight, modified copy of the list.
+                // Still need to be synchronized between reading and writing the hashmap,
+                // but the old and new immutable lists can be shared freely across threads throughout.
+                next = new ListAndMap(list.append(currClass));
+                map.put(currClass, next);
+//                    size++;
+            }
+            return next;
+        }
     }
 }
