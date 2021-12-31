@@ -93,7 +93,7 @@ public abstract class Xform<A> implements UnmodIterable<A> {
          combined into the earliest single explicit drop op.  Such combinations are additive,
          meaning that drop(3).drop(5) is equivalent to drop(8).
          */
-        private static class DropOp extends Operation {
+        private static final class DropOp extends Operation {
             private long leftToDrop;
             DropOp(long drop) {
                 leftToDrop = drop;
@@ -111,11 +111,11 @@ public abstract class Xform<A> implements UnmodIterable<A> {
             }
         }
 
-        private static class FilterOp extends Operation {
+        private static final class FilterOp extends Operation {
             FilterOp(Fn1<Object,Boolean> func) { filter = func; }
         }
 
-        private static class MapOp extends Operation {
+        private static final class MapOp extends Operation {
             MapOp(Fn1 func) { map = func; }
             @Override public Or<Long,OpStrategy> drop(long num) {
                 return Or.bad(OpStrategy.ASK_SUPPLIER);
@@ -125,7 +125,7 @@ public abstract class Xform<A> implements UnmodIterable<A> {
 
         // TODO: FlatMap should drop and take internally using addition/subtraction on each output
         // TODO: list instead of testing each list item individually.
-        private static class FlatMapOp extends Operation {
+        private static final class FlatMapOp extends Operation {
 //            ListSourceDesc<U> cache = null;
 //            int numToDrop = 0;
 
@@ -138,7 +138,7 @@ public abstract class Xform<A> implements UnmodIterable<A> {
          combined into the earliest single explicit take op.  Such combination is a pick-least of
          all the takes, meaning that take(5).take(3) is equivalent to take(3).
          */
-        private static class TakeOp extends Operation {
+        private static final class TakeOp extends Operation {
             private long numToTake;
             TakeOp(long take) {
                 numToTake = take;
@@ -233,7 +233,7 @@ public abstract class Xform<A> implements UnmodIterable<A> {
     }
 
     /** Describes a concat() operation, but does not perform it. */
-    private final static class AppendIterDesc<T> extends Xform<T> {
+    private static final class AppendIterDesc<T> extends Xform<T> {
         final Xform<T> src;
 
         AppendIterDesc(Xform<T> prev, Xform<T> s) { super(prev); src = s; }
