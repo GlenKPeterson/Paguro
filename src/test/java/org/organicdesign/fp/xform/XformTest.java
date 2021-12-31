@@ -18,6 +18,7 @@ import junit.framework.TestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.organicdesign.fp.collections.RangeOfInt;
 import org.organicdesign.fp.oneOf.Option;
 
 import java.util.ArrayList;
@@ -907,4 +908,12 @@ public class XformTest extends TestCase {
                           new Integer[]{4, 5, 6});
     }
     // Above here taken from SequenceTest.
+
+//    @Test
+//    public void testDropOpSpeed() {
+//        System.out.println("Start");
+//        assertArrayEquals(new Integer[]{Integer.MAX_VALUE - 1},
+//                Xform.of(RangeOfInt.of(0, Integer.MAX_VALUE)).drop(Integer.MAX_VALUE - 1).toMutList().toArray());
+//        System.out.println("End");
+//    }
 }
