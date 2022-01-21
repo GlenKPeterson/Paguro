@@ -1,7 +1,6 @@
 package org.organicdesign.fp.oneOf;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.function.Fn1;
 import org.organicdesign.fp.type.RuntimeTypes;
@@ -10,28 +9,25 @@ import java.util.Objects;
 
 import static org.organicdesign.fp.type.RuntimeTypes.union2Str;
 
-/**
- Holds one of 4 values. See {@link OneOf2} for a full description.  If you're passing the same type, you probably
- want a tuple instead.
- */
+/** Holds one of 4 types of value. See {@link OneOf2} for a full description. */
 public abstract class OneOf4<A,B,C,D> {
-    private final @Nullable Object item;
+    protected final @NotNull Object item;
     private final int sel;
     @SuppressWarnings("rawtypes")
     private final @NotNull ImList<Class> types;
 
     /**
-     Protected constructor for subclassing.
-
-     @param o the item (may be null)
-     @param aClass class 0 (to have at runtime for descriptive error messages and toString()).
-     @param bClass class 1 (to have at runtime for descriptive error messages and toString()).
-     @param cClass class 2 (to have at runtime for descriptive error messages and toString()).
-     @param dClass class 3 (to have at runtime for descriptive error messages and toString()).
-     @param index 0 means this represents an A, 1 represents a B, 2 represents a C, 3 means D
+     * Protected constructor for subclassing.
+     *
+     * @param o the item
+     * @param aClass class 0
+     * @param bClass class 1
+     * @param cClass class 2
+     * @param dClass class 3
+     * @param index 0 means this represents an A, 1 a B, 2 a C, and 3 a D.
      */
     protected OneOf4(
-            @Nullable Object o,
+            @NotNull Object o,
             @NotNull Class<A> aClass,
             @NotNull Class<B> bClass,
             @NotNull Class<C> cClass,
@@ -46,7 +42,7 @@ public abstract class OneOf4<A,B,C,D> {
         } else if (index > 3) {
             throw new IllegalArgumentException("Selected item index must be 0-3");
         }
-        if ( (o != null) && (!types.get(index).isInstance(o)) ) {
+        if (!types.get(index).isInstance(o)) {
             throw new ClassCastException("You specified index " + index + ", indicating a(n) " +
                                          types.get(index).getCanonicalName() + "," +
                                          " but passed a " + o.getClass().getCanonicalName());
@@ -54,13 +50,13 @@ public abstract class OneOf4<A,B,C,D> {
     }
 
     /**
-     Languages that have union types built in have a match statement that works like this method.
-     Exactly one of these functions will be executed - determined by which type of item this object holds.
-     @param fa the function to be executed if this OneOf stores the first type.
-     @param fb the function to be executed if this OneOf stores the second type.
-     @param fc the function to be executed if this OneOf stores the third type.
-     @param fd the function to be executed if this OneOf stores the fourth type.
-     @return the return value of whichever function is executed.
+     * Languages that have union types built in have a match statement that works like this method.
+     * Exactly one of these functions will be executed - determined by which type of item this object holds.
+     * @param fa applied iff this stores the first type.
+     * @param fb applied iff this stores the second type.
+     * @param fc applied iff this stores the third type.
+     * @param fd applied iff this stores the fourth type.
+     * @return the return value of whichever function is executed.
      */
     // We only store one item and its type is erased, so we have to cast it at runtime.
     // If sel is managed correctly, this ensures that cast is accurate.

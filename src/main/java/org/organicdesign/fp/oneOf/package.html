@@ -1,4 +1,4 @@
-<html>
+<html lang="en">
 <body>
 <p>This package contains Option which has Some() and None() which is useful for indicating "Not-Found"
     or "End-of-stream/file".  It also has Or which has Good() and Bad() for functional error
@@ -38,7 +38,7 @@ String showThing(String s, Integer i) {
 
 <p>Really, we want to move to a type system where types are sets.
     ML had this in 1990.
-    Then Object Oriented programming took the world by storm and types without Objects waned.
+    Then Object-Oriented programming took the world by storm and types without Objects waned.
     In retrospect, we may have missed something.</p>
 
 <p>Here's an example using OneOf2.
@@ -48,21 +48,21 @@ String showThing(String s, Integer i) {
 // You need to subclass a OneOf class with your own class like this:
 static class Str_Int extends OneOf2&lt;String,Integer&gt; {
     // Constructor
-    private Str_Int(Object o, int n) { super(o, String.class, Integer.class, n); }
+    private Str_Int(@NotNull Object o, int n) { super(o, String.class, Integer.class, n); }
 
     // Static Factory Methods:
     // Make sure to use consecutive integers starting from zero
     // for the second constructor argument.  These ints represent
     // indices that select the classes you passed to the call to
     // super() above.  So String uses index 0:
-    static Str_Int ofStr(String o) { return new Str_Int(o, 0); }
+    static Str_Int of(@NotNull String o) { return new Str_Int(o, 0); }
 
     // Integer uses index 1:
-    static Str_Int ofInt(Integer o) { return new Str_Int(o, 1); }
+    static Str_Int of(@NotNull Integer o) { return new Str_Int(o, 1); }
 }
 
 // Now create a new instance with your factory
-Str_Int soi = Str_Int.ofInt(57);
+Str_Int soi = Str_Int.of(57);
 
 // Finally, use your new instance.  Notice that this forces you
 // to account for all cases of what the union type could contain.
@@ -100,7 +100,7 @@ if (parent instanceof Document) {
 }
 </code></pre>
 
-<p>What if you don't use Cells any more?  Dead code.
+<p>What if you don't use Cells anymore?  Dead code.
     What if you forget to code for some type?  Runtime Bugs.
     What if parent can be some additional type in the future, like a Table?  Runtime Bugs.</p>
 
@@ -111,16 +111,16 @@ public static class Doc_Para_Li_Cell
         extends OneOf3&lt;Document,Paragraph,Cell&gt; {
 
     // Constructor
-    protected Doc_Para_Li_Cell(Object o, int s) {
+    protected Doc_Para_Li_Cell(@NotNull Object o, int s) {
         super(o, Document.class, Paragraph.class, Cell.class, s);
     }
 
     // Static factory methods
-    public static Doc_Para_Li_Cell ofDoc(Document document) {
+    public static Doc_Para_Li_Cell of(@NotNull Document document) {
         return new Doc_Para_Li_Cell(document, 0);
     }
-    public static Doc_Para_Li_Cell ofPara(Paragraph p) { return new Doc_Para_Li_Cell(p, 1); }
-    public static Doc_Para_Li_Cell ofCell(Cell c) { return new Doc_Para_Li_Cell(c, 2); }
+    public static Doc_Para_Li_Cell of(@NotNull Paragraph p) { return new Doc_Para_Li_Cell(p, 1); }
+    public static Doc_Para_Li_Cell of(@NotNull Cell c) { return new Doc_Para_Li_Cell(c, 2); }
 }</code></pre>
 
 <p>Now in your code, when you want to add a bunch of text, you can do it the right way for each.  No casts,
@@ -142,7 +142,7 @@ parent.match(doc  -&gt; { doc.add(table); return null; },
              para -&gt; { throw new IllegalStateException("Can't add a table to a paragraph."); },
              cell -&gt; { cell.add(table); return null; });</code></pre>
 
-<p>Now if you decide not to use Cells any more, you switch Doc_Para_Li_Cell to extend OneOf2, rename it to Doc_Para_Li
+<p>Now if you decide not to use Cells anymore, switch Doc_Para_Li_Cell to extend OneOf2, rename it to Doc_Para_Li
     and fix all the compile-time errors.  To add a Table type, extend OneOf4.
     No dead code.  No bugs.
     Union types extend type safety outside the object hierarchy.
@@ -150,7 +150,7 @@ parent.match(doc  -&gt; { doc.add(table); return null; },
     Well, Kotlin already has it for nulls, just not in the general case.</p>
 
 <p>If you like Paguro and are interested in a new JVM and maybe compile-to-JavaScript language
-    with Union and Intersection types instead of Object Oriented hierarchies, take a look at the
+    with Union and Intersection types instead of Object-Oriented hierarchies, take a look at the
     evolving spec for the
     <a href="https://github.com/GlenKPeterson/Cymling" target="_blank">Cymling</a> programming
     language.  It may need some help to become reality.</p>

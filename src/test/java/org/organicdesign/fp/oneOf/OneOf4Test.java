@@ -17,36 +17,36 @@ public class OneOf4Test {
         }
 
         // Static factory methods
-        static Str_Int_Float_Dub ofStr(String o) { return new Str_Int_Float_Dub(o, 0); }
-        static Str_Int_Float_Dub ofInt(Integer o) { return new Str_Int_Float_Dub(o, 1); }
-        static Str_Int_Float_Dub ofFloat(Float o) { return new Str_Int_Float_Dub(o, 2); }
-        static Str_Int_Float_Dub ofDub(Double o) { return new Str_Int_Float_Dub(o, 3); }
+        static Str_Int_Float_Dub of(String o) { return new Str_Int_Float_Dub(o, 0); }
+        static Str_Int_Float_Dub of(Integer o) { return new Str_Int_Float_Dub(o, 1); }
+        static Str_Int_Float_Dub of(Float o) { return new Str_Int_Float_Dub(o, 2); }
+        static Str_Int_Float_Dub of(Double o) { return new Str_Int_Float_Dub(o, 3); }
     }
 
     @Test
     public void testBasics() {
-        Str_Int_Float_Dub oots = Str_Int_Float_Dub.ofStr("right");
+        Str_Int_Float_Dub oots = Str_Int_Float_Dub.of("right");
         assertEquals("right", oots.match(s -> s,
                                          i -> "wrong",
                                          f -> "bad",
                                          d -> "evil"));
         assertEquals("\"right\":String|Integer|Float|Double", oots.toString());
 
-        Str_Int_Float_Dub ooti = Str_Int_Float_Dub.ofInt(57);
+        Str_Int_Float_Dub ooti = Str_Int_Float_Dub.of(57);
         assertEquals(Integer.valueOf(57), ooti.match(s -> -99,
                                                      i -> i,
                                                      f -> 99,
                                                      d -> 2));
         assertEquals("57:String|Integer|Float|Double", ooti.toString());
 
-        Str_Int_Float_Dub ootf = Str_Int_Float_Dub.ofFloat(57.2f);
+        Str_Int_Float_Dub ootf = Str_Int_Float_Dub.of(57.2f);
         assertEquals(Float.valueOf(57.2f), ootf.match(s -> -99f,
                                                       i -> 99f,
                                                       f -> f,
                                                       d -> 2));
         assertEquals("57.2:String|Integer|Float|Double", ootf.toString());
 
-        Str_Int_Float_Dub ootd = Str_Int_Float_Dub.ofDub(17.2);
+        Str_Int_Float_Dub ootd = Str_Int_Float_Dub.of(17.2);
         assertEquals(Double.valueOf(17.2), ootd.match(s -> -99f,
                                                       i -> 99f,
                                                       f -> 2,
@@ -55,38 +55,38 @@ public class OneOf4Test {
     }
 
     @Test public void testEquality() {
-        assertEquals(0, Str_Int_Float_Dub.ofStr(null).hashCode());
-        assertEquals(1, Str_Int_Float_Dub.ofInt(null).hashCode());
-        assertEquals(2, Str_Int_Float_Dub.ofFloat(null).hashCode());
-        assertEquals(3, Str_Int_Float_Dub.ofDub(null).hashCode());
-        assertNotEquals(3, Str_Int_Float_Dub.ofDub(-1.3).hashCode());
+        assertEquals(0, Str_Int_Float_Dub.of("").hashCode());
+        assertEquals(1, Str_Int_Float_Dub.of(0).hashCode());
+        assertEquals(2, Str_Int_Float_Dub.of(0f).hashCode());
+        assertEquals(3, Str_Int_Float_Dub.of(0.0).hashCode());
+        assertNotEquals(3, Str_Int_Float_Dub.of(-1.3).hashCode());
 
-        assertFalse(Str_Int_Float_Dub.ofFloat(5f).equals(Str_Int_Float_Dub.ofInt(5)));
-        assertFalse(Str_Int_Float_Dub.ofInt(41).equals(Str_Int_Float_Dub.ofStr("A")));
-        assertFalse(Str_Int_Float_Dub.ofStr("A").equals(Str_Int_Float_Dub.ofInt(41)));
-        assertFalse(Str_Int_Float_Dub.ofFloat(-19.3f).equals(Str_Int_Float_Dub.ofDub(-19.3)));
+        assertFalse(Str_Int_Float_Dub.of(5f).equals(Str_Int_Float_Dub.of(5)));
+        assertFalse(Str_Int_Float_Dub.of(41).equals(Str_Int_Float_Dub.of("A")));
+        assertFalse(Str_Int_Float_Dub.of("A").equals(Str_Int_Float_Dub.of(41)));
+        assertFalse(Str_Int_Float_Dub.of(-19.3f).equals(Str_Int_Float_Dub.of(-19.3)));
 
-        assertFalse(Str_Int_Float_Dub.ofInt(65).equals(Str_Int_Float_Dub.ofStr("A")));
-        assertFalse(Str_Int_Float_Dub.ofStr("A").equals(Str_Int_Float_Dub.ofInt(65)));
-        assertFalse(Str_Int_Float_Dub.ofFloat(65.0f).equals(Str_Int_Float_Dub.ofDub(65.0)));
+        assertFalse(Str_Int_Float_Dub.of(65).equals(Str_Int_Float_Dub.of("A")));
+        assertFalse(Str_Int_Float_Dub.of("A").equals(Str_Int_Float_Dub.of(65)));
+        assertFalse(Str_Int_Float_Dub.of(65.0f).equals(Str_Int_Float_Dub.of(65.0)));
 
-        assertTrue(Str_Int_Float_Dub.ofInt(37).equals(Str_Int_Float_Dub.ofInt(37)));
+        assertTrue(Str_Int_Float_Dub.of(37).equals(Str_Int_Float_Dub.of(37)));
 
-        EqualsContract.equalsDistinctHashCode(Str_Int_Float_Dub.ofStr("one"), Str_Int_Float_Dub.ofStr("one"),
-                                              Str_Int_Float_Dub.ofStr("one"),
-                                              Str_Int_Float_Dub.ofStr("onf"));
+        EqualsContract.equalsDistinctHashCode(Str_Int_Float_Dub.of("one"), Str_Int_Float_Dub.of("one"),
+                                              Str_Int_Float_Dub.of("one"),
+                                              Str_Int_Float_Dub.of("onf"));
 
-        EqualsContract.equalsDistinctHashCode(Str_Int_Float_Dub.ofInt(97), Str_Int_Float_Dub.ofInt(97),
-                                              Str_Int_Float_Dub.ofInt(97),
-                                              Str_Int_Float_Dub.ofInt(-97));
+        EqualsContract.equalsDistinctHashCode(Str_Int_Float_Dub.of(97), Str_Int_Float_Dub.of(97),
+                                              Str_Int_Float_Dub.of(97),
+                                              Str_Int_Float_Dub.of(-97));
 
-        EqualsContract.equalsDistinctHashCode(Str_Int_Float_Dub.ofFloat(17f), Str_Int_Float_Dub.ofFloat(17f),
-                                              Str_Int_Float_Dub.ofFloat(17f),
-                                              Str_Int_Float_Dub.ofFloat(-17f));
+        EqualsContract.equalsDistinctHashCode(Str_Int_Float_Dub.of(17f), Str_Int_Float_Dub.of(17f),
+                                              Str_Int_Float_Dub.of(17f),
+                                              Str_Int_Float_Dub.of(-17f));
 
-        EqualsContract.equalsDistinctHashCode(Str_Int_Float_Dub.ofDub(31.7), Str_Int_Float_Dub.ofDub(31.7),
-                                              Str_Int_Float_Dub.ofDub(31.7),
-                                              Str_Int_Float_Dub.ofDub(-3333.7));
+        EqualsContract.equalsDistinctHashCode(Str_Int_Float_Dub.of(31.7), Str_Int_Float_Dub.of(31.7),
+                                              Str_Int_Float_Dub.of(31.7),
+                                              Str_Int_Float_Dub.of(-3333.7));
     }
 
     @Test(expected = IllegalArgumentException.class)

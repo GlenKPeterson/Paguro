@@ -61,5 +61,8 @@ public class Fn2Test {
         assertEquals(3, counter.get());
         assertEquals("3~2.5", g.apply(3, 2.5));
         assertEquals(3, counter.get());
+
+        assertEquals(3.5, Fn2.first().apply(3.5, 4.0));
+        assertEquals(4.0, Fn2.second().apply(3.5, 4.0));
     }
 }

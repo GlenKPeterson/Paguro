@@ -5,6 +5,17 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
+## Release 3.10.0 2022-01-21: "OneOf5"
+- Added OneOf5.  A second-class Union Type like OneOf4, but with one more.
+- Removed OneOf2OrNone; use Option<OneOf2> instead.
+  The [OneOf2OrNoneTest](src/test/java/org/organicdesign/fp/oneOf/OneOf2OrNoneTest.java) shows how.
+- Changed the contained object in all OneOf_ classes from `@Nullable` to `@NotNull` and from `private` to `protected`.
+  If you use @NotNull annotations in your subclass, you can now overload the static factory methods in your subclasses (you can use the same name for all of them).
+  Instead of storing null in a OneOf, simply return a `null` OneOf_ or `Option<OneOf_>.none()`.
+  The `protected` lets subclasses access the contained item for easily implementing an interface that the possible values share.
+  The [OneOf2Test](src/test/java/org/organicdesign/fp/oneOf/OneOf2Test.java) shows how.
+- Test coverage reached 95% by line.
+
 ## Release 3.9.0 2021-12-30: Removed None.none()
  - Use Option.none() instead of None.none().
    They are duplicate methods.
@@ -236,6 +247,7 @@ public class String_Integer extends OneOf2<String,Integer> {
 
     public static String_Integer str(String cre) { return new String_Integer(cre, null, 1); }
     public static String_Integer in(Integer rev) { return new String_Integer(null, rev, 2); }
+}
 ```
 to (MAKE SURE TO USE ZERO-BASED INDICES!):
 ```java
@@ -244,6 +256,7 @@ public class String_Integer extends OneOf2<String,Integer> {
 
     public static String_Integer str(String cre) { return new String_Integer(cre, 0); }
     public static String_Integer in(Integer rev) { return new String_Integer(rev, 1); }
+}
 ```
 
 If you used the super::throw1 and super::throw2 methods, those have disappeared in favor of just using match everywhere.

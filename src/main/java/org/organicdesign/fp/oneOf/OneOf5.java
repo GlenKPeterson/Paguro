@@ -9,8 +9,8 @@ import java.util.Objects;
 
 import static org.organicdesign.fp.type.RuntimeTypes.union2Str;
 
-/** Holds one of 3 types of value. See {@link OneOf2} for a full description. */
-public class OneOf3<A,B,C> {
+/** Holds one of 5 types of value. See {@link OneOf2} for a full description. */
+public abstract class OneOf5<A,B,C,D,E> {
     protected final @NotNull Object item;
     private final int sel;
     @SuppressWarnings("rawtypes")
@@ -23,22 +23,26 @@ public class OneOf3<A,B,C> {
      * @param aClass class 0
      * @param bClass class 1
      * @param cClass class 2
-     * @param index 0 means this represents an A, 1 a B, and 2 a C.
+     * @param dClass class 3
+     * @param eClass class 4
+     * @param index 0 means this represents an A, 1 a B, 2 a C, 3 a D, and 4 an E.
      */
-    protected OneOf3(
+    protected OneOf5(
             @NotNull Object o,
             @NotNull Class<A> aClass,
             @NotNull Class<B> bClass,
             @NotNull Class<C> cClass,
+            @NotNull Class<D> dClass,
+            @NotNull Class<E> eClass,
             int index
     ) {
-        types = RuntimeTypes.registerClasses(aClass, bClass, cClass);
+        types = RuntimeTypes.registerClasses(aClass, bClass, cClass, dClass, eClass);
         sel = index;
         item = o;
         if (index < 0) {
-            throw new IllegalArgumentException("Selected item index must be 0-2");
-        } else if (index > 2) {
-            throw new IllegalArgumentException("Selected item index must be 0-2");
+            throw new IllegalArgumentException("Selected item index must be 0-4");
+        } else if (index > 4) {
+            throw new IllegalArgumentException("Selected item index must be 0-4");
         }
         if (!types.get(index).isInstance(o)) {
             throw new ClassCastException("You specified index " + index + ", indicating a(n) " +
@@ -53,6 +57,8 @@ public class OneOf3<A,B,C> {
      * @param fa applied iff this stores the first type.
      * @param fb applied iff this stores the second type.
      * @param fc applied iff this stores the third type.
+     * @param fd applied iff this stores the fourth type.
+     * @param fe applied iff this stores the fifth type.
      * @return the return value of whichever function is executed.
      */
     // We only store one item and its type is erased, so we have to cast it at runtime.
@@ -61,14 +67,20 @@ public class OneOf3<A,B,C> {
     public <R> R match(
             @NotNull Fn1<A, R> fa,
             @NotNull Fn1<B, R> fb,
-            @NotNull Fn1<C, R> fc
+            @NotNull Fn1<C, R> fc,
+            @NotNull Fn1<D, R> fd,
+            @NotNull Fn1<E, R> fe
     ) {
         if (sel == 0) {
             return fa.apply((A) item);
         } else if (sel == 1) {
             return fb.apply((B) item);
-        } else {
+        } else if (sel == 2) {
             return fc.apply((C) item);
+        } else if (sel == 3) {
+            return fd.apply((D) item);
+        } else {
+            return fe.apply((E) item);
         }
     }
 
@@ -77,13 +89,12 @@ public class OneOf3<A,B,C> {
         return Objects.hashCode(item) + sel;
     }
 
-    @Override
-    public boolean equals(Object other) {
+    @Override public boolean equals(Object other) {
         if (this == other) { return true; }
-        if (!(other instanceof OneOf3)) { return false; }
+        if (!(other instanceof OneOf5)) { return false; }
 
         @SuppressWarnings("rawtypes")
-        OneOf3 that = (OneOf3) other;
+        OneOf5 that = (OneOf5) other;
         return (sel == that.sel) &&
                Objects.equals(item, that.item);
     }

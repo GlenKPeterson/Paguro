@@ -1,5 +1,6 @@
 package org.organicdesign.fp.oneOf;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.organicdesign.testUtils.EqualsContract;
 
@@ -11,31 +12,31 @@ public class OneOf3Test {
     static class Str_Int_Float extends OneOf3<String,Integer,Float> {
 
         // Constructor
-        private Str_Int_Float(Object o, int n) {
+        private Str_Int_Float(@NotNull Object o, int n) {
             super(o, String.class, Integer.class, Float.class, n);
         }
 
         // Static factory methods
-        static Str_Int_Float ofStr(String o) { return new Str_Int_Float(o, 0); }
-        static Str_Int_Float ofInt(Integer o) { return new Str_Int_Float(o, 1); }
-        static Str_Int_Float ofFloat(Float o) { return new Str_Int_Float(o, 2); }
+        static Str_Int_Float of(@NotNull String o) { return new Str_Int_Float(o, 0); }
+        static Str_Int_Float of(@NotNull Integer o) { return new Str_Int_Float(o, 1); }
+        static Str_Int_Float of(@NotNull Float o) { return new Str_Int_Float(o, 2); }
     }
 
     @Test
     public void testBasics() {
-        Str_Int_Float oots = Str_Int_Float.ofStr("right");
+        Str_Int_Float oots = Str_Int_Float.of("right");
         assertEquals("right", oots.match(s -> s,
                                          i -> "wrong",
                                          f -> "bad"));
         assertEquals("\"right\":String|Integer|Float", oots.toString());
 
-        Str_Int_Float ooti = Str_Int_Float.ofInt(57);
+        Str_Int_Float ooti = Str_Int_Float.of(57);
         assertEquals(Integer.valueOf(57), ooti.match(s -> -99,
                                                      i -> i,
                                                      f -> 99));
         assertEquals("57:String|Integer|Float", ooti.toString());
 
-        Str_Int_Float ootf = Str_Int_Float.ofFloat(57.2f);
+        Str_Int_Float ootf = Str_Int_Float.of(57.2f);
         assertEquals(Float.valueOf(57.2f), ootf.match(s -> -99f,
                                                      i -> 99f,
                                                      f -> f));
@@ -43,30 +44,30 @@ public class OneOf3Test {
     }
 
     @Test public void testEquality() {
-        assertEquals(0, Str_Int_Float.ofStr(null).hashCode());
-        assertEquals(1, Str_Int_Float.ofInt(null).hashCode());
-        assertEquals(2, Str_Int_Float.ofFloat(null).hashCode());
+        assertEquals(0, Str_Int_Float.of("").hashCode());
+        assertEquals(1, Str_Int_Float.of(0).hashCode());
+        assertEquals(2, Str_Int_Float.of(0f).hashCode());
 
-        assertFalse(Str_Int_Float.ofFloat(5f).equals(Str_Int_Float.ofInt(5)));
-        assertFalse(Str_Int_Float.ofInt(41).equals(Str_Int_Float.ofStr("A")));
-        assertFalse(Str_Int_Float.ofStr("A").equals(Str_Int_Float.ofInt(41)));
+        assertFalse(Str_Int_Float.of(5f).equals(Str_Int_Float.of(5)));
+        assertFalse(Str_Int_Float.of(41).equals(Str_Int_Float.of("A")));
+        assertFalse(Str_Int_Float.of("A").equals(Str_Int_Float.of(41)));
 
-        assertFalse(Str_Int_Float.ofInt(65).equals(Str_Int_Float.ofStr("A")));
-        assertFalse(Str_Int_Float.ofStr("A").equals(Str_Int_Float.ofInt(65)));
+        assertFalse(Str_Int_Float.of(65).equals(Str_Int_Float.of("A")));
+        assertFalse(Str_Int_Float.of("A").equals(Str_Int_Float.of(65)));
 
-        assertTrue(Str_Int_Float.ofInt(37).equals(Str_Int_Float.ofInt(37)));
+        assertTrue(Str_Int_Float.of(37).equals(Str_Int_Float.of(37)));
 
-        EqualsContract.equalsDistinctHashCode(Str_Int_Float.ofStr("one"), Str_Int_Float.ofStr("one"),
-                                              Str_Int_Float.ofStr("one"),
-                                              Str_Int_Float.ofStr("onf"));
+        EqualsContract.equalsDistinctHashCode(Str_Int_Float.of("one"), Str_Int_Float.of("one"),
+                                              Str_Int_Float.of("one"),
+                                              Str_Int_Float.of("onf"));
 
-        EqualsContract.equalsDistinctHashCode(Str_Int_Float.ofInt(97), Str_Int_Float.ofInt(97),
-                                              Str_Int_Float.ofInt(97),
-                                              Str_Int_Float.ofInt(-97));
+        EqualsContract.equalsDistinctHashCode(Str_Int_Float.of(97), Str_Int_Float.of(97),
+                                              Str_Int_Float.of(97),
+                                              Str_Int_Float.of(-97));
 
-        EqualsContract.equalsDistinctHashCode(Str_Int_Float.ofFloat(17f), Str_Int_Float.ofFloat(17f),
-                                              Str_Int_Float.ofFloat(17f),
-                                              Str_Int_Float.ofFloat(-17f));
+        EqualsContract.equalsDistinctHashCode(Str_Int_Float.of(17f), Str_Int_Float.of(17f),
+                                              Str_Int_Float.of(17f),
+                                              Str_Int_Float.of(-17f));
     }
 
     @Test(expected = IllegalArgumentException.class)

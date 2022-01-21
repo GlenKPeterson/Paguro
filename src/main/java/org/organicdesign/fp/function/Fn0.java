@@ -14,7 +14,6 @@
 
 package org.organicdesign.fp.function;
 
-import java.io.Serializable;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 
@@ -50,12 +49,22 @@ public interface Fn0<U> extends Supplier<U>, Callable<U> {
     // ========================================== Static ==========================================
     // Enums are serializable.  Anonymous classes and lambdas are not.
 
+// Dear Glen,
+// You have implemented this twice now.  There are 3 reasons to leave it commented out:
+// 1. `() -> none` is brief, clear, and beautiful.
+// 2. You hate the method reference syntax (it's ambiguous).
+// 3. Encourage using Option over null.
 //    /** One-of-a-kind Fn0's. */
-//    enum ConstObjObj implements Fn0<Object> {
+//    enum ConstObj implements Fn0<Option<Object>> {
 //        NULL {
-//            @Override public Object applyEx() throws Exception { return null; }
+//            @Override
+//            public @NotNull Option<Object> applyEx() throws Exception { return Option.none(); }
 //        }
 //    }
+//
+//    /** Returns a type-safe version of the {@link ConstObj#NULL} thunk. */
+//    @SuppressWarnings("unchecked")
+//    static <S> @NotNull Fn0<S> nullSupplier() { return (Fn0<S>) ConstObj.NULL; }
 
 //    /**
 //     Wraps a value in a constant function.  If you need to "memoize" some really expensive
@@ -76,9 +85,4 @@ public interface Fn0<U> extends Supplier<U>, Callable<U> {
 //    }
 //
 //    static <K> Fn0<K> constantFunction(final K k) { return new Constant<>(k); }
-
-// Don't think this is necessary.  Is it?
-//    default Supplier<U> asSupplier() {
-//        return () -> apply();
-//    }
 }

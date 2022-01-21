@@ -15,7 +15,6 @@
 package org.organicdesign.fp.oneOf;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.function.Fn1;
 import org.organicdesign.fp.type.RuntimeTypes;
@@ -75,26 +74,26 @@ x.str().contains("goody!");
 // If not an Integer at runtime throws "Expected a(n) Integer but found a(n) String"
 3 + x.integer();
 }</pre>
- */
-// TODO: Should this implement javax.lang.model.type.UnionType somehow?
-public class OneOf2<A,B> {
 
-    private final @Nullable Object item;
+ Instead of putting a Null object in here, either return a null OneOf2 or wrap OneOf2 in an {@link Option}
+ */
+public class OneOf2<A,B> {
+    protected final @NotNull Object item;
     private final int sel;
     @SuppressWarnings("rawtypes")
     private final @NotNull ImList<Class> types;
 
     /**
-     Protected constructor for subclassing.  A, B, and C parameters can be null, but if one is non-null, the index
-     must specify the non-null value (to keep you from assigning a bogus index value).
-
-     @param o the item
-     @param aClass class 0 (to have at runtime for descriptive error messages and toString()).
-     @param bClass class 1 (to have at runtime for descriptive error messages and toString()).
-     @param index 0 means this represents an A, 1 represents a B, 2 represents a C, 3 means D
+     * Protected constructor for subclassing.
+     * Be extremely careful to pass the correct index!
+     *
+     * @param o the item
+     * @param aClass class 0
+     * @param bClass class 1
+     * @param index 0 means this represents an A, 1 represents a B
      */
     protected OneOf2(
-            @Nullable Object o,
+            @NotNull Object o,
             @NotNull Class<A> aClass,
             @NotNull Class<B> bClass,
             int index
@@ -107,7 +106,7 @@ public class OneOf2<A,B> {
         } else if (index > 1) {
             throw new IllegalArgumentException("Selected item index must be 0-1");
         }
-        if ( (o != null) && (!types.get(index).isInstance(o)) ) {
+        if (!types.get(index).isInstance(o)) {
             throw new ClassCastException("You specified index " + index + ", indicating a(n) " +
                                          types.get(index).getCanonicalName() + "," +
                                          " but passed a " + o.getClass().getCanonicalName());
@@ -115,11 +114,11 @@ public class OneOf2<A,B> {
     }
 
     /**
-     Languages that have union types built in have a match statement that works like this method.
-     Exactly one of these functions will be executed - determined by which type of item this object holds.
-     @param fa the function to be executed if this OneOf stores the first type.
-     @param fb the function to be executed if this OneOf stores the second type.
-     @return the return value of whichever function is executed.
+     * Languages that have union types built in have a match statement that works like this method.
+     * Exactly one of these functions will be executed - determined by which type of item this object holds.
+     * @param fa applied iff this stores the first type.
+     * @param fb applied iff this stores the second type.
+     * @return the return value of whichever function is executed.
      */
     // We only store one item and its type is erased, so we have to cast it at runtime.
     // If sel is managed correctly, this ensures that cast is accurate.
