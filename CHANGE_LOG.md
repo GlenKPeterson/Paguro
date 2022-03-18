@@ -5,6 +5,12 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
+## Release 3.10.1 2022-03-18: NotNull whereNotNull()
+ - Added `@NotNull` annotation to the generic type parameter returned by Transformable.whereNonNull()
+   (and implementation of that method in UnmodIterable).
+   - Was: `@NotNull Transformable<T> whereNonNull()`
+   - Now: `@NotNull Transformable<@NotNull T> whereNonNull()`
+
 ## Release 3.10.0 2022-01-21: "OneOf5"
 - Added OneOf5.  A second-class Union Type like OneOf4, but with one more.
 - Removed OneOf2OrNone; use Option<OneOf2> instead.

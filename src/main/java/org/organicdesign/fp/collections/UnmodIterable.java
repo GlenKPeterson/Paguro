@@ -194,7 +194,7 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
     }
 
     /** {@inheritDoc} */
-    @Override default @NotNull UnmodIterable<T> whereNonNull() {
+    @Override default @NotNull UnmodIterable<@NotNull T> whereNonNull() {
         return Xform.of(this).filter(Objects::nonNull);
     }
 
