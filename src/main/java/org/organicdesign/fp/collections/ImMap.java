@@ -43,7 +43,7 @@ public interface ImMap<K,V> extends BaseUnsortedMap<K,V> {
     @NotNull MutMap<K,V> mutable();
 
     /**
-     * Efficiently adds {@link UnmodMap.UnEntry}&lt;K,V> to this ImMap.  Ordering is ignored.
+     * Efficiently adds {@link UnmodMap.UnEntry}&lt;K,V&gt; to this ImMap.  Ordering is ignored.
      * @param items the values to add
      * @return a new ImMap with the additional items.
      */
@@ -55,7 +55,7 @@ public interface ImMap<K,V> extends BaseUnsortedMap<K,V> {
     }
 
     /**
-     * Efficiently adds {@link UnmodMap.UnEntry}&lt;K,V> to this ImMap.  Ordering is ignored.
+     * Efficiently adds {@link UnmodMap.UnEntry}&lt;K,V&gt; to this ImMap.  Ordering is ignored.
      * @param items the values to add
      * @return a new ImMap with the additional items.
      */
