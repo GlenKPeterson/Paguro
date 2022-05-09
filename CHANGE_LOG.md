@@ -5,8 +5,8 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
-// TODO: public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<K,V>>, Sized {
-// Change to Map.Entry!!!!
+// CONSIDER public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<K,V>>, Sized {
+// CONSIDER Changing to Map.Entry
 ## Release 3.10.2 2022-05-08: concat() and precat()
  - Implemented concat() and precat() methods on ImMap, MutMap, ImSet, MutSet, ImRrbTree and MutRrbTree
    because:
