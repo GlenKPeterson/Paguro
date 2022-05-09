@@ -14,6 +14,7 @@
 
 package org.organicdesign.fp.collections;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -30,9 +31,15 @@ public interface MutSet<E> extends BaseSet<E> {
     MutSet<E> put(E val);
 
     /** {@inheritDoc} */
-    @NotNull
-    @Override default MutSet<E> union(Iterable<? extends E> iter) {
-        return concat(iter).toMutSet();
+    @Override
+    @Contract(mutates = "this")
+    default @NotNull MutSet<E> union(Iterable<? extends E> iter) {
+        if (iter != null) {
+            for (E item : iter) {
+                put(item);
+            }
+        }
+        return this;
     }
 
     /** {@inheritDoc} */

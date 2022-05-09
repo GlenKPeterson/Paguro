@@ -5,6 +5,25 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
+// CONSIDER public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<K,V>>, Sized {
+// CONSIDER Changing to Map.Entry
+## Release 3.10.3 2022-05-08: concat() and precat()
+ - Implemented concat() and precat() methods on RrbTree and precat() on ImRrbTree and MutRrbTree
+   because:
+   - concat() was implemented on PersistentVector() because it's a cheap operation.
+   - concat() and precat() are cheap and sensible on the RRB Tree.
+ - Added a few @NotNull and @Contract annotations where they were missing.
+
+### Release 3.10.2 2022-05-08: Oops!
+Thought I could implement concat and precat on unsorted maps, but no.  Here's why:
+
+SortedSet(3, 4, 5).precat(1, 2) yields an Xform that starts with 1, 2, then however the source is iterated (3, 4, 5).
+So it insures that the precat-stuff comes first.
+Similarly SortedSet(3, 4, 5).concat(6, 7) yields the itrerated source, then the to-be-concatenated additions.
+I just made UnorderedSet(3, 4, 5).precat(6, 7) return a set containing the numbers 3-7 in any order.
+That's not what precat (or concat) is supposed to do.
+I'm going to undo this!
+
 ## Release 3.10.1 2022-03-18: NotNull whereNotNull()
  - Added `@NotNull` annotation to the generic type parameter returned by Transformable.whereNonNull()
    (and implementation of that method in UnmodIterable).

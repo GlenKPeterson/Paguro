@@ -420,8 +420,9 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
 
         @Override public Equator<K> equator() { return equator; }
 
-        @NotNull
-        @Override public MutHashMap<K,V> assoc(K key, V val) {
+        @Override
+        @Contract(mutates = "this")
+        public @NotNull MutHashMap<K,V> assoc(K key, V val) {
             ensureEditable();
             if (key == null) {
                 if (this.nullValue != val)

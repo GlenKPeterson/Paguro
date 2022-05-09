@@ -7,10 +7,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.organicdesign.fp.oneOf.Option;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.organicdesign.fp.StaticImports.vec;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 import static org.organicdesign.fp.collections.PersistentHashSetTest.Ctx.mod3Eq;
@@ -30,7 +30,7 @@ public class PersistentHashSetTest {
     }
 
     @Test
-    public void assocAndGet() throws Exception {
+    public void assocAndGet() {
         PersistentHashSet<String> s1 = PersistentHashSet.empty();
         assertTrue(s1.isEmpty());
 
@@ -81,7 +81,8 @@ public class PersistentHashSetTest {
 
     }
 
-    @Test public void moreAssoc() throws Exception {
+    @Test
+    public void moreAssoc() {
         PersistentHashSet<String> s1 = PersistentHashSet.empty();
         s1 = s1.put("one");
         assertEquals(1, s1.size());

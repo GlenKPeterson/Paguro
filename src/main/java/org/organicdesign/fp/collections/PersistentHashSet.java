@@ -20,6 +20,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -120,7 +121,7 @@ public class PersistentHashSet<E> extends AbstractUnmodSet<E>
         @SuppressWarnings("unchecked")
         private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
             s.defaultReadObject();
-            MutMap tempMap = PersistentHashMap.<K,K>empty().mutable();
+            MutMap<K,K> tempMap = PersistentHashMap.<K,K>empty().mutable();
             for (int i = 0; i < size; i++) {
                 K k = (K) s.readObject();
                 tempMap = tempMap.assoc(k, k);
@@ -168,7 +169,8 @@ public class PersistentHashSet<E> extends AbstractUnmodSet<E>
 
     @Override public int size() { return impl.size(); }
 
-    public MutHashSet<E> mutable() {
+    @Contract(pure = true)
+    public @NotNull MutHashSet<E> mutable() {
         return new MutHashSet<>(impl.mutable());
     }
 
@@ -204,7 +206,9 @@ public class PersistentHashSet<E> extends AbstractUnmodSet<E>
             return this;
         }
 
-        @Override  public PersistentHashSet<E> immutable() {
+        @Override
+        @Contract(pure = true)
+        public @NotNull PersistentHashSet<E> immutable() {
             return new PersistentHashSet<>(impl.immutable());
         }
     }
