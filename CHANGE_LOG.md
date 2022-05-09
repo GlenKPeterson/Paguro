@@ -7,7 +7,7 @@ tells you what to use instead.  Once we delete the deprecated methods, that docu
 
 // TODO: public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<K,V>>, Sized {
 // Change to Map.Entry!!!!
-## Release 3.10.2 2022-03-18: concat()
+## Release 3.10.2 2022-05-08: concat() and precat()
  - Implemented concat() and precat() methods on ImMap, MutMap, ImSet, MutSet, ImRrbTree and MutRrbTree
    because:
    - concat() was implemented on PersistentVector() because it's a cheap operation.
