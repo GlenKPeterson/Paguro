@@ -13,6 +13,7 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 public interface ImSet<E> extends BaseSet<E> {
 
     /** Returns a mutable version of this immutable set. */
-    MutSet<E> mutable();
+    @NotNull MutSet<E> mutable();
 
     /**
      Adds an element, returning a modified version of the set (leaving the original set unchanged).
@@ -34,14 +35,35 @@ public interface ImSet<E> extends BaseSet<E> {
     @NotNull
     @Override ImSet<E> put(E e);
 
+    @Contract(pure = true)
     default @NotNull ImSet<E> union(@Nullable Iterable<? extends E> iter) {
-        if (iter == null) { return this; }
-        ImSet<E> ret = this;
-        for (E e : iter) { ret = ret.put(e); }
-        return ret;
+        return iter == null ? this
+                            : mutable().union(iter).immutable();
     }
 
     /** {@inheritDoc} */
     @NotNull
     @Override ImSet<E> without(E key);
+
+    /**
+     * Efficiently adds items to this ImSet.  Ordering is ignored.
+     * @param items the values to add
+     * @return a new ImSet with the additional items.
+     */
+    @Override
+    @Contract(pure = true)
+    default @NotNull ImSet<E> concat(@Nullable Iterable<? extends E> items) {
+        return union(items);
+    }
+
+    /**
+     * Efficiently adds items to this ImSet.  Ordering is ignored.
+     * @param items the values to add
+     * @return a new ImSet with the additional items.
+     */
+    @Override
+    @Contract(pure = true)
+    default @NotNull ImSet<E> precat(@Nullable Iterable<? extends E> items) {
+        return union(items);
+    }
 }

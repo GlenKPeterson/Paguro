@@ -14,17 +14,16 @@
 package org.organicdesign.fp.collections;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.organicdesign.fp.StaticImports;
 import org.organicdesign.fp.TestUtilities;
 import org.organicdesign.fp.collections.RrbTree.ImRrbt;
 import org.organicdesign.fp.collections.RrbTree.MutRrbt;
-import org.organicdesign.fp.oneOf.Option;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.organicdesign.fp.StaticImports.xform;
 import static org.organicdesign.fp.TestUtilities.compareIterators;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
@@ -71,7 +70,8 @@ public class RrbTreeTest {
         return is;
     }
 
-    @Test public void buildStrict() {
+    @Test
+    public void buildStrict() {
         buildInOrderTest(RrbTree.empty(), 10000);
         buildInOrderTest(RrbTree.emptyMutable(), 100000);
     }
@@ -105,7 +105,8 @@ public class RrbTreeTest {
             assertEquals(Integer.valueOf(j), is.get(0));
 //            System.out.println(" ==" + is);
             for (int k = 0; k <= j; k++) {
-                assertEquals("Checking index: " + k + " for size=" + control.size(), control.get(k), is.get(k));
+                assertEquals(control.get(k), is.get(k),
+                             "Checking index: " + k + " for size=" + control.size());
             }
             is.debugValidate();
 //            System.out.println(is);
@@ -177,7 +178,8 @@ public class RrbTreeTest {
     }
 
     private RrbTree<Integer> randomInsertTest2(RrbTree<Integer> is, List<Integer> control, int[] indices) {
-        assertEquals("inputSize (if this blows up, this test is being used incorrectly)", control.size(), is.size());
+        assertEquals(control.size(), is.size(),
+                     "inputSize (if this blows up, this test is being used incorrectly)");
 //        System.out.println("Before:" + is.indentedStr());
         for (int j = 0; j < indices.length; j++){
             int idx = indices[j];
@@ -187,15 +189,17 @@ public class RrbTreeTest {
             is.debugValidate();
 //            System.out.println("control:" + control);
 //            System.out.println("===test:" + is.indentedStr());
-            assertEquals("size", control.size(), is.size());
-            assertEquals("item at " + idx, control.get(idx), is.get(idx));
+            assertEquals(control.size(), is.size(),
+                         "size");
+            assertEquals(control.get(idx), is.get(idx),
+                         "item at " + idx);
 //            System.out.println("control:" + control);
 //            System.out.println("===test:" + is);
             for (int k = 0; k <= j; k++) {
-                assertEquals("Wrong item at " + k + ", but still correct size (" + is.size() + ")\n" +
-                        "control:\n" + control + "\n" +
-                        "test:\n" + is.indentedStr(0),
-                             control.get(k), is.get(k));
+                assertEquals(control.get(k), is.get(k),
+                             "Wrong item at " + k + ", but still correct size (" + is.size() + ")\n" +
+                             "control:\n" + control + "\n" +
+                             "test:\n" + is.indentedStr(0));
 //                System.out.println("control[" + k + "]:" + control.get(k) + " test[" + k + "]:" + is.get(k));
             }
         }
@@ -443,51 +447,57 @@ public class RrbTreeTest {
         TestUtilities.listIteratorTest(Collections.emptyList(), RrbTree.empty());
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx00() { RrbTree.empty().get(Integer.MIN_VALUE); }
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx01() { RrbTree.emptyMutable().get(-1); }
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx02() { RrbTree.empty().get(0); }
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx03() { RrbTree.emptyMutable().get(1); }
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx04() { RrbTree.empty().get(Integer.MAX_VALUE); }
+    @Test
+    public void testExceptions() {
+        assertThrows(IndexOutOfBoundsException.class,
+                     () -> RrbTree.empty().get(Integer.MIN_VALUE));
+        assertThrows(IndexOutOfBoundsException.class,
+                     () -> RrbTree.emptyMutable().get(-1));
+        assertThrows(IndexOutOfBoundsException.class,
+                     () -> RrbTree.empty().get(0));
+        assertThrows(IndexOutOfBoundsException.class,
+                     () -> RrbTree.emptyMutable().get(1));
+        assertThrows(IndexOutOfBoundsException.class,
+                     () -> RrbTree.empty().get(Integer.MAX_VALUE - 1));
+        assertThrows(IndexOutOfBoundsException.class,
+                     () -> RrbTree.empty().get(Integer.MAX_VALUE));
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx10() { RrbTree.emptyMutable().replace(Integer.MIN_VALUE, null); }
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx11() { RrbTree.empty().replace(-1, null); }
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx12() { RrbTree.emptyMutable().replace(0, null); }
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx13() { RrbTree.empty().replace(1, null); }
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx14() { RrbTree.emptyMutable().replace(Integer.MAX_VALUE, null); }
+        assertThrows(IndexOutOfBoundsException.class,
+                     () -> RrbTree.emptyMutable().replace(Integer.MIN_VALUE, null));
+        assertThrows(IndexOutOfBoundsException.class,
+                     () -> RrbTree.empty().replace(-1, null));
+        assertThrows(IndexOutOfBoundsException.class,
+                     () -> RrbTree.emptyMutable().replace(0, null));
+        assertThrows(IndexOutOfBoundsException.class,
+                     () -> RrbTree.empty().replace(1, null));
+        assertThrows(IndexOutOfBoundsException.class,
+                     () -> RrbTree.emptyMutable().replace(Integer.MAX_VALUE, null));
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx20() { RrbTree.empty().split(Integer.MIN_VALUE); }
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx21() { RrbTree.emptyMutable().split(-1); }
+        assertThrows(IndexOutOfBoundsException.class,
+                     () -> RrbTree.empty().split(Integer.MIN_VALUE));
+        assertThrows(IndexOutOfBoundsException.class,
+                     () -> RrbTree.emptyMutable().split(-1));
 //    @Test(expected = IndexOutOfBoundsException.class)
 //    public void emptyEx22() { RrbTree.empty().split(0); }
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx23() { RrbTree.emptyMutable().split(1); }
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx24() { RrbTree.empty().split(Integer.MAX_VALUE); }
+        assertThrows(IndexOutOfBoundsException.class,
+                     () -> RrbTree.emptyMutable().split(1));
+        assertThrows(IndexOutOfBoundsException.class,
+                     () -> RrbTree.empty().split(Integer.MAX_VALUE));
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx30() { RrbTree.emptyMutable().without(Integer.MIN_VALUE); }
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx31() { RrbTree.empty().without(-1); }
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx32() { RrbTree.emptyMutable().without(0); }
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx33() { RrbTree.empty().without(1); }
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void emptyEx34() { RrbTree.emptyMutable().without(Integer.MAX_VALUE); }
+        assertThrows(IndexOutOfBoundsException.class,
+                     () -> RrbTree.emptyMutable().without(Integer.MIN_VALUE));
+        assertThrows(IndexOutOfBoundsException.class,
+                     () -> RrbTree.empty().without(-1));
+        assertThrows(IndexOutOfBoundsException.class,
+                     () -> RrbTree.emptyMutable().without(0));
+        assertThrows(IndexOutOfBoundsException.class,
+                     () -> RrbTree.empty().without(1));
+        assertThrows(IndexOutOfBoundsException.class,
+                     () -> RrbTree.emptyMutable().without(Integer.MAX_VALUE));
+    }
 
-    @Test public void addSeveralItems() {
+    @Test
+    public void addSeveralItems() {
 //        System.out.println("addSeveral start");
         final int SEVERAL = 100; //0; //0; //SecureRandom.getInstanceStrong().nextInt(999999) + 33 ;
         RrbTree<Integer> is = RrbTree.empty();
@@ -506,9 +516,12 @@ public class RrbTreeTest {
         }
     }
 
-    // TODO: Think about what exception to expect.
-    @Test(expected = Exception.class)
-    public void putEx() { RrbTree.empty().replace(1, "Hello"); }
+    @Test
+    public void putEx() {
+        // TODO: Think about what exception to expect.
+        assertThrows(Exception.class,
+                     () -> RrbTree.empty().replace(1, "Hello"));
+    }
 
     private static boolean isPrime(int num) {
         return false;
@@ -551,10 +564,10 @@ public class RrbTreeTest {
             System.out.println("left=\n" + leftSplit.indentedStr(0));
             System.out.println("right=\n" + rightSplit.indentedStr(0));
         }
-        assertEquals("leftControl:" + leftControl + "\n doesn't equal leftSplit:" + leftSplit,
-                     leftControl, leftSplit);
-        assertEquals("rightControl:" + rightControl + "\n doesn't equal rightSplit:" + rightSplit,
-                     rightControl, rightSplit);
+        assertEquals(leftControl, leftSplit,
+                     "leftControl:" + leftControl + "\n doesn't equal leftSplit:" + leftSplit);
+        assertEquals(rightControl, rightSplit,
+                     "rightControl:" + rightControl + "\n doesn't equal rightSplit:" + rightSplit);
         leftSplit.debugValidate();
         rightSplit.debugValidate();
 //        System.out.println("==================================");
@@ -1078,12 +1091,25 @@ public class RrbTreeTest {
                 StaticImports.<Object>rrb(1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2)
                         .concat(StaticImports.<Object>rrb("a"));
 
-        List<Object> list = Arrays.asList(1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,"a");
+        List<Object> control = new ArrayList<>(
+                List.of(1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,"a"));
 
         int i = 0;
         // iterating throws ArrayStoreException
         for (Object elem : rrb) {
-            assertEquals(list.get(i), elem);
+            assertEquals(control.get(i), elem);
+            i++;
+        }
+
+        rrb = rrb.precat(List.of('b', 'c', 'd'));
+        control.add(0, 'd');
+        control.add(0, 'c');
+        control.add(0, 'b');
+
+        i = 0;
+        // iterating throws ArrayStoreException
+        for (Object elem : rrb) {
+            assertEquals(control.get(i), elem);
             i++;
         }
     }

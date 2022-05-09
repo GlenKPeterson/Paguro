@@ -1,35 +1,30 @@
 package org.organicdesign.fp.collections;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.organicdesign.fp.collections.UnmodIterable.emptyUnmodIterable;
 
-@RunWith(JUnit4.class)
 public class UnmodIterableTest {
-    class TestIterable<T> implements UnmodIterable<T> {
+    static class TestIterable<T> implements UnmodIterable<T> {
         private final Iterable<T> inner;
         TestIterable(Iterable<T> i) { inner = i; }
-        @NotNull
-        @Override public UnmodIterator<T> iterator() {
-            Iterator<T> iter = inner.iterator();
-            return new UnmodIterator<T>() {
+
+        @Override
+        public @NotNull UnmodIterator<T> iterator() {
+            final Iterator<T> iter = inner.iterator();
+            return new UnmodIterator<>() {
                 @Override public boolean hasNext() { return iter.hasNext(); }
                 @Override public T next() { return iter.next(); }
             };
         }
     }
 
-    @Test public void transformTests() {
+    @Test
+    public void transformTests() {
         TestIterable<String> testIterable =
                 new TestIterable<>(Arrays.asList("How", "now"));
 

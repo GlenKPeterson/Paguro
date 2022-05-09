@@ -5,6 +5,17 @@ releases on the way from an old version to a new one.  Fix any deprecation warni
 release before upgrading to the next one.  The documentation next to each Deprecated annotation
 tells you what to use instead.  Once we delete the deprecated methods, that documentation goes too.
 
+// TODO: public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<K,V>>, Sized {
+// Change to Map.Entry!!!!
+## Release 3.10.2 2022-03-18: concat()
+ - Implemented concat() and precat() methods on ImMap, MutMap, ImSet, MutSet, ImRrbTree and MutRrbTree
+   because:
+   - concat() was implemented on PersistentVector() because it's a cheap operation.
+   - concat() and precat() are cheap and sensible on the other collection types (RRB Tree and non-sorted maps and sets)
+   - Now they all return their original collection type instead of an Xform.
+   - Mirko Raner (@raner) brought this to my attention.
+ - Added a few @NotNull and @Contract annotations where they were missing.
+
 ## Release 3.10.1 2022-03-18: NotNull whereNotNull()
  - Added `@NotNull` annotation to the generic type parameter returned by Transformable.whereNonNull()
    (and implementation of that method in UnmodIterable).

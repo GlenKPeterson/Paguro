@@ -16,6 +16,7 @@ package org.organicdesign.fp.collections;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
@@ -53,4 +54,23 @@ public interface MutMap<K,V> extends BaseUnsortedMap<K,V> {
     @Override
     @Contract(mutates = "this")
     @NotNull MutMap<K,V> without(K key);
+
+    /** {@inheritDoc} */
+    @Override
+    @Contract(mutates = "this")
+    default @NotNull MutMap<K,V> concat(@Nullable Iterable<? extends UnmodMap.UnEntry<K,V>> items) {
+        if (items != null) {
+            for (Entry<K,V> item : items) {
+                assoc(item.getKey(), item.getValue());
+            }
+        }
+        return this;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    @Contract(mutates = "this")
+    default @NotNull MutMap<K,V> precat(@Nullable Iterable<? extends UnmodMap.UnEntry<K,V>> items) {
+        return concat(items);
+    }
 }

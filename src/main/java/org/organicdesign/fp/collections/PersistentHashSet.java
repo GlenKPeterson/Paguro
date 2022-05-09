@@ -20,7 +20,9 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  A wrapper that turns a PersistentTreeMap into a set.
@@ -120,7 +122,7 @@ public class PersistentHashSet<E> extends AbstractUnmodSet<E>
         @SuppressWarnings("unchecked")
         private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
             s.defaultReadObject();
-            MutMap tempMap = PersistentHashMap.<K,K>empty().mutable();
+            MutMap<K,K> tempMap = PersistentHashMap.<K,K>empty().mutable();
             for (int i = 0; i < size; i++) {
                 K k = (K) s.readObject();
                 tempMap = tempMap.assoc(k, k);
@@ -168,8 +170,23 @@ public class PersistentHashSet<E> extends AbstractUnmodSet<E>
 
     @Override public int size() { return impl.size(); }
 
-    public MutHashSet<E> mutable() {
+    @Contract(pure = true)
+    public @NotNull MutHashSet<E> mutable() {
         return new MutHashSet<>(impl.mutable());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    @Contract(pure = true)
+    public @NotNull PersistentHashSet<E> concat(@Nullable Iterable<? extends E> items) {
+        return (PersistentHashSet<E>) ImSet.super.concat(items);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    @Contract(pure = true)
+    public @NotNull PersistentHashSet<E> precat(@Nullable Iterable<? extends E> items) {
+        return (PersistentHashSet<E>) ImSet.super.precat(items);
     }
 
     public static final class MutHashSet<E> extends AbstractUnmodSet<E>
@@ -204,9 +221,24 @@ public class PersistentHashSet<E> extends AbstractUnmodSet<E>
             return this;
         }
 
-        @Override  public PersistentHashSet<E> immutable() {
+        @Override
+        @Contract(pure = true)
+        public @NotNull PersistentHashSet<E> immutable() {
             return new PersistentHashSet<>(impl.immutable());
         }
-    }
 
+        /** {@inheritDoc} */
+        @Override
+        @Contract(mutates = "this")
+        public @NotNull MutHashSet<E> concat(@Nullable Iterable<? extends E> items) {
+            return (MutHashSet<E>) MutSet.super.concat(items);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        @Contract(mutates = "this")
+        public @NotNull MutHashSet<E> precat(@Nullable Iterable<? extends E> items) {
+            return (MutHashSet<E>) MutSet.super.precat(items);
+        }
+    }
 }

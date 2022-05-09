@@ -2,7 +2,9 @@ package org.organicdesign.fp.collections;
 
 import java.util.Map;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /** An immutable map with no guarantees about its ordering. */
 public interface ImMap<K,V> extends BaseUnsortedMap<K,V> {
@@ -40,4 +42,26 @@ public interface ImMap<K,V> extends BaseUnsortedMap<K,V> {
     /** Returns a mutable version of this mutable map. */
     @NotNull MutMap<K,V> mutable();
 
+    /**
+     * Efficiently adds {@link UnmodMap.UnEntry}&lt;K,V> to this ImMap.  Ordering is ignored.
+     * @param items the values to add
+     * @return a new ImMap with the additional items.
+     */
+    @Override
+    @Contract(pure = true)
+    default @NotNull ImMap<K,V> concat(@Nullable Iterable<? extends UnmodMap.UnEntry<K,V>> items) {
+        return (items == null) ? this
+                               : mutable().concat(items).immutable();
+    }
+
+    /**
+     * Efficiently adds {@link UnmodMap.UnEntry}&lt;K,V> to this ImMap.  Ordering is ignored.
+     * @param items the values to add
+     * @return a new ImMap with the additional items.
+     */
+    @Override
+    @Contract(pure = true)
+    default @NotNull ImMap<K,V> precat(@Nullable Iterable<? extends UnmodMap.UnEntry<K,V>> items) {
+        return concat(items);
+    }
 }

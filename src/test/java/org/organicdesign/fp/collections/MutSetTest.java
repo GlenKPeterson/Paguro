@@ -1,26 +1,25 @@
 package org.organicdesign.fp.collections;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.organicdesign.fp.FunctionUtils.ordinal;
 
-/**
- Created by gpeterso on 9/13/16.
- */
 public class MutSetTest {
-    public static class TestSet<E> extends AbstractUnmodSet<E>
+
+    public static class MutTestSet<E> extends AbstractUnmodSet<E>
             implements MutSet<E> {
+
         private final Set<E> inner;
-        public TestSet(Set<E> s) { inner = s; }
+        public MutTestSet(Set<E> s) { inner = s; }
 
         @Override public ImSet<E> immutable() {
-            return new ImUnsortedSetTest.TestSet<>(inner);
+            return new ImSetTest.ImTestSet<>(inner);
         }
 
         @NotNull
@@ -41,7 +40,7 @@ public class MutSetTest {
 
         @NotNull
         @Override public UnmodIterator<E> iterator() {
-            return new UnmodIterator<E>() {
+            return new UnmodIterator<>() {
                 private final Iterator<E> iter = inner.iterator();
                 @Override public boolean hasNext() { return iter.hasNext(); }
                 @Override public E next() { return iter.next(); }
@@ -49,9 +48,10 @@ public class MutSetTest {
         }
     }
 
-    @Test public void testMutable() {
+    @Test
+    public void testMutable() {
         Set<String> control = new HashSet<>();
-        TestSet<String> test = new TestSet<>(new HashSet<>());
+        MutTestSet<String> test = new MutTestSet<>(new HashSet<>());
         for (int i = 0; i < 27; i++) {
             String ord = ordinal(i);
             control.add(ord);

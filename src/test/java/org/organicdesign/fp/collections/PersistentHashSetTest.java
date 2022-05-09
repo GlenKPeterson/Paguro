@@ -7,10 +7,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.organicdesign.fp.oneOf.Option;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.organicdesign.fp.StaticImports.vec;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 import static org.organicdesign.fp.collections.PersistentHashSetTest.Ctx.mod3Eq;
@@ -30,7 +30,7 @@ public class PersistentHashSetTest {
     }
 
     @Test
-    public void assocAndGet() throws Exception {
+    public void assocAndGet() {
         PersistentHashSet<String> s1 = PersistentHashSet.empty();
         assertTrue(s1.isEmpty());
 
@@ -79,9 +79,18 @@ public class PersistentHashSetTest {
                           serializeDeserialize(PersistentHashSet.<Integer>empty().put(3).put(2).put(1))
                                   .toArray());
 
+        assertEquals(Set.of(3),
+                     PersistentHashSet.empty().put(3).concat(null));
+        assertEquals(Set.of(3),
+                     PersistentHashSet.empty().put(3).concat(List.of()));
+        assertEquals(Set.of(1, 2, 3, 5, 7, 11, 13, 17),
+                     PersistentHashSet.empty().concat(List.of(1, 2, 3, 5, 7, 11, 13, 17)));
+        assertEquals(Set.of(1, 2, 3, 5, 7, 11, 13, 17),
+                     PersistentHashSet.empty().precat(List.of(1, 2, 3, 5, 7, 11, 13, 17)));
     }
 
-    @Test public void moreAssoc() throws Exception {
+    @Test
+    public void moreAssoc() {
         PersistentHashSet<String> s1 = PersistentHashSet.empty();
         s1 = s1.put("one");
         assertEquals(1, s1.size());
@@ -312,6 +321,15 @@ public class PersistentHashSetTest {
         assertEquals(control.size(), test.size());
         setIterTest(control, test.iterator());
         assertEquals(control, test);
+
+        assertEquals(Set.of(3),
+                     PersistentHashSet.emptyMutable().put(3).concat(null));
+        assertEquals(Set.of(3),
+                     PersistentHashSet.emptyMutable().put(3).concat(List.of()));
+        assertEquals(Set.of(1, 2, 3, 5, 7, 11, 13, 17),
+                     PersistentHashSet.emptyMutable().concat(List.of(1, 2, 3, 5, 7, 11, 13, 17)));
+        assertEquals(Set.of(1, 2, 3, 5, 7, 11, 13, 17),
+                     PersistentHashSet.emptyMutable().precat(List.of(1, 2, 3, 5, 7, 11, 13, 17)));
     }
 
     enum Ctx implements ComparisonContext<Integer> {

@@ -1,27 +1,18 @@
 package org.organicdesign.fp.collections;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.organicdesign.fp.oneOf.Option;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.organicdesign.fp.FunctionUtils.ordinal;
 
-/**
- Created by gpeterso on 9/13/16.
- */
 public class ImMapTest {
     private static class TestMap<K,V> implements ImMap<K,V> {
-        private static <K,V> Map<K,V> copyMap(Map<K,V> m) {
-            Map<K,V> ret = new HashMap<>();
-            ret.putAll(m);
-            return ret;
-        }
-
         private final Map<K,V> inner;
 
         private TestMap(Map<K,V> m) { inner = m; }
@@ -32,9 +23,9 @@ public class ImMapTest {
                                           : Option.none();
         }
 
-        @NotNull
-        @Override public ImMap<K, V> assoc(K key, V val) {
-            Map<K,V> m = copyMap(inner);
+        @Override
+        public @NotNull ImMap<K, V> assoc(K key, V val) {
+            Map<K,V> m = new HashMap<>(inner);
             m.put(key, val);
             return new TestMap<>(m);
         }
@@ -48,18 +39,18 @@ public class ImMapTest {
             throw new UnsupportedOperationException("not implemented");
         }
 
-        @NotNull
-        @Override public ImMap<K, V> without(K key) {
-            Map<K,V> m = copyMap(inner);
+        @Override
+        public @NotNull ImMap<K, V> without(K key) {
+            Map<K,V> m = new HashMap<>(inner);
             m.remove(key);
             return new TestMap<>(m);
         }
 
         @Override public int size() { return inner.size(); }
 
-        @NotNull
-        @Override public ImSet<K> keySet() {
-            return new ImSetTest.TestSet<>(inner.keySet());
+        @Override
+        public @NotNull ImSet<K> keySet() {
+            return new ImSetTest.ImTestSet<>(inner.keySet());
         }
 
         @NotNull
@@ -68,7 +59,8 @@ public class ImMapTest {
         }
     }
 
-    @Test public void testAssoc() {
+    @Test
+    public void testAssoc() {
         Map<String,Integer> control = new HashMap<>();
         ImMap<String,Integer> test = new TestMap<>(new HashMap<>());
         for (int i = 0; i < 20; i++) {

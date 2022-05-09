@@ -1,81 +1,24 @@
 package org.organicdesign.fp.collections;
 
-import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.organicdesign.fp.FunctionUtils.ordinal;
 
 /**
  Created by gpeterso on 9/13/16.
  */
 public class ImUnsortedSetTest {
-    static class TestSet<E> implements ImSet<E> {
-        static <T> Set<T> dup(Collection<T> in) {
-            Set<T> out = new HashSet<>();
-            out.addAll(in);
-            return out;
-        }
-
-        private final Set<E> inner;
-        TestSet(Collection<E> s) {
-            inner = new HashSet<>();
-            inner.addAll(s);
-        }
-
-        @Override public MutSet<E> mutable() {
-            return new MutSetTest.TestSet<>(dup(inner));
-        }
-
-        @NotNull
-        @Override public ImSet<E> put(E val){
-            Set<E> next = dup(inner);
-            next.add(val);
-            return new TestSet<>(next);
-        }
-
-        @NotNull
-        @Override public ImSet<E> without(E key) {
-            Set<E> next = dup(inner);
-            next.remove(key);
-            return new ImUnsortedSetTest.TestSet<>(next);
-        }
-
-        @Override public int size() { return inner.size(); }
-
-        @Override public boolean contains(Object o) { return inner.contains(o); }
-
-        @NotNull
-        @Override public UnmodIterator<E> iterator() {
-            return new UnmodIterator<E>() {
-                Iterator<E> iter = inner.iterator();
-                @Override public boolean hasNext() { return iter.hasNext(); }
-                @Override public E next() { return iter.next(); }
-            };
-        }
-
-        /** Note: not reflexive with TreeSet.equals() */
-        @Override public boolean equals(Object o) {
-            if (this == o) { return true; }
-            if ( !(o instanceof Set) ) { return false; }
-            Set that = (Set) o;
-            return that.size() == inner.size() &&
-                   containsAll(that);
-        }
-
-        @Override public int hashCode() { return UnmodIterable.hash(this); }
-
-        @Override public String toString() { return inner.toString(); }
-    }
 
     @Test
     public void testUnion() {
         List<String> origItems = Arrays.asList("This", "is", "a", "test");
-        Set<String> control = new HashSet<>();
-        control.addAll(origItems);
-        ImSet<String> test = new TestSet<>(origItems);
+        Set<String> control = new HashSet<>(origItems);
+        ImSet<String> test = new ImSetTest.ImTestSet<>(origItems);
 
         assertEquals(control, test);
 

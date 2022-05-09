@@ -383,6 +383,20 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
         return new PersistentHashMap<>(equator, size - 1, newroot, hasNull, nullValue);
     }
 
+    /** {@inheritDoc} */
+    @Override
+    @Contract(pure = true)
+    public @NotNull PersistentHashMap<K,V> concat(@Nullable Iterable<? extends UnmodMap.UnEntry<K,V>> items) {
+        return (PersistentHashMap<K,V>) ImMap.super.concat(items);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    @Contract(pure = true)
+    public @NotNull PersistentHashMap<K,V> precat(@Nullable Iterable<? extends UnmodMap.UnEntry<K,V>> items) {
+        return (PersistentHashMap<K,V>) ImMap.super.precat(items);
+    }
+
     public static final class MutHashMap<K,V> extends AbstractUnmodMap<K,V>
             implements MutMap<K,V> {
 
@@ -420,8 +434,9 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
 
         @Override public Equator<K> equator() { return equator; }
 
-        @NotNull
-        @Override public MutHashMap<K,V> assoc(K key, V val) {
+        @Override
+        @Contract(mutates = "this")
+        public @NotNull MutHashMap<K,V> assoc(K key, V val) {
             ensureEditable();
             if (key == null) {
                 if (this.nullValue != val)
@@ -518,6 +533,20 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
         public int size() {
             ensureEditable();
             return count;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        @Contract(mutates = "this")
+        public @NotNull MutHashMap<K,V> concat(@Nullable Iterable<? extends UnmodMap.UnEntry<K,V>> items) {
+            return (MutHashMap<K,V>) MutMap.super.concat(items);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        @Contract(mutates = "this")
+        public @NotNull MutHashMap<K,V> precat(@Nullable Iterable<? extends UnmodMap.UnEntry<K,V>> items) {
+            return (MutHashMap<K,V>) MutMap.super.precat(items);
         }
 
         private void ensureEditable() {

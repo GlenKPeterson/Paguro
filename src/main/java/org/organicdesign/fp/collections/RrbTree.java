@@ -143,6 +143,26 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
             return (MutRrbt<E>) MutList.super.concat(es);
         }
 
+        /** {@inheritDoc} */
+        @Override
+        @Contract(mutates = "this")
+        public @NotNull MutRrbt<E> precat(@Nullable Iterable<? extends E> es) {
+            // We could check if es is sized and has a size >= MIN_NODE_LENGTH
+            // and if so, do something clever with writing chunks to the underlying tree.
+            // Until then, this will handle everything almost as well.
+            //
+            // If we insert(0, item) in order, they will end up reversed, so we have to
+            // add one to the insertion point for each item added.
+            int idx = 0;
+            if (es != null) {
+                for (E e : es) {
+                    insert(idx, e);
+                    idx++;
+                }
+            }
+            return this;
+        }
+
         void debugValidate() {
             if (focusLength > STRICT_NODE_LENGTH) {
                 throw new IllegalStateException("focus len:" + focusLength +
@@ -441,8 +461,16 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
 
         /** {@inheritDoc} */
         @Override
+        @Contract(pure = true)
         public @NotNull ImRrbt<E> concat(@Nullable Iterable<? extends E> es) {
             return this.mutable().concat(es).immutable();
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        @Contract(pure = true)
+        public @NotNull ImRrbt<E> precat(@Nullable Iterable<? extends E> es) {
+            return this.mutable().precat(es).immutable();
         }
 
         void debugValidate() {
@@ -869,6 +897,14 @@ involves changing more nodes than maybe necessary.
 
     /** Creates a new empty ("M-T") tree of the appropriate (mutable/immutable) type. */
     protected abstract @NotNull RrbTree<E> mt();
+
+    /**
+     * {@inheritDoc}
+     * Precat is implemented here because it is a very cheap operation on an RRB-Tree.
+     * It's not implemented on PersistentVector because it is very expensive there.
+     */
+    @Override
+    public abstract @NotNull RrbTree<E> precat(@Nullable Iterable<? extends E> es);
 
     /** Internal method - do not use. */
     abstract @NotNull Node<E> pushFocus();
