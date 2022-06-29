@@ -25,6 +25,15 @@ Paguro lets you forget about:
 
 Kotlin fixes almost all these issues too, but if you're stuck in Java, Paguro is a great solution.
 
+# What's the Best/Most-Used Part?
+- The stuff in StaticImports:
+  - `vec()`
+  - `map(tup(x, y), tup(a, b))`
+  - `xform()` and `xformArray()`
+ - The functional interfaces: `Fn0`, `Fn1`, `Fn2`, `Fn3` because they wrap checked exceptions.
+ - Because Java doesn't have sealed classes, I often write a lot of match() methods like those on the oneOf classes.  I probably copy the match() methods as often as I use most of the OneOf# classes.  It's a great way to say, "Make sure you code for each of these cases every time you use this kind of thing."
+ - `LazyRef`
+
 # What's in Paguro?
 Type-safe, null-safe versions of Clojure's immutable/persistent collections, an immutable alternative to Java 8 Streams that handles checked exceptions in lambdas, and other tools to make functional programming in Java easier.
 
