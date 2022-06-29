@@ -25,15 +25,6 @@ Paguro lets you forget about:
 
 Kotlin fixes almost all these issues too, but if you're stuck in Java, Paguro is a great solution.
 
-# What's the Best/Most-Used Part?
-- The stuff in StaticImports:
-  - `vec()`
-  - `map(tup(x, y), tup(a, b))`
-  - `xform()` and `xformArray()`
- - The functional interfaces: `Fn0`, `Fn1`, `Fn2`, `Fn3` because they wrap checked exceptions.
- - Because Java doesn't have sealed classes, I often write a lot of match() methods like those on the oneOf classes.  I probably copy the match() methods as often as I use most of the OneOf# classes.  It's a great way to say, "Make sure you code for each of these cases every time you use this kind of thing."
- - `LazyRef`
-
 # What's in Paguro?
 Type-safe, null-safe versions of Clojure's immutable/persistent collections, an immutable alternative to Java 8 Streams that handles checked exceptions in lambdas, and other tools to make functional programming in Java easier.
 
@@ -60,6 +51,15 @@ Paguro is short for the Latin "Paguroidea" - the name of the Hermit Crab superfa
 
 [Usage examples](src/test/java/org/organicdesign/fp/UsageExampleTest.java) are implemented as unit tests to ensure that they remain correct and current.
 
+# What's the Most-Practical/Most-Used Part?
+- The stuff in StaticImports:
+  - `vec()`
+  - `map(tup(x, y), tup(a, b))`
+  - `xform()` and `xformArray()`
+ - The functional interfaces: `Fn0`, `Fn1`, `Fn2`, `Fn3` because they wrap checked exceptions.
+ - Because Java doesn't have sealed classes, I often write a lot of match() methods like those on the oneOf classes.  I probably copy the match() methods as often as I use most of the OneOf# classes.  It's a great way to say, "Make sure you code for each of these cases every time you use this kind of thing."
+ - `LazyRef`
+ - `Tuple2` implements `Map.Entry<K,V>` which means I use the Map.Entry interface a lot more than I would otherwise (compare with `Pair<A,B>` in Kotlin).  Paguro lets you convert to and from maps easily, so this interface becomes super handy.  `Iterable<Map.Entry<K,V>>` becomes a pretty common input type.
 
 # Getting Started
 
@@ -71,7 +71,7 @@ Paguro is short for the Latin "Paguroidea" - the name of the Hermit Crab superfa
 # Classic
 You are on the Paguro Classic, or main branch of this project.
 If you work with pure Java, or a mix of Java and Kotlin files, this is your branch.
-If you want to live dangerously, try the all-Kotlin version in the 4.0 branch when it becomes available.
+I'm not sure the pure-Kotlin branch will ever be released.  Plain Java with `@NotNull` annotations gets you most of the way there, with almost no dependencies.
 
 # News
 ## RrbTree.join() seems to work now
