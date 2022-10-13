@@ -107,7 +107,9 @@ public class OneOf2<A,B> {
             throw new IllegalArgumentException("Selected item index must be 0-1");
         }
         if (!types.get(index).isInstance(o)) {
-            throw new ClassCastException("You specified index " + index + ", indicating a(n) " +
+            // Made this "indicating a " instead of "indicating a(n) " because a(n) looks like a function.
+            // Poor grammar, in this case, is less confusing.
+            throw new ClassCastException("You specified index " + index + ", indicating a " +
                                          types.get(index).getCanonicalName() + "," +
                                          " but passed a " + o.getClass().getCanonicalName());
         }

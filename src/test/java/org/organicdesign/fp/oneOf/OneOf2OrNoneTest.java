@@ -1,10 +1,11 @@
 package org.organicdesign.fp.oneOf;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.organicdesign.testUtils.EqualsContract;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.organicdesign.fp.oneOf.Option.none;
 import static org.organicdesign.testUtils.Serialization.serializeDeserialize;
 
@@ -20,7 +21,8 @@ public class OneOf2OrNoneTest {
         static Option<Str_Int> ofNone() { return Option.none(); }
     }
 
-    @Test public void testBasics() {
+    @Test
+    public void testBasics() {
         Option<Str_Int> si = Str_Int.of(57);
         assertEquals(Integer.valueOf(57), si.match(some -> some.match(x -> -99,
                                                                       y -> y),
@@ -42,7 +44,9 @@ public class OneOf2OrNoneTest {
         assertEquals(None.NONE, serializeDeserialize(none()));
     }
 
-    @Test public void testEquality() {
+    @SuppressWarnings({"deprecation", "RedundantSuppression"})
+    @Test
+    public void testEquality() {
         assertEquals(0, Str_Int.of("").hashCode());
         assertEquals(1, Str_Int.of(0).hashCode());
         assertEquals(none().hashCode(), Str_Int.ofNone().hashCode());
@@ -56,24 +60,36 @@ public class OneOf2OrNoneTest {
                                               Str_Int.of(-97));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void subClassExa_n() { new Str_Int("hi", -1); }
+    @Test
+    public void subClassExceptions() {
+        Exception e;
 
-    @Test(expected = IllegalArgumentException.class)
-    public void subClassEx_bn() { new Str_Int(1, -1); }
+        e = assertThrowsExactly(IllegalArgumentException.class,
+                                () -> new Str_Int("hi", -1));
+        assertEquals("Selected item index must be 0-1", e.getMessage());
 
-    @Test(expected = ClassCastException.class)
-    public void subClassExab_0() { new Str_Int(1, 0); }
+        e = assertThrowsExactly(IllegalArgumentException.class,
+                                () -> new Str_Int(1, -1));
+        assertEquals("Selected item index must be 0-1", e.getMessage());
 
-    @Test(expected = ClassCastException.class)
-    public void subClassExa_1() { new Str_Int("hi", 1); }
+        e = assertThrowsExactly(ClassCastException.class,
+                                () -> new Str_Int(1, 0));
+        assertEquals("You specified index 0, indicating a java.lang.String, but passed a java.lang.Integer", e.getMessage());
 
-    @Test(expected = IllegalArgumentException.class)
-    public void subClassExa_2() { new Str_Int("hi", 2); }
+        e = assertThrowsExactly(ClassCastException.class,
+                                () -> new Str_Int("hi", 1));
+        assertEquals("You specified index 1, indicating a java.lang.Integer, but passed a java.lang.String", e.getMessage());
 
-    @Test(expected = IllegalArgumentException.class)
-    public void subClassEx_b2() { new Str_Int(1, 2); }
+        e = assertThrowsExactly(IllegalArgumentException.class,
+                                () -> new Str_Int("hi", 2));
+        assertEquals("Selected item index must be 0-1", e.getMessage());
 
-    @Test(expected = IllegalArgumentException.class)
-    public void subClassEx_b3() { new Str_Int(1, 3); }
+        e = assertThrowsExactly(IllegalArgumentException.class,
+                                () -> new Str_Int(1, 2));
+        assertEquals("Selected item index must be 0-1", e.getMessage());
+
+        e = assertThrowsExactly(IllegalArgumentException.class,
+                                () -> new Str_Int(1, 3));
+        assertEquals("Selected item index must be 0-1", e.getMessage());
+    }
 }

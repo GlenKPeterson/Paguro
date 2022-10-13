@@ -61,12 +61,13 @@ public interface Option<T> extends Serializable { // extends UnmodSortedIterable
     @SuppressWarnings("unchecked")
     static <T> @NotNull Option<T> none() { return None.NONE; }
 
-    /** Public static factory method for constructing the Some Option. */
+    /** Public static factory method for constructing the {@link Some} Option. */
     static <T> @NotNull Option<T> some(T t) {
         return new Some<>(t);
     }
 
     /** Construct an option, but if t is null, make it None instead of Some. */
+    @SuppressWarnings({"deprecation", "RedundantSuppression"})
     static <T> @NotNull Option<T> someOrNullNoneOf(@Nullable T t) {
         if ( (t == null) || None.NONE.equals(t) ) {
             return none();

@@ -1,14 +1,15 @@
 package org.organicdesign.fp.oneOf;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class OptionTest {
 
-    @Test public void basics() {
+    @Test
+    public void basics() {
         Option<Integer> o1a = Option.some(1);
         assertTrue(o1a.isSome());
         assertEquals(Integer.valueOf(1), o1a.get());
@@ -43,18 +44,21 @@ public class OptionTest {
                                                    () -> 2));
         assertEquals(None.NONE, Option.someOrNullNoneOf(None.NONE));
 
-        //noinspection SimplifiableJUnitAssertion,EqualsWithItself
-        assertTrue(None.NONE.equals(None.NONE));
-        //noinspection SimplifiableJUnitAssertion
-        assertTrue(None.NONE.equals(Option.someOrNullNoneOf(null)));
+        assertEquals(None.NONE, None.NONE);
+        assertEquals(None.NONE, Option.someOrNullNoneOf(null));
     }
 
-    @Test(expected = IllegalStateException.class) public void noneEx() {
-        Option.none().get();
-    }
+    @Test
+    public void testExceptions() {
+        IllegalStateException iSE;
+        iSE = assertThrowsExactly(IllegalStateException.class,
+                                  () -> Option.none().get());
+        assertEquals("Called get on None", iSE.getMessage());
 
-    @Test(expected = IllegalStateException.class) public void nullNoneEx() {
-        Option.someOrNullNoneOf(null).get();
+        iSE = assertThrowsExactly(IllegalStateException.class,
+                                  () -> Option.someOrNullNoneOf(null).get());
+
+        assertEquals("Called get on None", iSE.getMessage());
     }
 //
 //    @Test public void iterationTest() {
@@ -105,17 +109,17 @@ public class OptionTest {
         Option<Integer> z = Option.some(null);
         Option<Integer> n1 = Option.none();
         Option<Integer> n2 = Option.someOrNullNoneOf(null);
-        Option n3 = Option.none();
+        Option<Integer> n3 = Option.none();
 
-        assertTrue(n1 == n2);
-        assertTrue(n2 == n3);
+        assertSame(n1, n2);
+        assertSame(n2, n3);
 
-        assertFalse(n1.equals(z));
-        assertFalse(z.equals(n1));
-        assertFalse(n2.equals(z));
-        assertFalse(z.equals(n2));
-        assertFalse(n3.equals(z));
-        assertFalse(z.equals(n3));
+        assertNotEquals(n1, z);
+        assertNotEquals(z, n1);
+        assertNotEquals(n2, z);
+        assertNotEquals(z, n2);
+        assertNotEquals(n3, z);
+        assertNotEquals(z, n3);
 
         assertNotEquals(z.hashCode(), n1.hashCode());
         assertNotEquals(z.hashCode(), n2.hashCode());
@@ -124,15 +128,15 @@ public class OptionTest {
         assertEquals(n1.hashCode(), n2.hashCode());
         assertEquals(n2.hashCode(), n3.hashCode());
 
-        assertTrue(n1.equals(n2));
-        assertTrue(n2.equals(n1));
+        assertEquals(n1, n2);
+        assertEquals(n2, n1);
 
         equalsDistinctHashCode(o1a, o1b, o1c, n1);
 
         equalsDistinctHashCode(Option.some(null), Option.some(null), Option.some(null), n2);
 
         // None is a serializable singleton.
-        assertTrue(n1 == serializeDeserialize(n1));
+        assertSame(n1, serializeDeserialize(n1));
         assertEquals(n1, serializeDeserialize(n1));
     }
 

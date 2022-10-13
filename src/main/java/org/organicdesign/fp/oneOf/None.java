@@ -41,12 +41,10 @@ public final class None<T> implements Option<T> {
     /** {@inheritDoc} */
     @Override public <U> Option<U> then(Fn1<T,Option<U>> f) { return Option.none(); }
 
-    /** Valid, but deprecated because it's usually an error to call this in client code. */
-    @Deprecated // Has no effect.  Darn!
+    /** This final singleton class always returns zero (it represents None after all). */
     @Override public int hashCode() { return 0; }
 
-    /** Valid, but deprecated because it's usually an error to call this in client code. */
-    @Deprecated // Has no effect.  Darn!
+    /** Asks if the other object is instanceof the final singleton class None */
     @Override public boolean equals(Object other) {
         return other instanceof org.organicdesign.fp.oneOf.None;
     }

@@ -7,6 +7,14 @@ tells you what to use instead.  Once we delete the deprecated methods, that docu
 
 // CONSIDER public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<K,V>>, Sized {
 // CONSIDER Changing to Map.Entry
+
+## Release 3.10.4 2022-10-13: Dependency bumps and better tests (most changes from Aug 13)
+ - Fixed a typo in an exception message.
+ - Changed two unit tests from older jUnit to jUnit 5 Jupiter.
+ - Removed the Deprecated annotation from the .equals() and .hashcode() methods of the Option classes (Some and None).
+   I don't think they prevented any misuse and I ended up suppressing the warnings where Paguro used those methods.
+   Basically, they are no more dangerous than most Java .equals() methods.
+
 ## Release 3.10.3 2022-05-08: concat() and precat()
  - Implemented concat() and precat() methods on RrbTree and precat() on ImRrbTree and MutRrbTree
    because:
