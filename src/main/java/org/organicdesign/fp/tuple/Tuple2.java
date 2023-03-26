@@ -36,8 +36,8 @@ public class Tuple2<A,B> implements Entry<A,B>, UnmodMap.UnEntry<A,B>, Serializa
     private static final long serialVersionUID = 20160906065000L;
 
     // Fields are protected so that sub-classes can make accessor methods with meaningful names.
-    protected final A _1;
-    protected final B _2;
+    protected final A field1;
+    protected final B field2;
 
     /**
      Constructor is protected (not public) for easy inheritance.  Josh Bloch's "Item 1" says public
@@ -47,7 +47,7 @@ public class Tuple2<A,B> implements Entry<A,B>, UnmodMap.UnEntry<A,B>, Serializa
      constructor.
      */
     protected Tuple2(A a, B b) {
-        _1 = a; _2 = b;
+        field1 = a; field2 = b;
     }
 
     /** Public static factory method */
@@ -65,15 +65,15 @@ public class Tuple2<A,B> implements Entry<A,B>, UnmodMap.UnEntry<A,B>, Serializa
     }
 
     /** Returns the 1st field */
-    public A _1() { return _1; }
+    public A _1() { return field1; }
     /** Returns the 2nd field */
-    public B _2() { return _2; }
+    public B _2() { return field2; }
 
     @Override
     public String toString() {
         return getClass().getSimpleName() + "(" +
-               stringify(_1) + "," +
-               stringify(_2) + ")";
+               stringify(field1) + "," +
+               stringify(field2) + ")";
     }
 
     @Override
@@ -84,26 +84,26 @@ public class Tuple2<A,B> implements Entry<A,B>, UnmodMap.UnEntry<A,B>, Serializa
         // Details...
         @SuppressWarnings("rawtypes") final Entry that = (Entry) other;
 
-        return Objects.equals(_1, that.getKey()) &&
-               Objects.equals(_2, that.getValue());
+        return Objects.equals(field1, that.getKey()) &&
+               Objects.equals(field2, that.getValue());
     }
 
     @Override
     public int hashCode() {
         // This is specified in java.util.Map as part of the map contract.
-        return  (_1 == null ? 0 : _1.hashCode()) ^
-                (_2 == null ? 0 : _2.hashCode());
+        return  (field1 == null ? 0 : field1.hashCode()) ^
+                (field2 == null ? 0 : field2.hashCode());
     }
 
     // Inherited from Map.Entry
     /** Returns the first field of the tuple.  To implement Map.Entry. */
     @Contract(pure = true)
-    @Override public A getKey() { return _1; }
+    @Override public A getKey() { return field1; }
 
     /** Returns the second field of the tuple.  To implement Map.Entry. */
     @Override
     @Contract(pure = true)
-    public B getValue() { return _2; }
+    public B getValue() { return field2; }
 
     /** This method is required to implement Map.Entry, but calling it only issues an exception */
     @SuppressWarnings("deprecation")

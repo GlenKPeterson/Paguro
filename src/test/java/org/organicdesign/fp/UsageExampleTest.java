@@ -156,8 +156,8 @@ public class UsageExampleTest {
         Email(EmailType t, String s) { super(t, s); }
 
         // Give descriptive names to the field getters
-        EmailType mailType() { return _1; }
-        String address() { return _2; }
+        EmailType mailType() { return field1; }
+        String address() { return field2; }
     }
 
     // Notice in this type signature, we have replaced Tuple2<EmailType,String> with Email

@@ -26,6 +26,10 @@ public abstract class AbstractUnmodMap<K,V>
         Map<?, ?> that = (Map<?, ?>) other;
         if (that.size() != size()) { return false; }
 
+        return checkKeyValues(that);
+    }
+
+    private boolean checkKeyValues(Map that){
         try {
             for (Entry<K, V> e : this) {
                 K key = e.getKey();

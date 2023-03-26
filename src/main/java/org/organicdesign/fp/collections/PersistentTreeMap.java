@@ -905,17 +905,17 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
         abstract Node<K,V> redden();
 
         Node<K,V> balanceLeft(Node<K,V> parent) {
-            return black(parent._1, parent._2, this, parent.right());
+            return black(parent.field1, parent.field2, this, parent.right());
         }
 
         Node<K,V> balanceRight(Node<K,V> parent) {
-            return black(parent._1, parent._2, parent.left(), this);
+            return black(parent.field1, parent.field2, parent.left(), this);
         }
 
         abstract Node<K,V> replace(K key, V val, Node<K,V> left, Node<K,V> right);
 
         @Override public String toString() {
-            return stringify(_1) + "=" + stringify(_2);
+            return stringify(field1) + "=" + stringify(field2);
         }
 
 //        public <R> R kvreduce(Fn3<R,K,V,R> f, R init) {
@@ -943,16 +943,16 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
         @Override Node<K,V> addRight(Node<K,V> ins) { return ins.balanceRight(this); }
 
         @Override Node<K,V> removeLeft(Node<K,V> del) {
-            return balanceLeftDel(_1, _2, del, right());
+            return balanceLeftDel(field1, field2, del, right());
         }
 
         @Override Node<K,V> removeRight(Node<K,V> del) {
-            return balanceRightDel(_1, _2, left(), del);
+            return balanceRightDel(field1, field2, left(), del);
         }
 
         @Override Node<K,V> blacken() { return this; }
 
-        @Override Node<K,V> redden() { return new Red<>(_1, _2); }
+        @Override Node<K,V> redden() { return new Red<>(field1, field2); }
 
         @Override
         Node<K,V> replace(K key, V val, Node<K,V> left, Node<K,V> right) {
@@ -972,21 +972,21 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
 
         @Override public Node<K,V> right() { return right; }
 
-        @Override Node<K,V> redden() { return new RedBranch<>(_1, _2, left, right); }
+        @Override Node<K,V> redden() { return new RedBranch<>(field1, field2, left, right); }
     }
 
     private static class Red<K, V> extends Node<K,V> {
         Red(K key, V val) { super(key, val); }
 
-        @Override Node<K,V> addLeft(Node<K,V> ins) { return red(_1, _2, ins, right()); }
+        @Override Node<K,V> addLeft(Node<K,V> ins) { return red(field1, field2, ins, right()); }
 
-        @Override Node<K,V> addRight(Node<K,V> ins) { return red(_1, _2, left(), ins); }
+        @Override Node<K,V> addRight(Node<K,V> ins) { return red(field1, field2, left(), ins); }
 
-        @Override Node<K,V> removeLeft(Node<K,V> del) { return red(_1, _2, del, right()); }
+        @Override Node<K,V> removeLeft(Node<K,V> del) { return red(field1, field2, del, right()); }
 
-        @Override Node<K,V> removeRight(Node<K,V> del) { return red(_1, _2, left(), del); }
+        @Override Node<K,V> removeRight(Node<K,V> del) { return red(field1, field2, left(), del); }
 
-        @Override Node<K,V> blacken() { return new Black<>(_1, _2); }
+        @Override Node<K,V> blacken() { return new Black<>(field1, field2); }
 
         @Override
         Node<K,V> redden() { throw new UnsupportedOperationException("Invariant violation"); }
@@ -1013,10 +1013,10 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
 
         @Override Node<K,V> balanceLeft(Node<K,V> parent) {
             if (left instanceof PersistentTreeMap.Red)
-                return red(_1, _2, left.blacken(),
+                return red(field1, field2, left.blacken(),
                            black(parent.getKey(), parent.getValue(), right, parent.right()));
             else if (right instanceof PersistentTreeMap.Red)
-                return red(right.getKey(), right.getValue(), black(_1, _2, left, right.left()),
+                return red(right.getKey(), right.getValue(), black(field1, field2, left, right.left()),
                            black(parent.getKey(), parent.getValue(), right.right(), parent.right()));
             else
                 return super.balanceLeft(parent);
@@ -1025,18 +1025,18 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
 
         @Override Node<K,V> balanceRight(Node<K,V> parent) {
             if (right instanceof PersistentTreeMap.Red)
-                return red(_1, _2,
+                return red(field1, field2,
                            black(parent.getKey(), parent.getValue(), parent.left(), left),
                            right.blacken());
             else if (left instanceof PersistentTreeMap.Red)
                 return red(left.getKey(), left.getValue(),
                            black(parent.getKey(), parent.getValue(), parent.left(), left.left()),
-                           black(_1, _2, left.right(), right));
+                           black(field1, field2, left.right(), right));
             else
                 return super.balanceRight(parent);
         }
 
-        @Override Node<K,V> blacken() { return new BlackBranch<>(_1, _2, left, right); }
+        @Override Node<K,V> blacken() { return new BlackBranch<>(field1, field2, left, right); }
     }
 
 

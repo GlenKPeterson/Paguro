@@ -58,9 +58,15 @@ public class RangeOfInt implements UnmodList<Integer>, Serializable {
                 if ((o1 instanceof RangeOfInt) && (o2 instanceof RangeOfInt)) {
                     return o1.equals(o2);
                 }
-                return o1.size() == o2.size() &&
-                       UnmodSortedIterable.equal(UnmodSortedIterable.castFromList(o1),
-                                                 UnmodSortedIterable.castFromList(o2));
+                return compareIterables(o1, o2);
+            }
+
+            private boolean compareIterables(List<Integer> o1, List<Integer> o2){
+                boolean equalSize = o1.size() == o2.size();
+                UnmodSortedIterable<Integer> obj1 = UnmodSortedIterable.castFromList(o1);
+                UnmodSortedIterable<Integer> obj2 = UnmodSortedIterable.castFromList(o2);
+                boolean equalContent = UnmodSortedIterable.equal(obj1, obj2);
+                return equalSize && equalContent;
             }
         }
     }
