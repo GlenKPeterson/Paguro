@@ -5,23 +5,31 @@ import java.util.NoSuchElementException;
 
 public class ListOperator implements Serializable {
 
-    ListOperator(){}
+    private int start;
+    private int end;
+    private int size;
+
+    ListOperator(int start, int end, int size){
+        this.start = start;
+        this.end = end;
+        this.size = size;
+    }
 
 
-    public UnmodListIterator<Integer> Iterator(RangeOfInt ROF, int startIdx) {
-        if ((startIdx < 0) || (startIdx > ROF.getSize())) {
+    public UnmodListIterator<Integer> Iterator(int startIdx) {
+        if ((startIdx < 0) || (startIdx > size)){
             // To match ArrayList and other java.util.List expectations
             throw new IndexOutOfBoundsException("Index: " + startIdx);
         }
         return new UnmodListIterator<Integer>() {
-            int val = ROF.getStart() + startIdx;
+            int val = start + startIdx;
 
             public boolean hasNext() {
-                return val < ROF.getEnd();
+                return val < end;
             }
 
             public Integer next() {
-                if (val >= ROF.getEnd()) {
+                if (val >= end) {
                     // To match ArrayList and other java.util.List expectations
                     throw new NoSuchElementException();
                 }
@@ -31,11 +39,11 @@ public class ListOperator implements Serializable {
             }
 
             public boolean hasPrevious() {
-                return val > ROF.getStart();
+                return val > start;
             }
 
             public Integer previous() {
-                if (val <= ROF.getStart()) {
+                if (val <= start) {
                     // To match ArrayList and other java.util.List expectations
                     throw new NoSuchElementException();
                 }
@@ -44,14 +52,14 @@ public class ListOperator implements Serializable {
             }
 
             public int nextIndex() {
-                return val - ROF.getStart();
+                return val - start;
             }
         };
     }
 
 
     public RangeOfInt subList(int fromIndex, int toIndex, RangeOfInt ROF) {
-        if ((fromIndex == 0) && (toIndex == ROF.getSize())) {
+        if ((fromIndex == 0) && (toIndex == size)) {
             return ROF;
         }
         // Note that this is an IllegalArgumentException, not IndexOutOfBoundsException in order to
@@ -64,7 +72,7 @@ public class ListOperator implements Serializable {
         if (fromIndex < 0) {
             throw new IndexOutOfBoundsException("fromIndex = " + fromIndex);
         }
-        if (toIndex > ROF.getSize()) {
+        if (toIndex > size) {
             throw new IndexOutOfBoundsException("toIndex = " + toIndex);
         }
 
@@ -74,6 +82,6 @@ public class ListOperator implements Serializable {
         // with a right bound index of size, as opposed to size minus 1.  I spent hours
         // understanding this before fixing a bug with it.  In the end, subList should do the same
         // thing on a Range that it does on the equivalent ArrayList.  I made tests for the same.
-        return RangeOfInt.of(ROF.getStart() + fromIndex, ROF.getStart() + toIndex);
+        return RangeOfInt.of(start + fromIndex, start + toIndex);
     }
 }

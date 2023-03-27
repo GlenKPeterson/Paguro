@@ -103,7 +103,7 @@ public class RangeOfInt implements UnmodList<Integer>, Serializable {
     private final int end;
     private transient int size;
 
-    private ListOperator listOperator = new ListOperator();
+    private ListOperator listOperator;
 
     // ======================================== Constructor ========================================
 
@@ -266,24 +266,15 @@ public class RangeOfInt implements UnmodList<Integer>, Serializable {
      */
     @NotNull
     @Override public UnmodListIterator<Integer> listIterator(final int startIdx) {
-        return listOperator.Iterator(this, startIdx);
+        listOperator = new ListOperator(start, end, size);
+        return listOperator.Iterator(startIdx);
     }
 
     /** {@inheritDoc} */
     @NotNull
     @Override public RangeOfInt subList(int fromIndex, int toIndex) {
+        listOperator = new ListOperator(start, end, size);
         return listOperator.subList(fromIndex, toIndex, this);
     }
 
-    public int getSize(){
-        return size;
-    }
-
-    public int getStart(){
-        return start;
-    }
-
-    public int getEnd(){
-        return end;
-    }
 }
