@@ -984,8 +984,7 @@ involves changing more nodes than maybe necessary.
     }
 
     private static <E> @NotNull Node<E> eliminateUnnecessaryAncestors(Node<E> n) {
-        while ( !(n instanceof Leaf) &&
-                (n.numChildren() == 1) ) {
+        while ( n.hasOneChild() ) {
             n = n.child(0);
         }
         return n;
@@ -1058,6 +1057,12 @@ involves changing more nodes than maybe necessary.
     // ================================ Node private inner classes ================================
 
     private interface Node<T> extends Indented {
+
+        boolean hasOneChild();
+
+        Node<T> pushFocusNode(int index, T @NotNull [] oldFocus, int subNodeAdjustedIndex, Node<T> subNode, int subNodeIndex, int[] cumulativeSizes, Node<T>[] nodes);
+
+
         /** Returns the immediate child node at the given index. */
         @NotNull Node<T> child(int childIdx);
 
@@ -1113,6 +1118,8 @@ involves changing more nodes than maybe necessary.
         @NotNull Node<T> replace(int idx, T t);
 
         @NotNull SplitNode<T> splitAt(int splitIndex);
+
+        boolean isLeaf();
     }
 
 //    private interface BranchNode<T> extends Node<T> {
@@ -1171,6 +1178,100 @@ involves changing more nodes than maybe necessary.
     }
 
     private static class Leaf<T> implements Node<T> {
+
+        @Override
+        public boolean hasOneChild(){
+            return false;
+        }
+
+        @Override
+        public Node<T> pushFocusNode(int index, T @NotNull [] oldFocus, int subNodeAdjustedIndex, Node<T> subNode, int subNodeIndex, int[] cumulativeSizes, Node<T>[] nodes) {
+            // Here we already know:
+            //  - the leaf doesn't have capacity
+            //  - We don't need to split ourselves
+            // Therefore:
+            //  - If the focus is big enough to be its own leaf and the index is on a leaf
+            //    boundary and , make it one.
+            //  - Else, insert into the array and replace one leaf with two.
+
+            final Node<T>[] newNodes;
+            final int[] newCumSizes;
+            final int numToSkip;
+
+            //  If the focus is big enough to be its own leaf and the index is on a leaf
+            // boundary, make it one.
+            if ( (oldFocus.length >= MIN_NODE_LENGTH) &&
+                    (subNodeAdjustedIndex == 0 || subNodeAdjustedIndex == subNode.size()) ) {
+
+                // Insert-between
+                // Just add a new leaf
+                Leaf<T> newNode = new Leaf<>(oldFocus);
+
+                // If we aren't inserting before the existing leaf node, we're inserting after.
+                if (subNodeAdjustedIndex != 0) {
+                    subNodeIndex++;
+                }
+
+                newNodes = insertIntoArrayAt(newNode, nodes, subNodeIndex, Node.class);
+                // Increment newCumSizes for the changed item and all items to the right.
+                newCumSizes = new int[cumulativeSizes.length + 1];
+                int cumulativeSize = 0;
+                if (subNodeIndex > 0) {
+                    System.arraycopy(cumulativeSizes, 0, newCumSizes, 0, subNodeIndex);
+                    cumulativeSize = newCumSizes[subNodeIndex - 1];
+                }
+                newCumSizes[subNodeIndex] = cumulativeSize + oldFocus.length;
+                numToSkip = 1;
+//                    for (int i = subNodeIndex + 1; i < newCumSizes.length; i++) {
+//                        newCumSizes[i] = cumulativeSizes[i - 1] + oldFocus.length;
+//                    }
+            } else {
+                // Grab the array from the existing leaf node, make the insert, and yield two
+                // new leaf nodes.
+                // Split-to-insert
+                Leaf<T>[] res =
+                        ((Leaf<T>) subNode).spliceAndSplit(oldFocus, subNodeAdjustedIndex);
+                Leaf<T> leftLeaf = res[0];
+                Leaf<T> rightLeaf = res[1];
+
+                newNodes = new Node[nodes.length + 1];
+
+                // Increment newCumSizes for the changed item and all items to the right.
+                newCumSizes = new int[cumulativeSizes.length + 1];
+                int leftSize = 0;
+
+                // Copy nodes and cumulativeSizes before split
+                if (subNodeIndex > 0) {
+                    //               src,srcPos,dest,destPos,length
+                    System.arraycopy(nodes, 0, newNodes, 0, subNodeIndex);
+                    //               src,   srcPos, dest,    destPos, length
+                    System.arraycopy(cumulativeSizes, 0, newCumSizes, 0, subNodeIndex);
+
+                    leftSize = cumulativeSizes[subNodeIndex - 1];
+                }
+
+                // Copy split nodes and cumulativeSizes
+                newNodes[subNodeIndex] = leftLeaf;
+                newNodes[subNodeIndex + 1] = rightLeaf;
+                leftSize += leftLeaf.size();
+                newCumSizes[subNodeIndex] = leftSize;
+                newCumSizes[subNodeIndex + 1] = leftSize + rightLeaf.size();
+
+                if (subNodeIndex < (nodes.length - 1)) {
+                    //               src,srcPos,dest,destPos,length
+                    System.arraycopy(nodes, subNodeIndex + 1, newNodes, subNodeIndex + 2,
+                            nodes.length - subNodeIndex - 1);
+                }
+                numToSkip = 2;
+            }
+            for (int i = subNodeIndex + numToSkip; i < newCumSizes.length; i++) {
+                newCumSizes[i] = cumulativeSizes[i - 1] + oldFocus.length;
+            }
+
+            return new Relaxed<>(newCumSizes, newNodes);
+            // end if subNode instanceof Leaf
+        }
+
         final T[] items;
 
         Leaf(T[] ts) { items = ts; }
@@ -1333,10 +1434,72 @@ involves changing more nodes than maybe necessary.
         public @NotNull String indentedStr(int indent) {
             return arrayString(items);
         }
+
+        @Override
+        public boolean isLeaf(){
+            return true;
+        }
     } // end class Leaf
 
     // Contains a relaxed tree of nodes that average around 32 items each.
     private static class Relaxed<T> implements Node<T> {
+
+        @Override
+        public boolean hasOneChild(){
+            if(numChildren()==1){
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public Node<T> pushFocusNode(int index, T @NotNull [] oldFocus, int subNodeAdjustedIndex, Node<T> subNode, int subNodeIndex, int[] cumulativeSizes, Node<T>[] nodes){
+            // Here we have capacity and the full sub-node is not a leaf or strict, so we have to
+            // split the appropriate sub-node.
+
+            // For now, split at half of size.
+            Relaxed<T>[] newSubNode = ((Relaxed<T>) subNode).split();
+
+            Relaxed<T> node1 = newSubNode[0];
+            Relaxed<T> node2 = newSubNode[1];
+            Node<T>[] newNodes = genericNodeArray(nodes.length + 1);
+
+            // If we aren't inserting at the first item, array-copy the nodes before the insert
+            // point.
+            if (subNodeIndex > 0) {
+                System.arraycopy(nodes, 0, newNodes, 0, subNodeIndex);
+            }
+
+            // Insert the new item.
+            newNodes[subNodeIndex] = node1;
+            newNodes[subNodeIndex + 1] = node2;
+
+            // If we aren't inserting at the last item, array-copy the nodes after the insert
+            // point.
+            if (subNodeIndex < nodes.length) {
+                System.arraycopy(nodes, subNodeIndex + 1, newNodes, subNodeIndex + 2,
+                        nodes.length - subNodeIndex - 1);
+            }
+
+            int[] newCumSizes = new int[cumulativeSizes.length + 1];
+            int cumulativeSize = 0;
+            if (subNodeIndex > 0) {
+                System.arraycopy(cumulativeSizes, 0, newCumSizes, 0, subNodeIndex);
+                cumulativeSize = cumulativeSizes[subNodeIndex - 1];
+            }
+
+            for (int i = subNodeIndex; i < newCumSizes.length; i++) {
+                // TODO: Calculate instead of loading into memory.  See splitAt calculation above.
+                cumulativeSize += newNodes[i].size();
+                newCumSizes[i] = cumulativeSize;
+            }
+
+            Relaxed<T> newRelaxed = new Relaxed<>(newCumSizes, newNodes);
+//            debug("newRelaxed2:\n" + newRelaxed.indentedStr(0));
+
+            return newRelaxed.pushFocus(index, oldFocus);
+//            debug("Parent after:" + after.indentedStr(0));
+        }
 
         // Holds the size of each sub-node and plus all nodes to its left.  You could think of this
         // as maxIndex + 1. This is a separate array so that it can be retrieved in a single memory
@@ -1725,138 +1888,7 @@ involves changing more nodes than maybe necessary.
                 return newRelaxed.pushFocus(index, oldFocus);
             }
 
-            if (subNode instanceof Leaf) {
-                // Here we already know:
-                //  - the leaf doesn't have capacity
-                //  - We don't need to split ourselves
-                // Therefore:
-                //  - If the focus is big enough to be its own leaf and the index is on a leaf
-                //    boundary and , make it one.
-                //  - Else, insert into the array and replace one leaf with two.
-
-                final Node<T>[] newNodes;
-                final int[] newCumSizes;
-                final int numToSkip;
-
-                //  If the focus is big enough to be its own leaf and the index is on a leaf
-                // boundary, make it one.
-                if ( (oldFocus.length >= MIN_NODE_LENGTH) &&
-                     (subNodeAdjustedIndex == 0 || subNodeAdjustedIndex == subNode.size()) ) {
-
-                    // Insert-between
-                    // Just add a new leaf
-                    Leaf<T> newNode = new Leaf<>(oldFocus);
-
-                    // If we aren't inserting before the existing leaf node, we're inserting after.
-                    if (subNodeAdjustedIndex != 0) {
-                        subNodeIndex++;
-                    }
-
-                    newNodes = insertIntoArrayAt(newNode, nodes, subNodeIndex, Node.class);
-                    // Increment newCumSizes for the changed item and all items to the right.
-                    newCumSizes = new int[cumulativeSizes.length + 1];
-                    int cumulativeSize = 0;
-                    if (subNodeIndex > 0) {
-                        System.arraycopy(cumulativeSizes, 0, newCumSizes, 0, subNodeIndex);
-                        cumulativeSize = newCumSizes[subNodeIndex - 1];
-                    }
-                    newCumSizes[subNodeIndex] = cumulativeSize + oldFocus.length;
-                    numToSkip = 1;
-//                    for (int i = subNodeIndex + 1; i < newCumSizes.length; i++) {
-//                        newCumSizes[i] = cumulativeSizes[i - 1] + oldFocus.length;
-//                    }
-                } else {
-                    // Grab the array from the existing leaf node, make the insert, and yield two
-                    // new leaf nodes.
-                    // Split-to-insert
-                    Leaf<T>[] res =
-                            ((Leaf<T>) subNode).spliceAndSplit(oldFocus, subNodeAdjustedIndex);
-                    Leaf<T> leftLeaf = res[0];
-                    Leaf<T> rightLeaf = res[1];
-
-                    newNodes = new Node[nodes.length + 1];
-
-                    // Increment newCumSizes for the changed item and all items to the right.
-                    newCumSizes = new int[cumulativeSizes.length + 1];
-                    int leftSize = 0;
-
-                    // Copy nodes and cumulativeSizes before split
-                    if (subNodeIndex > 0) {
-                        //               src,srcPos,dest,destPos,length
-                        System.arraycopy(nodes, 0, newNodes, 0, subNodeIndex);
-                        //               src,   srcPos, dest,    destPos, length
-                        System.arraycopy(cumulativeSizes, 0, newCumSizes, 0, subNodeIndex);
-
-                        leftSize = cumulativeSizes[subNodeIndex - 1];
-                    }
-
-                    // Copy split nodes and cumulativeSizes
-                    newNodes[subNodeIndex] = leftLeaf;
-                    newNodes[subNodeIndex + 1] = rightLeaf;
-                    leftSize += leftLeaf.size();
-                    newCumSizes[subNodeIndex] = leftSize;
-                    newCumSizes[subNodeIndex + 1] = leftSize + rightLeaf.size();
-
-                    if (subNodeIndex < (nodes.length - 1)) {
-                        //               src,srcPos,dest,destPos,length
-                        System.arraycopy(nodes, subNodeIndex + 1, newNodes, subNodeIndex + 2,
-                                         nodes.length - subNodeIndex - 1);
-                    }
-                    numToSkip = 2;
-                }
-                for (int i = subNodeIndex + numToSkip; i < newCumSizes.length; i++) {
-                    newCumSizes[i] = cumulativeSizes[i - 1] + oldFocus.length;
-                }
-
-                return new Relaxed<>(newCumSizes, newNodes);
-                // end if subNode instanceof Leaf
-            }
-
-            // Here we have capacity and the full sub-node is not a leaf or strict, so we have to
-            // split the appropriate sub-node.
-
-            // For now, split at half of size.
-            Relaxed<T>[] newSubNode = ((Relaxed<T>) subNode).split();
-
-            Relaxed<T> node1 = newSubNode[0];
-            Relaxed<T> node2 = newSubNode[1];
-            Node<T>[] newNodes = genericNodeArray(nodes.length + 1);
-
-            // If we aren't inserting at the first item, array-copy the nodes before the insert
-            // point.
-            if (subNodeIndex > 0) {
-                System.arraycopy(nodes, 0, newNodes, 0, subNodeIndex);
-            }
-
-            // Insert the new item.
-            newNodes[subNodeIndex] = node1;
-            newNodes[subNodeIndex + 1] = node2;
-
-            // If we aren't inserting at the last item, array-copy the nodes after the insert
-            // point.
-            if (subNodeIndex < nodes.length) {
-                System.arraycopy(nodes, subNodeIndex + 1, newNodes, subNodeIndex + 2,
-                                 nodes.length - subNodeIndex - 1);
-            }
-
-            int[] newCumSizes = new int[cumulativeSizes.length + 1];
-            int cumulativeSize = 0;
-            if (subNodeIndex > 0) {
-                System.arraycopy(cumulativeSizes, 0, newCumSizes, 0, subNodeIndex);
-                cumulativeSize = cumulativeSizes[subNodeIndex - 1];
-            }
-
-            for (int i = subNodeIndex; i < newCumSizes.length; i++) {
-                // TODO: Calculate instead of loading into memory.  See splitAt calculation above.
-                cumulativeSize += newNodes[i].size();
-                newCumSizes[i] = cumulativeSize;
-            }
-
-            Relaxed<T> newRelaxed = new Relaxed<>(newCumSizes, newNodes);
-//            debug("newRelaxed2:\n" + newRelaxed.indentedStr(0));
-
-            return newRelaxed.pushFocus(index, oldFocus);
-//            debug("Parent after:" + after.indentedStr(0));
+            return subNode.pushFocusNode(index, oldFocus, subNodeAdjustedIndex, subNode, subNodeIndex, cumulativeSizes, nodes);
         }
 
         @SuppressWarnings("unchecked")
@@ -2041,6 +2073,11 @@ involves changing more nodes than maybe necessary.
             }
             return right;
         } // end fixRight()
+
+        @Override
+        public boolean isLeaf(){
+            return false;
+        }
     } // end class Relaxed
 
     // =================================== Tree-walking Iterator ==================================
@@ -2074,7 +2111,7 @@ involves changing more nodes than maybe necessary.
         // Descent to the leftmost unused leaf node.
         private E @NotNull [] findLeaf(@NotNull Node<E> node) {
             // Descent to left-most bottom node.
-            while (!(node instanceof Leaf)) {
+            while (!(node.isLeaf())) {
                 IdxNode<E> in = new IdxNode<>(node);
                 // Add indexNode to ancestor stack
                 stack[++stackMaxIdx] = in;
@@ -2137,7 +2174,8 @@ involves changing more nodes than maybe necessary.
                 isFirst = false;
             } else {
 //                sB.append(" ");
-                if (items[0] instanceof Leaf) {
+                Node node0 = (Node) items[0];
+                if (node0.isLeaf()) {
                     sB.append(" ");
                 } else {
                     sB.append("\n").append(indentSpace(nextIndent));
