@@ -745,35 +745,7 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
     @SuppressWarnings("unchecked")
     private static <K, V> Node<K,V> append(Node<? extends K,? extends V> left,
                                    Node<? extends K,? extends V> right) {
-        if (left == null)
-            return (Node<K,V>) right;
-        else if (right == null)
-            return (Node<K,V>) left;
-        else if (left instanceof PersistentTreeMap.Red) {
-            if (right instanceof PersistentTreeMap.Red) {
-                Node<K,V> app = append(left.right(), right.left());
-                if (app instanceof PersistentTreeMap.Red)
-                    return red(app.getKey(), app.getValue(),
-                               red(left.getKey(), left.getValue(), left.left(), app.left()),
-                               red(right.getKey(), right.getValue(), app.right(), right.right()));
-                else
-                    return red(left.getKey(), left.getValue(), left.left(),
-                               red(right.getKey(), right.getValue(), app, right.right()));
-            } else
-                return red(left.getKey(), left.getValue(), left.left(), append(left.right(), right));
-        } else if (right instanceof PersistentTreeMap.Red)
-            return red(right.getKey(), right.getValue(), append(left, right.left()), right.right());
-        else //black/black
-        {
-            Node<K,V> app = append(left.right(), right.left());
-            if (app instanceof PersistentTreeMap.Red)
-                return red(app.getKey(), app.getValue(),
-                           black(left.getKey(), left.getValue(), left.left(), app.left()),
-                           black(right.getKey(), right.getValue(), app.right(), right.right()));
-            else
-                return balanceLeftDel(left.getKey(), left.getValue(), left.left(),
-                                      black(right.getKey(), right.getValue(), app, right.right()));
-        }
+        return Node.appendNode(left, right);
     }
 
     private static <K, V, K1 extends K, V1 extends V>
@@ -918,6 +890,39 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
             return stringify(field1) + "=" + stringify(field2);
         }
 
+        static <K, V> Node<K,V> appendNode(Node<? extends K,? extends V> left,
+                             Node<? extends K,? extends V> right){
+            if (left == null)
+                return (Node<K,V>) right;
+            else if (right == null)
+                return (Node<K,V>) left;
+            else if (left instanceof PersistentTreeMap.Red) {
+                if (right instanceof PersistentTreeMap.Red) {
+                    Node<K,V> app = append(left.right(), right.left());
+                    if (app instanceof PersistentTreeMap.Red)
+                        return red(app.getKey(), app.getValue(),
+                                red(left.getKey(), left.getValue(), left.left(), app.left()),
+                                red(right.getKey(), right.getValue(), app.right(), right.right()));
+                    else
+                        return red(left.getKey(), left.getValue(), left.left(),
+                                red(right.getKey(), right.getValue(), app, right.right()));
+                } else
+                    return red(left.getKey(), left.getValue(), left.left(), append(left.right(), right));
+            } else if (right instanceof PersistentTreeMap.Red)
+                return red(right.getKey(), right.getValue(), append(left, right.left()), right.right());
+            else //black/black
+            {
+                Node<K,V> app = append(left.right(), right.left());
+                if (app instanceof PersistentTreeMap.Red)
+                    return red(app.getKey(), app.getValue(),
+                            black(left.getKey(), left.getValue(), left.left(), app.left()),
+                            black(right.getKey(), right.getValue(), app.right(), right.right()));
+                else
+                    return balanceLeftDel(left.getKey(), left.getValue(), left.left(),
+                            black(right.getKey(), right.getValue(), app, right.right()));
+            }
+        }
+
 //        public <R> R kvreduce(Fn3<R,K,V,R> f, R init) {
 //            if (left() != null) {
 //                init = left().kvreduce(f, init);
@@ -958,6 +963,7 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
         Node<K,V> replace(K key, V val, Node<K,V> left, Node<K,V> right) {
             return black(key, val, left, right);
         }
+
     }
 
     private static class BlackBranch<K, V> extends Black<K,V> {
@@ -995,6 +1001,8 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
         Node<K,V> replace(K key, V val, Node<K,V> left, Node<K,V> right) {
             return red(key, val, left, right);
         }
+
+
     }
 
     private static class RedBranch<K, V> extends Red<K,V> {

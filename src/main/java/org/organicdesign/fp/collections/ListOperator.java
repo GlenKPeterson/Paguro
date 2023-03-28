@@ -11,7 +11,7 @@ public class ListOperator implements Serializable {
 
 
     public UnmodListIterator<Integer> Iterator(int startIdx, RangeOfInt ROF) {
-        if ((startIdx < 0) || (startIdx > ROF.getStart())){
+        if ((startIdx < 0) || (startIdx > ROF.getSize())){
             // To match ArrayList and other java.util.List expectations
             throw new IndexOutOfBoundsException("Index: " + startIdx);
         }
@@ -46,7 +46,7 @@ public class ListOperator implements Serializable {
             }
 
             public int nextIndex() {
-                return val - ROF.getSize();
+                return val - ROF.getStart();
             }
         };
     }

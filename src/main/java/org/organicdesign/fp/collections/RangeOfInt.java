@@ -107,7 +107,12 @@ public class RangeOfInt implements UnmodList<Integer>, Serializable {
 
     // ======================================== Constructor ========================================
 
-    private RangeOfInt(int s, int e) { start = s; end = e; size = (end - start); }
+    private RangeOfInt(int s, int e) {
+        start = s;
+        end = e;
+        size = (end - start);
+        listOperator = new ListOperator();
+        }
 
     // ======================================= Serialization =======================================
 
