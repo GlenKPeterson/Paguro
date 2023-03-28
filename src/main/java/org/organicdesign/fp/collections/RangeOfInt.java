@@ -58,9 +58,15 @@ public class RangeOfInt implements UnmodList<Integer>, Serializable {
                 if ((o1 instanceof RangeOfInt) && (o2 instanceof RangeOfInt)) {
                     return o1.equals(o2);
                 }
-                return o1.size() == o2.size() &&
-                       UnmodSortedIterable.equal(UnmodSortedIterable.castFromList(o1),
-                                                 UnmodSortedIterable.castFromList(o2));
+                return compareIterables(o1, o2);
+            }
+
+            private boolean compareIterables(List<Integer> o1, List<Integer> o2){
+                boolean equalSize = o1.size() == o2.size();
+                UnmodSortedIterable<Integer> obj1 = UnmodSortedIterable.castFromList(o1);
+                UnmodSortedIterable<Integer> obj2 = UnmodSortedIterable.castFromList(o2);
+                boolean equalContent = UnmodSortedIterable.equal(obj1, obj2);
+                return equalSize && equalContent;
             }
         }
     }
@@ -97,9 +103,16 @@ public class RangeOfInt implements UnmodList<Integer>, Serializable {
     private final int end;
     private transient int size;
 
+    private ListOperator listOperator;
+
     // ======================================== Constructor ========================================
 
-    private RangeOfInt(int s, int e) { start = s; end = e; size = (end - start); }
+    private RangeOfInt(int s, int e) {
+        start = s;
+        end = e;
+        size = (end - start);
+        listOperator = new ListOperator();
+        }
 
     // ======================================= Serialization =======================================
 
@@ -258,61 +271,24 @@ public class RangeOfInt implements UnmodList<Integer>, Serializable {
      */
     @NotNull
     @Override public UnmodListIterator<Integer> listIterator(final int startIdx) {
-        if( (startIdx < 0) || (startIdx > size) ) {
-            // To match ArrayList and other java.util.List expectations
-            throw new IndexOutOfBoundsException("Index: " + startIdx);
-        }
-        return new UnmodListIterator<Integer>() {
-            int val = start + startIdx;
-            @Override public boolean hasNext() { return val < end; }
-            @Override public Integer next() {
-                if (val >= end) {
-                    // To match ArrayList and other java.util.List expectations
-                    throw new NoSuchElementException();
-                }
-                Integer t = val;
-                val = val + 1;
-                return t;
-            }
-            @Override public boolean hasPrevious() { return val > start; }
-            @Override public Integer previous() {
-                if (val <= start) {
-                    // To match ArrayList and other java.util.List expectations
-                    throw new NoSuchElementException();
-                }
-                val = val - 1;
-                return val;
-            }
-            @Override public int nextIndex() { return val - start; }
-        };
+        return listOperator.Iterator(startIdx, this);
     }
 
     /** {@inheritDoc} */
     @NotNull
     @Override public RangeOfInt subList(int fromIndex, int toIndex) {
-        if ( (fromIndex == 0) && (toIndex == size) ) {
-            return this;
-        }
-        // Note that this is an IllegalArgumentException, not IndexOutOfBoundsException in order to
-        // match ArrayList.
-        if (fromIndex > toIndex) {
-            throw new IllegalArgumentException("fromIndex(" + fromIndex + ") > toIndex(" + toIndex +
-                                               ")");
-        }
-        // The text of this matches ArrayList
-        if (fromIndex < 0) {
-            throw new IndexOutOfBoundsException("fromIndex = " + fromIndex);
-        }
-        if (toIndex > size) {
-            throw new IndexOutOfBoundsException("toIndex = " + toIndex);
-        }
+        return listOperator.subList(fromIndex, toIndex, this);
+    }
 
-        // Look very closely at the second parameter because the bounds checking is *different*
-        // from the get() method.  get(toIndex) can throw an exception if toIndex >= start+size.
-        // But since a range is exclusive of it's right-bound, we can create a new sub-range
-        // with a right bound index of size, as opposed to size minus 1.  I spent hours
-        // understanding this before fixing a bug with it.  In the end, subList should do the same
-        // thing on a Range that it does on the equivalent ArrayList.  I made tests for the same.
-        return RangeOfInt.of(start + fromIndex, start + toIndex);
+    public int getStart(){
+        return start;
+    }
+
+    public int getEnd(){
+        return end;
+    }
+
+    public int getSize(){
+        return size;
     }
 }
