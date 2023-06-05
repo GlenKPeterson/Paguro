@@ -61,7 +61,7 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
      any null Entries.
      */
     public static <K extends Comparable<K>,V> PersistentTreeMap<K,V>
-    of(Iterable<Map.Entry<K,V>> es) {
+    of(Iterable<? extends Map.Entry<K,V>> es) {
         if (es == null) { return empty(); }
         PersistentTreeMap<K,V> map = new PersistentTreeMap<>(Equator.defaultComparator(), null, 0);
         for (Map.Entry<K,V> entry : es) {
@@ -87,7 +87,7 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
      @return a new PersistentTreeMap of the specified comparator and the given key/value pairs
      */
     public static <K,V> PersistentTreeMap<K,V>
-    ofComp(Comparator<? super K> comp, Iterable<Map.Entry<K,V>> kvPairs) {
+    ofComp(Comparator<? super K> comp, Iterable<? extends Map.Entry<K,V>> kvPairs) {
         if (kvPairs == null) { return new PersistentTreeMap<>(comp, null, 0); }
         PersistentTreeMap<K,V> map = new PersistentTreeMap<>(comp, null, 0);
         for (Map.Entry<K,V> entry : kvPairs) {
@@ -104,7 +104,7 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
      items will blow up at runtime.  Either a withComparator() method will be added, or this will
      be removed.
      */
-    final static public PersistentTreeMap EMPTY =
+    final static public PersistentTreeMap<?, ?> EMPTY =
             new PersistentTreeMap<>(Equator.defaultComparator(), null, 0);
 
     /**
