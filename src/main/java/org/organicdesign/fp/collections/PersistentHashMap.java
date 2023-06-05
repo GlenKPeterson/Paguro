@@ -156,7 +156,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
     @SuppressWarnings("WeakerAccess")
     public static <K,V> @NotNull PersistentHashMap<K,V> ofEq(
             Equator<K> eq,
-            @Nullable Iterable<Map.Entry<K,V>> es) {
+            @Nullable Iterable<? extends Map.Entry<K,V>> es) {
         if (es == null) { return empty(eq); }
         MutHashMap<K,V> map = emptyMutable(eq);
         for (Map.Entry<K,V> entry : es) {
@@ -179,7 +179,7 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
 
      @return a new PersistentHashMap of the given key/value pairs
       */
-    public static <K,V> @NotNull PersistentHashMap<K,V> of(@Nullable Iterable<Map.Entry<K,V>> kvPairs) {
+    public static <K,V> @NotNull PersistentHashMap<K,V> of(@Nullable Iterable<? extends Map.Entry<K,V>> kvPairs) {
         if (kvPairs == null) { return empty(); }
         PersistentHashMap<K,V> m = empty();
         MutHashMap<K,V> map = m.mutable();

@@ -24,7 +24,6 @@ import org.organicdesign.fp.function.Fn1;
 import org.organicdesign.fp.oneOf.Option;
 import org.organicdesign.fp.tuple.Tuple2;
 
-import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.organicdesign.fp.FunctionUtils.ordinal;
 import static org.organicdesign.fp.StaticImports.*;
@@ -1617,5 +1616,27 @@ public class PersistentHashMapTest {
         assertFalse(h2 == h2.assoc(null, "nada"));
         assertNotEquals(h2, h2.assoc(null, "nada"));
         assertEquals(h2.size() + 1, h2.assoc(null, "nada").size());
+    }
+
+    @Test
+    public void testOfIterable() {
+        PersistentHashMap<String, String> map = PersistentHashMap.<String, String>empty()
+                .assoc("a", "a")
+                .assoc("b", "b")
+                .assoc("c", "c")
+                .assoc("d", "d");
+        PersistentHashMap<String, String> map2 = PersistentHashMap.<String, String>empty()
+                .assoc("e", "e")
+                .assoc("f", "f")
+                .assoc("g", "g")
+                .assoc("h", "h");
+
+        assertEquals(map.without("a").without("b"), PersistentHashMap.of(
+                map.filter(entry -> !(entry.getKey().equals("a") || entry.getKey().equals("b")))));
+
+        ImMap<String, String> combined = map.concat(map2).toImMap(x -> x);
+        assertEquals(combined, PersistentTreeMap.of(map.concat(map2)));
+
+        assertEquals(map, PersistentTreeMap.of(map));
     }
 }

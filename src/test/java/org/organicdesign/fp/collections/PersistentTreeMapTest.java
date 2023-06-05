@@ -925,4 +925,24 @@ public class PersistentTreeMapTest {
                                                                Fn1.identity()),
                                         max);
     }
+
+    @Test public void testOfIterable() {
+        PersistentTreeMap<String, String> map = PersistentTreeMap.<String, String>empty()
+                .assoc("a", "a")
+                .assoc("b", "b")
+                .assoc("c", "c")
+                .assoc("d", "d");
+        PersistentTreeMap<String, String> map2 = PersistentTreeMap.<String, String>empty()
+                .assoc("e", "e")
+                .assoc("f", "f")
+                .assoc("g", "g")
+                .assoc("h", "h");
+
+        assertEquals(map.without("a").without("b"), PersistentTreeMap.of(map.drop(2)));
+
+        ImSortedMap<String, String> combined = map.concat(map2).toImSortedMap(Equator.defaultComparator(), entry -> entry);
+        assertEquals(combined, PersistentTreeMap.of(map.concat(map2)));
+
+        assertEquals(map, PersistentTreeMap.of(map));
+    }
 }
