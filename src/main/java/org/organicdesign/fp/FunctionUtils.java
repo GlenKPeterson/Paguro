@@ -28,6 +28,11 @@ public class FunctionUtils {
         throw new UnsupportedOperationException("No instantiation");
     }
 
+    /**
+     * Replace with com.planbase.taint.Taintable.stringify.
+     * That method is safe.  This one is a joke.
+     */
+    @Deprecated(forRemoval = true)
     public static @NotNull String stringify(@Nullable Object o) {
         if (o == null) { return "null"; }
         if (o instanceof String) { return "\"" + o + "\""; }
