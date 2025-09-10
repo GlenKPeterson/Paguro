@@ -1,10 +1,11 @@
 package org.organicdesign.fp;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.ImMap;
 import org.organicdesign.fp.collections.RangeOfInt;
 import org.organicdesign.fp.tuple.Tuple3;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,7 +14,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.organicdesign.fp.StaticImports.*;
 import static org.organicdesign.fp.TradJavaStreamComparisonTest.ColorVal.*;
 
@@ -60,7 +62,8 @@ public class TradJavaStreamComparisonTest {
     }
 
     // Prove that all three reverse-mappings work.
-    @Test public void testReverseMapping() {
+    @Test
+    public void testReverseMapping() {
         assertEquals(RED, ColorVal.fromCharP('R'));
         assertEquals(RED, ColorVal.fromCharT('R'));
         assertEquals(RED, ColorVal.fromChar8('R'));
@@ -85,17 +88,15 @@ public class TradJavaStreamComparisonTest {
     // method is ever going away.  But the warning indicates the coding error of ever trying to
     // call this method.
     @SuppressWarnings("deprecation")
-    @Test(expected = UnsupportedOperationException.class)
-    public void revMapExJ() { charMapP.put('Z', RED); }
-
-    // Traditional Java doesn't indicate that the put method always throws an exception.
-    @Test(expected = UnsupportedOperationException.class)
-    public void revMapExT() { charMapT.put('Z', RED); }
-
-    // Java8 doesn't indicate that the put method always throws an exception.
-    @SuppressWarnings("ConstantConditions")
-    @Test(expected = UnsupportedOperationException.class)
-    public void revMapEx8() { charMap8.put('Z', RED); }
+    @Test
+    public void revMapEx() {
+        assertThrowsExactly(UnsupportedOperationException.class, () ->
+                charMapP.put('Z', RED));
+        assertThrowsExactly(UnsupportedOperationException.class, () ->
+                charMapT.put('Z', RED));
+        assertThrowsExactly(UnsupportedOperationException.class, () ->
+                charMap8.put('Z', RED));
+    }
 
     // Maybe your code has to inter-operate with a legacy system that instead of letters, uses
     // numbers to indicate the three primary colors:
@@ -177,13 +178,13 @@ public class TradJavaStreamComparisonTest {
                 .flatMap(i -> RangeOfInt.of(0, 256).map(j -> new Color(i, (i + j) / 2, 255)))
                 .toImList();
 
-        assertTrue(imgData.toString()
-                          .startsWith("PersistentVector(" +
-                                      "Color(0,0,255)," +
-                                      "Color(0,0,255)," +
-                                      "Color(0,1,255)," +
-                                      "Color(0,1,255)," +
-                                      "Color(0,2,255),"));
+        assertThat(imgData.toString())
+                          .startsWith("vec(" +
+                                      "Color(0, 0, 255), " +
+                                      "Color(0, 0, 255), " +
+                                      "Color(0, 1, 255), " +
+                                      "Color(0, 1, 255), " +
+                                      "Color(0, 2, 255), ");
 
         ImMap<Integer,Integer> greenCounts = imgData
                 .fold(map(),
@@ -208,13 +209,13 @@ public class TradJavaStreamComparisonTest {
             }
         }
 
-        assertTrue(imgData.toString()
-                          .startsWith("[" +
-                                      "Color(0,0,255), " +
-                                      "Color(0,0,255), " +
-                                      "Color(0,1,255), " +
-                                      "Color(0,1,255), " +
-                                      "Color(0,2,255), "));
+        assertThat(imgData.toString())
+                .startsWith("[" +
+                        "Color(0, 0, 255), " +
+                        "Color(0, 0, 255), " +
+                        "Color(0, 1, 255), " +
+                        "Color(0, 1, 255), " +
+                        "Color(0, 2, 255), ");
 
         Map<Integer,Integer> greenCounts = new HashMap<>();
         for (Color color : imgData) {
@@ -237,13 +238,13 @@ public class TradJavaStreamComparisonTest {
                 imgData.add(new Color(i, (i + j) / 2, 255));
             }
         }
-        assertTrue(imgData.toString()
-                          .startsWith("[" +
-                                      "Color(0,0,255), " +
-                                      "Color(0,0,255), " +
-                                      "Color(0,1,255), " +
-                                      "Color(0,1,255), " +
-                                      "Color(0,2,255), "));
+        assertThat(imgData.toString()).
+                startsWith("[" +
+                        "Color(0, 0, 255), " +
+                        "Color(0, 0, 255), " +
+                        "Color(0, 1, 255), " +
+                        "Color(0, 1, 255), " +
+                        "Color(0, 2, 255), ");
 
         // If this didn't throw an exception, we could use (thanks to @codepoetics on reddit)
 //        Map<Integer,Long> greenCounts = Collections.unmodifiableMap(

@@ -1,7 +1,11 @@
 package org.organicdesign.fp.collections;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.AbstractMap;
 import java.util.Map;
+
+import static com.planbase.indented.StringUtils.iterableToStr;
 
 /**
  Implements equals() and hashCode() methods compatible with java.util.Map (which ignores order)

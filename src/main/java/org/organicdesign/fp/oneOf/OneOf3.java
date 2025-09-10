@@ -41,9 +41,9 @@ public class OneOf3<A,B,C> {
             throw new IllegalArgumentException("Selected item index must be 0-2");
         }
         if (!types.get(index).isInstance(o)) {
-            throw new ClassCastException("You specified index " + index + ", indicating a " +
-                                         types.get(index).getCanonicalName() + "," +
-                                         " but passed a " + o.getClass().getCanonicalName());
+            throw new IllegalArgumentException("Index " + index + " takes a " +
+                    types.get(index).getCanonicalName() + "," +
+                    " but was passed a " + o.getClass().getCanonicalName());
         }
     }
 

@@ -1,13 +1,12 @@
 package org.organicdesign.fp.oneOf;
 
+import com.planbase.testutils.EqualsContract;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
-import org.organicdesign.testUtils.EqualsContract;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static com.planbase.testutils.Serialization.serializeDeserialize;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.organicdesign.fp.oneOf.Option.none;
-import static org.organicdesign.testUtils.Serialization.serializeDeserialize;
 
 public class OneOf2OrNoneTest {
 
@@ -60,9 +59,10 @@ public class OneOf2OrNoneTest {
                                               Str_Int.of(-97));
     }
 
+    // Might be cut-pasted from OneOf2Test
     @Test
-    public void subClassExceptions() {
-        Exception e;
+    public void subclassExceptions() {
+        @NotNull Exception e;
 
         e = assertThrowsExactly(IllegalArgumentException.class,
                                 () -> new Str_Int("hi", -1));
@@ -72,13 +72,13 @@ public class OneOf2OrNoneTest {
                                 () -> new Str_Int(1, -1));
         assertEquals("Selected item index must be 0-1", e.getMessage());
 
-        e = assertThrowsExactly(ClassCastException.class,
+        e = assertThrowsExactly(IllegalArgumentException.class,
                                 () -> new Str_Int(1, 0));
-        assertEquals("You specified index 0, indicating a java.lang.String, but passed a java.lang.Integer", e.getMessage());
+        assertEquals("Index 0 takes a java.lang.String, but was passed a java.lang.Integer", e.getMessage());
 
-        e = assertThrowsExactly(ClassCastException.class,
+        e = assertThrowsExactly(IllegalArgumentException.class,
                                 () -> new Str_Int("hi", 1));
-        assertEquals("You specified index 1, indicating a java.lang.Integer, but passed a java.lang.String", e.getMessage());
+        assertEquals("Index 1 takes a java.lang.Integer, but was passed a java.lang.String", e.getMessage());
 
         e = assertThrowsExactly(IllegalArgumentException.class,
                                 () -> new Str_Int("hi", 2));

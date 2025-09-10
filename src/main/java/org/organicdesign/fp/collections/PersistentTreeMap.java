@@ -9,25 +9,16 @@
 /* rich May 20, 2006 */
 package org.organicdesign.fp.collections;
 
-import java.io.IOException;
-import java.io.InvalidObjectException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.util.ArrayDeque;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Queue;
-import java.util.Stack;
-
+import com.planbase.indented.IndentedStringable;
 import org.jetbrains.annotations.NotNull;
 import org.organicdesign.fp.function.Fn1;
 import org.organicdesign.fp.oneOf.Option;
 import org.organicdesign.fp.tuple.Tuple2;
 
-import static org.organicdesign.fp.FunctionUtils.stringify;
+import java.io.*;
+import java.util.*;
+
+import static com.planbase.indented.StringUtils.indent;
 
 /**
  Persistent Red Black Tree. Note that instances of this class are constant values
@@ -44,7 +35,7 @@ import static org.organicdesign.fp.FunctionUtils.stringify;
  */
 
 public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
-        implements ImSortedMap<K,V>, Serializable {
+        implements IndentedStringable, ImSortedMap<K,V>, Serializable {
 
     /**
      This is a throw-away class used internally by PersistentTreeMap and PersistentHashMap like
@@ -914,8 +905,12 @@ public class PersistentTreeMap<K,V> extends AbstractUnmodMap<K,V>
 
         abstract Node<K,V> replace(K key, V val, Node<K,V> left, Node<K,V> right);
 
+        @Override
+        public @NotNull String indentedStr(int indent, boolean singleLine) {
+            return indent(0, _1) + "=" + indent(0, _2);
+        }
         @Override public String toString() {
-            return stringify(_1) + "=" + stringify(_2);
+            return indentedStr(0);
         }
 
 //        public <R> R kvreduce(Fn3<R,K,V,R> f, R init) {

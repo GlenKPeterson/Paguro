@@ -1,14 +1,15 @@
 package org.organicdesign.fp.collections;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
-import static org.organicdesign.fp.FunctionUtils.ordinal;
+import static com.planbase.indented.StringUtils.ordinal;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.organicdesign.fp.oneOf.Option.none;
 import static org.organicdesign.fp.oneOf.Option.some;
 
@@ -40,7 +41,8 @@ public class MutListTest {
         @Override public E get(int i) { return inner.get(i); }
     }
 
-    @Test public void testStuff() {
+    @Test
+    public void testStuff() {
         List<String> control = new ArrayList<>();
         MutList<String> test = new TestList<>(new ArrayList<>());
 

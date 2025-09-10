@@ -14,19 +14,12 @@
 
 package org.organicdesign.fp.collections;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("WeakerAccess")
 public class UnmodCollectionTest {
@@ -79,7 +72,8 @@ public class UnmodCollectionTest {
     // changed to Paguro.
     private static final UnmodCollection<String> unColl = new TestColl<>(sticksAndStones);
 
-    @Test public void containsTest() {
+    @Test
+    public void containsTest() {
         for (String s : sticksAndStones) {
             assertTrue(unColl.contains(s));
         }
@@ -146,11 +140,11 @@ public class UnmodCollectionTest {
     static <T> void assertSetEqualsOnArrays(T[] as, T[] bs) {
         Set<T> aSet = new HashSet<>(Arrays.asList(as));
         Set<T> bSet = new HashSet<>(Arrays.asList(bs));
-        assertTrue("set a.size() == b.size()", aSet.size() == bSet.size());
-        assertTrue("set a.containsAll(b)", aSet.containsAll(bSet));
-        assertTrue("set b.containsAll(a)", bSet.containsAll(aSet));
-        assertTrue("set a.equals(b)", aSet.equals(bSet));
-        assertTrue("set b.equals(a)", bSet.equals(aSet));
+        assertTrue(aSet.size() == bSet.size(), "set a.size() == b.size()");
+        assertTrue(aSet.containsAll(bSet), "set a.containsAll(b)");
+        assertTrue(bSet.containsAll(aSet), "set b.containsAll(a)");
+        assertTrue(aSet.equals(bSet), "set a.equals(b)");
+        assertTrue(bSet.equals(aSet), "set b.equals(a)");
     }
 
     @Test public void toArrayTest() {
@@ -185,30 +179,28 @@ public class UnmodCollectionTest {
     }
 
     @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOp01() { unColl.add("hi"); }
+    @Test
+    public void unsupportedOp() {
+        assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unColl.add("hi"));
 
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOp02() { unColl.addAll(Arrays.asList("hi", "there")); }
+        assertThrowsExactly(UnsupportedOperationException.class, () ->
+                        unColl.addAll(Arrays.asList("hi", "there")));
 
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOp03() { unColl.clear(); }
+        assertThrowsExactly(UnsupportedOperationException.class, () ->
+                        unColl.clear());
 
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOp04() { unColl.remove("hi"); }
+        assertThrowsExactly(UnsupportedOperationException.class, () ->
+                        unColl.remove("hi"));
 
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOp05() { unColl.removeAll(Arrays.asList("hi", "there")); }
+        assertThrowsExactly(UnsupportedOperationException.class, () ->
+                        unColl.removeAll(Arrays.asList("hi", "there")));
 
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOp06() { unColl.removeIf(item -> false); }
+        assertThrowsExactly(UnsupportedOperationException.class, () ->
+                        unColl.removeIf(item -> false));
 
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOp07() { unColl.retainAll(Arrays.asList("hi", "there")); }
+        assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unColl.retainAll(Arrays.asList("hi", "there")));
+    }
+
 }

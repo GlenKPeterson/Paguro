@@ -1,30 +1,33 @@
 package org.organicdesign.fp.function;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
-@RunWith(JUnit4.class)
+
 public class Fn0Test {
-    @Test(expected = RuntimeException.class)
-    public void applyIOException() {
-        //noinspection Convert2Lambda
-        new Fn0<Integer>() {
-            @Override public Integer applyEx() throws Exception {
-                throw new IOException("test exception");
-            }
-        }.apply();
-    }
+    @Test
+    public void testExceptions() {
+        assertThrowsExactly(RuntimeException.class, () ->
+                new Fn0<Integer>() {
+                    @Override public Integer applyEx() throws Exception {
+                        throw new IOException("test exception");
+                    }
+                }.apply());
 
-    @Test(expected = IllegalStateException.class)
-    public void applyIllegalStateException() {
-        ((Fn0<Integer>) () -> {
-            throw new IllegalStateException("test exception");
-        }).apply();
+        assertThrowsExactly(IllegalStateException.class, () ->
+                ((Fn0<Integer>) () -> {
+                    throw new IllegalStateException("test exception");
+                }).apply());
+
+        assertThrowsExactly(IllegalStateException.class, () ->
+                ((Fn0<Integer>) () -> {
+                    throw new IllegalStateException("test exception");
+                }).call());
     }
 
     @Test public void constantFunction() throws Exception {
@@ -48,12 +51,5 @@ public class Fn0Test {
 //        assertNotEquals(Fn0.constantFunction(null), null);
 //
 //        assertFalse(Fn0.constantFunction(35).equals((Callable<Integer>) () -> 35));
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void testCall() throws Exception {
-        ((Fn0<Integer>) () -> {
-            throw new IllegalStateException("test exception");
-        }).call();
     }
 }

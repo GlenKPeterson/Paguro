@@ -116,12 +116,14 @@ public class TupleGenerator {
         fr.write(copyright() +
                  "package org.organicdesign.fp.tuple;\n" +
                  "\n" +
+                 "import com.planbase.indented.IndentedStringable;\n" +
                  "import org.jetbrains.annotations.NotNull;\n" +
                  "\n" +
+                 "import java.io.Serial;\n" +
                  "import java.io.Serializable;\n" +
                  "import java.util.Objects;\n" +
                  "\n" +
-                 "import static org.organicdesign.fp.FunctionUtils.stringify;\n" +
+                 "import static com.planbase.indented.StringUtils.indent;\n" +
                  generatedWarning() +
                  "/**\n" +
                  " * Holds " + i + " items of potentially different types.  Designed to let you easily create immutable\n" +
@@ -130,12 +132,13 @@ public class TupleGenerator {
                  " */\n" +
                  "public class Tuple" + i + "<");
         fr.write(types(i));
-        fr.write("> implements Serializable {\n" +
+        fr.write("> implements IndentedStringable, Serializable {\n" +
                  "\n" +
                  "    // For serializable.  Make sure to change whenever internal data format changes.\n" +
                  "    // Implemented because implementing serializable only on a subclass of an\n" +
                  "    // immutable class requires a serialization proxy.  That's probably worse than\n" +
                  "    // the conceptual burden of all tuples being Serializable.\n" +
+                "     @Serial\n" +
                  "    private static final long serialVersionUID = 20211228180200L;\n" +
                  "\n" +
                  "    // Fields are protected so that subclasses can make accessor methods with meaningful names.\n");
@@ -210,25 +213,21 @@ public class TupleGenerator {
 
         fr.write("\n" +
                  "    @Override\n" +
-                 "    public @NotNull String toString() {\n" +
-                 "        return getClass().getSimpleName() + \"(\" +\n" +
-                 "               stringify(_");
-        isFirst = true;
+                 "    public @NotNull String indentedStr(int indent, boolean singleLine) {\n" +
+                 "        return getClass().getSimpleName() + \"(\" +\n");
         for (int l = 1; l <= i; l++) {
-            if (isFirst) {
-                isFirst = false;
-            } else {
-                if ((l % 3) == 0) {
-                    fr.write(" + \",\" +\n" +
-                             "               stringify(_");
-                } else {
-                    fr.write(" + \",\" + stringify(_");
-                }
-            }
+            fr.write("               indent(indent, _");
             fr.write(String.valueOf(l));
-            fr.write(")");
+            if (l != i) {
+                fr.write(") + \", \" +\n");
+            }
         }
-        fr.write(" + \")\";\n" +
+        fr.write(") + \")\";\n" +
+                 "    }\n" +
+                 "\n" +
+                 "    @Override\n" +
+                 "    public @NotNull String toString() {\n" +
+                 "        return indentedStr(0, true);\n" +
                  "    }\n" +
                  "\n" +
                  "    @Override\n" +
@@ -335,12 +334,12 @@ public class TupleGenerator {
         fr.write(copyright() +
                  "package org.organicdesign.fp.tuple;\n" +
                  "\n" +
-                 "import org.junit.Test;\n" +
+                 "import org.junit.jupiter.api.Test;\n" +
                  "\n" +
-                 "import static org.junit.Assert.assertEquals;\n" +
-                 "import static org.organicdesign.fp.TestUtilities.serializeDeserialize;" +
-                 "import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;\n" +
-                 "import static org.organicdesign.testUtils.EqualsContract.equalsSameHashCode;\n" +
+                 "import static com.planbase.testutils.EqualsContract.equalsDistinctHashCode;\n" +
+                 "import static com.planbase.testutils.EqualsContract.equalsSameHashCode;\n" +
+                 "import static org.junit.jupiter.api.Assertions.assertEquals;\n" +
+                 "import static org.organicdesign.fp.TestUtilities.serializeDeserialize;\n" +
                  generatedWarning() +
                  "public class Tuple" + i + "Test {\n" +
                  "    @Test public void constructionAndAccess() {\n" +
@@ -391,8 +390,8 @@ public class TupleGenerator {
         }
         fr.write("));\n" +
                  "\n" +
-                 "        assertEquals(\"Tuple" + i + "(" + tupleTestParams(i).replace("\"", "\\\"") + ")\", a.toString());\n" +
-                 "        assertEquals(\"Tuple" + i + "(" + tupleTestParams(i).replace("\"", "\\\"") + ")\", ser.toString());\n" +
+                 "        assertEquals(\"Tuple" + i + "(" + tupleTestParams(i).replace("\"", "\\\"").replace(",", ", ") + ")\", a.toString());\n" +
+                 "        assertEquals(\"Tuple" + i + "(" + tupleTestParams(i).replace("\"", "\\\"").replace(",", ", ") + ")\", ser.toString());\n" +
                  "    }\n" +
                  "}\n");
         fr.flush();

@@ -14,31 +14,25 @@
 
 package org.organicdesign.fp.collections;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.jupiter.api.Test;
 import org.organicdesign.fp.TestUtilities;
 
-import static org.junit.Assert.*;
+import java.util.*;
+
+import static com.planbase.testutils.EqualsContract.equalsDistinctHashCode;
+import static com.planbase.testutils.EqualsContract.equalsSameHashCode;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.organicdesign.fp.StaticImports.vec;
 import static org.organicdesign.fp.TestUtilities.compareIterators;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
-import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
-import static org.organicdesign.testUtils.EqualsContract.equalsSameHashCode;
 
-@RunWith(JUnit4.class)
 public class PersistentTreeSetTest {
 
     public static final Comparator<String> STR_LEN_COMP =
             (a, b) -> Integer.compare(a.length(), b.length());
 
-    @Test public void javaBug() {
+    @Test
+    public void javaBug() {
         // This illustrates the bug in java
         SortedSet<String> ss = new TreeSet<>(STR_LEN_COMP);
         ss.add("bye");
@@ -339,7 +333,7 @@ public class PersistentTreeSetTest {
     @Test public void testToString() {
         PersistentTreeSet<String> s2 = PersistentTreeSet.ofComp(STR_LEN_COMP);
 
-        assertEquals("PersistentTreeSet(\"b\",\"an\",\"the\",\"work\",\"hello\")",
+        assertEquals("PersistentTreeSet(\"b\", \"an\", \"the\", \"work\", \"hello\")",
                      s2.put("hello").put("an").put("work").put("b").put("the").toString());
     }
 

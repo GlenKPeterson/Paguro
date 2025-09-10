@@ -1,27 +1,24 @@
 package org.organicdesign.fp.function;
 
+import org.junit.jupiter.api.Test;
+import org.organicdesign.fp.collections.ImList;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import org.organicdesign.fp.collections.ImList;
-
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.organicdesign.fp.FunctionUtils.ordinal;
+import static com.planbase.indented.StringUtils.ordinal;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.organicdesign.fp.StaticImports.vec;
-import static org.organicdesign.fp.function.Fn1.ConstObjObj.IDENTITY;
 import static org.organicdesign.fp.function.Fn1.ConstObjBool.ACCEPT;
 import static org.organicdesign.fp.function.Fn1.ConstObjBool.REJECT;
+import static org.organicdesign.fp.function.Fn1.ConstObjObj.IDENTITY;
 
-@RunWith(JUnit4.class)
 public class Fn1Test {
-    @Test(expected = RuntimeException.class)
-    public void applyIOException() {
+    @Test
+    public void exception() {
+        assertThrowsExactly(RuntimeException.class, () ->
         new Fn1<Integer,Integer>() {
             @Override public Integer applyEx(Integer o) throws Exception {
                 if (o < 10) {
@@ -29,19 +26,16 @@ public class Fn1Test {
                 }
                 return o;
             }
-        }.apply(3);
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void applyIllegalStateException() {
-        new Fn1<Integer,Integer>() {
-            @Override public Integer applyEx(Integer o) throws Exception {
-                if (o < 10) {
-                    throw new IllegalStateException("test exception");
-                }
-                return o;
-            }
-        }.apply(3);
+        }.apply(3));
+        assertThrowsExactly(IllegalStateException.class, () ->
+                new Fn1<Integer,Integer>() {
+                    @Override public Integer applyEx(Integer o) throws Exception {
+                        if (o < 10) {
+                            throw new IllegalStateException("test exception");
+                        }
+                        return o;
+                    }
+                }.apply(3));
     }
 
     static Fn1<Object,Boolean> NOT_PROCESSED = i -> {

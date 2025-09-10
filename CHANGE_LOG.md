@@ -8,6 +8,31 @@ tells you what to use instead.  Once we delete the deprecated methods, that docu
 // CONSIDER public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<K,V>>, Sized {
 // CONSIDER Changing to Map.Entry
 
+// TODO: `UnmodIterable.precat(...)` and `.concat(...)` should either disallow null,
+//  or allow it and protect against it everywhere.  Pick one.
+
+## Release 3.11.0 2025-09-10:
+ - Deleted org/organicdesign/fp/FunctionUtils.java.
+   Use the similar methods from com/planbase/indented/StringUtils.java instead.
+ - Added dependency on com-planbase:indented.
+   Indented is Kotlin-based, so that increases the size of Paguro.
+   But it fixes some serious issues with `stringify`.
+   The correct implementation is hundreds of lines of code.
+ - Switched dependency from org-organicdesign:testUtils -> com-planbase:test-utils-basic as this is the latest version.
+ - Upgraded Junit 4 -> 5 (test dependency only)
+ - Targets Java 17 instead of 11 (all the com-planbase projects do now)
+ - Many classes now implement IndentredStringable (soon hopefully to be open-sourced).
+   Their String representations have changed slightly - most notably adding a space after each comma.
+ - RangeOfInt no longer converts String->Int in the overridden `contains(Object o)` method.
+ - OneOfX classes now throw an IllegalArgumentException if you pass the wrong type instead of a ClassCastException.
+
+### Note
+This project will likely move to com-planbase soon.
+It will likely be built as part of a larger Gradle project, though still probably released/releasable as a separate artifact.
+It may also be implemented in Kotlin, partially or completely.
+That's just a better language.
+It will still usable from Java (where it is currently most useful).
+
 ## Release 3.10.4 2022-10-13: Dependency bumps and better tests (most changes from Aug 13)
  - Fixed a typo in an exception message.
  - Changed two unit tests from older jUnit to jUnit 5 Jupiter.

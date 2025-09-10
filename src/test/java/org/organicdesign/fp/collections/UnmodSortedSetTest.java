@@ -1,17 +1,12 @@
 package org.organicdesign.fp.collections;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class UnmodSortedSetTest {
     static class TestSortSet<E> implements UnmodSortedSet<E> {
@@ -66,7 +61,8 @@ public class UnmodSortedSetTest {
 
     UnmodSortedSet<String> unSortSet = new TestSortSet<>(Arrays.asList(vals), null);
 
-    @Test public void basics() {
+    @Test
+    public void basics() {
         assertEquals(0, unSortSet.headSet("apple").size());
         assertEquals(1, unSortSet.headSet("cat").size());
         assertTrue(unSortSet.headSet("cat").contains("apple"));

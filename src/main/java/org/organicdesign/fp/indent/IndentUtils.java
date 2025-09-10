@@ -2,82 +2,12 @@ package org.organicdesign.fp.indent;
 
 import org.jetbrains.annotations.NotNull;
 
+import static com.planbase.indented.StringUtils.indent;
+
 public class IndentUtils {
 
     private IndentUtils() {
         throw new UnsupportedOperationException("No instantiation");
-    }
-
-    // ========================================== STATIC ==========================================
-    // Note, this is part of something completely different, but was especially useful for
-    // debugging the above.  So much so, that I want to keep it when I'm done, but it needs
-    // to move somewhere else before releasing.
-    private static final String[] SPACES = {
-            "",
-            " ",
-            "  ",
-            "   ",
-            "    ",
-            "     ",
-            "      ",
-            "       ",
-            "        ",
-            "         ",
-            "          ",
-            "           ",
-            "            ",
-            "             ",
-            "              ",
-            "               ",
-            "                ",
-            "                 ",
-            "                  ",
-            "                   ",
-            "                    ",
-            "                     ",
-            "                      ",
-            "                       ",
-            "                        ",
-            "                         ",
-            "                          ",
-            "                           ",
-            "                            ",
-            "                             ",
-            "                              ",
-            "                               ",
-            "                                ",
-            "                                 ",
-            "                                  ",
-            "                                   ",
-            "                                    ",
-            "                                     ",
-            "                                      ",
-            "                                       ",
-            "                                        ",
-            "                                         ",
-            "                                          ",
-            "                                           ",
-            "                                            ",
-            "                                             ",
-            "                                              ",
-            "                                               ",
-            "                                                "};
-
-    private static final int SPACES_LENGTH_MINUS_ONE = SPACES.length - 1;
-
-    /**
-     Creates a new StringBuilder with the given number of spaces and returns it.
-     @param len the number of spaces
-     @return a {@link StringBuilder} with the specificed number of initial spaces.
-     */
-    public static @NotNull StringBuilder indentSpace(int len) {
-        StringBuilder sB = new StringBuilder();
-        if (len < 1) { return sB; }
-        while (len > SPACES_LENGTH_MINUS_ONE) {
-            sB.append(SPACES[SPACES_LENGTH_MINUS_ONE]);
-            len = len - SPACES_LENGTH_MINUS_ONE;
-        }
-        return sB.append(SPACES[len]);
     }
 
     /**
@@ -92,11 +22,7 @@ public class IndentUtils {
             } else {
                 sB.append(" ");
             }
-            if (item instanceof String) {
-                sB.append("\"").append(item).append("\"");
-            } else {
-                sB.append(item);
-            }
+            sB.append(indent(0, item));
         }
         return sB.append("]").toString();
     }
@@ -114,7 +40,7 @@ public class IndentUtils {
             } else {
                 sB.append(" ");
             }
-            sB.append(item);
+            sB.append(indent(0, item));
         }
         return sB.append("]").toString();
     }

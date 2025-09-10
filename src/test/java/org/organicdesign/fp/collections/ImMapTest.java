@@ -8,8 +8,8 @@ import org.organicdesign.fp.tuple.Tuple2;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.planbase.indented.StringUtils.ordinal;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.organicdesign.fp.FunctionUtils.ordinal;
 
 public class ImMapTest {
     private static class TestMap<K,V> implements ImMap<K,V> {

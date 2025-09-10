@@ -19,11 +19,14 @@ import java.io.Serializable;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
 
+import com.planbase.indented.IndentedStringable;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.organicdesign.fp.function.Fn0;
 import org.organicdesign.fp.oneOf.Option;
+
+import static com.planbase.indented.StringUtils.iterableToStr;
 
 /**
  This started out as Rich Hickey's PersistentVector class from Clojure in late 2014.  Glen added
@@ -37,7 +40,7 @@ import org.organicdesign.fp.oneOf.Option;
  @author Glen Peterson (Java-centric editor)
  */
 public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
-        implements ImList<E>, Serializable {
+        implements ImList<E>, Serializable, IndentedStringable {
 
     // There's bit shifting going on here because it's a very fast operation.
     // Shifting right by 5 is aeons faster than dividing by 32.
@@ -188,6 +191,16 @@ public class PersistentVector<E> extends UnmodList.AbstractUnmodList<E>
     }
 
     // ===================================== Instance Methods =====================================
+
+    @Override
+    public @NotNull String indentedStr(int i, boolean singleLine) {
+        return iterableToStr(i, "vec", this, false, true);
+    }
+
+    @Override
+    public @NotNull String toString() {
+        return indentedStr(0, true);
+    }
 
     // IEditableCollection has this return ITransientCollection<E>,
     // not MutVector<E> as this originally returned.

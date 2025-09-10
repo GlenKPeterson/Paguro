@@ -1,14 +1,15 @@
 package org.organicdesign.fp.collections;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.organicdesign.fp.collections.ComparisonContext.defCompCtx;
 import static org.organicdesign.fp.collections.Equator.defaultComparator;
 import static org.organicdesign.fp.collections.Equator.defaultEquator;
 
 public class EquatorTest {
-    @Test public void defaultEquatorTest() {
+    @Test
+    public void defaultEquatorTest() {
         assertEquals(0, defaultEquator().hash(null));
         assertEquals("".hashCode(), defaultEquator().hash(""));
         assertEquals("Telephone Pole".hashCode(), defaultEquator().hash("Telephone Pole"));

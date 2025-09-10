@@ -14,23 +14,24 @@
 
 package org.organicdesign.fp.tuple;
 
+import com.planbase.indented.IndentedStringable;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.organicdesign.fp.collections.UnmodMap;
+
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.organicdesign.fp.collections.UnmodMap;
-
-import static org.organicdesign.fp.FunctionUtils.stringify;
+import static com.planbase.indented.StringUtils.indent;
 
 /**
  Holds 2 items of potentially different types, and implements Map.Entry (and UnmodMap.UnEntry
  (there is no ImMap.ImEntry)).  Designed to let you easily create immutable subclasses (to give your
  data structures meaningful names) with correct equals(), hashCode(), and toString() methods.
  */
-public class Tuple2<A,B> implements Entry<A,B>, UnmodMap.UnEntry<A,B>, Serializable {
+public class Tuple2<A,B> implements Entry<A,B>, UnmodMap.UnEntry<A,B>, Serializable, IndentedStringable {
 
     // For serializable.  Make sure to change whenever internal data format changes.
     private static final long serialVersionUID = 20160906065000L;
@@ -70,10 +71,15 @@ public class Tuple2<A,B> implements Entry<A,B>, UnmodMap.UnEntry<A,B>, Serializa
     public B _2() { return _2; }
 
     @Override
-    public String toString() {
+    public @NotNull String indentedStr(int i, boolean b) {
         return getClass().getSimpleName() + "(" +
-               stringify(_1) + "," +
-               stringify(_2) + ")";
+                indent(0, _1) + ", " +
+                indent(0, _2) + ")";
+    }
+
+    @Override
+    public String toString() {
+        return indentedStr(0, true);
     }
 
     @Override

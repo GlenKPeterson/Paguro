@@ -1,26 +1,23 @@
 package org.organicdesign.fp.collections;
 
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
-import org.organicdesign.fp.TestUtilities;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.*;
+
+import static com.planbase.testutils.EqualsContract.equalsDistinctHashCode;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.organicdesign.fp.StaticImports.*;
+import static org.organicdesign.fp.TestUtilities.iteratorTest;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 import static org.organicdesign.fp.collections.Equator.defaultComparator;
-import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class UnmodSortedMapTest {
     static class TestMap<K, V> implements UnmodSortedMap<K,V>, Serializable {
 
+        @Serial
         private static final long serialVersionUID = 20160901201600L;
 
 //        static <K, V> SortedMap<K,V> dup(SortedMap<K,V> in) {
@@ -109,7 +106,6 @@ public class UnmodSortedMapTest {
 
     final static TestMap<String,Integer> testMap = new TestMap<>(refMap, null);
 
-    @SuppressWarnings("unchecked")
     @Test public void entrySetTest() {
 
         Set<Map.Entry<String,Integer>> refEntSet = refMap.entrySet();
@@ -128,9 +124,9 @@ public class UnmodSortedMapTest {
         assertTrue(refEntSet.contains(clemKey));
         assertTrue(testEntSet.contains(clemKey));
 
-        TestUtilities.iteratorTest(refEntSet.iterator(), testEntSet.iterator());
+        iteratorTest(refEntSet.iterator(), testEntSet.iterator());
 
-        TestUtilities.iteratorTest(refEntSet.iterator(), serializeDeserialize(testEntSet).iterator());
+        iteratorTest(refEntSet.iterator(), serializeDeserialize(testEntSet).iterator());
 
         // I can't fix TreeMap, so I guess this is good enough.
         // java.io.NotSerializableException: java.util.TreeMap$EntryIterator
@@ -358,8 +354,8 @@ public class UnmodSortedMapTest {
         assertTrue(refKeySet.contains(clemKey.getKey()));
         assertTrue(testKeySet.contains(clemKey.getKey()));
 
-        TestUtilities.iteratorTest(refKeySet.iterator(), testKeySet.iterator());
-        TestUtilities.iteratorTest(refKeySet.iterator(),
+        iteratorTest(refKeySet.iterator(), testKeySet.iterator());
+        iteratorTest(refKeySet.iterator(),
                                    serializeDeserialize(testKeySet).iterator());
 
         Comparator<? super String> testComp0 = testKeySet.comparator();
@@ -528,9 +524,9 @@ public class UnmodSortedMapTest {
         assertTrue(refValColl.contains(clemKey.getValue()));
         assertTrue(testValColl.contains(clemKey.getValue()));
 
-        TestUtilities.iteratorTest(refValColl.iterator(), testValColl.iterator());
+        iteratorTest(refValColl.iterator(), testValColl.iterator());
 
-        TestUtilities.iteratorTest(refValColl.iterator(),
+        iteratorTest(refValColl.iterator(),
                                    serializeDeserialize(testValColl).iterator());
 
         equalsDistinctHashCode(testValColl,

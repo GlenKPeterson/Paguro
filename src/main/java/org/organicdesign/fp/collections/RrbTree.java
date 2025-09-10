@@ -26,9 +26,9 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.planbase.indented.StringUtils.spaces;
 import static org.organicdesign.fp.collections.Cowry.*;
 import static org.organicdesign.fp.indent.IndentUtils.arrayString;
-import static org.organicdesign.fp.indent.IndentUtils.indentSpace;
 
 /**
  <p>An RRB Tree is an immutable List (like Clojure's PersistentVector) that also supports random inserts, deletes,
@@ -222,7 +222,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
             return "RrbTree(size=" + size +
                    " fsi=" + focusStartIndex +
                    " focus=" + arrayString(focus) + "\n" +
-                   indentSpace(indent + 8) + "root=" +
+                   spaces(indent + 8) + "root=" +
                    root.indentedStr(indent + 13) +
                    ")";
         }
@@ -623,7 +623,7 @@ public abstract class RrbTree<E> implements BaseList<E>, Indented {
             return "RrbTree(size=" + size +
                    " fsi=" + focusStartIndex +
                    " focus=" + arrayString(focus) + "\n" +
-                   indentSpace(indent + 8) + "root=" +
+                   spaces(indent + 8) + "root=" +
                    root.indentedStr(indent + 13) +
                    ")";
         }
@@ -904,7 +904,7 @@ involves changing more nodes than maybe necessary.
      * It's not implemented on PersistentVector because it is very expensive there.
      */
     @Override
-    public abstract @NotNull RrbTree<E> precat(@Nullable Iterable<? extends E> es);
+    public abstract @NotNull RrbTree<E> precat(Iterable<? extends E> es);
 
     /** Internal method - do not use. */
     abstract @NotNull Node<E> pushFocus();
@@ -1153,10 +1153,10 @@ involves changing more nodes than maybe necessary.
 
         @Override
         public @NotNull String indentedStr(int indent) {
-            StringBuilder sB = new StringBuilder() // indentSpace(indent)
+            StringBuilder sB = new StringBuilder() // spaces(indent)
                     .append("SplitNode(");
             int nextIndent = indent + sB.length();
-            String nextIndentStr = indentSpace(nextIndent).toString();
+            String nextIndentStr = spaces(nextIndent).toString();
             return sB.append("left=").append(left().indentedStr(nextIndent + 5)).append(",\n")
                      .append(nextIndentStr).append("leftFocus=").append(arrayString(leftFocus()))
                      .append(",\n")
@@ -1871,11 +1871,11 @@ involves changing more nodes than maybe necessary.
 
         @Override
         public @NotNull String indentedStr(int indent) {
-            StringBuilder sB = new StringBuilder() // indentSpace(indent)
+            StringBuilder sB = new StringBuilder() // spaces(indent)
                     .append("Relaxed(");
             int nextIndent = indent + sB.length();
             sB.append("cumulativeSizes=").append(arrayString(cumulativeSizes)).append("\n")
-              .append(indentSpace(nextIndent)).append("nodes=[");
+              .append(spaces(nextIndent)).append("nodes=[");
             // + 6 for "nodes="
             return showSubNodes(sB, nodes, nextIndent + 7)
                     .append("])")
@@ -2140,7 +2140,7 @@ involves changing more nodes than maybe necessary.
                 if (items[0] instanceof Leaf) {
                     sB.append(" ");
                 } else {
-                    sB.append("\n").append(indentSpace(nextIndent));
+                    sB.append("\n").append(spaces(nextIndent));
                 }
             }
             //noinspection rawtypes

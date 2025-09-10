@@ -38,7 +38,7 @@ http://mvnrepository.com/artifact/org.organicdesign/Paguro
 	-->
 	<groupId>org.organicdesign</groupId>
 	<artifactId>Paguro</artifactId>
-	<version>3.10.4</version>
+	<version>3.11.0</version>
 	<packaging>jar</packaging>
 
 	<name>Paguro</name>
@@ -176,20 +176,31 @@ http://mvnrepository.com/artifact/org.organicdesign/Paguro
 	</build>
 	<dependencies>
 		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-api</artifactId>
-			<version>5.9.0</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.jetbrains</groupId>
 			<artifactId>annotations</artifactId>
 			<version>23.0.0</version>
 		</dependency>
 		<dependency>
-			<groupId>org.organicdesign</groupId>
-			<artifactId>TestUtils</artifactId>
-			<version>1.0.6</version>
+			<groupId>com.planbase</groupId>
+			<artifactId>indented</artifactId>
+			<version>5.0.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.planbase</groupId>
+			<artifactId>test-utils-basic</artifactId>
+			<version>5.0.2</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>3.27.4</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<version>5.9.0</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -206,8 +217,8 @@ http://mvnrepository.com/artifact/org.organicdesign/Paguro
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<maven.compiler.source>11</maven.compiler.source>
-		<maven.compiler.target>11</maven.compiler.target>
+		<maven.compiler.source>17</maven.compiler.source>
+		<maven.compiler.target>17</maven.compiler.target>
 		<maven.compiler.arg>-profile</maven.compiler.arg>
 		<maven.compiler.arg>compact1</maven.compiler.arg>
 		<maven.compiler.arg>-Xlint</maven.compiler.arg>

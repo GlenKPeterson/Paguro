@@ -5,9 +5,9 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
+import static com.planbase.indented.StringUtils.ordinal;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.organicdesign.fp.FunctionUtils.ordinal;
 
 /**
  Created by gpeterso on 9/13/16.

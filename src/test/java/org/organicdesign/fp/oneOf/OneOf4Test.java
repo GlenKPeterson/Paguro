@@ -1,12 +1,10 @@
 package org.organicdesign.fp.oneOf;
 
-import org.junit.Test;
-import org.organicdesign.testUtils.EqualsContract;
+import com.planbase.testutils.EqualsContract;
+import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.Test;
 
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class OneOf4Test {
     static class Str_Int_Float_Dub extends OneOf4<String,Integer,Float,Double> {
@@ -40,14 +38,14 @@ public class OneOf4Test {
         assertEquals("57:String|Integer|Float|Double", ooti.toString());
 
         Str_Int_Float_Dub ootf = Str_Int_Float_Dub.of(57.2f);
-        assertEquals(Float.valueOf(57.2f), ootf.match(s -> -99f,
+        assertEquals(Float.valueOf(57.2f), (Float) ootf.match(s -> -99f,
                                                       i -> 99f,
                                                       f -> f,
                                                       d -> 2));
-        assertEquals("57.2:String|Integer|Float|Double", ootf.toString());
+        assertEquals("57.2f:String|Integer|Float|Double", ootf.toString());
 
         Str_Int_Float_Dub ootd = Str_Int_Float_Dub.of(17.2);
-        assertEquals(Double.valueOf(17.2), ootd.match(s -> -99f,
+        assertEquals(Double.valueOf(17.2), (Double) ootd.match(s -> -99f,
                                                       i -> 99f,
                                                       f -> 2,
                                                       d -> d));
@@ -89,63 +87,92 @@ public class OneOf4Test {
                                               Str_Int_Float_Dub.of(-3333.7));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void subClassEx____n() { new Str_Int_Float_Dub(null, -1); }
+    // Cut-pasted and edited from OneOf5Test
+    @Test
+    public void subclassExceptions() {
+        @NotNull Exception ex;
+        ex = assertThrowsExactly(IllegalArgumentException.class, () ->
+                new Str_Int_Float_Dub(1, 0));
+        assertEquals("Index 0 takes a java.lang.String, but was passed a java.lang.Integer", ex.getMessage());
 
-    @Test(expected = IllegalArgumentException.class)
-    public void subClassExa___n() { new Str_Int_Float_Dub("hi", -1); }
+        ex = assertThrowsExactly(IllegalArgumentException.class, () ->
+                new Str_Int_Float_Dub(2f, 0));
+        assertEquals("Index 0 takes a java.lang.String, but was passed a java.lang.Float", ex.getMessage());
 
-    @Test(expected = IllegalArgumentException.class)
-    public void subClassEx_b__n() { new Str_Int_Float_Dub(1, -1); }
+        ex = assertThrowsExactly(IllegalArgumentException.class, () ->
+                new Str_Int_Float_Dub(3.0, 0));
+        assertEquals("Index 0 takes a java.lang.String, but was passed a java.lang.Double", ex.getMessage());
 
-    @Test(expected = ClassCastException.class)
-    public void subClassExa_c_0() { new Str_Int_Float_Dub(2f, 0); }
+        ex = assertThrowsExactly(IllegalArgumentException.class, () ->
+                new Str_Int_Float_Dub('x', 0));
+        assertEquals("Index 0 takes a java.lang.String, but was passed a java.lang.Character", ex.getMessage());
 
-    @Test(expected = ClassCastException.class)
-    public void subClassExa__d0() { new Str_Int_Float_Dub(3.0, 0); }
+        ex = assertThrowsExactly(IllegalArgumentException.class, () ->
+                new Str_Int_Float_Dub("hi", 1));
+        assertEquals("Index 1 takes a java.lang.Integer, but was passed a java.lang.String", ex.getMessage());
 
-    @Test(expected = ClassCastException.class)
-    public void subClassExa___1() { new Str_Int_Float_Dub("hi", 1); }
+        ex = assertThrowsExactly(IllegalArgumentException.class, () ->
+                new Str_Int_Float_Dub(2f, 1));
+        assertEquals("Index 1 takes a java.lang.Integer, but was passed a java.lang.Float", ex.getMessage());
 
-    @Test(expected = ClassCastException.class)
-    public void subClassEx_bc_1() { new Str_Int_Float_Dub(2f, 1); }
+        ex = assertThrowsExactly(IllegalArgumentException.class, () ->
+                new Str_Int_Float_Dub(3.0, 1));
+        assertEquals("Index 1 takes a java.lang.Integer, but was passed a java.lang.Double", ex.getMessage());
 
-    @Test(expected = ClassCastException.class)
-    public void subClassEx_b_c1() { new Str_Int_Float_Dub(3.0, 1); }
+        ex = assertThrowsExactly(IllegalArgumentException.class, () ->
+                new Str_Int_Float_Dub('x', 1));
+        assertEquals("Index 1 takes a java.lang.Integer, but was passed a java.lang.Character", ex.getMessage());
 
+        ex = assertThrowsExactly(IllegalArgumentException.class, () ->
+                new Str_Int_Float_Dub("hi", 2));
+        assertEquals("Index 2 takes a java.lang.Float, but was passed a java.lang.String", ex.getMessage());
 
-    @Test(expected = ClassCastException.class)
-    public void subClassExa___2() { new Str_Int_Float_Dub("hi", 2); }
+        ex = assertThrowsExactly(IllegalArgumentException.class, () ->
+                new Str_Int_Float_Dub(1, 2));
+        assertEquals("Index 2 takes a java.lang.Float, but was passed a java.lang.Integer", ex.getMessage());
 
-    @Test(expected = ClassCastException.class)
-    public void subClassEx_b__2() { new Str_Int_Float_Dub(1, 2); }
+        ex = assertThrowsExactly(IllegalArgumentException.class, () ->
+                new Str_Int_Float_Dub(3.0, 2));
+        assertEquals("Index 2 takes a java.lang.Float, but was passed a java.lang.Double", ex.getMessage());
 
-    @Test(expected = ClassCastException.class)
-    public void subClassEx__cd2() { new Str_Int_Float_Dub(3.0, 2); }
+        ex = assertThrowsExactly(IllegalArgumentException.class, () ->
+                new Str_Int_Float_Dub('x', 2));
+        assertEquals("Index 2 takes a java.lang.Float, but was passed a java.lang.Character", ex.getMessage());
 
+        ex = assertThrowsExactly(IllegalArgumentException.class, () ->
+                new Str_Int_Float_Dub("hi", 3));
+        assertEquals("Index 3 takes a java.lang.Double, but was passed a java.lang.String", ex.getMessage());
 
-    @Test(expected = ClassCastException.class)
-    public void subClassExa___3() { new Str_Int_Float_Dub("hi", 3); }
+        ex = assertThrowsExactly(IllegalArgumentException.class, () ->
+                new Str_Int_Float_Dub(1, 3));
+        assertEquals("Index 3 takes a java.lang.Double, but was passed a java.lang.Integer", ex.getMessage());
 
-    @Test(expected = ClassCastException.class)
-    public void subClassEx_b__3() { new Str_Int_Float_Dub(1, 3); }
+        ex = assertThrowsExactly(IllegalArgumentException.class, () ->
+                new Str_Int_Float_Dub(2f, 3));
+        assertEquals("Index 3 takes a java.lang.Double, but was passed a java.lang.Float", ex.getMessage());
 
-    @Test(expected = ClassCastException.class)
-    public void subClassEx__c_3() { new Str_Int_Float_Dub(2f, 3); }
+        ex = assertThrowsExactly(IllegalArgumentException.class, () ->
+                new Str_Int_Float_Dub('x', 3));
+        assertEquals("Index 3 takes a java.lang.Double, but was passed a java.lang.Character", ex.getMessage());
 
+        ex = assertThrowsExactly(IllegalArgumentException.class, () ->
+                new Str_Int_Float_Dub("hi", -1));
+        assertEquals("Selected item index must be 0-3", ex.getMessage());
 
-    @Test(expected = IllegalArgumentException.class)
-    public void subClassExa___4() { new Str_Int_Float_Dub("hi", 4); }
+        ex = assertThrowsExactly(IllegalArgumentException.class, () ->
+                new Str_Int_Float_Dub(1, 4));
+        assertEquals("Selected item index must be 0-3", ex.getMessage());
 
-    @Test(expected = IllegalArgumentException.class)
-    public void subClassEx_b__4() { new Str_Int_Float_Dub(1, 4); }
+        ex = assertThrowsExactly(IllegalArgumentException.class, () ->
+                new Str_Int_Float_Dub(2f, -1));
+        assertEquals("Selected item index must be 0-3", ex.getMessage());
 
-    @Test(expected = IllegalArgumentException.class)
-    public void subClassEx__c_4() { new Str_Int_Float_Dub(2f, 4); }
+        ex = assertThrowsExactly(IllegalArgumentException.class, () ->
+                new Str_Int_Float_Dub(3.0, 4));
+        assertEquals("Selected item index must be 0-3", ex.getMessage());
 
-    @Test(expected = IllegalArgumentException.class)
-    public void subClassEx___d4() { new Str_Int_Float_Dub(3.0, 4); }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void subClassEx____4() { new Str_Int_Float_Dub(null, 4); }
+        ex = assertThrowsExactly(IllegalArgumentException.class, () ->
+                new Str_Int_Float_Dub('x', -1));
+        assertEquals("Selected item index must be 0-3", ex.getMessage());
+    }
 }

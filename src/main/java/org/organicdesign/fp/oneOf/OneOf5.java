@@ -45,9 +45,9 @@ public abstract class OneOf5<A,B,C,D,E> {
             throw new IllegalArgumentException("Selected item index must be 0-4");
         }
         if (!types.get(index).isInstance(o)) {
-            throw new ClassCastException("You specified index " + index + ", indicating a " +
+            throw new IllegalArgumentException("Index " + index + " takes a " +
                                          types.get(index).getCanonicalName() + "," +
-                                         " but passed a " + o.getClass().getCanonicalName());
+                                         " but was passed a " + o.getClass().getCanonicalName());
         }
     }
 

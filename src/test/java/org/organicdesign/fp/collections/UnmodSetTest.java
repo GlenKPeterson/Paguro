@@ -1,12 +1,12 @@
 package org.organicdesign.fp.collections;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Objects;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class UnmodSetTest {
     static final String[] vals = new String[] { "this", "is", "a", "test" };
@@ -34,7 +34,8 @@ public class UnmodSetTest {
         @Override public int size() { return vals.length; }
     };
 
-    @Test public void containsAllTest() {
+    @Test
+    public void containsAllTest() {
         assertTrue(unSet.containsAll(Arrays.asList(vals)));
         assertFalse(unSet.containsAll(Arrays.asList("junk", "no")));
         assertFalse(unSet.containsAll(Arrays.asList("this", "is", "a", "test", "junk", "no")));
@@ -53,35 +54,23 @@ public class UnmodSetTest {
     }
 
     @SuppressWarnings("deprecation")
-    @Test(expected = UnsupportedOperationException.class)
-    public void unsupportedOpAdd() { unSet.add("hi"); }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpAddAll() { unSet.addAll(Arrays.asList("hi", "there")); }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpClear() { unSet.clear(); }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpRemoveIdx() { unSet.remove(0); }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpRemove() { unSet.remove("hi"); }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpRemoveAll() { unSet.removeAll(Arrays.asList("hi", "there")); }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpRemoveIf() { unSet.removeIf(item -> false); }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpRetainAll() { unSet.retainAll(Arrays.asList("hi", "there")); }
-
+    @Test
+    public void unsupportedOp() {
+        assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unSet.add("hi"));
+        assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unSet.addAll(Arrays.asList("hi", "there")));
+        assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unSet.clear());
+        assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unSet.remove(0));
+        assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unSet.remove("hi"));
+        assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unSet.removeAll(Arrays.asList("hi", "there")));
+        assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unSet.removeIf(item -> false));
+        assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unSet.retainAll(Arrays.asList("hi", "there")));
+    }
 }

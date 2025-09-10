@@ -15,12 +15,12 @@
 package org.organicdesign.fp.collections;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.organicdesign.fp.TestUtilities;
 
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.organicdesign.fp.oneOf.Option.none;
 import static org.organicdesign.fp.oneOf.Option.some;
 
@@ -97,7 +97,8 @@ public class ImListTest {
         }
     }
 
-    @Test public void get() {
+    @Test
+    public void get() {
         ImList<String> pv =
                 new TestList<>(Arrays.asList("Four", "score", "and", "seven",
                                              "years", "ago..."));

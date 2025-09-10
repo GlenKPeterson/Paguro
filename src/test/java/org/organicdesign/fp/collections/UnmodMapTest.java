@@ -14,26 +14,18 @@
 
 package org.organicdesign.fp.collections;
 
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.function.BiFunction;
-
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
-import org.organicdesign.fp.FunctionUtils;
+import org.junit.jupiter.api.Test;
 import org.organicdesign.fp.TestUtilities;
 import org.organicdesign.fp.tuple.Tuple2;
 
-import static org.junit.Assert.*;
+import java.io.Serializable;
+import java.util.*;
+
+import static com.planbase.testutils.EqualsContract.equalsDistinctHashCode;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.organicdesign.fp.StaticImports.tup;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
-import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class UnmodMapTest {
     static class TestMap<K,V> implements UnmodMap<K,V>, Serializable {
@@ -80,15 +72,6 @@ public class UnmodMapTest {
         assertTrue(unMap.containsValue(2));
         assertTrue(unMap.containsValue(3));
         assertFalse(unMap.isEmpty());
-    }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpUnEntrySetValue() {
-        new UnmodMap.UnEntry<String,Integer>() {
-            @Override public String getKey() { return null; }
-            @Override public Integer getValue() { return null; }
-        }.setValue(null);
     }
 
 //    @Test public void unEntryTest() {
@@ -214,56 +197,41 @@ public class UnmodMapTest {
     }
 
     @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpClear() { unMap.clear(); }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpCompute() { unMap.compute(null, (s, i) -> i); }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpComputeIfAbsent() { unMap.computeIfAbsent(null, s -> 1); }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpComputeIfPresent() { unMap.computeIfPresent(null, (s, i) -> i); }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpMerge() { unMap.merge(null, 99, (a, b) -> a); }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpPut() { unMap.put(null, null); }
-
-//    @SuppressWarnings("deprecation")
-//    @Test (expected = UnsupportedOperationException.class)
-//    public void unsupportedOpPutAll() { unMap.putAll(null); }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpPutIfAbsent() { unMap.putIfAbsent(null, null); }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpRemove() { unMap.remove(null); }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpRemoveKv() { unMap.remove(null, null); }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpReplace() { unMap.replace(null, null); }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpReplace3() { unMap.replace(null, null, null); }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpReplaceAll() { unMap.replaceAll(null); }
+    @Test
+    public void unsupportedOp() {
+        //noinspection WriteOnlyObject
+        assertThrowsExactly(UnsupportedOperationException.class, () ->
+                new UnmodMap.UnEntry<String,Integer>() {
+                    @Override public String getKey() { return null; }
+                    @Override public Integer getValue() { return null; }
+                }.setValue(null));
+        assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unMap.clear());
+        assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unMap.compute(null, (s, i) -> i));
+        assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unMap.computeIfAbsent(null, s -> 1));
+        assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unMap.computeIfPresent(null, (s, i) -> i));
+        assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unMap.merge(null, 99, (a, b) -> a));
+        assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unMap.put(null, null));
+        assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unMap.putIfAbsent(null, null));
+        assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unMap.remove(null));
+        assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unMap.remove(null, null));
+        assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unMap.replace(null, null));
+        assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unMap.replace(null, null, null));
+        assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unMap.replaceAll(null));
+        assertThrowsExactly(UnsupportedOperationException.class, () ->
+                ue.setValue(null));
+    }
 
     static class TestEntry<K,V> implements Map.Entry<K,V> {
         private K key;
@@ -331,8 +299,4 @@ public class UnmodMapTest {
                                    UnmodMap.UnEntry.entryIterToUnEntryUnIter(map.entrySet()
                                                                                 .iterator()));
     }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void testUnEntryEx() { ue.setValue(null); }
 }

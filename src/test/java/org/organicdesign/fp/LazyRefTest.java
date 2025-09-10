@@ -12,17 +12,14 @@
 // limitations under the License.
 package org.organicdesign.fp;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.jupiter.api.Test;
 import org.organicdesign.fp.function.Fn0;
 import org.organicdesign.fp.function.LazyRef;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@RunWith(JUnit4.class)
 public class LazyRefTest {
 
     @Test

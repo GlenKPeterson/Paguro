@@ -1,15 +1,12 @@
 package org.organicdesign.fp.xform;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.jupiter.api.Test;
 import org.organicdesign.fp.function.Fn1;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
-@RunWith(JUnit4.class)
 public class XformTakenWhileTest {
 
     @Test

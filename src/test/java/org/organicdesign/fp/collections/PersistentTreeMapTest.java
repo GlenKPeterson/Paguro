@@ -14,32 +14,23 @@
 
 package org.organicdesign.fp.collections;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.jupiter.api.Test;
 import org.organicdesign.fp.FunctionUtilsTest;
 import org.organicdesign.fp.TestUtilities;
 import org.organicdesign.fp.function.Fn1;
 import org.organicdesign.fp.tuple.Tuple2;
 
-import static org.junit.Assert.*;
-import static org.organicdesign.fp.FunctionUtils.ordinal;
+import java.util.*;
+
+import static com.planbase.indented.StringUtils.ordinal;
+import static com.planbase.testutils.EqualsContract.equalsDistinctHashCode;
+import static com.planbase.testutils.EqualsContract.equalsSameHashCode;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.organicdesign.fp.StaticImports.*;
 import static org.organicdesign.fp.TestUtilities.compareIterators;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 import static org.organicdesign.fp.collections.PersistentTreeMap.empty;
-import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
-import static org.organicdesign.testUtils.EqualsContract.equalsSameHashCode;
 
-@RunWith(JUnit4.class)
 public class PersistentTreeMapTest {
     private static <K,V> void compareEntryIterSer(Iterator<? extends Map.Entry<K,V>> cIter,
                                                   Iterator<? extends Map.Entry<K,V>> tIter) {
@@ -57,7 +48,8 @@ public class PersistentTreeMapTest {
         assertFalse(tIter.hasNext());
     }
 
-    @Test public void assocAndGet() {
+    @Test
+    public void assocAndGet() {
         PersistentTreeMap<String,Integer> m1 = empty();
         PersistentTreeMap<String,Integer> m2 = m1.assoc("one", 1000);
 
@@ -479,9 +471,12 @@ public class PersistentTreeMapTest {
         }
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void subMapEx() {
-        PersistentTreeMap.<Integer,Integer>empty().subMap(3, 2);
+    @Test
+    public void exceptions() {
+        assertThrowsExactly(IllegalArgumentException.class, () ->
+                PersistentTreeMap.<Integer,Integer>empty().subMap(3, 2));
+        assertThrowsExactly(NoSuchElementException.class, () ->
+                empty().lastKey());
     }
 
     @Test public void subMap() {
@@ -519,26 +514,26 @@ public class PersistentTreeMapTest {
                      empty().toString());
         assertEquals("PersistentTreeMap(1=\"one\")",
                      PersistentTreeMap.of(vec(tup(1, "one"))).toString());
-        assertEquals("PersistentTreeMap(1=\"one\",2=\"two\")",
+        assertEquals("PersistentTreeMap(1=\"one\", 2=\"two\")",
                      PersistentTreeMap.of(vec(tup(1, "one"))).assoc(2, "two").toString());
-        assertEquals("PersistentTreeMap(1=\"one\",2=\"two\",3=\"three\")",
+        assertEquals("PersistentTreeMap(1=\"one\", 2=\"two\", 3=\"three\")",
                      PersistentTreeMap.of(vec(tup(1, "one"))).assoc(2, "two").assoc(3, "three")
                                       .toString());
-        assertEquals("PersistentTreeMap(1=\"one\",2=\"two\",3=\"three\"," +
+        assertEquals("PersistentTreeMap(1=\"one\", 2=\"two\", 3=\"three\", " +
                      "4=\"four\")",
                      PersistentTreeMap.of(vec(tup(1, "one"))).assoc(2, "two").assoc(3, "three")
                                       .assoc(4, "four").toString());
-        assertEquals("PersistentTreeMap(1=\"one\",2=\"two\",3=\"three\"," +
-                     "4=\"four\",5=\"five\")",
+        assertEquals("PersistentTreeMap(1=\"one\", 2=\"two\", 3=\"three\", " +
+                     "4=\"four\", 5=\"five\")",
                      PersistentTreeMap.of(vec(tup(1, "one"))).assoc(2, "two").assoc(3, "three")
                                       .assoc(4, "four").assoc(5, "five").toString());
-        assertEquals("PersistentTreeMap(1=\"one\",2=\"two\",3=\"three\",4=\"four\",5=\"five\"," +
+        assertEquals("PersistentTreeMap(1=\"one\", 2=\"two\", 3=\"three\", 4=\"four\", 5=\"five\", " +
                      "6=\"six\")",
                      PersistentTreeMap.of(vec(tup(1, "one"))).assoc(2, "two").assoc(3, "three")
                                       .assoc(4, "four").assoc(5, "five").assoc(6, "six")
                                       .toString());
-        assertEquals("PersistentTreeMap(1=\"one\",2=\"two\",3=\"three\",4=\"four\",5=\"five\"," +
-                     "6=\"six\",7=\"seven\")",
+        assertEquals("PersistentTreeMap(1=\"one\", 2=\"two\", 3=\"three\", 4=\"four\", 5=\"five\", " +
+                     "6=\"six\", 7=\"seven\")",
                      PersistentTreeMap.of(vec(tup(1, "one"))).assoc(2, "two").assoc(3, "three")
                                       .assoc(4, "four").assoc(5, "five").assoc(6, "six")
                                       .assoc(7, "seven").toString());
@@ -580,9 +575,6 @@ public class PersistentTreeMapTest {
         assertEquals(Integer.valueOf(2), m.without(3).lastKey());
         assertEquals(Integer.valueOf(1), m.without(2).without(3).lastKey());
     }
-
-    @Test(expected = NoSuchElementException.class)
-    public void lastKeyEx() { empty().lastKey(); }
 
     @Test public void serializeEmptyTest() {
         PersistentTreeMap<String,Integer> e = empty();

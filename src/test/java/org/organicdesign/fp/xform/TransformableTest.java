@@ -2,7 +2,7 @@ package org.organicdesign.fp.xform;
 
 import java.util.*;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.organicdesign.fp.collections.ImMap;
 import org.organicdesign.fp.collections.ImSortedMap;
 import org.organicdesign.fp.collections.PersistentHashMap;
@@ -12,15 +12,15 @@ import org.organicdesign.fp.function.Fn1;
 import org.organicdesign.fp.oneOf.Option;
 import org.organicdesign.fp.tuple.Tuple2;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.organicdesign.fp.FunctionUtils.ordinal;
+import static com.planbase.indented.StringUtils.ordinal;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 public class TransformableTest {
     static final List<Integer> controlList = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9);
 
-    @Test public void testAny() {
+    @Test
+    public void testAny() {
         assertTrue(Xform.of(controlList)
                         .any(i -> i > 3));
         assertTrue(Xform.of(controlList)

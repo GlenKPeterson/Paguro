@@ -13,21 +13,20 @@
 // limitations under the License.
 package org.organicdesign.fp.oneOf;
 
-import org.junit.Test;
-import org.organicdesign.fp.oneOf.Or;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
-import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
+import static com.planbase.testutils.EqualsContract.equalsDistinctHashCode;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class OrTest {
-    @Test public void bad() {
+    @Test
+    public void bad() {
         Or<Integer,String> or = Or.bad("Hello");
         assertTrue(or.isBad());
         assertFalse(or.isGood());
         assertEquals("Hello", or.bad());
 
-        assertTrue(or.match((g) -> Boolean.FALSE,
-                            (b) -> "Hello".equals(b)));
+        assertTrue((Boolean) or.match((g) -> Boolean.FALSE, (b) -> "Hello".equals(b)));
     }
 
     @Test public void good() {
@@ -36,20 +35,15 @@ public class OrTest {
         assertTrue(or.isGood());
         assertEquals("Hello", or.good());
 
-        assertTrue(or.match((g) -> "Hello".equals(g),
-                            (b) -> Boolean.FALSE));
+        assertTrue((Boolean) or.match((g) -> "Hello".equals(g), (b) -> Boolean.FALSE));
     }
 
-    @SuppressWarnings("deprecation")
-    @Test (expected = IllegalStateException.class)
-    public void badEx() {
-        Or.bad("Hello").good();
-    }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = IllegalStateException.class)
-    public void goodEx() {
-        Or.good("Hello").bad();
+    @Test
+    public void exception() {
+        assertThrowsExactly(IllegalStateException.class, () ->
+        Or.bad("Hello").good());
+        assertThrowsExactly(IllegalStateException.class, () ->
+        Or.good("Hello").bad());
     }
 
     @Test public void equalsHashCodeToStr() {

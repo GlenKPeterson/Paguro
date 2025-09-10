@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
-import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
+import static com.planbase.testutils.EqualsContract.equalsDistinctHashCode;
 
 public class OptionTest {
 

@@ -28,6 +28,7 @@ import org.organicdesign.fp.function.Fn2;
 import org.organicdesign.fp.oneOf.Option;
 import org.organicdesign.fp.tuple.Tuple2;
 
+import static com.planbase.indented.StringUtils.iterableToStr;
 import static org.organicdesign.fp.collections.UnmodIterator.emptyUnmodIterator;
 
 /**
@@ -269,6 +270,11 @@ public class PersistentHashMap<K,V> extends AbstractUnmodMap<K,V>
     // ===================================== Instance Methods =====================================
 //    /** Not sure I like this - could disappear. */
 //    boolean hasNull() { return hasNull; }
+
+    @Override
+    public @NotNull String indentedStr(int indent, boolean singleLine) {
+        return iterableToStr(indent, "map", this, false, singleLine);
+    }
 
     /** {@inheritDoc} */
     @Override

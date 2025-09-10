@@ -1,9 +1,9 @@
 package org.organicdesign.fp.collections;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * For testing internal Cowry methods.
@@ -11,15 +11,16 @@ import static org.junit.Assert.assertArrayEquals;
 public class CowryTest {
     @Test
     public void testEmptyArray() {
-        Assert.assertArrayEquals(new Object[0], Cowry.emptyArray());
-        Assert.assertArrayEquals(new String[0], Cowry.emptyArray());
-        Assert.assertArrayEquals(new Integer[0], Cowry.emptyArray());
+        assertArrayEquals(new Object[0], Cowry.emptyArray());
+        assertArrayEquals(new String[0], Cowry.emptyArray());
+        assertArrayEquals(new Integer[0], Cowry.emptyArray());
     }
 
-    @Test public void testSingleElementArray() {
-        Assert.assertArrayEquals(new Object[] {1 }, Cowry.singleElementArray(1));
-        assertArrayEquals(new Object[] { 1 }, Cowry.singleElementArray(1, null));
-        assertArrayEquals(new Integer[] { 1 }, Cowry.singleElementArray(1, Integer.class));
+    @Test
+    public void testSingleElementArray() {
+        assertArrayEquals(new Object[]{1}, Cowry.singleElementArray(1));
+        assertArrayEquals(new Object[]{1}, Cowry.singleElementArray(1, null));
+        assertArrayEquals(new Integer[]{1}, Cowry.singleElementArray(1, Integer.class));
     }
 
     @Test
@@ -114,13 +115,18 @@ public class CowryTest {
                           Cowry.splitArray(new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 }, 9));
     }
 
-    @Test(expected = Exception.class)
-    public void testSplitArrayEx1() {
-        Cowry.splitArray(new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 }, 10);
-    }
+    @Test
+    public void testSplitArray() {
+        @NotNull Exception ex;
+        ex = assertThrowsExactly(NegativeArraySizeException.class, () ->
+                Cowry.splitArray(new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9}, 10));
+        // This is a lame exception, but this function is the innermost-piece powering these collections
+        // and needs to be fast, and this is what the underlying Array returns,
+        // so we'll just live with that.
+        assertEquals("-1", ex.getMessage());
 
-    @Test(expected = Exception.class)
-    public void testSplitArrayEx2() {
-        Cowry.splitArray(new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 }, -1);
+        ex = assertThrowsExactly(NegativeArraySizeException.class, () ->
+                Cowry.splitArray(new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9}, -1));
+        assertEquals("-1", ex.getMessage());
     }
 }

@@ -14,14 +14,15 @@
 
 package org.organicdesign.fp.tuple;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static org.junit.Assert.*;
+import static com.planbase.testutils.EqualsContract.equalsDistinctHashCode;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
-import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
 public class Tuple2Test {
 
@@ -139,9 +140,10 @@ public class Tuple2Test {
     }
 
     @SuppressWarnings("deprecation")
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void modification() {
+        @SuppressWarnings("WriteOnlyObject")
         Tuple2<Integer,String> t = Tuple2.of(19, "World");
-        t.setValue("Boom!");
+        assertThrowsExactly(UnsupportedOperationException.class, () -> t.setValue("Boom!"));
     }
 }

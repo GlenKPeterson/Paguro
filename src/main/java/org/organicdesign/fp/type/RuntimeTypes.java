@@ -7,7 +7,7 @@ import org.organicdesign.fp.collections.ImList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.organicdesign.fp.FunctionUtils.stringify;
+import static com.planbase.indented.StringUtils.indent;
 import static org.organicdesign.fp.StaticImports.vec;
 
 /**
@@ -63,7 +63,7 @@ public final class RuntimeTypes {
             @NotNull ImList<Class> types
     ) {
             StringBuilder sB = new StringBuilder();
-            sB.append(stringify(item)).append(":");
+            sB.append(indent(0, item)).append(":");
             boolean isFirst = true;
             for (Class c : types) {
                 if (isFirst) {

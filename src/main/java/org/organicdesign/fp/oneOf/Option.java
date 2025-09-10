@@ -15,12 +15,13 @@ package org.organicdesign.fp.oneOf;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.function.Fn0;
 import org.organicdesign.fp.function.Fn1;
 
 import java.io.Serializable;
 import java.util.Objects;
+
+import static com.planbase.indented.StringUtils.indent;
 
 /**
  * Indicates presence or absence of a value (null is a valid, present value).
@@ -94,7 +95,7 @@ public interface Option<T> extends Serializable { // extends UnmodSortedIterable
 
         /** {@inheritDoc} */
         @Override
-        public @NotNull String toString() { return "Some(" + FunctionUtils.stringify(item) + ")"; }
+        public @NotNull String toString() { return "Some(" + indent(0, item) + ")"; }
 
         /** {@inheritDoc} */
         @Override

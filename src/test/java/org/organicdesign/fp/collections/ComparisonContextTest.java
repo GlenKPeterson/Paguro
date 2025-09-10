@@ -14,11 +14,12 @@
 
 package org.organicdesign.fp.collections;
 
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.organicdesign.fp.collections.ComparisonContextTest.Ctx.CC;
 
 public class ComparisonContextTest {
@@ -42,7 +43,8 @@ public class ComparisonContextTest {
     };
 
 
-    @Test public void testNoEx() {
+    @Test
+    public void testNoEx() {
         assertTrue(CC.compare(1, 2) < 0);
         assertTrue(CC.compare(2, 1) > 0);
         assertTrue(CC.compare(3, 3) == 0);
@@ -77,23 +79,21 @@ public class ComparisonContextTest {
         assertTrue(CC.lte(null, null));
     }
 
-    @Test (expected = IllegalArgumentException.class)
-    public void testEx01() { CC.compare(1, null); }
-
-    @Test (expected = IllegalArgumentException.class)
-    public void testEx02() { CC.compare(null, 1); }
-
-    @Test (expected = IllegalArgumentException.class)
-    public void testEx03() { CC.gt(1, null); }
-
-    @Test (expected = IllegalArgumentException.class)
-    public void testEx04() { CC.gt(null, 1); }
-
-    @Test (expected = IllegalArgumentException.class)
-    public void testEx05() { CC.lt(1, null); }
-
-    @Test (expected = IllegalArgumentException.class)
-    public void testEx06() { CC.lt(null, 1); }
+    @Test
+    public void testEx() {
+        assertThrowsExactly(IllegalArgumentException.class, () ->
+                CC.compare(1, null));
+        assertThrowsExactly(IllegalArgumentException.class, () ->
+                CC.compare(null, 1));
+        assertThrowsExactly(IllegalArgumentException.class, () ->
+                CC.gt(1, null));
+        assertThrowsExactly(IllegalArgumentException.class, () ->
+                CC.gt(null, 1));
+        assertThrowsExactly(IllegalArgumentException.class, () ->
+                CC.lt(1, null));
+        assertThrowsExactly(IllegalArgumentException.class, () ->
+                CC.lt(null, 1));
+    }
 
     @Test public void testMinMax() {
         assertEquals((Integer) 2, CC.min(Arrays.asList(2, 3, 4, 5, 6, 7, 8, 9)));

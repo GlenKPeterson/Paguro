@@ -12,7 +12,8 @@ import org.organicdesign.fp.xform.Xform;
 import java.util.Iterator;
 import java.util.Objects;
 
-import static org.organicdesign.fp.FunctionUtils.stringify;
+import static com.planbase.indented.StringUtils.indent;
+
 
 /** An unmodifiable Iterable, without any guarantee about order. */
 public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
@@ -118,16 +119,18 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
     }
 
     /** Computes a reasonable to-string. */
+    // Todo: ReplaceWith StringUtils.iterableToStr()
+    @Deprecated(forRemoval = true)
     static @NotNull String toString(@NotNull String name, @NotNull Iterable<?> iterable) {
         StringBuilder sB = new StringBuilder();
         sB.append(name).append("(");
         int i = 0;
-        Iterator<?> iter = iterable.iterator();
-        while (iter.hasNext()) {
-            if (i > 0) { sB.append(","); }
+        for (Object o : iterable) {
+            if (i > 0) {
+                sB.append(",");
+            }
 //            if (i > 4) { break; }
-            Object item = iter.next();
-            sB.append(stringify(item));
+            sB.append(indent(0, o));
             i++;
         }
 //        if (iter.hasNext()) {

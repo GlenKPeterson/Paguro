@@ -1,14 +1,12 @@
 package org.organicdesign.fp.xform;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
-@RunWith(JUnit4.class)
 public class XformTakenTest {
     @Test
     public void takeItemsInOneBatch() {
@@ -25,10 +23,13 @@ public class XformTakenTest {
         assertArrayEquals(new Integer[0], seq.take(0).toMutList().toArray());
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void exception1() { Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).take(-1); }
-    @Test(expected = IllegalArgumentException.class)
-    public void exception2() { Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).take(-99); }
+    @Test
+    public void exception() {
+        assertThrowsExactly(IllegalArgumentException.class, () ->
+                Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).take(-1));
+        assertThrowsExactly(IllegalArgumentException.class, () ->
+                Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).take(-99));
+    }
 
     @Test
     public void takeItemsInMultiBatches() {

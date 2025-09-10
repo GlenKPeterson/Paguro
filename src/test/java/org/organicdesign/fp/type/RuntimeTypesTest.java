@@ -1,10 +1,10 @@
 package org.organicdesign.fp.type;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.organicdesign.fp.collections.ImList;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.organicdesign.fp.StaticImports.vec;
 import static org.organicdesign.fp.type.RuntimeTypes.registerClasses;
 import static org.organicdesign.fp.type.RuntimeTypes.union2Str;

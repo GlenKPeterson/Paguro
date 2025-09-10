@@ -14,40 +14,24 @@
 
 package org.organicdesign.fp;
 
-import org.junit.Test;
-import org.organicdesign.fp.collections.ImList;
-import org.organicdesign.fp.collections.ImMap;
-import org.organicdesign.fp.collections.ImSet;
-import org.organicdesign.fp.collections.ImSortedMap;
-import org.organicdesign.fp.collections.ImSortedSet;
-import org.organicdesign.fp.collections.PersistentHashMap;
-import org.organicdesign.fp.collections.PersistentHashSet;
-import org.organicdesign.fp.collections.PersistentTreeMap;
-import org.organicdesign.fp.collections.PersistentTreeSet;
-import org.organicdesign.fp.collections.PersistentVector;
-import org.organicdesign.fp.function.Fn1;
+import org.junit.jupiter.api.Test;
+import org.organicdesign.fp.collections.*;
 import org.organicdesign.fp.tuple.Tuple2;
 import org.organicdesign.fp.tuple.Tuple3;
 import org.organicdesign.fp.xform.Xform;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.organicdesign.fp.StaticImports.*;
 
 public class StaticImportsTest {
 
-    @Test public void mutableMapTest() {
+    @Test
+    public void mutableMapTest() {
         assertEquals(Collections.emptyMap(), mutableMap());
         assertEquals(Collections.singletonMap(35, "Thirty Five"),
                      mutableMap(tup(35, "Thirty Five")));
@@ -88,18 +72,20 @@ public class StaticImportsTest {
                      mutableVec(1, 2, 3));
     }
 
-    @Test (expected = UnsupportedOperationException.class)
+    @Test
     public void instantiationEx() throws Throwable {
         Class<StaticImports> c = StaticImports.class;
-        Constructor defCons = c.getDeclaredConstructor();
+        Constructor<StaticImports> defCons = c.getDeclaredConstructor();
         defCons.setAccessible(true);
-        try {
-            // This catches the exception and wraps it in an InvocationTargetException
-            defCons.newInstance();
-        } catch (InvocationTargetException ite) {
-            // Here we throw the original exception.
-            throw ite.getTargetException();
-        }
+        assertThrowsExactly(UnsupportedOperationException.class, () -> {
+            try {
+                // This catches the exception and wraps it in an InvocationTargetException
+                defCons.newInstance();
+            } catch (InvocationTargetException ite) {
+                // Here we throw the original exception.
+                throw ite.getTargetException();
+            }
+        });
     }
 
     @SuppressWarnings({"NullArgumentToVariableArgMethod", "RedundantArrayCreation", "unchecked"})

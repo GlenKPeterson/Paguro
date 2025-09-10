@@ -109,9 +109,9 @@ public class OneOf2<A,B> {
         if (!types.get(index).isInstance(o)) {
             // Made this "indicating a " instead of "indicating a(n) " because a(n) looks like a function.
             // Poor grammar, in this case, is less confusing.
-            throw new ClassCastException("You specified index " + index + ", indicating a " +
-                                         types.get(index).getCanonicalName() + "," +
-                                         " but passed a " + o.getClass().getCanonicalName());
+            throw new IllegalArgumentException("Index " + index + " takes a " +
+                    types.get(index).getCanonicalName() + "," +
+                    " but was passed a " + o.getClass().getCanonicalName());
         }
     }
 

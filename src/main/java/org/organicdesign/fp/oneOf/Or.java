@@ -18,7 +18,7 @@ import org.organicdesign.fp.function.Fn1;
 
 import java.util.Objects;
 
-import static org.organicdesign.fp.FunctionUtils.stringify;
+import static com.planbase.indented.StringUtils.indent;
 
 /**
  `Or` represents the presence of a successful outcome, or an error.
@@ -101,7 +101,7 @@ public interface Or<G,B> {
 
         /** {@inheritDoc} */
         @Override
-        public @NotNull String toString() { return "Good(" + stringify(g) + ")"; }
+        public @NotNull String toString() { return "Good(" + indent(0, g) + ")"; }
     }
 
     /** Represents the presence of a Bad value (and absence of a Good). */
@@ -139,6 +139,6 @@ public interface Or<G,B> {
 
         /** {@inheritDoc} */
         @Override
-        public @NotNull String toString() { return "Bad(" + stringify(b) + ")"; }
+        public @NotNull String toString() { return "Bad(" + indent(0, b) + ")"; }
     }
 } // end interface Or

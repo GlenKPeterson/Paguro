@@ -14,17 +14,14 @@
 
 package org.organicdesign.fp.collections;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.junit.Test;
+import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.Test;
 import org.organicdesign.fp.TestUtilities;
 import org.organicdesign.fp.tuple.Tuple2;
 
-import static org.junit.Assert.*;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class UnmodListTest {
     @Test public void permutationsTest() {
@@ -155,14 +152,76 @@ public class UnmodListTest {
         assertEquals(sla.size(), slb.size());
     }
 
-    @Test (expected = IllegalArgumentException.class)
-    public void subListEx01() { unList.subList(3, 2); }
+    @SuppressWarnings("deprecation")
+    @Test
+    public void subListEx() {
+        @NotNull Exception ex;
+        ex = assertThrowsExactly(IllegalArgumentException.class, () ->
+            unList.subList(3, 2));
+        // Note that this is an IllegalArgumentException, not IndexOutOfBoundsException in order to
+        // match ArrayList.
+        assertEquals("fromIndex(3) > toIndex(2)", ex.getMessage());
 
-    @Test (expected = IndexOutOfBoundsException.class)
-    public void subListEx02() { unList.subList(-1, 2); }
+        assertThrowsExactly(IndexOutOfBoundsException.class, () ->
+                unList.subList(-1, 2));
 
-    @Test (expected = IndexOutOfBoundsException.class)
-    public void subListEx03() { unList.subList(1, unList.size() + 1); }
+        // This text matches ArrayList (eew)
+        ex = assertThrowsExactly(IndexOutOfBoundsException.class, () ->
+                unList.subList(1, unList.size() + 1));
+        assertEquals("toIndex = 14", ex.getMessage());
+
+        ex = assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unList.add("hi"));
+        assertEquals("Modification attempted", ex.getMessage());
+
+        ex = assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unList.add(0, "hi"));
+        assertEquals("Modification attempted", ex.getMessage());
+
+        ex = assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unList.addAll(Arrays.asList("hi", "there")));
+        assertEquals("Modification attempted", ex.getMessage());
+
+        ex = assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unList.addAll(0, Arrays.asList("hi", "there")));
+        assertEquals("Modification attempted", ex.getMessage());
+
+        ex = assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unList.clear());
+        assertEquals("Modification attempted", ex.getMessage());
+
+        ex = assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unList.remove(0));
+        assertEquals("Modification attempted", ex.getMessage());
+
+        ex = assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unList.remove("hi"));
+        assertEquals("Modification attempted", ex.getMessage());
+
+        ex = assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unList.removeAll(Arrays.asList("hi", "there")));
+        assertEquals("Modification attempted", ex.getMessage());
+
+        ex = assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unList.replaceAll(x -> x));
+        assertEquals("Modification attempted", ex.getMessage());
+
+        ex = assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unList.removeIf(item -> false));
+        assertEquals("Modification attempted", ex.getMessage());
+
+        ex = assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unList.retainAll(Arrays.asList("hi", "there")));
+        assertEquals("Modification attempted", ex.getMessage());
+
+        ex = assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unList.set(0, "hi"));
+        assertEquals("Modification attempted", ex.getMessage());
+
+        ex = assertThrowsExactly(UnsupportedOperationException.class, () ->
+                unList.sort(String.CASE_INSENSITIVE_ORDER));
+        assertEquals("Modification attempted", ex.getMessage());
+    }
 
     @Test public void toArrayTest() {
         assertArrayEquals(sticksAndStones, unList.toArray());
@@ -171,56 +230,4 @@ public class UnmodListTest {
         assertTrue(sticksAndStones.length <
                    unList.toArray(new String[sticksAndStones.length + 1]).length);
     }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpAdd() { unList.add("hi"); }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpAddIdx() { unList.add(0, "hi"); }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpAddAll() { unList.addAll(Arrays.asList("hi", "there")); }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpAddAllIdx() { unList.addAll(0, Arrays.asList("hi", "there")); }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpClear() { unList.clear(); }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpRemoveIdx() { unList.remove(0); }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpRemove() { unList.remove("hi"); }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpRemoveAll() { unList.removeAll(Arrays.asList("hi", "there")); }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpReplaceAll() { unList.replaceAll(x -> x); }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpRemoveIf() { unList.removeIf(item -> false); }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpRetainAll() { unList.retainAll(Arrays.asList("hi", "there")); }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpSet() { unList.set(0, "hi"); }
-
-    @SuppressWarnings("deprecation")
-    @Test (expected = UnsupportedOperationException.class)
-    public void unsupportedOpSort() { unList.sort(String.CASE_INSENSITIVE_ORDER); }
 }

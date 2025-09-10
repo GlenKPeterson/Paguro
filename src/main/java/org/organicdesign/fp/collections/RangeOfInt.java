@@ -166,13 +166,11 @@ public class RangeOfInt implements UnmodList<Integer>, Serializable {
             } catch (ArithmeticException ignore) {
                 return false;
             }
-        } else if (o instanceof String) {
-            return contains(Integer.valueOf((String) o));
+//        } else if (o instanceof String) {
+//            return contains(Integer.valueOf((String) o));
         } else {
-            throw new IllegalArgumentException("Don't know how to convert to a primitive int" +
-                                               " without risking accidental truncation.  Pass an" +
-                                               " Integer, Long, BigInteger, or String that parses" +
-                                               " within Integer bounds instead.");
+            throw new IllegalArgumentException("Argument must be a non-null Integer, Long, or BigInteger, not " +
+                    (o == null ? "null" : o.getClass().getCanonicalName()));
         }
     }
 

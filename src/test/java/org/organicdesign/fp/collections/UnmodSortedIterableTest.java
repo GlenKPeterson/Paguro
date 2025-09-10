@@ -1,20 +1,13 @@
 package org.organicdesign.fp.collections;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.organicdesign.fp.TestUtilities;
 
-import static org.junit.Assert.assertTrue;
-import static org.organicdesign.fp.FunctionUtils.ordinal;
+import java.util.*;
+
+import static com.planbase.indented.StringUtils.ordinal;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class UnmodSortedIterableTest {
     @Test public void equalsTest() {

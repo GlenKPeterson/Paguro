@@ -7,8 +7,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import static com.planbase.indented.StringUtils.ordinal;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.organicdesign.fp.FunctionUtils.ordinal;
 
 public class MutSetTest {
 

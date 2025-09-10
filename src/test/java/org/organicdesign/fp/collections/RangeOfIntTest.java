@@ -1,16 +1,17 @@
 package org.organicdesign.fp.collections;
 
+import com.planbase.testutils.EqualsContract;
+import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.Test;
+import org.organicdesign.fp.TestUtilities;
+import org.organicdesign.fp.collections.RangeOfInt.Equat;
+
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Test;
-import org.organicdesign.fp.TestUtilities;
-import org.organicdesign.fp.collections.RangeOfInt.Equat;
-import org.organicdesign.testUtils.EqualsContract;
-
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 
 public class RangeOfIntTest {
@@ -29,7 +30,8 @@ public class RangeOfIntTest {
 //        RangeOfInt.of(1, 0);
 //    }
 
-    @Test public void basics() {
+    @Test
+    public void basics() {
         RangeOfInt ir1 = RangeOfInt.of(0, 1);
         assertTrue(ir1.contains(0));
         assertFalse(ir1.contains(1));
@@ -68,89 +70,100 @@ public class RangeOfIntTest {
         assertFalse(ir1.contains(BigInteger.valueOf(Integer.MIN_VALUE - 1L)));
         assertFalse(ir1.contains(BigInteger.valueOf(Integer.MAX_VALUE)));
 
-        assertTrue(ir1.contains("33"));
-        assertTrue(ir1.contains("-21"));
-        assertTrue(ir1.contains(String.valueOf(Integer.MIN_VALUE)));
-        assertTrue(ir1.contains(String.valueOf(Integer.MAX_VALUE - 1L)));
-        assertFalse(ir1.contains(String.valueOf(Integer.MAX_VALUE)));
+        assertTrue(ir1.contains(BigInteger.valueOf(33)));
+        assertTrue(ir1.contains(Long.valueOf(-21)));
     }
 
     @SuppressWarnings("SuspiciousMethodCalls")
-    @Test(expected = IllegalArgumentException.class)
-    public void containsEx01() {
-        RangeOfInt.of(Integer.MIN_VALUE, Integer.MAX_VALUE)
-                  .contains(new Number() {
-                      @Override public int intValue() { return 0; }
-                      @Override public long longValue() { return 0L; }
-                      @Override public float floatValue() { return 0.0f; }
-                      @Override public double doubleValue() { return 0.0; }
-                  });
-    }
-    @SuppressWarnings("SuspiciousMethodCalls")
-    @Test(expected = IllegalArgumentException.class)
-    public void containsEx02() {
-        RangeOfInt.of(Integer.MIN_VALUE, Integer.MAX_VALUE).contains(Float.valueOf(0.0f));
-    }
-    @SuppressWarnings("SuspiciousMethodCalls")
-    @Test(expected = IllegalArgumentException.class)
-    public void containsEx03() {
-        RangeOfInt.of(Integer.MIN_VALUE, Integer.MAX_VALUE).contains(Double.valueOf(0.0d));
-    }
-    @SuppressWarnings("SuspiciousMethodCalls")
-    @Test(expected = NumberFormatException.class)
-    public void containsEx04() {
-        RangeOfInt.of(Integer.MIN_VALUE, Integer.MAX_VALUE)
-                  .contains("I wish they changed this to T");
-    }
-    @SuppressWarnings("SuspiciousMethodCalls")
-    @Test(expected = NumberFormatException.class)
-    public void containsEx05() {
-        RangeOfInt.of(Integer.MIN_VALUE, Integer.MAX_VALUE)
-                  .contains("12.5"); // float
-    }
-    @SuppressWarnings("SuspiciousMethodCalls")
-    @Test(expected = NumberFormatException.class)
-    public void containsEx06() {
-        RangeOfInt.of(Integer.MIN_VALUE, Integer.MAX_VALUE)
-                  .contains("-0.6"); // float
-    }
-    @SuppressWarnings("SuspiciousMethodCalls")
-    @Test(expected = NumberFormatException.class)
-    public void containsEx07() {
-        RangeOfInt.of(Integer.MIN_VALUE, Integer.MAX_VALUE)
-                  .contains("0x7"); // Hexidecimal
-    }
-    @SuppressWarnings("SuspiciousMethodCalls")
-    @Test(expected = NumberFormatException.class)
-    public void containsEx08() {
-        RangeOfInt.of(Integer.MIN_VALUE, Integer.MAX_VALUE)
-                  .contains(String.valueOf(Integer.MAX_VALUE + 1L));
-    }
-    @SuppressWarnings("SuspiciousMethodCalls")
-    @Test(expected = NumberFormatException.class)
-    public void containsEx09() {
-        RangeOfInt.of(Integer.MIN_VALUE, Integer.MAX_VALUE)
-                  .contains(String.valueOf(Integer.MIN_VALUE - 1L));
-    }
+    @Test
+    public void containsEx() {
+        @NotNull Exception ex;
+        assertThrowsExactly(IllegalArgumentException.class, () ->
+                RangeOfInt.of(Integer.MIN_VALUE, Integer.MAX_VALUE)
+                        .contains(new Number() {
+                            @Override public int intValue() { return 0; }
+                            @Override public long longValue() { return 0L; }
+                            @Override public float floatValue() { return 0.0f; }
+                            @Override public double doubleValue() { return 0.0; }
+                        }));
+        assertThrowsExactly(IllegalArgumentException.class, () ->
+                RangeOfInt.of(Integer.MIN_VALUE, Integer.MAX_VALUE).contains(Float.valueOf(0.0f)));
+        assertThrowsExactly(IllegalArgumentException.class, () ->
+                RangeOfInt.of(Integer.MIN_VALUE, Integer.MAX_VALUE).contains(Double.valueOf(0.0d)));
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testEx01() { RangeOfInt.of(1, 2).get(-1); }
+        ex = assertThrowsExactly(IllegalArgumentException.class, () ->
+                RangeOfInt.of(Integer.MIN_VALUE, Integer.MAX_VALUE)
+                        .contains(null));
+        assertEquals("Argument must be a non-null Integer, Long, or BigInteger, not null", ex.getMessage());
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testEx02() { RangeOfInt.of(1, 2).get(2); }
+        ex = assertThrowsExactly(IllegalArgumentException.class, () ->
+                RangeOfInt.of(Integer.MIN_VALUE, Integer.MAX_VALUE)
+                        .contains("I wish they changed this to T"));
+        assertEquals("Argument must be a non-null Integer, Long, or BigInteger, not java.lang.String", ex.getMessage());
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testEx03() { RangeOfInt.of(1, 2).get(Integer.MIN_VALUE); }
+        ex = assertThrowsExactly(IllegalArgumentException.class, () ->
+                RangeOfInt.of(Integer.MIN_VALUE, Integer.MAX_VALUE)
+                        .contains("12.5")); // float
+        assertEquals("Argument must be a non-null Integer, Long, or BigInteger, not java.lang.String", ex.getMessage());
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testEx04() { RangeOfInt.of(1, 2).get(Integer.MAX_VALUE); }
+        assertThrowsExactly(IndexOutOfBoundsException.class, () ->
+                RangeOfInt.of(1, 2).get(-1));
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testEx05() {
-        RangeOfInt r = RangeOfInt.of(99);
-        r.get(r.size());
+        ex = assertThrowsExactly(IndexOutOfBoundsException.class, () ->
+                RangeOfInt.of(1, 2).get(2));
+        assertEquals("Index 2 was outside the size of this range: 1 to 2", ex.getMessage());
+
+        ex = assertThrowsExactly(IndexOutOfBoundsException.class, () ->
+                RangeOfInt.of(1, 2).get(Integer.MIN_VALUE));
+        assertEquals("Index -2147483648 was outside the size of this range: 1 to 2", ex.getMessage());
+
+        ex = assertThrowsExactly(IndexOutOfBoundsException.class, () ->
+                RangeOfInt.of(1, 2).get(Integer.MAX_VALUE));
+        assertEquals("Index 2147483647 was outside the size of this range: 1 to 2", ex.getMessage());
+
+        ex = assertThrowsExactly(IndexOutOfBoundsException.class, () -> {
+            RangeOfInt r = RangeOfInt.of(99);
+            r.get(r.size());
+        });
+        assertEquals("Index 99 was outside the size of this range: 0 to 99", ex.getMessage());
+
+        assertThrowsExactly(IllegalArgumentException.class, () ->
+                RangeOfInt.of(-1));
+        assertThrowsExactly(IndexOutOfBoundsException.class, () ->
+                Arrays.asList(-2, -1, 0, 1, 2, 3, 4).subList(-1, 1));
+        assertThrowsExactly(IndexOutOfBoundsException.class, () ->
+                RangeOfInt.of(-2, 5).subList(-1, 1));
+
+        assertThrowsExactly(IllegalArgumentException.class, () ->
+                Arrays.asList(-2, -1, 0, 1, 2, 3, 4).subList(1, 0));
+        assertThrowsExactly(IllegalArgumentException.class, () ->
+                RangeOfInt.of(-2, 5).subList(1, 0));
+
+        assertThrowsExactly(IndexOutOfBoundsException.class, () -> {
+            List<Integer> r = Arrays.asList(-2, -1, 0, 1, 2, 3, 4);
+            r.subList(0, r.size() + 1);
+        });
+        assertThrowsExactly(IndexOutOfBoundsException.class, () -> {
+            RangeOfInt r = RangeOfInt.of(-2, 5);
+            r.subList(0, r.size() + 1);
+        });
+        assertThrowsExactly(IndexOutOfBoundsException.class, () -> {
+            List<Integer> r = Arrays.asList(-2, -1, 0, 1, 2, 3, 4);
+            r.subList(0, 0).get(0);
+        });
+        assertThrowsExactly(IndexOutOfBoundsException.class, () -> {
+            RangeOfInt r = RangeOfInt.of(-2, 5);
+            r.subList(0, 0).get(0);
+        });
+        assertThrowsExactly(IndexOutOfBoundsException.class, () -> {
+            List<Integer> r = Arrays.asList(-2, -1, 0, 1, 2, 3, 4);
+            r.subList(3,3).get(0);
+        });
+        assertThrowsExactly(IndexOutOfBoundsException.class, () -> {
+            RangeOfInt r = RangeOfInt.of(-2, 5);
+            r.subList(3,3).get(0);
+        });
     }
-
     @Test public void equality() {
         EqualsContract.equalsDistinctHashCode(RangeOfInt.of(Integer.valueOf(-1),
                                                             Integer.valueOf(4)),
@@ -175,27 +188,26 @@ public class RangeOfIntTest {
         assertTrue(UnmodSortedIterable.equal(UnmodSortedIterable.castFromList(a),
                                              UnmodSortedIterable.castFromList(b)));
 
-        assertTrue("List and range are equal", Equat.LIST.eq(a, b));
+        assertTrue(Equat.LIST.eq(a, b), "List and range are equal");
 
-        assertTrue("List equal to self", Equat.LIST.eq(a, a));
+        assertTrue(Equat.LIST.eq(a, a), "List equal to self");
 
-        assertTrue("Range equal to self", Equat.LIST.eq(b, b));
+        assertTrue(Equat.LIST.eq(b, b), "Range equal to self");
 
-        assertTrue("Range equal to different Range", Equat.LIST.eq(b, RangeOfInt.of(-2, 5)));
+        assertTrue(Equat.LIST.eq(b, RangeOfInt.of(-2, 5)), "Range equal to different Range");
 
         // Is this a good idea?
-        assertTrue("Null equal to self", Equat.LIST.eq(null, null));
+        assertTrue(Equat.LIST.eq(null, null), "Null equal to self");
 
-        assertTrue("Range and range are equal", Equat.LIST.eq(RangeOfInt.of(-2, 5),
-                                                                           b));
+        assertTrue(Equat.LIST.eq(RangeOfInt.of(-2, 5), b), "Range and range are equal");
 
-        assertFalse("Not equal to null", Equat.LIST.eq(a, null));
-        assertFalse("Not equal to null", Equat.LIST.eq(null, a));
+        assertFalse(Equat.LIST.eq(a, null), "Not equal to null");
+        assertFalse(Equat.LIST.eq(null, a), "Not equal to null");
 
-        assertFalse("Not equal to different Range", Equat.LIST.eq(a, RangeOfInt.of(-3, 4)));
-        assertFalse("Not equal to different Range", Equat.LIST.eq(b, RangeOfInt.of(-2, 4)));
-        assertFalse("Not equal to different Range", Equat.LIST.eq(RangeOfInt.of(-3, 4), b));
-        assertFalse("Not equal to different Range", Equat.LIST.eq(RangeOfInt.of(-3, 5), a));
+        assertFalse(Equat.LIST.eq(a, RangeOfInt.of(-3, 4)), "Not equal to different Range");
+        assertFalse(Equat.LIST.eq(b, RangeOfInt.of(-2, 4)), "Not equal to different Range");
+        assertFalse(Equat.LIST.eq(RangeOfInt.of(-3, 4), b), "Not equal to different Range");
+        assertFalse(Equat.LIST.eq(RangeOfInt.of(-3, 5), a), "Not equal to different Range");
     }
 
     @SuppressWarnings("SuspiciousMethodCalls")
@@ -289,56 +301,8 @@ public class RangeOfIntTest {
         assertEquals(sla.size(), slb.size());
     }
 
-//    @Test(expected = IllegalArgumentException.class)
-//    public void factoryEx1() { RangeOfInt.of(null); }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void factoryEx2() { RangeOfInt.of(-1); }
-
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void subListExArray1() { Arrays.asList(-2, -1, 0, 1, 2, 3, 4).subList(-1, 1); }
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void subListEx1() { RangeOfInt.of(-2, 5).subList(-1, 1); }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void subListExArray2() { Arrays.asList(-2, -1, 0, 1, 2, 3, 4).subList(1, 0); }
-    @Test(expected = IllegalArgumentException.class)
-    public void subListEx2() { RangeOfInt.of(-2, 5).subList(1, 0); }
-
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void subListExArray3() {
-        List<Integer> r = Arrays.asList(-2, -1, 0, 1, 2, 3, 4);
-        r.subList(0, r.size() + 1);
-    }
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void subListEx3() {
-        RangeOfInt r = RangeOfInt.of(-2, 5);
-        r.subList(0, r.size() + 1);
-    }
-
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void subListExArray4() {
-        List<Integer> r = Arrays.asList(-2, -1, 0, 1, 2, 3, 4);
-        r.subList(0, 0).get(0);
-    }
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void subListEx4() {
-        RangeOfInt r = RangeOfInt.of(-2, 5);
-        r.subList(0, 0).get(0);
-    }
-
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void subListExArray5() {
-        List<Integer> r = Arrays.asList(-2, -1, 0, 1, 2, 3, 4);
-        r.subList(3,3).get(0);
-    }
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void subListEx5() {
-        RangeOfInt r = RangeOfInt.of(-2, 5);
-        r.subList(3,3).get(0);
-    }
-
-    @Test public void serializationTest() throws Exception {
+                    @Test
+        public void serializationTest() throws Exception {
         List<Integer> a = Arrays.asList(-2, -1, 0, 1, 2, 3, 4);
         List<Integer> b = RangeOfInt.of(-2, 5);
         Equator<List<Integer>> deserEq = serializeDeserialize(Equat.LIST);
@@ -353,27 +317,26 @@ public class RangeOfIntTest {
         assertTrue(UnmodSortedIterable.equal(UnmodSortedIterable.castFromList(a),
                                              UnmodSortedIterable.castFromList(b)));
 
-        assertTrue("List and range are equal", deserEq.eq(a, b));
+        assertTrue(deserEq.eq(a, b), "List and range are equal");
 
-        assertTrue("List equal to self", deserEq.eq(a, a));
+        assertTrue(deserEq.eq(a, a), "List equal to self");
 
-        assertTrue("Range equal to self", deserEq.eq(b, b));
+        assertTrue(deserEq.eq(b, b), "Range equal to self");
 
-        assertTrue("Range equal to different Range", deserEq.eq(b, RangeOfInt.of(-2, 5)));
+        assertTrue(deserEq.eq(b, RangeOfInt.of(-2, 5)), "Range equal to different Range");
 
         // Is this a good idea?
-        assertTrue("Null equal to self", deserEq.eq(null, null));
+        assertTrue(deserEq.eq(null, null), "Null equal to self");
 
-        assertTrue("Range and range are equal", deserEq.eq(RangeOfInt.of(-2, 5),
-                                                                           b));
+        assertTrue(deserEq.eq(RangeOfInt.of(-2, 5), b), "Range and range are equal");
 
-        assertFalse("Not equal to null", deserEq.eq(a, null));
-        assertFalse("Not equal to null", deserEq.eq(null, a));
+        assertFalse(deserEq.eq(a, null), "Not equal to null");
+        assertFalse(deserEq.eq(null, a), "Not equal to null");
 
-        assertFalse("Not equal to different Range", deserEq.eq(a, RangeOfInt.of(-3, 4)));
-        assertFalse("Not equal to different Range", deserEq.eq(b, RangeOfInt.of(-2, 4)));
-        assertFalse("Not equal to different Range", deserEq.eq(RangeOfInt.of(-3, 4), b));
-        assertFalse("Not equal to different Range", deserEq.eq(RangeOfInt.of(-3, 5), a));
+        assertFalse(deserEq.eq(a, RangeOfInt.of(-3, 4)), "Not equal to different Range");
+        assertFalse(deserEq.eq(b, RangeOfInt.of(-2, 4)), "Not equal to different Range");
+        assertFalse(deserEq.eq(RangeOfInt.of(-3, 4), b), "Not equal to different Range");
+        assertFalse(deserEq.eq(RangeOfInt.of(-3, 5), a), "Not equal to different Range");
 
         RangeOfInt ir1 = serializeDeserialize(RangeOfInt.of(0, 1));
         assertEquals(ir1.contains(0), true);

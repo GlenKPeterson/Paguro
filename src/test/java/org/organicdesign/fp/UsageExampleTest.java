@@ -14,7 +14,7 @@
 
 package org.organicdesign.fp;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.ImMap;
 import org.organicdesign.fp.collections.UnmodIterable;
@@ -22,7 +22,7 @@ import org.organicdesign.fp.function.Fn1;
 import org.organicdesign.fp.tuple.Tuple2;
 import org.organicdesign.fp.tuple.Tuple3;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.organicdesign.fp.StaticImports.tup;
 import static org.organicdesign.fp.StaticImports.vec;
 import static org.organicdesign.fp.UsageExampleTest.EmailType.HOME;
@@ -35,7 +35,8 @@ public class UsageExampleTest {
     // of Java's type inferencing.  This is still type-checked by the compiler, but without
     // specifying ANY types explicitly
     // Part 1 of 3
-    @Test public void dataDefinitionPart1() {
+    @Test
+    public void dataDefinitionPart1() {
         // In this example, we're going to define some people with email addresses, then look up
         // Jane by her email address. The first line is a JUnit test to verify that "Jane" is the
         // name of the person we find with the subsequent code.
@@ -92,17 +93,17 @@ public class UsageExampleTest {
                     tup("Fred", "Tase", vec(tup(HOME, "c@d.e"))));
 
         // Everything has build-in toString() methods.  Collections show the first 3-5 elements.
-        assertEquals("PersistentVector(" +
-                     "Tuple3(\"Jane\",\"Smith\",PersistentVector(Tuple2(HOME,\"a@b.c\")," +
-                     "Tuple2(WORK,\"b@c.d\")))," +
-                     "Tuple3(\"Fred\",\"Tase\",PersistentVector(Tuple2(HOME,\"c@d.e\"))))",
+        assertEquals("vec(" +
+                     "Tuple3(\"Jane\", \"Smith\", vec(Tuple2(HOME, \"a@b.c\"), " +
+                     "Tuple2(WORK, \"b@c.d\"))), " +
+                     "Tuple3(\"Fred\", \"Tase\", vec(Tuple2(HOME, \"c@d.e\"))))",
                      people.toString());
 
         // Inspect Jane's record:
         Tuple3<String,String,ImList<Tuple2<EmailType,String>>> jane = people.get(0);
 
-        assertEquals("Tuple3(\"Jane\",\"Smith\",PersistentVector(Tuple2(HOME,\"a@b.c\")," +
-                     "Tuple2(WORK,\"b@c.d\")))",
+        assertEquals("Tuple3(\"Jane\", \"Smith\", vec(Tuple2(HOME, \"a@b.c\"), " +
+                     "Tuple2(WORK, \"b@c.d\")))",
                      jane.toString());
 
         // Make a map to look up people by their email address.
@@ -125,15 +126,15 @@ public class UsageExampleTest {
                       .toImMap(x -> x);
 
         // Look at the map we just created
-        assertEquals("PersistentHashMap(" +
-                     "Tuple2(\"a@b.c\"," +
-                     "Tuple3(\"Jane\",\"Smith\",PersistentVector(Tuple2(HOME,\"a@b.c\")," +
-                     "Tuple2(WORK,\"b@c.d\"))))," +
-                     "Tuple2(\"b@c.d\"," +
-                     "Tuple3(\"Jane\",\"Smith\",PersistentVector(Tuple2(HOME,\"a@b.c\")," +
-                     "Tuple2(WORK,\"b@c.d\"))))," +
-                     "Tuple2(\"c@d.e\"," +
-                     "Tuple3(\"Fred\",\"Tase\",PersistentVector(Tuple2(HOME,\"c@d.e\")))))",
+        assertEquals("map(" +
+                     "Tuple2(\"a@b.c\", " +
+                     "Tuple3(\"Jane\", \"Smith\", vec(Tuple2(HOME, \"a@b.c\"), " +
+                     "Tuple2(WORK, \"b@c.d\")))), " +
+                     "Tuple2(\"b@c.d\", " +
+                     "Tuple3(\"Jane\", \"Smith\", vec(Tuple2(HOME, \"a@b.c\"), " +
+                     "Tuple2(WORK, \"b@c.d\")))), " +
+                     "Tuple2(\"c@d.e\", " +
+                     "Tuple3(\"Fred\", \"Tase\", vec(Tuple2(HOME, \"c@d.e\")))))",
                      peopleByEmail.toString());
 
         // Prove that we can now look up Jane by her address
@@ -183,18 +184,15 @@ public class UsageExampleTest {
 
         // Notice that the tuples are smart enough to take their new names, Person and Email instead
         // of Tuple3 and Tuple2.  This aids readability when debugging.
-        assertEquals("PersistentVector(" +
-                     "Person(\"Jane\",\"Smith\"," +
-                     "PersistentVector(Email(HOME,\"a@b.c\"),Email(WORK,\"b@c.d\")))," +
-                     "Person(\"Fred\",\"Tase\"," +
-                     "PersistentVector(Email(HOME,\"c@d.e\"),Email(WORK,\"d@e.f\"))))",
+        assertEquals("vec(Person(\"Jane\", \"Smith\", vec(Email(HOME, \"a@b.c\"), Email(WORK, \"b@c.d\"))), " +
+                     "Person(\"Fred\", \"Tase\", vec(Email(HOME, \"c@d.e\"), Email(WORK, \"d@e.f\"))))",
                      people.toString());
 
         // This type signature couldn't be simpler (or more descriptive):
         Person jane = people.get(0);
 
-        assertEquals("Person(\"Jane\",\"Smith\"," +
-                     "PersistentVector(Email(HOME,\"a@b.c\"),Email(WORK,\"b@c.d\")))",
+        assertEquals("Person(\"Jane\", \"Smith\", " +
+                     "vec(Email(HOME, \"a@b.c\"), Email(WORK, \"b@c.d\")))",
                      jane.toString());
 
         // Let's use our new, descriptive field getter methods:
@@ -211,15 +209,15 @@ public class UsageExampleTest {
                                                .map(mail -> tup(mail.address(), person)))
                       .toImMap(Fn1.identity());
 
-        assertEquals("PersistentHashMap(" +
-                     "Tuple2(\"d@e.f\",Person(\"Fred\",\"Tase\",PersistentVector(Email(HOME,\"c@d.e\")," +
-                     "Email(WORK,\"d@e.f\"))))," +
-                     "Tuple2(\"a@b.c\",Person(\"Jane\",\"Smith\",PersistentVector(Email(HOME,\"a@b.c\")," +
-                     "Email(WORK,\"b@c.d\"))))," +
-                     "Tuple2(\"b@c.d\",Person(\"Jane\",\"Smith\",PersistentVector(Email(HOME,\"a@b.c\")," +
-                     "Email(WORK,\"b@c.d\"))))," +
-                     "Tuple2(\"c@d.e\",Person(\"Fred\",\"Tase\",PersistentVector(Email(HOME,\"c@d.e\")," +
-                     "Email(WORK,\"d@e.f\")))))",
+        assertEquals("map(" +
+                     "Tuple2(\"d@e.f\", Person(\"Fred\", \"Tase\", vec(Email(HOME, \"c@d.e\"), " +
+                     "Email(WORK, \"d@e.f\")))), " +
+                     "Tuple2(\"a@b.c\", Person(\"Jane\", \"Smith\", vec(Email(HOME, \"a@b.c\"), " +
+                     "Email(WORK, \"b@c.d\")))), " +
+                     "Tuple2(\"b@c.d\", Person(\"Jane\", \"Smith\", vec(Email(HOME, \"a@b.c\"), " +
+                     "Email(WORK, \"b@c.d\")))), " +
+                     "Tuple2(\"c@d.e\", Person(\"Fred\", \"Tase\", vec(Email(HOME, \"c@d.e\"), " +
+                     "Email(WORK, \"d@e.f\")))))",
                      peopleByEmail.toString());
 
         // Now look Jane up by her address.

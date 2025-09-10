@@ -14,25 +14,24 @@
 
 package org.organicdesign.fp.collections;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.*;
-
 import org.junit.jupiter.api.Test;
 import org.organicdesign.fp.FunctionUtilsTest;
 import org.organicdesign.fp.function.Fn1;
 import org.organicdesign.fp.oneOf.Option;
 import org.organicdesign.fp.tuple.Tuple2;
 
-import static java.util.Map.entry;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.*;
+
+import static com.planbase.indented.StringUtils.ordinal;
+import static com.planbase.testutils.EqualsContract.equalsDistinctHashCode;
+import static com.planbase.testutils.EqualsContract.equalsSameHashCode;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.organicdesign.fp.FunctionUtils.ordinal;
 import static org.organicdesign.fp.StaticImports.*;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 import static org.organicdesign.fp.collections.PersistentHashMapTest.CompCtxt.BY_DATE;
 import static org.organicdesign.fp.collections.PersistentHashMapTest.CompCtxt.BY_INT;
-import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
-import static org.organicdesign.testUtils.EqualsContract.equalsSameHashCode;
 
 public class PersistentHashMapTest {
     public static <K,V> void mapIterTest(Map<K,V> c, Iterator<? extends Map.Entry<K,V>> test) {
@@ -74,14 +73,14 @@ public class PersistentHashMapTest {
 
     @Test
     public void testIteratorExceptions() {
-        assertThrows(NoSuchElementException.class,
+        assertThrowsExactly(NoSuchElementException.class,
                      () -> PersistentHashMap.empty().iterator().next());
 
         PersistentHashMap<String,Integer> m = PersistentHashMap.empty();
         m = m.assoc(null, 1);
         Iterator<UnmodMap.UnEntry<String,Integer>> iter = m.iterator();
         iter.next();
-        assertThrows(NoSuchElementException.class,
+        assertThrowsExactly(NoSuchElementException.class,
                      () -> iter.next());
     }
 
@@ -91,7 +90,7 @@ public class PersistentHashMapTest {
         m = m.assoc("one", 1);
         Iterator<UnmodMap.UnEntry<String,Integer>> iter = m.iterator();
         iter.next();
-        assertThrows(NoSuchElementException.class,
+        assertThrowsExactly(NoSuchElementException.class,
                      () -> iter.next());
     }
 
@@ -102,7 +101,7 @@ public class PersistentHashMapTest {
         Iterator<UnmodMap.UnEntry<String,Integer>> iter = m.iterator();
         iter.next();
         iter.next();
-        assertThrows(NoSuchElementException.class,
+        assertThrowsExactly(NoSuchElementException.class,
                      () -> iter.next());
     }
 
@@ -114,7 +113,7 @@ public class PersistentHashMapTest {
         iter.next();
         iter.next();
         iter.next();
-        assertThrows(NoSuchElementException.class,
+        assertThrowsExactly(NoSuchElementException.class,
                      () -> iter.next());
     }
 
@@ -153,7 +152,7 @@ public class PersistentHashMapTest {
 
     @Test
     public void keyIterEx0() {
-        assertThrows(NoSuchElementException.class,
+        assertThrowsExactly(NoSuchElementException.class,
                      () -> PersistentHashMap.empty().keyIterator().next());
     }
 
@@ -163,7 +162,7 @@ public class PersistentHashMapTest {
         m = m.assoc(null, 1);
         UnmodIterator<String> iter = m.keyIterator();
         iter.next();
-        assertThrows(NoSuchElementException.class,
+        assertThrowsExactly(NoSuchElementException.class,
                      () -> iter.next());
     }
 
@@ -173,7 +172,7 @@ public class PersistentHashMapTest {
         m = m.assoc("one", 1);
         UnmodIterator<String> iter = m.keyIterator();
         iter.next();
-        assertThrows(NoSuchElementException.class,
+        assertThrowsExactly(NoSuchElementException.class,
                      () -> iter.next());
     }
 
@@ -184,7 +183,7 @@ public class PersistentHashMapTest {
         UnmodIterator<String> iter = m.keyIterator();
         iter.next();
         iter.next();
-        assertThrows(NoSuchElementException.class,
+        assertThrowsExactly(NoSuchElementException.class,
                      () -> iter.next());
     }
 
@@ -196,7 +195,7 @@ public class PersistentHashMapTest {
         iter.next();
         iter.next();
         iter.next();
-        assertThrows(NoSuchElementException.class,
+        assertThrowsExactly(NoSuchElementException.class,
                      () -> iter.next());
     }
 
@@ -236,7 +235,7 @@ public class PersistentHashMapTest {
 
     @Test
     public void valIterEx0() {
-        assertThrows(NoSuchElementException.class,
+        assertThrowsExactly(NoSuchElementException.class,
                      () -> PersistentHashMap.empty().valIterator().next());
     }
 
@@ -246,7 +245,7 @@ public class PersistentHashMapTest {
         m = m.assoc(null, 1);
         UnmodIterator<Integer> iter = m.valIterator();
         iter.next();
-        assertThrows(NoSuchElementException.class,
+        assertThrowsExactly(NoSuchElementException.class,
                      () -> iter.next());
     }
 
@@ -256,7 +255,7 @@ public class PersistentHashMapTest {
         m = m.assoc("one", 1);
         UnmodIterator<Integer> iter = m.valIterator();
         iter.next();
-        assertThrows(NoSuchElementException.class,
+        assertThrowsExactly(NoSuchElementException.class,
                      () -> iter.next());
     }
 
@@ -267,7 +266,7 @@ public class PersistentHashMapTest {
         UnmodIterator<Integer> iter = m.valIterator();
         iter.next();
         iter.next();
-        assertThrows(NoSuchElementException.class,
+        assertThrowsExactly(NoSuchElementException.class,
                      () -> iter.next());
     }
 
@@ -279,7 +278,7 @@ public class PersistentHashMapTest {
         iter.next();
         iter.next();
         iter.next();
-        assertThrows(NoSuchElementException.class,
+        assertThrowsExactly(NoSuchElementException.class,
                      () -> iter.next());
     }
 
@@ -566,7 +565,7 @@ public class PersistentHashMapTest {
         PersistentHashMap<String,Integer> m = PersistentHashMap.empty();
         PersistentHashMap.MutHashMap<String,Integer> t = m.mutable();
         t.immutable();
-        assertThrows(IllegalStateException.class,
+        assertThrowsExactly(IllegalStateException.class,
                      () -> t.size());
     }
 
@@ -1048,11 +1047,11 @@ public class PersistentHashMapTest {
     }
 
     @Test public void testToString() {
-        assertEquals("PersistentHashMap()",
+        assertEquals("map()",
                      PersistentHashMap.empty().toString());
-        assertEquals("PersistentHashMap(Tuple2(1,\"one\"))",
+        assertEquals("map(Tuple2(1, \"one\"))",
                      PersistentHashMap.of(vec(tup(1, "one"))).toString());
-        assertEquals("PersistentHashMap(Tuple2(1,\"one\"),Tuple2(2,\"two\"))",
+        assertEquals("map(Tuple2(1, \"one\"), Tuple2(2, \"two\"))",
                      PersistentHashMap.of(vec(tup(1,"one"),tup(2,"two"))).toString());
     }
 

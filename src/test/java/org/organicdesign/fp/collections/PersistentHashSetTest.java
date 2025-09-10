@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.organicdesign.fp.StaticImports.vec;
 import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 import static org.organicdesign.fp.collections.PersistentHashSetTest.Ctx.mod3Eq;
-import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
+import static com.planbase.testutils.EqualsContract.equalsDistinctHashCode;
 
 public class PersistentHashSetTest {
 

@@ -1,16 +1,11 @@
 package org.organicdesign.fp.collections;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ImSortedSetTest {
     static class TestSortSet<T> implements ImSortedSet<T> {
@@ -78,7 +73,8 @@ public class ImSortedSetTest {
 
     ImSortedSet<String> imSortSet = new TestSortSet<>(Arrays.asList(vals), null);
 
-    @Test public void basics() {
+    @Test
+    public void basics() {
         assertEquals(0, imSortSet.headSet("apple").size());
         assertEquals(1, imSortSet.headSet("cat").size());
         assertTrue(imSortSet.headSet("cat").contains("apple"));

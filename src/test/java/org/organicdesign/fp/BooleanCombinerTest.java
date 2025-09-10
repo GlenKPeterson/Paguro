@@ -13,20 +13,17 @@
 
 package org.organicdesign.fp;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.jupiter.api.Test;
 import org.organicdesign.fp.function.Fn1;
 
-import static junit.framework.TestCase.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.organicdesign.fp.StaticImports.vec;
-import static org.organicdesign.fp.function.Fn1.ConstObjBool.*;
+import static org.organicdesign.fp.function.Fn1.ConstObjBool.ACCEPT;
+import static org.organicdesign.fp.function.Fn1.ConstObjBool.REJECT;
 
-@RunWith(JUnit4.class)
 public class BooleanCombinerTest {
 
     @Test
-    @SuppressWarnings("unchecked")
     public void combineAnd() {
 //        assertTrue(Fn1.BooleanCombiner.AND.combineArray() == ACCEPT);
         assertTrue(Fn1.BooleanCombiner.AND.combine(null) == ACCEPT);
@@ -39,7 +36,6 @@ public class BooleanCombinerTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void combineOr() {
 //        assertTrue(Fn1.BooleanCombiner.OR.combineArray() == REJECT);
         assertTrue(Fn1.BooleanCombiner.OR.combine(null) == REJECT);

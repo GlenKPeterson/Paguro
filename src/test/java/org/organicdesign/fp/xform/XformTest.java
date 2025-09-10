@@ -14,31 +14,22 @@
 
 package org.organicdesign.fp.xform;
 
-import junit.framework.TestCase;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import org.organicdesign.fp.collections.RangeOfInt;
+import org.junit.jupiter.api.Test;
 import org.organicdesign.fp.oneOf.Option;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.organicdesign.fp.collections.UnmodIterator.emptyUnmodIterator;
+import static com.planbase.testutils.EqualsContract.equalsDistinctHashCode;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.organicdesign.fp.StaticImports.vec;
 import static org.organicdesign.fp.StaticImports.xform;
+import static org.organicdesign.fp.collections.UnmodIterator.emptyUnmodIterator;
 import static org.organicdesign.fp.function.Fn1.accept;
 import static org.organicdesign.fp.function.Fn1.reject;
-import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
 
-@RunWith(JUnit4.class)
-public class XformTest extends TestCase {
+public class XformTest {
 
     public static void basics(Xform<Integer> td) {
         assertEquals(Arrays.asList(1, 2, 3),
@@ -483,13 +474,13 @@ public class XformTest extends TestCase {
                                .drop(3).drop(2).drop(1).drop(0).toMutList().toArray());
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void exception1() {
-        Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).drop(-1);
-    }
-    @Test(expected = IllegalArgumentException.class)
-    public void exception2() {
-        Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).drop(-99);
+    @Test
+    public void exception() {
+        assertThrowsExactly(IllegalArgumentException.class, () ->
+                Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).drop(-1));
+
+        assertThrowsExactly(IllegalArgumentException.class, () ->
+                Xform.of(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)).drop(-99));
     }
 
 //    @Test(expected = IllegalArgumentException.class)

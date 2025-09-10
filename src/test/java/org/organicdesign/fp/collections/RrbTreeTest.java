@@ -30,7 +30,7 @@ import static org.organicdesign.fp.TestUtilities.serializeDeserialize;
 import static org.organicdesign.fp.collections.RrbTree.STRICT_NODE_LENGTH;
 import static org.organicdesign.fp.oneOf.Option.none;
 import static org.organicdesign.fp.oneOf.Option.some;
-import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
+import static com.planbase.testutils.EqualsContract.equalsDistinctHashCode;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class RrbTreeTest {
@@ -449,50 +449,57 @@ public class RrbTreeTest {
 
     @Test
     public void testExceptions() {
-        assertThrows(IndexOutOfBoundsException.class,
+        @NotNull Exception ex;
+        assertThrowsExactly(IndexOutOfBoundsException.class,
                      () -> RrbTree.empty().get(Integer.MIN_VALUE));
-        assertThrows(IndexOutOfBoundsException.class,
+        assertThrowsExactly(IndexOutOfBoundsException.class,
                      () -> RrbTree.emptyMutable().get(-1));
-        assertThrows(IndexOutOfBoundsException.class,
+
+        ex = assertThrowsExactly(ArrayIndexOutOfBoundsException.class,
                      () -> RrbTree.empty().get(0));
-        assertThrows(IndexOutOfBoundsException.class,
+        assertEquals("Index 0 out of bounds for length 0", ex.getMessage());
+
+        assertThrowsExactly(IndexOutOfBoundsException.class,
                      () -> RrbTree.emptyMutable().get(1));
-        assertThrows(IndexOutOfBoundsException.class,
+        assertThrowsExactly(IndexOutOfBoundsException.class,
                      () -> RrbTree.empty().get(Integer.MAX_VALUE - 1));
-        assertThrows(IndexOutOfBoundsException.class,
+        assertThrowsExactly(IndexOutOfBoundsException.class,
                      () -> RrbTree.empty().get(Integer.MAX_VALUE));
 
-        assertThrows(IndexOutOfBoundsException.class,
+        assertThrowsExactly(IndexOutOfBoundsException.class,
                      () -> RrbTree.emptyMutable().replace(Integer.MIN_VALUE, null));
-        assertThrows(IndexOutOfBoundsException.class,
+        assertThrowsExactly(IndexOutOfBoundsException.class,
                      () -> RrbTree.empty().replace(-1, null));
-        assertThrows(IndexOutOfBoundsException.class,
+
+        ex = assertThrowsExactly(ArrayIndexOutOfBoundsException.class,
                      () -> RrbTree.emptyMutable().replace(0, null));
-        assertThrows(IndexOutOfBoundsException.class,
+        assertEquals("Index 0 out of bounds for length 0", ex.getMessage());
+
+        assertThrowsExactly(IndexOutOfBoundsException.class,
                      () -> RrbTree.empty().replace(1, null));
-        assertThrows(IndexOutOfBoundsException.class,
+        assertThrowsExactly(IndexOutOfBoundsException.class,
                      () -> RrbTree.emptyMutable().replace(Integer.MAX_VALUE, null));
 
-        assertThrows(IndexOutOfBoundsException.class,
+        assertThrowsExactly(IndexOutOfBoundsException.class,
                      () -> RrbTree.empty().split(Integer.MIN_VALUE));
-        assertThrows(IndexOutOfBoundsException.class,
+        assertThrowsExactly(IndexOutOfBoundsException.class,
                      () -> RrbTree.emptyMutable().split(-1));
 //    @Test(expected = IndexOutOfBoundsException.class)
 //    public void emptyEx22() { RrbTree.empty().split(0); }
-        assertThrows(IndexOutOfBoundsException.class,
+        assertThrowsExactly(IndexOutOfBoundsException.class,
                      () -> RrbTree.emptyMutable().split(1));
-        assertThrows(IndexOutOfBoundsException.class,
+        assertThrowsExactly(IndexOutOfBoundsException.class,
                      () -> RrbTree.empty().split(Integer.MAX_VALUE));
 
-        assertThrows(IndexOutOfBoundsException.class,
+        assertThrowsExactly(IndexOutOfBoundsException.class,
                      () -> RrbTree.emptyMutable().without(Integer.MIN_VALUE));
-        assertThrows(IndexOutOfBoundsException.class,
+        assertThrowsExactly(IndexOutOfBoundsException.class,
                      () -> RrbTree.empty().without(-1));
-        assertThrows(IndexOutOfBoundsException.class,
+        assertThrowsExactly(IndexOutOfBoundsException.class,
                      () -> RrbTree.emptyMutable().without(0));
-        assertThrows(IndexOutOfBoundsException.class,
+        assertThrowsExactly(IndexOutOfBoundsException.class,
                      () -> RrbTree.empty().without(1));
-        assertThrows(IndexOutOfBoundsException.class,
+        assertThrowsExactly(IndexOutOfBoundsException.class,
                      () -> RrbTree.emptyMutable().without(Integer.MAX_VALUE));
     }
 
@@ -519,8 +526,10 @@ public class RrbTreeTest {
     @Test
     public void putEx() {
         // TODO: Think about what exception to expect.
-        assertThrows(Exception.class,
-                     () -> RrbTree.empty().replace(1, "Hello"));
+        @NotNull Exception ex;
+        ex = assertThrowsExactly(IndexOutOfBoundsException.class,
+                () -> RrbTree.empty().replace(1, "Hello"));
+        assertEquals("Index: 1 size: 0", ex.getMessage());
     }
 
     private static boolean isPrime(int num) {

@@ -16,7 +16,6 @@ package org.organicdesign.fp.xform;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.organicdesign.fp.StaticImports;
 import org.organicdesign.fp.collections.UnmodIterable;
 import org.organicdesign.fp.collections.UnmodIterator;
 import org.organicdesign.fp.function.Fn1;
