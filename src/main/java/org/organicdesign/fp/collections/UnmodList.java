@@ -280,7 +280,12 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
 
             @Override public int size() { return size; }
 
-            @Override public E get(int index) { return parent.get(index + fromIndex); }
+            @Override public E get(int index) {
+                if (index < 0 || index >= size) {
+                    throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+                }
+                return parent.get(index + fromIndex);
+            }
         };
     }
 
