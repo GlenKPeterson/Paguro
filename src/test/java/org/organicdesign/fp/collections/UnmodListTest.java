@@ -223,4 +223,27 @@ public class UnmodListTest {
     @SuppressWarnings("deprecation")
     @Test (expected = UnsupportedOperationException.class)
     public void unsupportedOpSort() { unList.sort(String.CASE_INSENSITIVE_ORDER); }
+
+    @Test public void subListGetChecksItsOwnBounds() {
+        UnmodList<String> slice = unList.subList(2, 5);
+        assertEquals("stones", slice.get(0));
+        assertEquals("break", slice.get(2));
+        assertThrows(IndexOutOfBoundsException.class, () -> slice.get(-1));
+        assertThrows(IndexOutOfBoundsException.class, () -> slice.get(3));
+    }
+
+    @Test public void emptySubListHasNoAccessibleElements() {
+        UnmodList<String> empty = unList.subList(2, 2);
+        assertThrows(IndexOutOfBoundsException.class, () -> empty.get(0));
+        assertThrows(IndexOutOfBoundsException.class, () -> empty.get(-1));
+    }
+
+    @Test public void nestedSubListGetChecksItsOwnBounds() {
+        UnmodList<String> slice = unList.subList(1, 6).subList(1, 3);
+        assertEquals("stones", slice.get(0));
+        assertEquals("will", slice.get(1));
+        assertThrows(IndexOutOfBoundsException.class, () -> slice.get(-1));
+        assertThrows(IndexOutOfBoundsException.class, () -> slice.get(2));
+    }
+
 }
